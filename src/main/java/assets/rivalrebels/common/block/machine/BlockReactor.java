@@ -18,11 +18,14 @@ import java.util.Random;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IIcon;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
@@ -105,47 +108,34 @@ public class BlockReactor extends BlockContainer
 		return new TileEntityReactor();
 	}
 
-	/**
-	 * Called upon block activation (right click on the block.)
-	 */
-	@Override
-	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
-	{
-		if (!par1World.isRemote)
-		{
-			FMLNetworkHandler.openGui(par5EntityPlayer, RivalRebels.instance, 0, par1World, par2, par3, par4);
-			// par5EntityPlayer.openGui(RivalRebels.instance, RivalRebels.tokamakID, par1World, par2, par3, par4);
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (!world.isRemote) {
+            // tokamak gui
+			FMLNetworkHandler.openGui(player, RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
 		}
-		RivalRebelsSoundPlayer.playSound(par1World, 10, 3, par2, par3, par4);
+		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos.getX(), pos.getY(), pos.getZ());
 
 		return true;
 	}
 
-	@Override
-	public void breakBlock(World world, int x, int y, int z, Block id, int meta)
-	{
-		TileEntity te = world.getTileEntity(x, y, z);
-		if (te != null && te instanceof TileEntityReactor)
-		{
-			TileEntityReactor ter = (TileEntityReactor) te;
-			ter.on = false;
-			List<?> list = world.loadedTileEntityList;
-			Iterator<?> iter = list.iterator();
-			while (iter.hasNext())
-			{
-				te = (TileEntity) iter.next();
-				if (te != null && te instanceof TileEntityMachineBase)
-				{
-					TileEntityMachineBase temb = (TileEntityMachineBase) te;
-					if (temb.x == x && temb.y == y && temb.z == z)
-					{
-						temb.x = temb.y = temb.z = 0;
-						temb.edist = 0;
-					}
-				}
-			}
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+		TileEntity te = world.getTileEntity(pos);
+		if (te instanceof TileEntityReactor ter) {
+            ter.on = false;
+            for (TileEntity tileEntity : world.loadedTileEntityList) {
+                te = tileEntity;
+                if (te instanceof TileEntityMachineBase temb) {
+                    if (pos.equals(temb.rpos)) {
+                        temb.rpos = BlockPos.ORIGIN;
+                        temb.edist = 0;
+                    }
+                }
+            }
 		}
-		super.breakBlock(world, x, y, z, id, meta);
+
+		super.breakBlock(world, pos, state);
 	}
 
 	@SideOnly(Side.CLIENT)

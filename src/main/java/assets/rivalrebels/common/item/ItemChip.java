@@ -19,6 +19,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -33,43 +35,41 @@ public class ItemChip extends Item
 	}
 
 	@Override
-	public void onUpdate(ItemStack item, World world, Entity entity, int count, boolean flag)
-	{
-		if (item.getTagCompound() == null) item.stackTagCompound = new NBTTagCompound();
+	public void onUpdate(ItemStack item, World world, Entity entity, int count, boolean flag) {
+		if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
 		if (RivalRebels.round.isStarted() && !item.getTagCompound().getBoolean("isReady") && entity instanceof EntityPlayer player)
 		{
-            item.getTagCompound().setString("username", player.getCommandSenderName());
-			item.getTagCompound().setInteger("team", RivalRebels.round.rrplayerlist.getForName(player.getCommandSenderName()).rrteam.ordinal());
+            item.getTagCompound().setString("username", player.getName());
+			item.getTagCompound().setInteger("team", RivalRebels.round.rrplayerlist.getForName(player.getName()).rrteam.ordinal());
 			item.getTagCompound().setBoolean("isReady", true);
 		}
 	}
 
-	@Override
-	public boolean onItemUseFirst(ItemStack item, EntityPlayer player, World world, int x, int y, int z, int m, float hitX, float hitZ, float hitY)
-	{
+    @Override
+    public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ) {
 		player.swingItem();
 		if (!world.isRemote)
 		{
-			if (world.getBlock(x, y, z) == RivalRebels.buildrhodes)
+			if (world.getBlockState(pos).getBlock() == RivalRebels.buildrhodes)
 			{
-				world.setBlock(x-1, y, z, RivalRebels.steel);
-				world.setBlock(x+1, y, z, RivalRebels.steel);
-				world.setBlock(x, y+1, z, RivalRebels.conduit);
-				world.setBlock(x-1, y+1, z, RivalRebels.steel);
-				world.setBlock(x+1, y+1, z, RivalRebels.steel);
-				world.setBlock(x, y+2, z, RivalRebels.steel);
-				world.setBlock(x-1, y+2, z, RivalRebels.steel);
-				world.setBlock(x+1, y+2, z, RivalRebels.steel);
-				if (world.getBlock(x, y-1, z) == RivalRebels.buildrhodes)
+				world.setBlockState(pos.west(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.east(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.up(), RivalRebels.conduit.getDefaultState());
+				world.setBlockState(pos.up().west(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.up().east(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.up(2), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.up(2).west(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.up(2).east(), RivalRebels.steel.getDefaultState());
+				if (world.getBlockState(pos.down()).getBlock() == RivalRebels.buildrhodes)
 				{
-					world.setBlock(x, y, z, RivalRebels.conduit);
-					world.setBlock(x, y-1, z, RivalRebels.rhodesactivator);
-					world.setBlock(x-1, y-1, z, RivalRebels.steel);
-					world.setBlock(x+1, y-1, z, RivalRebels.steel);
+					world.setBlockState(pos, RivalRebels.conduit.getDefaultState());
+					world.setBlockState(pos.down(), RivalRebels.rhodesactivator.getDefaultState());
+					world.setBlockState(pos.down().west(), RivalRebels.steel.getDefaultState());
+					world.setBlockState(pos.down().east(), RivalRebels.steel.getDefaultState());
 				}
 				else
 				{
-					world.setBlock(x, y, z, RivalRebels.rhodesactivator);
+					world.setBlockState(pos, RivalRebels.rhodesactivator.getDefaultState());
 				}
 				return true;
 			}
@@ -80,10 +80,10 @@ public class ItemChip extends Item
 	@Override
 	public void addInformation(ItemStack item, EntityPlayer player, List<String> list, boolean par4)
 	{
-		if (item.stackTagCompound != null)
+		if (item.hasTagCompound())
 		{
-			list.add(RivalRebelsTeam.getForID(item.stackTagCompound.getInteger("team")).name());
-			list.add(item.stackTagCompound.getString("username"));
+			list.add(RivalRebelsTeam.getForID(item.getTagCompound().getInteger("team")).name());
+			list.add(item.getTagCompound().getString("username"));
 		}
 	}
 

@@ -20,10 +20,9 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class PacketDispatcher
 {
-	public static final SimpleNetworkWrapper	packetsys	= NetworkRegistry.INSTANCE.newSimpleChannel(RivalRebels.MODID);
+	public static final SimpleNetworkWrapper packetsys = NetworkRegistry.INSTANCE.newSimpleChannel(RivalRebels.MODID);
 
-	public static final void registerPackets()
-	{
+	public static void registerPackets() {
 		int packetCount = 0;
 		packetsys.registerMessage(EntityGorePacket.Handler.class,		EntityGorePacket.class,			packetCount++, Side.CLIENT);
 		packetsys.registerMessage(EntityDebrisPacket.Handler.class,		EntityDebrisPacket.class,		packetCount++, Side.CLIENT);

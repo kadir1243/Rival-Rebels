@@ -58,10 +58,10 @@ public class BlockForceFieldNode extends BlockContainer
 			ItemStack is = player.inventory.getCurrentItem();
 			if (is != null && is.getItem() instanceof ItemChip && (teffn.username == null || teffn.username.equals("")) && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
 			{
-				teffn.rrteam = RivalRebels.round.rrplayerlist.getForName(player.getCommandSenderName()).rrteam;
+				teffn.rrteam = RivalRebels.round.rrplayerlist.getForName(player.getName()).rrteam;
 				if (teffn.rrteam == RivalRebelsTeam.NONE || teffn.rrteam == null)
 				{
-					teffn.username = player.getCommandSenderName();
+					teffn.username = player.getName();
 					teffn.rrteam = null;
 				}
 				RivalRebelsSoundPlayer.playSound(world, 10, 5, x, y, z);

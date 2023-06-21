@@ -33,7 +33,7 @@ public class ItemExPill extends Item
 		maxStackSize = 6;
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	@Override
 	public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
 	{
@@ -48,7 +48,7 @@ public class ItemExPill extends Item
 				player.addChatMessage(new ChatComponentText("§7[§6Status§7]§e The experiment turned out a success."));
 				world.playSoundAtEntity(player, "mob.magmacube.jump", 1.0F, 1.0F);
 				world.playSoundAtEntity(player, "mob.ghast.scream", 1.0F, 1.0F);
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.blindness.id, 30, 20));
+				player.addPotionEffect(new PotionEffect(Potion.blindness.id, 30, 20));
 				player.getFoodStats().addStats(20, 200);
 				player.heal(20);
 			}
@@ -57,16 +57,16 @@ public class ItemExPill extends Item
 				player.addChatMessage(new ChatComponentText("§7[§6Status§7]§e Begrüßen Sie den Uber-Soldat."));
 				world.playSoundAtEntity(player, "mob.magmacube.jump", 1.0F, 1.0F);
 				world.playSoundAtEntity(player, "mob.ghast.scream", 1.0F, 1.0F);
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.blindness.id, 30, 20));
+				player.addPotionEffect(new PotionEffect(Potion.blindness.id, 30, 20));
 				player.getFoodStats().addStats(20, 200);
 				player.heal(20);
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.resistance.id, 450, 20));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.damageBoost.id, 500, 20));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.jump.id, 300, 2));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.digSpeed.id, 500, 02));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 550, 2));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.waterBreathing.id, 800, 20));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.fireResistance.id, 800, 20));
+				player.addPotionEffect(new PotionEffect(Potion.resistance.id, 450, 20));
+				player.addPotionEffect(new PotionEffect(Potion.damageBoost.id, 500, 20));
+				player.addPotionEffect(new PotionEffect(Potion.jump.id, 300, 2));
+				player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 500, 02));
+				player.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 550, 2));
+				player.addPotionEffect(new PotionEffect(Potion.waterBreathing.id, 800, 20));
+				player.addPotionEffect(new PotionEffect(Potion.fireResistance.id, 800, 20));
 			}
 			else if (rand >= 20)
 			{
@@ -80,23 +80,23 @@ public class ItemExPill extends Item
 				player.addChatMessage(new ChatComponentText("§7[§6Status§7]§e Unexpected results have occurred."));
 				world.playSoundAtEntity(player, "mob.magmacube.jump", 1.0F, 1.0F);
 				world.playSoundAtEntity(player, "mob.ghast.scream", 1.0F, 1.0F);
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.confusion.id, 1500, 20));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.blindness.id, 1500, 20));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 1500, 20));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 1500, 20));
-				((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.weakness.id, 1500, 20));
+				player.addPotionEffect(new PotionEffect(Potion.confusion.id, 1500, 20));
+				player.addPotionEffect(new PotionEffect(Potion.blindness.id, 1500, 20));
+				player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 1500, 20));
+				player.addPotionEffect(new PotionEffect(Potion.digSlowdown.id, 1500, 20));
+				player.addPotionEffect(new PotionEffect(Potion.weakness.id, 1500, 20));
 			}
 			player.inventory.consumeInventoryItem(item.getItem());
 		}
 		return item;
 	}
-	
+
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.eat;
+		return EnumAction.EAT;
 	}
-	
+
 	/**
 	 * How long it takes to use or consume an item
 	 */
@@ -105,7 +105,7 @@ public class ItemExPill extends Item
 	{
 		return 32;
 	}
-	
+
 	@Override
 	public void registerIcons(IIconRegister iconregister)
 	{

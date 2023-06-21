@@ -11,23 +11,23 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.util.List;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.entity.EntityRhodes;
+import net.minecraft.entity.Entity;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.MathHelper;
+import net.minecraft.util.Vec3;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityMeltDown extends TileEntity
+import java.util.List;
+
+public class TileEntityMeltDown extends TileEntity implements ITickable
 {
 	public float	size		= 0;
 	float			increment	= 0.075f;
@@ -37,34 +37,34 @@ public class TileEntityMeltDown extends TileEntity
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
 	@Override
-	public void updateEntity()
+	public void update()
 	{
 		prevsize = size;
 		size += increment;
 		if (prevsize == 0)
 		{
-			RivalRebelsSoundPlayer.playSound(worldObj, 16, 0, xCoord, yCoord, zCoord, 4);
+			RivalRebelsSoundPlayer.playSound(worldObj, 16, 0, pos, 4);
 		}
 		if (size > 9.3f)
 		{
 			size = 0f;
-			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
+			worldObj.setBlockToAir(pos);
 			this.invalidate();
 		}
 
 		double fsize = Math.sin(size) * 5.9;
 		fsize *= 2;
-		List l = this.worldObj.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBox(xCoord - fsize + 0.5, yCoord - fsize + 0.5, zCoord - fsize + 0.5, xCoord + fsize + 0.5, yCoord + fsize + 0.5, zCoord + fsize + 0.5));
+		List<Entity> l = this.worldObj.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos.add(0.5 - fsize, 0.5 - fsize, 0.5 - fsize), pos.add(fsize + 0.5, fsize + 0.5, fsize + 0.5)));
 		for (int i = 0; i < l.size(); i++)
 		{
-			Entity e = (Entity) l.get(i);
-			double var13 = e.getDistance(xCoord, yCoord, zCoord) / fsize;
+			Entity e = l.get(i);
+			double var13 = e.getDistance(pos.getX(), pos.getY(), pos.getZ()) / fsize;
 
 			if (var13 <= 1.0D)
 			{
-				double var15 = e.posX - xCoord;
-				double var17 = e.posY + e.getEyeHeight() - yCoord;
-				double var19 = e.posZ - zCoord;
+				double var15 = e.posX - pos.getX();
+				double var17 = e.posY + e.getEyeHeight() - pos.getY();
+				double var19 = e.posZ - pos.getZ();
 				double var33 = MathHelper.sqrt_double(var15 * var15 + var17 * var17 + var19 * var19);
 
 				if (var33 != 0.0D)
@@ -72,7 +72,7 @@ public class TileEntityMeltDown extends TileEntity
 					var15 /= var33;
 					var17 /= var33;
 					var19 /= var33;
-					double var32 = worldObj.getBlockDensity(Vec3.createVectorHelper(xCoord, yCoord, zCoord), e.boundingBox);
+					double var32 = worldObj.getBlockDensity(new Vec3(pos), e.getEntityBoundingBox());
 					double var34 = (1.0D - var13) * var32;
 					if (!(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityRhodes))
 					{
@@ -84,13 +84,12 @@ public class TileEntityMeltDown extends TileEntity
 				}
 			}
 		}
-		super.updateEntity();
 	}
 
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
-		return AxisAlignedBB.getBoundingBox(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 3, yCoord + 3, zCoord + 3);
+		return new AxisAlignedBB(pos.add(-2, -2, -2), pos.add(3, 3, 3));
 	}
 
 	@Override

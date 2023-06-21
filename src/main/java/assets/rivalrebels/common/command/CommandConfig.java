@@ -17,6 +17,7 @@ import assets.rivalrebels.common.item.weapon.ItemRoda;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 
 import java.util.Arrays;
@@ -180,10 +181,9 @@ public class CommandConfig extends CommandBase
 		}
 		sender.addChatMessage(new ChatComponentText("§cUsage: /rrconfig nuketime|nukedrop|bignuke|bigshroom|flash|b2chance|nukepancake|dragon|b2"));
 	}
-	/**
-     * Adds the strings available in this command to the given list of tab completion options.
-     */
-    public List<String> addTabCompletionOptions(ICommandSender p, String[] s) {
-		return Arrays.asList("nuketime", "nukedrop", "nukepancake", "dragon", "b2");
+
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return Arrays.asList("nuketime", "nukedrop", "nukepancake", "dragon", "b2");
     }
 }

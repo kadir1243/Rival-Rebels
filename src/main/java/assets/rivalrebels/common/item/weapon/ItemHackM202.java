@@ -11,25 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-
-import java.util.HashSet;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.entity.EntityB83;
 import assets.rivalrebels.common.entity.EntityHackB83;
-import assets.rivalrebels.common.entity.EntityRocket;
 import assets.rivalrebels.common.explosion.Explosion;
+import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.world.World;
+
+import java.util.HashSet;
 
 public class ItemHackM202 extends ItemTool
 {

@@ -14,9 +14,9 @@ package assets.rivalrebels.common.tileentity;
 import java.util.List;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ITickable;
 import net.minecraft.util.MathHelper;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -27,45 +27,42 @@ import assets.rivalrebels.common.entity.EntityTsarBlast;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityPlasmaExplosion extends TileEntity
+public class TileEntityPlasmaExplosion extends TileEntity implements ITickable
 {
 	public float	size		= 0;
 	float			increment	= 0.3f;
 	float			prevsize	= 0;
 
-	public TileEntityPlasmaExplosion()
-	{
-
+	public TileEntityPlasmaExplosion() {
 	}
 
 	/**
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
 	@Override
-	public void updateEntity()
+	public void update()
 	{
 		prevsize = size;
 		size += increment;
 		if (prevsize == 0)
 		{
-			RivalRebelsSoundPlayer.playSound(worldObj, 16, 0, xCoord, yCoord, zCoord, 4);
+			RivalRebelsSoundPlayer.playSound(worldObj, 16, 0, pos, 4);
 		}
 		if (size > 3.1f)
 		{
 			size = 0f;
-			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
+			worldObj.setBlockToAir(pos);
 			this.invalidate();
 		}
 
 		double fsize = Math.sin(size) * 5.9 * 2;
-		double fsqr = fsize * fsize;
-		List l = this.worldObj.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBox(xCoord - fsize + 0.5, yCoord - fsize + 0.5, zCoord - fsize + 0.5, xCoord + fsize + 0.5, yCoord + fsize + 0.5, zCoord + fsize + 0.5));
+        List<Entity> l = this.worldObj.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(pos.add(0.5 - fsize, 0.5 - fsize, 0.5 - fsize), pos.add(fsize + 0.5, fsize + 0.5, fsize + 0.5)));
 		for (int i = 0; i < l.size(); i++)
 		{
-			Entity e = (Entity) l.get(i);
-			double var15 = e.posX - xCoord;
-			double var17 = e.posY + e.getEyeHeight() - yCoord + 1.5f;
-			double var19 = e.posZ - zCoord;
+			Entity e = l.get(i);
+			double var15 = e.posX - pos.getX();
+			double var17 = e.posY + e.getEyeHeight() - pos.getY() + 1.5f;
+			double var19 = e.posZ - pos.getZ();
 			double dist = 0.5f/(MathHelper.sqrt_double(var15*var15+var17*var17+var19*var19)+0.01f);
 			if (dist <= 0.5f && !(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityTsarBlast) && !(e instanceof EntityRhodes))
 			{
@@ -75,13 +72,12 @@ public class TileEntityPlasmaExplosion extends TileEntity
 				e.motionZ += var19*dist;
 			}
 		}
-		super.updateEntity();
 	}
 
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
-		return AxisAlignedBB.getBoundingBox(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 3, yCoord + 3, zCoord + 3);
+		return new AxisAlignedBB(pos.add(-2, -2, -2), pos.add(3, 3, 3));
 	}
 
 	@Override

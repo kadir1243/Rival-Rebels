@@ -11,14 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.command;
 
-import java.util.List;
-
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 
 public class CommandPlaySound extends CommandBase
 {
@@ -60,8 +57,8 @@ public class CommandPlaySound extends CommandBase
 			{
 				sender.addChatMessage(new ChatComponentText("No!"));
 			}
-			ChunkCoordinates cc = sender.getPlayerCoordinates();
-			RivalRebelsSoundPlayer.playSound(sender.getEntityWorld(), dir, num, cc.posX, cc.posY, cc.posZ, vol, pit);
+			BlockPos cc = sender.getPosition();
+			RivalRebelsSoundPlayer.playSound(sender.getEntityWorld(), dir, num, cc.getX(), cc.getY(), cc.getZ(), vol, pit);
 		}
 		else
 		{

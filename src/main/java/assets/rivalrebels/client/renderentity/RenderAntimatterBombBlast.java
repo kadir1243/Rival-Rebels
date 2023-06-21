@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,14 +32,15 @@ public class RenderAntimatterBombBlast extends Render
 	private ModelBlastSphere modelsphere;
 	private ModelBlastRing modelring;
 	private ModelAntimatterBombBlast modelabomb;
-	
-	public RenderAntimatterBombBlast()
+
+	public RenderAntimatterBombBlast(RenderManager renderManager)
 	{
+        super(renderManager);
 		modelsphere = new ModelBlastSphere();
 		modelabomb = new ModelAntimatterBombBlast();
 		modelring = new ModelBlastRing();
 	}
-	
+
 	@Override
 	public void doRender(Entity var1, double x, double y, double z, float var8, float var9)
 	{
@@ -115,7 +117,7 @@ public class RenderAntimatterBombBlast extends Render
 			modelsphere.renderModel(tsar.time, (float)Math.random(), (float)Math.random(), (float)Math.random(), 1);
 		}
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

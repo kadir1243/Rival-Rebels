@@ -81,7 +81,7 @@ public class RivalRebelsRenderOverlay
 			GL11.glDisable(GL11.GL_DEPTH_TEST);
 			GL11.glDepthMask(false);
 			GL11.glEnable(GL11.GL_BLEND);
-			FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+			FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
 			int w = event.resolution.getScaledWidth();
 			int h = event.resolution.getScaledHeight();
 
@@ -232,11 +232,10 @@ public class RivalRebelsRenderOverlay
 				// t.addVertex(1, 1, -90);
 				// t.draw();
 				// GL11.glEnable(GL11.GL_BLEND);
-				Block id = player.worldObj.getBlock(ItemBinoculars.tx, ItemBinoculars.ty, ItemBinoculars.tz);
-				String disp = "X";
-				if (id != null) disp = StatCollector.translateToLocal(id.getUnlocalizedName()+".name");
+				Block block = player.worldObj.getBlockState(ItemBinoculars.tpos).getBlock();
+				String disp = StatCollector.translateToLocal(block.getUnlocalizedName()+".name");
 				fr.drawString(disp, (int) ((w * 0.50) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.18), 0x00ff00, false);
-				if (!ItemBinoculars.tooFar) disp = "(" + ItemBinoculars.tx + ", " + ItemBinoculars.ty + ", " + ItemBinoculars.tz + ")";
+				if (!ItemBinoculars.tooFar) disp = "(" + ItemBinoculars.tpos.getX() + ", " + ItemBinoculars.tpos.getY() + ", " + ItemBinoculars.tpos.getZ() + ")";
 				else disp = "";
 				fr.drawString(disp, (int) ((w * 0.50) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.13), 0x00ff00, false);
 				disp = "";

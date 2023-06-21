@@ -11,20 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.List;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TsarBomba;
+import net.minecraft.world.World;
 
 public class EntityTheoreticalTsarBlast extends EntityTsarBlast
 {
@@ -33,7 +22,7 @@ public class EntityTheoreticalTsarBlast extends EntityTsarBlast
 		super(par1World);
 		ignoreFrustumCheck = true;
 	}
-	
+
 	public EntityTheoreticalTsarBlast(World par1World, float x, float y, float z, TsarBomba tsarBomba, int rad)
 	{
 		super(par1World);

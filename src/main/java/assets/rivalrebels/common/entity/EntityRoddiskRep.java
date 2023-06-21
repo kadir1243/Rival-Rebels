@@ -11,23 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityCaveSpider;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.monster.EntityGhast;
-import net.minecraft.entity.monster.EntityMagmaCube;
-import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.*;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntitySquid;
@@ -37,30 +28,26 @@ import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+
+import java.util.List;
 
 public class EntityRoddiskRep extends EntityInanimate
 {
 	public EntityPlayer	shooter;
-	
+
 	public EntityRoddiskRep(World par1World)
 	{
 		super(par1World);
 	}
-	
+
 	public EntityRoddiskRep(World par1World, EntityPlayer par2EntityLiving, float par3)
 	{
 		super(par1World);
 		this.shooter = par2EntityLiving;
 		this.setSize(0.5F, 0.5F);
-		this.boundingBox.setBounds(-0.4, -0.0625, -0.4, 0.4, 0.0625, 0.4);
+        this.setEntityBoundingBox(new AxisAlignedBB(-0.4, -0.0625, -0.4, 0.4, 0.0625, 0.4));
 		this.setLocationAndAngles(par2EntityLiving.posX, par2EntityLiving.posY + par2EntityLiving.getEyeHeight(), par2EntityLiving.posZ, par2EntityLiving.rotationYaw, par2EntityLiving.rotationPitch);
 		this.posX -= (MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
 		this.posY -= 0.1;
@@ -72,7 +59,7 @@ public class EntityRoddiskRep extends EntityInanimate
 		this.motionY = (-MathHelper.sin(this.rotationPitch / 180.0F * (float) Math.PI));
 		this.setHeading(this.motionX, this.motionY, this.motionZ, par3 * 1.5F, 1.0F);
 	}
-	
+
 	public void setHeading(double par1, double par3, double par5, float par7, float par8)
 	{
 		float var9 = MathHelper.sqrt_double(par1 * par1 + par3 * par3 + par5 * par5);
@@ -92,20 +79,14 @@ public class EntityRoddiskRep extends EntityInanimate
 		this.prevRotationYaw = this.rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
 		this.prevRotationPitch = this.rotationPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI);
 	}
-	
-	@Override
-	protected void entityInit()
-	{
-		
-	}
-	
-	@Override
+
+    @Override
 	public void onUpdate()
 	{
 		this.lastTickPosX = this.posX;
 		this.lastTickPosY = this.posY;
 		this.lastTickPosZ = this.posZ;
-		
+
 		if (ticksExisted > 100 && shooter == null && !worldObj.isRemote)
 		{
 			//worldObj.spawnEntityInWorld(new EntityItem(worldObj, posX, posY, posZ, new ItemStack(RivalRebels.roddisk)));
@@ -130,7 +111,7 @@ public class EntityRoddiskRep extends EntityInanimate
 			double d = 1.0f/Math.sqrt(randx*randx+randy*randy);
 			worldObj.spawnEntityInWorld(new EntityLaserBurst(worldObj, posX, posY, posZ, randx*d, -Math.abs(motionY), randy*d, shooter));
 		}
-		
+
 		int radius = 2;
 		int nx = MathHelper.floor_double(posX - radius - 1.0D);
 		int px = MathHelper.floor_double(posX + radius + 1.0D);
@@ -138,84 +119,74 @@ public class EntityRoddiskRep extends EntityInanimate
 		int py = MathHelper.floor_double(posY + radius + 1.0D);
 		int nz = MathHelper.floor_double(posZ - radius - 1.0D);
 		int pz = MathHelper.floor_double(posZ + radius + 1.0D);
-		List par9 = worldObj.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBox(nx, ny, nz, px, py, pz));
-		
+		List<Entity> par9 = worldObj.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(nx, ny, nz, px, py, pz));
+
 		for (int var11 = 0; var11 < par9.size(); ++var11)
 		{
-			Entity var31 = (Entity) par9.get(var11);
+			Entity var31 = par9.get(var11);
 			if (var31 instanceof EntityArrow)
 			{
 				var31.setDead();
 			}
 		}
-		
-		Vec3 var15 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-		Vec3 var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+
+		Vec3 var15 = new Vec3(this.posX, this.posY, this.posZ);
+		Vec3 var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 		MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var15, var2);
-		var15 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-		var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-		
+		var15 = new Vec3(this.posX, this.posY, this.posZ);
+		var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+
 		if (var3 != null)
 		{
-			var2 = Vec3.createVectorHelper(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
+			var2 = new Vec3(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
 		}
-		
+
 		if (!this.worldObj.isRemote)
 		{
 			Entity var4 = null;
-			List var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.boundingBox.addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().addCoord(this.motionX, this.motionY, this.motionZ).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
-			Iterator var8 = var5.iterator();
-			
-			while (var8.hasNext())
-			{
-				Entity var9 = (Entity) var8.next();
-				
-				if (var9 instanceof EntityRoddiskRegular || var9 instanceof EntityRoddiskRebel || var9 instanceof EntityRoddiskLeader || var9 instanceof EntityRoddiskOfficer)
-				{
-					var9.setDead();
-					EntityItem ei = new EntityItem(worldObj, var9.posX, var9.posY, var9.posZ, new ItemStack(RivalRebels.roddisk));
-					worldObj.spawnEntityInWorld(ei);
-				}
-				else if (var9.canBeCollidedWith() && var9 != this.shooter)
-				{
-					float var10 = 0.3F;
-					AxisAlignedBB var11 = var9.boundingBox.expand(var10, var10, var10);
-					MovingObjectPosition var12 = var11.calculateIntercept(var15, var2);
-					
-					if (var12 != null)
-					{
-						double var13 = var15.distanceTo(var12.hitVec);
-						
-						if (var13 < var6 || var6 == 0.0D)
-						{
-							var4 = var9;
-							var6 = var13;
-						}
-					}
-				}
-			}
-			
+
+            for (Entity var9 : var5) {
+                if (var9 instanceof EntityRoddiskRegular || var9 instanceof EntityRoddiskRebel || var9 instanceof EntityRoddiskLeader || var9 instanceof EntityRoddiskOfficer) {
+                    var9.setDead();
+                    EntityItem ei = new EntityItem(worldObj, var9.posX, var9.posY, var9.posZ, new ItemStack(RivalRebels.roddisk));
+                    worldObj.spawnEntityInWorld(ei);
+                } else if (var9.canBeCollidedWith() && var9 != this.shooter) {
+                    float var10 = 0.3F;
+                    AxisAlignedBB var11 = var9.getEntityBoundingBox().expand(var10, var10, var10);
+                    MovingObjectPosition var12 = var11.calculateIntercept(var15, var2);
+
+                    if (var12 != null) {
+                        double var13 = var15.distanceTo(var12.hitVec);
+
+                        if (var13 < var6 || var6 == 0.0D) {
+                            var4 = var9;
+                            var6 = var13;
+                        }
+                    }
+                }
+            }
+
 			if (var4 != null)
 			{
 				var3 = new MovingObjectPosition(var4);
 			}
 		}
-		
+
 		if (var3 != null)
 		{
-			worldObj.spawnParticle("explode", var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
-			worldObj.spawnParticle("explode", var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
-			worldObj.spawnParticle("explode", var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
-			worldObj.spawnParticle("explode", var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
-			
+			worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
+			worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
+			worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
+			worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
+
 			if (var3.entityHit != null)
 			{
 				RivalRebelsSoundPlayer.playSound(this, 5, 1);
-				if (var3.entityHit instanceof EntityPlayer && var3.entityHit != shooter)
+				if (var3.entityHit instanceof EntityPlayer entityPlayerHit && var3.entityHit != shooter)
 				{
-					EntityPlayer entityPlayerHit = (EntityPlayer) var3.entityHit;
-					ItemStack armorSlots[] = entityPlayerHit.inventory.armorInventory;
+                    ItemStack[] armorSlots = entityPlayerHit.inventory.armorInventory;
 					for (int i = 0; i < 4; i++)
 					{
 						if (armorSlots[i] != null)
@@ -240,19 +211,18 @@ public class EntityRoddiskRep extends EntityInanimate
 						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 3, 0));
 					}
 				}
-				else if ((var3.entityHit instanceof EntityLivingBase
+				else if ((var3.entityHit instanceof EntityLivingBase entity
 						&& !(var3.entityHit instanceof EntityAnimal)
 						&& !(var3.entityHit instanceof EntityBat)
 						&& !(var3.entityHit instanceof EntityVillager)
 						&& !(var3.entityHit instanceof EntitySquid)))
 				{
-					EntityLivingBase entity = (EntityLivingBase) var3.entityHit;
-					entity.attackEntityFrom(RivalRebelsDamageSource.tron, 40);
+                    entity.attackEntityFrom(RivalRebelsDamageSource.tron, 40);
 					if (entity.getHealth() < 3)
 					{
-						int legs = -1;
-						int arms = -1;
-						int mobs = -1;
+						int legs;
+						int arms;
+						int mobs;
 						entity.setDead();
 						RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
 						if (entity instanceof EntityZombie && !(entity instanceof EntityPigZombie))
@@ -317,8 +287,8 @@ public class EntityRoddiskRep extends EntityInanimate
 						}
 						else
 						{
-							legs = (int) (entity.boundingBox.getAverageEdgeLength() * 2);
-							arms = (int) (entity.boundingBox.getAverageEdgeLength() * 2);
+							legs = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
+							arms = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
 							mobs = 11;
 						}
 						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 0, mobs));
@@ -343,58 +313,58 @@ public class EntityRoddiskRep extends EntityInanimate
 					var3.entityHit.attackEntityFrom(RivalRebelsDamageSource.tron, 20);
 				}
 			}
-			else if (worldObj.getBlock(var3.blockX, var3.blockY, var3.blockZ) == RivalRebels.flare)
+			else if (worldObj.getBlockState(var3.getBlockPos()).getBlock() == RivalRebels.flare)
 			{
-				RivalRebels.flare.onBlockDestroyedByPlayer(worldObj, var3.blockX, var3.blockY, var3.blockZ, 0);
+				RivalRebels.flare.onBlockDestroyedByPlayer(worldObj, var3.getBlockPos(), worldObj.getBlockState(var3.getBlockPos()));
 			}
-			else if (worldObj.getBlock(var3.blockX, var3.blockY, var3.blockZ) == RivalRebels.landmine || worldObj.getBlock(var3.blockX, var3.blockY, var3.blockZ) == RivalRebels.alandmine)
+			else if (worldObj.getBlockState(var3.getBlockPos()).getBlock() == RivalRebels.landmine || worldObj.getBlockState(var3.getBlockPos()).getBlock() == RivalRebels.alandmine)
 			{
-				RivalRebels.landmine.onEntityCollidedWithBlock(worldObj, var3.blockX, var3.blockY, var3.blockZ, this);
+				RivalRebels.landmine.onEntityCollidedWithBlock(worldObj, var3.getBlockPos(), this);
 			}
 			else
 			{
-				Block block = worldObj.getBlock(var3.blockX, var3.blockY, var3.blockZ);
+				Block block = worldObj.getBlockState(var3.getBlockPos()).getBlock();
 				if (block == Blocks.glass || block == Blocks.glass_pane)
 				{
-					worldObj.setBlock(var3.blockX, var3.blockY, var3.blockZ, Blocks.air);
+					worldObj.setBlockToAir(var3.getBlockPos());
 				}
 				RivalRebelsSoundPlayer.playSound(this, 5, 2);
-				
-				if (var3.sideHit == 4 || var3.sideHit == 5) this.motionX *= -1;
-				if (var3.sideHit == 0 || var3.sideHit == 1) this.motionY *= -1;
-				if (var3.sideHit == 2 || var3.sideHit == 3) this.motionZ *= -1;
+
+                if (var3.sideHit == EnumFacing.WEST || var3.sideHit == EnumFacing.EAST) this.motionX *= -1;
+                if (var3.sideHit == EnumFacing.DOWN || var3.sideHit == EnumFacing.UP) this.motionY *= -1;
+                if (var3.sideHit == EnumFacing.NORTH || var3.sideHit == EnumFacing.SOUTH) this.motionZ *= -1;
 			}
 		}
-		
+
 		this.posX += this.motionX;
 		this.posY += this.motionY;
 		this.posZ += this.motionZ;
 		float var16 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 		this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
-		
-		for (this.rotationPitch = (float) (Math.atan2(this.motionY, var16) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
-		{
-			;
-		}
-		
-		while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+
+        this.rotationPitch = (float) (Math.atan2(this.motionY, var16) * 180.0D / Math.PI);
+        while (this.rotationPitch - this.prevRotationPitch < -180.0F) {
+            this.prevRotationPitch -= 360.0F;
+        }
+
+        while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
 		{
 			this.prevRotationPitch += 360.0F;
 		}
-		
+
 		while (this.rotationYaw - this.prevRotationYaw < -180.0F)
 		{
 			this.prevRotationYaw -= 360.0F;
 		}
-		
+
 		while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
 		{
 			this.prevRotationYaw += 360.0F;
 		}
-		
+
 		this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
 		this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
-		
+
 		if (shooter != null)
 		{
 			motionX += (shooter.posX - posX) * 0.01f;
@@ -404,10 +374,10 @@ public class EntityRoddiskRep extends EntityInanimate
 		motionX *= 0.995f;
 		motionY *= 0.995f;
 		motionZ *= 0.995f;
-		
+
 		this.setPosition(this.posX, this.posY, this.posZ);
 	}
-	
+
 	@Override
 	public boolean interactFirst(EntityPlayer player)
 	{
@@ -419,58 +389,49 @@ public class EntityRoddiskRep extends EntityInanimate
 		}
 		return true;
 	}
-	
+
 	@Override
 	public int getBrightnessForRender(float par1)
 	{
 		return 1000000;
 	}
-	
+
 	@Override
 	public float getBrightness(float par1)
 	{
 		return 1000000F;
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound var1)
 	{
-		
+
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound var1)
 	{
-		
+
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
-		return par1Entity.boundingBox;
+		return par1Entity.getEntityBoundingBox();
 	}
-	
-	/**
-	 * returns the bounding box for this entity
-	 */
-	@Override
-	public AxisAlignedBB getBoundingBox()
-	{
-		return this.boundingBox;
-	}
-	
+
 	@Override
 	public boolean canBeCollidedWith()
 	{
 		return !this.isDead;
 	}
-	
+
 	/**
 	 * Returns true if this entity should push and be pushed by other entities when colliding.
 	 */

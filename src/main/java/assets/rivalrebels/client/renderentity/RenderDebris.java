@@ -12,12 +12,13 @@
 package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.world.World;
 
@@ -25,61 +26,59 @@ import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.common.entity.EntityDebris;
 
-public class RenderDebris extends Render
+public class RenderDebris extends Render<EntityDebris>
 {
-	private final RenderBlocks	blockrenderer	= new RenderBlocks();
-	
-	public RenderDebris()
+	private final RenderBlocks blockrenderer = new RenderBlocks();
+
+	public RenderDebris(RenderManager manager)
 	{
-		shadowSize = 0.5F;
+        super(manager);
+        shadowSize = 0.5F;
 	}
-	
+
 	@Override
-	public void doRender(Entity e, double x, double y, double z, float pitch, float yaw)
+	public void doRender(EntityDebris debris, double x, double y, double z, float pitch, float yaw)
 	{
 		GL11.glEnable(GL11.GL_LIGHTING);
-		if (e.isDead) return;
-		EntityDebris debris = (EntityDebris) e;
+		if (debris.isDead) return;
 		World world = debris.worldObj;
-		Block block = debris.block;
-		int m = debris.metadata;
-		int i = MathHelper.floor_double(debris.posX);
-		int j = MathHelper.floor_double(debris.posY);
-		int k = MathHelper.floor_double(debris.posZ);
-		if (block != null)
-		{
-			GL11.glPushMatrix();
+        IBlockState state = debris.blockState;
+        BlockPos pos = debris.getPosition();
+		if (state != null) {
+            Block block = state.getBlock();
+            int metadata = block.getMetaFromState(state);
+            GL11.glPushMatrix();
 			GL11.glTranslated(x, y, z);
 			bindEntityTexture(debris);
 			GL11.glDisable(GL11.GL_LIGHTING);
-			Tessellator tessellator = Tessellator.instance;
+			Tessellator tessellator = Tessellator.getInstance();
 			blockrenderer.blockAccess = world;
-			block.setBlockBoundsBasedOnState(world, i, j, k);
+			block.setBlockBoundsBasedOnState(world, pos);
 			blockrenderer.setRenderBoundsFromBlock(block);
 			int color = block.getBlockColor();
 			float r = (color >> 16 & 255) / 255.0F;
 			float g = (color >> 8 & 255) / 255.0F;
 			float b = (color & 255) / 255.0F;
 			tessellator.startDrawingQuads();
-			tessellator.setBrightness(block.getMixedBrightnessForBlock(world, i, j, k));
+			tessellator.setBrightness(block.getMixedBrightnessForBlock(world, pos));
 			tessellator.setColorOpaque_F(0.5f * r, 0.5f * g, 0.5f * b);
-			blockrenderer.renderFaceYNeg(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 0, m));
+			blockrenderer.renderFaceYNeg(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 0, metadata));
 			tessellator.setColorOpaque_F(r, g, b);
-			blockrenderer.renderFaceYPos(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 1, m));
+			blockrenderer.renderFaceYPos(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 1, metadata));
 			tessellator.setColorOpaque_F(0.8f * r, 0.8f * g, 0.8f * b);
-			blockrenderer.renderFaceZNeg(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 2, m));
-			blockrenderer.renderFaceZPos(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 3, m));
+			blockrenderer.renderFaceZNeg(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 2, metadata));
+			blockrenderer.renderFaceZPos(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 3, metadata));
 			tessellator.setColorOpaque_F(0.6f * r, 0.6f * g, 0.6f * b);
-			blockrenderer.renderFaceXNeg(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 4, m));
-			blockrenderer.renderFaceXPos(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 5, m));
+			blockrenderer.renderFaceXNeg(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 4, metadata));
+			blockrenderer.renderFaceXPos(block, -0.5D, -0.5D, -0.5D, blockrenderer.getBlockIconFromSideAndMetadata(block, 5, metadata));
 			tessellator.draw();
 			GL11.glEnable(GL11.GL_LIGHTING);
 			GL11.glPopMatrix();
 		}
 	}
-	
+
 	@Override
-	protected ResourceLocation getEntityTexture(Entity r)
+	protected ResourceLocation getEntityTexture(EntityDebris debris)
 	{
 		return TextureMap.locationBlocksTexture;
 	}

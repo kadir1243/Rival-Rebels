@@ -11,18 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.EnumSkyBlock;
 import net.minecraft.world.World;
 
 public class EntityTarget extends EntityLivingBase
@@ -36,7 +29,7 @@ public class EntityTarget extends EntityLivingBase
 	{
 		super(par1World);
 		e = relay;
-		boundingBox.setBB(e.boundingBox);
+        this.setEntityBoundingBox(e.getEntityBoundingBox());
 		ySize=e.ySize;
 		height=e.height;
 		width = e.width;
@@ -70,16 +63,22 @@ public class EntityTarget extends EntityLivingBase
 	{
 		return null;
 	}
-	@Override
-	public void setCurrentItemOrArmor(int slotIn, ItemStack itemStackIn)
-	{
+
+    @Override
+    public ItemStack getCurrentArmor(int slotIn) {
+        return null;
+    }
+
+    @Override
+	public void setCurrentItemOrArmor(int slotIn, ItemStack itemStackIn) {
 	}
-	@Override
-	public ItemStack[] getLastActiveItems()
-	{
-		return null;
-	}
-	@Override
+
+    @Override
+    public ItemStack[] getInventory() {
+        return null;
+    }
+
+    @Override
 	public void writeEntityToNBT(NBTTagCompound nbt)
 	{
 		nbt.setInteger("id", e.getEntityId());

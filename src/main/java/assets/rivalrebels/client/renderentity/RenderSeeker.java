@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -30,8 +31,9 @@ public class RenderSeeker extends Render
 {
 	ModelRocket	md;
 
-	public RenderSeeker()
+	public RenderSeeker(RenderManager renderManager)
 	{
+        super(renderManager);
 		md = new ModelRocket();
 	}
 

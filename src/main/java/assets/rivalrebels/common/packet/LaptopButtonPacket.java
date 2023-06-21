@@ -11,53 +11,40 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class LaptopButtonPacket implements IMessage
-{
-	int x;
-	int y;
-	int z;
+public class LaptopButtonPacket implements IMessage {
+    private BlockPos pos;
 
 	public LaptopButtonPacket()
 	{
 
 	}
 
-	public LaptopButtonPacket(int X, int Y, int Z)
+	public LaptopButtonPacket(BlockPos pos)
 	{
-		x = X;
-		y = Y;
-		z = Z;
+		this.pos = pos;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		x = buf.readInt();
-		y = buf.readInt();
-		z = buf.readInt();
+        PacketBuffer buffer = new PacketBuffer(buf);
+        pos = buffer.readBlockPos();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
+        PacketBuffer buffer = new PacketBuffer(buf);
+        buffer.writeBlockPos(pos);
 	}
 
 	public static class Handler implements IMessageHandler<LaptopButtonPacket, IMessage>
@@ -65,10 +52,10 @@ public class LaptopButtonPacket implements IMessage
 		@Override
 		public IMessage onMessage(LaptopButtonPacket m, MessageContext ctx)
 		{
-			if (ctx.getServerHandler().playerEntity.getDistanceSq(m.x, m.y, m.z) < 100)
+			if (ctx.getServerHandler().playerEntity.getDistanceSq(m.pos) < 100)
 			{
-				TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.x, m.y, m.z);
-				if (te != null && te instanceof TileEntityLaptop)
+				TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.pos);
+				if (te instanceof TileEntityLaptop)
 				{
 					((TileEntityLaptop)te).onGoButtonPressed();
 				}

@@ -18,28 +18,23 @@ public enum RivalRebelsRank
 	OFFICER(2,16),
 	LEADER(3,3),
 	REP(4,5);
-	public int	id	= 0;
-	public int	snf	= 0;
-	
+	public final int id;
+	public final int snf;
+
 	RivalRebelsRank(int i, int s)
 	{
 		id = i;
 		snf = s;
 	}
-	
+
 	public static RivalRebelsRank getForID(int i)
 	{
-		switch (i)
-		{
-			case 1:
-				return REBEL;
-			case 2:
-				return OFFICER;
-			case 3:
-				return LEADER;
-			case 4:
-				return REP;
-		}
-		return REGULAR;
-	}
+        return switch (i) {
+            case 1 -> REBEL;
+            case 2 -> OFFICER;
+            case 3 -> LEADER;
+            case 4 -> REP;
+            default -> REGULAR;
+        };
+    }
 }

@@ -11,8 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.core;
 
-import org.apache.commons.io.IOUtils;
-
 import java.io.*;
 import java.nio.file.Files;
 

@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -26,7 +27,11 @@ public class RenderLaserLink extends Render
 	static float	red		= 0.5F;
 	static float	green	= 0.1F;
 	static float	blue	= 0.1F;
-	
+
+    public RenderLaserLink(RenderManager renderManager) {
+        super(renderManager);
+    }
+
 	public void renderLaserLink(EntityLaserLink ell, double x, double y, double z, float yaw, float pitch)
 	{
 		double distance = ell.motionX * 100;
@@ -34,7 +39,7 @@ public class RenderLaserLink extends Render
 		{
 			float radius = 0.7F;
 			Tessellator tessellator = Tessellator.instance;
-			
+
 			GL11.glPushMatrix();
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -43,7 +48,7 @@ public class RenderLaserLink extends Render
 			GL11.glTranslatef((float) x, (float) y, (float) z);
 			GL11.glRotatef(-ell.rotationYaw, 0.0F, 1.0F, 0.0F);
 			GL11.glRotatef(ell.rotationPitch, 1.0F, 0.0F, 0.0F);
-			
+
 			for (float o = 0; o <= radius; o += radius / 16)
 			{
 				tessellator.startDrawingQuads();
@@ -75,20 +80,20 @@ public class RenderLaserLink extends Render
 				tessellator.addVertex(0 + o, 0 + o, 0 + distance);
 				tessellator.draw();
 			}
-			
+
 			GL11.glDisable(GL11.GL_BLEND);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 			GL11.glPopMatrix();
 		}
 	}
-	
+
 	@Override
 	public void doRender(Entity entityLaserLink, double x, double y, double z, float yaw, float pitch)
 	{
 		this.renderLaserLink((EntityLaserLink) entityLaserLink, x, y, z, yaw, pitch);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

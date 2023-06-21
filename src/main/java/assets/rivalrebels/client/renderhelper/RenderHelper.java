@@ -14,6 +14,7 @@ package assets.rivalrebels.client.renderhelper;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 
+import net.minecraft.client.renderer.WorldRenderer;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -62,27 +63,28 @@ public class RenderHelper
 		addFace(xpypzn, xpynzn, xnynzn, xnypzn, t6, t12, t13, t7); // left
 		addFace(xnypzn, xnynzn, xnynzp, xnypzp, t7, t13, t14, t9); // back
 	}
-	
+
 	public static void drawPoint(Vertice v1, float size)
 	{
 		GL11.glPushMatrix();
 		GL11.glTranslatef(v1.x, v1.y, v1.z);
 		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 		size /= 2;
-		Tessellator t = Tessellator.instance;
+		Tessellator t = Tessellator.getInstance();
 		GL11.glRotatef(180 - Minecraft.getMinecraft().thePlayer.rotationYaw, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(90 - Minecraft.getMinecraft().thePlayer.rotationPitch, 1.0F, 0.0F, 0.0F);
-		t.startDrawingQuads();
-		t.setNormal(0.0F, 1.0F, 0.0F);
-		t.addVertexWithUV(-size, 0, -size, 0, 0);
-		t.addVertexWithUV(size, 0, -size, 1, 0);
-		t.addVertexWithUV(size, 0, size, 1, 1);
-		t.addVertexWithUV(-size, 0, size, 0, 1);
+        WorldRenderer renderer = t.getWorldRenderer();
+        renderer.startDrawingQuads();
+		renderer.setNormal(0.0F, 1.0F, 0.0F);
+		renderer.addVertexWithUV(-size, 0, -size, 0, 0);
+		renderer.addVertexWithUV(size, 0, -size, 1, 0);
+		renderer.addVertexWithUV(size, 0, size, 1, 1);
+		renderer.addVertexWithUV(-size, 0, size, 0, 1);
 		t.draw();
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 		GL11.glPopMatrix();
 	}
-	
+
 	public static void drawLine(Vertice v1, float size1, Vertice v2, float size2)
 	{
 		GL11.glPushMatrix();
@@ -103,7 +105,7 @@ public class RenderHelper
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 		GL11.glPopMatrix();
 	}
-	
+
 	public static void renderBox(float length, float height, float depth)
 	{
 		GL11.glRotatef(90, 0.0F, 1.0F, 0.0F);
@@ -125,7 +127,7 @@ public class RenderHelper
 		addFace(xpypzn, xpynzn, xnynzn, xnypzn); // left
 		addFace(xnypzn, xnynzn, xnynzp, xnypzp); // back
 	}
-	
+
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4)
 	{
 		Tessellator t = Tessellator.instance;
@@ -152,7 +154,7 @@ public class RenderHelper
 		addVertice(mv, mt);
 		t.draw();
 	}
-	
+
 	// private void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4)
 	// {
 	// Tessellator t = Tessellator.instance;
@@ -163,7 +165,7 @@ public class RenderHelper
 	// addVertice(v4);
 	// t.draw();
 	// }
-	
+
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4)
 	{
 		Tessellator t = Tessellator.instance;
@@ -174,7 +176,7 @@ public class RenderHelper
 		addVertice(v4);
 		t.draw();
 	}
-	
+
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureFace t)
 	{
 		Tessellator tess = Tessellator.instance;
@@ -185,7 +187,7 @@ public class RenderHelper
 		addVertice(v4, t.v4);
 		tess.draw();
 	}
-	
+
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, float par5, float par6, float par7, float par8)
 	{
 		Tessellator t = Tessellator.instance;
@@ -196,7 +198,7 @@ public class RenderHelper
 		addVertice(v4, par5, par7);
 		t.draw();
 	}
-	
+
 	public static void addTri(Vertice v1, Vertice v2, Vertice v3)
 	{
 		Tessellator t = Tessellator.instance;
@@ -206,19 +208,19 @@ public class RenderHelper
 		addVertice(v2);
 		t.draw();
 	}
-	
+
 	public static void addVertice(Vertice v, TextureVertice t)
 	{
 		Tessellator tessellator = Tessellator.instance;
 		tessellator.addVertexWithUV(v.x, v.y, v.z, t.x, t.y);
 	}
-	
+
 	public static void addVertice(Vertice v, float x, float y)
 	{
 		Tessellator tessellator = Tessellator.instance;
 		tessellator.addVertexWithUV(v.x, v.y, v.z, x, y);
 	}
-	
+
 	public static void addVertice(Vertice v)
 	{
 		Tessellator tessellator = Tessellator.instance;

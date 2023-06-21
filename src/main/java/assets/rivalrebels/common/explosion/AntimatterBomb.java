@@ -11,14 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.explosion;
 
+import assets.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityAntimatterBombBlast;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class AntimatterBomb {
+    private static final Logger LOGGER = LogManager.getLogger();
 	public int		posX;
 	public int		posY;
 	public int		posZ;
@@ -48,8 +53,8 @@ public class AntimatterBomb {
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
 		rad = rad*rad/2;
 		if (world.isRemote) return;
-		System.out.println("radius:" + radius);
-		System.out.println("Nlimit:" + nlimit);
+		LOGGER.info("radius:" + radius);
+		LOGGER.info("Nlimit:" + nlimit);
 		int clamprad = radius;
 		//if (clamprad > 50) clamprad = 50;
 		for (int X = -clamprad; X < clamprad; X++)
@@ -61,10 +66,10 @@ public class AntimatterBomb {
 				{
 					for (int Y = 70; Y > 0; Y--)
 					{
-						Block block = worldObj.getBlock(X + posX, Y, Z + posZ);
+						Block block = worldObj.getBlockState(new BlockPos(X + posX, Y, Z + posZ)).getBlock();
 						if (block == Blocks.water || block == Blocks.lava || block == Blocks.flowing_water || block == Blocks.flowing_lava)
 						{
-							worldObj.setBlockToAir(X + posX, Y, Z + posZ);
+							worldObj.setBlockToAir(new BlockPos(X + posX, Y, Z + posZ));
 						}
 					}
 				}
@@ -105,23 +110,21 @@ public class AntimatterBomb {
 	private boolean processChunk(int x, int z)
 	{
 		processedchunks++;
-		//System.out.println("processedchunks:" + processedchunks);
+		//LOGGER.debug("processedchunks:" + processedchunks);
 		double dist = x * x + z * z;
-		if (dist < radius * radius)
-		{
+		if (dist < radius * radius) {
 			dist = Math.sqrt(dist);
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
 			if (RivalRebels.elevation) yele = y;
 			int ylimit = (int) Math.floor(yele - (radius - dist) * 4);
 
-			for (int Y = y; Y > ylimit; Y--)
-			{
+			for (int Y = y; Y > ylimit; Y--) {
 				if (Y == 0) break;
-				Block block = worldObj.getBlock(x + posX, Y, z + posZ);
+				Block block = worldObj.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
 				if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
 				else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-				worldObj.setBlock(x + posX, Y, z + posZ, Blocks.air);
+				worldObj.setBlockToAir(new BlockPos(x + posX, Y, z + posZ));
 			}
 
 			double limit = (radius / 2) + worldObj.rand.nextInt(radius / 4) + 7.5;
@@ -130,10 +133,10 @@ public class AntimatterBomb {
 				for (int Y = ylimit; Y > ylimit - (worldObj.rand.nextInt(5) + 2); Y--)
 				{
 					if (Y == 0) break;
-					Block block = worldObj.getBlock(x + posX, Y, z + posZ);
+					Block block = worldObj.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
 					if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
 					else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-					worldObj.setBlock(x + posX, Y, z + posZ, Blocks.obsidian);
+					worldObj.setBlockState(new BlockPos(x + posX, Y, z + posZ), Blocks.obsidian.getDefaultState());
 				}
 			}
 
@@ -144,41 +147,32 @@ public class AntimatterBomb {
 			dist = Math.sqrt(dist);
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			int ylimit = (int) Math.ceil(Math.sin((dist - radius - (radius / 16)) * radius * 0.001875) * (radius / 16));
-			if (dist >= radius + 5)
-			{
+			if (dist >= radius + 5) {
 				int metadata = (int) Math.floor((16d / radius) * dist);
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y >= 0; Y--)
-				{
+				for (int Y = ylimit; Y >= 0; Y--) {
 					if (Y == 0) continue;
 					int yy = Y + y;
-					Block blockID = worldObj.getBlock(x + posX, yy, z + posZ);
-					if (blockID == RivalRebels.omegaobj) RivalRebels.round.winSigma();
-					else if (blockID == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-					else if (!isTree)
-					{
-						Block blockID1 = worldObj.getBlock(x + posX, yy - ylimit, z + posZ);
-						int datavalue = worldObj.getBlockMetadata(x + posX, yy - ylimit, z + posZ);
-						worldObj.setBlock(x + posX, yy, z + posZ, blockID1, datavalue, 3);
-					}
-					else
-					{
+					Block block = worldObj.getBlockState(new BlockPos(x + posX, yy, z + posZ)).getBlock();
+					if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
+					else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
+					else if (!isTree) {
+						worldObj.setBlockState(new BlockPos(x + posX, yy, z + posZ), worldObj.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ)));
+					} else {
 						isTree = false;
-						for (int Yy = 0; Yy >= -treeHeight; Yy--)
-						{
-							worldObj.setBlock(x + posX, yy + Yy, z + posZ, RivalRebels.petrifiedwood);
-							worldObj.setBlockMetadataWithNotify(x + posX, yy + Yy, z + posZ, metadata, 3);
+						for (int Yy = 0; Yy >= -treeHeight; Yy--) {
+							worldObj.setBlockState(new BlockPos(x + posX, yy + Yy, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
 						}
 						break;
 					}
 				}
-			}
-			else
-			{
-				Block blockID = worldObj.getBlock(x + posX, y, z + posZ);
-				if (blockID != null && !blockID.isOpaqueCube()) worldObj.setBlock(x + posX, y, z + posZ, Blocks.air);
+			} else {
+                BlockPos pos = new BlockPos(x + posX, y, z + posZ);
+                if (!worldObj.getBlockState(pos).getBlock().isOpaqueCube()) {
+                    worldObj.setBlockToAir(pos);
+                }
 			}
 			return true;
 		}
@@ -191,34 +185,28 @@ public class AntimatterBomb {
 		boolean found = false;
 		for (int y = 256; y > 0; y--)
 		{
-			Block blockID = worldObj.getBlock(x, y, z);
-			if (blockID != Blocks.air)
-			{
-				if (blockID == RivalRebels.omegaobj) RivalRebels.round.winSigma();
-				else if (blockID == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-				if (blockID == RivalRebels.reactive)
-				{
-					for (int i = 0; i < (1 - (dist / radius)) * 16 + Math.random() * 2; i++)
-					{
-						worldObj.setBlock(x, y, z, Blocks.air);
+            BlockPos pos = new BlockPos(x, y, z);
+			Block block = worldObj.getBlockState(pos).getBlock();
+			if (!worldObj.isAirBlock(pos)) {
+				if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
+				else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
+				if (block == RivalRebels.reactive) {
+					for (int i = 0; i < (1 - (dist / radius)) * 16 + Math.random() * 2; i++) {
+						worldObj.setBlockToAir(pos);
 					}
 				}
-				if (!blockID.isOpaqueCube() || blockID == Blocks.log)
-				{
-					worldObj.setBlockToAir(x, y, z);
-					if (dist > radius / 2 && blockID == Blocks.log && worldObj.getBlock(x, y - 1, z) == Blocks.log) isTree = true;
+				if (!block.isOpaqueCube() || block == Blocks.log) {
+					worldObj.setBlockToAir(pos);
+					if (dist > radius / 2 && block == Blocks.log && worldObj.getBlockState(pos.down()).getBlock() == Blocks.log) isTree = true;
 					if (!found && isTree)
 					{
 						foundY = y;
 						found = true;
 					}
-					continue;
-				}
-				else
-				{
-					if (!found) return y;
-					else
-					{
+                } else {
+					if (!found) {
+                        return y;
+                    } else {
 						treeHeight = foundY - y;
 						return foundY;
 					}

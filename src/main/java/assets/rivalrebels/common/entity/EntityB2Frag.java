@@ -11,27 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
-import net.minecraft.world.World;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.*;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
+import java.util.List;
 
 public class EntityB2Frag extends EntityInanimate
 {
@@ -54,7 +48,7 @@ public class EntityB2Frag extends EntityInanimate
 	{
 		super(par1World);
 		health = 300;
-		boundingBox.setBounds(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5);
+        setEntityBoundingBox(new AxisAlignedBB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
 		setSize(7.5F, 7.5F);
 		ignoreFrustumCheck = true;
 	}
@@ -63,7 +57,7 @@ public class EntityB2Frag extends EntityInanimate
 	{
 		super(par1World);
 		health = 300;
-		boundingBox.setBounds(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5);
+        setEntityBoundingBox(new AxisAlignedBB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
 		setSize(7.5F, 7.5F);
 		ignoreFrustumCheck = true;
 
@@ -104,13 +98,7 @@ public class EntityB2Frag extends EntityInanimate
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
-		return par1Entity.boundingBox;
-	}
-
-	@Override
-	public AxisAlignedBB getBoundingBox()
-	{
-		return boundingBox;
+		return par1Entity.getEntityBoundingBox();
 	}
 
 	@Override
@@ -127,38 +115,20 @@ public class EntityB2Frag extends EntityInanimate
 			Side side = FMLCommonHandler.instance().getEffectiveSide();
 			if (side == Side.SERVER)
 			{
-				Iterator iter = worldObj.playerEntities.iterator();
-				while (iter.hasNext())
-				{
-					EntityPlayer player = (EntityPlayer) iter.next();
-					ByteArrayOutputStream bos = new ByteArrayOutputStream(9);
-					DataOutputStream outputStream = new DataOutputStream(bos);
-					try
-					{
-						outputStream.writeInt(17);
-						outputStream.writeInt(getEntityId());
-						outputStream.writeByte(type);
-					}
-					catch (Exception ex)
-					{
-						ex.printStackTrace();
-					}
-					finally
-					{
-						try
-						{
-							if (outputStream != null) outputStream.close();
-						}
-						catch (IOException error)
-						{
-
-						}
-					}
-					//Packet250CustomPayload packet = new Packet250CustomPayload();
-					//packet.data = bos.toByteArray();
-					//packet.length = bos.size();
-					//PacketDispatcher.sendPacketToPlayer(packet, player);
-				}
+                for (EntityPlayer player : worldObj.playerEntities) {
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream(9);
+                    try (DataOutputStream outputStream = new DataOutputStream(bos)) {
+                        outputStream.writeInt(17);
+                        outputStream.writeInt(getEntityId());
+                        outputStream.writeByte(type);
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                    //Packet250CustomPayload packet = new Packet250CustomPayload();
+                    //packet.data = bos.toByteArray();
+                    //packet.length = bos.size();
+                    //PacketDispatcher.sendPacketToPlayer(packet, player);
+                }
 			}
 		}
 
@@ -186,11 +156,9 @@ public class EntityB2Frag extends EntityInanimate
 			ticksInAir = 0;
 		}
 
-		Vec3 vec3 = Vec3.createVectorHelper(posX, posY, posZ);
-		Vec3 vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3 vec3 = new Vec3(posX, posY, posZ);
+		Vec3 vec31 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
 		MovingObjectPosition movingobjectposition = worldObj.rayTraceBlocks(vec3, vec31);
-		vec3 = Vec3.createVectorHelper(posX, posY, posZ);
-		vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
 
 		if (movingobjectposition != null)
 		{
@@ -200,29 +168,22 @@ public class EntityB2Frag extends EntityInanimate
 
 		if (!worldObj.isRemote)
 		{
-			List var5 = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
-			Iterator var8 = var5.iterator();
+			List<Entity> var5 = worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
 
-			while (var8.hasNext())
-			{
-				Entity var9 = (Entity) var8.next();
+            for (Entity var9 : var5) {
+                if (var9 instanceof EntityRocket) {
+                    ((EntityRocket) var9).explode(null);
+                }
 
-				if (var9 instanceof EntityRocket)
-				{
-					((EntityRocket) var9).explode(null);
-				}
+                if (var9 instanceof EntityPlasmoid) {
+                    ((EntityPlasmoid) var9).explode();
+                }
 
-				if (var9 instanceof EntityPlasmoid)
-				{
-					((EntityPlasmoid) var9).explode();
-				}
-
-				if (var9 instanceof EntityLaserBurst)
-				{
-					((EntityLaserBurst) var9).setDead();
-					attackEntityFrom(DamageSource.generic, 6);
-				}
-			}
+                if (var9 instanceof EntityLaserBurst) {
+                    var9.setDead();
+                    attackEntityFrom(DamageSource.generic, 6);
+                }
+            }
 		}
 
 		rotationPitch += motionpitch;
@@ -237,7 +198,7 @@ public class EntityB2Frag extends EntityInanimate
 		float f2 = 0.99F;
 		float f3 = 0.05F;
 
-		if (isSliding == true)
+		if (isSliding)
 		{
 			motionpitch = 0;
 			motionyaw = 0;
@@ -320,8 +281,4 @@ public class EntityB2Frag extends EntityInanimate
 		return true;
 	}
 
-	@Override
-	protected void entityInit()
-	{
-	}
 }

@@ -11,26 +11,20 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
-public class LaptopRefreshPacket implements IMessage
-{
-	int x;
-	int y;
-	int z;
+public class LaptopRefreshPacket implements IMessage {
+    private BlockPos pos;
 	int tasks;
 	int carpet;
 
@@ -39,11 +33,9 @@ public class LaptopRefreshPacket implements IMessage
 
 	}
 
-	public LaptopRefreshPacket(int X, int Y, int Z, int T, int C)
+	public LaptopRefreshPacket(BlockPos pos, int T, int C)
 	{
-		x = X;
-		y = Y;
-		z = Z;
+		this.pos = pos;
 		tasks = T;
 		carpet = C;
 	}
@@ -51,31 +43,31 @@ public class LaptopRefreshPacket implements IMessage
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		x = buf.readInt();
-		y = buf.readInt();
-		z = buf.readInt();
-		tasks = buf.readInt();
-		carpet = buf.readInt();
+        PacketBuffer buffer = new PacketBuffer(buf);
+		pos = buffer.readBlockPos();
+		tasks = buffer.readInt();
+		carpet = buffer.readInt();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
-		buf.writeInt(tasks);
-		buf.writeInt(carpet);
+        PacketBuffer buffer = new PacketBuffer(buf);
+		buffer.writeBlockPos(pos);
+		buffer.writeInt(tasks);
+		buffer.writeInt(carpet);
 	}
 
-	public static class Handler implements IMessageHandler<LaptopRefreshPacket, IMessage>
-	{
+	public static class Handler implements IMessageHandler<LaptopRefreshPacket, IMessage> {
+        private static final Logger LOGGER = LogManager.getLogger();
 		@Override
 		public IMessage onMessage(LaptopRefreshPacket m, MessageContext ctx)
 		{
-			TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(m.x, m.y, m.z);
-			//System.out.println("packet recieved");
-			if (te != null && te instanceof TileEntityLaptop)
+			TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(m.pos);
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Laptop Refresh Packet received");
+            }
+			if (te instanceof TileEntityLaptop)
 			{
 				((TileEntityLaptop)te).b2spirit=m.tasks;
 				((TileEntityLaptop)te).b2carpet=m.carpet;

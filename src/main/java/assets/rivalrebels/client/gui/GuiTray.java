@@ -9,158 +9,35 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-// package RivalRebels.Client.Gui;
-//
-// import java.io.ByteArrayOutputStream;
-// import java.io.DataOutputStream;
-// import java.io.IOException;
-//
-// import RivalRebels.Client.GuiHelper.GuiButton;
-// import RivalRebels.Common.Container.ContainerLaptop;
-// import RivalRebels.Common.Core.RivalRebels;
-// import RivalRebels.Common.Core.RivalRebelsClientPacketHandler;
-// import RivalRebels.Common.TileEntity.TileEntityLaptop;
-// import net.minecraftforge.fml.common.FMLCommonHandler;
-// import net.minecraftforge.fml.common.network.PacketDispatcher;
-// import net.minecraftforge.fml.common.registry.LanguageRegistry;
-// import net.minecraftforge.fml.relauncher.Side;
-// import net.minecraftforge.fml.relauncher.SideOnly;
-// import net.minecraft.inventory.Container;
-// import net.minecraft.network.packet.Packet250CustomPayload;
-// import net.minecraft.client.Minecraft;
-// import net.minecraft.client.gui.inventory.GuiContainer;
-// import net.minecraft.entity.player.InventoryPlayer;
-// import net.minecraft.util.StatCollector;
-// import net.minecraft.util.StringTranslate;
-//
-// import org.lwjgl.opengl.GL11;
-//
-// @SideOnly(Side.CLIENT)
-// public class GuiLaptop extends GuiContainer
-// {
-// ContainerLaptop container;
-// TileEntityLaptop lt;
-// GuiButton button;
-//
-// public GuiLaptop(Container container)
-// {
-// super(container);
-// container = (ContainerLaptop) container;
-// }
-//
-// public GuiLaptop(InventoryPlayer inventoryPlayer, TileEntityLaptop tileEntity)
-// {
-// super(new ContainerLaptop(inventoryPlayer, tileEntity));
-// ySize = 206;
-// lt = tileEntity;
-// }
-//
-// public void initGui()
-// {
-// int x = (width - xSize) / 2;
-// int y = (height - ySize) / 2;
-// this.buttonList.clear();
-//
-// button = new GuiButton(0, x+131, y+89, 16, 16, "");
-// buttonList.add(button);
-// }
-//
-// @Override
-// protected void drawGuiContainerForegroundLayer(int par1, int par2)
-// {
-// super.drawGuiContainerForegroundLayer(par1, par2);
-// int posX = (width - xSize) / 2;
-// int posY = (height - ySize) / 2;
-// Minecraft.getMinecraft().fontRenderer.drawString(StatCollector.translateToLocal("RivalRebels.controller.B83"), posX + 118, posY + 11, 0xffffff);
-// Minecraft.getMinecraft().fontRenderer.drawString(StatCollector.translateToLocal("RivalRebels.controller.b2spirit"), posX + 25, posY + 11, 0xffffff);
-// }
-//
-// @Override
-// protected void drawGuiContainerBackgroundLayer(float par1, int x, int y)
-// {
-// GL11.glColor3f(1, 1, 1);
-// Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guilaptopnuke);
-// int posX = (width - xSize) / 2;
-// int posY = (height - ySize) / 2;
-// this.drawTexturedModalRect(posX, posY, 0, 0, xSize, ySize);
-// if (lt.hasChips()) this.drawTexturedModalRect(posX + 135, posY + 79, 248, 0, 8, 8);
-// if (button.mousePressed(mc, x, y))
-// {
-// Side side = FMLCommonHandler.instance().getEffectiveSide();
-// if (side == Side.CLIENT)
-// {
-// ByteArrayOutputStream bos = new ByteArrayOutputStream(8);
-// DataOutputStream outputStream = new DataOutputStream(bos);
-// try
-// {
-// outputStream.writeInt(5);
-// outputStream.writeInt(2);
-// outputStream.writeInt(lt.xCoord);
-// outputStream.writeInt(lt.yCoord);
-// outputStream.writeInt(lt.zCoord);
-// }
-// catch (Exception ex)
-// {
-// ex.printStackTrace();
-// }
-// finally
-// {
-// try
-// {
-// if (outputStream != null) outputStream.close();
-// }
-// catch (IOException error)
-// {
-//
-// }
-// }
-// Packet250CustomPayload packet = new Packet250CustomPayload();
-// packet.channel = "RodolRivalRebels";
-// packet.data = bos.toByteArray();
-// packet.length = bos.size();
-// PacketDispatcher.sendPacketToServer(packet);
-// }
-// }
-// }
-// }
 
 package assets.rivalrebels.client.gui;
 
-import java.awt.Desktop;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.util.StatCollector;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.guihelper.GuiCustomButton;
-import assets.rivalrebels.client.guihelper.GuiDropdownOption;
-import assets.rivalrebels.client.guihelper.GuiRotor;
 import assets.rivalrebels.client.guihelper.Rectangle;
-import assets.rivalrebels.client.guihelper.Vector;
+import assets.rivalrebels.client.guihelper.*;
 import assets.rivalrebels.client.tileentityrender.TileEntityRecieverRenderer;
 import assets.rivalrebels.common.container.ContainerReciever;
 import assets.rivalrebels.common.packet.ADSClosePacket;
 import assets.rivalrebels.common.packet.ADSWeaponPacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.OpenGlHelper;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
+import net.minecraft.util.StatCollector;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL12;
+
+import java.awt.*;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @SideOnly(Side.CLIENT)
 public class GuiTray extends GuiContainer
@@ -223,9 +100,9 @@ public class GuiTray extends GuiContainer
 	{
 		if (par2 == 1)
 		{
-			this.mc.displayGuiScreen((GuiScreen) null);
+			this.mc.displayGuiScreen(null);
 			this.mc.setIngameFocus();
-			PacketDispatcher.packetsys.sendToServer(new ADSClosePacket(r.xCoord, r.yCoord, r.zCoord, mobs.isPressed, chip.isPressed, players.isPressed, range.getDegree()*2));
+			PacketDispatcher.packetsys.sendToServer(new ADSClosePacket(r.getPos(), mobs.isPressed, chip.isPressed, players.isPressed, range.getDegree()*2));
 		}
 	}
 
@@ -236,7 +113,7 @@ public class GuiTray extends GuiContainer
 
 		if (select1.isPressed)
 		{
-			PacketDispatcher.packetsys.sendToServer(new ADSWeaponPacket(r.xCoord, r.yCoord, r.zCoord, 1));
+			PacketDispatcher.packetsys.sendToServer(new ADSWeaponPacket(r.getPos(), 1));
 		}
 		select1.isPressed = false;
 
@@ -260,15 +137,11 @@ public class GuiTray extends GuiContainer
 				{
 					Desktop.getDesktop().browse(new URI("http://rivalrebels.com"));
 				}
-				catch (IOException e)
+				catch (IOException | URISyntaxException e)
 				{
 					e.printStackTrace();
 				}
-				catch (URISyntaxException e)
-				{
-					e.printStackTrace();
-				}
-			}
+            }
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
@@ -338,7 +211,7 @@ public class GuiTray extends GuiContainer
 			drawTexturedModalRect(x + 104, y + 68, 248, 0, 8, 8);
 		}
 
-		Minecraft.getMinecraft().fontRenderer.drawString(StatCollector.translateToLocal("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff);
+		Minecraft.getMinecraft().fontRendererObj.drawString(StatCollector.translateToLocal("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff);
 		drawADS(guiLeft + 51, guiTop + 75, 30, guiLeft + 51 - this.xSize_lo, guiTop + 25 - this.ySize_lo);
 	}
 }

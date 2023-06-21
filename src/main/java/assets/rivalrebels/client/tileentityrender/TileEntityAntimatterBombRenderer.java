@@ -11,32 +11,27 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.client.renderentity.RenderAntimatterBomb;
 import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityAntimatterBombRenderer extends TileEntitySpecialRenderer
+public class TileEntityAntimatterBombRenderer extends TileEntitySpecialRenderer<TileEntityAntimatterBomb>
 {
 	public TileEntityAntimatterBombRenderer()
 	{
 	}
 
-	public void renderAModelAt(TileEntityAntimatterBomb tile, double d, double d1, double d2, float f)
-	{
+    @Override
+    public void renderTileEntityAt(TileEntityAntimatterBomb tile, double x, double y, double z, float partialTicks, int destroyStage) {
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.0F, (float) d2 + 0.5F);
+		GL11.glTranslatef((float) x + 0.5F, (float) y + 1.0F, (float) z + 0.5F);
 		GL11.glScalef(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
 		int metadata = tile.getBlockMetadata();
 
@@ -61,11 +56,5 @@ public class TileEntityAntimatterBombRenderer extends TileEntitySpecialRenderer
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etantimatterbomb);
 		RenderAntimatterBomb.bomb.renderAll();
 		GL11.glPopMatrix();
-	}
-
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityAntimatterBomb) tileentity, d, d1, d2, f);
 	}
 }

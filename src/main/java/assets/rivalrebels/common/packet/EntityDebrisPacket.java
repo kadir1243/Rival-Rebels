@@ -11,69 +11,52 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.common.entity.EntityDebris;
 import io.netty.buffer.ByteBuf;
-
-import java.util.Iterator;
-
 import net.minecraft.block.Block;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import assets.rivalrebels.common.entity.EntityDebris;
+import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class EntityDebrisPacket implements IMessage
-{
-	Block	block;
-	int		metadata	= 0;
-	int		id			= 0;
+public class EntityDebrisPacket implements IMessage {
+	private int id = 0;
+    private IBlockState blockState;
 
-	public EntityDebrisPacket()
-	{
+    public EntityDebrisPacket() {
+    }
 
-	}
-
-	public EntityDebrisPacket(EntityDebris ed)
-	{
+	public EntityDebrisPacket(EntityDebris ed) {
 		id = ed.getEntityId();
-		block = ed.block;
-		metadata = ed.metadata;
-	}
+        blockState = ed.blockState;
+    }
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		id = buf.readInt();
-		block = Block.getBlockById(buf.readInt());
-		metadata = buf.readByte();
-	}
+	public void fromBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+		id = buffer.readInt();
+        this.blockState = Block.getStateById(buffer.readVarIntFromBuffer());
+    }
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(id);
-		buf.writeInt(Block.getIdFromBlock(block));
-		buf.writeByte(metadata);
+	public void toBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+		buffer.writeInt(id);
+        buffer.writeVarIntToBuffer(Block.getStateId(blockState));
 	}
 
-	public static class Handler implements IMessageHandler<EntityDebrisPacket, IMessage>
-	{
+	public static class Handler implements IMessageHandler<EntityDebrisPacket, IMessage> {
 		@Override
-		public IMessage onMessage(EntityDebrisPacket m, MessageContext ctx)
-		{
-			Iterator iter = Minecraft.getMinecraft().theWorld.loadedEntityList.iterator();
-			while (iter.hasNext())
-			{
-				Entity e = (Entity) iter.next();
-				if (e.getEntityId() == m.id && e instanceof EntityDebris)
-				{
-					EntityDebris ed = (EntityDebris) e;
-					ed.block = m.block;
-					ed.metadata = m.metadata;
-					break;
-				}
-			}
+		public IMessage onMessage(EntityDebrisPacket m, MessageContext ctx) {
+            for (Entity e : Minecraft.getMinecraft().theWorld.loadedEntityList) {
+                if (e.getEntityId() == m.id && e instanceof EntityDebris ed) {
+                    ed.blockState = m.blockState;
+                    break;
+                }
+            }
 			return null;
 		}
 	}

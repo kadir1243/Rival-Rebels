@@ -63,7 +63,7 @@ public class BlockToxicGas extends Block
 	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
 	{
 
-		return AxisAlignedBB.getBoundingBox(par2, par3, par4, par2, par3, par4);
+		return new AxisAlignedBB(par2, par3, par4, par2, par3, par4);
 	}
 
 	@Override

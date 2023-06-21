@@ -21,6 +21,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -38,13 +39,13 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 	public float				slide			= 0;
 	private boolean				inwaterprevtick	= false;
 	private int					soundfile		= 0;
-	
+
 	public EntityRocket(World par1World)
 	{
 		super(par1World);
 		setSize(0.5F, 0.5F);
 	}
-	
+
 	public EntityRocket(World par1World, double par2, double par4, double par6)
 	{
 		super(par1World);
@@ -52,7 +53,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		setPosition(par2, par4, par6);
 		yOffset = 0.0F;
 	}
-	
+
 	public EntityRocket(World par1World, EntityPlayer entity2, float par3)
 	{
 		super(par1World);
@@ -70,7 +71,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
 		setThrowableHeading(motionX, motionY, motionZ, 0.5f, 0.1f);
 	}
-	
+
 	public EntityRocket(World par1World, double x, double y,double z, double mx, double my, double mz)
 	{
 		super(par1World);
@@ -80,7 +81,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
-	
+
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
 		motionX = mx;
@@ -89,7 +90,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
 		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt_double(mx * mx + mz * mz)) * 180.0D / Math.PI);
 	}
-	
+
 	@Override
 	public void setThrowableHeading(double mx, double my, double mz, float speed, float randomness)
 	{
@@ -105,7 +106,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		mz *= speed;
 		setAnglesMotion(mx, my, mz);
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -113,46 +114,46 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 	public void onUpdate()
 	{
 		super.onUpdate();
-		
+
 		if (ticksExisted == 0)
 		{
 			rotation = worldObj.rand.nextInt(360);
 			slide = worldObj.rand.nextInt(21) - 10;
 			for (int i = 0; i < 10; i++)
 			{
-				worldObj.spawnParticle("explode", posX - motionX * 2, posY - motionY * 2, posZ - motionZ * 2, -motionX + (worldObj.rand.nextFloat() - 0.5f) * 0.1f, -motionY + (worldObj.rand.nextFloat() - 0.5) * 0.1f, -motionZ + (worldObj.rand.nextFloat() - 0.5f) * 0.1f);
+				worldObj.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, posX - motionX * 2, posY - motionY * 2, posZ - motionZ * 2, -motionX + (worldObj.rand.nextFloat() - 0.5f) * 0.1f, -motionY + (worldObj.rand.nextFloat() - 0.5) * 0.1f, -motionZ + (worldObj.rand.nextFloat() - 0.5f) * 0.1f);
 			}
 		}
 		rotation += (int) slide;
 		slide *= 0.9;
-		
+
 		if (ticksExisted >= RivalRebels.rpgDecay)
 		{
 			explode(null);
 		}
 		// worldObj.spawnEntityInWorld(new EntityLightningLink(worldObj, posX, posY, posZ, rotationYaw, rotationPitch, 100));
-		
+
 		if (worldObj.isRemote && ticksExisted >= 5 && !inWater && ticksExisted <= 100)
 		{
 			worldObj.spawnEntityInWorld(new EntityPropulsionFX(worldObj, posX, posY, posZ, -motionX * 0.5, -motionY * 0.5 - 0.1, -motionZ * 0.5));
 		}
-		Vec3 vec31 = Vec3.createVectorHelper(posX, posY, posZ);
-		Vec3 vec3 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-		MovingObjectPosition mop = worldObj.func_147447_a(vec31, vec3, false, true, false);
+		Vec3 vec31 = new Vec3(posX, posY, posZ);
+		Vec3 vec3 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
+		MovingObjectPosition mop = worldObj.rayTraceBlocks(vec31, vec3, false, true, false);
 		if (!worldObj.isRemote)
 		{
-			vec31 = Vec3.createVectorHelper(posX, posY, posZ);
-			if (mop != null) vec3 = Vec3.createVectorHelper(mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
-			else vec3 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-			
-			List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
+			vec31 = new Vec3(posX, posY, posZ);
+			if (mop != null) vec3 = new Vec3(mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
+			else vec3 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
+
+			List<Entity> list = worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
 			for (int i = 0; i < list.size(); ++i)
 			{
-				Entity entity = (Entity) list.get(i);
+				Entity entity = list.get(i);
 				if (entity.canBeCollidedWith() && ticksExisted >= 7 && entity != thrower)
 				{
-					MovingObjectPosition mop1 = entity.boundingBox.expand(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
+					MovingObjectPosition mop1 = entity.getEntityBoundingBox().expand(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
 					if (mop1 != null)
 					{
 						double d1 = vec31.squareDistanceTo(mop1.hitVec);
@@ -183,12 +184,12 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
 		float var17 = 1.1f;
 		if (ticksExisted > 25) var17 = 0.9999F;
-		
+
 		if (isInWater())
 		{
 			for (int var7 = 0; var7 < 4; ++var7)
 			{
-				worldObj.spawnParticle("bubble", posX - motionX * 0.25F, posY - motionY * 0.25F, posZ - motionZ * 0.25F, motionX, motionY, motionZ);
+				worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * 0.25F, posY - motionY * 0.25F, posZ - motionZ * 0.25F, motionX, motionY, motionZ);
 			}
 			if (!inwaterprevtick)
 			{
@@ -202,7 +203,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		{
 			soundfile = 0;
 		}
-		
+
 		motionX *= var17;
 		motionY *= var17;
 		motionZ *= var17;
@@ -214,25 +215,24 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		setPosition(posX, posY, posZ);
 		++ticksExisted;
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
 	{
-		
+
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
-		
+
 	}
-	
+
 	public void explode(MovingObjectPosition mop)
 	{
-		if (mop != null && mop.entityHit instanceof EntityPlayer)
+		if (mop != null && mop.entityHit instanceof EntityPlayer player)
 		{
-			EntityPlayer player = (EntityPlayer) mop.entityHit;
-			ItemStack armorSlots[] = player.inventory.armorInventory;
+            ItemStack[] armorSlots = player.inventory.armorInventory;
 			if (armorSlots[0] != null) armorSlots[0].damageItem(48, player);
 			if (armorSlots[1] != null) armorSlots[1].damageItem(48, player);
 			if (armorSlots[2] != null) armorSlots[2].damageItem(48, player);
@@ -240,10 +240,10 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		}
 		if (mop != null && mop.entityHit == null)
 		{
-			Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
+			Block block = worldObj.getBlockState(mop.getBlockPos()).getBlock();
 			if (block == Blocks.glass || block == Blocks.glass_pane || block == Blocks.stained_glass || block == Blocks.stained_glass_pane)
 			{
-				worldObj.setBlock(mop.blockX, mop.blockY, mop.blockZ, Blocks.air);
+				worldObj.setBlockToAir(mop.getBlockPos());
 				RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
 				return;
 			}
@@ -252,29 +252,25 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		new Explosion(worldObj, posX, posY, posZ, RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
 		setDead();
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public int getBrightnessForRender(float par1)
 	{
 		return 1000;
 	}
-	
+
 	@Override
 	public float getBrightness(float par1)
 	{
 		return 1000F;
 	}
-	
-	@Override
-	protected void entityInit()
-	{
-	}
+
 }
 
 /*

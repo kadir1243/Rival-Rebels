@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
@@ -36,8 +37,9 @@ public class RenderAntimatterBomb extends Render
 {
     public static IModelCustom bomb;
 
-	public RenderAntimatterBomb()
+	public RenderAntimatterBomb(RenderManager renderManager)
 	{
+        super(renderManager);
     	bomb = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/t.obj"));
 	}
 

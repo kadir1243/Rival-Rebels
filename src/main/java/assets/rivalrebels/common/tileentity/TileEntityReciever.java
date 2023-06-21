@@ -11,6 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.entity.EntityRhodes;
+import assets.rivalrebels.common.item.weapon.ItemRoda;
+import assets.rivalrebels.common.packet.ADSUpdatePacket;
+import assets.rivalrebels.common.packet.PacketDispatcher;
+import assets.rivalrebels.common.round.RivalRebelsPlayer;
+import assets.rivalrebels.common.round.RivalRebelsTeam;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.monster.EntityGhast;
@@ -28,17 +36,6 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.entity.EntityFlameBall1;
-import assets.rivalrebels.common.entity.EntityRhodes;
-import assets.rivalrebels.common.item.weapon.ItemRoda;
-import assets.rivalrebels.common.packet.ADSUpdatePacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.packet.ReactorUpdatePacket;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -68,7 +65,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	private Entity			le						= null;
 	public int				wepSelected;
 	public static int		staticEntityIndex		= 1;
-	public int				entityIndex				= 1;
+	public int entityIndex;
 	public String			username				= "nohbdy";
 	private int ticksincepacket;
 	int ticksSinceLastShot = 0;
@@ -92,9 +89,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	}
 
 	@Override
-	public void updateEntity()
+	public void update()
 	{
-		super.updateEntity();
+		super.update();
 		if (xO == zO) updateDirection();
 		powered(0, 0);
 		convertBatteryToEnergy();
@@ -111,7 +108,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
-		return AxisAlignedBB.getBoundingBox(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 2, yCoord + 2, zCoord + 2);
+		return new AxisAlignedBB(getPos().getX() - 1, getPos().getY() - 1, getPos().getZ() - 1, getPos().getX() + 2, getPos().getY() + 2, getPos().getZ() + 2);
 	}
 
 	private boolean hasBattery()
@@ -144,10 +141,10 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		if (wep != 0)
 		{
-			if (chestContents[6] != null && chestContents[6].stackTagCompound != null)
+			if (chestContents[6] != null && chestContents[6].hasTagCompound())
 			{
-				team = RivalRebelsTeam.getForID(chestContents[6].stackTagCompound.getInteger("team"));
-				username = chestContents[6].stackTagCompound.getString("username");
+				team = RivalRebelsTeam.getForID(chestContents[6].getTagCompound().getInteger("team"));
+				username = chestContents[6].getTagCompound().getString("username");
 			}
 			chestContents[6] = chestContents[7] = chestContents[8] = null;
 			hasWeapon = true;
@@ -177,14 +174,14 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 					{
 						if (worldObj.rand.nextInt(3) == 0)
 						{
-							RivalRebelsSoundPlayer.playSound(worldObj, xCoord, yCoord, zCoord, 8, 1, 0.1f);
+							RivalRebelsSoundPlayer.playSound(worldObj, getPos().getX(), getPos().getY(), getPos().getZ(), 8, 1, 0.1f);
 						}
 						float rotationYaw = (float) (180 - yaw);
 						float rotationPitch = (float) (-pitch);
 						double motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 						double motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 						double motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-						ItemRoda.spawn(entityIndex,worldObj,xCoord + xO + 0.5, yCoord + 0.75, zCoord + zO + 0.5,motionX,motionY,motionZ,1.0f,0.0f);
+						ItemRoda.spawn(entityIndex,worldObj,getPos().getX() + xO + 0.5, getPos().getY() + 0.75, getPos().getZ() + zO + 0.5,motionX,motionY,motionZ,1.0f,0.0f);
 						useAmmo();
 					}
 					return power - 4;
@@ -194,15 +191,15 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			if (ticksincepacket > 6 && !worldObj.isRemote)
 			{
 				ticksincepacket = 0;
-				PacketDispatcher.packetsys.sendToAll(new ADSUpdatePacket(xCoord, yCoord, zCoord, yawLimit, kMobs, kTeam, kPlayers, hasWeapon, username));
+				PacketDispatcher.packetsys.sendToAll(new ADSUpdatePacket(getPos(), yawLimit, kMobs, kTeam, kPlayers, hasWeapon, username));
 			}
 		}
 		return power - 1;
 	}
 
 	/*
-	 * public Packet getDescriptionPacket() { Packet132TileEntityData p = new Packet132TileEntityData(); NBTTagCompound nbt = new NBTTagCompound(); writeToNBT(nbt); p.data = nbt; p.xPosition = xCoord;
-	 * p.yPosition = yCoord; p.zPosition = zCoord; return p; } public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) { readFromNBT(pkt.data); }
+	 * public Packet getDescriptionPacket() { Packet132TileEntityData p = new Packet132TileEntityData(); NBTTagCompound nbt = new NBTTagCompound(); writeToNBT(nbt); p.data = nbt; p.xPosition = getPos().getX();
+	 * p.yPosition = getPos().getY(); p.zPosition = getPos().getZ(); return p; } public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) { readFromNBT(pkt.data); }
 	 */
 
 	private boolean hasAmmo()
@@ -233,7 +230,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		for (int i = 0; i < iter.length; i++)
 		{
 			Entity e = (Entity) iter[i];
-			double dist = e.getDistanceSq(xCoord + 0.5 + xO, yCoord + 0.5, zCoord + 0.5 + zO);
+			double dist = e.getDistanceSq(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO);
 			if (dist < ldist)
 			{
 				if (canTarget(e))
@@ -254,17 +251,16 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	private boolean isValidTarget(Entity e)
 	{
 		if (e == null) return false;
-		else if (e instanceof EntityPlayer)
+		else if (e instanceof EntityPlayer p)
 		{
-			EntityPlayer p = ((EntityPlayer) e);
-			if (p.capabilities.isCreativeMode) return false;
+            if (p.capabilities.isCreativeMode) return false;
 			else
 			{
 				if (kPlayers) return true;
 				else if (!kTeam) return false;
-				RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForName(((EntityPlayer) e).getCommandSenderName());
+				RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForName(((EntityPlayer) e).getName());
 				if (rrp == null) return kTeam;
-				if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getCommandSenderName().equals(username);
+				if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getName().equals(username);
 				if (rrp.rrteam != team) return kTeam;
 				else return false;
 			}
@@ -276,15 +272,15 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		int yaw = (int) (getYawTo(e, 0) - getBaseRotation() + 360) % 360;
 		if (Math.abs(yaw) > yawLimit / 2 && Math.abs(yaw) < 360 - (yawLimit / 2)) return false;
-		Vec3 start = Vec3.createVectorHelper(e.posX, e.posY + e.getEyeHeight(), e.posZ);
-		Vec3 end = Vec3.createVectorHelper(xCoord + 0.5 + xO, yCoord + 0.5, zCoord + 0.5 + zO);
-		MovingObjectPosition mop = worldObj.func_147447_a(start, end, false, true, false);
-		return mop == null || (mop.blockX == xCoord && mop.blockY == yCoord && mop.blockZ == zCoord);
+		Vec3 start = new Vec3(e.posX, e.posY + e.getEyeHeight(), e.posZ);
+		Vec3 end = new Vec3(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO);
+		MovingObjectPosition mop = worldObj.rayTraceBlocks(start, end, false, true, false);
+		return mop == null || mop.getBlockPos().equals(getPos());
 	}
 
 	private void updateDirection()
 	{
-		direction = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+		direction = getBlockType().getMetaFromState(worldObj.getBlockState(pos));
 		xO = 0.0;
 		zO = 0.0;
 		if (direction == 2) zO = -0.76f;
@@ -295,9 +291,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 
 	public int lookAt(Entity t)
 	{
-		double dist = t.getDistance(xCoord + 0.5 + xO, yCoord + 0.5, zCoord + 0.5 + zO);
-		double ya = getYawTo(t, le == t ? dist * 1.00 : 0);
-		double pi = getPitchTo(t, le == t ? dist * 1.00 : 0);
+		double dist = t.getDistance(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO);
+		double ya = getYawTo(t, le == t ? dist : 0);
+		double pi = getPitchTo(t, le == t ? dist : 0);
 		if (pi > ll && pi < ul)
 		{
 			pitch = (pitch + pitch + pitch + pi) / 4;
@@ -316,17 +312,17 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 
 	public double getYawTo(Entity t, double off)
 	{
-		double x = xCoord + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
-		double z = zCoord + 0.5 + zO - t.posZ - (t.posZ - prevTz) * off;
+		double x = getPos().getX() + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
+		double z = getPos().getZ() + 0.5 + zO - t.posZ - (t.posZ - prevTz) * off;
 		double ya = Math.atan2(x, z);
 		return ((ya / Math.PI) * 180);
 	}
 
 	public double getPitchTo(Entity t, double off)
 	{
-		double x = xCoord + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
-		double y = yCoord + (0.5 * scale) - t.posY - t.getEyeHeight() - (t.posY - prevTy) * off;
-		double z = zCoord + 0.5 + zO - t.posZ - (t.posZ - prevTz) * off;
+		double x = getPos().getX() + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
+		double y = getPos().getY() + (0.5 * scale) - t.posY - t.getEyeHeight() - (t.posY - prevTy) * off;
+		double z = getPos().getZ() + 0.5 + zO - t.posZ - (t.posZ - prevTz) * off;
 		double d = Math.sqrt(x * x + z * z);
 		double pi = Math.atan2(d, -y);
 		return 90 - ((pi / Math.PI) * 180);
@@ -376,8 +372,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			{
 				var3 = this.chestContents[par1];
 				this.chestContents[par1] = null;
-				return var3;
-			}
+            }
 			else
 			{
 				var3 = this.chestContents[par1].splitStack(par2);
@@ -386,9 +381,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 				{
 					this.chestContents[par1] = null;
 				}
-				return var3;
-			}
-		}
+            }
+            return var3;
+        }
 		return null;
 	}
 
@@ -396,7 +391,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
 	 */
 	@Override
-	public ItemStack getStackInSlotOnClosing(int par1)
+	public ItemStack removeStackFromSlot(int par1)
 	{
 		if (par1 >= getSizeInventory()) return null;
 		if (this.chestContents[par1] != null)
@@ -438,7 +433,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
 	{
-		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+		return this.worldObj.getTileEntity(this.getPos()) == this && par1EntityPlayer.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
 
 	@Override
@@ -511,26 +506,22 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	}
 
 	@Override
-	public String getInventoryName()
+	public String getName()
 	{
 		return "Automated Defense System";
 	}
 
 	@Override
-	public boolean hasCustomInventoryName()
+	public boolean hasCustomName()
 	{
 		return false;
 	}
 
 	@Override
-	public void openInventory()
-	{
-
+	public void openInventory(EntityPlayer player) {
 	}
 
 	@Override
-	public void closeInventory()
-	{
-
+	public void closeInventory(EntityPlayer player) {
 	}
 }

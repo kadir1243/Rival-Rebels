@@ -11,26 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.container;
 
+import assets.rivalrebels.common.block.trap.BlockTimedBomb;
+import assets.rivalrebels.common.item.*;
+import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import assets.rivalrebels.common.block.trap.BlockTimedBomb;
-import assets.rivalrebels.common.item.ItemAntenna;
-import assets.rivalrebels.common.item.ItemChip;
-import assets.rivalrebels.common.item.ItemFuse;
-import assets.rivalrebels.common.item.ItemRodHydrogen;
-import assets.rivalrebels.common.item.ItemRodNuclear;
-import assets.rivalrebels.common.item.ItemRodRedstone;
-import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
 
 public class ContainerTachyonBomb extends Container
 {
 	protected TileEntityTachyonBomb	entity;
-	
+
 	public ContainerTachyonBomb(InventoryPlayer inventoryPlayer, TileEntityTachyonBomb tileEntity)
 	{
 		entity = tileEntity;
@@ -48,13 +41,13 @@ public class ContainerTachyonBomb extends Container
 		addSlotToContainer(new SlotRR(entity, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
 	}
-	
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
 		return entity.isUseableByPlayer(player);
 	}
-	
+
 	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
@@ -64,24 +57,24 @@ public class ContainerTachyonBomb extends Container
 				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
 			}
 		}
-		
+
 		for (int i = 0; i < 9; i++)
 		{
 			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
 		}
 	}
-	
+
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
 	{
 		ItemStack var3 = null;
-		Slot var4 = (Slot) this.inventorySlots.get(par2);
-		
+		Slot var4 = this.inventorySlots.get(par2);
+
 		if (var4 != null && var4.getHasStack())
 		{
 			ItemStack var5 = var4.getStack();
 			var3 = var5.copy();
-			
+
 			if (par2 <= 19)
 			{
 				if (!this.mergeItemStack(var5, 19, this.inventorySlots.size(), true))
@@ -93,17 +86,17 @@ public class ContainerTachyonBomb extends Container
 			{
 				return null;
 			}
-			
+
 			if (var5.stackSize == 0)
 			{
-				var4.putStack((ItemStack) null);
+				var4.putStack(null);
 			}
 			else
 			{
 				var4.onSlotChanged();
 			}
 		}
-		
+
 		return var3;
 	}
 }

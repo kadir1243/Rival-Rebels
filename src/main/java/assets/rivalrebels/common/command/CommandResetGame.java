@@ -11,16 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.command;
 
-import java.util.List;
-
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerNotFoundException;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.ChatComponentText;
+
+import java.util.List;
 
 public class CommandResetGame extends CommandBase
 {
@@ -46,8 +47,7 @@ public class CommandResetGame extends CommandBase
 	}
 
 	@Override
-	public void processCommand(ICommandSender sender, String[] array)
-	{
+	public void processCommand(ICommandSender sender, String[] array) throws PlayerNotFoundException {
 		EntityPlayer player = getCommandSenderAsPlayer(sender);
 		if (array.length == 1 && array[0].length() > 0)
 		{
@@ -70,12 +70,8 @@ public class CommandResetGame extends CommandBase
 		}
 	}
 
-	/**
-	 * Adds the strings available in this command to the given list of tab completion options.
-	 */
-	@Override
-	public List<String> addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
-	{
-		return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
-	}
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
+    }
 }

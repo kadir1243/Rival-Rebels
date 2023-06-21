@@ -11,32 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import assets.rivalrebels.common.tileentity.TileEntityList;
-import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
-import assets.rivalrebels.common.tileentity.TileEntityReactive;
-import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ADSClosePacket implements IMessage
-{
-	int x;
-	int y;
-	int z;
+public class ADSClosePacket implements IMessage {
+    private BlockPos pos;
 	boolean mobs;
 	boolean chip;
 	boolean player;
@@ -47,11 +32,9 @@ public class ADSClosePacket implements IMessage
 
 	}
 
-	public ADSClosePacket(int X, int Y, int Z, boolean m, boolean c, boolean p, int r)
+	public ADSClosePacket(BlockPos pos, boolean m, boolean c, boolean p, int r)
 	{
-		x = X;
-		y = Y;
-		z = Z;
+        this.pos = pos;
 		mobs = m;
 		chip = c;
 		player = p;
@@ -59,28 +42,25 @@ public class ADSClosePacket implements IMessage
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		x = buf.readInt();
-		y = buf.readInt();
-		z = buf.readInt();
-		mobs = buf.readBoolean();
-		chip = buf.readBoolean();
-		player = buf.readBoolean();
-		range = buf.readInt();
+	public void fromBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+        pos = buffer.readBlockPos();
+
+		mobs = buffer.readBoolean();
+		chip = buffer.readBoolean();
+		player = buffer.readBoolean();
+		range = buffer.readInt();
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
+	public void toBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+		buffer.writeBlockPos(pos);
 
-		buf.writeBoolean(mobs);
-		buf.writeBoolean(chip);
-		buf.writeBoolean(player);
-		buf.writeInt(range);
+		buffer.writeBoolean(mobs);
+		buffer.writeBoolean(chip);
+		buffer.writeBoolean(player);
+		buffer.writeInt(range);
 	}
 
 	public static class Handler implements IMessageHandler<ADSClosePacket, IMessage>
@@ -88,11 +68,10 @@ public class ADSClosePacket implements IMessage
 		@Override
 		public IMessage onMessage(ADSClosePacket m, MessageContext ctx)
 		{
-			TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.x, m.y, m.z);
-			if (te instanceof TileEntityReciever && ctx.getServerHandler().playerEntity.getDistanceSq(m.x, m.y, m.z) < 100)
+			TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.pos);
+			if (te instanceof TileEntityReciever ter && ctx.getServerHandler().playerEntity.getDistanceSq(m.pos) < 100)
 			{
-				TileEntityReciever ter = (TileEntityReciever) te;
-				ter.kMobs = m.mobs;
+                ter.kMobs = m.mobs;
 				ter.kTeam = m.chip;
 				ter.kPlayers = m.player;
 				ter.yawLimit = m.range;

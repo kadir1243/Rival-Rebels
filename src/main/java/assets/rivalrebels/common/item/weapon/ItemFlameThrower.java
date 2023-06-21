@@ -40,94 +40,12 @@ import net.minecraftforge.fml.relauncher.Side;
 
 public class ItemFlameThrower extends ItemTool
 {
-	// HashMap<String, Entity> entities;
-	public ItemFlameThrower()
-	{
-		super(1, ToolMaterial.EMERALD, new HashSet<>());
+	public ItemFlameThrower() {
+        super(1, ToolMaterial.EMERALD, new HashSet<>());
 		maxStackSize = 1;
-		// entities = new HashMap<String, Entity>();
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
-	//
-	// @Override
-	// public boolean isFull3D()
-	// {
-	// return true;
-	// }
-
-	// @Override
-	// public EnumAction getItemUseAction(ItemStack par1ItemStack)
-	// {
-	// return EnumAction.bow;
-	// }
-	//
-	// @Override
-	// public int getMaxItemUseDuration(ItemStack par1ItemStack)
-	// {
-	// return 1024;
-	// }
-	//
-	// @Override
-	// public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
-	// {
-	// if (player.capabilities.isCreativeMode || player.inventory.hasItem(RivalRebels.fuel) || RivalRebels.infiniteAmmo)
-	// {
-	// player.setItemInUse(item, getMaxItemUseDuration(item));
-	// if (!player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
-	// {
-	// player.inventory.consumeInventoryItem(RivalRebels.fuel);
-	// }
-	// if (!world.isRemote)
-	// {
-	// EntityMagnet em = (EntityMagnet) entities.get(player.username);
-	// if (em != null) em.setDead();
-	// em = new EntityMagnet(world, player);
-	// world.spawnEntityInWorld(em);
-	// entities.put(player.username, em);
-	// em.isBeingShot = true;
-	// }
-	// }
-	// else if (!world.isRemote)
-	// {
-	// player.addChatMessage(new ChatComponentText("§cOut of batteries");
-	// }
-	// return item;
-	// }
-	//
-	// @Override
-	// public void onUsingItemTick(ItemStack stack, EntityPlayer player, int count)
-	// {
-	// EntityMagnet em = (EntityMagnet) entities.get(player.username);
-	// if (em == null) return;
-	// em.shootingEntity = player;
-	// // if (player.worldObj.isRemote && player.username.equals(Minecraft.getMinecraft().thePlayer.username))
-	// // {
-	// // em.rotationPitch = Minecraft.getMinecraft().thePlayer.rotationPitch;
-	// // em.rotationYaw = Minecraft.getMinecraft().thePlayer.rotationYaw;
-	// // em.posX = Minecraft.getMinecraft().thePlayer.posX;
-	// // em.posY = Minecraft.getMinecraft().thePlayer.posY;
-	// // em.posZ = Minecraft.getMinecraft().thePlayer.posZ;
-	// // }
-	// }
-	//
-	// @Override
-	// public void onPlayerStoppedUsing(ItemStack stack, World world, EntityPlayer player, int count)
-	// {
-	// EntityMagnet em = (EntityMagnet) entities.get(player.username);
-	// if (em == null) return;
-	// em.isBeingShot = false;
-	// em.setDead();
-	// entities.remove(player.username);
-	// }
-
-	// public ItemFlameThrower(int par1)
-	// {
-	// super(par1);
-	// maxStackSize = 1;
-	// setCreativeTab(RivalRebels.instance.rralltab);
-	// }
-	//
 	@Override
 	public boolean isFull3D()
 	{
@@ -137,7 +55,7 @@ public class ItemFlameThrower extends ItemTool
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
 
 	@Override
@@ -198,18 +116,14 @@ public class ItemFlameThrower extends ItemTool
 					}
 					if (!item.isItemEnchanted())
 					{
-						switch (getMode(item))
-						{
-							case 0:
-								for (int i = 0; i < 4; i++) world.spawnEntityInWorld(new EntityFlameBall2(world, entity, (float) (Math.random() + 0.5f)));
-							break;
-							case 1:
-								world.spawnEntityInWorld(new EntityFlameBall1(entity.worldObj, entity, 1));
-							break;
-							case 2:
-								world.spawnEntityInWorld(new EntityFlameBall(world, entity, 1));
-							break;
-						}
+                        switch (getMode(item)) {
+                            case 0 -> {
+                                for (int i = 0; i < 4; i++)
+                                    world.spawnEntityInWorld(new EntityFlameBall2(world, entity, (float) (Math.random() + 0.5f)));
+                            }
+                            case 1 -> world.spawnEntityInWorld(new EntityFlameBall1(entity.worldObj, entity, 1));
+                            case 2 -> world.spawnEntityInWorld(new EntityFlameBall(world, entity, 1));
+                        }
 					}
 				}
 			}
@@ -219,16 +133,15 @@ public class ItemFlameThrower extends ItemTool
 	@Override
 	public void onUpdate(ItemStack item, World world, Entity entity, int par4, boolean par5)
 	{
-		if (item.getTagCompound() == null) item.stackTagCompound = new NBTTagCompound();
+		if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
 		if (!item.getTagCompound().getBoolean("isReady"))
 		{
 			item.getTagCompound().setBoolean("isReady", true);
 			item.getTagCompound().setInteger("mode", 2);
 		}
-		if (entity instanceof EntityPlayer)
+		if (entity instanceof EntityPlayer player)
 		{
-			EntityPlayer player = (EntityPlayer) entity;
-			if (player.inventory.getCurrentItem() != null)
+            if (player.inventory.getCurrentItem() != null)
 			{
 				if (player.inventory.getCurrentItem().getItem() == this)
 				{
@@ -245,17 +158,17 @@ public class ItemFlameThrower extends ItemTool
 
 	public void openGui(ItemStack item, Entity entity)
 	{
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-		if ((RivalRebels.altRkey?Keyboard.isKeyDown(Keyboard.KEY_F):Keyboard.isKeyDown(Keyboard.KEY_R)) && item == ((EntityPlayer) entity).inventory.getCurrentItem() && Minecraft.getMinecraft().currentScreen == null)
-		{
-			RivalRebels.proxy.flamethrowerGui(getMode(item));
-		}
+        if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT) {
+            if ((RivalRebels.altRkey ? Keyboard.isKeyDown(Keyboard.KEY_F) : Keyboard.isKeyDown(Keyboard.KEY_R)) && item == ((EntityPlayer) entity).inventory.getCurrentItem() && Minecraft.getMinecraft().currentScreen == null) {
+                RivalRebels.proxy.flamethrowerGui(getMode(item));
+            }
+        }
 	}
 
 	public int getMode(ItemStack item)
 	{
-		if (item.stackTagCompound == null) return 0;
-		else return item.stackTagCompound.getInteger("mode");
+		if (!item.hasTagCompound()) return 0;
+		else return item.getTagCompound().getInteger("mode");
 	}
 
 	@Override

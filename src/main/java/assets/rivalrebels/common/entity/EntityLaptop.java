@@ -11,17 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class EntityLaptop extends EntityInanimate
 {
@@ -32,22 +31,13 @@ public class EntityLaptop extends EntityInanimate
 	{
 		super(par1World);
 		this.setSize(1F, 0.6F);
-		boundingBox.setBounds(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125);
+        this.setEntityBoundingBox(new AxisAlignedBB(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
 	}
 
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
-		return par1Entity.boundingBox;
-	}
-
-	/**
-	 * returns the bounding box for this entity
-	 */
-	@Override
-	public AxisAlignedBB getBoundingBox()
-	{
-		return this.boundingBox;
+		return par1Entity.getEntityBoundingBox();
 	}
 
 	@Override
@@ -70,7 +60,7 @@ public class EntityLaptop extends EntityInanimate
 		super(par1World);
 		setPosition(x, y, z);
 		rotationYaw = yaw;
-		boundingBox.setBounds(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125);
+        setEntityBoundingBox(new AxisAlignedBB(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
 	}
 
 	@Override
@@ -79,12 +69,12 @@ public class EntityLaptop extends EntityInanimate
 		super.onUpdate();
 		slide = (Math.cos(test) + 1) * 45;
 
-		List players = worldObj.playerEntities;
-		Iterator iter = players.iterator();
+		List<EntityPlayer> players = worldObj.playerEntities;
+		Iterator<EntityPlayer> iter = players.iterator();
 		boolean i = false;
 		while (iter.hasNext())
 		{
-			EntityPlayer player = (EntityPlayer) iter.next();
+			EntityPlayer player = iter.next();
 			if (player.getDistanceSq(posX + 0.5f, posY + 0.5f, posZ + 0.5f) <= 9)
 			{
 				i = true;
@@ -114,22 +104,5 @@ public class EntityLaptop extends EntityInanimate
 			setDead();
 		}
 		return true;
-	}
-
-	@Override
-	protected void entityInit()
-	{
-	}
-
-	@Override
-	protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
-	{
-
-	}
-
-	@Override
-	protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
-	{
-
 	}
 }

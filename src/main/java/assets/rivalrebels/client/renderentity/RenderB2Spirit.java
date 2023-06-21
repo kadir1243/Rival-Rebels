@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -31,8 +32,9 @@ public class RenderB2Spirit extends Render
 	public static ModelFromObj	shuttle;
 	public static ModelFromObj	tupolev;
 
-	public RenderB2Spirit()
+	public RenderB2Spirit(RenderManager renderManager)
 	{
+        super(renderManager);
 		try
 		{
 			b2 = ModelFromObj.readObjFile("d.obj");

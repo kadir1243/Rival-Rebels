@@ -14,6 +14,7 @@ package assets.rivalrebels.client.renderentity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
@@ -36,9 +37,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class RenderRhodesTorso extends Render
 {
-	public RenderRhodesTorso()
-	{
-	}
+	public RenderRhodesTorso(RenderManager renderManager) {
+        super(renderManager);
+    }
 
 	public void renderRhodes(EntityRhodesTorso rhodes, double x, double y, double z, float par8, float ptt)
 	{

@@ -14,6 +14,7 @@ package assets.rivalrebels.common.command;
 import assets.rivalrebels.common.entity.EntityHotPotato;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
 
@@ -22,9 +23,7 @@ import java.util.List;
 
 public class CommandHotPotato extends CommandBase
 {
-	public static int x = -1;
-	public static int y = -1;
-	public static int z = -1;
+    public static BlockPos pos = new BlockPos(-1, -1, -1);
 	public static World world = null;
 	public static boolean roundinprogress = false;
 	@Override
@@ -73,7 +72,7 @@ public class CommandHotPotato extends CommandBase
 				}
 				int n = Integer.parseInt(array[0]);
 				sender.addChatMessage(new ChatComponentText("§cLet the Hot Potato games begin! " + n + " rounds."));
-				EntityHotPotato tsar = new EntityHotPotato(world,x,y,z,n);
+				EntityHotPotato tsar = new EntityHotPotato(world, pos.getX(), pos.getY(), pos.getZ(),n);
 				world.spawnEntityInWorld(tsar);
 				roundinprogress = true;
             }
@@ -81,11 +80,9 @@ public class CommandHotPotato extends CommandBase
         }
 		sender.addChatMessage(new ChatComponentText("§cUsage: /rrhotpotato [number of rounds]"));
 	}
-	/**
-     * Adds the strings available in this command to the given list of tab completion options.
-     */
-    public List<String> addTabCompletionOptions(ICommandSender p, String[] s)
-    {
-		return Collections.singletonList("nuketime");
+
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return Collections.singletonList("nuketime");
     }
 }

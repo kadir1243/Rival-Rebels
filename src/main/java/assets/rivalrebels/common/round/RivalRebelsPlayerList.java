@@ -11,15 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.round;
 
-import io.netty.buffer.ByteBuf;
-
-import java.util.Arrays;
-
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.packet.PacketDispatcher;
+import io.netty.buffer.ByteBuf;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.Arrays;
 
 public class RivalRebelsPlayerList implements IMessage
 {
@@ -38,15 +36,13 @@ public class RivalRebelsPlayerList implements IMessage
 	public RivalRebelsPlayer add(RivalRebelsPlayer o)
 	{
 		size++;
-		if (size <= list.length) list[size - 1] = o;
-		else
-		{
-			int nsize = ((list.length * 3) / 2) + 1;
-			if (nsize < size) nsize = size;
-			list = Arrays.copyOf(list, nsize);
-			list[size - 1] = o;
-		}
-		return o;
+        if (size > list.length) {
+            int nsize = ((list.length * 3) / 2) + 1;
+            if (nsize < size) nsize = size;
+            list = Arrays.copyOf(list, nsize);
+        }
+        list[size - 1] = o;
+        return o;
 	}
 
 	public void clear()

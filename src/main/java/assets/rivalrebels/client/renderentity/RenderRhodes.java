@@ -16,6 +16,7 @@ import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -70,8 +71,9 @@ public class RenderRhodes extends Render
 			"flags/",
 	};
 
-	public RenderRhodes()
+	public RenderRhodes(RenderManager renderManager)
 	{
+        super(renderManager);
     	texture = new ResourceLocation(RivalRebels.MODID, "textures/entity/rhodes.png");
     	flametex = new ResourceLocation(RivalRebels.MODID, "textures/entity/flame.png");
     	head = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/head.obj"));
@@ -107,48 +109,6 @@ public class RenderRhodes extends Render
 			e.printStackTrace();
 		}
 	}
-
-	/*public static float atan2(float y, float x)
-	{
-		return atan(y/((float)Math.sqrt(x*x+y*y)+x));
-		if (x>=0)
-		{
-			if (y>=0)
-			{
-				if (x>y) return atan(y/x);
-				else return 90-atan(x/y);
-			}
-			else return 90-atan(y/x);
-		}
-		else
-		{
-			if (y>=0) return 90-atan(y/x);
-			else
-			{
-				if (x>y) return 90-atan(y/x);
-				else return atan(x/y);
-			}
-		}
-	}
-
-	public static float atan(float x)
-	{
-		return atan(y/((float)Math.sqrt(x*x+y*y)+x));
-		if (x > 1)
-		{
-			float r = 1/x;
-			return 180-(110.8653352702f-20.8654f*r*r)*r;
-		}
-		else if (x > -1)
-		{
-			return (110.8653352702f-20.8654f*x*x)*x;
-		}
-		else
-		{
-			float r = 1/x;
-			return -180-(110.8653352702f-20.8654f*r*r)*r;
-		}
-	}*/
 
 	public static float[] colors = {
 		255/255f,     255/255f,     255/255f, //1
@@ -202,7 +162,7 @@ public class RenderRhodes extends Render
             if (rhodes.rider != null)
             {
             	name += " - " + rhodes.rider.getDisplayName();
-            	RivalRebelsPlayer rrp = RivalRebels.instance.round.rrplayerlist.getForName(rhodes.rider.getCommandSenderName());
+            	RivalRebelsPlayer rrp = RivalRebels.instance.round.rrplayerlist.getForName(rhodes.rider.getName());
             	if (rrp!=null)
             	{
             		switch (rrp.rrteam)

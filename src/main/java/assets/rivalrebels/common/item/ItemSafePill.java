@@ -11,8 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -21,8 +22,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 
 public class ItemSafePill extends Item
 {
@@ -32,7 +31,7 @@ public class ItemSafePill extends Item
 		maxStackSize = 6;
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	@Override
 	public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
 	{
@@ -44,20 +43,20 @@ public class ItemSafePill extends Item
 			RivalRebelsSoundPlayer.playSound(player, 28, 18);
 			world.playSoundAtEntity(player, "mob.magmacube.jump", 1.0F, 1.0F);
 			world.playSoundAtEntity(player, "mob.ghast.scream", 1.0F, 1.0F);
-			((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.blindness.id, 10, 20));
+			player.addPotionEffect(new PotionEffect(Potion.blindness.id, 10, 20));
 			player.getFoodStats().addStats(10, 200);
 			player.heal(10);
 			player.inventory.consumeInventoryItem(item.getItem());
 		}
 		return item;
 	}
-	
+
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.eat;
+		return EnumAction.EAT;
 	}
-	
+
 	/**
 	 * How long it takes to use or consume an item
 	 */
@@ -66,7 +65,7 @@ public class ItemSafePill extends Item
 	{
 		return 32;
 	}
-	
+
 	@Override
 	public void registerIcons(IIconRegister iconregister)
 	{

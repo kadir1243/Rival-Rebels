@@ -22,7 +22,7 @@ import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class TextPacket implements IMessage
 {
-	String text;
+	private String text;
 
 	public TextPacket()
 	{
@@ -56,7 +56,7 @@ public class TextPacket implements IMessage
 		{
 			if (m.text.startsWith("-t"))
 			{
-				String[] str = m.text.substring(2, m.text.length()).split("\n");
+				String[] str = m.text.substring(2).split("\n");
 				for (int i = 0; i < str.length; i++) Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(str[i]));
 			}
 			else

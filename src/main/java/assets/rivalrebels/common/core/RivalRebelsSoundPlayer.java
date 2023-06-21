@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.core;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 
 public class RivalRebelsSoundPlayer
@@ -77,7 +78,7 @@ public class RivalRebelsSoundPlayer
 			// voice 28
 			"ba"
 									};
-	
+
 	static String[][]	number		=
 									{
 									// artillery
@@ -215,7 +216,7 @@ public class RivalRebelsSoundPlayer
 			"r",
 			"s"}
 									};
-	
+
 	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume, float pitch)
 	{
 		if (world != null && dir >= 0 && dir < directory.length && num >= 0 && num < number[dir].length)
@@ -229,17 +230,20 @@ public class RivalRebelsSoundPlayer
 			return false;
 		}
 	}
-	
-	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume)
-	{
+
+	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume) {
 		return playSound(world, dir, num, x, y, z, volume, 1);
 	}
-	
+
+    public static boolean playSound(World world, int dir, int num, BlockPos pos, float volume) {
+        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ(), volume);
+    }
+
 	public static boolean playSound(World world, int dir, int num, double x, double y, double z)
 	{
 		return playSound(world, dir, num, x, y, z, 1, 1);
 	}
-	
+
 	public static boolean playSound(Entity entity, int dir, int num, float volume, float pitch)
 	{
 		if (entity != null)
@@ -251,12 +255,12 @@ public class RivalRebelsSoundPlayer
 			return false;
 		}
 	}
-	
+
 	public static boolean playSound(Entity entity, int dir, int num, float volume)
 	{
 		return playSound(entity, dir, num, volume, 1);
 	}
-	
+
 	public static boolean playSound(Entity entity, int dir, int num)
 	{
 		return playSound(entity, dir, num, 1, 1);

@@ -50,7 +50,7 @@ public class BlockSteel extends Block
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
 	{
 		float f = 0.0625F;
-		return AxisAlignedBB.getBoundingBox(par2 + f, par3 + f, par4 + f, (par2 + 1) - f, (float) par3 + 1, (par4 + 1) - f);
+		return new AxisAlignedBB(par2 + f, par3 + f, par4 + f, (par2 + 1) - f, (float) par3 + 1, (par4 + 1) - f);
 	}
 
 	@Override

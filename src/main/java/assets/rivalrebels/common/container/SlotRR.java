@@ -21,25 +21,25 @@ import assets.rivalrebels.RivalRebels;
 
 public class SlotRR extends Slot
 {
-	int				maxStack			= 64;
-	Class<?>		limit				= Item.class;
-	boolean			acceptsTrollFace	= false;
-	boolean			acceptsTimedBomb	= false;
-	public boolean	locked				= false;
-	
+	private final int maxStack;
+	private final Class<?> limit;
+	private boolean acceptsTrollFace;
+	private boolean acceptsTimedBomb;
+	public boolean	locked;
+
 	public SlotRR(IInventory inv, int id, int x, int y, int mstack, Class<?> only)
 	{
 		super(inv, id, x, y);
 		maxStack = mstack;
 		limit = only;
 	}
-	
+
 	@Override
 	public boolean canTakeStack(EntityPlayer par1EntityPlayer)
 	{
 		return !locked;
 	}
-	
+
 	@Override
 	public boolean isItemValid(ItemStack item)
 	{
@@ -49,28 +49,27 @@ public class SlotRR extends Slot
 		boolean trollface = acceptsTrollFace && (item.getItem() == RivalRebels.trollmask);
 		boolean timedbomb = acceptsTimedBomb && (item.getItem() == Item.getItemFromBlock(RivalRebels.timedbomb));
 		boolean itemmatch = limit.isAssignableFrom(item.getItem().getClass());
-		boolean blockmatch = isblock && limit.isAssignableFrom(((ItemBlock) item.getItem()).field_150939_a.getClass());
-		if (itemmatch || blockmatch || trollface || timedbomb) return true;
-		return false;
-	}
-	
+		boolean blockmatch = isblock && limit.isAssignableFrom(((ItemBlock) item.getItem()).block.getClass());
+        return itemmatch || blockmatch || trollface || timedbomb;
+    }
+
 	@Override
 	public int getSlotStackLimit()
 	{
 		return maxStack;
 	}
-	
+
 	public SlotRR setAcceptsTrollface(boolean t)
 	{
 		acceptsTrollFace = t;
-		
+
 		return this;
 	}
-	
+
 	public SlotRR setAcceptsTimedBomb(boolean t)
 	{
 		acceptsTimedBomb = t;
-		
+
 		return this;
 	}
 }

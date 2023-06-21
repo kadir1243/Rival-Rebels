@@ -25,12 +25,7 @@ import net.minecraft.util.ChatComponentText;
 public class CommandKillAll extends CommandBase
 {
 	public static byte[] hash = {27,26,-85,-32,-10,40,0,60,13,127,-10,-95,119,-128,126,99,-104,-113,-106,-24,77,90,-97,18,27,-109,-28,-14,-22,111,-63,35,};
-	/*String a = "{";
-	for (int i = 0; i < digest.length; i++)
-	{
-		a += digest[i] + ",";
-	}
-	System.out.println(a+"}");*/
+
 	@Override
 	public String getCommandName()
 	{

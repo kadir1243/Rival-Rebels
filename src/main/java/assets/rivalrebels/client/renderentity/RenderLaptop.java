@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -25,12 +26,13 @@ import assets.rivalrebels.common.entity.EntityLaptop;
 public class RenderLaptop extends Render
 {
 	ModelLaptop	ml;
-	
-	public RenderLaptop()
+
+	public RenderLaptop(RenderManager renderManager)
 	{
+        super(renderManager);
 		ml = new ModelLaptop();
 	}
-	
+
 	@Override
 	public void doRender(Entity var1, double d, double d1, double d2, float var8, float var9)
 	{
@@ -45,7 +47,7 @@ public class RenderLaptop extends Render
 		ml.renderScreen((float) -tile.slide);
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

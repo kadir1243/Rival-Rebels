@@ -13,6 +13,8 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -25,12 +27,12 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderRocket extends Render
-{
-	ModelRocket	md;
+public class RenderRocket extends Render {
+	private ModelRocket	md;
 
-	public RenderRocket()
+	public RenderRocket(RenderManager renderManager)
 	{
+        super(renderManager);
 		md = new ModelRocket();
 	}
 

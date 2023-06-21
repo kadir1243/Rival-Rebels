@@ -70,7 +70,7 @@ public class GuiSpawn extends GuiScreen
 		sigmaScroll = new GuiScroll(5, posX + 243, posY + 140, 80);
 		playerScroll = new GuiScroll(6, posX + 154, posY + 103, 16);
 		gameScroll = new GuiScroll(7, posX + 243, posY + 66, 16);
-		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForName(Minecraft.getMinecraft().thePlayer.getCommandSenderName());
+		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForName(Minecraft.getMinecraft().thePlayer.getName());
 		resetButton.enabled = nw.resets > 0 && !nw.isreset;
 		omegaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
 		sigmaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
@@ -100,7 +100,7 @@ public class GuiSpawn extends GuiScreen
     @Override
 	public void drawScreen(int x, int y, float d)
 	{
-		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForName(Minecraft.getMinecraft().thePlayer.getCommandSenderName());
+		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForName(Minecraft.getMinecraft().thePlayer.getName());
 		classButton.enabled = nw.isreset;
 		omegaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
 		sigmaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;

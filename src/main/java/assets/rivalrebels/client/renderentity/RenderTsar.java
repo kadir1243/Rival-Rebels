@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.entity.EntityTsar;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.renderer.entity.Render;
@@ -25,8 +26,9 @@ public class RenderTsar extends Render
 {
 	private ModelTsarBomba	model;
 
-	public RenderTsar()
+	public RenderTsar(RenderManager renderManager)
 	{
+        super(renderManager);
 		model = new ModelTsarBomba();
 	}
 

@@ -13,12 +13,10 @@ package assets.rivalrebels.client.tileentityrender;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.model.ModelFast3D;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.client.model.ModelReactor;
 import assets.rivalrebels.client.model.RenderLibrary;
@@ -87,7 +85,7 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer<TileEnt
 		GL11.glScalef(0.2f, 0.2f, 0.2f);
 		mo.render();
 		GL11.glPopMatrix();
-		for (int i = 0; i < tile.machines.getSize(); i++)
+		for (int i = 0; i < tile.machines.size(); i++)
 		{
 			TileEntityMachineBase temb = (TileEntityMachineBase) tile.machines.get(i);
 			if (temb.powerGiven > 0)

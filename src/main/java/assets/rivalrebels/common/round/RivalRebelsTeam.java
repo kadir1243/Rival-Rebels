@@ -16,23 +16,20 @@ public enum RivalRebelsTeam
 	NONE(0),
 	OMEGA(1),
 	SIGMA(2);
-	
-	public int	id	= 0;
-	
+
+	public int id;
+
 	RivalRebelsTeam(int i)
 	{
 		id = i;
 	}
-	
+
 	public static RivalRebelsTeam getForID(int i)
 	{
-		switch (i)
-		{
-			case 1:
-				return OMEGA;
-			case 2:
-				return SIGMA;
-		}
-		return NONE;
-	}
+        return switch (i) {
+            case 1 -> OMEGA;
+            case 2 -> SIGMA;
+            default -> NONE;
+        };
+    }
 }

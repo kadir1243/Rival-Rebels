@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.model.AdvancedModelLoader;
@@ -33,8 +34,9 @@ public class RenderNuke extends Render
 {
     public static IModelCustom model;
 
-	public RenderNuke()
+	public RenderNuke(RenderManager renderManager)
 	{
+        super(renderManager);
 		model = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/wacknuke.obj"));
 	}
 

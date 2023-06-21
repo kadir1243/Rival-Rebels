@@ -11,9 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.item.ItemStack;
 import assets.rivalrebels.RivalRebels;
+import net.minecraft.client.renderer.texture.IIconRegister;
 
 public class ItemRodHydrogen extends ItemRod
 {
@@ -25,20 +24,8 @@ public class ItemRodHydrogen extends ItemRod
 		this.setMaxDamage(32);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
-	@Override
-	public boolean isItemTool(ItemStack is)
-	{
-		return true;
-	}
-	
-	@Override
-	public boolean isDamageable()
-	{
-		return true;
-	}
-	
-	@Override
+
+    @Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:au");

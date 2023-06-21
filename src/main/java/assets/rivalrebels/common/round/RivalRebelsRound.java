@@ -29,6 +29,7 @@ import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
 import net.minecraft.scoreboard.Scoreboard;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
@@ -174,10 +175,10 @@ public class RivalRebelsRound implements IMessage
 		rrplayerlist = new RivalRebelsPlayerList();
         for (EntityPlayer player : world.playerEntities) {
             player.attackEntityFrom(DamageSource.outOfWorld, 20000);
-            player.inventory.clearInventory(null, -1);
+            player.inventory.clear();
         }
 		cSpawnz += spawnDist;
-		world.setSpawnLocation(cSpawnx, 200, cSpawnz);
+		world.setSpawnPoint(new BlockPos(cSpawnx, 200, cSpawnz));
 		float f = RivalRebels.rhodesChance;
 		while (f >= 1)
 		{
@@ -209,7 +210,7 @@ public class RivalRebelsRound implements IMessage
 			rrplayerlist = new RivalRebelsPlayerList();
 			cSpawnx = (oObjx+sObjx)/2;
 			cSpawnz = (oObjz+sObjz)/2;
-			world.setSpawnLocation(cSpawnx, world.getHeightValue(cSpawnx, cSpawnz), cSpawnz);
+			world.setSpawnPoint(world.getHeight(new BlockPos(cSpawnx, 0, cSpawnz)));
 			omegaHealth=RivalRebels.objectiveHealth;
 			sigmaHealth=RivalRebels.objectiveHealth;
 			PacketDispatcher.packetsys.sendToAll(this);
@@ -335,13 +336,13 @@ public class RivalRebelsRound implements IMessage
 			omega.setAllowFriendlyFire(false);
 			sigma.setAllowFriendlyFire(false);
 			ScoreObjective kills = scrb.addScoreObjective("kills", IScoreObjectiveCriteria.playerKillCount);
-			scrb.func_96530_a(0, kills);
+			scrb.setObjectiveInDisplaySlot(0, kills);
 			ScoreObjective deaths = scrb.addScoreObjective("deaths", IScoreObjectiveCriteria.deathCount);
 			if (RivalRebels.scoreboardenabled) {
-                scrb.func_96530_a(1, deaths);
+                scrb.setObjectiveInDisplaySlot(1, deaths);
             }
 			deaths.setDisplayName("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S");
-			} catch(Exception e) {} //just in case teams already exist etc
+			} catch (Exception ignored) {} //just in case teams already exist etc
 
 			world.getGameRules().setOrCreateGameRule("keepInventory", "true");
 			rounddata = new File(world.getSaveHandler().getWorldDirectory(), "rivalrebelsgamedata");
@@ -365,11 +366,11 @@ public class RivalRebelsRound implements IMessage
 	{
 		PacketDispatcher.packetsys.sendTo(new InspectPacket(), (EntityPlayerMP) event.player);
 		if (!roundstarted) return;
-		if (!rrplayerlist.contains(event.player.getCommandSenderName()))
+		if (!rrplayerlist.contains(event.player.getName()))
 		{
-			event.player.inventory.clearInventory(null, -1);
+			event.player.inventory.clear();
 			event.player.setLocationAndAngles(cSpawnx, 200, cSpawnz,0,0);
-			//rrplayerlist.add(new RivalRebelsPlayer(event.player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RivalRebels.resetMax));
+			//rrplayerlist.add(new RivalRebelsPlayer(event.player.getName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RivalRebels.resetMax));
 		}
 		PacketDispatcher.packetsys.sendTo(rrplayerlist, (EntityPlayerMP) event.player);
 		if (isInSpawn(event.player)) PacketDispatcher.packetsys.sendTo(new GuiSpawnPacket(), (EntityPlayerMP) event.player);
@@ -397,7 +398,7 @@ public class RivalRebelsRound implements IMessage
 				for (int y1 = -5; y1 < hrs; y1++)
 				{
 					int YY = y1 * y1 + ZZ;
-					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlock(cSpawnx + x1, 200 + y1, cSpawnz + z1, RivalRebels.fshield);
+					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlockState(new BlockPos(cSpawnx + x1, 200 + y1, cSpawnz + z1), RivalRebels.fshield.getDefaultState());
 				}
 			}
 		}
@@ -407,7 +408,7 @@ public class RivalRebelsRound implements IMessage
 		sObjx = cSpawnx - objDist;
 		sObjz = cSpawnz;
 
-		Chunk chunk = world.getChunkFromBlockCoords(oObjx, oObjz);
+		Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(oObjx, 0, oObjz));
         int x = oObjx&15;
         int z = oObjz&15;
         for (oObjy = chunk.getTopFilledSegment() + 15; oObjy > 0; --oObjy)
@@ -418,7 +419,7 @@ public class RivalRebelsRound implements IMessage
                 break;
             }
         }
-        chunk = world.getChunkFromBlockCoords(sObjx, sObjz);
+        chunk = world.getChunkFromBlockCoords(new BlockPos(sObjx, 0, sObjz));
         x = sObjx&15;
         z = sObjz&15;
         for (sObjy = chunk.getTopFilledSegment() + 15; sObjy > 0; --sObjy)
@@ -438,52 +439,54 @@ public class RivalRebelsRound implements IMessage
 				int ZZ = zz * zz + XX;
 				if (ZZ <= objRadius2)
 				{
-					if (Math.abs(xx) == 15 && Math.abs(zz) == 15)
+                    BlockPos omegaPosition = new BlockPos(oObjx + xx, oObjy, oObjz + zz);
+                    BlockPos sigmaPosition = new BlockPos(sObjx + xx, sObjy, sObjz + zz);
+                    if (Math.abs(xx) == 15 && Math.abs(zz) == 15)
 					{
-						world.setBlock(oObjx + xx, oObjy, oObjz + zz, RivalRebels.fshield);
-						world.setBlock(sObjx + xx, sObjy, sObjz + zz, RivalRebels.fshield);
+						world.setBlockState(omegaPosition, RivalRebels.fshield.getDefaultState());
+						world.setBlockState(sigmaPosition, RivalRebels.fshield.getDefaultState());
 					}
 					else
 					{
-						world.setBlock(oObjx + xx, oObjy, oObjz + zz, RivalRebels.reactive);
-						world.setBlock(sObjx + xx, sObjy, sObjz + zz, RivalRebels.reactive);
+						world.setBlockState(omegaPosition, RivalRebels.reactive.getDefaultState());
+						world.setBlockState(sigmaPosition, RivalRebels.reactive.getDefaultState());
 					}
 					for (int yy = 1; yy <= 7; yy++)
 					{
-						world.setBlock(oObjx + xx, oObjy + yy, oObjz + zz, Blocks.air);
-						world.setBlock(sObjx + xx, sObjy + yy, sObjz + zz, Blocks.air);
+						world.setBlockToAir(omegaPosition.up(yy));
+						world.setBlockToAir(sigmaPosition.up(yy));
 					}
 				}
 			}
 		}
 
-		world.setBlock(oObjx + 21, oObjy, oObjz + 21, RivalRebels.conduit);
-		world.setBlock(oObjx + 21, oObjy, oObjz - 21, RivalRebels.conduit);
-		world.setBlock(oObjx - 21, oObjy, oObjz + 21, RivalRebels.conduit);
-		world.setBlock(oObjx - 21, oObjy, oObjz - 21, RivalRebels.conduit);
-		world.setBlock(sObjx + 21, sObjy, sObjz + 21, RivalRebels.conduit);
-		world.setBlock(sObjx + 21, sObjy, sObjz - 21, RivalRebels.conduit);
-		world.setBlock(sObjx - 21, sObjy, sObjz + 21, RivalRebels.conduit);
-		world.setBlock(sObjx - 21, sObjy, sObjz - 21, RivalRebels.conduit);
+		world.setBlockState(new BlockPos(oObjx + 21, oObjy, oObjz + 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(oObjx + 21, oObjy, oObjz - 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(oObjx - 21, oObjy, oObjz + 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(oObjx - 21, oObjy, oObjz - 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx + 21, sObjy, sObjz + 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx + 21, sObjy, sObjz - 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx - 21, sObjy, sObjz + 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx - 21, sObjy, sObjz - 21), RivalRebels.conduit.getDefaultState());
 
 		for (int i = 0; i < 4; i++)
 		{
-			world.setBlock(oObjx + 21, oObjy + 1 + i, oObjz + 21, Blocks.air);
-			world.setBlock(oObjx + 21, oObjy + 1 + i, oObjz - 21, Blocks.air);
-			world.setBlock(oObjx - 21, oObjy + 1 + i, oObjz + 21, Blocks.air);
-			world.setBlock(oObjx - 21, oObjy + 1 + i, oObjz - 21, Blocks.air);
-			world.setBlock(sObjx + 21, sObjy + 1 + i, sObjz + 21, Blocks.air);
-			world.setBlock(sObjx + 21, sObjy + 1 + i, sObjz - 21, Blocks.air);
-			world.setBlock(sObjx - 21, sObjy + 1 + i, sObjz + 21, Blocks.air);
-			world.setBlock(sObjx - 21, sObjy + 1 + i, sObjz - 21, Blocks.air);
+			world.setBlockToAir(new BlockPos(oObjx + 21, oObjy + 1 + i, oObjz + 21));
+			world.setBlockToAir(new BlockPos(oObjx + 21, oObjy + 1 + i, oObjz - 21));
+			world.setBlockToAir(new BlockPos(oObjx - 21, oObjy + 1 + i, oObjz + 21));
+			world.setBlockToAir(new BlockPos(oObjx - 21, oObjy + 1 + i, oObjz - 21));
+			world.setBlockToAir(new BlockPos(sObjx + 21, sObjy + 1 + i, sObjz + 21));
+			world.setBlockToAir(new BlockPos(sObjx + 21, sObjy + 1 + i, sObjz - 21));
+			world.setBlockToAir(new BlockPos(sObjx - 21, sObjy + 1 + i, sObjz + 21));
+			world.setBlockToAir(new BlockPos(sObjx - 21, sObjy + 1 + i, sObjz - 21));
 		}
 
-		world.setBlock(oObjx, oObjy + 1, oObjz, RivalRebels.omegaobj);
-		world.setBlock(sObjx, sObjy + 1, sObjz, RivalRebels.sigmaobj);
+		world.setBlockState(new BlockPos(oObjx, oObjy + 1, oObjz), RivalRebels.omegaobj.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx, sObjy + 1, sObjz), RivalRebels.sigmaobj.getDefaultState());
 		if (RivalRebels.rhodesRoundsBase)
 		{
-			world.setBlock(oObjx, oObjy + 2, oObjz, RivalRebels.buildrhodes);
-			world.setBlock(sObjx, sObjy + 2, sObjz, RivalRebels.buildrhodes);
+			world.setBlockState(new BlockPos(oObjx, oObjy + 2, oObjz), RivalRebels.buildrhodes.getDefaultState());
+			world.setBlockState(new BlockPos(sObjx, sObjy + 2, sObjz), RivalRebels.buildrhodes.getDefaultState());
 		}
 	}
 
@@ -498,8 +501,8 @@ public class RivalRebelsRound implements IMessage
 		winCountdown = 1400;
 		sigmaWins++;
 		lastwinomega = false;
-		world.setBlock(oObjx, oObjy, oObjz, RivalRebels.plasmaexplosion);
-		world.setBlock(sObjx, sObjy, sObjz, RivalRebels.plasmaexplosion);
+		world.setBlockState(new BlockPos(oObjx, oObjy, oObjz), RivalRebels.plasmaexplosion.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx, sObjy, sObjz), RivalRebels.plasmaexplosion.getDefaultState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++)
 		{
 			int xxpl = xpl * xpl;
@@ -510,7 +513,7 @@ public class RivalRebelsRound implements IMessage
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						world.setBlock(oObjx + xpl, oObjy + ypl, oObjz + zpl, Blocks.air);
+						world.setBlockToAir(new BlockPos(oObjx + xpl, oObjy + ypl, oObjz + zpl));
 					}
 				}
 			}
@@ -524,8 +527,8 @@ public class RivalRebelsRound implements IMessage
 		winCountdown = 1400;
 		omegaWins++;
 		lastwinomega = true;
-		world.setBlock(oObjx, oObjy, oObjz, RivalRebels.plasmaexplosion);
-		world.setBlock(sObjx, sObjy, sObjz, RivalRebels.plasmaexplosion);
+		world.setBlockState(new BlockPos(oObjx, oObjy, oObjz), RivalRebels.plasmaexplosion.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx, sObjy, sObjz), RivalRebels.plasmaexplosion.getDefaultState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++)
 		{
 			int xxpl = xpl * xpl;
@@ -536,7 +539,7 @@ public class RivalRebelsRound implements IMessage
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						world.setBlock(sObjx + xpl, sObjy + ypl, sObjz + zpl, Blocks.air);
+						world.setBlockToAir(new BlockPos(sObjx + xpl, sObjy + ypl, sObjz + zpl));
 					}
 				}
 			}
@@ -547,8 +550,8 @@ public class RivalRebelsRound implements IMessage
 	public void stopRounds()
 	{
 		if (!roundstarted) return;
-		world.setBlock(oObjx, oObjy, oObjz, RivalRebels.plasmaexplosion);
-		world.setBlock(sObjx, sObjy, sObjz, RivalRebels.plasmaexplosion);
+		world.setBlockState(new BlockPos(oObjx, oObjy, oObjz), RivalRebels.plasmaexplosion.getDefaultState());
+		world.setBlockState(new BlockPos(sObjx, sObjy, sObjz), RivalRebels.plasmaexplosion.getDefaultState());
 		winCountdown = 0;
 		roundstarted = false;
 		rrplayerlist.clearTeam();

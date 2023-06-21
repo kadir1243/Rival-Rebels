@@ -223,11 +223,11 @@ public class GuiReactor extends GuiContainer
 		{
 			if (power.mousePressed(mc, par2, par3))
 			{
-				PacketDispatcher.packetsys.sendToServer(new ReactorGUIPacket(ter.xCoord,ter.yCoord,ter.zCoord,(byte) 0));
+				PacketDispatcher.packetsys.sendToServer(new ReactorGUIPacket(ter.getPos(),(byte) 0));
 			}
 			if (eject.mousePressed(mc, par2, par3))
 			{
-				PacketDispatcher.packetsys.sendToServer(new ReactorGUIPacket(ter.xCoord,ter.yCoord,ter.zCoord,(byte) 1));
+				PacketDispatcher.packetsys.sendToServer(new ReactorGUIPacket(ter.getPos(),(byte) 1));
 			}
 		}
 		power.isPressed = ter.on;
@@ -262,7 +262,7 @@ public class GuiReactor extends GuiContainer
 			{
 				rsidepath = "RivalRebels:textures/blocks/" + display.getBlockTextureFromSide(2).getIconName().split("RivalRebels:")[1] + ".png";
 			}
-			Tessellator tessellator = Tessellator.instance;
+			Tessellator tessellator = Tessellator.getInstance();
 
 			GL11.glEnable(GL11.GL_BLEND);
 			float alpha = 0.5f;

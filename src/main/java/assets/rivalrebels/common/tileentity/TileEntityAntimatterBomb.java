@@ -11,8 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.entity.EntityAntimatterBomb;
+import assets.rivalrebels.common.packet.PacketDispatcher;
+import assets.rivalrebels.common.packet.TextPacket;
+import assets.rivalrebels.common.round.RivalRebelsTeam;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -21,22 +26,12 @@ import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-
-import org.lwjgl.opengl.GL11;
-
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.entity.EntityAntimatterBomb;
-import assets.rivalrebels.common.entity.EntityTsar;
-import assets.rivalrebels.common.entity.EntityTsarBlast;
-import assets.rivalrebels.common.explosion.TsarBomba;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.packet.TextPacket;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
+import net.minecraft.util.ChatComponentTranslation;
+import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityAntimatterBomb extends TileEntity implements IInventory
+public class TileEntityAntimatterBomb extends TileEntity implements IInventory, ITickable
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
@@ -45,10 +40,7 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	/** The number of players currently using this chest */
 	public int				numUsingPlayers;
 
-	/** Server sync counter (once per 20 ticks) */
-	private int				ticksSinceSync;
-
-	public int				countdown		= RivalRebels.nuclearBombCountdown * 20;
+    public int				countdown		= RivalRebels.nuclearBombCountdown * 20;
 	public int				nuclear			= 0;
 	public int				hydrogen		= 0;
 	public boolean			hasAntennae		= false;
@@ -113,7 +105,7 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
 	 */
 	@Override
-	public ItemStack getStackInSlotOnClosing(int par1)
+	public ItemStack removeStackFromSlot(int par1)
 	{
 		if (this.chestContents[par1] != null)
 		{
@@ -146,11 +138,10 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	 * Reads a tile entity from NBT.
 	 */
 	@Override
-	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
+	public void readFromNBT(NBTTagCompound nbt)
 	{
-		super.readFromNBT(par1NBTTagCompound);
-		this.blockMetadata = par1NBTTagCompound.getInteger("TsarBombaMetadata");
-		NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10); // TODO: !!
+		super.readFromNBT(nbt);
+		NBTTagList var2 = nbt.getTagList("Items", 10); // TODO: !!
 		this.chestContents = new ItemStack[this.getSizeInventory()];
 
 		for (int var3 = 0; var3 < var2.tagCount(); ++var3)
@@ -172,7 +163,6 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
 	{
 		super.writeToNBT(par1NBTTagCompound);
-		par1NBTTagCompound.setInteger("TsarBombaMetadata", this.blockMetadata);
 		NBTTagList var2 = new NBTTagList();
 
 		for (int var3 = 0; var3 < this.chestContents.length; ++var3)
@@ -203,7 +193,7 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
 	{
-		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) == this && par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+		return this.worldObj.getTileEntity(this.getPos()) == this && par1EntityPlayer.getDistanceSq(this.getPos().add(0.5, 0.5, 0.5)) <= 64.0D;
 	}
 
 	/**
@@ -219,8 +209,7 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
 	@Override
-	public void updateEntity()
-	{
+	public void update() {
 		nuclear = 0;
 		hydrogen = 0;
 		for (int i = 3; i <= 18; i++)
@@ -259,8 +248,8 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 			hasChip = getStackInSlot(20).getItem() == RivalRebels.chip;
 			if (hasChip)
 			{
-				rrteam = RivalRebelsTeam.getForID(getStackInSlot(20).stackTagCompound.getInteger("team"));
-				username = getStackInSlot(20).stackTagCompound.getString("username");
+				rrteam = RivalRebelsTeam.getForID(getStackInSlot(20).getTagCompound().getInteger("team"));
+				username = getStackInSlot(20).getTagCompound().getString("username");
 			}
 		}
 		else
@@ -277,23 +266,12 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 			hasAntennae = false;
 		}
 
-		if (getStackInSlot(19) != null)
-		{
-			hasExplosive = true;// getStackInSlot(19).func_150998_b(RivalRebels.timedbomb);
-		}
-		else
-		{
-			hasExplosive = false;
-		}
+        hasExplosive = getStackInSlot(19) != null;// getStackInSlot(19).canHarvestBlock(RivalRebels.timedbomb);
 
 		boolean sp = false;
-		try
-		{
+		try {
 			sp = !MinecraftServer.getServer().isDedicatedServer() && MinecraftServer.getServer().getConfigurationManager().playerEntityList.size() == 1;
-		}
-		catch (NullPointerException e)
-		{
-
+		} catch (NullPointerException ignored) {
 		}
 
 		if (hasFuse && hasExplosive && nuclear == hydrogen && hasAntennae && hasChip)
@@ -304,11 +282,11 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
 				{
-					dist = getDistanceFrom(RivalRebels.round.oObjx, yCoord, RivalRebels.round.oObjz);
+					dist = getDistanceSq(RivalRebels.round.oObjx, getPos().getY(), RivalRebels.round.oObjz);
 				}
 				if (rrteam == RivalRebelsTeam.SIGMA)
 				{
-					dist = getDistanceFrom(RivalRebels.round.sObjx, yCoord, RivalRebels.round.sObjz);
+					dist = getDistanceSq(RivalRebels.round.sObjx, getPos().getY(), RivalRebels.round.sObjz);
 				}
 			}
 			if (dist > (RivalRebels.tsarBombaStrength + (nuclear * hydrogen) + 29) * (RivalRebels.tsarBombaStrength + (nuclear * hydrogen) + 29))
@@ -330,19 +308,20 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 			if (RivalRebels.nuclearBombCountdown == 0) countdown = 10;
 		}
 
-		if (countdown == 200 && !worldObj.isRemote && RivalRebels.nuclearBombCountdown > 10)
-		{
-			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning1"));
-			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning2"));
-			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning3"));
+		if (countdown == 200 && !worldObj.isRemote && RivalRebels.nuclearBombCountdown > 10) {
+            for (EntityPlayer player : getWorld().playerEntities) {
+                player.addChatMessage(new ChatComponentTranslation("RivalRebels.warning1"));
+                player.addChatMessage(new ChatComponentTranslation("RivalRebels.warning2"));
+                player.addChatMessage(new ChatComponentTranslation("RivalRebels.warning3"));
+            }
 		}
 
-		if (countdown % 20 == 0 && countdown <= 200 && RivalRebels.nuclearBombCountdown > 10) RivalRebelsSoundPlayer.playSound(worldObj, 14, 0, xCoord, yCoord, zCoord, 100);
+		if (countdown % 20 == 0 && countdown <= 200 && RivalRebels.nuclearBombCountdown > 10) RivalRebelsSoundPlayer.playSound(worldObj, 14, 0, getPos(), 100);
 
 		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !worldObj.isRemote && nuclear == hydrogen)
 		{
-			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
-			worldObj.lastLightningBolt = 2;
+			worldObj.setBlockToAir(getPos());
+			worldObj.setLastLightningBolt(2);
 			float pitch = 0;
 			float yaw = switch (this.getBlockMetadata()) {
                 case 2 -> 180;
@@ -352,17 +331,15 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
                 default -> 0;
             };
 
-            EntityAntimatterBomb tsar = new EntityAntimatterBomb(worldObj, xCoord+0.5f, yCoord+1f, zCoord+0.5f, yaw, pitch, hydrogen, hasTrollface);
+            EntityAntimatterBomb tsar = new EntityAntimatterBomb(worldObj, getPos().getX()+0.5f, getPos().getY() + 1f, getPos().getZ() + 0.5f, yaw, pitch, hydrogen, hasTrollface);
 			worldObj.spawnEntityInWorld(tsar);
 		}
 
 		if (countdown == 0 && nuclear == 0 && hydrogen == 0)
 		{
-			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
-			worldObj.createExplosion(null, xCoord, yCoord, zCoord, 4, false);
+			worldObj.setBlockToAir(getPos());
+			worldObj.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, false);
 		}
-
-		super.updateEntity();
 	}
 
 	/**
@@ -392,7 +369,7 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
-		return AxisAlignedBB.getBoundingBox(xCoord - 5, yCoord, zCoord - 5, xCoord + 6, yCoord + 2, zCoord + 6);
+		return new AxisAlignedBB(getPos().add(-5, 0, -5), getPos().add(6, 2, 6));
 	}
 
 	@Override
@@ -409,26 +386,22 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory
 	}
 
 	@Override
-	public String getInventoryName()
+	public String getName()
 	{
 		return "Antimatter Bomb";
 	}
 
 	@Override
-	public boolean hasCustomInventoryName()
+	public boolean hasCustomName()
 	{
 		return false;
 	}
 
 	@Override
-	public void openInventory()
-	{
-
+	public void openInventory(EntityPlayer player) {
 	}
 
 	@Override
-	public void closeInventory()
-	{
-
+	public void closeInventory(EntityPlayer player) {
 	}
 }

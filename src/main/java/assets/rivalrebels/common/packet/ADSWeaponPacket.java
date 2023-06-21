@@ -11,32 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import assets.rivalrebels.common.tileentity.TileEntityList;
-import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
-import assets.rivalrebels.common.tileentity.TileEntityReactive;
-import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ADSWeaponPacket implements IMessage
 {
-	int x;
-	int y;
-	int z;
+    private BlockPos pos;
 	int wep;
 
 	public ADSWeaponPacket()
@@ -44,30 +30,26 @@ public class ADSWeaponPacket implements IMessage
 
 	}
 
-	public ADSWeaponPacket(int X, int Y, int Z, int w)
+	public ADSWeaponPacket(BlockPos pos, int w)
 	{
-		x = X;
-		y = Y;
-		z = Z;
+		this.pos = pos;
 		wep = w;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		x = buf.readInt();
-		y = buf.readInt();
-		z = buf.readInt();
-		wep = buf.readInt();
+        PacketBuffer buffer = new PacketBuffer(buf);
+        pos = buffer.readBlockPos();
+		wep = buffer.readInt();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
-		buf.writeInt(wep);
+        PacketBuffer buffer = new PacketBuffer(buf);
+		buffer.writeBlockPos(pos);
+		buffer.writeInt(wep);
 	}
 
 	public static class Handler implements IMessageHandler<ADSWeaponPacket, IMessage>
@@ -75,11 +57,10 @@ public class ADSWeaponPacket implements IMessage
 		@Override
 		public IMessage onMessage(ADSWeaponPacket m, MessageContext ctx)
 		{
-			TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.x, m.y, m.z);
-			if (te instanceof TileEntityReciever)
+			TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.pos);
+			if (te instanceof TileEntityReciever ter)
 			{
-				TileEntityReciever ter = (TileEntityReciever) te;
-				if (ter.hasWepReqs())
+                if (ter.hasWepReqs())
 				{
 					ter.setWep(m.wep);
 				}

@@ -74,7 +74,7 @@ public class BlockRemoteCharge extends Block
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return AxisAlignedBB.getBoundingBox(par2 + f1, par3, par4 + f, (par2 + 1) - f, (par3 + f2) - f, (par4 + 1) - f);
+		return new AxisAlignedBB(par2 + f1, par3, par4 + f, (par2 + 1) - f, (par3 + f2) - f, (par4 + 1) - f);
 	}
 
 	/**
@@ -96,7 +96,7 @@ public class BlockRemoteCharge extends Block
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return AxisAlignedBB.getBoundingBox(par2 + f1, par3, par4 + f, (par2 + 1) - f, par3 + f2, (par4 + 1) - f);
+		return new AxisAlignedBB(par2 + f1, par3, par4 + f, (par2 + 1) - f, par3 + f2, (par4 + 1) - f);
 	}
 
 	/**

@@ -11,18 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import java.util.HashSet;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.entity.EntityCuchillo;
 import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.entity.EntityCuchillo;
-import assets.rivalrebels.common.entity.EntityRhodes;
+
+import java.util.HashSet;
 
 public class ItemCuchillo extends ItemTool
 {
@@ -39,7 +38,7 @@ public class ItemCuchillo extends ItemTool
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
 
 	@Override

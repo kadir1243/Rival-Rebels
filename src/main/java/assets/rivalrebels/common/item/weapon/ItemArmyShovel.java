@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.item.weapon;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.texture.IIconRegister;
@@ -22,29 +23,29 @@ import assets.rivalrebels.RivalRebels;
 
 public class ItemArmyShovel extends ItemTool
 {
-	private static HashSet<Block>	blocksEffectiveAgainst;
-	
+	private static final Set<Block> blocksEffectiveAgainst;
+
 	public ItemArmyShovel()
 	{
 		super(1, ToolMaterial.IRON, blocksEffectiveAgainst);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	@Override
 	public boolean isDamageable()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean canHarvestBlock(Block par1Block, ItemStack is)
 	{
 		return blocksEffectiveAgainst.contains(par1Block);
 	}
-	
+
 	static
 	{
-		blocksEffectiveAgainst = new HashSet<Block>();
+		blocksEffectiveAgainst = new HashSet<>();
 		blocksEffectiveAgainst.add(Blocks.stone);
 		blocksEffectiveAgainst.add(Blocks.grass);
 		blocksEffectiveAgainst.add(Blocks.dirt);
@@ -96,7 +97,7 @@ public class ItemArmyShovel extends ItemTool
 		blocksEffectiveAgainst.add(RivalRebels.petrifiedstone4);
 		blocksEffectiveAgainst.add(RivalRebels.petrifiedwood);
 	}
-	
+
 	@Override
 	public void registerIcons(IIconRegister iconregister)
 	{

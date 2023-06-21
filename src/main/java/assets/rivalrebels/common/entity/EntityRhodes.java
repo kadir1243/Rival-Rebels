@@ -24,6 +24,7 @@ import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
+import net.minecraft.util.*;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -46,10 +47,6 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
 
 import java.util.*;
@@ -161,10 +158,7 @@ public class EntityRhodes extends Entity
 	public static int texfolder = -1;
 	public String itexloc;
 	public int itexfolder;
-
-	public int wakeX = -1;
-	public int wakeY = -1;
-	public int wakeZ = -1;
+    public BlockPos wakePos = new BlockPos(-1, -1, -1);
 
 	public EntityRhodes(World w)
 	{
@@ -227,7 +221,7 @@ public class EntityRhodes extends Entity
 	@Override
 	public void onUpdate()
 	{
-		if ((wakeY != -1) && (worldObj.getBlock(wakeX, wakeY, wakeZ) != RivalRebels.rhodesactivator))
+		if (wakePos.getY() != -1 && (worldObj.getBlockState(wakePos).getBlock() != RivalRebels.rhodesactivator))
 		{
 			damageUntilWake -= 100;
 
@@ -317,7 +311,7 @@ public class EntityRhodes extends Entity
 		{
 			if (!worldObj.isRemote)
 			{
-				if (health == 0) PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.Status " + getName() + " RivalRebels.meltdown" + (rider == null? "" : " " + rider.getCommandSenderName())));
+				if (health == 0) PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.Status " + getName() + " RivalRebels.meltdown" + (rider == null? "" : " " + rider.getName())));
 				if (ticksExisted % 5 == 0) PacketDispatcher.packetsys.sendToAll(new RhodesPacket(this));
 				if (health < -100)
 				{
@@ -451,63 +445,62 @@ public class EntityRhodes extends Entity
 			{
 				int irpyyoff = irpy + (ticksExisted % 6);
 				int ilpyyoff = ilpy + (ticksExisted % 6);
-				Block b = worldObj.getBlock(irpx, irpyyoff, irpz);
-				if (b != Blocks.water && b != Blocks.flowing_water && b != Blocks.air)
-				{
-					worldObj.setBlock(irpx-2, irpyyoff, irpz-2, Blocks.air);
-					worldObj.setBlock(irpx-2, irpyyoff, irpz-1, Blocks.air);
-					worldObj.setBlock(irpx-2, irpyyoff, irpz, Blocks.air);
-					worldObj.setBlock(irpx-2, irpyyoff, irpz+1, Blocks.air);
-					worldObj.setBlock(irpx-2, irpyyoff, irpz+2, Blocks.air);
-					worldObj.setBlock(irpx-1, irpyyoff, irpz-2, Blocks.air);
-					worldObj.setBlock(irpx-1, irpyyoff, irpz-1, Blocks.air);
-					worldObj.setBlock(irpx-1, irpyyoff, irpz, Blocks.air);
-					worldObj.setBlock(irpx-1, irpyyoff, irpz+1, Blocks.air);
-					worldObj.setBlock(irpx-1, irpyyoff, irpz+2, Blocks.air);
-					worldObj.setBlock(irpx, irpyyoff, irpz-2, Blocks.air);
-					worldObj.setBlock(irpx, irpyyoff, irpz-1, Blocks.air);
-					worldObj.setBlock(irpx, irpyyoff, irpz, Blocks.air);
-					worldObj.setBlock(irpx, irpyyoff, irpz+1, Blocks.air);
-					worldObj.setBlock(irpx, irpyyoff, irpz+2, Blocks.air);
-					worldObj.setBlock(irpx+1, irpyyoff, irpz-2, Blocks.air);
-					worldObj.setBlock(irpx+1, irpyyoff, irpz-1, Blocks.air);
-					worldObj.setBlock(irpx+1, irpyyoff, irpz, Blocks.air);
-					worldObj.setBlock(irpx+1, irpyyoff, irpz+1, Blocks.air);
-					worldObj.setBlock(irpx+1, irpyyoff, irpz+2, Blocks.air);
-					worldObj.setBlock(irpx+2, irpyyoff, irpz-2, Blocks.air);
-					worldObj.setBlock(irpx+2, irpyyoff, irpz-1, Blocks.air);
-					worldObj.setBlock(irpx+2, irpyyoff, irpz, Blocks.air);
-					worldObj.setBlock(irpx+2, irpyyoff, irpz+1, Blocks.air);
-					worldObj.setBlock(irpx+2, irpyyoff, irpz+2, Blocks.air);
+				Block b = worldObj.getBlockState(new BlockPos(irpx, irpyyoff, irpz)).getBlock();
+				if (b != Blocks.water && b != Blocks.flowing_water && b != Blocks.air) {
+					worldObj.setBlockToAir(new BlockPos(irpx-2, irpyyoff, irpz-2));
+					worldObj.setBlockToAir(new BlockPos(irpx-2, irpyyoff, irpz-1));
+					worldObj.setBlockToAir(new BlockPos(irpx-2, irpyyoff, irpz  ));
+					worldObj.setBlockToAir(new BlockPos(irpx-2, irpyyoff, irpz+1));
+					worldObj.setBlockToAir(new BlockPos(irpx-2, irpyyoff, irpz+2));
+					worldObj.setBlockToAir(new BlockPos(irpx-1, irpyyoff, irpz-2));
+					worldObj.setBlockToAir(new BlockPos(irpx-1, irpyyoff, irpz-1));
+					worldObj.setBlockToAir(new BlockPos(irpx-1, irpyyoff, irpz  ));
+					worldObj.setBlockToAir(new BlockPos(irpx-1, irpyyoff, irpz+1));
+					worldObj.setBlockToAir(new BlockPos(irpx-1, irpyyoff, irpz+2));
+					worldObj.setBlockToAir(new BlockPos(irpx, irpyyoff, irpz-2  ));
+					worldObj.setBlockToAir(new BlockPos(irpx, irpyyoff, irpz-1  ));
+					worldObj.setBlockToAir(new BlockPos(irpx, irpyyoff, irpz    ));
+					worldObj.setBlockToAir(new BlockPos(irpx, irpyyoff, irpz+1  ));
+					worldObj.setBlockToAir(new BlockPos(irpx, irpyyoff, irpz+2  ));
+					worldObj.setBlockToAir(new BlockPos(irpx+1, irpyyoff, irpz-2));
+					worldObj.setBlockToAir(new BlockPos(irpx+1, irpyyoff, irpz-1));
+					worldObj.setBlockToAir(new BlockPos(irpx+1, irpyyoff, irpz  ));
+					worldObj.setBlockToAir(new BlockPos(irpx+1, irpyyoff, irpz+1));
+					worldObj.setBlockToAir(new BlockPos(irpx+1, irpyyoff, irpz+2));
+					worldObj.setBlockToAir(new BlockPos(irpx+2, irpyyoff, irpz-2));
+					worldObj.setBlockToAir(new BlockPos(irpx+2, irpyyoff, irpz-1));
+					worldObj.setBlockToAir(new BlockPos(irpx+2, irpyyoff, irpz  ));
+					worldObj.setBlockToAir(new BlockPos(irpx+2, irpyyoff, irpz+1));
+					worldObj.setBlockToAir(new BlockPos(irpx+2, irpyyoff, irpz+2));
 				}
-				b = worldObj.getBlock(ilpx, ilpyyoff, ilpz);
+				b = worldObj.getBlockState(new BlockPos(ilpx, ilpyyoff, ilpz)).getBlock();
 				if (b != Blocks.water && b != Blocks.flowing_water && b != Blocks.air)
 				{
-					worldObj.setBlock(ilpx-2, ilpyyoff, ilpz-2, Blocks.air);
-					worldObj.setBlock(ilpx-2, ilpyyoff, ilpz-1, Blocks.air);
-					worldObj.setBlock(ilpx-2, ilpyyoff, ilpz, Blocks.air);
-					worldObj.setBlock(ilpx-2, ilpyyoff, ilpz+1, Blocks.air);
-					worldObj.setBlock(ilpx-2, ilpyyoff, ilpz+2, Blocks.air);
-					worldObj.setBlock(ilpx-1, ilpyyoff, ilpz-2, Blocks.air);
-					worldObj.setBlock(ilpx-1, ilpyyoff, ilpz-1, Blocks.air);
-					worldObj.setBlock(ilpx-1, ilpyyoff, ilpz, Blocks.air);
-					worldObj.setBlock(ilpx-1, ilpyyoff, ilpz+1, Blocks.air);
-					worldObj.setBlock(ilpx-1, ilpyyoff, ilpz+2, Blocks.air);
-					worldObj.setBlock(ilpx, ilpyyoff, ilpz-2, Blocks.air);
-					worldObj.setBlock(ilpx, ilpyyoff, ilpz-1, Blocks.air);
-					worldObj.setBlock(ilpx, ilpyyoff, ilpz, Blocks.air);
-					worldObj.setBlock(ilpx, ilpyyoff, ilpz+1, Blocks.air);
-					worldObj.setBlock(ilpx, ilpyyoff, ilpz+2, Blocks.air);
-					worldObj.setBlock(ilpx+1, ilpyyoff, ilpz-2, Blocks.air);
-					worldObj.setBlock(ilpx+1, ilpyyoff, ilpz-1, Blocks.air);
-					worldObj.setBlock(ilpx+1, ilpyyoff, ilpz, Blocks.air);
-					worldObj.setBlock(ilpx+1, ilpyyoff, ilpz+1, Blocks.air);
-					worldObj.setBlock(ilpx+1, ilpyyoff, ilpz+2, Blocks.air);
-					worldObj.setBlock(ilpx+2, ilpyyoff, ilpz-2, Blocks.air);
-					worldObj.setBlock(ilpx+2, ilpyyoff, ilpz-1, Blocks.air);
-					worldObj.setBlock(ilpx+2, ilpyyoff, ilpz, Blocks.air);
-					worldObj.setBlock(ilpx+2, ilpyyoff, ilpz+1, Blocks.air);
-					worldObj.setBlock(ilpx+2, ilpyyoff, ilpz+2, Blocks.air);
+					worldObj.setBlockToAir(new BlockPos(ilpx-2, ilpyyoff, ilpz-2));
+					worldObj.setBlockToAir(new BlockPos(ilpx-2, ilpyyoff, ilpz-1));
+					worldObj.setBlockToAir(new BlockPos(ilpx-2, ilpyyoff, ilpz  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx-2, ilpyyoff, ilpz+1));
+					worldObj.setBlockToAir(new BlockPos(ilpx-2, ilpyyoff, ilpz+2));
+					worldObj.setBlockToAir(new BlockPos(ilpx-1, ilpyyoff, ilpz-2));
+					worldObj.setBlockToAir(new BlockPos(ilpx-1, ilpyyoff, ilpz-1));
+					worldObj.setBlockToAir(new BlockPos(ilpx-1, ilpyyoff, ilpz  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx-1, ilpyyoff, ilpz+1));
+					worldObj.setBlockToAir(new BlockPos(ilpx-1, ilpyyoff, ilpz+2));
+					worldObj.setBlockToAir(new BlockPos(ilpx, ilpyyoff, ilpz-2  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx, ilpyyoff, ilpz-1  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx, ilpyyoff, ilpz    ));
+					worldObj.setBlockToAir(new BlockPos(ilpx, ilpyyoff, ilpz+1  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx, ilpyyoff, ilpz+2  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx+1, ilpyyoff, ilpz-2));
+					worldObj.setBlockToAir(new BlockPos(ilpx+1, ilpyyoff, ilpz-1));
+					worldObj.setBlockToAir(new BlockPos(ilpx+1, ilpyyoff, ilpz  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx+1, ilpyyoff, ilpz+1));
+					worldObj.setBlockToAir(new BlockPos(ilpx+1, ilpyyoff, ilpz+2));
+					worldObj.setBlockToAir(new BlockPos(ilpx+2, ilpyyoff, ilpz-2));
+					worldObj.setBlockToAir(new BlockPos(ilpx+2, ilpyyoff, ilpz-1));
+					worldObj.setBlockToAir(new BlockPos(ilpx+2, ilpyyoff, ilpz  ));
+					worldObj.setBlockToAir(new BlockPos(ilpx+2, ilpyyoff, ilpz+1));
+					worldObj.setBlockToAir(new BlockPos(ilpx+2, ilpyyoff, ilpz+2));
 				}
 				int px = (int) posX;
 				int py = (int) (posY-5*scale + (ticksExisted%20)*scale);
@@ -516,10 +509,10 @@ public class EntityRhodes extends Entity
 				{
 					for (int z = -4; z < 5; z++)
 					{
-						b = worldObj.getBlock(px+x, py, pz+z);
+						b = worldObj.getBlockState(new BlockPos(px+x, py, pz+z)).getBlock();
 						if (b != Blocks.air && b != Blocks.water && b != Blocks.flowing_water)
 						{
-							worldObj.setBlock(px+x, py, pz+z, Blocks.air);
+							worldObj.setBlockToAir(new BlockPos(px+x, py, pz+z));
 							if (rand.nextInt(333)==0)
 							{
 								new Explosion(worldObj, px, py, pz, 3, false, true, RivalRebelsDamageSource.rocket);
@@ -893,12 +886,12 @@ public class EntityRhodes extends Entity
 				if (Math.abs(headpitch-pitch) < 10f && ticksExisted % 3 == 0)
 				{
 					range = 70*scale;
-					Vec3 start = Vec3.createVectorHelper(posX, posY+13*scale, posZ);
-					Vec3 end = Vec3.createVectorHelper(0, 0, range);
+					Vec3 start = new Vec3(posX, posY+13*scale, posZ);
+					Vec3 end = new Vec3(0, 0, range);
 					end.rotateAroundX(-headpitch / 180.0F * (float) Math.PI);
 					end.rotateAroundY(bodyyaw / 180.0F * (float) Math.PI);
 					end = end.addVector(posX, posY+13*scale, posZ);
-					Iterator<Entity> iter = worldObj.getEntitiesWithinAABBExcludingEntity(this,AxisAlignedBB.getBoundingBox(Math.min(start.xCoord,end.xCoord)-5,
+					Iterator<Entity> iter = worldObj.getEntitiesWithinAABBExcludingEntity(this,new AxisAlignedBB(Math.min(start.xCoord,end.xCoord)-5,
 																													Math.min(start.yCoord,end.yCoord)-5,
 																													Math.min(start.zCoord,end.zCoord)-5,
 																													Math.max(start.xCoord,end.xCoord)+5,
@@ -915,7 +908,7 @@ public class EntityRhodes extends Entity
 							|| e instanceof EntityMinecart)
 							&& e != rider)
 						{
-							Vec3 entity = Vec3.createVectorHelper(e.posX, e.posY, e.posZ);
+							Vec3 entity = new Vec3(e.posX, e.posY, e.posZ);
 							double bbx = 1;
 							if (e instanceof EntityRhodes) bbx = 20 * ((EntityRhodes)e).scale;
 							if (entity.subtract(start).crossProduct(entity.subtract(end)).squareDistanceTo(0, 0, 0) < 10000 * bbx)
@@ -1651,7 +1644,7 @@ public class EntityRhodes extends Entity
 				}
 			}
 			if (priority <= 0) lastRocketTarget = null;
-            for (Entity e : worldObj.getEntitiesWithinAABBExcludingEntity(this, AxisAlignedBB.getBoundingBox(px - 100 * scale, py - 100 * scale, pz - 100 * scale, px + 100 * scale, py + 100 * scale, pz + 100 * scale))) {
+            for (Entity e : worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(px - 100 * scale, py - 100 * scale, pz - 100 * scale, px + 100 * scale, py + 100 * scale, pz + 100 * scale))) {
                 if (!e.isDead && (!(e instanceof EntityLivingBase) || ((EntityLivingBase) e).getHealth() > 0) &&
                     !(e instanceof EntityThrowable
                         || e instanceof EntityInanimate
@@ -1828,7 +1821,7 @@ public class EntityRhodes extends Entity
 				}
 			}
 			if (priority <= 0) lastFlameTarget = null;
-            for (Entity e : worldObj.getEntitiesWithinAABBExcludingEntity(this, AxisAlignedBB.getBoundingBox(px - 40 * scale, py - 40 * scale, pz - 40 * scale, px + 40 * scale, py + 40 * scale, pz + 40 * scale))) {
+            for (Entity e : worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(px - 40 * scale, py - 40 * scale, pz - 40 * scale, px + 40 * scale, py + 40 * scale, pz + 40 * scale))) {
                 if (!e.isDead && (!(e instanceof EntityLivingBase) || ((EntityLivingBase) e).getHealth() > 0) &&
                     !(e instanceof EntityThrowable
                         || e instanceof EntityInanimate
@@ -1916,7 +1909,7 @@ public class EntityRhodes extends Entity
 			}
 			if (priority <= 0) lastLaserTarget = null;
 
-			Iterator iter = worldObj.getEntitiesWithinAABBExcludingEntity(this, AxisAlignedBB.getBoundingBox(posX-70*scale, posY+13*scale-70*scale, posZ-70*scale, posX+70*scale, posY+13*scale+70*scale, posZ+70*scale)).iterator();
+			Iterator iter = worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(posX-70*scale, posY+13*scale-70*scale, posZ-70*scale, posX+70*scale, posY+13*scale+70*scale, posZ+70*scale)).iterator();
 			while(iter.hasNext())
 			{
 				Entity e = (Entity) iter.next();
@@ -2073,8 +2066,8 @@ public class EntityRhodes extends Entity
 						}
 						else
 						{
-							legs = (int) (lastLaserTarget.boundingBox.getAverageEdgeLength() * 2);
-							arms = (int) (lastLaserTarget.boundingBox.getAverageEdgeLength() * 2);
+							legs = (int) (lastLaserTarget.getEntityBoundingBox().getAverageEdgeLength() * 2);
+							arms = (int) (lastLaserTarget.getEntityBoundingBox().getAverageEdgeLength() * 2);
 							mobs = 11;
 						}
 						worldObj.spawnEntityInWorld(new EntityGore(worldObj, lastLaserTarget, 0, mobs));
@@ -2096,7 +2089,7 @@ public class EntityRhodes extends Entity
 		if (e instanceof EntityPlayer) return  ((EntityPlayer) e).capabilities.isCreativeMode?-100:600;
 		if (e instanceof EntityLivingBase) return ((EntityLivingBase)e).getMaxHealth()+100;
 		if ((e instanceof EntityRhodes && (RivalRebels.rhodesFF && (RivalRebels.rhodesCC || ((EntityRhodes)e).colorType != colorType))) || e instanceof EntityB2Spirit) return 800;
-		if (e.boundingBox.getAverageEdgeLength() > 3) return (float) (e.boundingBox.getAverageEdgeLength()*3 + 500 + e.height);
+		if (e.getEntityBoundingBox().getAverageEdgeLength() > 3) return (float) (e.getEntityBoundingBox().getAverageEdgeLength()*3 + 500 + e.height);
 		return 0;
 	}
 
@@ -2125,7 +2118,7 @@ public class EntityRhodes extends Entity
 		{
 			if (worldObj.getBlock(X, Y, Z).isOpaqueCube())
 			{
-				return Vec3.createVectorHelper(X, Y, Z);
+				return new Vec3(X, Y, Z);
 			}
 			if(tMaxX < tMaxY)
 			{
@@ -2338,7 +2331,7 @@ public class EntityRhodes extends Entity
 
         if (this.worldObj.blockExists(i, 0, j))
         {
-            return this.worldObj.getLightBrightness(i, 255, j);
+            return this.worldObj.getLightBrightness(new BlockPos(i, 255, j));
         }
         else
         {

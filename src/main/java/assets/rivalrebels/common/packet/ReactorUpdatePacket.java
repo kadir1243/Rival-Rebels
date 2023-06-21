@@ -11,49 +11,36 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityList;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class ReactorUpdatePacket implements IMessage
-{
-	int x;
-	int y;
-	int z;
+public class ReactorUpdatePacket implements IMessage {
+    private BlockPos pos;
 	float consumed;
 	float lasttick;
 	boolean melt;
 	boolean eject;
 	boolean on;
 	TileEntityList machines;
-	ByteBuf bbuf;
 
-	public ReactorUpdatePacket()
-	{
-
+    public ReactorUpdatePacket() {
 	}
 
-	public ReactorUpdatePacket(int X, int Y, int Z, float cons, float last, boolean mt, boolean ej, boolean o, TileEntityList mach)
+	public ReactorUpdatePacket(BlockPos pos, float cons, float last, boolean mt, boolean ej, boolean o, TileEntityList mach)
 	{
-		x = X;
-		y = Y;
-		z = Z;
+		this.pos = pos;
 		consumed = cons;
 		lasttick = last;
 		melt = mt;
@@ -63,79 +50,82 @@ public class ReactorUpdatePacket implements IMessage
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		bbuf = buf.copy();
-	}
+	public void fromBytes(ByteBuf buf) {
+        if (FMLCommonHandler.instance().getEffectiveSide() != Side.CLIENT) return;
+        PacketBuffer buffer = new PacketBuffer(buf);
+        pos = buffer.readBlockPos();
+        consumed = buffer.readFloat();
+        lasttick = buffer.readFloat();
+        melt = buffer.readBoolean();
+        eject = buffer.readBoolean();
+        on = buffer.readBoolean();
+        int machineAmount = buffer.readInt();
+        if (machineAmount > 0) {
+            machines = new TileEntityList();
+        }
+        for (int i = 0; i < machineAmount; i++) {
+            boolean shouldBeRead = buffer.readBoolean();
+            if (!shouldBeRead) {
+                continue;
+            }
+            BlockPos tilePos = buffer.readBlockPos();
+            float powerGiven = buffer.readFloat();
+            float pInR = buffer.readFloat();
+            TileEntityMachineBase tileEntity = (TileEntityMachineBase) Minecraft.getMinecraft().theWorld.getTileEntity(tilePos);
+            tileEntity.powerGiven = powerGiven;
+            tileEntity.pInR = pInR;
+            tileEntity.rpos = pos;
+            tileEntity.edist = (float) Math.sqrt(tileEntity.getDistanceSq(pos.getX(), pos.getY(), pos.getZ()));
+
+            machines.add(tileEntity);
+        }
+    }
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
+	public void toBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+        buffer.writeBlockPos(pos);
 
-		buf.writeFloat(consumed);
-		buf.writeFloat(lasttick);
-		buf.writeBoolean(melt);
-		buf.writeBoolean(eject);
-		buf.writeBoolean(on);
-		if (machines == null) return;
-		for (int i = 0; i < machines.getSize(); i++)
-		{
-			TileEntityMachineBase te = (TileEntityMachineBase) machines.get(i);
-			if (te == null || te instanceof TileEntityReactive) continue;
-			buf.writeInt(te.xCoord);
-			buf.writeInt(te.yCoord);
-			buf.writeInt(te.zCoord);
-			buf.writeFloat(te.powerGiven);
-			buf.writeFloat(te.pInR);
-		}
+		buffer.writeFloat(consumed);
+		buffer.writeFloat(lasttick);
+		buffer.writeBoolean(melt);
+		buffer.writeBoolean(eject);
+		buffer.writeBoolean(on);
+		buffer.writeInt(machines == null ? 0 : machines.size());
+        if (machines != null) {
+            for (int i = 0; i < machines.size(); i++) {
+                TileEntityMachineBase te = (TileEntityMachineBase) machines.get(i);
+                if (te != null && !(te instanceof TileEntityReactive)) {
+                    buffer.writeBoolean(true);
+                    buffer.writeBlockPos(te.getPos());
+                    buffer.writeFloat(te.powerGiven);
+                    buffer.writeFloat(te.pInR);
+                } else {
+                    buffer.writeBoolean(false);
+                }
+            }
+        }
 	}
 
-	public static class Handler implements IMessageHandler<ReactorUpdatePacket, IMessage>
-	{
+	public static class Handler implements IMessageHandler<ReactorUpdatePacket, IMessage> {
 		@Override
-		public IMessage onMessage(ReactorUpdatePacket m, MessageContext ctx)
-		{
-			int x = m.bbuf.readInt();
-			int y = m.bbuf.readInt();
-			int z = m.bbuf.readInt();
-			TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(x, y, z);
+		public IMessage onMessage(ReactorUpdatePacket m, MessageContext ctx) {
+            if (ctx.side == Side.CLIENT) {
+                BlockPos pos = m.pos;
+                TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(pos);
 
-			if (te instanceof TileEntityReactor)
-			{
-				TileEntityReactor ter = (TileEntityReactor) te;
-				ter.consumed = m.bbuf.readFloat();
-				ter.lasttickconsumed = m.bbuf.readFloat();
-				ter.melt = m.bbuf.readBoolean();
-				ter.eject = m.bbuf.readBoolean();
-				ter.on = m.bbuf.readBoolean();
-				ter.machines.clear();
-				while (m.bbuf.isReadable())
-				{
-					int xx = m.bbuf.readInt();
-					int yy = m.bbuf.readInt();
-					int zz = m.bbuf.readInt();
-					TileEntity temb = Minecraft.getMinecraft().theWorld.getTileEntity(xx, yy, zz);
-					if (temb instanceof TileEntityMachineBase)
-					{
-						TileEntityMachineBase tembr = ((TileEntityMachineBase) temb);
-						tembr.powerGiven = m.bbuf.readFloat();
-						tembr.pInR = m.bbuf.readFloat();
-						tembr.x = x;
-						tembr.y = y;
-						tembr.z = z;
-						tembr.edist = (float) Math.sqrt(tembr.getDistanceFrom(x, y, z));
-						ter.machines.add(temb);
-					}
-					else
-					{
-						m.bbuf.readFloat();
-						m.bbuf.readFloat();
-					}
-				}
-			}
+                if (te instanceof TileEntityReactor ter) {
+                    ter.consumed = m.consumed;
+                    ter.lasttickconsumed = m.lasttick;
+                    ter.melt = m.melt;
+                    ter.eject = m.eject;
+                    ter.on = m.on;
+                    ter.machines.clear();
+
+                    ter.machines.addAll(m.machines);
+                }
+            }
+
 			return null;
 		}
 	}

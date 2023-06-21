@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -28,12 +29,13 @@ public class RenderRoddiskRep extends Render
 {
 	int					er	= 0;
 	private ModelDisk	model;
-	
-	public RenderRoddiskRep()
+
+	public RenderRoddiskRep(RenderManager renderManager)
 	{
+        super(renderManager);
 		model = new ModelDisk();
 	}
-	
+
 	@Override
 	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9)
 	{
@@ -49,17 +51,17 @@ public class RenderRoddiskRep extends Render
 		GL11.glPushMatrix();
 		GL11.glRotatef(erd.rotationPitch, 0.0F, 0.0F, 1.0F);
 		GL11.glRotatef(erd.rotationYaw - 90.0f + er, 0.0F, 1.0F, 0.0F);
-		
+
 		model.render();
 		model.render();
 		model.render();
-		
+
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_LIGHTING);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

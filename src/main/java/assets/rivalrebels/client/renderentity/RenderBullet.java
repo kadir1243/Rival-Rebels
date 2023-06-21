@@ -11,30 +11,28 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-import org.lwjgl.opengl.GL14;
 
-import assets.rivalrebels.RivalRebels;
-
-public class RenderBullet extends Render
+public class RenderBullet extends Render<Entity>
 {
 	/**
 	 * Have the icon index (in items.png) that will be used to render the image. Currently, eggs and snowballs uses this classes.
 	 */
-	private String	path;
-	
-	public RenderBullet(String par1)
+	private String path;
+
+	public RenderBullet(RenderManager renderManager, String path)
 	{
-		path = par1;
+        super(renderManager);
+		this.path = path;
 	}
-	
+
 	/**
 	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
 	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
@@ -48,15 +46,15 @@ public class RenderBullet extends Render
 			GL11.glPushMatrix();
 			GL11.glTranslatef((float) par2, (float) par4, (float) par6);
 			GL11.glScalef(0.5F, 0.5F, 0.5F);
-			if (path == "flame") Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etflame);
-			if (path == "fire") Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etfire);
-			Tessellator var10 = Tessellator.instance;
-			this.func_77026_a(var10);
+			if ("flame".equals(path)) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etflame);
+			if ("fire".equals(path)) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etfire);
+			Tessellator var10 = Tessellator.getInstance();
+			this.renderEntity(var10);
 			GL11.glPopMatrix();
 		}
 	}
-	
-	private void func_77026_a(Tessellator par1Tessellator)
+
+	private void renderEntity(Tessellator par1Tessellator)
 	{
 		float var7 = 1.0F;
 		float var8 = 0.5F;
@@ -71,7 +69,7 @@ public class RenderBullet extends Render
 		par1Tessellator.addVertexWithUV((0.0F - var8), (var7 - var9), 0.0D, 0, 1);
 		par1Tessellator.draw();
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

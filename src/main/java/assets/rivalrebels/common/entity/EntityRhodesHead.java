@@ -11,23 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.explosion.Explosion;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.DamageSource;
+import net.minecraft.world.World;
 
 public class EntityRhodesHead extends EntityRhodesPiece
 {
@@ -35,7 +24,7 @@ public class EntityRhodesHead extends EntityRhodesPiece
 	{
 		super(w);
 	}
-	
+
 	public EntityRhodesHead(World w, double x, double y, double z, float scale, int color)
 	{
 		super(w, x, y, z, scale, color);
@@ -47,7 +36,7 @@ public class EntityRhodesHead extends EntityRhodesPiece
 	{
 		return 3000;
 	}
-	
+
 	@Override
 	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
 	{
@@ -68,7 +57,7 @@ public class EntityRhodesHead extends EntityRhodesPiece
 				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
 			}
 		}
-		
+
 		return true;
 	}
 }

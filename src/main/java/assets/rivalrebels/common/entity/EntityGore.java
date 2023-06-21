@@ -93,7 +93,7 @@ public class EntityGore extends EntityInanimate
 		mob = Mob;
 		if (Mob == 0)
 		{
-			username = ((EntityPlayer) origin).getCommandSenderName();
+			username = ((EntityPlayer) origin).getName();
 			setBiped(0);
 		}
 		else if (Mob == 1)
@@ -142,7 +142,7 @@ public class EntityGore extends EntityInanimate
 		}
 		else if (Mob == 11)
 		{
-			size = origin.boundingBox.getAverageEdgeLength();
+			size = origin.getEntityBoundingBox().getAverageEdgeLength();
 			if (size > 2 || size < 1) greenblood = true;
 			setDefault();
 		}
@@ -340,7 +340,7 @@ public class EntityGore extends EntityInanimate
 			while (iter.hasNext())
 			{
 				EntityPlayer player = (EntityPlayer) iter.next();
-				if (player.getCommandSenderName().equals(username))
+				if (player.getName().equals(username))
 				{
 					AbstractClientPlayer acp = (AbstractClientPlayer) player;
 					playerSkin = acp.getLocationSkin();
@@ -365,11 +365,11 @@ public class EntityGore extends EntityInanimate
 			if (slideCount == 140) setDead();
 		}
 
-		Vec3 vec3 = Vec3.createVectorHelper(posX, posY, posZ);
-		Vec3 vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3 vec3 = new Vec3(posX, posY, posZ);
+		Vec3 vec31 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
 		MovingObjectPosition movingobjectposition = worldObj.rayTraceBlocks(vec3, vec31);
-		vec3 = Vec3.createVectorHelper(posX, posY, posZ);
-		vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
+		vec3 = new Vec3(posX, posY, posZ);
+		vec31 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
 
 		if (movingobjectposition != null)
 		{

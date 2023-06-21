@@ -11,20 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
+public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer<TileEntityReciever>
 {
 	public static ModelFromObj	base;
 	public static ModelFromObj	arm;
@@ -44,9 +41,9 @@ public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
 		}
 	}
 
-	public void renderAModelAt(TileEntityReciever tile, double x, double y, double z, float f)
-	{
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreciever);
+    @Override
+    public void renderTileEntityAt(TileEntityReciever tile, double x, double y, double z, float partialTicks, int destroyStage) {
+        Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreciever);
 		GL11.glPushMatrix();
 		GL11.glTranslated(x + 0.5, y, z + 0.5);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -74,11 +71,5 @@ public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
 		}
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
-	}
-
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityReciever) tileentity, d, d1, d2, f);
 	}
 }

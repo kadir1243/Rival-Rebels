@@ -11,31 +11,23 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.item.weapon.ItemBinoculars;
+import assets.rivalrebels.common.packet.LaptopRefreshPacket;
+import assets.rivalrebels.common.packet.PacketDispatcher;
+import assets.rivalrebels.common.round.RivalRebelsTeam;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.item.weapon.ItemBinoculars;
-import assets.rivalrebels.common.packet.LaptopButtonPacket;
-import assets.rivalrebels.common.packet.LaptopRefreshPacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.relauncher.Side;
+import net.minecraft.util.ITickable;
 
-public class TileEntityLaptop extends TileEntity implements IInventory
+import java.util.List;
+
+public class TileEntityLaptop extends TileEntity implements IInventory, ITickable
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
@@ -81,8 +73,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 			{
 				var3 = this.chestContents[par1];
 				this.chestContents[par1] = null;
-				return var3;
-			}
+            }
 			else
 			{
 				var3 = this.chestContents[par1].splitStack(par2);
@@ -92,9 +83,9 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 					this.chestContents[par1] = null;
 				}
 
-				return var3;
-			}
-		}
+            }
+            return var3;
+        }
 		return null;
 	}
 
@@ -102,7 +93,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
 	 */
 	@Override
-	public ItemStack getStackInSlotOnClosing(int par1)
+	public ItemStack removeStackFromSlot(int par1)
 	{
 		if (this.chestContents[par1] != null)
 		{
@@ -190,7 +181,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
 	{
-		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+		return this.worldObj.getTileEntity(this.pos) == this && par1EntityPlayer.getDistanceSq(this.pos.add(0.5D, 0.5D, 0.5D)) <= 64.0D;
 	}
 
 	public void onGoButtonPressed()
@@ -235,9 +226,9 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 			if (getStackInSlot(j) == null) r = false;
 			else
 			{
-				if (getStackInSlot(j).stackTagCompound==null) getStackInSlot(j).stackTagCompound = new NBTTagCompound();
-				if (rrteam == RivalRebelsTeam.NONE) rrteam = RivalRebelsTeam.getForID(getStackInSlot(j).stackTagCompound.getInteger("team"));
-				else if (rrteam != RivalRebelsTeam.getForID(getStackInSlot(j).stackTagCompound.getInteger("team"))) r = false;
+				if (!getStackInSlot(j).hasTagCompound()) getStackInSlot(j).setTagCompound(new NBTTagCompound());
+				if (rrteam == RivalRebelsTeam.NONE) rrteam = RivalRebelsTeam.getForID(getStackInSlot(j).getTagCompound().getInteger("team"));
+				else if (rrteam != RivalRebelsTeam.getForID(getStackInSlot(j).getTagCompound().getInteger("team"))) r = false;
 			}
 		}
 		return r;
@@ -247,9 +238,8 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
 	@Override
-	public void updateEntity()
+	public void update()
 	{
-		super.updateEntity();
 		++this.ticksSinceSync;
 
 		slide = (Math.cos(test) + 1) * 45;
@@ -259,18 +249,14 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 			ItemBinoculars.add(this);
 		//	listed = true;
 		//}
-		List players = worldObj.playerEntities;
-		Iterator iter = players.iterator();
-		boolean i = false;
-		while (iter.hasNext())
-		{
-			EntityPlayer player = (EntityPlayer) iter.next();
-			if (player.getDistanceSq(xCoord + 0.5f, yCoord + 0.5f, zCoord + 0.5f) <= 9)
-			{
-				i = true;
-			}
-		}
-		if (i)
+        boolean thereIsAPlayerInDistance = false;
+        List<EntityPlayer> players = worldObj.playerEntities;
+        for (EntityPlayer player : players) {
+            if (player.getDistanceSq(pos.add(0.5F, 0.5F, 0.5F)) <= 9) {
+                thereIsAPlayerInDistance = true;
+            }
+        }
+		if (thereIsAPlayerInDistance)
 		{
 			if (slide < 89.995) test += 0.05;
 		}
@@ -320,35 +306,30 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	}
 
 	@Override
-	public String getInventoryName()
+	public String getName()
 	{
 		return "Laptop";
 	}
 
 	@Override
-	public boolean hasCustomInventoryName()
+	public boolean hasCustomName()
 	{
 		return false;
 	}
 
 	@Override
-	public void openInventory()
-	{
-
+	public void openInventory(EntityPlayer player) {
 	}
 
 	@Override
-	public void closeInventory()
-	{
-
+	public void closeInventory(EntityPlayer player) {
 	}
 
 	public void refreshTasks() {
-		PacketDispatcher.packetsys.sendToAll(new LaptopRefreshPacket(xCoord, yCoord, zCoord, b2spirit, b2carpet));
+		PacketDispatcher.packetsys.sendToAll(new LaptopRefreshPacket(getPos(), b2spirit, b2carpet));
 	}
 
-	public boolean isReady()
-	{
+	public boolean isReady() {
 		return hasChips()
 				&& getStackInSlot(4) != null
 				&& getStackInSlot(5) != null

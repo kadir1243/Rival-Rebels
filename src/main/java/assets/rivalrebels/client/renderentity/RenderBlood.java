@@ -14,6 +14,7 @@ package assets.rivalrebels.client.renderentity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -24,6 +25,10 @@ import assets.rivalrebels.RivalRebels;
 
 public class RenderBlood extends Render
 {
+    public RenderBlood(RenderManager renderManager) {
+        super(renderManager);
+    }
+
 	@Override
 	public void doRender(Entity entity, double x, double y, double z, float f, float f1)
 	{
@@ -38,7 +43,7 @@ public class RenderBlood extends Render
 			GL11.glPopMatrix();
 		}
 	}
-	
+
 	private void renderFaceMe()
 	{
 		float var7 = 1.0F;
@@ -55,7 +60,7 @@ public class RenderBlood extends Render
 		t.addVertexWithUV((0.0F - var8), (var7 - var9), 0.0D, 0, 1);
 		t.draw();
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

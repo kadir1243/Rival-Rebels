@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityTachyonBomb;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -28,8 +29,9 @@ public class RenderTachyonBomb extends Render
 {
     public static IModelCustom bomb;
 
-	public RenderTachyonBomb()
+	public RenderTachyonBomb(RenderManager renderManager)
 	{
+        super(renderManager);
     	bomb = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/t.obj"));
 	}
 

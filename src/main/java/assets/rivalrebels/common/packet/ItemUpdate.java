@@ -57,13 +57,13 @@ public class ItemUpdate implements IMessage
 			ItemStack itemstack = ctx.getServerHandler().playerEntity.inventory.getStackInSlot(message.item);
 			if (itemstack.getItem() instanceof ItemTesla)
 			{
-				if (itemstack.stackTagCompound == null) itemstack.stackTagCompound = new NBTTagCompound();
-				itemstack.stackTagCompound.setInteger("dial", message.value);
+				if (!itemstack.hasTagCompound()) itemstack.setTagCompound(new NBTTagCompound());
+				itemstack.getTagCompound().setInteger("dial", message.value);
 			}
 			if (itemstack.getItem() instanceof ItemFlameThrower)
 			{
-				if (itemstack.stackTagCompound == null) itemstack.stackTagCompound = new NBTTagCompound();
-				itemstack.stackTagCompound.setInteger("mode", message.value);
+                if (!itemstack.hasTagCompound()) itemstack.setTagCompound(new NBTTagCompound());
+				itemstack.getTagCompound().setInteger("mode", message.value);
 			}
 			return null;
 		}

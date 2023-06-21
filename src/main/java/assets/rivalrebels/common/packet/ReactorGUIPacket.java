@@ -11,27 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ReactorGUIPacket implements IMessage
 {
-	int x;
-	int y;
-	int z;
+    private BlockPos pos;
 	byte type;
 
 	public ReactorGUIPacket()
@@ -39,44 +30,35 @@ public class ReactorGUIPacket implements IMessage
 
 	}
 
-	public ReactorGUIPacket(int X, int Y, int Z, byte b)
+	public ReactorGUIPacket(BlockPos pos, byte b)
 	{
-		x = X;
-		y = Y;
-		z = Z;
+		this.pos = pos;
 		type = b;
 	}
 
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		x = buf.readInt();
-		y = buf.readInt();
-		z = buf.readInt();
-		type = buf.readByte();
+        PacketBuffer buffer = new PacketBuffer(buf);
+		pos = buffer.readBlockPos();
+		type = buffer.readByte();
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
-		buf.writeByte(type);
+        PacketBuffer buffer = new PacketBuffer(buf);
+		buffer.writeBlockPos(pos);
+		buffer.writeByte(type);
 	}
 
-	public static class Handler implements IMessageHandler<ReactorGUIPacket, IMessage>
-	{
+	public static class Handler implements IMessageHandler<ReactorGUIPacket, IMessage> {
 		@Override
-		public IMessage onMessage(ReactorGUIPacket m, MessageContext ctx)
-		{
-			if (ctx.getServerHandler().playerEntity.getDistanceSq(m.x, m.y, m.z) < 100)
-			{
-				TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.x, m.y, m.z);
-				if (te != null && te instanceof TileEntityReactor)
-				{
-					TileEntityReactor ter = (TileEntityReactor)te;
-					if (m.type == 0) ter.toggleOn();
+		public IMessage onMessage(ReactorGUIPacket m, MessageContext ctx) {
+			if (ctx.getServerHandler().playerEntity.getDistanceSq(m.pos) < 100) {
+				TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.pos);
+				if (te instanceof TileEntityReactor ter) {
+                    if (m.type == 0) ter.toggleOn();
 					if (m.type == 1) ter.ejectCore();
 				}
 			}

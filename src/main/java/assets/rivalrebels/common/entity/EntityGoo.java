@@ -11,7 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.Entity;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
@@ -63,11 +62,11 @@ public class EntityGoo extends EntityInanimate
 
 		++ticksExisted;
 
-		Vec3 vec3 = Vec3.createVectorHelper(posX, posY, posZ);
-		Vec3 vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3 vec3 = new Vec3(posX, posY, posZ);
+		Vec3 vec31 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
 		MovingObjectPosition movingobjectposition = worldObj.rayTraceBlocks(vec3, vec31);
-		vec3 = Vec3.createVectorHelper(posX, posY, posZ);
-		vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
+		vec3 = new Vec3(posX, posY, posZ);
+		vec31 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
 
 		if (movingobjectposition != null || isInWater() || (ticksExisted == 20 && isGore)) setDead();
 

@@ -11,25 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.autobuilds.BlockRhodesScaffold;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
+import net.minecraft.util.BlockPos;
 
 public class TileEntityRhodesActivator extends TileEntityMachineBase
 {
@@ -51,17 +37,17 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 				boolean buildrhodes = true;
 				boolean buildrhodes1 = true;
 				boolean buildrhodes2 = true;
-				int x = xCoord;
-				int y = yCoord;
-				int z = zCoord;
+				int x = getPos().getX();
+				int y = getPos().getY();
+				int z = getPos().getZ();
 				for (int i = 0; i < 31*9; i++)
 				{
 					byte b = BlockRhodesScaffold.binimg[i];
 					int fy = 2-(i/9);
 					int fx1 = -10+(i%9);
-					int fx2 = +7-(i%9);
-					Block s1 = worldObj.getBlock(x+fx1, y+fy, z);
-					Block s2 = worldObj.getBlock(x+fx2, y+fy, z);
+					int fx2 = 7 -(i%9);
+					Block s1 = worldObj.getBlockState(new BlockPos(x+fx1, y+fy, z)).getBlock();
+					Block s2 = worldObj.getBlockState(new BlockPos(x+fx2, y+fy, z)).getBlock();
 					if (b == 1 && (s1 != RivalRebels.conduit || s2 != RivalRebels.conduit))
 					{
 						buildrhodes = false;
@@ -79,12 +65,12 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 					byte b = BlockRhodesScaffold.binimg[i];
 					int fy = 2-(i/9);
 					int fx1 = -10+(i%9);
-					int fx2 = +7-(i%9);
+					int fx2 = 7 -(i%9);
 					fy *= 2;
 					fx1 *= 2;
 					fx2 *= 2;
-					Block s1 = worldObj.getBlock(x+fx1, y+fy, z);
-					Block s2 = worldObj.getBlock(x+fx2, y+fy, z);
+					Block s1 = worldObj.getBlockState(new BlockPos(x+fx1, y+fy, z)).getBlock();
+					Block s2 = worldObj.getBlockState(new BlockPos(x+fx2, y+fy, z)).getBlock();
 					if (b == 1 && (s1 != RivalRebels.conduit || s2 != RivalRebels.conduit))
 					{
 						buildrhodes1 = false;
@@ -102,12 +88,12 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 					byte b = BlockRhodesScaffold.binimg[i];
 					int fy = 2-(i/9);
 					int fx1 = -10+(i%9);
-					int fx2 = +7-(i%9);
+					int fx2 = 7 -(i%9);
 					fy *= 3;
 					fx1 *= 3;
 					fx2 *= 3;
-					Block s1 = worldObj.getBlock(x+fx1, y+fy, z);
-					Block s2 = worldObj.getBlock(x+fx2, y+fy, z);
+					Block s1 = worldObj.getBlockState(new BlockPos(x+fx1, y+fy, z)).getBlock();
+					Block s2 = worldObj.getBlockState(new BlockPos(x+fx2, y+fy, z)).getBlock();
 					if (b == 1 && (s1 != RivalRebels.conduit || s2 != RivalRebels.conduit))
 					{
 						buildrhodes2 = false;
@@ -128,13 +114,13 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 						{
 							int fy = 2-(i/9);
 							int fx1 = -10+(i%9);
-							int fx2 = +7-(i%9);
-							worldObj.setBlock(x+fx1, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx2, y+fy, z, Blocks.air);
+							int fx2 = 7 -(i%9);
+							worldObj.setBlockToAir(new BlockPos(x+fx1, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2, y+fy, z));
 						}
 					}
 					EntityRhodes er = new EntityRhodes(worldObj, x-1f, y-13, z, 1);
-					if (zCoord > this.z) er.bodyyaw = 180;
+					if (getPos().getZ() > this.rpos.getZ()) er.bodyyaw = 180;
 					worldObj.spawnEntityInWorld(er);
 				}
 				else if (buildrhodes1)
@@ -146,22 +132,22 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 						{
 							int fy = 2-(i/9);
 							int fx1 = -10+(i%9);
-							int fx2 = +7-(i%9);
+							int fx2 = 7 -(i%9);
 							fy *= 2;
 							fx1 *= 2;
 							fx2 *= 2;
-							worldObj.setBlock(x+fx1, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx2, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx1+1, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx2+1, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx1, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx2, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx1+1, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx2+1, y+fy+1, z, Blocks.air);
+							worldObj.setBlockToAir(new BlockPos(x+fx1, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+1, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+1, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+1, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+1, y+fy+1, z));
 						}
 					}
 					EntityRhodes er = new EntityRhodes(worldObj, x-2f, y-26, z, 2);
-					if (zCoord > this.z) er.bodyyaw = 180;
+					if (getPos().getZ() > this.rpos.getZ()) er.bodyyaw = 180;
 					worldObj.spawnEntityInWorld(er);
 				}
 				else if (buildrhodes2)
@@ -173,72 +159,68 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 						{
 							int fy = 2-(i/9);
 							int fx1 = -10+(i%9);
-							int fx2 = +7-(i%9);
+							int fx2 = 7 -(i%9);
 							fy *= 3;
 							fx1 *= 3;
 							fx2 *= 3;
-							worldObj.setBlock(x+fx1, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx2, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx1+1, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx2+1, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx1+2, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx2+2, y+fy, z, Blocks.air);
-							worldObj.setBlock(x+fx1, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx2, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx1+1, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx2+1, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx1+2, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx2+2, y+fy+1, z, Blocks.air);
-							worldObj.setBlock(x+fx1, y+fy+2, z, Blocks.air);
-							worldObj.setBlock(x+fx2, y+fy+2, z, Blocks.air);
-							worldObj.setBlock(x+fx1+1, y+fy+2, z, Blocks.air);
-							worldObj.setBlock(x+fx2+1, y+fy+2, z, Blocks.air);
-							worldObj.setBlock(x+fx1+2, y+fy+2, z, Blocks.air);
-							worldObj.setBlock(x+fx2+2, y+fy+2, z, Blocks.air);
+							worldObj.setBlockToAir(new BlockPos(x+fx1, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+1, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+1, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+2, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+2, y+fy, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+1, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+1, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+2, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+2, y+fy+1, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1, y+fy+2, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2, y+fy+2, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+1, y+fy+2, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+1, y+fy+2, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx1+2, y+fy+2, z));
+							worldObj.setBlockToAir(new BlockPos(x+fx2+2, y+fy+2, z));
 						}
 					}
 					EntityRhodes er = new EntityRhodes(worldObj, x-3f, y-39, z, 3);
-					if (zCoord > this.z) er.bodyyaw = 180;
+					if (getPos().getZ() > this.rpos.getZ()) er.bodyyaw = 180;
 					worldObj.spawnEntityInWorld(er);
 				}
-				else if (worldObj.getBlock(x, y+1, z) == RivalRebels.conduit
-					&& worldObj.getBlock(x-1, y, z) == RivalRebels.steel
-					&& worldObj.getBlock(x+1, y, z) == RivalRebels.steel
-					&& worldObj.getBlock(x-1, y+1, z) == RivalRebels.steel
-					&& worldObj.getBlock(x+1, y+1, z) == RivalRebels.steel
-					&& worldObj.getBlock(x-1, y+3, z) == RivalRebels.steel
-					&& worldObj.getBlock(x+1, y+3, z) == RivalRebels.steel
-					&& worldObj.getBlock(x, y+3, z) == RivalRebels.steel
-					&& worldObj.getBlock(x, y+2, z) == RivalRebels.conduit
-					&& worldObj.getBlock(x-1, y+2, z) == RivalRebels.steel
-					&& worldObj.getBlock(x+1, y+2, z) == RivalRebels.steel)
+				else if (worldObj.getBlockState(new BlockPos(x, y+1, z)).getBlock() == RivalRebels.conduit
+					&& worldObj.getBlockState(new BlockPos(x-1, y, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x+1, y, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x-1, y+1, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x+1, y+1, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x-1, y+3, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x+1, y+3, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x, y+3, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x, y+2, z)).getBlock() == RivalRebels.conduit
+					&& worldObj.getBlockState(new BlockPos(x-1, y+2, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x+1, y+2, z)).getBlock() == RivalRebels.steel)
 				{
-					worldObj.setBlock(x, y+1, z, Blocks.air);
-					worldObj.setBlock(x, y+2, z, Blocks.air);
-					worldObj.setBlock(x, y+3, z, Blocks.air);
+					worldObj.setBlockToAir(new BlockPos(x, y+1, z));
+					worldObj.setBlockToAir(new BlockPos(x, y+2, z));
+					worldObj.setBlockToAir(new BlockPos(x, y+3, z));
 					EntityRhodes er = new EntityRhodes(worldObj, x+0.5f, y+2.5f, z+0.5f, 0.0666666666666f);
-					er.wakeX = x;
-					er.wakeY = y;
-					er.wakeZ = z;
-					if (zCoord > this.z) er.bodyyaw = 180;
+                    er.wakePos = new BlockPos(x, y, z);
+					if (getPos().getZ() > this.rpos.getZ()) er.bodyyaw = 180;
 					worldObj.spawnEntityInWorld(er);
 				}
-				else if (worldObj.getBlock(x, y+1, z) == RivalRebels.conduit
-					&& worldObj.getBlock(x-1, y, z) == RivalRebels.steel
-					&& worldObj.getBlock(x+1, y, z) == RivalRebels.steel
-					&& worldObj.getBlock(x-1, y+1, z) == RivalRebels.steel
-					&& worldObj.getBlock(x+1, y+1, z) == RivalRebels.steel
-					&& worldObj.getBlock(x-1, y+2, z) == RivalRebels.steel
-					&& worldObj.getBlock(x+1, y+2, z) == RivalRebels.steel
-					&& worldObj.getBlock(x, y+2, z) == RivalRebels.steel)
+				else if (worldObj.getBlockState(new BlockPos(x, y+1, z)).getBlock() == RivalRebels.conduit
+					&& worldObj.getBlockState(new BlockPos(x-1, y, z  )).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x+1, y, z  )).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x-1, y+1, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x+1, y+1, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x-1, y+2, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x+1, y+2, z)).getBlock() == RivalRebels.steel
+					&& worldObj.getBlockState(new BlockPos(x, y+2, z  )).getBlock() == RivalRebels.steel)
 				{
-					worldObj.setBlock(x, y+1, z, Blocks.air);
-					worldObj.setBlock(x, y+2, z, Blocks.air);
+					worldObj.setBlockToAir(new BlockPos(x, y+1, z));
+					worldObj.setBlockToAir(new BlockPos(x, y+2, z));
 					EntityRhodes er = new EntityRhodes(worldObj, x+0.5f, y+1.5f, z+0.5f, 0.0333333333333f);
-					er.wakeX = x;
-					er.wakeY = y;
-					er.wakeZ = z;
-					if (zCoord > this.z) er.bodyyaw = 180;
+                    er.wakePos = new BlockPos(x, y, z);
+					if (getPos().getZ() > this.rpos.getZ()) er.bodyyaw = 180;
 					worldObj.spawnEntityInWorld(er);
 				}
 				return power*0.5f;

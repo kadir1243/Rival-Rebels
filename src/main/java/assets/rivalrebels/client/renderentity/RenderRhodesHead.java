@@ -12,6 +12,7 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesHead;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
@@ -23,9 +24,9 @@ import org.lwjgl.opengl.GL11;
 @SideOnly(Side.CLIENT)
 public class RenderRhodesHead extends Render
 {
-	public RenderRhodesHead()
-	{
-	}
+	public RenderRhodesHead(RenderManager renderManager) {
+        super(renderManager);
+    }
 
 	public void renderRhodes(EntityRhodesHead rhodes, double x, double y, double z, float par8, float ptt)
 	{

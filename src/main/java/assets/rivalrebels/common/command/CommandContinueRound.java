@@ -40,8 +40,7 @@ public class CommandContinueRound extends CommandBase
 	}
 
     @Override
-	public void processCommand(ICommandSender sender, String[] array)
-	{
+	public void processCommand(ICommandSender sender, String[] array) {
 		RivalRebels.round.stopRounds();
 		RivalRebels.round.newRound();
 		sender.addChatMessage(new ChatComponentText("The current round has been successfully started."));

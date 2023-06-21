@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.ResourceLocation;
@@ -28,12 +29,13 @@ import assets.rivalrebels.common.entity.EntityTsarBlast;
 public class RenderSphereBlast extends Render
 {
 	private ModelBlastSphere	modelsphere;
-	
-	public RenderSphereBlast()
+
+	public RenderSphereBlast(RenderManager renderManager)
 	{
+        super(renderManager);
 		modelsphere = new ModelBlastSphere();
 	}
-	
+
 	@Override
 	public void doRender(Entity var1, double x, double y, double z, float var8, float var9)
 	{
@@ -65,7 +67,7 @@ public class RenderSphereBlast extends Render
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

@@ -15,8 +15,10 @@ import java.util.List;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.command.PlayerNotFoundException;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 
@@ -41,19 +43,14 @@ public class CommandKillme extends CommandBase
 	}
 
 	@Override
-	public void processCommand(ICommandSender sender, String[] array)
-	{
+	public void processCommand(ICommandSender sender, String[] array) throws PlayerNotFoundException {
 		EntityPlayer person = getCommandSenderAsPlayer(sender);
 		person.attackEntityFrom(RivalRebelsDamageSource.cyanide, 10000);
 		sender.addChatMessage(new ChatComponentText("Do you think the cyanide tasted good?"));
 	}
 
-	/**
-	 * Adds the strings available in this command to the given list of tab completion options.
-	 */
-	@Override
-	public List<String> addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
-	{
-		return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
-	}
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
+        return args.length >= 1 ? getListOfStringsMatchingLastWord(args, MinecraftServer.getServer().getAllUsernames()) : null;
+    }
 }

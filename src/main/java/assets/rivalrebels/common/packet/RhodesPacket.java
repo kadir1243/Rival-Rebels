@@ -11,17 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.common.core.FileRW;
+import assets.rivalrebels.common.entity.EntityRhodes;
 import io.netty.buffer.ByteBuf;
-
-import java.util.Iterator;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.DamageSource;
-import assets.rivalrebels.common.core.FileRW;
-import assets.rivalrebels.common.entity.EntityGore;
-import assets.rivalrebels.common.entity.EntityRhodes;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -187,10 +182,9 @@ public class RhodesPacket implements IMessage
 		public IMessage onMessage(RhodesPacket m, MessageContext ctx)
 		{
 			Entity e = Minecraft.getMinecraft().theWorld.getEntityByID(m.id);
-			if (e instanceof EntityRhodes)
+			if (e instanceof EntityRhodes er)
 			{
-				EntityRhodes er = (EntityRhodes) e;
-				er.lastbodyyaw = er.bodyyaw;
+                er.lastbodyyaw = er.bodyyaw;
 				er.lastheadyaw = er.headyaw;
 				er.lastheadpitch = er.headpitch;
 				er.lastleftarmyaw = er.leftarmyaw;

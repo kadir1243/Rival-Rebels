@@ -40,12 +40,12 @@ public class ResetPacket implements IMessage
 		@Override
 		public IMessage onMessage(ResetPacket m, MessageContext ctx)
 		{
-			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getCommandSenderName());
+			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getName());
 			if (!p.isreset && p.resets > 0)
 			{
 				p.isreset = true;
 				p.resets--;
-				ctx.getServerHandler().playerEntity.inventory.clearInventory(null, -1);
+				ctx.getServerHandler().playerEntity.inventory.clear();
 				PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
 			}
 			return null;

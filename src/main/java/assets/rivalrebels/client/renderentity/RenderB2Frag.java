@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -30,8 +31,9 @@ public class RenderB2Frag extends Render
 	ModelFromObj	md1;
 	ModelFromObj	md2;
 
-	public RenderB2Frag()
+	public RenderB2Frag(RenderManager renderManager)
 	{
+        super(renderManager);
 		try
 		{
 			md1 = ModelFromObj.readObjFile("f.obj");

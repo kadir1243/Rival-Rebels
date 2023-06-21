@@ -11,14 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.item.ItemStack;
-import net.minecraft.scoreboard.Scoreboard;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.item.ItemStack;
+import net.minecraft.scoreboard.Scoreboard;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
@@ -58,7 +57,7 @@ public class JoinTeamPacket implements IMessage
 		@Override
 		public IMessage onMessage(JoinTeamPacket m, MessageContext ctx)
 		{
-			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getCommandSenderName());
+			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getName());
 
 			if (p.isreset)
 			{
@@ -67,7 +66,7 @@ public class JoinTeamPacket implements IMessage
 				p.rrteam=m.rrteam;
 				Scoreboard scrb = RivalRebels.round.world.getScoreboard();
 				scrb.removePlayerFromTeams(p.username);
-				scrb.func_151392_a(p.username, p.rrteam.toString());
+				scrb.addPlayerToTeam(p.username, p.rrteam.toString());
 				ItemStack[] inventory = m.rrclass.inventory;
 
 				for (int i = 0; i < inventory.length; i++)

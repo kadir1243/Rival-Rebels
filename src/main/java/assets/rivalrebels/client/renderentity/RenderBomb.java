@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -34,8 +35,9 @@ public class RenderBomb extends Render
 {
 	private ModelNuclearBomb	model;
 	private ModelBlastSphere	modelsphere;
-	public RenderBomb()
+	public RenderBomb(RenderManager renderManager)
 	{
+        super(renderManager);
 		modelsphere = new ModelBlastSphere();
 		model = new ModelNuclearBomb();
 	}

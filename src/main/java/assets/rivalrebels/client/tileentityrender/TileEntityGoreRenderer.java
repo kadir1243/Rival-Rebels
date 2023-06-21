@@ -11,22 +11,20 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.renderhelper.Vertice;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
+public class TileEntityGoreRenderer extends TileEntitySpecialRenderer<TileEntityGore>
 {
 	float	s	= 0.5F;
 
@@ -40,17 +38,18 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 	Vertice	v7	= new Vertice(-s, -s, -s);
 	Vertice	v8	= new Vertice(-s, -s, s);
 
-	public void renderAModelAt(TileEntityGore tile, double x, double y, double z, float f)
-	{
-		World world = tile.getWorldObj();
+    @Override
+    public void renderTileEntityAt(TileEntityGore tile, double x, double y, double z, float partialTicks, int destroyStage) {
+		World world = tile.getWorld();
+        BlockPos pos = tile.getPos();
 
-		boolean ceil = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord + 1, tile.zCoord, false);
-		boolean floor = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord - 1, tile.zCoord, false);
-		boolean side1 = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord, tile.zCoord + 1, false);
-		boolean side2 = world.isBlockNormalCubeDefault(tile.xCoord - 1, tile.yCoord, tile.zCoord, false);
-		boolean side3 = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord, tile.zCoord - 1, false);
-		boolean side4 = world.isBlockNormalCubeDefault(tile.xCoord + 1, tile.yCoord, tile.zCoord, false);
-		int meta = tile.blockMetadata;
+        boolean ceil = world.isBlockNormalCube(pos.up(), false);
+		boolean floor = world.isBlockNormalCube(pos.down(), false);
+		boolean side1 = world.isBlockNormalCube(pos.south(), false);
+		boolean side2 = world.isBlockNormalCube(pos.west(), false);
+		boolean side3 = world.isBlockNormalCube(pos.north(), false);
+		boolean side4 = world.isBlockNormalCube(pos.east(), false);
+		int meta = tile.getBlockMetadata();
 
 		GL11.glPushMatrix();
 		GL11.glTranslatef((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
@@ -62,7 +61,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 		else if (meta == 5) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash6);
 		else Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash1);
 		GL11.glDisable(GL11.GL_LIGHTING);
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.getInstance();
 
 		if (side1)
 		{
@@ -127,15 +126,9 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 		GL11.glPopMatrix();
 	}
 
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityGore) tileentity, d, d1, d2, f);
-	}
-
 	private void addVertex(Vertice v, double t, double t2, boolean offset)
 	{
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.getInstance();
 		tessellator.addVertexWithUV(v.x * 0.999, v.y * 0.999, v.z * 0.999, t, t2);
 	}
 }

@@ -11,9 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.round;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.server.MinecraftServer;
 import assets.rivalrebels.common.core.FileRW;
+import io.netty.buffer.ByteBuf;
 
 public class RivalRebelsPlayer
 {
@@ -24,7 +23,7 @@ public class RivalRebelsPlayer
 	public int				resets	= -1;
 	public boolean			isreset	= true;
 	public boolean			voted	= false;
-	
+
 	public RivalRebelsPlayer(String user, RivalRebelsTeam rteam, RivalRebelsClass rclass, RivalRebelsRank rrank, int r)
 	{
 		username = user;
@@ -33,45 +32,38 @@ public class RivalRebelsPlayer
 		rrrank = rrank;
 		resets = r;
 	}
-	
+
 	public RivalRebelsPlayer(ByteBuf buf)
 	{
 		fromBytes(buf);
 	}
-	
+
 	public boolean equals(RivalRebelsPlayer o)
 	{
-		if (username.equals(o.username)) return true;
-		return false;
-	}
-	
+        return username.equals(o.username);
+    }
+
 	public void reset()
 	{
 		resets++;
 		isreset = true;
 	}
-	
+
 	public void clear()
 	{
 		rrclass = RivalRebelsClass.NONE;
 		isreset = true;
 		resets = -1;
 	}
-	
+
 	public void clearTeam()
 	{
 		rrclass = RivalRebelsClass.NONE;
 		rrteam = RivalRebelsTeam.NONE;
 		isreset = true;
 		resets = -1;
-		MinecraftServer server = MinecraftServer.getServer();
-		if (server != null)
-		{
-			//server.handleRConCommand("/scoreboard teams leave Omega " + username);
-			//server.handleRConCommand("/scoreboard teams leave Sigma " + username);
-		}
 	}
-	
+
 	public void toBytes(ByteBuf buf)
 	{
 		buf.writeByte(rrclass.id);
@@ -82,7 +74,7 @@ public class RivalRebelsPlayer
 		buf.writeByte(username.length());
 		buf.writeBytes(FileRW.getBytesString(username));
 	}
-	
+
 	public void fromBytes(ByteBuf buf)
 	{
 		rrclass = RivalRebelsClass.getForID(buf.readByte());

@@ -11,32 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-
+import assets.rivalrebels.common.packet.EntityDebrisPacket;
+import assets.rivalrebels.common.packet.PacketDispatcher;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockFalling;
 import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.common.packet.EntityDebrisPacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 
 public class EntityDebris extends EntityInanimate
 {
-	public Block			block;
-	public int				metadata;
-	public int				ticksExisted;
-	public boolean			grounded;
-	public NBTTagCompound	tileEntityData;
+    public IBlockState blockState;
+    public int ticksExisted;
+    public NBTTagCompound tileEntityData;
 
 	public EntityDebris(World w)
 	{
@@ -46,9 +40,8 @@ public class EntityDebris extends EntityInanimate
 	public EntityDebris(World w, int x, int y, int z)
 	{
 		super(w);
-		block = w.getBlock(x, y, z);
-		metadata = w.getBlockMetadata(x, y, z);
-		w.setBlock(x, y, z, Blocks.air);
+        blockState = w.getBlockState(new BlockPos(x, y, z));
+		w.setBlockToAir(new BlockPos(x, y, z));
 		setSize(1F, 1F);
 		yOffset = 0.5f;
 		setPosition(x + 0.5f, y + 0.5f, z + 0.5f);
@@ -59,8 +52,7 @@ public class EntityDebris extends EntityInanimate
 	public EntityDebris(World w, double x, double y, double z, double mx, double my, double mz, Block b)
 	{
 		super(w);
-		block = b;
-		metadata = 0;
+        blockState = b.getDefaultState();
 		setSize(1F, 1F);
 		yOffset = 0.5f;
 		setPosition(x, y, z);
@@ -72,12 +64,7 @@ public class EntityDebris extends EntityInanimate
 		motionZ = mz;
 	}
 
-	@Override
-	protected void entityInit()
-	{
-	}
-
-	@Override
+    @Override
 	public void onUpdate()
 	{
 		if (ticksExisted == 0 && FMLCommonHandler.instance().getEffectiveSide() == Side.SERVER) PacketDispatcher.packetsys.sendToAll(new EntityDebrisPacket(this));
@@ -93,34 +80,26 @@ public class EntityDebris extends EntityInanimate
 		posY += motionY;
 		posZ += motionZ;
 
-		if (!worldObj.isRemote && worldObj.getBlock(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ)).isOpaqueCube()) die(prevPosX, prevPosY, prevPosZ);
+		if (!worldObj.isRemote && worldObj.getBlockState(getPosition()).getBlock().isOpaqueCube()) die(prevPosX, prevPosY, prevPosZ);
 	}
 
-	public void die(double X, double Y, double Z)
+	public void die(double x, double y, double z)
 	{
-		int x = MathHelper.floor_double(X);
-		int y = MathHelper.floor_double(Y);
-		int z = MathHelper.floor_double(Z);
+        BlockPos pos = new BlockPos(x, y, z);
 		setDead();
-		worldObj.setBlock(x, y, z, block, metadata, 3);
-		if (block instanceof BlockFalling) ((BlockFalling) block).func_149828_a(worldObj, x, y, z, metadata);
-		if (tileEntityData != null && block instanceof ITileEntityProvider)
-		{
-			TileEntity tileentity = worldObj.getTileEntity(x, y, z);
-			if (tileentity != null)
-			{
+		worldObj.setBlockState(pos, blockState);
+		if (blockState.getBlock() instanceof BlockFalling) ((BlockFalling) blockState.getBlock()).playSoundWhenFallen(worldObj, pos.getX(), pos.getY(), pos.getZ(), blockState.getBlock().getMetaFromState(blockState));
+		if (tileEntityData != null && blockState.getBlock() instanceof ITileEntityProvider) {
+			TileEntity tileentity = worldObj.getTileEntity(pos);
+			if (tileentity != null) {
 				NBTTagCompound nbttagcompound = new NBTTagCompound();
 				tileentity.writeToNBT(nbttagcompound);
-				Iterator iter = tileEntityData.func_150296_c().iterator();
-				while (iter.hasNext())
-				{
-					String s = (String) iter.next();
-					NBTBase nbtbase = tileEntityData.getTag(s);
-					if (!s.equals("x") && !s.equals("y") && !s.equals("z"))
-					{
-						nbttagcompound.setTag(s, nbtbase.copy());
-					}
-				}
+                for (String key : tileEntityData.getKeySet()) {
+                    NBTBase tag = tileEntityData.getTag(key);
+                    if (!key.equals("x") && !key.equals("y") && !key.equals("z")) {
+                        nbttagcompound.setTag(key, tag.copy());
+                    }
+                }
 				tileentity.readFromNBT(nbttagcompound);
 				tileentity.markDirty();
 			}
@@ -130,19 +109,16 @@ public class EntityDebris extends EntityInanimate
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbt)
 	{
-		nbt.setByte("Tile", (byte) Block.getIdFromBlock(block));
-		nbt.setInteger("TileID", Block.getIdFromBlock(block));
-		nbt.setByte("Data", (byte) metadata);
+        nbt.setString("Block", Block.blockRegistry.getNameForObject(blockState.getBlock()).toString());
+		nbt.setByte("Data", (byte) blockState.getBlock().getMetaFromState(blockState));
 		nbt.setByte("Time", (byte) ticksExisted);
 		if (tileEntityData != null) nbt.setTag("TileEntityData", tileEntityData);
 	}
 
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound nbt)
-	{
-		if (nbt.hasKey("TileID", 99)) block = Block.getBlockById(nbt.getInteger("TileID"));
-		else block = Block.getBlockById(nbt.getByte("Tile") & 255);
-		metadata = nbt.getByte("Data") & 255;
+	protected void readEntityFromNBT(NBTTagCompound nbt) {
+        int metaData = nbt.getByte("Data") & 255;
+        blockState = Block.getBlockFromName(nbt.getString("Block")).getStateFromMeta(metaData);
 		ticksExisted = nbt.getByte("Time") & 255;
 		if (nbt.hasKey("TileEntityData", 10)) tileEntityData = nbt.getCompoundTag("TileEntityData");
 	}
@@ -151,7 +127,7 @@ public class EntityDebris extends EntityInanimate
 	public void addEntityCrashInfo(CrashReportCategory crash)
 	{
 		super.addEntityCrashInfo(crash);
-		crash.addCrashSection("Immitating block ID", Integer.valueOf(Block.getIdFromBlock(block)));
-		crash.addCrashSection("Immitating block data", Integer.valueOf(metadata));
+		crash.addCrashSection("Immitating block ID", Block.getIdFromBlock(blockState.getBlock()));
+		crash.addCrashSection("Immitating block data", blockState.getBlock().getMetaFromState(blockState));
 	}
 }

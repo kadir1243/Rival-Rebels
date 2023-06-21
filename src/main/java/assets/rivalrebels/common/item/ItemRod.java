@@ -11,14 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.Item;
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
-import net.minecraft.item.Item.ToolMaterial;
 
 import java.util.HashSet;
-
-import assets.rivalrebels.RivalRebels;
 
 public class ItemRod extends ItemTool
 {

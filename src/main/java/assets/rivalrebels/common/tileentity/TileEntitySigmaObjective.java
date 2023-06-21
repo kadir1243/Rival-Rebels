@@ -11,10 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.util.Iterator;
-import java.util.List;
-
-import assets.rivalrebels.RivalRebels;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
@@ -23,13 +19,16 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.IChatComponent;
+import net.minecraft.util.ITickable;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implements IInventory, ICommandSender
+import java.util.List;
+
+public class TileEntitySigmaObjective extends TileEntity implements IInventory, ICommandSender, ITickable
 {
 	private ItemStack[]	chestContents	= new ItemStack[16];
 
@@ -39,10 +38,7 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 	/** The number of players currently using this chest */
 	public int			numUsingPlayers;
 
-	/** Server sync counter (once per 20 ticks) */
-	private int			ticksSinceSync;
-
-	/**
+    /**
 	 * Returns the number of slots in the inventory.
 	 */
 	@Override
@@ -74,8 +70,7 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 			{
 				var3 = this.chestContents[par1];
 				this.chestContents[par1] = null;
-				return var3;
-			}
+            }
 			else
 			{
 				var3 = this.chestContents[par1].splitStack(par2);
@@ -84,9 +79,9 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 				{
 					this.chestContents[par1] = null;
 				}
-				return var3;
-			}
-		}
+            }
+            return var3;
+        }
 		return null;
 	}
 
@@ -94,7 +89,7 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
 	 */
 	@Override
-	public ItemStack getStackInSlotOnClosing(int par1)
+	public ItemStack removeStackFromSlot(int par1)
 	{
 		if (this.chestContents[par1] != null)
 		{
@@ -179,32 +174,23 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
 	{
-		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+		return this.worldObj.getTileEntity(this.pos) != this ? false : par1EntityPlayer.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
 
 	/**
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
 	@Override
-	public void updateEntity()
-	{
-		super.updateEntity();
-		++this.ticksSinceSync;
+	public void update() {
+        slide = (Math.cos(test) + 1) / 32 * 10;
 
-		slide = (Math.cos(test) + 1) / 32 * 10;
-
-		super.updateEntity();
-		List players = worldObj.playerEntities;
-		Iterator iter = players.iterator();
-		boolean i = false;
-		while (iter.hasNext())
-		{
-			EntityPlayer player = (EntityPlayer) iter.next();
-			if (player.getDistanceSq(xCoord + 0.5f, yCoord + 0.5f, zCoord + 0.5f) <= 9)
-			{
-				i = true;
-			}
-		}
+        boolean i = false;
+        List<EntityPlayer> players = worldObj.playerEntities;
+        for (EntityPlayer player : players) {
+            if (player.getDistanceSq(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f) <= 9) {
+                i = true;
+            }
+        }
 		if (i)
 		{
 			if (slide < 0.621) test += 0.05;
@@ -244,7 +230,7 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
-		return AxisAlignedBB.getBoundingBox(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 2, yCoord + 2, zCoord + 2);
+		return new AxisAlignedBB(pos.add(-1, -1, -1), pos.add(2, 2, 2));
 	}
 
 	@Override
@@ -271,7 +257,7 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 	}
 
 	@Override
-	public String getCommandSenderName()
+	public String getName()
 	{
 		return "RivalRebelsSigma";
 	}
@@ -282,57 +268,38 @@ public class TileEntitySigmaObjective extends TileEntity/*MachineBase*/ implemen
 		return true;
 	}
 
-	@Override
-	public ChunkCoordinates getPlayerCoordinates()
-	{
-		return new ChunkCoordinates(xCoord, yCoord, zCoord);
-	}
+    @Override
+    public BlockPos getPosition() {
+        return getPos();
+    }
 
-	@Override
+    @Override
 	public World getEntityWorld()
 	{
 		return worldObj;
 	}
 
 	@Override
-	public IChatComponent func_145748_c_()
+	public IChatComponent getDisplayName()
 	{
 		return null;
 	}
 
 	@Override
-	public void addChatMessage(IChatComponent message)
-	{
-
+	public void addChatMessage(IChatComponent message) {
 	}
 
 	@Override
-	public String getInventoryName()
-	{
-		return "Objective";
-	}
-
-	@Override
-	public boolean hasCustomInventoryName()
+	public boolean hasCustomName()
 	{
 		return false;
 	}
 
 	@Override
-	public void openInventory()
-	{
-
+	public void openInventory(EntityPlayer player) {
 	}
 
 	@Override
-	public void closeInventory()
-	{
-
+	public void closeInventory(EntityPlayer player) {
 	}
-
-	/*@Override
-	public float powered(float power, float distance)
-	{
-		return RivalRebels.round.addSigmaHealth(power);
-	}*/
 }

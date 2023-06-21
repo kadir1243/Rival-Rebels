@@ -11,23 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.block.material.Material;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.explosion.NuclearExplosion;
+
+import java.util.List;
 
 public class EntityBomb extends EntityThrowable
 {
@@ -35,13 +28,13 @@ public class EntityBomb extends EntityThrowable
 	public int timeleft = 20;
 	public boolean exploded = false;
 	public boolean hit = false;
-	
+
 	public EntityBomb(World par1World)
 	{
 		super(par1World);
 		this.setSize(0.5F, 0.5F);
 	}
-	
+
 	public EntityBomb(World par1World, double x, double y, double z, float yaw, float pitch)
 	{
 		this(par1World);
@@ -59,7 +52,7 @@ public class EntityBomb extends EntityThrowable
 		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
-	
+
 	public EntityBomb(World par1World, EntityPlayer entity2, float par3)
 	{
 		super(par1World);
@@ -75,7 +68,7 @@ public class EntityBomb extends EntityThrowable
 		posZ += motionZ;
 		setThrowableHeading(motionX, motionY, motionZ, 2.5f, 0.1f);
 	}
-	
+
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
 		motionX = mx;
@@ -84,7 +77,7 @@ public class EntityBomb extends EntityThrowable
 		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
 		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt_double(mx * mx + mz * mz)) * 180.0D / Math.PI);
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -96,7 +89,7 @@ public class EntityBomb extends EntityThrowable
 		this.lastTickPosZ = this.posZ;
 		if (ticksInAir == - 100) explode(false);
 		++this.ticksInAir;
-		
+
 		if (exploded)
 		{
 			motionY = 0;
@@ -109,89 +102,82 @@ public class EntityBomb extends EntityThrowable
 		}
 		else
 		{
-			Vec3 var15 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-			Vec3 var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+			Vec3 var15 = new Vec3(this.posX, this.posY, this.posZ);
+			Vec3 var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
 			MovingObjectPosition var3 = this.worldObj.rayTraceBlocks(var15, var2);
-			var15 = Vec3.createVectorHelper(this.posX, this.posY, this.posZ);
-			var2 = Vec3.createVectorHelper(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-			
+			var15 = new Vec3(this.posX, this.posY, this.posZ);
+			var2 = new Vec3(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+
 			if (var3 != null)
 			{
-				var2 = Vec3.createVectorHelper(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
+				var2 = new Vec3(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
 			}
-			
+
 			if (!this.worldObj.isRemote)
 			{
 				Entity var4 = null;
-				List var5 = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
+				List<Entity> var5 = worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
 				double var6 = 0.0D;
-				Iterator var8 = var5.iterator();
-				
-				while (var8.hasNext())
-				{
-					Entity var9 = (Entity) var8.next();
-					
-					if (var9.canBeCollidedWith())
-					{
-						float var10 = 0.3F;
-						AxisAlignedBB var11 = var9.boundingBox.expand(var10, var10, var10);
-						MovingObjectPosition var12 = var11.calculateIntercept(var15, var2);
-						
-						if (var12 != null)
-						{
-							double var13 = var15.distanceTo(var12.hitVec);
-							
-							if (var13 < var6 || var6 == 0.0D)
-							{
-								var4 = var9;
-								var6 = var13;
-							}
-						}
-					}
-				}
-				
+
+                for (Entity var9 : var5) {
+                    if (var9.canBeCollidedWith()) {
+                        float var10 = 0.3F;
+                        AxisAlignedBB var11 = var9.getEntityBoundingBox().expand(var10, var10, var10);
+                        MovingObjectPosition var12 = var11.calculateIntercept(var15, var2);
+
+                        if (var12 != null) {
+                            double var13 = var15.distanceTo(var12.hitVec);
+
+                            if (var13 < var6 || var6 == 0.0D) {
+                                var4 = var9;
+                                var6 = var13;
+                            }
+                        }
+                    }
+                }
+
 				if (var4 != null)
 				{
 					var3 = new MovingObjectPosition(var4);
 				}
 			}
-			
+
 			if (var3 != null)
 			{
 				this.onImpact(var3);
 			}
-			
+
 			this.posX += this.motionX;
 			this.posY += this.motionY;
 			this.posZ += this.motionZ;
 			float var16 = MathHelper.sqrt_double(this.motionX * this.motionX + this.motionZ * this.motionZ);
 			this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
-			
-			for (this.rotationPitch = (float) (Math.atan2(this.motionY, var16) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
-			{
-				;
-			}
-			
-			while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+
+            this.rotationPitch = (float) (Math.atan2(this.motionY, var16) * 180.0D / Math.PI);
+            while (this.rotationPitch - this.prevRotationPitch < -180.0F) {
+                this.prevRotationPitch -= 360.0F;
+            }
+
+            while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
 			{
 				this.prevRotationPitch += 360.0F;
 			}
-			
+
 			while (this.rotationYaw - this.prevRotationYaw < -180.0F)
 			{
 				this.prevRotationYaw -= 360.0F;
 			}
-			
+
 			while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
 			{
 				this.prevRotationYaw += 360.0F;
 			}
-			
+
 			this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
 			this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
 			float var17 = 0.95f;
 			float var18 = this.getGravityVelocity();
-			
+
 			this.motionX *= var17;
 			this.motionY *= var17;
 			this.motionZ *= var17;
@@ -199,25 +185,25 @@ public class EntityBomb extends EntityThrowable
 		}
 		this.setPosition(this.posX, this.posY, this.posZ);
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
 	{
-		
+
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
-		
+
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	@Override
 	protected void onImpact(MovingObjectPosition var1)
 	{
@@ -231,7 +217,7 @@ public class EntityBomb extends EntityThrowable
 			explode(false);
 		}
 	}
-	
+
 	@Override
 	protected float getGravityVelocity()
 	{
@@ -253,7 +239,7 @@ public class EntityBomb extends EntityThrowable
 				{
 					for (int z = -r; z <= r; z++)
 					{
-						worldObj.setBlockToAir((int)(posX+x), (int)(Math.max(posY, r+1)+y), (int)(posZ+z));
+                        worldObj.setBlockToAir(new BlockPos((int) (posX + x), (int) (Math.max(posY, r + 1) + y), (int) (posZ + z)));
 					}
 				}
 			}

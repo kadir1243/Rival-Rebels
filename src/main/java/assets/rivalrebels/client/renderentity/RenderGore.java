@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -35,8 +36,10 @@ public class RenderGore extends Render
 	private static final ResourceLocation	cavespider		= new ResourceLocation("textures/entity/spider/cave_spider.png");
 	private static final ResourceLocation	zombiepigman	= new ResourceLocation("textures/entity/zombie_pigman.png");
 	private static final ResourceLocation	zombie			= new ResourceLocation("textures/entity/zombie/zombie.png");
-	RenderHelper							md				= new RenderHelper();
-	
+
+    public RenderGore(RenderManager renderManager) {
+        super(renderManager);
+    }
 	@Override
 	public void doRender(Entity entity, double x, double y, double z, float f, float f1)
 	{
@@ -49,7 +52,7 @@ public class RenderGore extends Render
 		int mob = eg.mob;
 		int type = eg.type;
 		double size = eg.size;
-		
+
 		if (mob == 0)
 		{
 			if (eg.playerSkin != null) Minecraft.getMinecraft().renderEngine.bindTexture(eg.playerSkin);
@@ -168,7 +171,7 @@ public class RenderGore extends Render
 		}
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

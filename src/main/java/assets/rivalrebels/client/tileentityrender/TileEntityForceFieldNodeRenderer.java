@@ -16,6 +16,7 @@ import java.nio.ByteOrder;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
 import net.minecraft.tileentity.TileEntity;
 
@@ -33,7 +34,7 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
+public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer<TileEntityForceFieldNode>
 {
 	public static int				frames	= 28;
 	public static int[]			id		= new int[frames];
@@ -47,8 +48,8 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 
 	int	count	= 0;
 
-	public void renderAModelAt(TileEntityForceFieldNode tile, double x, double y, double z, float f)
-	{
+    @Override
+    public void renderTileEntityAt(TileEntityForceFieldNode tile, double x, double y, double z, float partialTicks, int destroyStage) {
 		if (tile.pInR <= 0 || !RivalRebels.goodRender) return;
 
 		count++;
@@ -76,8 +77,9 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glRotatef(90, 0.0F, 1.0F, 0.0F);
 		GL11.glTranslatef(0, 0, 0.5f);
-		Tessellator tess = Tessellator.instance;
-		tess.startDrawingQuads();
+		Tessellator tess = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tess.getWorldRenderer();
+        tess.startDrawingQuads();
 
 		tess.addVertexWithUV(-0.0625f, 3.5f, 0f, 0, 0);
 		tess.addVertexWithUV(-0.0625f, -3.5f, 0f, 0, 1);
@@ -98,7 +100,7 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 		GL11.glPopMatrix();
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && RivalRebels.optiFineWarn)
 		{
-			FMLNetworkHandler.openGui(Minecraft.getMinecraft().thePlayer, RivalRebels.instance, 24, tile.getWorldObj(), 0, 0, 0);
+			FMLNetworkHandler.openGui(Minecraft.getMinecraft().thePlayer, RivalRebels.instance, 24, tile.getWorld(), 0, 0, 0);
 			// Minecraft.getMinecraft().thePlayer.openGui(RivalRebels.instance, 24, tile.getWorldObj(), 0, 0, 0);
 			RivalRebels.optiFineWarn = false;
 		}
@@ -148,11 +150,5 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 	public static long getTime()
 	{
 		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
-	}
-
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityForceFieldNode) tileentity, d, d1, d2, f);
 	}
 }

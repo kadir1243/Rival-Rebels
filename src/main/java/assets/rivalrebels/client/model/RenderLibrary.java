@@ -18,22 +18,19 @@ import net.minecraft.client.renderer.Tessellator;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-public class RenderLibrary
-{
-	Tessellator					t		= Tessellator.instance;
-	Random						random	= new Random();
+public class RenderLibrary {
+	private final Tessellator t = Tessellator.getInstance();
+	private final Random random	= new Random();
 	public static RenderLibrary	instance;
-	
-	public RenderLibrary()
-	{
-		
+
+	public RenderLibrary() {
 	}
-	
+
 	public void init()
 	{
 		instance = this;
 	}
-	
+
 	public void renderModel(float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a)
 	{
 		GL11.glPushMatrix();
@@ -52,24 +49,24 @@ public class RenderLibrary
 		double[] xv = new double[segNum];
 		double[] yv = new double[segNum];
 		double[] zv = new double[segNum];
-		
+
 		for (int i = 1; i < segNum; i++)
 		{
 			double interp = (double) i / (double) segNum;
 			double X = (dist * interp);
 			double Y = (y * interp);
 			double ihdist = (dist * interp) - hdist;
-			
+
 			Y += ((hdists - (ihdist * ihdist)) / hdists) * arcRatio;
 			xv[i] = X;
 			yv[i] = Y + random.nextGaussian() * rvar;
 			zv[i] = random.nextGaussian() * rvar;
 		}
-		
+
 		xv[0] = 0;
 		yv[0] = 0;
 		zv[0] = 0;
-		
+
 		for (int o = 0; o < steps; o++)
 		{
 			t.startDrawingQuads();
@@ -80,17 +77,17 @@ public class RenderLibrary
 				t.addVertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s);
 				t.addVertex(xv[i], yv[i] + s, zv[i] + s);
 				t.addVertex(xv[i], yv[i] + s, zv[i] - s);
-				
+
 				t.addVertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s);
 				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s);
 				t.addVertex(xv[i], yv[i] - s, zv[i] + s);
 				t.addVertex(xv[i], yv[i] + s, zv[i] + s);
-				
+
 				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s);
 				t.addVertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s);
 				t.addVertex(xv[i], yv[i] + s, zv[i] - s);
 				t.addVertex(xv[i], yv[i] - s, zv[i] - s);
-				
+
 				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s);
 				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s);
 				t.addVertex(xv[i], yv[i] - s, zv[i] - s);
@@ -98,7 +95,7 @@ public class RenderLibrary
 			}
 			t.draw();
 		}
-		
+
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL12.GL_RESCALE_NORMAL);

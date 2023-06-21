@@ -15,6 +15,7 @@ import java.util.Random;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -33,9 +34,9 @@ public class RenderLightningLink extends Render
 	static float	green	= 0.75F;
 	static float	blue	= 1F;
 
-	public RenderLightningLink()
-	{
-	}
+	public RenderLightningLink(RenderManager renderManager) {
+        super(renderManager);
+    }
 
 	public void renderLightningLink(EntityLightningLink ell, double x, double y, double z, float yaw, float pitch)
 	{

@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -28,9 +29,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class RenderHackB83 extends Render
 {
-	public RenderHackB83()
-	{
-	}
+	public RenderHackB83(RenderManager renderManager) {
+        super(renderManager);
+    }
 
 	public void renderB83(EntityHackB83 b83, double x, double y, double z, float par8, float par9)
 	{

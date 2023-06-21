@@ -49,7 +49,7 @@ public class VotePacket implements IMessage
 		@Override
 		public IMessage onMessage(VotePacket m, MessageContext ctx)
 		{
-			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getCommandSenderName());
+			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getName());
 			if (!p.voted)
 			{
 				p.voted = true;

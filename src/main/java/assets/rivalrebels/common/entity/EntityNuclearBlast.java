@@ -11,27 +11,25 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.explosion.NuclearExplosion;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.MathHelper;
-import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.explosion.NuclearExplosion;
+
+import java.util.List;
 
 public class EntityNuclearBlast extends EntityInanimate
 {
 	public int	ticksExisted;
 	int			time;
 	int			Strength;
-	
+
 	public EntityNuclearBlast(World par1World)
 	{
 		super(par1World);
@@ -40,7 +38,7 @@ public class EntityNuclearBlast extends EntityInanimate
 		time = 0;
 		setSize(0.5F, 0.5F);
 	}
-	
+
 	public EntityNuclearBlast(World par1World, double par2, double par4, double par6, int s, boolean hasTroll)
 	{
 		super(par1World);
@@ -60,25 +58,25 @@ public class EntityNuclearBlast extends EntityInanimate
 		setPosition(par2, par4, par6);
 		yOffset = 0.0F;
 	}
-	
+
 	@Override
 	public int getBrightnessForRender(float par1)
 	{
 		return 1000;
 	}
-	
+
 	@Override
 	public float getBrightness(float par1)
 	{
 		return 1000F;
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -117,26 +115,23 @@ public class EntityNuclearBlast extends EntityInanimate
 		{
 			if (ticksExisted % 5 == worldObj.rand.nextInt(5))
 			{
-				Iterator i = worldObj.playerEntities.iterator();
-				while (i.hasNext())
-				{
-					EntityPlayer p = (EntityPlayer) i.next();
-					worldObj.playSoundAtEntity(p, "ambient.weather.thunder", 10.0F, 0.50F);
-					worldObj.playSoundAtEntity(p, "random.explode", 5.0F, 0.10F);
-				}
+                for (EntityPlayer p : worldObj.playerEntities) {
+                    worldObj.playSoundAtEntity(p, "ambient.weather.thunder", 10.0F, 0.50F);
+                    worldObj.playSoundAtEntity(p, "random.explode", 5.0F, 0.10F);
+                }
 			}
 		}
 		else
 		{
 			setDead();
 		}
-		
+
 		ticksExisted++;
 	}
-	
+
 	private void pushAndHurtEntities()
 	{
-		int radius = Strength * RivalRebels.nuclearBombStrength * 1;
+		int radius = Strength * RivalRebels.nuclearBombStrength;
 		if (radius > 80) radius = 80;
 		int var3 = MathHelper.floor_double(posX - radius - 1.0D);
 		int var4 = MathHelper.floor_double(posX + radius + 1.0D);
@@ -144,21 +139,20 @@ public class EntityNuclearBlast extends EntityInanimate
 		int var28 = MathHelper.floor_double(posY + radius + 1.0D);
 		int var7 = MathHelper.floor_double(posZ - radius - 1.0D);
 		int var29 = MathHelper.floor_double(posZ + radius + 1.0D);
-		List var9 = worldObj.getEntitiesWithinAABBExcludingEntity(this, AxisAlignedBB.getBoundingBox(var3, var5, var7, var4, var28, var29));
-		Vec3 var30 = Vec3.createVectorHelper(posX, posY, posZ);
-		
-		for (int var11 = 0; var11 < var9.size(); ++var11)
+		List<Entity> var9 = worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(var3, var5, var7, var4, var28, var29));
+
+        for (int var11 = 0; var11 < var9.size(); ++var11)
 		{
-			Entity var31 = (Entity) var9.get(var11);
+			Entity var31 = var9.get(var11);
 			double var13 = var31.getDistance(posX, posY, posZ) / radius;
-			
+
 			if (var13 <= 1.0D)
 			{
 				double var15 = var31.posX - posX;
 				double var17 = var31.posY + var31.getEyeHeight() - posY;
 				double var19 = var31.posZ - posZ;
 				double var33 = MathHelper.sqrt_double(var15 * var15 + var17 * var17 + var19 * var19);
-				
+
 				if (var33 != 0.0D)
 				{
 					var15 /= var33;
@@ -180,7 +174,7 @@ public class EntityNuclearBlast extends EntityInanimate
 			}
 		}
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound var1)
 	{
@@ -189,7 +183,7 @@ public class EntityNuclearBlast extends EntityInanimate
 		motionY = Strength = var1.getInteger("charges");
 		motionX = var1.getBoolean("troll") ? 1.0f : 0.0f;
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound var1)
 	{
@@ -197,9 +191,5 @@ public class EntityNuclearBlast extends EntityInanimate
 		var1.setInteger("time", time);
 		var1.setInteger("charges", Strength);
 	}
-	
-	@Override
-	protected void entityInit()
-	{
-	}
+
 }

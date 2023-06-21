@@ -31,16 +31,16 @@ public class ItemGasGrenade extends Item
 		maxStackSize = 6;
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	/**
 	 * returns the action that specifies what animation to play when the items is being used
 	 */
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
-	
+
 	/**
 	 * How long it takes to use or consume an item
 	 */
@@ -49,7 +49,7 @@ public class ItemGasGrenade extends Item
 	{
 		return 75;
 	}
-	
+
 	@Override
 	public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityPlayer player, int i)
 	{
@@ -71,7 +71,7 @@ public class ItemGasGrenade extends Item
 			}
 		}
 	}
-	
+
 	/**
 	 * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
 	 */
@@ -81,9 +81,9 @@ public class ItemGasGrenade extends Item
 		player.setItemInUse(par1ItemStack, getMaxItemUseDuration(par1ItemStack));
 		world.playSoundAtEntity(player, "mob.slimeattack", 1.0F, 1.0F);
 		return par1ItemStack;
-		
+
 	}
-	
+
 	@Override
 	public void onUsingTick(ItemStack stack, EntityPlayer player, int count)
 	{
@@ -105,7 +105,7 @@ public class ItemGasGrenade extends Item
 			}
 		}
 	}
-	
+
 	@Override
 	public void registerIcons(IIconRegister iconregister)
 	{

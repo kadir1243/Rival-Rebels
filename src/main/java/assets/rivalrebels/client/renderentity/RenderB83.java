@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -29,8 +30,8 @@ public class RenderB83 extends Render
 {
 	public static ModelFromObj	md;
 
-	public RenderB83()
-	{
+	public RenderB83(RenderManager renderManager) {
+        super(renderManager);
 		try
 		{
 			md = ModelFromObj.readObjFile("c.obj");

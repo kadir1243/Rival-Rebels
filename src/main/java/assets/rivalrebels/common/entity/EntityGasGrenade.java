@@ -11,23 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLiving;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class EntityGasGrenade extends EntityInanimate
 {
@@ -113,7 +109,7 @@ public class EntityGasGrenade extends EntityInanimate
 	@Override
 	protected void entityInit()
 	{
-		dataWatcher.addObject(16, Byte.valueOf((byte) 0));
+		dataWatcher.addObject(16, (byte) 0);
 	}
 
 	/**
@@ -139,23 +135,15 @@ public class EntityGasGrenade extends EntityInanimate
 		prevRotationPitch = rotationPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI);
 	}
 
-	@Override
 	@SideOnly(Side.CLIENT)
-	/**
-	 * Sets the position and rotation. Only difference from the other one is no bounding on the rotation. Args: posX,
-	 * posY, posZ, yaw, pitch
-	 */
-	public void setPositionAndRotation2(double par1, double par3, double par5, float par7, float par8, int par9)
-	{
-		setPosition(par1, par3, par5);
-		setRotation(par7, par8);
-	}
+    @Override
+    public void setPositionAndRotation2(double x, double y, double z, float yaw, float pitch, int posRotationIncrements, boolean p_180426_10_) {
+        setPosition(x, y, z);
+        setRotation(yaw, pitch);
+    }
 
-	@Override
+    @Override
 	@SideOnly(Side.CLIENT)
-	/**
-	 * Sets the velocity to the args. Args: x, y, z
-	 */
 	public void setVelocity(double par1, double par3, double par5)
 	{
 		motionX = par1;
@@ -165,8 +153,8 @@ public class EntityGasGrenade extends EntityInanimate
 		if (prevRotationPitch == 0.0F && prevRotationYaw == 0.0F)
 		{
 			float var7 = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
-			prevRotationYaw = rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
-			prevRotationPitch = rotationPitch = (float) (Math.atan2(par3, var7) * 180.0D / Math.PI);
+            rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
+            rotationPitch = (float) (Math.atan2(par3, var7) * 180.0D / Math.PI);
 			prevRotationPitch = rotationPitch;
 			prevRotationYaw = rotationYaw;
 			setLocationAndAngles(posX, posY, posZ, rotationYaw, rotationPitch);
@@ -188,31 +176,31 @@ public class EntityGasGrenade extends EntityInanimate
 			prevRotationPitch = rotationPitch = (float) (Math.atan2(motionY, var1) * 180.0D / Math.PI);
 		}
 		++ticksInAir;
-		Vec3 var17 = Vec3.createVectorHelper(posX, posY, posZ);
-		Vec3 var3 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-		MovingObjectPosition var4 = worldObj.func_147447_a(var17, var3, false, true, false);
-		var17 = Vec3.createVectorHelper(posX, posY, posZ);
-		var3 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3 var17 = new Vec3(posX, posY, posZ);
+		Vec3 var3 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
+		MovingObjectPosition var4 = worldObj.rayTraceBlocks(var17, var3, false, true, false);
+		var17 = new Vec3(posX, posY, posZ);
+		var3 = new Vec3(posX + motionX, posY + motionY, posZ + motionZ);
 
 		if (var4 != null)
 		{
-			var3 = Vec3.createVectorHelper(var4.hitVec.xCoord, var4.hitVec.yCoord, var4.hitVec.zCoord);
+			var3 = new Vec3(var4.hitVec.xCoord, var4.hitVec.yCoord, var4.hitVec.zCoord);
 		}
 
 		Entity var5 = null;
-		List var6 = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
+		List<Entity> var6 = worldObj.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
 		double var7 = 0.0D;
-		Iterator var9 = var6.iterator();
+		Iterator<Entity> var9 = var6.iterator();
 
 		if (!worldObj.isRemote)
 		{
 			while (var9.hasNext())
 			{
-				Entity var10 = (Entity) var9.next();
+				Entity var10 = var9.next();
 
 				if (var10.canBeCollidedWith() && (var10 != shootingEntity || ticksInAir >= 5))
 				{
-					AxisAlignedBB var12 = var10.boundingBox.expand(0.3f, 0.3f, 0.3f);
+					AxisAlignedBB var12 = var10.getEntityBoundingBox().expand(0.3f, 0.3f, 0.3f);
 					MovingObjectPosition var13 = var12.calculateIntercept(var17, var3);
 
 					if (var13 != null)
@@ -248,12 +236,12 @@ public class EntityGasGrenade extends EntityInanimate
 		var20 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
 		rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
 
-		for (rotationPitch = (float) (Math.atan2(motionY, var20) * 180.0D / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F)
-		{
-			;
-		}
+        rotationPitch = (float) (Math.atan2(motionY, var20) * 180.0D / Math.PI);
+        while (rotationPitch - prevRotationPitch < -180.0F) {
+            prevRotationPitch -= 360.0F;
+        }
 
-		while (rotationPitch - prevRotationPitch >= 180.0F)
+        while (rotationPitch - prevRotationPitch >= 180.0F)
 		{
 			prevRotationPitch += 360.0F;
 		}
@@ -282,7 +270,7 @@ public class EntityGasGrenade extends EntityInanimate
 			for (int var26 = 0; var26 < 4; ++var26)
 			{
 				float var27 = 0.25F;
-				worldObj.spawnParticle("bubble", posX - motionX * var27, posY - motionY * var27, posZ - motionZ * var27, motionX, motionY, motionZ);
+				worldObj.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * var27, posY - motionY * var27, posZ - motionZ * var27, motionX, motionY, motionZ);
 			}
 
 			var23 = 0.8F;
@@ -293,25 +281,21 @@ public class EntityGasGrenade extends EntityInanimate
 		motionZ *= var23;
 		motionY -= 0.03f;
 		setPosition(posX, posY, posZ);
-		func_145775_I();
+        doBlockCollisions();
 	}
 
 	/**
 	 * (abstract) Protected helper method to write subclass entity data to NBT.
 	 */
 	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-	{
-
+	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) {
 	}
 
 	/**
 	 * (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
 	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
-
+	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
 	}
 
 	@Override
@@ -330,21 +314,21 @@ public class EntityGasGrenade extends EntityInanimate
 		return false;
 	}
 
-	public void func_70243_d(boolean par1)
+	public void setIsCritical(boolean par1)
 	{
 		byte var2 = dataWatcher.getWatchableObjectByte(16);
 
 		if (par1)
 		{
-			dataWatcher.updateObject(16, Byte.valueOf((byte) (var2 | 1)));
+			dataWatcher.updateObject(16, (byte) (var2 | 1));
 		}
 		else
 		{
-			dataWatcher.updateObject(16, Byte.valueOf((byte) (var2 & -2)));
+			dataWatcher.updateObject(16, (byte) (var2 & -2));
 		}
 	}
 
-	public boolean func_70241_g()
+	public boolean getIsCritical()
 	{
 		byte var1 = dataWatcher.getWatchableObjectByte(16);
 		return (var1 & 1) != 0;
@@ -359,9 +343,9 @@ public class EntityGasGrenade extends EntityInanimate
 			{
 				for (int z = -4; z <= 4; z++)
 				{
-					if (worldObj.getBlock((int) posX + x, (int) posY + y, (int) posZ + z) == Blocks.air)
-					{
-						worldObj.setBlock((int) posX + x, (int) posY + y, (int) posZ + z, RivalRebels.toxicgas);
+                    BlockPos pos = getPosition().add(x, y, z);
+					if (worldObj.isAirBlock(pos)) {
+						worldObj.setBlockState(pos, RivalRebels.toxicgas.getDefaultState());
 					}
 				}
 			}

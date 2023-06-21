@@ -11,8 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.explosion;
 
+import assets.rivalrebels.common.block.trap.BlockPetrifiedStone;
+import assets.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import net.minecraft.block.Block;
 import net.minecraft.init.Blocks;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
@@ -35,7 +38,7 @@ public class TsarBomba
 	private boolean isTree;
 	private int 	treeHeight;
 	public int processedchunks = 0;
-	
+
 	public TsarBomba(int x, int y, int z, World world, int rad)
 	{
 		posX = x;
@@ -61,23 +64,24 @@ public class TsarBomba
 				{
 					for (int Y = 70; Y > 0; Y--)
 					{
-						Block block = worldObj.getBlock(X + posX, Y, Z + posZ);
+                        BlockPos pos = new BlockPos(X + posX, Y, Z + posZ);
+                        Block block = worldObj.getBlockState(pos).getBlock();
 						if (block == Blocks.water || block == Blocks.lava || block == Blocks.flowing_water || block == Blocks.flowing_lava)
 						{
-							worldObj.setBlockToAir(X + posX, Y, Z + posZ);
+							worldObj.setBlockToAir(pos);
 						}
 					}
 				}
 			}
 		}
 	}
-	
+
 	public void update(EntityTsarBlast tsarblast)
 	{
 		if (n > 0 && n < nlimit)
 		{
 			boolean repeat = processChunk(lastposX, lastposZ);
-			
+
 			shell = (int) Math.floor((Math.sqrt(n) + 1) / 2);
 			int shell2 = 2 * shell;
 			leg = (int) Math.floor((n - (shell2 - 1) * (shell2 - 1)) / shell2);
@@ -102,7 +106,7 @@ public class TsarBomba
 			tsarblast.setDead();
 		}
 	}
-	
+
 	private boolean processChunk(int x, int z)
 	{
 		processedchunks++;
@@ -115,16 +119,17 @@ public class TsarBomba
 			float yele = posY + (y - posY) * 0.5f;
 			if (RivalRebels.elevation) yele = y;
 			int ylimit = (int) Math.floor(yele - ((radius - dist) / 2) + (Math.sin(dist * 0.5) * 1.15));
-			
+
 			for (int Y = y; Y > ylimit; Y--)
 			{
 				if (Y == 0) break;
-				Block block = worldObj.getBlock(x + posX, Y, z + posZ);
+                BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
+                Block block = worldObj.getBlockState(pos).getBlock();
 				if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
 				else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-				worldObj.setBlock(x + posX, Y, z + posZ, Blocks.air);
+				worldObj.setBlockToAir(pos);
 			}
-			
+
 			double limit = (radius / 2) + worldObj.rand.nextInt(radius / 4) + 7.5;
 			if (dist < limit)
 			{
@@ -141,17 +146,18 @@ public class TsarBomba
 				for (int Y = ylimit; Y > ylimit - (worldObj.rand.nextInt(5) + 2); Y--)
 				{
 					if (Y == 0) break;
-					Block block = worldObj.getBlock(x + posX, Y, z + posZ);
+                    BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
+                    Block block = worldObj.getBlockState(pos).getBlock();
 					if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
 					else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-					if (blockType == 1) worldObj.setBlock(x + posX, Y, z + posZ, RivalRebels.petrifiedstone1);
-					else if (blockType == 2) worldObj.setBlock(x + posX, Y, z + posZ, RivalRebels.petrifiedstone2);
-					else if (blockType == 3) worldObj.setBlock(x + posX, Y, z + posZ, RivalRebels.petrifiedstone3);
-					else worldObj.setBlock(x + posX, Y, z + posZ, RivalRebels.petrifiedstone4);
-					worldObj.setBlockMetadataWithNotify(x + posX, Y, z + posZ, metadata, 3);
+					if (blockType == 1) worldObj.setBlockState(pos, RivalRebels.petrifiedstone1.getDefaultState());
+					else if (blockType == 2) worldObj.setBlockState(pos, RivalRebels.petrifiedstone2.getDefaultState());
+					else if (blockType == 3) worldObj.setBlockState(pos, RivalRebels.petrifiedstone3.getDefaultState());
+					else worldObj.setBlockState(pos, RivalRebels.petrifiedstone4.getDefaultState());
+					worldObj.setBlockState(pos, worldObj.getBlockState(pos).withProperty(BlockPetrifiedStone.STATE, metadata));
 				}
 			}
-			
+
 			if (isTree)
 			{
 				isTree = false;
@@ -162,11 +168,10 @@ public class TsarBomba
 				for (int Y = ylimit; Y > ylimit - treeHeight; Y--)
 				{
 					if (Y == 0) break;
-					worldObj.setBlock(x + posX, Y, z + posZ, RivalRebels.petrifiedwood);
-					worldObj.setBlockMetadataWithNotify(x + posX, Y, z + posZ, metadata, 3);
+					worldObj.setBlockState(new BlockPos(x + posX, Y, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
 				}
 			}
-			
+
 			return true;
 		}
 		else if (dist <= radius * radius * 1.3125 * 1.3125)
@@ -184,22 +189,15 @@ public class TsarBomba
 				{
 					if (Y == 0) break;
 					int yy = Y + y;
-					Block blockID = worldObj.getBlock(x + posX, yy, z + posZ);
-					if (blockID == RivalRebels.omegaobj) RivalRebels.round.winSigma();
-					else if (blockID == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-					else if (!isTree)
-					{
-						Block blockID1 = worldObj.getBlock(x + posX, yy - ylimit, z + posZ);
-						int datavalue = worldObj.getBlockMetadata(x + posX, yy - ylimit, z + posZ);
-						worldObj.setBlock(x + posX, yy, z + posZ, blockID1, datavalue, 3);
-					}
-					else
-					{
+                    BlockPos pos = new BlockPos(x + posX, yy, z + posZ);
+                    Block block = worldObj.getBlockState(pos).getBlock();
+					if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
+					else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
+					else if (!isTree) worldObj.setBlockState(pos, worldObj.getBlockState(pos.down(ylimit)));
+					else {
 						isTree = false;
-						for (int Yy = 0; Yy >= -treeHeight; Yy--)
-						{
-							worldObj.setBlock(x + posX, yy + Yy, z + posZ, RivalRebels.petrifiedwood);
-							worldObj.setBlockMetadataWithNotify(x + posX, yy + Yy, z + posZ, metadata, 3);
+						for (int Yy = 0; Yy >= -treeHeight; Yy--) {
+                            worldObj.setBlockState(pos.up(Yy), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
 						}
 						break;
 					}
@@ -207,11 +205,11 @@ public class TsarBomba
 			}
 			else
 			{
-				Block blockID = worldObj.getBlock(x + posX, y, z + posZ);
-				if (blockID == Blocks.bedrock)
-				;
-				else if (blockID != null && !blockID.isOpaqueCube()) worldObj.setBlock(x + posX, y, z + posZ, Blocks.air);
-				if (isTree)
+                BlockPos pos = new BlockPos(x + posX, y, z + posZ);
+                Block block = worldObj.getBlockState(pos).getBlock();
+                if (block != Blocks.bedrock && !block.isOpaqueCube())
+                    worldObj.setBlockToAir(pos);
+                if (isTree)
 				{
 					isTree = false;
 					int metadata = (int) Math.floor((16d / radius) * dist);
@@ -220,8 +218,7 @@ public class TsarBomba
 					if (metadata > 15) metadata = 15;
 					for (int Y = ylimit; Y > ylimit - treeHeight; Y--)
 					{
-						worldObj.setBlock(x + posX, Y, z + posZ, RivalRebels.petrifiedwood);
-						worldObj.setBlockMetadataWithNotify(x + posX, Y, z + posZ, metadata, 3);
+                        worldObj.setBlockState(new BlockPos(x + posX, Y, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
 					}
 				}
 			}
@@ -229,36 +226,36 @@ public class TsarBomba
 		}
 		return false;
 	}
-	
+
 	private int getTopBlock(int x, int z, double dist)
 	{
 		int foundY = 0;
 		boolean found = false;
 		for (int y = 256; y > 0; y--)
 		{
-			Block blockID = worldObj.getBlock(x, y, z);
-			if (blockID != Blocks.air)
+            BlockPos pos = new BlockPos(x, y, z);
+            Block block = worldObj.getBlockState(pos).getBlock();
+			if (block != Blocks.air)
 			{
-				if (blockID == RivalRebels.omegaobj) RivalRebels.round.winSigma();
-				else if (blockID == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
-				if (blockID == RivalRebels.reactive)
+				if (block == RivalRebels.omegaobj) RivalRebels.round.winSigma();
+				else if (block == RivalRebels.sigmaobj) RivalRebels.round.winOmega();
+				if (block == RivalRebels.reactive)
 				{
 					for (int i = 0; i < (1 - (dist / radius)) * 16 + Math.random() * 2; i++)
 					{
-						worldObj.setBlock(x, y, z, Blocks.air);
+						worldObj.setBlockToAir(pos);
 					}
 				}
-				if (!blockID.isOpaqueCube() || blockID == Blocks.log)
+				if (!block.isOpaqueCube() || block == Blocks.log)
 				{
-					worldObj.setBlockToAir(x, y, z);
-					if (dist > radius / 2 && blockID == Blocks.log && worldObj.getBlock(x, y - 1, z) == Blocks.log) isTree = true;
+					worldObj.setBlockToAir(pos);
+					if (dist > radius / 2 && block == Blocks.log && worldObj.getBlockState(pos.down()).getBlock() == Blocks.log) isTree = true;
 					if (!found && isTree)
 					{
 						foundY = y;
 						found = true;
 					}
-					continue;
-				}
+                }
 				else
 				{
 					if (!found) return y;

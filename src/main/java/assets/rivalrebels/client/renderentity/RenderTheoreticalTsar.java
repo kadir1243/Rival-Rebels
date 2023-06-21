@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -35,8 +36,9 @@ public class RenderTheoreticalTsar extends Render
 {
 	private ModelTheoreticalTsarBomba	model;
 
-	public RenderTheoreticalTsar()
+	public RenderTheoreticalTsar(RenderManager renderManager)
 	{
+        super(renderManager);
 		model = new ModelTheoreticalTsarBomba();
 	}
 

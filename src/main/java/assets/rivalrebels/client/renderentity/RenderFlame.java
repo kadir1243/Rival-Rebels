@@ -14,6 +14,7 @@ package assets.rivalrebels.client.renderentity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -25,6 +26,10 @@ import assets.rivalrebels.common.entity.EntityFlameBall;
 
 public class RenderFlame extends Render
 {
+    public RenderFlame(RenderManager renderManager) {
+        super(renderManager);
+    }
+
 	public void renderFlame(EntityFlameBall ell, double x, double y, double z, float yaw, float pitch)
 	{
 		if (ell.ticksExisted < 3) return;
@@ -40,7 +45,7 @@ public class RenderFlame extends Render
 		GL14.glBlendEquation(GL14.GL_FUNC_ADD);
 		GL11.glColor4f(1f, 1f, 1f, 1f);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etflameball);
-		
+
 		GL11.glPushMatrix();
 		float X = (ell.sequence % 4) / 4f;
 		float Y = (ell.sequence - (ell.sequence % 4)) / 16f;
@@ -61,20 +66,20 @@ public class RenderFlame extends Render
 		t.draw();
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
-		
+
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glEnable(GL11.GL_CULL_FACE);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glDepthMask(true);
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	public void doRender(Entity entityLaserLink, double x, double y, double z, float yaw, float pitch)
 	{
 		renderFlame((EntityFlameBall) entityLaserLink, x, y, z, yaw, pitch);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

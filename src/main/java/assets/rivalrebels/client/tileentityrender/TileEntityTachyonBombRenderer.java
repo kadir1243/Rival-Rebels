@@ -11,36 +11,29 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.renderentity.RenderTachyonBomb;
+import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-
-import org.lwjgl.opengl.GL11;
-
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.model.ModelTsarBomba;
-import assets.rivalrebels.client.renderentity.RenderAntimatterBomb;
-import assets.rivalrebels.client.renderentity.RenderTachyonBomb;
-import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer
+public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer<TileEntityTachyonBomb>
 {
 	public TileEntityTachyonBombRenderer()
 	{
 	}
 
-	public void renderAModelAt(TileEntityTachyonBomb tile, double d, double d1, double d2, float f)
-	{
-		GL11.glDisable(GL11.GL_LIGHTING);
+    @Override
+    public void renderTileEntityAt(TileEntityTachyonBomb te, double x, double y, double z, float partialTicks, int destroyStage) {
+        GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.0F, (float) d2 + 0.5F);
+		GL11.glTranslatef((float) x + 0.5F, (float) y + 1.0F, (float) z + 0.5F);
 		GL11.glScalef(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-		int metadata = tile.getBlockMetadata();
+		int metadata = te.getBlockMetadata();
 
 		if (metadata == 2)
 		{
@@ -63,11 +56,5 @@ public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettachyonbomb);
 		RenderTachyonBomb.bomb.renderAll();
 		GL11.glPopMatrix();
-	}
-
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityTachyonBomb) tileentity, d, d1, d2, f);
 	}
 }

@@ -24,20 +24,14 @@ public abstract class TileEntityLoadBase extends TileEntity
 	public ItemStack[]		inventory;
 	public ItemStack[]		output;
 	public TileEntityLoader	loader		= null;
-	
+
 	public TileEntityLoadBase(int slots1, int slots2, int slots3)
 	{
 		input = new ItemStack[slots1];
 		inventory = new ItemStack[slots2];
 		output = new ItemStack[slots3];
 	}
-	
-	@Override
-	public void updateEntity()
-	{
-		
-	}
-	
+
 	public void add(ItemStack item, ItemStack[] itemarray)
 	{
 		int add = item.stackSize;
@@ -65,7 +59,7 @@ public abstract class TileEntityLoadBase extends TileEntity
 			}
 		}
 	}
-	
+
 	public int remove(ItemStack item, ItemStack[] itemarray)
 	{
 		int remove = item.stackSize;
@@ -87,7 +81,7 @@ public abstract class TileEntityLoadBase extends TileEntity
 		}
 		return remove;
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
@@ -114,7 +108,7 @@ public abstract class TileEntityLoadBase extends TileEntity
 			}
 		}
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
