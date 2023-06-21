@@ -20,19 +20,19 @@ import assets.rivalrebels.client.model.ModelTheoreticalTsarBomba;
 import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityTheoreticalTsarBombaRenderer extends TileEntitySpecialRenderer
 {
 	private ModelTheoreticalTsarBomba	model;
-	
+
 	public TileEntityTheoreticalTsarBombaRenderer()
 	{
 		model = new ModelTheoreticalTsarBomba();
 	}
-	
+
 	public void renderAModelAt(TileEntityTheoreticalTsarBomba tile, double d, double d1, double d2, float f)
 	{
 		GL11.glDisable(GL11.GL_LIGHTING);
@@ -40,24 +40,24 @@ public class TileEntityTheoreticalTsarBombaRenderer extends TileEntitySpecialRen
 		GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1F, (float) d2 + 0.5F);
 		GL11.glScalef(1.3f, 1.3f, 1.3f);
 		int metadata = tile.getBlockMetadata();
-		
+
 		if (metadata == 2)
 		{
 			GL11.glRotatef(180, 0, 1, 0);
 			GL11.glRotatef(90, 1, 0, 0);
 		}
-		
+
 		if (metadata == 3)
 		{
 			GL11.glRotatef(90, 1, 0, 0);
 		}
-		
+
 		if (metadata == 4)
 		{
 			GL11.glRotatef(-90, 0, 1, 0);
 			GL11.glRotatef(90, 1, 0, 0);
 		}
-		
+
 		if (metadata == 5)
 		{
 			GL11.glRotatef(90, 0, 1, 0);
@@ -66,7 +66,7 @@ public class TileEntityTheoreticalTsarBombaRenderer extends TileEntitySpecialRen
 		model.render();
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
 	{

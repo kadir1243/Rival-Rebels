@@ -12,7 +12,7 @@
 package assets.rivalrebels.common.core;
 
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
 /**
  * Raised by the SoundManager.loadSoundSettings, this would be a good place for adding your custom sounds to the SoundPool.

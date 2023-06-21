@@ -19,20 +19,20 @@ import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class JoinTeamPacket implements IMessage
 {
 	RivalRebelsClass rrclass;
 	RivalRebelsTeam rrteam;
-	
+
 	public JoinTeamPacket()
 	{
-		
+
 	}
-	
+
 	public JoinTeamPacket(RivalRebelsTeam rrt, RivalRebelsClass rrc)
 	{
 		rrclass = rrc;
@@ -52,14 +52,14 @@ public class JoinTeamPacket implements IMessage
 		buf.writeByte(rrclass.id);
 		buf.writeByte(rrteam.id);
 	}
-	
+
 	public static class Handler implements IMessageHandler<JoinTeamPacket, IMessage>
 	{
 		@Override
 		public IMessage onMessage(JoinTeamPacket m, MessageContext ctx)
 		{
 			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getCommandSenderName());
-			
+
 			if (p.isreset)
 			{
 				p.isreset = false;
@@ -69,12 +69,12 @@ public class JoinTeamPacket implements IMessage
 				scrb.removePlayerFromTeams(p.username);
 				scrb.func_151392_a(p.username, p.rrteam.toString());
 				ItemStack[] inventory = m.rrclass.inventory;
-				
+
 				for (int i = 0; i < inventory.length; i++)
 				{
 					ctx.getServerHandler().playerEntity.inventory.addItemStackToInventory(inventory[i].copy());
 				}
-				
+
 				if (m.rrteam == RivalRebelsTeam.OMEGA)
 				{
 					switch (m.rrclass)
@@ -82,20 +82,20 @@ public class JoinTeamPacket implements IMessage
 						case REBEL:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.orebelboots), new ItemStack(RivalRebels.orebelpants), new ItemStack(RivalRebels.orebelchest), new ItemStack(RivalRebels.orebelhelmet) };
 						break;
-						
+
 						case NUKER:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.onukerboots), new ItemStack(RivalRebels.onukerpants), new ItemStack(RivalRebels.onukerchest), new ItemStack(RivalRebels.onukerhelmet) };
 						break;
-						
+
 						case INTEL:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.ointelboots), new ItemStack(RivalRebels.ointelpants), new ItemStack(RivalRebels.ointelchest), new ItemStack(RivalRebels.ointelhelmet) };
 						break;
-						
+
 						case HACKER:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.ohackerboots), new ItemStack(RivalRebels.ohackerpants), new ItemStack(RivalRebels.ohackerchest), new ItemStack(RivalRebels.ohackerhelmet) };
 						break;
 						case NONE:
-							
+
 						break;
 					}
 				}
@@ -106,20 +106,20 @@ public class JoinTeamPacket implements IMessage
 						case REBEL:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.srebelboots), new ItemStack(RivalRebels.srebelpants), new ItemStack(RivalRebels.srebelchest), new ItemStack(RivalRebels.srebelhelmet) };
 						break;
-						
+
 						case NUKER:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.snukerboots), new ItemStack(RivalRebels.snukerpants), new ItemStack(RivalRebels.snukerchest), new ItemStack(RivalRebels.snukerhelmet) };
 						break;
-						
+
 						case INTEL:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.sintelboots), new ItemStack(RivalRebels.sintelpants), new ItemStack(RivalRebels.sintelchest), new ItemStack(RivalRebels.sintelhelmet) };
 						break;
-						
+
 						case HACKER:
 							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.shackerboots), new ItemStack(RivalRebels.shackerpants), new ItemStack(RivalRebels.shackerchest), new ItemStack(RivalRebels.shackerhelmet) };
 						break;
 						case NONE:
-							
+
 						break;
 					}
 				}

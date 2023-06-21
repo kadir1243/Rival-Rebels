@@ -28,21 +28,21 @@ import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityCuchillo extends EntityInanimate
 {
 	public Entity	shootingEntity;
 	private boolean	inGround;
 	private int		ticksInGround;
-	
+
 	public EntityCuchillo(World par1World)
 	{
 		super(par1World);
 		setSize(0.5F, 0.5F);
 	}
-	
+
 	public EntityCuchillo(World par1World, EntityPlayer player, float par3)
 	{
 		super(par1World);
@@ -66,7 +66,7 @@ public class EntityCuchillo extends EntityInanimate
 		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
-	
+
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
 		motionX = mx;
@@ -75,12 +75,12 @@ public class EntityCuchillo extends EntityInanimate
 		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
 		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt_double(mx * mx + mz * mz)) * 180.0D / Math.PI);
 	}
-	
+
 	@Override
 	protected void entityInit()
 	{
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
@@ -94,7 +94,7 @@ public class EntityCuchillo extends EntityInanimate
 			vec31 = Vec3.createVectorHelper(posX, posY, posZ);
 			if (mop != null) vec3 = Vec3.createVectorHelper(mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
 			else vec3 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-			
+
 			List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
 			for (int i = 0; i < list.size(); ++i)
@@ -114,7 +114,7 @@ public class EntityCuchillo extends EntityInanimate
 					}
 				}
 			}
-			
+
 			if (mop != null)
 			{
 				if (!worldObj.isRemote)
@@ -158,9 +158,9 @@ public class EntityCuchillo extends EntityInanimate
 					prevRotationYaw += 360.0F;
 				rotationPitch -= 30;
 				rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
-				
+
 				float friction = 0.98f;
-				
+
 				if (isInWater())
 				{
 					for (int var26 = 0; var26 < 4; ++var26)
@@ -187,17 +187,17 @@ public class EntityCuchillo extends EntityInanimate
 			}
 		}
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
 	{
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
 	}
-	
+
 	@Override
 	public void onCollideWithPlayer(EntityPlayer par1EntityPlayer)
 	{
@@ -208,14 +208,14 @@ public class EntityCuchillo extends EntityInanimate
 			setDead();
 		}
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public float getShadowSize()
 	{
 		return 0.0F;
 	}
-	
+
 	@Override
 	public boolean canAttackWithItem()
 	{
@@ -226,7 +226,7 @@ public class EntityCuchillo extends EntityInanimate
 /*
  * package RivalRebels.Common.Entity; import net.minecraft.block.Block; import net.minecraft.entity.Entity; import net.minecraft.entity.item.EntityItem; import
  * net.minecraft.entity.player.EntityPlayer; import net.minecraft.item.ItemStack; import net.minecraft.nbt.NBTTagCompound; import net.minecraft.world.World; import RivalRebels.Common.Core.RivalRebels;
- * import RivalRebels.Common.Core.RivalRebelsDamageSource; import cpw.mods.fml.relauncher.Side; import cpw.mods.fml.relauncher.SideOnly; public class EntityCuchillo extends EntityPhysics { boolean
+ * import RivalRebels.Common.Core.RivalRebelsDamageSource; import net.minecraftforge.fml.relauncher.Side; import net.minecraftforge.fml.relauncher.SideOnly; public class EntityCuchillo extends EntityPhysics { boolean
  * frozen = false; public EntityCuchillo(World par1World, EntityPlayer player, float par3) { super(par1World, player, par3); }
  * @Override protected void entityInit() { }
  * @Override public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) { }

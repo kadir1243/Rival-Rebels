@@ -27,8 +27,8 @@ import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockRhodesActivator extends BlockContainer
 {
@@ -36,43 +36,43 @@ public class BlockRhodesActivator extends BlockContainer
 	{
 		super(Material.iron);
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean hasTileEntity(int metadata)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityRhodesActivator();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
 	@SideOnly(Side.CLIENT)
 	IIcon	icontop;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		if (side == 0 || side == 1) return icontop;
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

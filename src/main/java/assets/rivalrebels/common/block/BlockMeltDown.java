@@ -21,8 +21,8 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.common.tileentity.TileEntityMeltDown;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockMeltDown extends BlockContainer
 {
@@ -30,49 +30,49 @@ public class BlockMeltDown extends BlockContainer
 	{
 		super(Material.portal);
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return -1;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityMeltDown();
 	}
-	
+
 	@Override
 	public void onBlockAdded(World world, int x, int y, int z)
 	{
 		world.scheduleBlockUpdate(x, y, z, this, 1);
 	}
-	
+
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random par5Random)
 	{
@@ -82,16 +82,16 @@ public class BlockMeltDown extends BlockContainer
 			world.setBlock(x, y + 2, z, this, meta + 1, 2);
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

@@ -34,8 +34,8 @@ import assets.rivalrebels.common.entity.EntityRoddiskLeader;
 import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockLandMine extends BlockFalling
 {
@@ -43,19 +43,19 @@ public class BlockLandMine extends BlockFalling
 	{
 		super();
 	}
-	
+
 	@Override
 	public Item getItemDropped(int i, Random r, int j)
 	{
 		return Item.getItemFromBlock(RivalRebels.alandmine);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 1;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getBlockColor()
@@ -66,7 +66,7 @@ public class BlockLandMine extends BlockFalling
 		}
 		return 0xFFFFFF;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	/**
@@ -76,7 +76,7 @@ public class BlockLandMine extends BlockFalling
 	{
 		return Blocks.grass.getRenderColor(par1);
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	/**
@@ -91,7 +91,7 @@ public class BlockLandMine extends BlockFalling
 		}
 		return 0xFFFFFF;
 	}
-	
+
 	@Override
 	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random)
 	{
@@ -101,20 +101,20 @@ public class BlockLandMine extends BlockFalling
 			if (!par1World.isRemote) par1World.createExplosion(null, par2, par3 + 2.5f, par4, RivalRebels.landmineExplodeSize, true);
 		}
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
 	{
 		float f = 0.01F;
 		return AxisAlignedBB.getBoundingBox(par2, par3, par4, par2 + 1, par3 + 1 - f, par4 + 1);
 	}
-	
+
 	@Override
 	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
 	{
 		return AxisAlignedBB.getBoundingBox(par2, par3, par4, par2 + 1, par3 + 1, par4 + 1);
 	}
-	
+
 	@Override
 	public void onEntityCollidedWithBlock(World world, int par2, int par3, int par4, Entity entity)
 	{
@@ -125,13 +125,13 @@ public class BlockLandMine extends BlockFalling
 			RivalRebelsSoundPlayer.playSound(world, 11, 1, par2, par3, par4, 3, 2);
 		}
 	}
-	
+
 	@Override
 	public void onBlockDestroyedByExplosion(World world, int x, int y, int z, net.minecraft.world.Explosion explosion)
 	{
 		if (!world.isRemote) world.createExplosion(null, x, y + 2.5f, z, RivalRebels.landmineExplodeSize, true);
 	}
-	
+
 	@Override
 	public final IIcon getIcon(IBlockAccess world, int x, int y, int z, int s)
 	{
@@ -143,7 +143,7 @@ public class BlockLandMine extends BlockFalling
 		n[3] = world.getBlock(x, y - 1, z);
 		n[4] = world.getBlock(x, y, z + 1);
 		n[5] = world.getBlock(x, y, z - 1);
-		
+
 		int popularity1 = 0;
 		int popularity2 = 0;
 		Block mode = Blocks.grass;
@@ -165,7 +165,7 @@ public class BlockLandMine extends BlockFalling
 		}
 		return mode.getIcon(world, x, y, z, s);
 	}
-	
+
 	@Override
 	public void onBlockAdded(World world, int x, int y, int z)
 	{
@@ -176,7 +176,7 @@ public class BlockLandMine extends BlockFalling
 		n[3] = world.getBlock(x, y - 1, z);
 		n[4] = world.getBlock(x, y, z + 1);
 		n[5] = world.getBlock(x, y, z - 1);
-		
+
 		int popularity1 = 0;
 		int popularity2 = 0;
 		Block mode = Blocks.grass;
@@ -198,13 +198,13 @@ public class BlockLandMine extends BlockFalling
 		}
 		if (mode == Blocks.grass) world.setBlock(x, y, z, RivalRebels.landmine);
 	}
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return Blocks.grass.getIcon(side, meta);
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
@@ -215,7 +215,7 @@ public class BlockLandMine extends BlockFalling
     {
         return new ItemStack(RivalRebels.alandmine);
     }
-	
+
 	/**
 	 * Called when the falling block entity for this block hits the ground and turns back into a block
 	 */

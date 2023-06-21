@@ -34,21 +34,21 @@ import assets.rivalrebels.common.explosion.TsarBomba;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.TextPacket;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityTachyonBomb extends TileEntity implements IInventory
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
 	private ItemStack[]		chestContents	= new ItemStack[36];
-	
+
 	/** The number of players currently using this chest */
 	public int				numUsingPlayers;
-	
+
 	/** Server sync counter (once per 20 ticks) */
 	private int				ticksSinceSync;
-	
+
 	public int				countdown		= RivalRebels.nuclearBombCountdown * 20;
 	public int				nuclear			= 0;
 	public int				hydrogen		= 0;
@@ -58,7 +58,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 	public boolean			hasChip			= false;
 	public boolean			hasTrollface	= false;
 	public float			megaton			= 0;
-	
+
 	/**
 	 * Returns the number of slots in the inventory.
 	 */
@@ -67,7 +67,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 	{
 		return 21;
 	}
-	
+
 	/**
 	 * Returns the stack in slot i
 	 */
@@ -76,7 +76,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 	{
 		return this.chestContents[par1];
 	}
-	
+
 	/**
 	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
 	 */
@@ -86,7 +86,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		if (this.chestContents[par1] != null)
 		{
 			ItemStack var3;
-			
+
 			if (this.chestContents[par1].stackSize <= par2)
 			{
 				var3 = this.chestContents[par1];
@@ -96,12 +96,12 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 			else
 			{
 				var3 = this.chestContents[par1].splitStack(par2);
-				
+
 				if (this.chestContents[par1].stackSize == 0)
 				{
 					this.chestContents[par1] = null;
 				}
-				
+
 				return var3;
 			}
 		}
@@ -110,7 +110,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 			return null;
 		}
 	}
-	
+
 	/**
 	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
 	 */
@@ -128,7 +128,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 			return null;
 		}
 	}
-	
+
 	/**
 	 * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
 	 */
@@ -136,14 +136,14 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 	public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
 	{
 		this.chestContents[par1] = par2ItemStack;
-		
+
 		if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit())
 		{
 			par2ItemStack.stackSize = this.getInventoryStackLimit();
 		}
-		
+
 	}
-	
+
 	/**
 	 * Reads a tile entity from NBT.
 	 */
@@ -154,19 +154,19 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		this.blockMetadata = par1NBTTagCompound.getInteger("TsarBombaMetadata");
 		NBTTagList var2 = par1NBTTagCompound.getTagList("Items", 10); // TODO: !!
 		this.chestContents = new ItemStack[this.getSizeInventory()];
-		
+
 		for (int var3 = 0; var3 < var2.tagCount(); ++var3)
 		{
 			NBTTagCompound var4 = var2.getCompoundTagAt(var3);
 			int var5 = var4.getByte("Slot") & 255;
-			
+
 			if (var5 >= 0 && var5 < this.chestContents.length)
 			{
 				this.chestContents[var5] = ItemStack.loadItemStackFromNBT(var4);
 			}
 		}
 	}
-	
+
 	/**
 	 * Writes a tile entity to NBT.
 	 */
@@ -176,7 +176,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		super.writeToNBT(par1NBTTagCompound);
 		par1NBTTagCompound.setInteger("TsarBombaMetadata", this.blockMetadata);
 		NBTTagList var2 = new NBTTagList();
-		
+
 		for (int var3 = 0; var3 < this.chestContents.length; ++var3)
 		{
 			if (this.chestContents[var3] != null)
@@ -189,7 +189,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		}
 		par1NBTTagCompound.setTag("Items", var2);
 	}
-	
+
 	/**
 	 * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't this more of a set than a get?*
 	 */
@@ -198,7 +198,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 	{
 		return 1;
 	}
-	
+
 	/**
 	 * Do not make give this method the name canInteractWith because it clashes with Container
 	 */
@@ -207,7 +207,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 	{
 		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
 	}
-	
+
 	/**
 	 * Causes the TileEntity to reset all it's cached values for it's container block, blockID, metaData and in the case of chests, the adjcacent chest check
 	 */
@@ -216,7 +216,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 	{
 		super.updateContainingBlockInfo();
 	}
-	
+
 	/**
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
@@ -246,7 +246,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 			}
 		}
 		if (nuclear == hydrogen) megaton = nuclear * 6.25f;
-		
+
 		if (getStackInSlot(0) != null)
 		{
 			hasFuse = getStackInSlot(0).getItem() == RivalRebels.fuse;
@@ -255,7 +255,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		{
 			hasFuse = false;
 		}
-		
+
 		if (getStackInSlot(20) != null)
 		{
 			hasChip = getStackInSlot(20).getItem() == RivalRebels.chip;
@@ -269,7 +269,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		{
 			hasChip = false;
 		}
-		
+
 		if (getStackInSlot(1) != null && getStackInSlot(2) != null)
 		{
 			hasAntennae = getStackInSlot(1).getItem() == RivalRebels.antenna && getStackInSlot(2).getItem() == RivalRebels.antenna;
@@ -278,7 +278,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		{
 			hasAntennae = false;
 		}
-		
+
 		if (getStackInSlot(19) != null)
 		{
 			hasExplosive = true;// getStackInSlot(19).func_150998_b(RivalRebels.timedbomb);
@@ -287,7 +287,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		{
 			hasExplosive = false;
 		}
-		
+
 		boolean sp = false;
 		try
 		{
@@ -295,13 +295,13 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		}
 		catch (NullPointerException e)
 		{
-			
+
 		}
-		
+
 		if (hasFuse && hasExplosive && nuclear == hydrogen && hasAntennae && hasChip)
 		{
 			double dist = 1000000;
-			
+
 			if (!sp || RivalRebels.stopSelfnukeinSP)
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
@@ -331,16 +331,16 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 			countdown = RivalRebels.nuclearBombCountdown * 20;
 			if (RivalRebels.nuclearBombCountdown == 0) countdown = 10;
 		}
-		
+
 		if (countdown == 200 && !worldObj.isRemote && RivalRebels.nuclearBombCountdown > 10)
 		{
 			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning1"));
 			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning2"));
 			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning3"));
 		}
-		
+
 		if (countdown % 20 == 0 && countdown <= 200 && RivalRebels.nuclearBombCountdown > 10) RivalRebelsSoundPlayer.playSound(worldObj, 14, 0, xCoord, yCoord, zCoord, 100);
-		
+
 		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !worldObj.isRemote && nuclear == hydrogen)
 		{
 			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
@@ -362,23 +362,23 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 				yaw = 90;
 				break;
 			}
-			
+
 			EntityTachyonBomb tsar = new EntityTachyonBomb(worldObj, xCoord+0.5f, yCoord+1f, zCoord+0.5f, yaw, pitch, hydrogen, hasTrollface);
 			worldObj.spawnEntityInWorld(tsar);
 		}
-		
+
 		if (countdown == 0 && nuclear == 0 && hydrogen == 0)
 		{
 			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
 			worldObj.createExplosion(null, xCoord, yCoord, zCoord, 4, false);
 		}
-		
+
 		super.updateEntity();
 	}
-	
+
 	/**
 	 * Called when a client event is received with the event number and argument, see World.sendClientEvent
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -391,7 +391,7 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		}
 		return false;
 	}
-	
+
 	/**
 	 * invalidates a tile entity
 	 */
@@ -401,47 +401,47 @@ public class TileEntityTachyonBomb extends TileEntity implements IInventory
 		this.updateContainingBlockInfo();
 		super.invalidate();
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
 		return AxisAlignedBB.getBoundingBox(xCoord - 5, yCoord, zCoord - 5, xCoord + 6, yCoord + 2, zCoord + 6);
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()
 	{
 		return 16384.0D;
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public String getInventoryName()
 	{
 		return "Tachyon Bomb";
 	}
-	
+
 	@Override
 	public boolean hasCustomInventoryName()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void openInventory()
 	{
-		
+
 	}
-	
+
 	@Override
 	public void closeInventory()
 	{
-		
+
 	}
 }

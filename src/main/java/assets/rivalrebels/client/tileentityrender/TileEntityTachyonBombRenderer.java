@@ -24,8 +24,8 @@ import assets.rivalrebels.client.renderentity.RenderTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer
@@ -33,7 +33,7 @@ public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer
 	public TileEntityTachyonBombRenderer()
 	{
 	}
-	
+
 	public void renderAModelAt(TileEntityTachyonBomb tile, double d, double d1, double d2, float f)
 	{
 		GL11.glDisable(GL11.GL_LIGHTING);
@@ -41,21 +41,21 @@ public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer
 		GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.0F, (float) d2 + 0.5F);
 		GL11.glScalef(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
 		int metadata = tile.getBlockMetadata();
-		
+
 		if (metadata == 2)
 		{
 			GL11.glRotatef(180, 0, 1, 0);
 		}
-		
+
 		if (metadata == 3)
 		{
 		}
-		
+
 		if (metadata == 4)
 		{
 			GL11.glRotatef(-90, 0, 1, 0);
 		}
-		
+
 		if (metadata == 5)
 		{
 			GL11.glRotatef(90, 0, 1, 0);
@@ -64,7 +64,7 @@ public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer
 		RenderTachyonBomb.bomb.renderAll();
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
 	{

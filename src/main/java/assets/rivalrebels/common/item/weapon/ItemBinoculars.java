@@ -38,9 +38,9 @@ import assets.rivalrebels.common.packet.LaptopEngagePacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class ItemBinoculars extends Item
 {
@@ -62,32 +62,32 @@ public class ItemBinoculars extends Item
 	static public boolean c = false;
 	static public boolean sc = false;
 	static public int slot = -1;
-	
+
 	public ItemBinoculars()
 	{
 		super();
 		maxStackSize = 1;
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	@Override
 	public boolean isFull3D()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
 		return EnumAction.bow;
 	}
-	
+
 	@Override
 	public int getMaxItemUseDuration(ItemStack par1ItemStack)
 	{
 		return 200;
 	}
-	
+
 	/**
 	 * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
 	 */
@@ -97,14 +97,14 @@ public class ItemBinoculars extends Item
 		par3EntityPlayer.setItemInUse(par1ItemStack, getMaxItemUseDuration(par1ItemStack));
 		return par1ItemStack;
 	}
-	
+
 	float	zoom		= 30f;
 	float 	fovset		= 0f;
 	float	senset		= 0f;
 	boolean	zoomed		= false;
 	boolean	prevzoomed	= false;
 	boolean	prevmclick;
-	
+
 	@Override
 	public void onUpdate(ItemStack item, World world, Entity entity, int par4, boolean par5)
 	{
@@ -152,22 +152,22 @@ public class ItemBinoculars extends Item
 					if (zoom > 67) zoom = 67;
 					Minecraft.getMinecraft().gameSettings.fovSetting = zoom + (Minecraft.getMinecraft().gameSettings.fovSetting - zoom) * 0.85f;
 					Minecraft.getMinecraft().gameSettings.mouseSensitivity = senset * MathHelper.sqrt_float(zoom) * 0.1f;
-					
+
 					if (Mouse.isButtonDown(1))
 					{
 						double cospitch = MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI);
 						double sinpitch = MathHelper.sin(player.rotationPitch / 180.0F * (float) Math.PI);
 						double cosyaw = MathHelper.cos(player.rotationYaw / 180.0F * (float) Math.PI);
 						double sinyaw = MathHelper.sin(player.rotationYaw / 180.0F * (float) Math.PI);
-						
+
 						double dx = (-sinyaw * cospitch) * 130;
 						double dz = (cosyaw * cospitch) * 130;
 						double dy = (-sinpitch) * 130;
-						
+
 						Vec3 var17 = Vec3.createVectorHelper(player.posX, player.posY, player.posZ);
 						Vec3 var3 = Vec3.createVectorHelper(player.posX + dx, player.posY + dy, player.posZ + dz);
 						MovingObjectPosition MOP = world.rayTraceBlocks(var17, var3, false);
-						
+
 						TileEntityLaptop t = null;
 						Iterator iter = ltel.iterator();
 						double d = 100;
@@ -233,12 +233,12 @@ public class ItemBinoculars extends Item
 			prevmclick = isMousePressed();
 		}
 	}
-	
+
 	public boolean isMousePressed()
 	{
 		return ((RivalRebels.altRkey?Keyboard.isKeyDown(Keyboard.KEY_F):Keyboard.isKeyDown(Keyboard.KEY_R)) && RivalRebels.rtarget) || (Mouse.isButtonDown(0) && RivalRebels.lctarget);
 	}
-	
+
 	public static void add(TileEntityLaptop tel)
 	{
 		if (!ltel.contains(tel))
@@ -246,12 +246,12 @@ public class ItemBinoculars extends Item
 			ltel.add(tel);
 		}
 	}
-	
+
 	public static void remove(TileEntityLaptop tel)
 	{
 		ltel.remove(tel);
 	}
-	
+
 	@Override
 	public void registerIcons(IIconRegister iconregister)
 	{

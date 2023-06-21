@@ -25,9 +25,9 @@ import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.packet.EntityGorePacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityGore extends EntityInanimate
 {
@@ -53,7 +53,7 @@ public class EntityGore extends EntityInanimate
 	// @SideOnly(Side.CLIENT)
 	public ResourceLocation	playerSkin	= null;
 	private int				bounces		= -1;
-	
+
 	public EntityGore(World par1World)
 	{
 		super(par1World);
@@ -69,7 +69,7 @@ public class EntityGore extends EntityInanimate
 		type = Type;
 		mob = Mob;
 	}
-	
+
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
 		motionX = mx;
@@ -78,7 +78,7 @@ public class EntityGore extends EntityInanimate
 		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
 		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt_double(mx * mx + mz * mz)) * 180.0D / Math.PI);
 	}
-	
+
 	public EntityGore(World par1World, Entity toBeGibbed, int Type, int Mob)
 	{
 		super(par1World);
@@ -146,15 +146,15 @@ public class EntityGore extends EntityInanimate
 			if (size > 2 || size < 1) greenblood = true;
 			setDefault();
 		}
-		
+
 		motionyaw = (float) ((Math.random() - 0.5) * 135);
 		motionpitch = (float) ((Math.random() - 0.5) * 135);
-		
+
 		setLocationAndAngles(toBeGibbed.posX + x, toBeGibbed.posY + y, toBeGibbed.posZ + z, rotYaw, rotPitch);
 		setPosition(posX, posY, posZ);
 		setThrowableHeading(0.3f);
 	}
-	
+
 	private void setNoped()
 	{
 		if (type == 0)
@@ -169,7 +169,7 @@ public class EntityGore extends EntityInanimate
 		}
 		rotYaw = origin.rotationYaw;
 	}
-	
+
 	private void setBiped(int thin)
 	{
 		if (type == 0)
@@ -207,7 +207,7 @@ public class EntityGore extends EntityInanimate
 			rotYaw = origin.rotationYaw;
 		}
 	}
-	
+
 	private void setQuadruped()
 	{
 		if (type == 0)
@@ -232,7 +232,7 @@ public class EntityGore extends EntityInanimate
 			rotYaw = origin.rotationYaw;
 		}
 	}
-	
+
 	private void setOctoped(int mode)
 	{
 		if (mode != 2)
@@ -281,7 +281,7 @@ public class EntityGore extends EntityInanimate
 			}
 		}
 	}
-	
+
 	private void setDefault()
 	{
 		if (type == 0)
@@ -314,14 +314,14 @@ public class EntityGore extends EntityInanimate
 			rotYaw = origin.rotationYaw;
 		}
 	}
-	
+
 	public void setThrowableHeading(float par7)
 	{
 		motionX = rand.nextGaussian() * par7;
 		motionY = Math.abs(rand.nextGaussian() * par7);
 		motionZ = rand.nextGaussian() * par7;
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
@@ -333,7 +333,7 @@ public class EntityGore extends EntityInanimate
 				PacketDispatcher.packetsys.sendToAll(new EntityGorePacket(this));
 			}
 		}
-		
+
 		if (playerSkin == null && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && !username.equals("Steve"))
 		{
 			Iterator iter = worldObj.playerEntities.iterator();
@@ -347,11 +347,11 @@ public class EntityGore extends EntityInanimate
 				}
 			}
 		}
-		
+
 		++ticksExisted;
-		
+
 		super.onUpdate();
-		
+
 		if (inGround)
 		{
 			inGround = false;
@@ -364,31 +364,31 @@ public class EntityGore extends EntityInanimate
 			slideCount++;
 			if (slideCount == 140) setDead();
 		}
-		
+
 		Vec3 vec3 = Vec3.createVectorHelper(posX, posY, posZ);
 		Vec3 vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
 		MovingObjectPosition movingobjectposition = worldObj.rayTraceBlocks(vec3, vec31);
 		vec3 = Vec3.createVectorHelper(posX, posY, posZ);
 		vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-		
+
 		if (movingobjectposition != null)
 		{
 			isSliding = true;
 			posY = movingobjectposition.hitVec.yCoord + offset;
 		}
-		
+
 		rotationPitch += motionpitch;
 		rotationYaw += motionyaw;
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
-		
+
 		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.5F;
 		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.5F;
-		
+
 		float f2 = 0.99F;
 		float f3 = 0.05F;
-		
+
 		if (isInWater())
 		{
 			// for (int k = 0; k < 4; ++k)
@@ -396,7 +396,7 @@ public class EntityGore extends EntityInanimate
 			// float f4 = 0.25F;
 			// worldObj.spawnParticle("bubble", posX - motionX * (double)f4, posY - motionY * (double)f4, posZ - motionZ * (double)f4, motionX, motionY, motionZ);
 			// }
-			
+
 			f2 = 0.9F;
 		}
 		else if (!isSliding)
@@ -410,14 +410,14 @@ public class EntityGore extends EntityInanimate
 		{
 			f2 = 0.8f;
 		}
-		
+
 		motionpitch *= (double) f2;
 		motionyaw *= (double) f2;
 		motionX *= f2;
 		motionY *= f2;
 		motionZ *= f2;
 		motionY -= f3;
-		
+
 		if (isSliding == true)
 		{
 			if (bounces == -1) bounces = worldObj.rand.nextInt(2) + 2;
@@ -433,10 +433,10 @@ public class EntityGore extends EntityInanimate
 			motionpitch = 0;
 			rotationPitch = pitchLock;
 		}
-		
+
 		setPosition(posX, posY, posZ);
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	private void spawnBlood()
 	{
@@ -445,7 +445,7 @@ public class EntityGore extends EntityInanimate
 			RivalRebels.proxy.spawnGore(worldObj, this, !greenblood);
 		}
 	}
-	
+
 	public static byte[] getBytesString(String str)
 	{
 		char[] buffer = str.toCharArray();
@@ -456,14 +456,14 @@ public class EntityGore extends EntityInanimate
 		}
 		return bytes;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -471,7 +471,7 @@ public class EntityGore extends EntityInanimate
 		par1NBTTagCompound.setByte("Type", (byte) type);
 		par1NBTTagCompound.setByte("Green", (byte) (greenblood ? 1 : 0));
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -479,17 +479,17 @@ public class EntityGore extends EntityInanimate
 		type = par1NBTTagCompound.getByte("Type") & 255;
 		greenblood = par1NBTTagCompound.getByte("Green") == 1;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public float getShadowSize()
 	{
 		return 0.0F;
 	}
-	
+
 	@Override
 	public void entityInit()
 	{
-		
+
 	}
 }

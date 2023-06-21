@@ -30,9 +30,9 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockReactor extends BlockContainer
 {
@@ -40,19 +40,19 @@ public class BlockReactor extends BlockContainer
 	{
 		super(Material.iron);
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return -1;
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 1;
 	}
-	
+
 	/**
 	 * Called when the block is placed in the world.
 	 */
@@ -60,51 +60,51 @@ public class BlockReactor extends BlockContainer
 	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLiving, ItemStack par6ItemStack)
 	{
 		int l = MathHelper.floor_double((par5EntityLiving.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		
+
 		if (l == 0)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
 		}
-		
+
 		if (l == 1)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
 		}
-		
+
 		if (l == 2)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
 		}
-		
+
 		if (l == 3)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
 		}
-		
+
 		if (par6ItemStack.hasDisplayName())// TODO: what the hell
 		{
 			// ((TileEntityFurnace)par1World.getTileEntity(par2, par3, par4)).setGuiDisplayName(par6ItemStack.getDisplayName());
 		}
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityReactor();
 	}
-	
+
 	/**
 	 * Called upon block activation (right click on the block.)
 	 */
@@ -117,10 +117,10 @@ public class BlockReactor extends BlockContainer
 			// par5EntityPlayer.openGui(RivalRebels.instance, RivalRebels.tokamakID, par1World, par2, par3, par4);
 		}
 		RivalRebelsSoundPlayer.playSound(par1World, 10, 3, par2, par3, par4);
-		
+
 		return true;
 	}
-	
+
 	@Override
 	public void breakBlock(World world, int x, int y, int z, Block id, int meta)
 	{
@@ -147,16 +147,16 @@ public class BlockReactor extends BlockContainer
 		}
 		super.breakBlock(world, x, y, z, id, meta);
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

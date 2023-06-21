@@ -25,11 +25,11 @@ import assets.rivalrebels.common.tileentity.TileEntityList;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ReactorUpdatePacket implements IMessage
 {
@@ -43,12 +43,12 @@ public class ReactorUpdatePacket implements IMessage
 	boolean on;
 	TileEntityList machines;
 	ByteBuf bbuf;
-	
+
 	public ReactorUpdatePacket()
 	{
-		
+
 	}
-	
+
 	public ReactorUpdatePacket(int X, int Y, int Z, float cons, float last, boolean mt, boolean ej, boolean o, TileEntityList mach)
 	{
 		x = X;
@@ -61,7 +61,7 @@ public class ReactorUpdatePacket implements IMessage
 		on = o;
 		machines = mach;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -74,7 +74,7 @@ public class ReactorUpdatePacket implements IMessage
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
-		
+
 		buf.writeFloat(consumed);
 		buf.writeFloat(lasttick);
 		buf.writeBoolean(melt);
@@ -92,7 +92,7 @@ public class ReactorUpdatePacket implements IMessage
 			buf.writeFloat(te.pInR);
 		}
 	}
-	
+
 	public static class Handler implements IMessageHandler<ReactorUpdatePacket, IMessage>
 	{
 		@Override
@@ -102,7 +102,7 @@ public class ReactorUpdatePacket implements IMessage
 			int y = m.bbuf.readInt();
 			int z = m.bbuf.readInt();
 			TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(x, y, z);
-			
+
 			if (te instanceof TileEntityReactor)
 			{
 				TileEntityReactor ter = (TileEntityReactor) te;

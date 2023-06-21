@@ -16,8 +16,8 @@ import org.lwjgl.opengl.GL11;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ModelNukeCrate
@@ -35,7 +35,7 @@ public class ModelNukeCrate
 	TextureVertice	t2	= new TextureVertice(1, 0);
 	TextureVertice	t3	= new TextureVertice(1, 1);
 	TextureVertice	t4	= new TextureVertice(0, 1);
-	
+
 	public void renderModelA()
 	{
 		GL11.glPushMatrix();
@@ -46,7 +46,7 @@ public class ModelNukeCrate
 		RenderHelper.addFace(v1, v5, v6, v2, t1, t2, t3, t4);
 		GL11.glPopMatrix();
 	}
-	
+
 	public void renderModelB()
 	{
 		GL11.glPushMatrix();

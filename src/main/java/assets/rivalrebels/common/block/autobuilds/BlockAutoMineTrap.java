@@ -16,8 +16,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockAutoMineTrap extends BlockAutoTemplate
 {
@@ -25,7 +25,7 @@ public class BlockAutoMineTrap extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
@@ -43,7 +43,7 @@ public class BlockAutoMineTrap extends BlockAutoTemplate
 			}
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -56,7 +56,7 @@ public class BlockAutoMineTrap extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -69,7 +69,7 @@ public class BlockAutoMineTrap extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)

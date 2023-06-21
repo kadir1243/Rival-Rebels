@@ -28,8 +28,8 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityRhodesActivator extends TileEntityMachineBase
 {
@@ -39,7 +39,7 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 		pInM = 40;
 		pInR = 20;
 	}
-	
+
 	@Override
 	public float powered(float power, float distance)
 	{

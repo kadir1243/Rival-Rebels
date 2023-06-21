@@ -25,33 +25,28 @@ import assets.rivalrebels.client.model.RenderLibrary;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityReactorRenderer extends TileEntitySpecialRenderer
+public class TileEntityReactorRenderer extends TileEntitySpecialRenderer<TileEntityReactor>
 {
 	private ModelReactor	mr;
 	private ModelLaptop		ml;
 	private ModelFromObj	mo;
-	
-	public TileEntityReactorRenderer()
-	{
+
+	public TileEntityReactorRenderer() {
 		mr = new ModelReactor();
 		ml = new ModelLaptop();
-		try
-		{
+		try {
 			mo = ModelFromObj.readObjFile("a.obj");
-		}
-		catch (Exception e)
-		{
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		
 	}
-	
-	public void renderAModelAt(TileEntityReactor tile, double d, double d1, double d2, float f)
-	{
+
+    @Override
+    public void renderTileEntityAt(TileEntityReactor tile, double x, double y, double z, float partialTicks, int destroyStage) {
 		GL11.glEnable(GL11.GL_LIGHTING);
 		int var9 = tile.getBlockMetadata();
 		short var11 = 0;
@@ -59,23 +54,23 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer
 		{
 			var11 = 180;
 		}
-		
+
 		if (var9 == 3)
 		{
 			var11 = 0;
 		}
-		
+
 		if (var9 == 4)
 		{
 			var11 = -90;
 		}
-		
+
 		if (var9 == 5)
 		{
 			var11 = 90;
 		}
 		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d + 0.5F, (float) d1 + 1.1875F, (float) d2 + 0.5F);
+		GL11.glTranslatef((float) x + 0.5F, (float) y + 1.1875F, (float) z + 0.5F);
 		GL11.glRotatef(var11, 0.0F, 1.0F, 0.0F);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
 		ml.renderModel((float) -tile.slide);
@@ -83,7 +78,7 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer
 		ml.renderScreen((float) -tile.slide);
 		GL11.glPopMatrix();
 		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d + 0.5F, (float) d1 + 0.5F, (float) d2 + 0.5F);
+		GL11.glTranslatef((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
 		GL11.glRotatef(var11, 0.0F, 1.0F, 0.0F);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreactor);
 		mr.renderModel();
@@ -105,14 +100,8 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer
 				if (radius > 0.15) steps++;
 				if (radius > 0.25) radius = 0.25f;
 				// if (steps == 2 && temb.worldObj.rand.nextInt(5) != 0) return;
-				RenderLibrary.instance.renderModel((float) d + 0.5f, (float) d1 + 2.5f, (float) d2 + 0.5f, temb.xCoord - tile.xCoord, temb.yCoord - tile.yCoord - 2.5f, temb.zCoord - tile.zCoord, 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
+				RenderLibrary.instance.renderModel((float) x + 0.5f, (float) y + 2.5f, (float) z + 0.5f, temb.getPos().getX() - tile.getPos().getX(), temb.getPos().getY() - tile.getPos().getY() - 2.5f, temb.getPos().getZ() - tile.getPos().getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
 			}
 		}
-	}
-	
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityReactor) tileentity, d, d1, d2, f);
 	}
 }

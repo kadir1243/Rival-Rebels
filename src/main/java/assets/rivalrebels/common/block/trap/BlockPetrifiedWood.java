@@ -24,8 +24,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockPetrifiedWood extends Block
 {
@@ -33,20 +33,20 @@ public class BlockPetrifiedWood extends Block
 	{
 		super(Material.rock);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 1;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getBlockColor()
 	{
 		return 1118481 * 4;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	/**
@@ -56,7 +56,7 @@ public class BlockPetrifiedWood extends Block
 	{
 		return 1118481 * 4;
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9)
 	{
@@ -67,7 +67,7 @@ public class BlockPetrifiedWood extends Block
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void onEntityWalking(World world, int par2, int par3, int par4, Entity entity)
 	{
@@ -76,7 +76,7 @@ public class BlockPetrifiedWood extends Block
 			entity.attackEntityFrom(RivalRebelsDamageSource.radioactivepoisoning, ((16 - world.getBlockMetadata(par2, par3, par4)) / 2) + world.rand.nextInt(3) - 1);
 		}
 	}
-	
+
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack itemStack)
 	{
@@ -85,7 +85,7 @@ public class BlockPetrifiedWood extends Block
 			world.setBlockMetadataWithNotify(x, y, z, 7, 3);
 		}
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	/**
@@ -96,7 +96,7 @@ public class BlockPetrifiedWood extends Block
 	{
 		return par1IBlockAccess.getBlockMetadata(par2, par3, par4) * 1118481;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -109,7 +109,7 @@ public class BlockPetrifiedWood extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -122,7 +122,7 @@ public class BlockPetrifiedWood extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)

@@ -11,58 +11,52 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.model.ModelNuclearBomb;
 import assets.rivalrebels.client.renderentity.RenderNuke;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityNuclearBombRenderer extends TileEntitySpecialRenderer
+public class TileEntityNuclearBombRenderer extends TileEntitySpecialRenderer<TileEntityNuclearBomb>
 {
-	public TileEntityNuclearBombRenderer()
-	{
-	}
-	
-	public void renderAModelAt(TileEntityNuclearBomb tile, double d, double d1, double d2, float f)
-	{
+	public TileEntityNuclearBombRenderer() {}
+
+    @Override
+    public void renderTileEntityAt(TileEntityNuclearBomb tile, double x, double y, double z, float partialTicks, int destroyStage) {
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d + 0.5F, (float) d1 + 0.5F, (float) d2 + 0.5F);
+		GL11.glTranslatef((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
 		GL11.glScalef(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
 		int metadata = tile.getBlockMetadata();
 		if (metadata == 0)
 		{
 			GL11.glRotatef(90, 1, 0, 0);
 		}
-		
+
 		if (metadata == 1)
 		{
 			GL11.glRotatef(-90, 1, 0, 0);
 		}
-		
+
 		if (metadata == 2)
 		{
 			GL11.glRotatef(180, 0, 1, 0);
 		}
-		
+
 		if (metadata == 3)
 		{
 			GL11.glRotatef(0, 0, 1, 0);
 		}
-		
+
 		if (metadata == 4)
 		{
 			GL11.glRotatef(-90, 0, 1, 0);
 		}
-		
+
 		if (metadata == 5)
 		{
 			GL11.glRotatef(90, 0, 1, 0);
@@ -70,11 +64,5 @@ public class TileEntityNuclearBombRenderer extends TileEntitySpecialRenderer
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etwacknuke);
 		RenderNuke.model.renderAll();
 		GL11.glPopMatrix();
-	}
-	
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityNuclearBomb) tileentity, d, d1, d2, f);
 	}
 }

@@ -26,8 +26,8 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockForceFieldNode extends BlockContainer
 {
@@ -35,19 +35,19 @@ public class BlockForceFieldNode extends BlockContainer
 	{
 		super(Material.iron);
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9)
 	{
@@ -69,45 +69,45 @@ public class BlockForceFieldNode extends BlockContainer
 		}
 		return false;
 	}
-	
+
 	@Override
 	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLiving, ItemStack par6ItemStack)
 	{
 		int l = MathHelper.floor_double((par5EntityLiving.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		
+
 		if (l == 0)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
 		}
-		
+
 		if (l == 1)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
 		}
-		
+
 		if (l == 2)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
 		}
-		
+
 		if (l == 3)
 		{
 			par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
 		}
 	}
-	
+
 	@Override
 	public boolean hasTileEntity(int metadata)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityForceFieldNode();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
 	@SideOnly(Side.CLIENT)
@@ -120,7 +120,7 @@ public class BlockForceFieldNode extends BlockContainer
 	IIcon	icontop3;
 	@SideOnly(Side.CLIENT)
 	IIcon	icontop4;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -134,7 +134,7 @@ public class BlockForceFieldNode extends BlockContainer
 		if (side == meta) return icon2;
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

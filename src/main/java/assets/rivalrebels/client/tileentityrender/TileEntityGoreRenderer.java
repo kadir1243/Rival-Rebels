@@ -22,28 +22,28 @@ import org.lwjgl.opengl.GL11;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.renderhelper.Vertice;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 {
 	float	s	= 0.5F;
-	
+
 	Vertice	v1	= new Vertice(s, s, s);
 	Vertice	v2	= new Vertice(s, s, -s);
 	Vertice	v3	= new Vertice(-s, s, -s);
 	Vertice	v4	= new Vertice(-s, s, s);
-	
+
 	Vertice	v5	= new Vertice(s, -s, s);
 	Vertice	v6	= new Vertice(s, -s, -s);
 	Vertice	v7	= new Vertice(-s, -s, -s);
 	Vertice	v8	= new Vertice(-s, -s, s);
-	
+
 	public void renderAModelAt(TileEntityGore tile, double x, double y, double z, float f)
 	{
 		World world = tile.getWorldObj();
-		
+
 		boolean ceil = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord + 1, tile.zCoord, false);
 		boolean floor = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord - 1, tile.zCoord, false);
 		boolean side1 = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord, tile.zCoord + 1, false);
@@ -51,7 +51,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 		boolean side3 = world.isBlockNormalCubeDefault(tile.xCoord, tile.yCoord, tile.zCoord - 1, false);
 		boolean side4 = world.isBlockNormalCubeDefault(tile.xCoord + 1, tile.yCoord, tile.zCoord, false);
 		int meta = tile.blockMetadata;
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
 		if (meta == 0) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash1);
@@ -63,7 +63,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 		else Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash1);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		Tessellator tessellator = Tessellator.instance;
-		
+
 		if (side1)
 		{
 			tessellator.startDrawingQuads();
@@ -73,7 +73,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 			addVertex(v4, 0, 1, true);
 			tessellator.draw();
 		}
-		
+
 		if (side2)
 		{
 			tessellator.startDrawingQuads();
@@ -83,7 +83,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 			addVertex(v3, 0, 1, true);
 			tessellator.draw();
 		}
-		
+
 		if (side3)
 		{
 			tessellator.startDrawingQuads();
@@ -93,7 +93,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 			addVertex(v2, 0, 1, true);
 			tessellator.draw();
 		}
-		
+
 		if (side4)
 		{
 			tessellator.startDrawingQuads();
@@ -103,7 +103,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 			addVertex(v1, 0, 1, true);
 			tessellator.draw();
 		}
-		
+
 		if (ceil)
 		{
 			tessellator.startDrawingQuads();
@@ -113,7 +113,7 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 			addVertex(v1, 0, 1, true);
 			tessellator.draw();
 		}
-		
+
 		if (floor)
 		{
 			tessellator.startDrawingQuads();
@@ -123,16 +123,16 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer
 			addVertex(v8, 0, 1, true);
 			tessellator.draw();
 		}
-		
+
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
 	{
 		renderAModelAt((TileEntityGore) tileentity, d, d1, d2, f);
 	}
-	
+
 	private void addVertex(Vertice v, double t, double t2, boolean offset)
 	{
 		Tessellator tessellator = Tessellator.instance;

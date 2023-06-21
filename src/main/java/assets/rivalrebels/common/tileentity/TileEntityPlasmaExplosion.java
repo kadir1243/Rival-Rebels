@@ -24,20 +24,20 @@ import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityPlasmaExplosion extends TileEntity
 {
 	public float	size		= 0;
 	float			increment	= 0.3f;
 	float			prevsize	= 0;
-	
+
 	public TileEntityPlasmaExplosion()
 	{
-		
+
 	}
-	
+
 	/**
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
@@ -56,7 +56,7 @@ public class TileEntityPlasmaExplosion extends TileEntity
 			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
 			this.invalidate();
 		}
-		
+
 		double fsize = Math.sin(size) * 5.9 * 2;
 		double fsqr = fsize * fsize;
 		List l = this.worldObj.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBox(xCoord - fsize + 0.5, yCoord - fsize + 0.5, zCoord - fsize + 0.5, xCoord + fsize + 0.5, yCoord + fsize + 0.5, zCoord + fsize + 0.5));
@@ -77,13 +77,13 @@ public class TileEntityPlasmaExplosion extends TileEntity
 		}
 		super.updateEntity();
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
 		return AxisAlignedBB.getBoundingBox(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 3, yCoord + 3, zCoord + 3);
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()

@@ -23,8 +23,8 @@ import org.lwjgl.opengl.GL12;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityLightningLink;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderLightningLink extends Render
@@ -32,29 +32,29 @@ public class RenderLightningLink extends Render
 	static float	red		= 0.65F;
 	static float	green	= 0.75F;
 	static float	blue	= 1F;
-	
+
 	public RenderLightningLink()
 	{
 	}
-	
+
 	public void renderLightningLink(EntityLightningLink ell, double x, double y, double z, float yaw, float pitch)
 	{
 		float segmentDistance = RivalRebels.teslasegments;
 		float distance = (float) ell.motionX * 100;
 		distance = 100;
-		
+
 		// RenderLibrary.instance.renderModel((float) x, (float) y, (float) z,
 		// (float) Math.sin(-ell.rotationYaw / 180 * Math.PI) * distance,
 		// (float) Math.sin(-ell.rotationPitch / 180 * Math.PI) * distance,
 		// (float) Math.cos(-ell.rotationYaw / 180 * Math.PI) * distance,
 		// 2f, 0.07f, 8, 5f, 0.5f, red, green, blue, 1);
-		
+
 		if (distance > 0)
 		{
 			Random rand = new Random(ell.randLong);
 			float radius = 0.07F;
 			Tessellator tessellator = Tessellator.instance;
-			
+
 			GL11.glPushMatrix();
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
@@ -63,7 +63,7 @@ public class RenderLightningLink extends Render
 			GL11.glTranslatef((float) x, (float) y, (float) z);
 			GL11.glRotatef(ell.rotationYaw, 0.0F, 1.0F, 0.0F);
 			GL11.glRotatef(-ell.rotationPitch, 1.0F, 0.0F, 0.0F);
-			
+
 			double AddedX = 0;
 			double AddedY = 0;
 			double prevAddedX = 0;
@@ -86,7 +86,7 @@ public class RenderLightningLink extends Render
 				{
 					AddedX = AddedY = 0;
 				}
-				
+
 				for (float o = 0; o <= radius; o += radius / 8)
 				{
 					tessellator.startDrawingQuads();
@@ -119,20 +119,20 @@ public class RenderLightningLink extends Render
 					tessellator.draw();
 				}
 			}
-			
+
 			GL11.glDisable(GL11.GL_BLEND);
 			GL11.glEnable(GL11.GL_TEXTURE_2D);
 			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
 			GL11.glPopMatrix();
 		}
 	}
-	
+
 	@Override
 	public void doRender(Entity entityLightningLink, double x, double y, double z, float yaw, float pitch)
 	{
 		this.renderLightningLink((EntityLightningLink) entityLightningLink, x, y, z, yaw, pitch);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

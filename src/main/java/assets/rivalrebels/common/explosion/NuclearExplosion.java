@@ -29,8 +29,8 @@ import assets.rivalrebels.common.entity.EntityHackB83;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class NuclearExplosion
 {
@@ -43,13 +43,13 @@ public class NuclearExplosion
 						Blocks.diamond_ore,
 						Blocks.emerald_ore,
 						};
-	
+
 	public static Block[]	pgblocks	= {
 						Blocks.stone,
 						Blocks.cobblestone,
 						Blocks.dirt,
 						};
-	
+
 	public NuclearExplosion(World world, int x, int y, int z, int strength)
 	{
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
@@ -60,7 +60,7 @@ public class NuclearExplosion
 			fixLag(world, x, y, z, strength);
 		}
 	}
-	
+
 	public NuclearExplosion(World world, int x, int y, int z, int strength, boolean breakobj)
 	{
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
@@ -80,7 +80,7 @@ public class NuclearExplosion
 		int AOC = radius / RivalRebels.nuclearBombStrength;
 		int onepointfiveradiussqrd = onepointfiveradius * onepointfiveradius;
 		int twoAOC = AOC * 2; // twoaoc its a twoAOC
-		
+
 		for (int X = -onepointfiveradius; X <= onepointfiveradius; X++)
 		{
 			int xx = x + X;
@@ -194,7 +194,7 @@ public class NuclearExplosion
 		}
 		world.playSoundEffect(x, y, z, "random.explode", 4.0F, (1.0F + (rand.nextFloat() - rand.nextFloat()) * 0.2F) * 0.7F);
 	}
-	
+
 	private void pushAndHurtEntities(World world, int x, int y, int z, int radius)
 	{
 		radius *= 4;
@@ -206,19 +206,19 @@ public class NuclearExplosion
 		int var29 = MathHelper.floor_double(z + (double) radius + 1.0D);
 		List var9 = world.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBox(var3, var5, var7, var4, var28, var29));
 		Vec3 var30 = Vec3.createVectorHelper(x, y, z);
-		
+
 		for (int var11 = 0; var11 < var9.size(); ++var11)
 		{
 			Entity var31 = (Entity) var9.get(var11);
 			double var13 = var31.getDistance(x, y, z) / radius;
-			
+
 			if (var13 <= 1.0D)
 			{
 				double var15 = var31.posX - x;
 				double var17 = var31.posY + var31.getEyeHeight() - y;
 				double var19 = var31.posZ - z;
 				double var33 = MathHelper.sqrt_double(var15 * var15 + var17 * var17 + var19 * var19);
-				
+
 				if (var33 != 0.0D)
 				{
 					var15 /= var33;
@@ -242,7 +242,7 @@ public class NuclearExplosion
 			}
 		}
 	}
-	
+
 	private void fixLag(World world, int x, int y, int z, int strength)
 	{
 		for (int X = -strength; X <= strength; X++)

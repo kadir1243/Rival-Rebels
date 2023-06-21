@@ -17,8 +17,8 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiKnob extends GuiButton
@@ -27,7 +27,7 @@ public class GuiKnob extends GuiButton
 	protected int		maxdegreelimit	= 360;
 	protected int		mindegreelimit	= 0;
 	protected boolean	pressed;
-	
+
 	public GuiKnob(int id, int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, String par6Str)
 	{
 		super(id, x, y, 36, 36, par6Str);
@@ -38,7 +38,7 @@ public class GuiKnob extends GuiButton
 		}
 		degree = startDegree;
 	}
-	
+
 	/**
 	 * Draws this button to the screen.
 	 */
@@ -59,7 +59,7 @@ public class GuiKnob extends GuiButton
 		this.drawTexturedModalRect(this.xPosition, this.yPosition, 76 + state, 0, this.width, this.height);
 		GL11.glPopMatrix();
 	}
-	
+
 	/**
 	 * Fired when the mouse button is dragged. Equivalent of MouseListener.mouseDragged(MouseEvent e).
 	 */
@@ -74,23 +74,23 @@ public class GuiKnob extends GuiButton
 		else
 		{
 			pressed = false;
-			
+
 			float movement = -Mouse.getDWheel() * 0.375f;
 			degree += movement;
 		}
 	}
-	
+
 	@Override
 	public void mouseReleased(int par2, int par3)
 	{
 		pressed = false;
 	}
-	
+
 	public int getDegree()
 	{
 		return degree;
 	}
-	
+
 	/**
 	 * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent e).
 	 */

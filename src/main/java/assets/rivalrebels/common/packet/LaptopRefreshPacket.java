@@ -20,11 +20,11 @@ import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class LaptopRefreshPacket implements IMessage
 {
@@ -33,12 +33,12 @@ public class LaptopRefreshPacket implements IMessage
 	int z;
 	int tasks;
 	int carpet;
-	
+
 	public LaptopRefreshPacket()
 	{
-		
+
 	}
-	
+
 	public LaptopRefreshPacket(int X, int Y, int Z, int T, int C)
 	{
 		x = X;
@@ -47,7 +47,7 @@ public class LaptopRefreshPacket implements IMessage
 		tasks = T;
 		carpet = C;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -67,7 +67,7 @@ public class LaptopRefreshPacket implements IMessage
 		buf.writeInt(tasks);
 		buf.writeInt(carpet);
 	}
-	
+
 	public static class Handler implements IMessageHandler<LaptopRefreshPacket, IMessage>
 	{
 		@Override

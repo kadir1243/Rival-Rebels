@@ -25,20 +25,20 @@ import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.container.ContainerLoader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiLoader extends GuiContainer
 {
 	private IInventory	upperChestInventory;
 	private IInventory	lowerChestInventory;
-	
+
 	/**
 	 * window height is calculated with this values, the more rows, the heigher
 	 */
 	private int			inventoryRows	= 0;
-	
+
 	public GuiLoader(IInventory par1IInventory, IInventory par2IInventory)
 	{
 		super(new ContainerLoader(par1IInventory, par2IInventory));
@@ -51,7 +51,7 @@ public class GuiLoader extends GuiContainer
 		this.ySize = var4 + this.inventoryRows * 18;
 		this.xSize = 256;
 	}
-	
+
 	/**
 	 * Draw the foreground layer for the GuiContainer (everything in front of the items)
 	 */
@@ -94,9 +94,9 @@ public class GuiLoader extends GuiContainer
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
-	
+
 	boolean	buttondown;
-	
+
 	/**
 	 * Draw the background layer for the GuiContainer (everything behind the items)
 	 */

@@ -20,11 +20,11 @@
 // import RivalRebels.Common.Core.RivalRebels;
 // import RivalRebels.Common.Core.RivalRebelsClientPacketHandler;
 // import RivalRebels.Common.TileEntity.TileEntityLaptop;
-// import cpw.mods.fml.common.FMLCommonHandler;
-// import cpw.mods.fml.common.network.PacketDispatcher;
-// import cpw.mods.fml.common.registry.LanguageRegistry;
-// import cpw.mods.fml.relauncher.Side;
-// import cpw.mods.fml.relauncher.SideOnly;
+// import net.minecraftforge.fml.common.FMLCommonHandler;
+// import net.minecraftforge.fml.common.network.PacketDispatcher;
+// import net.minecraftforge.fml.common.registry.LanguageRegistry;
+// import net.minecraftforge.fml.relauncher.Side;
+// import net.minecraftforge.fml.relauncher.SideOnly;
 // import net.minecraft.inventory.Container;
 // import net.minecraft.network.packet.Packet250CustomPayload;
 // import net.minecraft.client.Minecraft;
@@ -158,9 +158,9 @@ import assets.rivalrebels.common.packet.ADSClosePacket;
 import assets.rivalrebels.common.packet.ADSWeaponPacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiTray extends GuiContainer
@@ -174,20 +174,20 @@ public class GuiTray extends GuiContainer
 	GuiCustomButton				players;
 	GuiCustomButton				mobs;
 	GuiDropdownOption			select1;
-	
+
 	public GuiTray(Container container)
 	{
 		super(container);
 		this.container = (ContainerReciever) container;
 	}
-	
+
 	public GuiTray(InventoryPlayer inventoryPlayer, TileEntityReciever tileEntity)
 	{
 		super(new ContainerReciever(inventoryPlayer, tileEntity));
 		ySize = 206;
 		r = tileEntity;
 	}
-	
+
 	@Override
 	public void initGui()
 	{
@@ -209,7 +209,7 @@ public class GuiTray extends GuiContainer
 		buttonList.add(mobs);
 		buttonList.add(select1);
 	}
-	
+
 	@Override
 	public void drawScreen(int par1, int par2, float par3)
 	{
@@ -217,7 +217,7 @@ public class GuiTray extends GuiContainer
 		this.xSize_lo = par1;
 		this.ySize_lo = par2;
 	}
-	
+
 	@Override
 	protected void keyTyped(char par1, int par2)
 	{
@@ -228,18 +228,18 @@ public class GuiTray extends GuiContainer
 			PacketDispatcher.packetsys.sendToServer(new ADSClosePacket(r.xCoord, r.yCoord, r.zCoord, mobs.isPressed, chip.isPressed, players.isPressed, range.getDegree()*2));
 		}
 	}
-	
+
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
 	{
 		super.drawGuiContainerForegroundLayer(par1, par2);
-		
+
 		if (select1.isPressed)
 		{
 			PacketDispatcher.packetsys.sendToServer(new ADSWeaponPacket(r.xCoord, r.yCoord, r.zCoord, 1));
 		}
 		select1.isPressed = false;
-		
+
 		int mousex = par1;
 		int mousey = par2;
 		int posx = (width - xSize) / 2;
@@ -272,11 +272,11 @@ public class GuiTray extends GuiContainer
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
-	
+
 	boolean		buttondown;
-	
+
 	static int	spinfac	= 0;
-	
+
 	public void drawADS(int x, int y, int scale, float px, float py)
 	{
 		spinfac += 1;
@@ -296,12 +296,12 @@ public class GuiTray extends GuiContainer
 			GL11.glTranslatef(0, 0, 0.5f);
 		}
 		// GL11.glRotated(Math.sin(spinfac/(40 * Math.PI)) * 10, 1.0F, 0.0F, 0.0F);
-		
+
 		// entity.rotationPitch = -((float)Math.atan((double)(py / 40.0F))) * 40.0F;
 		// entity.rotationYawHead = (float)Math.atan((double)(px / 40.0F)) * 40.0F;
 		// + (Math.sin(spinfac/(40 * Math.PI)) * 10)
 		// - (spinfac * 0.5)
-		
+
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreciever);
 		GL11.glRotated(180, 0, 1, 0);
 		// GL11.glRotated((spinfac * 0.5), 0, 1, 0);
@@ -323,7 +323,7 @@ public class GuiTray extends GuiContainer
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
 	}
-	
+
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
 	{
@@ -332,12 +332,12 @@ public class GuiTray extends GuiContainer
 		int x = (width - xSize) / 2;
 		int y = (height - ySize) / 2;
 		this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
-		
+
 		if (r.pInR > 0)
 		{
 			drawTexturedModalRect(x + 104, y + 68, 248, 0, 8, 8);
 		}
-		
+
 		Minecraft.getMinecraft().fontRenderer.drawString(StatCollector.translateToLocal("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff);
 		drawADS(guiLeft + 51, guiTop + 75, 30, guiLeft + 51 - this.xSize_lo, guiTop + 25 - this.ySize_lo);
 	}

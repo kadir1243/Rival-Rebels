@@ -18,18 +18,18 @@ import java.util.Iterator;
 import java.util.List;
 
 import net.minecraft.client.Minecraft;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class InspectPacket implements IMessage
 {
 	public InspectPacket()
 	{
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -39,7 +39,7 @@ public class InspectPacket implements IMessage
 	public void toBytes(ByteBuf buf)
 	{
 	}
-	
+
 	public static class Handler implements IMessageHandler<InspectPacket, IMessage>
 	{
 		@Override
@@ -77,7 +77,7 @@ public class InspectPacket implements IMessage
 //				if (iter.hasNext()) str.append(",");
 			}
 			String s = str.toString();
-			
+
 			return new ModListPacket(s);
 		}
 	}

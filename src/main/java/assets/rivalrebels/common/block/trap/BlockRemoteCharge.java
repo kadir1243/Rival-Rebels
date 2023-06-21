@@ -30,8 +30,8 @@ import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
 import assets.rivalrebels.common.explosion.Explosion;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockRemoteCharge extends Block
 {
@@ -44,13 +44,13 @@ public class BlockRemoteCharge extends Block
 		float f2 = 0.5F;
 		setBlockBounds(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
+
 	/**
 	 * Updates the blocks bounds based on its current state. Args: world, x, y, z
 	 */
@@ -63,7 +63,7 @@ public class BlockRemoteCharge extends Block
 		float f2 = 0.5F;
 		setBlockBounds(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
 	}
-	
+
 	/**
 	 * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been cleared to be reused)
 	 */
@@ -76,7 +76,7 @@ public class BlockRemoteCharge extends Block
 		float f2 = 0.5F;
 		return AxisAlignedBB.getBoundingBox(par2 + f1, par3, par4 + f, (par2 + 1) - f, (par3 + f2) - f, (par4 + 1) - f);
 	}
-	
+
 	/**
 	 * How many world ticks before ticking
 	 */
@@ -85,7 +85,7 @@ public class BlockRemoteCharge extends Block
 	{
 		return 1;
 	}
-	
+
 	/**
 	 * Returns the bounding box of the wired rectangular prism to render.
 	 */
@@ -98,7 +98,7 @@ public class BlockRemoteCharge extends Block
 		float f2 = 0.5F;
 		return AxisAlignedBB.getBoundingBox(par2 + f1, par3, par4 + f, (par2 + 1) - f, par3 + f2, (par4 + 1) - f);
 	}
-	
+
 	/**
 	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
 	 */
@@ -107,7 +107,7 @@ public class BlockRemoteCharge extends Block
 	{
 		return false;
 	}
-	
+
 	/**
 	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
 	 * etc to this block.
@@ -117,27 +117,27 @@ public class BlockRemoteCharge extends Block
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int l)
 	{
 		explode(world, x, y, z);
 	}
-	
+
 	@Override
 	public void onBlockDestroyedByExplosion(World world, int x, int y, int z, net.minecraft.world.Explosion explosion)
 	{
 		explode(world, x, y, z);
 	}
-	
+
 	public boolean	boom	= false;
-	
+
 	@Override
 	public void onBlockAdded(World world, int x, int y, int z)
 	{
 		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
 	}
-	
+
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random rand)
 	{
@@ -145,7 +145,7 @@ public class BlockRemoteCharge extends Block
 		{
 			explode(world, x, y, z);
 		}
-		
+
 		if (boom)
 		{
 			explode(world, x, y, z);
@@ -153,7 +153,7 @@ public class BlockRemoteCharge extends Block
 		}
 		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
 	}
-	
+
 	@Override
 	public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity)
 	{
@@ -162,14 +162,14 @@ public class BlockRemoteCharge extends Block
 			explode(world, x, y, z);
 		}
 	}
-	
+
 	public static void explode(World world, int x, int y, int z)
 	{
 		world.setBlock(x, y, z, Blocks.air);
 		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge);
 		RivalRebelsSoundPlayer.playSound(world, 22, 0, x, y, z, 1f, 0.3f);
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -182,7 +182,7 @@ public class BlockRemoteCharge extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -195,7 +195,7 @@ public class BlockRemoteCharge extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -207,7 +207,7 @@ public class BlockRemoteCharge extends Block
 		icon5 = iconregister.registerIcon("RivalRebels:af"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:af"); // SIDE E
 	}
-	
+
 	/**
 	 * Called when the falling block entity for this block hits the ground and turns back into a block
 	 */

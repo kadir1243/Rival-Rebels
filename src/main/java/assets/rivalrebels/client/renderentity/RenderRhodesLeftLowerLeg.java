@@ -34,8 +34,8 @@ import assets.rivalrebels.common.entity.EntityRhodesLeftLowerLeg;
 import assets.rivalrebels.common.entity.EntityRhodesLeftUpperArm;
 import assets.rivalrebels.common.entity.EntityRhodesRightUpperArm;
 import assets.rivalrebels.common.entity.EntityRhodesTorso;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderRhodesLeftLowerLeg extends Render
@@ -43,7 +43,7 @@ public class RenderRhodesLeftLowerLeg extends Render
 	public RenderRhodesLeftLowerLeg()
 	{
 	}
-	
+
 	public void renderRhodes(EntityRhodesLeftLowerLeg rhodes, double x, double y, double z, float par8, float ptt)
 	{
 		GL11.glPushMatrix();
@@ -59,7 +59,7 @@ public class RenderRhodesLeftLowerLeg extends Render
 		RenderRhodes.thigh.renderAll();
 		GL11.glPopMatrix();
 	}
-	
+
 	/**
 	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
 	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
@@ -70,7 +70,7 @@ public class RenderRhodesLeftLowerLeg extends Render
 	{
 		renderRhodes((EntityRhodesLeftLowerLeg) par1Entity, par2, par4, par6, par8, par9);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

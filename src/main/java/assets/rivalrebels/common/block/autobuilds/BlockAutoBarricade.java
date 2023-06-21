@@ -16,8 +16,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockAutoBarricade extends BlockAutoTemplate
 {
@@ -25,23 +25,23 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World par1World, int x, int y, int z)
 	{
 		super.build(par1World, x, y, z);
-		
+
 		placeBlockCarefully(par1World, x, y, z, Blocks.air);
 		placeBlockCarefully(par1World, x + 1, y, z + 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x + 1, y, z - 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x - 1, y, z - 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x - 1, y, z + 1, RivalRebels.reactive);
-		
+
 		placeBlockCarefully(par1World, x + 1, y + 1, z + 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x + 1, y + 1, z - 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x - 1, y + 1, z - 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x - 1, y + 1, z + 1, RivalRebels.reactive);
-		
+
 		placeBlockCarefully(par1World, x + 1, y + 2, z + 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x + 1, y + 2, z - 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x - 1, y + 2, z - 1, RivalRebels.reactive);
@@ -54,7 +54,7 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 		placeBlockCarefully(par1World, x + 2, y + 2, z, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x, y + 2, z - 2, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x - 2, y + 2, z, RivalRebels.reactive);
-		
+
 		placeBlockCarefully(par1World, x + 1, y + 3, z + 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x + 1, y + 3, z - 1, RivalRebels.reactive);
 		placeBlockCarefully(par1World, x - 1, y + 3, z - 1, RivalRebels.reactive);
@@ -67,7 +67,7 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 		placeBlockCarefully(par1World, x, y + 3, z + 2, RivalRebels.ffreciever, 3, 3);
 		placeBlockCarefully(par1World, x - 2, y + 3, z, RivalRebels.ffreciever, 4, 3);
 		placeBlockCarefully(par1World, x + 2, y + 3, z, RivalRebels.ffreciever, 5, 3);
-		
+
 		// int h = 1;
 		// int s = 1;
 		// placeBlockCarefully(par1World, x, y, z, 0);
@@ -131,7 +131,7 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 		// placeBlockCarefully(par1World, x + 1, y - h, z + s, RivalRebels.jump);
 		// placeBlockCarefully(par1World, x + 1, y - h, z - s, RivalRebels.jump);
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -144,7 +144,7 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -157,7 +157,7 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)

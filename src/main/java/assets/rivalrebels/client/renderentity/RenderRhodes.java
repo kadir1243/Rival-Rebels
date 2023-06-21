@@ -34,8 +34,8 @@ import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRender
 import assets.rivalrebels.common.entity.EntityB2Spirit;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderRhodes extends Render
@@ -69,7 +69,7 @@ public class RenderRhodes extends Render
 			"items/",
 			"flags/",
 	};
-    
+
 	public RenderRhodes()
 	{
     	texture = new ResourceLocation(RivalRebels.MODID, "textures/entity/rhodes.png");
@@ -86,14 +86,14 @@ public class RenderRhodes extends Render
     	flame = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/flame.obj"));
     	laser = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/laser.obj"));
     	booster = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/booster.obj"));
-    	
+
     	ffhead = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/ffhead.obj"));
     	fftorso = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/fftorso.obj"));
     	ffupperarm = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/ffupperarm.obj"));
     	fflowerarm = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/fflowerarm.obj"));
     	ffthigh = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/ffthigh.obj"));
     	ffshin = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/rhodes/ffshin.obj"));
-    	
+
 		modelsphere = new ModelBlastSphere();
 		try
 		{
@@ -107,7 +107,7 @@ public class RenderRhodes extends Render
 			e.printStackTrace();
 		}
 	}
-	
+
 	/*public static float atan2(float y, float x)
 	{
 		return atan(y/((float)Math.sqrt(x*x+y*y)+x));
@@ -130,7 +130,7 @@ public class RenderRhodes extends Render
 			}
 		}
 	}
-	
+
 	public static float atan(float x)
 	{
 		return atan(y/((float)Math.sqrt(x*x+y*y)+x));
@@ -149,7 +149,7 @@ public class RenderRhodes extends Render
 			return -180-(110.8653352702f-20.8654f*r*r)*r;
 		}
 	}*/
-	
+
 	public static float[] colors = {
 		255/255f,     255/255f,     255/255f, //1
 		125/255f,     142/255f,     180/255f, //2
@@ -169,7 +169,7 @@ public class RenderRhodes extends Render
 		 34/255f,      31/255f,      31/255f, //16
 		255/255f,     255/255f,     255/255f, //17
 	};
-	
+
 	public void renderRhodes(EntityRhodes rhodes, double x, double y, double z, float par8, float tt)
 	{
 		if (rhodes.health > 0)
@@ -179,7 +179,7 @@ public class RenderRhodes extends Render
 			GL11.glPushMatrix();
 			GL11.glTranslatef((float) x, (float) y, (float) z);
 			GL11.glScalef(rhodes.scale, rhodes.scale, rhodes.scale);
-			
+
 			FontRenderer fontrenderer = this.getFontRendererFromRenderManager();
             float f = 5F;
             float f1 = 0.016666668F * f;
@@ -235,8 +235,8 @@ public class RenderRhodes extends Render
             GL11.glDisable(GL11.GL_BLEND);
             GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
             GL11.glPopMatrix();
-			
-			
+
+
 			if (rhodes.colorType == 16)
 			{
 				GL11.glPushMatrix();
@@ -259,14 +259,14 @@ public class RenderRhodes extends Render
 				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 				GL11.glDisable(GL11.GL_CULL_FACE);
 				GL11.glRotatef(rhodes.getbodyyaw(ptt), 0, 1, 0);
-		
+
 				float leftlegheight = 7.26756f - 15
 						+ (MathHelper.cos((rhodes.getleftthighpitch(ptt)+11.99684962f)*0.01745329252f) * 7.331691240f)
 						+ (MathHelper.cos((rhodes.getleftthighpitch(ptt)+rhodes.getleftshinpitch(ptt)-12.2153067f)*0.01745329252f) * 8.521366426f);
 				float rightlegheight = 7.26756f - 15
 						+ (MathHelper.cos((rhodes.getrightthighpitch(ptt)+11.99684962f)*0.01745329252f) * 7.331691240f)
 						+ (MathHelper.cos((rhodes.getrightthighpitch(ptt)+rhodes.getrightshinpitch(ptt)-12.2153067f)*0.01745329252f) * 8.521366426f);
-			
+
 				//TORSO
 				GL11.glPushMatrix();
 				GL11.glColor3f(colors[rhodes.colorType*3], colors[rhodes.colorType*3+1], colors[rhodes.colorType*3+2]);
@@ -286,17 +286,17 @@ public class RenderRhodes extends Render
 	    		GL11.glDisable(GL11.GL_BLEND);
 				GL11.glPopMatrix();
 				Minecraft.getMinecraft().renderEngine.bindTexture(texture);
-				
+
 		    	torso.renderAll();
 
-		    	
+
 					//RIGHT UPPERARM
 					GL11.glPushMatrix();
 					GL11.glTranslatef(-6.4f, 0, 0);
 					GL11.glRotatef(rhodes.getrightarmyaw(ptt), 0, 1, 0);
 					GL11.glScalef(-1, 1, 1);
 			    	upperarm.renderAll();
-				    	
+
 				    	//RIGHT LOWERARM
 						GL11.glPushMatrix();
 						GL11.glTranslatef(0, -1.5f, 0);
@@ -305,15 +305,15 @@ public class RenderRhodes extends Render
 						GL11.glScalef(-1, 1, 1);
 				    	flamethrower.renderAll();
 						GL11.glPopMatrix();
-				    	
+
 					GL11.glPopMatrix();
-					
+
 					//LEFT UPPERARM
 					GL11.glPushMatrix();
 					GL11.glTranslatef(6.4f, 0, 0);
 					GL11.glRotatef(rhodes.getleftarmyaw(ptt), 0, 1, 0);
 			    	upperarm.renderAll();
-		
+
 				    	//LEFT LOWERARM
 						GL11.glPushMatrix();
 						GL11.glTranslatef(0, -1.5f, 0);
@@ -321,16 +321,16 @@ public class RenderRhodes extends Render
 				    	lowerarm.renderAll();
 				    	rocketlauncher.renderAll();
 						GL11.glPopMatrix();
-				    	
+
 					GL11.glPopMatrix();
-					
+
 					//RIGHT THIGH
 					GL11.glPushMatrix();
 					GL11.glTranslatef(0, -7.26756f, -0.27904f);
 					GL11.glRotatef(rhodes.getrightthighpitch(ptt), 1, 0, 0);
 					GL11.glScalef(-1, 1, 1);
 			    	thigh.renderAll();
-			    	
+
 				    	//RIGHT SHIN
 						GL11.glPushMatrix();
 						GL11.glTranslatef(0, -7.17156f, -1.52395f);
@@ -348,15 +348,15 @@ public class RenderRhodes extends Render
 				    		GL11.glDisable(GL11.GL_BLEND);
 				    	}
 						GL11.glPopMatrix();
-			    	
+
 					GL11.glPopMatrix();
-					
+
 					//LEFT THIGH
 					GL11.glPushMatrix();
 					GL11.glTranslatef(0, -7.26756f, -0.27904f);
 					GL11.glRotatef(rhodes.getleftthighpitch(ptt), 1, 0, 0);
 			    	thigh.renderAll();
-			    	
+
 				    	//LEFT SHIN
 						GL11.glPushMatrix();
 						GL11.glTranslatef(0, -7.17156f, -1.52395f);
@@ -372,9 +372,9 @@ public class RenderRhodes extends Render
 				    		GL11.glDisable(GL11.GL_BLEND);
 				    	}
 						GL11.glPopMatrix();
-					
+
 					GL11.glPopMatrix();
-					
+
 					//HEAD
 					GL11.glPushMatrix();
 					GL11.glTranslatef(0, 5.23244f, 0);
@@ -401,7 +401,7 @@ public class RenderRhodes extends Render
 			    	GL11.glDisable(GL11.GL_CULL_FACE);
 		    		GL11.glDisable(GL11.GL_BLEND);
 					GL11.glPopMatrix();
-					
+
 				GL11.glPopMatrix();
 				//TORSO
 				GL11.glPushMatrix();
@@ -416,7 +416,7 @@ public class RenderRhodes extends Render
 						}
 						catch (Exception e)
 						{
-							
+
 						}
 					}
 			    	if (rhodes.forcefield)
@@ -524,7 +524,7 @@ public class RenderRhodes extends Render
 			GL11.glPopMatrix();
 		}
 	}
-	
+
 	/**
 	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
 	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
@@ -535,7 +535,7 @@ public class RenderRhodes extends Render
 	{
 		renderRhodes((EntityRhodes) par1Entity, par2, par4, par6, par8, par9);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

@@ -26,11 +26,11 @@ import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ADSWeaponPacket implements IMessage
 {
@@ -38,12 +38,12 @@ public class ADSWeaponPacket implements IMessage
 	int y;
 	int z;
 	int wep;
-	
+
 	public ADSWeaponPacket()
 	{
-		
+
 	}
-	
+
 	public ADSWeaponPacket(int X, int Y, int Z, int w)
 	{
 		x = X;
@@ -51,7 +51,7 @@ public class ADSWeaponPacket implements IMessage
 		z = Z;
 		wep = w;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -69,7 +69,7 @@ public class ADSWeaponPacket implements IMessage
 		buf.writeInt(z);
 		buf.writeInt(wep);
 	}
-	
+
 	public static class Handler implements IMessageHandler<ADSWeaponPacket, IMessage>
 	{
 		@Override

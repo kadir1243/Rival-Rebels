@@ -21,26 +21,26 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.AxisAlignedBB;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
 
 public class EntityLaptop extends EntityInanimate
 {
 	public double	slide	= 0;
 	double			test	= Math.PI;
-	
+
 	public EntityLaptop(World par1World)
 	{
 		super(par1World);
 		this.setSize(1F, 0.6F);
 		boundingBox.setBounds(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125);
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
 		return par1Entity.boundingBox;
 	}
-	
+
 	/**
 	 * returns the bounding box for this entity
 	 */
@@ -49,13 +49,13 @@ public class EntityLaptop extends EntityInanimate
 	{
 		return this.boundingBox;
 	}
-	
+
 	@Override
 	public boolean canBeCollidedWith()
 	{
 		return !this.isDead;
 	}
-	
+
 	/**
 	 * Returns true if this entity should push and be pushed by other entities when colliding.
 	 */
@@ -64,7 +64,7 @@ public class EntityLaptop extends EntityInanimate
 	{
 		return true;
 	}
-	
+
 	public EntityLaptop(World par1World, float x, float y, float z, float yaw)
 	{
 		super(par1World);
@@ -72,13 +72,13 @@ public class EntityLaptop extends EntityInanimate
 		rotationYaw = yaw;
 		boundingBox.setBounds(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125);
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
 		super.onUpdate();
 		slide = (Math.cos(test) + 1) * 45;
-		
+
 		List players = worldObj.playerEntities;
 		Iterator iter = players.iterator();
 		boolean i = false;
@@ -99,7 +99,7 @@ public class EntityLaptop extends EntityInanimate
 			if (slide > 0.004) test -= 0.05;
 		}
 	}
-	
+
 	@Override
 	public boolean interactFirst(EntityPlayer player)
 	{
@@ -115,21 +115,21 @@ public class EntityLaptop extends EntityInanimate
 		}
 		return true;
 	}
-	
+
 	@Override
 	protected void entityInit()
 	{
 	}
-	
+
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbttagcompound)
 	{
-		
+
 	}
-	
+
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbttagcompound)
 	{
-		
+
 	}
 }

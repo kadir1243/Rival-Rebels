@@ -26,11 +26,11 @@ import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ADSClosePacket implements IMessage
 {
@@ -41,12 +41,12 @@ public class ADSClosePacket implements IMessage
 	boolean chip;
 	boolean player;
 	int range;
-	
+
 	public ADSClosePacket()
 	{
-		
+
 	}
-	
+
 	public ADSClosePacket(int X, int Y, int Z, boolean m, boolean c, boolean p, int r)
 	{
 		x = X;
@@ -57,7 +57,7 @@ public class ADSClosePacket implements IMessage
 		player = p;
 		range = r;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -76,13 +76,13 @@ public class ADSClosePacket implements IMessage
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
-		
+
 		buf.writeBoolean(mobs);
 		buf.writeBoolean(chip);
 		buf.writeBoolean(player);
 		buf.writeInt(range);
 	}
-	
+
 	public static class Handler implements IMessageHandler<ADSClosePacket, IMessage>
 	{
 		@Override

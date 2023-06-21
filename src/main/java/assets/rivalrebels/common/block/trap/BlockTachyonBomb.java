@@ -28,43 +28,43 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockTachyonBomb extends BlockContainer
 {
 	public int	orientation;
-	
+
 	public BlockTachyonBomb()
 	{
 		super(Material.iron);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return -1;
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	/**
 	 * Called when the block is placed in the world.
 	 */
@@ -74,7 +74,7 @@ public class BlockTachyonBomb extends BlockContainer
 		int var7 = MathHelper.floor_double((entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 		world.setBlockMetadataWithNotify(x, y, z, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))), 0);
 	}
-	
+
 	/**
 	 * Called upon block activation (right click on the block.)
 	 */
@@ -92,13 +92,13 @@ public class BlockTachyonBomb extends BlockContainer
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasTileEntity(int metadata)
 	{
 		return true;
 	}
-	
+
 	/**
 	 * each class overrides this to return a new <className>
 	 */
@@ -107,16 +107,16 @@ public class BlockTachyonBomb extends BlockContainer
 	{
 		return new TileEntityTachyonBomb();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

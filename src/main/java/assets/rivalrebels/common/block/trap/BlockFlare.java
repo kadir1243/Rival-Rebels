@@ -27,8 +27,8 @@ import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.Explosion;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockFlare extends Block
 {
@@ -36,13 +36,13 @@ public class BlockFlare extends Block
 	{
 		super(Material.wood);
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int i)
 	{
 		return null;
 	}
-	
+
 	/**
 	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
 	 * etc to this block.
@@ -52,7 +52,7 @@ public class BlockFlare extends Block
 	{
 		return false;
 	}
-	
+
 	/**
 	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
 	 */
@@ -61,7 +61,7 @@ public class BlockFlare extends Block
 	{
 		return false;
 	}
-	
+
 	/**
 	 * The type of render function that is called for this block
 	 */
@@ -70,34 +70,34 @@ public class BlockFlare extends Block
 	{
 		return 2;
 	}
-	
+
 	private boolean canPlaceTorchOn(World par1World, int par2, int par3, int par4)
 	{
 		if (par1World.isBlockNormalCubeDefault(par2, par3, par4, true))
 		{
 			return true;
 		}
-		
+
 		Block i = par1World.getBlock(par2, par3, par4);
-		
+
 		if (i == Blocks.fence || i == Blocks.nether_brick_fence || i == Blocks.glass)
 		{
 			return true;
 		}
-		
+
 		if (i != null && (i instanceof BlockStairs))
 		{
 			int j = par1World.getBlockMetadata(par2, par3, par4);
-			
+
 			if ((4 & j) != 0)
 			{
 				return true;
 			}
 		}
-		
+
 		return false;
 	}
-	
+
 	/**
 	 * Checks to see if its valid to put this block at the specified coordinates. Args: world, x, y, z
 	 */
@@ -106,34 +106,34 @@ public class BlockFlare extends Block
 	{
 		return canPlaceTorchOn(par1World, par2, par3 - 1, par4);
 	}
-	
+
 	/**
 	 * Called when a block is placed using an item. Used often for taking the facing and figuring out how to position the item. Args: x, y, z, facing
 	 */
 	public void onBlockPlaced(World par1World, int par2, int par3, int par4, int par5)
 	{
 		int i = par1World.getBlockMetadata(par2, par3, par4);
-		
+
 		if (par5 == 1 && canPlaceTorchOn(par1World, par2, par3 - 1, par4))
 		{
 			i = 5;
 		}
-		
+
 		if (par5 == 2 && par1World.isBlockNormalCubeDefault(par2, par3, par4 + 1, true))
 		{
 			i = 4;
 		}
-		
+
 		if (par5 == 3 && par1World.isBlockNormalCubeDefault(par2, par3, par4 - 1, true))
 		{
 			i = 3;
 		}
-		
+
 		if (par5 == 4 && par1World.isBlockNormalCubeDefault(par2 + 1, par3, par4, true))
 		{
 			i = 2;
 		}
-		
+
 		if (par5 == 5 && par1World.isBlockNormalCubeDefault(par2 - 1, par3, par4, true))
 		{
 			i = 1;
@@ -141,7 +141,7 @@ public class BlockFlare extends Block
 		par1World.setBlockMetadataWithNotify(par2, par3, par4, i, 0);
 		par1World.scheduleBlockUpdate(par2, par3, par4, this, 1);
 	}
-	
+
 	@Override
 	public void randomDisplayTick(World world, int x, int y, int z, Random par5Random)
 	{
@@ -153,7 +153,7 @@ public class BlockFlare extends Block
 		world.spawnParticle("smoke", x + .5, y + 1.6, z + .5, (-0.5 + world.rand.nextFloat()) * 0.1, 0.5 + world.rand.nextFloat() * 0.5, (-0.5 + world.rand.nextFloat()) * 0.1);
 		world.playSoundEffect(x, y, z, "random.fizz", 3F, 2);
 	}
-	
+
 	@Override
 	public void updateTick(World world, int x, int y, int z, Random random)
 	{
@@ -164,7 +164,7 @@ public class BlockFlare extends Block
 			world.spawnEntityInWorld(new EntityItem(world, x, y, z, new ItemStack(RivalRebels.flare)));
 		}
 	}
-	
+
 	@Override
 	public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int m)
 	{
@@ -175,29 +175,29 @@ public class BlockFlare extends Block
 			world.playSoundEffect(x, y, z, "random.explode", 0.5f, 0.3f);
 		}
 	}
-	
+
 	@Override
 	public void onEntityCollidedWithBlock(World par1World, int par2, int par3, int par4, Entity par5Entity)
 	{
 		par5Entity.attackEntityFrom(RivalRebelsDamageSource.flare, 1);
 		par5Entity.setFire(5);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 0;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

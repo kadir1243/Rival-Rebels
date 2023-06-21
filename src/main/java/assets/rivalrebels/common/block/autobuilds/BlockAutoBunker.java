@@ -16,8 +16,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockAutoBunker extends BlockAutoTemplate
 {
@@ -25,7 +25,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
@@ -33,7 +33,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		if (!world.isRemote)
 		{
 			int r = RivalRebels.bunkerradius;
-			
+
 			for (int x1 = -r; x1 <= r; x1++)
 			{
 				for (int y1 = 0; y1 <= 5; y1++)
@@ -44,7 +44,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 					}
 				}
 			}
-			
+
 			for (int a = -r; a <= r; a++)
 			{
 				for (int c = -r; c <= r; c++)
@@ -74,7 +74,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 						placeBlockCarefully(world, x + a, y, z + c, RivalRebels.smartcamo);
 						placeBlockCarefully(world, x + a, y + 1, z + c, RivalRebels.smartcamo);
 					}
-					
+
 				}
 			}
 			for (int a = -r; a <= r; a++)
@@ -88,7 +88,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 					}
 				}
 			}
-			
+
 			r = r - 2;
 			for (int a = -r; a <= r; a++)
 			{
@@ -117,7 +117,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 			placeBlockCarefully(world, x, y + 3, z - r + 5, RivalRebels.light2);
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -130,7 +130,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -143,7 +143,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)

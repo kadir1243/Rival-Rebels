@@ -21,8 +21,8 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockForceField extends Block
 {
@@ -31,18 +31,18 @@ public class BlockForceField extends Block
 		super(Material.glass);
 		setBlockBounds(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 0;
 	}
-	
+
 	public int idDropped(int i, Random random)
 	{
 		return 0;
 	}
-	
+
 	/**
 	 * Updates the blocks bounds based on its current state. Args: world, x, y, z
 	 */
@@ -51,28 +51,28 @@ public class BlockForceField extends Block
 	{
 		int var5 = par1IBlockAccess.getBlockMetadata(par2, par3, par4);
 		float var6 = 0.4375f;
-		
+
 		if (var5 == 4)
 		{
 			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 5)
 		{
 			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 2)
 		{
 			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		if (var5 == 3)
 		{
 			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
 	}
-	
+
 	// @Override
 	// public void onBlockAdded(World world, int x, int y, int z)
 	// {
@@ -85,7 +85,7 @@ public class BlockForceField extends Block
 	// if (par1World.rand.nextInt(20) == 0) par1World.setBlock(x, y, z, 0);
 	// else par1World.scheduleBlockUpdate(x, y, z, blockID, par1World.rand.nextInt(10)+10);
 	// }
-	
+
 	/**
 	 * Sets the block's bounds for rendering it as an item
 	 */
@@ -94,7 +94,7 @@ public class BlockForceField extends Block
 	{
 		setBlockBounds(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
 	}
-	
+
 	/**
 	 * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been cleared to be reused)
 	 */
@@ -103,30 +103,30 @@ public class BlockForceField extends Block
 	{
 		int var5 = par1World.getBlockMetadata(par2, par3, par4);
 		float var6 = 0.4375f;
-		
+
 		if (var5 == 4)
 		{
 			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 5)
 		{
 			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 2)
 		{
 			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		if (var5 == 3)
 		{
 			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		return super.getCollisionBoundingBoxFromPool(par1World, par2, par3, par4);
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	/**
@@ -136,30 +136,30 @@ public class BlockForceField extends Block
 	{
 		int var5 = par1World.getBlockMetadata(par2, par3, par4);
 		float var6 = 0.4375f;
-		
+
 		if (var5 == 4)
 		{
 			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 5)
 		{
 			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 2)
 		{
 			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		if (var5 == 3)
 		{
 			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		return super.getSelectedBoundingBoxFromPool(par1World, par2, par3, par4);
 	}
-	
+
 	/**
 	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
 	 * etc to this block.
@@ -169,7 +169,7 @@ public class BlockForceField extends Block
 	{
 		return false;
 	}
-	
+
 	/**
 	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
 	 */
@@ -178,7 +178,7 @@ public class BlockForceField extends Block
 	{
 		return false;
 	}
-	
+
 	/**
 	 * The type of render function that is called for this block
 	 */
@@ -187,16 +187,16 @@ public class BlockForceField extends Block
 	{
 		return RivalRebels.goodRender ? -1 : 0;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

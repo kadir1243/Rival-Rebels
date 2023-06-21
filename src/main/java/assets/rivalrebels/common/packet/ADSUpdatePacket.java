@@ -26,11 +26,11 @@ import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ADSUpdatePacket implements IMessage
 {
@@ -43,12 +43,12 @@ public class ADSUpdatePacket implements IMessage
 	boolean player;
 	boolean haswep;
 	String user;
-	
+
 	public ADSUpdatePacket()
 	{
-		
+
 	}
-	
+
 	public ADSUpdatePacket(int X, int Y, int Z, int r, boolean m, boolean c, boolean p, boolean h, String u)
 	{
 		x = X;
@@ -68,7 +68,7 @@ public class ADSUpdatePacket implements IMessage
 		x=buf.readInt();
 		y=buf.readInt();
 		z=buf.readInt();
-		
+
 		range=buf.readInt();
 		mob=buf.readBoolean();
 		chip=buf.readBoolean();
@@ -89,7 +89,7 @@ public class ADSUpdatePacket implements IMessage
 		buf.writeInt(x);
 		buf.writeInt(y);
 		buf.writeInt(z);
-		
+
 		buf.writeInt(range);
 		buf.writeBoolean(mob);
 		buf.writeBoolean(chip);
@@ -100,14 +100,14 @@ public class ADSUpdatePacket implements IMessage
 			buf.writeByte((byte)user.charAt(i));
 		}
 	}
-	
+
 	public static class Handler implements IMessageHandler<ADSUpdatePacket, IMessage>
 	{
 		@Override
 		public IMessage onMessage(ADSUpdatePacket m, MessageContext ctx)
 		{
 			TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(m.x, m.y, m.z);
-			
+
 			if (te instanceof TileEntityReciever)
 			{
 				TileEntityReciever ter = (TileEntityReciever) te;

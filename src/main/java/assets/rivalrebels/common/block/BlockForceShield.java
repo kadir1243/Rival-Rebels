@@ -21,8 +21,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockForceShield extends Block
 {
@@ -30,15 +30,15 @@ public class BlockForceShield extends Block
 	{
 		super(Material.iron);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
+
 	boolean	Destroy	= false;
-	
+
 	@Override
 	public void breakBlock(World world, int i, int j, int k, Block l, int s)
 	{
@@ -49,7 +49,7 @@ public class BlockForceShield extends Block
 		}
 		Destroy = false;
 	}
-	
+
 	@Override
 	public void onBlockHarvested(World world, int x, int y, int z, int m, EntityPlayer player)
 	{
@@ -73,24 +73,24 @@ public class BlockForceShield extends Block
 	{
 		return false;
 	}
-	
+
 	@Override
 	public int getMobilityFlag()
 	{
 		return 2;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	IIcon	icon2;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		if (side == 0 || side == 1) return icon2;
 		return icon1;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

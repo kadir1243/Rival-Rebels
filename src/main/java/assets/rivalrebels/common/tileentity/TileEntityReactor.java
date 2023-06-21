@@ -36,9 +36,9 @@ import assets.rivalrebels.common.item.ItemRodRedstone;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.ReactorUpdatePacket;
 import assets.rivalrebels.common.packet.TextPacket;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityReactor extends TileEntity implements IInventory
 {
@@ -58,7 +58,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 	public TileEntityList	machines			= new TileEntityList();
 	public int				tick				= 0;
 	public long				lastPacket			= System.currentTimeMillis();
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -86,7 +86,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			i++;
 		}
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -104,7 +104,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			par1NBTTagCompound.setInteger("mz" + i, te.zCoord);
 		}
 	}
-	
+
 	@Override
 	public void updateEntity()
 	{
@@ -141,7 +141,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				melt = false;
 				meltTick = 0;
 			}
-			
+
 			if (eject)
 			{
 				consumed = 0;
@@ -153,7 +153,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				on = false;
 				eject = false;
 			}
-			
+
 			if (melt)
 			{
 				if (core != null)
@@ -188,7 +188,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 					on = false;
 				}
 			}
-			
+
 			if (melt)
 			{
 				if (core != null)
@@ -206,7 +206,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 					on = false;
 				}
 			}
-			
+
 			if (fuel == null && tickssincelastrod != 0)
 			{
 				tickssincelastrod++;
@@ -224,12 +224,12 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			{
 				tickssincelastrod = 0;
 			}
-			
+
 			if (melt)
 			{
 				machines.clear();
 			}
-			
+
 			if (core == null)
 			{
 				on = false;
@@ -238,7 +238,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				melt = false;
 				meltTick = 0;
 			}
-			
+
 			if (on && core != null && fuel != null && core.getItem() instanceof ItemCore && fuel.getItem() instanceof ItemRod)
 			{
 				if (!prevOn && on) RivalRebelsSoundPlayer.playSound(worldObj, 21, 3, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
@@ -294,10 +294,10 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				if (fuel.stackTagCompound.hasKey("fuelLeft"))
 				{
 					fuel.stackTagCompound.setInteger("fuelLeft", (int) consumed);
-					
+
 					double fuelLeft = fuel.stackTagCompound.getInteger("fuelLeft");
 					double fuelPercentage = (fuelLeft / temp);
-					
+
 					if (r instanceof ItemRodNuclear)
 					{
 						double f2 = fuelPercentage * fuelPercentage;
@@ -332,7 +332,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			}
 		}
 	}
-	
+
 	public void meltDown(int radius)
 	{
 		/*for (int x = -radius; x < radius; x++)
@@ -351,7 +351,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 						worldObj.setBlock(xCoord + x, yCoord - 1, zCoord + z, RivalRebels.petrifiedstone3, (int) (dist * 2f) + 1, 2);
 					if (rand == 3) for (int i = 0; i < 16; i++)
 						worldObj.setBlock(xCoord + x, yCoord - 1, zCoord + z, RivalRebels.petrifiedstone4, (int) (dist * 2f) + 1, 2);
-					
+
 					worldObj.setBlock(xCoord + x, yCoord - 2, zCoord + z, RivalRebels.radioactivedirt);
 				}
 				else if (dist < radius)
@@ -363,13 +363,13 @@ public class TileEntityReactor extends TileEntity implements IInventory
 		worldObj.setBlock(xCoord, yCoord, zCoord, RivalRebels.meltdown);
 		new Explosion(worldObj, xCoord, yCoord - 2, zCoord, 4, false, false, RivalRebelsDamageSource.rocket);
 	}
-	
+
 	@Override
 	public int getSizeInventory()
 	{
 		return 2;
 	}
-	
+
 	@Override
 	public ItemStack getStackInSlot(int i)
 	{
@@ -377,7 +377,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 		else if (i == 1) return core;
 		else return null;
 	}
-	
+
 	@Override
 	public ItemStack decrStackSize(int i, int j)
 	{
@@ -393,7 +393,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 		}
 		else return null;
 	}
-	
+
 	@Override
 	public ItemStack getStackInSlotOnClosing(int i)
 	{
@@ -401,26 +401,26 @@ public class TileEntityReactor extends TileEntity implements IInventory
 		else if (i == 1) return core;
 		else return null;
 	}
-	
+
 	@Override
 	public void setInventorySlotContents(int i, ItemStack itemstack)
 	{
 		if (i == 0) fuel = itemstack;
 		else if (i == 1) core = itemstack;
 	}
-	
+
 	@Override
 	public int getInventoryStackLimit()
 	{
 		return 1;
 	}
-	
+
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer entityplayer)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack)
 	{
@@ -435,20 +435,20 @@ public class TileEntityReactor extends TileEntity implements IInventory
 		}
 		return false;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()
 	{
 		return 16384.0D;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
 		return AxisAlignedBB.getBoundingBox(xCoord-100, yCoord-100, zCoord-100, xCoord+100, yCoord+100, zCoord+100);
 	}
-	
+
 	public float getPower()
 	{
 		if (core != null && fuel != null)
@@ -460,29 +460,29 @@ public class TileEntityReactor extends TileEntity implements IInventory
 		}
 		return 0;
 	}
-	
+
 	@Override
 	public String getInventoryName()
 	{
 		return "Tokamak";
 	}
-	
+
 	@Override
 	public boolean hasCustomInventoryName()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void openInventory()
 	{
-		
+
 	}
-	
+
 	@Override
 	public void closeInventory()
 	{
-		
+
 	}
 
 	public void toggleOn()

@@ -22,9 +22,9 @@ import net.minecraft.util.DamageSource;
 import assets.rivalrebels.common.core.FileRW;
 import assets.rivalrebels.common.entity.EntityGore;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class RhodesPacket implements IMessage
 {
@@ -57,11 +57,11 @@ public class RhodesPacket implements IMessage
 	public float bodyyaw;
 	String texloc;
 	int texfolder;
-	
+
 	public RhodesPacket()
 	{
 	}
-	
+
 	public RhodesPacket(EntityRhodes er)
 	{
 		id = er.getEntityId();
@@ -94,7 +94,7 @@ public class RhodesPacket implements IMessage
 		texfolder = er.itexfolder;
 		scale = er.scale;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -139,7 +139,7 @@ public class RhodesPacket implements IMessage
 			texfolder = -1;
 		}
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
@@ -180,7 +180,7 @@ public class RhodesPacket implements IMessage
 			buf.writeBytes(FileRW.getBytesString(texloc));
 		}
 	}
-	
+
 	public static class Handler implements IMessageHandler<RhodesPacket, IMessage>
 	{
 		@Override

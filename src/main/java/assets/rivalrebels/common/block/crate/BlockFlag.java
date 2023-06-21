@@ -23,57 +23,57 @@ import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockFlag extends Block
 {
 	String	texpath	= "rivalrebels:";
-	
+
 	public BlockFlag(String name)
 	{
 		super(Material.cloth);
 		texpath += name;
 		//this.setCreativeTab(RivalRebels.rrarmortab);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 1;
 	}
-	
+
 	@Override
 	public Item getItemDropped(int meta, Random random, int fortune)
     {
 		if (this == RivalRebels.flag2) return RivalRebels.trollmask;
         return Item.getItemFromBlock(this);
     }
-	
+
 	@Override
 	public void setBlockBoundsForItemRender()
 	{
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return 20;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void setBlockBoundsBasedOnState(IBlockAccess worldIn, int x, int y, int z)
 	{
@@ -85,7 +85,7 @@ public class BlockFlag extends Block
 		float f5 = 0.0F;
 		float f6 = 0.0F;
 		boolean flag = l > 0;
-		
+
 		if ((l & 2) != 0)
 		{
 			f4 = Math.max(f4, 0.0625F);
@@ -96,7 +96,7 @@ public class BlockFlag extends Block
 			f6 = 1.0F;
 			flag = true;
 		}
-		
+
 		if ((l & 8) != 0)
 		{
 			f1 = Math.min(f1, 0.9375F);
@@ -107,7 +107,7 @@ public class BlockFlag extends Block
 			f6 = 1.0F;
 			flag = true;
 		}
-		
+
 		if ((l & 4) != 0)
 		{
 			f6 = Math.max(f6, 0.0625F);
@@ -118,7 +118,7 @@ public class BlockFlag extends Block
 			f5 = 1.0F;
 			flag = true;
 		}
-		
+
 		if ((l & 1) != 0)
 		{
 			f3 = Math.min(f3, 0.9375F);
@@ -129,7 +129,7 @@ public class BlockFlag extends Block
 			f5 = 1.0F;
 			flag = true;
 		}
-		
+
 		if (!flag && this.func_150093_a(worldIn.getBlock(x, y + 1, z)))
 		{
 			f2 = Math.min(f2, 0.9375F);
@@ -139,16 +139,16 @@ public class BlockFlag extends Block
 			f3 = 0.0F;
 			f6 = 1.0F;
 		}
-		
+
 		this.setBlockBounds(f1, f2, f3, f4, f5, f6);
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World worldIn, int x, int y, int z)
 	{
 		return null;
 	}
-	
+
 	@Override
 	public boolean canPlaceBlockOnSide(World worldIn, int x, int y, int z, int side)
 	{
@@ -168,30 +168,30 @@ public class BlockFlag extends Block
 				return false;
 		}
 	}
-	
+
 	private boolean func_150093_a(Block p_150093_1_)
 	{
 		return p_150093_1_.renderAsNormalBlock();
 	}
-	
+
 	private boolean func_150094_e(World p_150094_1_, int p_150094_2_, int p_150094_3_, int p_150094_4_)
 	{
 		int l = p_150094_1_.getBlockMetadata(p_150094_2_, p_150094_3_, p_150094_4_);
 		int i1 = l;
-		
+
 		if (l > 0)
 		{
 			for (int j1 = 0; j1 <= 3; ++j1)
 			{
 				int k1 = 1 << j1;
-				
+
 				if ((l & k1) != 0 && !this.func_150093_a(p_150094_1_.getBlock(p_150094_2_ + Direction.offsetX[j1], p_150094_3_, p_150094_4_ + Direction.offsetZ[j1])) && (p_150094_1_.getBlock(p_150094_2_, p_150094_3_ + 1, p_150094_4_) != this || (p_150094_1_.getBlockMetadata(p_150094_2_, p_150094_3_ + 1, p_150094_4_) & k1) == 0))
 				{
 					i1 &= ~k1;
 				}
 			}
 		}
-		
+
 		if (i1 == 0 && !this.func_150093_a(p_150094_1_.getBlock(p_150094_2_, p_150094_3_ + 1, p_150094_4_)))
 		{
 			return false;
@@ -202,11 +202,11 @@ public class BlockFlag extends Block
 			{
 				p_150094_1_.setBlockMetadataWithNotify(p_150094_2_, p_150094_3_, p_150094_4_, i1, 2);
 			}
-			
+
 			return true;
 		}
 	}
-	
+
 	@Override
 	public void onNeighborBlockChange(World worldIn, int x, int y, int z, Block neighbor)
 	{
@@ -216,12 +216,12 @@ public class BlockFlag extends Block
 			worldIn.setBlockToAir(x, y, z);
 		}
 	}
-	
+
 	@Override
 	public int onBlockPlaced(World worldIn, int x, int y, int z, int side, float subX, float subY, float subZ, int meta)
 	{
 		byte b0 = 0;
-		
+
 		switch (side)
 		{
 			case 2:
@@ -236,19 +236,19 @@ public class BlockFlag extends Block
 			case 5:
 				b0 = 2;
 		}
-		
+
 		return b0 != 0 ? b0 : meta;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

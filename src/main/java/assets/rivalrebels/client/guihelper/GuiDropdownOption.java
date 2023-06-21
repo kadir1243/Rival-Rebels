@@ -17,8 +17,8 @@ import net.minecraft.util.StatCollector;
 import org.lwjgl.input.Mouse;
 
 import assets.rivalrebels.client.gui.GuiTray;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
@@ -28,7 +28,7 @@ public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
 	public boolean	mouseDown	= false;
 	public String	text		= "";
 	public GuiTray	t;
-	
+
 	public GuiDropdownOption(int id, Vector p, int l, int n, String text, GuiTray tray)
 	{
 		super(id, p.x, p.y + n * 10, l, (n + 1) * 10, text);
@@ -36,7 +36,7 @@ public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
 		this.text = text;
 		t = tray;
 	}
-	
+
 	@Override
 	public void drawButton(Minecraft par1Minecraft, int par2, int par3)
 	{

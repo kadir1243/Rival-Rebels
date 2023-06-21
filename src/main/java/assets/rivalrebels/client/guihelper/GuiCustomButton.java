@@ -17,8 +17,8 @@ import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiCustomButton extends net.minecraft.client.gui.GuiButton
@@ -30,7 +30,7 @@ public class GuiCustomButton extends net.minecraft.client.gui.GuiButton
 	public boolean		isPressed	= false;
 	public boolean		wasPressed	= false;
 	public boolean		mouseDown	= false;
-	
+
 	public GuiCustomButton(int id, Rectangle rec, ResourceLocation rl, Vector uv, boolean isToggle)
 	{
 		super(id, rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, "");
@@ -39,7 +39,7 @@ public class GuiCustomButton extends net.minecraft.client.gui.GuiButton
 		resloc = rl;
 		toggleable = isToggle;
 	}
-	
+
 	/**
 	 * Draws this button to the screen.
 	 */
@@ -66,7 +66,7 @@ public class GuiCustomButton extends net.minecraft.client.gui.GuiButton
 		{
 			isPressed = false;
 		}
-		
+
 		if (isPressed)
 		{
 			par1Minecraft.renderEngine.bindTexture(resloc);

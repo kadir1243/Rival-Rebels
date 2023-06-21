@@ -29,8 +29,8 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockMario extends Block
 {
@@ -38,19 +38,19 @@ public class BlockMario extends Block
 	{
 		super(Material.rock);
 	}
-	
+
 	@Override
 	public Item getItemDropped(int i, Random r, int j)
 	{
 		return Item.getItemFromBlock(RivalRebels.amario);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 1;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public int getBlockColor()
@@ -58,7 +58,7 @@ public class BlockMario extends Block
 		if (this == RivalRebels.mario) return Blocks.grass.getBlockColor();
 		return 0xFFFFFF;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	/**
@@ -69,7 +69,7 @@ public class BlockMario extends Block
 		if (this == RivalRebels.mario) return Blocks.grass.getRenderColor(par1);
 		return 0xFFFFFF;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	/**
@@ -81,20 +81,20 @@ public class BlockMario extends Block
 		if (this == RivalRebels.mario) return Blocks.grass.colorMultiplier(par1IBlockAccess, par2, par3, par4);
 		return 0xFFFFFF;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
 	{
 		float f = 0.0625F;
 		return AxisAlignedBB.getBoundingBox(par2, par3, par4, par2 + 1, par3 + 1 - f, par4 + 1);
 	}
-	
+
 	@Override
 	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
 	{
 		return AxisAlignedBB.getBoundingBox(par2, par3, par4, par2 + 1, par3 + 1, par4 + 1);
 	}
-	
+
 	@Override
 	public void onEntityCollidedWithBlock(World world, int par2, int par3, int par4, Entity entity)
 	{
@@ -103,7 +103,7 @@ public class BlockMario extends Block
 			world.setBlock(par2, par3, par4, Blocks.gravel);
 		}
 	}
-	
+
 	@Override
 	public final IIcon getIcon(IBlockAccess world, int x, int y, int z, int s)
 	{
@@ -115,7 +115,7 @@ public class BlockMario extends Block
 		n[3] = world.getBlock(x, y - 1, z);
 		n[4] = world.getBlock(x, y, z + 1);
 		n[5] = world.getBlock(x, y, z - 1);
-		
+
 		int popularity1 = 0;
 		int popularity2 = 0;
 		Block mode = Blocks.gravel;
@@ -137,7 +137,7 @@ public class BlockMario extends Block
 		}
 		return mode.getIcon(world, x, y, z, s);
 	}
-	
+
 	@Override
 	public void onBlockAdded(World world, int x, int y, int z)
 	{
@@ -148,7 +148,7 @@ public class BlockMario extends Block
 		n[3] = world.getBlock(x, y - 1, z);
 		n[4] = world.getBlock(x, y, z + 1);
 		n[5] = world.getBlock(x, y, z - 1);
-		
+
 		int popularity1 = 0;
 		int popularity2 = 0;
 		Block mode = Blocks.gravel;
@@ -176,7 +176,7 @@ public class BlockMario extends Block
     {
         return new ItemStack(RivalRebels.amario);
     }
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -189,10 +189,10 @@ public class BlockMario extends Block
 			return Blocks.grass.getIcon(side, meta);
 		}
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
-		
+
 	}
 }

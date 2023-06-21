@@ -22,8 +22,8 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelRocket;
 import assets.rivalrebels.common.entity.EntityRocket;
 import assets.rivalrebels.common.entity.EntitySeekB83;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderSeeker extends Render

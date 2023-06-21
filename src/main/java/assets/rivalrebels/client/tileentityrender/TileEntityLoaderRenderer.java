@@ -21,15 +21,15 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelLoader;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityLoaderRenderer extends TileEntitySpecialRenderer
 {
 	private ModelLoader		loaderModel;
 	private ModelFromObj	tube;
-	
+
 	public TileEntityLoaderRenderer()
 	{
 		loaderModel = new ModelLoader();
@@ -42,7 +42,7 @@ public class TileEntityLoaderRenderer extends TileEntitySpecialRenderer
 			e.printStackTrace();
 		}
 	}
-	
+
 	/**
 	 * Renders the TileEntity for the chest at a position.
 	 */
@@ -58,22 +58,22 @@ public class TileEntityLoaderRenderer extends TileEntitySpecialRenderer
 		{
 			var11 = 90;
 		}
-		
+
 		if (var9 == 3)
 		{
 			var11 = -90;
 		}
-		
+
 		if (var9 == 4)
 		{
 			var11 = 180;
 		}
-		
+
 		if (var9 == 5)
 		{
 			var11 = 0;
 		}
-		
+
 		GL11.glRotatef(var11, 0.0F, 1.0F, 0.0F);
 		loaderModel.renderA();
 		loaderModel.renderB((float) tile.slide);
@@ -97,7 +97,7 @@ public class TileEntityLoaderRenderer extends TileEntitySpecialRenderer
 			GL11.glPopMatrix();
 		}
 	}
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity par1TileEntity, double par2, double par4, double par6, float par8)
 	{

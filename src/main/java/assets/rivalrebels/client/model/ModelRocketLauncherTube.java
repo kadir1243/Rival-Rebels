@@ -15,8 +15,8 @@ import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ModelRocketLauncherTube
@@ -44,11 +44,11 @@ public class ModelRocketLauncherTube
 	float	tx5		= 0.65625f;
 	float	ty1		= 0;
 	float	ty2		= 0.09375f;
-	
+
 	public void render()
 	{
 		GL11.glPushMatrix();
-		
+
 		RenderHelper.addFace(vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
 		RenderHelper.addFace(vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
 		RenderHelper.addFace(vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
@@ -57,12 +57,12 @@ public class ModelRocketLauncherTube
 		RenderHelper.addFace(vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2);
 		RenderHelper.addFace(vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2);
 		RenderHelper.addFace(vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2);
-		
+
 		RenderHelper.addFace(vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2);
 		RenderHelper.addFace(vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2);
 		RenderHelper.addFace(vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2);
 		RenderHelper.addFace(vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
-		
+
 		GL11.glPopMatrix();
 	}
 }

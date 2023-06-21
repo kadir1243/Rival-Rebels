@@ -43,7 +43,7 @@ import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import cpw.mods.fml.common.network.IGuiHandler;
+import net.minecraftforge.fml.common.network.IGuiHandler;
 
 public class RivalRebelsGuiHandler implements IGuiHandler
 {
@@ -86,10 +86,10 @@ public class RivalRebelsGuiHandler implements IGuiHandler
 		if (tileEntity instanceof TileEntityReciever)
 		{
 			return new ContainerReciever(player.inventory, (TileEntityReciever) tileEntity);
-		} 
+		}
 		return null;
 	}
-	
+
 	@Override
 	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
 	{

@@ -22,8 +22,8 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.common.tileentity.TileEntityConduit;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockConduit extends BlockContainer
 {
@@ -31,37 +31,37 @@ public class BlockConduit extends BlockContainer
 	{
 		super(Material.iron);
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase par5EntityLiving, ItemStack par6ItemStack)
 	{
 		world.setBlock(x, y, z, this, new Random().nextInt(9) + 1, 0x3);
 	}
-	
+
 	@Override
 	public boolean hasTileEntity(int metadata)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var2)
 	{
 		return new TileEntityConduit();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -80,7 +80,7 @@ public class BlockConduit extends BlockContainer
 	IIcon	icon8;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon9;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -95,7 +95,7 @@ public class BlockConduit extends BlockContainer
 		if (meta == 9) return icon9;
 		return icon1;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

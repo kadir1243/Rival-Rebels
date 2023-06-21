@@ -28,27 +28,27 @@ import org.lwjgl.opengl.GL11;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.container.ContainerNuclearBomb;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiNuclearBomb extends GuiContainer
 {
 	ContainerNuclearBomb	container;
 	TileEntityNuclearBomb	nuclearbomb;
-	
+
 	public GuiNuclearBomb(Container par1Container)
 	{
 		super(par1Container);
 		container = (ContainerNuclearBomb) par1Container;
 	}
-	
+
 	public GuiNuclearBomb(InventoryPlayer inventoryPlayer, TileEntityNuclearBomb tileEntity)
 	{
 		super(new ContainerNuclearBomb(inventoryPlayer, tileEntity));
 		nuclearbomb = tileEntity;
 	}
-	
+
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
 	{
@@ -89,7 +89,7 @@ public class GuiNuclearBomb extends GuiContainer
 				fontRendererObj.drawString("Umad bro?", 80, ySize - 96 + 2, 0xffffff);
 			}
 		}
-		
+
 		int mousex = par1;
 		int mousey = par2;
 		int posx = (width - xSize) / 2;
@@ -122,9 +122,9 @@ public class GuiNuclearBomb extends GuiContainer
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
-	
+
 	boolean	buttondown;
-	
+
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
 	{

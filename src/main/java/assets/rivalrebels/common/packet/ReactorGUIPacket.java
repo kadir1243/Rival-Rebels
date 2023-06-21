@@ -21,11 +21,11 @@ import assets.rivalrebels.common.round.RivalRebelsRank;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ReactorGUIPacket implements IMessage
 {
@@ -33,12 +33,12 @@ public class ReactorGUIPacket implements IMessage
 	int y;
 	int z;
 	byte type;
-	
+
 	public ReactorGUIPacket()
 	{
-		
+
 	}
-	
+
 	public ReactorGUIPacket(int X, int Y, int Z, byte b)
 	{
 		x = X;
@@ -46,7 +46,7 @@ public class ReactorGUIPacket implements IMessage
 		z = Z;
 		type = b;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -64,7 +64,7 @@ public class ReactorGUIPacket implements IMessage
 		buf.writeInt(z);
 		buf.writeByte(type);
 	}
-	
+
 	public static class Handler implements IMessageHandler<ReactorGUIPacket, IMessage>
 	{
 		@Override

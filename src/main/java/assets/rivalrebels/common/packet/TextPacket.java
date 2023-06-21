@@ -16,19 +16,19 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.StatCollector;
 import assets.rivalrebels.common.core.FileRW;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class TextPacket implements IMessage
 {
 	String text;
-	
+
 	public TextPacket()
 	{
-		
+
 	}
-	
+
 	public TextPacket(String t)
 	{
 		text = t;
@@ -48,7 +48,7 @@ public class TextPacket implements IMessage
 		buf.writeInt(text.length());
 		buf.writeBytes(FileRW.getBytesString(text));
 	}
-	
+
 	public static class Handler implements IMessageHandler<TextPacket, IMessage>
 	{
 		@Override

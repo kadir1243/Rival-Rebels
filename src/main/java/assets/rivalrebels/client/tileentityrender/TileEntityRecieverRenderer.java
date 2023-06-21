@@ -20,8 +20,8 @@ import org.lwjgl.opengl.GL11;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
@@ -29,7 +29,7 @@ public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
 	public static ModelFromObj	base;
 	public static ModelFromObj	arm;
 	public static ModelFromObj	adsdragon;
-	
+
 	public TileEntityRecieverRenderer()
 	{
 		try
@@ -43,7 +43,7 @@ public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void renderAModelAt(TileEntityReciever tile, double x, double y, double z, float f)
 	{
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreciever);
@@ -53,12 +53,12 @@ public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
 		GL11.glEnable(GL11.GL_LIGHTING);
 		int m = tile.getBlockMetadata();
 		short r = 0;
-		
+
 		if (m == 2) r = 0;
 		if (m == 3) r = 180;
 		if (m == 4) r = 90;
 		if (m == 5) r = -90;
-		
+
 		GL11.glPushMatrix();
 		GL11.glRotatef(r, 0, 1, 0);
 		GL11.glTranslated(0, 0, 0.5);
@@ -75,7 +75,7 @@ public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
 	{

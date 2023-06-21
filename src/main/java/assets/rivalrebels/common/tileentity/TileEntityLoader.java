@@ -23,73 +23,73 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.item.ItemRod;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityLoader extends TileEntity implements IInventory
 {
 	private ItemStack[]		chestContents	= new ItemStack[64];
-	
+
 	public double			slide			= 0;
 	double					test			= Math.PI;
 	int						counter;
-	
+
 	public TileEntityList	machines		= new TileEntityList();
-	
+
 	@Override
 	public int getSizeInventory()
 	{
 		return 60;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()
 	{
 		return 16384.0D;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
 		return AxisAlignedBB.getBoundingBox(xCoord - 5, yCoord - 1, zCoord - 5, xCoord + 6, yCoord + 2, zCoord + 6);
 	}
-	
+
 	@Override
 	public ItemStack getStackInSlot(int par1)
 	{
 		return this.chestContents[par1];
 	}
-	
+
 	@Override
 	public ItemStack decrStackSize(int par1, int par2)
 	{
 		if (this.chestContents[par1] != null)
 		{
 			ItemStack var3;
-			
+
 			if (this.chestContents[par1].stackSize <= par2)
 			{
 				var3 = this.chestContents[par1];
 				this.chestContents[par1] = null;
-				
+
 				return var3;
 			}
 			else
 			{
 				var3 = this.chestContents[par1].splitStack(par2);
-				
+
 				if (this.chestContents[par1].stackSize == 0)
 				{
 					this.chestContents[par1] = null;
 				}
-				
+
 				return var3;
 			}
 		}
 		return null;
 	}
-	
+
 	@Override
 	public ItemStack getStackInSlotOnClosing(int par1)
 	{
@@ -101,43 +101,43 @@ public class TileEntityLoader extends TileEntity implements IInventory
 		}
 		return null;
 	}
-	
+
 	@Override
 	public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
 	{
 		this.chestContents[par1] = par2ItemStack;
-		
+
 		if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit())
 		{
 			par2ItemStack.stackSize = this.getInventoryStackLimit();
 		}
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
 		NBTTagList nbttaglist = nbt.getTagList("Items", 10);
 		this.chestContents = new ItemStack[this.getSizeInventory()];
-		
+
 		for (int i = 0; i < nbttaglist.tagCount(); ++i)
 		{
 			NBTTagCompound nbt1 = nbttaglist.getCompoundTagAt(i);
 			int j = nbt1.getByte("Slot") & 255;
-			
+
 			if (j >= 0 && j < this.chestContents.length)
 			{
 				this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbt1);
 			}
 		}
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
 		super.writeToNBT(nbt);
 		NBTTagList nbttaglist = new NBTTagList();
-		
+
 		for (int i = 0; i < this.chestContents.length; ++i)
 		{
 			if (this.chestContents[i] != null)
@@ -148,29 +148,29 @@ public class TileEntityLoader extends TileEntity implements IInventory
 				nbttaglist.appendTag(nbt1);
 			}
 		}
-		
+
 		nbt.setTag("Items", nbttaglist);
 	}
-	
+
 	@Override
 	public int getInventoryStackLimit()
 	{
 		return 64;
 	}
-	
+
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
 	{
 		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
 	}
-	
+
 	@Override
 	public void updateEntity()
 	{
 		super.updateEntity();
-		
+
 		slide = (Math.cos(test) + 1) / 32 * 14;
-		
+
 		List players = worldObj.playerEntities;
 		Iterator iter = players.iterator();
 		boolean i = false;
@@ -380,41 +380,41 @@ public class TileEntityLoader extends TileEntity implements IInventory
 			}
 		}
 	}
-	
+
 	@Override
 	public void invalidate()
 	{
 		super.invalidate();
 		this.updateContainingBlockInfo();
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public String getInventoryName()
 	{
 		return "Loader";
 	}
-	
+
 	@Override
 	public boolean hasCustomInventoryName()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void openInventory()
 	{
-		
+
 	}
-	
+
 	@Override
 	public void closeInventory()
 	{
-		
+
 	}
 }

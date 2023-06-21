@@ -14,15 +14,15 @@ package assets.rivalrebels.common.packet;
 import io.netty.buffer.ByteBuf;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ResetPacket implements IMessage
 {
 	public ResetPacket()
 	{
-		
+
 	}
 
 	@Override
@@ -34,7 +34,7 @@ public class ResetPacket implements IMessage
 	public void toBytes(ByteBuf buf)
 	{
 	}
-	
+
 	public static class Handler implements IMessageHandler<ResetPacket, IMessage>
 	{
 		@Override

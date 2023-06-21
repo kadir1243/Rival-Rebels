@@ -20,27 +20,27 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import io.netty.buffer.ByteBuf;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.FileRW;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.Loader;
+import net.minecraftforge.fml.common.ModContainer;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ModListPacket implements IMessage
 {
 	public static EntityPlayerMP asker;
 	String text;
-	
+
 	public ModListPacket()
 	{
-		
+
 	}
-	
+
 	public ModListPacket(String t)
 	{
 		text = t;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -55,7 +55,7 @@ public class ModListPacket implements IMessage
 		buf.writeInt(text.length());
 		buf.writeBytes(FileRW.getBytesString(text));
 	}
-	
+
 	public static class Handler implements IMessageHandler<ModListPacket, IMessage>
 	{
 		@Override

@@ -42,9 +42,9 @@ import assets.rivalrebels.common.noise.RivalRebelsSimplexNoise;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.ReactorGUIPacket;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiReactor extends GuiContainer
@@ -64,7 +64,7 @@ public class GuiReactor extends GuiContainer
 	private GuiCustomButton			power;
 	private GuiCustomButton			eject;
 	private float					melttick			= 30;
-	
+
 	public GuiReactor(IInventory par1IInventory, IInventory par2IInventory)
 	{
 		super(new ContainerReactor(par1IInventory, par2IInventory));
@@ -74,7 +74,7 @@ public class GuiReactor extends GuiContainer
 		this.ySize = 200;
 		RivalRebelsSimplexNoise.refresh();
 	}
-	
+
 	@Override
 	public void initGui()
 	{
@@ -89,7 +89,7 @@ public class GuiReactor extends GuiContainer
 		this.buttonList.add(power);
 		this.buttonList.add(eject);
 	}
-	
+
 	/**
 	 * Draw the foreground layer for the GuiContainer (everything in front of the items)
 	 */
@@ -107,7 +107,7 @@ public class GuiReactor extends GuiContainer
 		GL11.glPopMatrix();
 		fontRendererObj.drawString("Teslas: " + df.format(ter.getPower() - ter.consumed), 120, 8, 0xffffff);
 		fontRendererObj.drawString("Output/t: " + df.format(ter.lasttickconsumed), 140, 18, 0xffffff);
-		
+
 		int mousex = par1;
 		int mousey = par2;
 		int posx = (width - xSize) / 2;
@@ -140,10 +140,10 @@ public class GuiReactor extends GuiContainer
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
-	
+
 	boolean	buttondown;
 	boolean	buttondown2;
-	
+
 	/**
 	 * Draw the background layer for the GuiContainer (everything behind the items)
 	 */
@@ -154,7 +154,7 @@ public class GuiReactor extends GuiContainer
 		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guittokamak);
 		this.drawTexturedModalRect(width / 2 - 89, height / 2 - 103, 0, 0, 212, 208);
-		
+
 		float s = (float) scroll.scroll / (float) scroll.limit;
 		int off = (int) Math.floor((machineslist.length - 2) * s);
 		if (off < 0) off = 0;
@@ -182,7 +182,7 @@ public class GuiReactor extends GuiContainer
 			}
 			Y += 18;
 		}
-		
+
 		drawDock();
 		long time = System.currentTimeMillis();
 		// 1f, 1f, 1f, 0.7f, 0f, 1f, HYDROGEN
@@ -233,7 +233,7 @@ public class GuiReactor extends GuiContainer
 		power.isPressed = ter.on;
 		buttondown2 = Mouse.isButtonDown(0);
 	}
-	
+
 	protected void drawDock()
 	{
 		int X = 89 + width / 2;
@@ -241,29 +241,29 @@ public class GuiReactor extends GuiContainer
 		for (int i = 0; i < 4; i++)
 		{
 			if (machines[i] == null) return;
-			
+
 			Block display = machines[i];
 			int meta = 2;
 			String toppath = "Minecraft:textures/blocks/" + display.getIcon(1, meta).getIconName() + ".png";
 			String lsidepath = "Minecraft:textures/blocks/" + display.getIcon(4, meta).getIconName() + ".png";
 			String rsidepath = "Minecraft:textures/blocks/" + display.getIcon(2, meta).getIconName() + ".png";
-			
+
 			if (toppath.contains("RivalRebels:"))
 			{
 				toppath = "RivalRebels:textures/blocks/" + display.getBlockTextureFromSide(1).getIconName().split("RivalRebels:")[1] + ".png";
 			}
-			
+
 			if (lsidepath.contains("RivalRebels:"))
 			{
 				lsidepath = "RivalRebels:textures/blocks/" + display.getBlockTextureFromSide(4).getIconName().split("RivalRebels:")[1] + ".png";
 			}
-			
+
 			if (rsidepath.contains("RivalRebels:"))
 			{
 				rsidepath = "RivalRebels:textures/blocks/" + display.getBlockTextureFromSide(2).getIconName().split("RivalRebels:")[1] + ".png";
 			}
 			Tessellator tessellator = Tessellator.instance;
-			
+
 			GL11.glEnable(GL11.GL_BLEND);
 			float alpha = 0.5f;
 			if (onmachines[i]) alpha = 1;
@@ -291,16 +291,16 @@ public class GuiReactor extends GuiContainer
 			tessellator.addVertexWithUV(X + 8, Y + 7, zLevel, 0, 0);
 			tessellator.addVertexWithUV(X + 8, Y + 16, zLevel, 0, 1);
 			tessellator.draw();
-			
+
 			GL11.glDisable(GL11.GL_BLEND);
-			
+
 			Y += 18;
 		}
 	}
-	
+
 	/**
 	 * Method that draws the noise sphere.
-	 * 
+	 *
 	 * @param red
 	 *            Vein Color Red
 	 * @param grn
@@ -326,7 +326,7 @@ public class GuiReactor extends GuiContainer
 	 * @param sscale
 	 *            Noise Scale
 	 */
-	
+
 	protected void drawNoiseSphere(float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol)
 	{
 		Tessellator t = Tessellator.instance;
@@ -378,7 +378,7 @@ public class GuiReactor extends GuiContainer
 						s *= 2;
 						a /= 2;
 					}
-					
+
 					t.setColorRGBA_F(lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v), v);
 					t.addVertex(X, Y, 4);
 				}
@@ -388,12 +388,12 @@ public class GuiReactor extends GuiContainer
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glPopMatrix();
 	}
-	
+
 	protected float lerp(float f1, float f2, float f3)
 	{
 		return f1 * f3 + f2 * (1 - f3);
 	}
-	
+
 	protected void drawInfographic(float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2)
 	{
 		Tessellator t = Tessellator.instance;

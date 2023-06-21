@@ -19,28 +19,28 @@ import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import assets.rivalrebels.common.entity.EntityDebris;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class EntityDebrisPacket implements IMessage
 {
 	Block	block;
 	int		metadata	= 0;
 	int		id			= 0;
-	
+
 	public EntityDebrisPacket()
 	{
-		
+
 	}
-	
+
 	public EntityDebrisPacket(EntityDebris ed)
 	{
 		id = ed.getEntityId();
 		block = ed.block;
 		metadata = ed.metadata;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -48,7 +48,7 @@ public class EntityDebrisPacket implements IMessage
 		block = Block.getBlockById(buf.readInt());
 		metadata = buf.readByte();
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
@@ -56,7 +56,7 @@ public class EntityDebrisPacket implements IMessage
 		buf.writeInt(Block.getIdFromBlock(block));
 		buf.writeByte(metadata);
 	}
-	
+
 	public static class Handler implements IMessageHandler<EntityDebrisPacket, IMessage>
 	{
 		@Override

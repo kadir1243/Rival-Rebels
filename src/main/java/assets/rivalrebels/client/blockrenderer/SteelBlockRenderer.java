@@ -20,7 +20,7 @@ import net.minecraft.world.IBlockAccess;
 import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import net.minecraftforge.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class SteelBlockRenderer implements ISimpleBlockRenderingHandler
 {

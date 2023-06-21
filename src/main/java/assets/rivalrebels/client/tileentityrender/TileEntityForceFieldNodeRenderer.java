@@ -27,10 +27,10 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
@@ -38,38 +38,38 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 	public static int				frames	= 28;
 	public static int[]			id		= new int[frames];
 	RenderHelper	model;
-	
+
 	public TileEntityForceFieldNodeRenderer()
 	{
 		model = new RenderHelper();
 		id = genTexture(28, 28, frames);
 	}
-	
+
 	int	count	= 0;
-	
+
 	public void renderAModelAt(TileEntityForceFieldNode tile, double x, double y, double z, float f)
 	{
 		if (tile.pInR <= 0 || !RivalRebels.goodRender) return;
-		
+
 		count++;
 		GL11.glPushMatrix();
 		GL11.glTranslatef((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		
+
 		if (tile.getBlockMetadata() == 2)
 		{
 			GL11.glRotatef(90, 0, 1, 0);
 		}
-		
+
 		if (tile.getBlockMetadata() == 3)
 		{
 			GL11.glRotatef(-90, 0, 1, 0);
 		}
-		
+
 		if (tile.getBlockMetadata() == 4)
 		{
 			GL11.glRotatef(180, 0, 1, 0);
 		}
-		
+
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, id[(int) ((getTime() / 100) % frames)]);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
@@ -78,20 +78,20 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 		GL11.glTranslatef(0, 0, 0.5f);
 		Tessellator tess = Tessellator.instance;
 		tess.startDrawingQuads();
-		
+
 		tess.addVertexWithUV(-0.0625f, 3.5f, 0f, 0, 0);
 		tess.addVertexWithUV(-0.0625f, -3.5f, 0f, 0, 1);
 		tess.addVertexWithUV(-0.0625f, -3.5f, 35f, 5, 1);
 		tess.addVertexWithUV(-0.0625f, 3.5f, 35f, 5, 0);
 		tess.draw();
-		
+
 		tess.startDrawingQuads();
 		tess.addVertexWithUV(0.0625f, -3.5f, 0f, 0, 1);
 		tess.addVertexWithUV(0.0625f, 3.5f, 0f, 0, 0);
 		tess.addVertexWithUV(0.0625f, 3.5f, 35f, 5, 0);
 		tess.addVertexWithUV(0.0625f, -3.5f, 35f, 5, 1);
 		tess.draw();
-		
+
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glDisable(GL11.GL_BLEND);
@@ -103,7 +103,7 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 			RivalRebels.optiFineWarn = false;
 		}
 	}
-	
+
 	private int[] genTexture(int xs, int zs, int ys)
 	{
 		int[] ids = new int[ys];
@@ -139,17 +139,17 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer
 		}
 		return ids;
 	}
-	
+
 	protected float lerp(float f1, float f2, float f3)
 	{
 		return f1 * f3 + f2 * (1 - f3);
 	}
-	
+
 	public static long getTime()
 	{
 		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
 	}
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
 	{

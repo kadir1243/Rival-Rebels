@@ -14,14 +14,14 @@ package assets.rivalrebels.common.packet;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsPlayerList;
 import assets.rivalrebels.common.round.RivalRebelsRound;
-import cpw.mods.fml.common.network.NetworkRegistry;
-import cpw.mods.fml.common.network.simpleimpl.SimpleNetworkWrapper;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class PacketDispatcher
 {
 	public static final SimpleNetworkWrapper	packetsys	= NetworkRegistry.INSTANCE.newSimpleChannel(RivalRebels.MODID);
-	
+
 	public static final void registerPackets()
 	{
 		int packetCount = 0;

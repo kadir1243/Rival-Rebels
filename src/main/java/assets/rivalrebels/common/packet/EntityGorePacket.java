@@ -19,9 +19,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import assets.rivalrebels.common.core.FileRW;
 import assets.rivalrebels.common.entity.EntityGore;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class EntityGorePacket implements IMessage
 {
@@ -31,11 +31,11 @@ public class EntityGorePacket implements IMessage
 	boolean	green		= false;
 	String	username	= "Steve";
 	float	size		= -1;
-	
+
 	public EntityGorePacket()
 	{
 	}
-	
+
 	public EntityGorePacket(EntityGore eg)
 	{
 		mob = (byte) eg.mob;
@@ -45,7 +45,7 @@ public class EntityGorePacket implements IMessage
 		username = eg.username;
 		size = (float) eg.size;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -61,7 +61,7 @@ public class EntityGorePacket implements IMessage
 		}
 		if (mob == 11) size = buf.readFloat();
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
@@ -76,7 +76,7 @@ public class EntityGorePacket implements IMessage
 		}
 		if (mob == 11) buf.writeFloat(size);
 	}
-	
+
 	public static class Handler implements IMessageHandler<EntityGorePacket, IMessage>
 	{
 		@Override
@@ -92,7 +92,7 @@ public class EntityGorePacket implements IMessage
 					eg.mob = m.mob;
 					eg.type = m.type;
 					eg.greenblood = m.green;
-					
+
 					if (m.mob == 0) eg.username = m.username;
 					if (m.mob == 11) eg.size = m.size;
 					break;

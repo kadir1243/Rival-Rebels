@@ -38,9 +38,9 @@ import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.ReactorUpdatePacket;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityReciever extends TileEntityMachineBase implements IInventory
 {
@@ -72,7 +72,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	public String			username				= "nohbdy";
 	private int ticksincepacket;
 	int ticksSinceLastShot = 0;
-	
+
 	public TileEntityReciever()
 	{
 		entityIndex = staticEntityIndex;
@@ -90,7 +90,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			chestContents[2] = new ItemStack(RivalRebels.fuel, 64);
 		}
 	}
-	
+
 	@Override
 	public void updateEntity()
 	{
@@ -100,25 +100,25 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		convertBatteryToEnergy();
 		if (!hasWeapon && wepSelected != 0 && hasWepReqs()) setWep(wepSelected);
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()
 	{
 		return 16384.0D;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
 		return AxisAlignedBB.getBoundingBox(xCoord - 1, yCoord - 1, zCoord - 1, xCoord + 2, yCoord + 2, zCoord + 2);
 	}
-	
+
 	private boolean hasBattery()
 	{
 		return chestContents[3] != null || chestContents[4] != null || chestContents[5] != null || RivalRebels.infiniteAmmo;
 	}
-	
+
 	private void convertBatteryToEnergy()
 	{
 		while (pInR < pInM / 2 && hasBattery())
@@ -127,19 +127,19 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			consumeBattery();
 		}
 	}
-	
+
 	private void consumeBattery()
 	{
 		if (chestContents[3] != null) decrStackSize(3, 1);
 		else if (chestContents[4] != null) decrStackSize(4, 1);
 		else if (chestContents[5] != null) decrStackSize(5, 1);
 	}
-	
+
 	public boolean hasWepReqs()
 	{
 		return chestContents[6] != null && chestContents[7] != null && chestContents[8] != null;
 	}
-	
+
 	public void setWep(int wep)
 	{
 		if (wep != 0)
@@ -154,7 +154,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			wepSelected = 0;
 		}
 	}
-	
+
 	@Override
 	public float powered(float power, float distance)
 	{
@@ -199,17 +199,17 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		}
 		return power - 1;
 	}
-	
+
 	/*
 	 * public Packet getDescriptionPacket() { Packet132TileEntityData p = new Packet132TileEntityData(); NBTTagCompound nbt = new NBTTagCompound(); writeToNBT(nbt); p.data = nbt; p.xPosition = xCoord;
 	 * p.yPosition = yCoord; p.zPosition = zCoord; return p; } public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) { readFromNBT(pkt.data); }
 	 */
-	
+
 	private boolean hasAmmo()
 	{
 		return chestContents[0] != null || chestContents[1] != null || chestContents[2] != null || RivalRebels.infiniteAmmo;
 	}
-	
+
 	private boolean useAmmo()
 	{
 		ammoCounter++;
@@ -224,7 +224,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		}
 		return true;
 	}
-	
+
 	private Entity getTarget()
 	{
 		Object[] iter = worldObj.loadedEntityList.toArray();
@@ -245,12 +245,12 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		}
 		return result;
 	}
-	
+
 	private boolean canTarget(Entity e)
 	{
 		return e != null && ((e instanceof EntityLivingBase && ((EntityLivingBase) e).getHealth() > 0) || e instanceof EntityRhodes) && getPitchTo(e, 0) > ll && getPitchTo(e, 0) < ul && isValidTarget(e) && canSee(e);
 	}
-	
+
 	private boolean isValidTarget(Entity e)
 	{
 		if (e == null) return false;
@@ -271,7 +271,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		}
 		else return (kMobs && (e instanceof EntityRhodes || (e instanceof EntityMob && !(e instanceof EntityAnimal) && !(e instanceof EntityBat) && !(e instanceof EntityVillager) && !(e instanceof EntitySquid)) || e instanceof EntityGhast));
 	}
-	
+
 	private boolean canSee(Entity e)
 	{
 		int yaw = (int) (getYawTo(e, 0) - getBaseRotation() + 360) % 360;
@@ -281,7 +281,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		MovingObjectPosition mop = worldObj.func_147447_a(start, end, false, true, false);
 		return mop == null || (mop.blockX == xCoord && mop.blockY == yCoord && mop.blockZ == zCoord);
 	}
-	
+
 	private void updateDirection()
 	{
 		direction = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
@@ -292,7 +292,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		if (direction == 3) zO = 0.76f;
 		if (direction == 5) xO = 0.76f;
 	}
-	
+
 	public int lookAt(Entity t)
 	{
 		double dist = t.getDistance(xCoord + 0.5 + xO, yCoord + 0.5, zCoord + 0.5 + zO);
@@ -313,7 +313,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		}
 		else return 0;
 	}
-	
+
 	public double getYawTo(Entity t, double off)
 	{
 		double x = xCoord + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
@@ -321,7 +321,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		double ya = Math.atan2(x, z);
 		return ((ya / Math.PI) * 180);
 	}
-	
+
 	public double getPitchTo(Entity t, double off)
 	{
 		double x = xCoord + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
@@ -331,7 +331,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		double pi = Math.atan2(d, -y);
 		return 90 - ((pi / Math.PI) * 180);
 	}
-	
+
 	public int getBaseRotation()
 	{
 		int m = getBlockMetadata();
@@ -342,7 +342,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		if (m == 5) r = 270;
 		return r;
 	}
-	
+
 	/**
 	 * Returns the number of slots in the inventory.
 	 */
@@ -351,7 +351,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		return 9;
 	}
-	
+
 	/**
 	 * Returns the stack in slot i
 	 */
@@ -361,7 +361,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		if (par1 >= getSizeInventory()) return null;
 		return this.chestContents[par1];
 	}
-	
+
 	/**
 	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
 	 */
@@ -371,7 +371,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		if (this.chestContents[par1] != null)
 		{
 			ItemStack var3;
-			
+
 			if (this.chestContents[par1].stackSize <= par2)
 			{
 				var3 = this.chestContents[par1];
@@ -381,7 +381,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			else
 			{
 				var3 = this.chestContents[par1].splitStack(par2);
-				
+
 				if (this.chestContents[par1].stackSize == 0)
 				{
 					this.chestContents[par1] = null;
@@ -391,7 +391,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		}
 		return null;
 	}
-	
+
 	/**
 	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
 	 */
@@ -407,7 +407,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
 	 */
@@ -416,13 +416,13 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		if (par1 >= getSizeInventory()) return;
 		this.chestContents[par1] = par2ItemStack;
-		
+
 		if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit())
 		{
 			par2ItemStack.stackSize = this.getInventoryStackLimit();
 		}
 	}
-	
+
 	/**
 	 * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't this more of a set than a get?*
 	 */
@@ -431,7 +431,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		return 64;
 	}
-	
+
 	/**
 	 * Do not make give this method the name canInteractWith because it clashes with Container
 	 */
@@ -440,13 +440,13 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack)
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Reads a tile entity from NBT.
 	 */
@@ -456,18 +456,18 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		super.readFromNBT(nbt);
 		NBTTagList nbttaglist = nbt.getTagList("Items", 10);
 		this.chestContents = new ItemStack[this.getSizeInventory()];
-		
+
 		for (int i = 0; i < nbttaglist.tagCount(); ++i)
 		{
 			NBTTagCompound nbt1 = nbttaglist.getCompoundTagAt(i);
 			int j = nbt1.getByte("Slot") & 255;
-			
+
 			if (j >= 0 && j < this.chestContents.length)
 			{
 				this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbt1);
 			}
 		}
-		
+
 		yawLimit = nbt.getInteger("yawLimit");
 		kPlayers = nbt.getBoolean("kPlayers");
 		kTeam = nbt.getBoolean("kTeam");
@@ -477,7 +477,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		team = RivalRebelsTeam.getForID(nbt.getInteger("team"));
 		entityIndex = nbt.getInteger("entityIndex");
 	}
-	
+
 	/**
 	 * Writes a tile entity to NBT.
 	 */
@@ -486,7 +486,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		super.writeToNBT(nbt);
 		NBTTagList nbttaglist = new NBTTagList();
-		
+
 		for (int i = 0; i < this.chestContents.length; ++i)
 		{
 			if (this.chestContents[i] != null)
@@ -497,9 +497,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 				nbttaglist.appendTag(nbt1);
 			}
 		}
-		
+
 		nbt.setTag("Items", nbttaglist);
-		
+
 		nbt.setInteger("yawLimit", yawLimit);
 		nbt.setBoolean("kPlayers", kPlayers);
 		nbt.setBoolean("kTeam", kTeam);
@@ -509,28 +509,28 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		nbt.setInteger("entityIndex", entityIndex);
 		if (team != null) nbt.setInteger("team", team.ordinal());
 	}
-	
+
 	@Override
 	public String getInventoryName()
 	{
 		return "Automated Defense System";
 	}
-	
+
 	@Override
 	public boolean hasCustomInventoryName()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void openInventory()
 	{
-		
+
 	}
-	
+
 	@Override
 	public void closeInventory()
 	{
-		
+
 	}
 }

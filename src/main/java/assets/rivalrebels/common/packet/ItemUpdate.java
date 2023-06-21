@@ -16,39 +16,39 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import assets.rivalrebels.common.item.weapon.ItemFlameThrower;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class ItemUpdate implements IMessage
 {
 	public int	item;
 	public int	value;
-	
+
 	public ItemUpdate()
 	{
 	}
-	
+
 	public ItemUpdate(int currentItem, int i)
 	{
 		item = currentItem;
 		value = i;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
 		item = buf.readByte();
 		value = buf.readByte();
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
 		buf.writeByte(item);
 		buf.writeByte(value);
 	}
-	
+
 	public static class Handler implements IMessageHandler<ItemUpdate, IMessage>
 	{
 		@Override

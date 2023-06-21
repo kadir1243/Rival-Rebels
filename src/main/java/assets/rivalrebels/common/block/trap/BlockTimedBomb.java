@@ -22,25 +22,25 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockTimedBomb extends BlockFalling
 {
 	int	ticksSincePlaced;
-	
+
 	public BlockTimedBomb()
 	{
 		super();
 		ticksSincePlaced = 0;
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public void onBlockDestroyedByExplosion(World par1World, int par2, int par3, int par4, net.minecraft.world.Explosion explosion)
 	{
@@ -48,7 +48,7 @@ public class BlockTimedBomb extends BlockFalling
 		new Explosion(par1World, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timebomb);
 		RivalRebelsSoundPlayer.playSound(par1World, 26, 0, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, 2f, 0.3f);
 	}
-	
+
 	@Override
 	public void onBlockDestroyedByPlayer(World world, int i, int j, int k, int l)
 	{
@@ -56,14 +56,14 @@ public class BlockTimedBomb extends BlockFalling
 		new Explosion(world, i + 0.5f, j + 0.5f, k + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timebomb);
 		RivalRebelsSoundPlayer.playSound(world, 26, 0, i + 0.5f, j + 0.5f, k + 0.5f, 2f, 0.3f);
 	}
-	
+
 	@Override
 	public void onBlockAdded(World par1World, int par2, int par3, int par4)
 	{
 		ticksSincePlaced = 0;
 		par1World.scheduleBlockUpdate(par2, par3, par4, this, 8);
 	}
-	
+
 	@Override
 	public void updateTick(World par1World, int par2, int par3, int par4, Random par5Random)
 	{
@@ -97,7 +97,7 @@ public class BlockTimedBomb extends BlockFalling
 			}
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -110,7 +110,7 @@ public class BlockTimedBomb extends BlockFalling
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -123,7 +123,7 @@ public class BlockTimedBomb extends BlockFalling
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -135,7 +135,7 @@ public class BlockTimedBomb extends BlockFalling
 		icon5 = iconregister.registerIcon("RivalRebels:ab"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ab"); // SIDE E
 	}
-	
+
 	/**
 	 * Called when the falling block entity for this block hits the ground and turns back into a block
 	 */

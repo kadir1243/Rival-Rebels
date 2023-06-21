@@ -16,23 +16,23 @@ import net.minecraft.client.particle.EntityFX;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class EntityBloodFX extends EntityFX
 {
 	boolean	isBlood;
-	
+
 	public EntityBloodFX(World w, double x, double y, double z, boolean b)
 	{
 		this(w, x, y, z, w.rand.nextGaussian() * 0.1, w.rand.nextGaussian() * 0.1, w.rand.nextGaussian() * 0.1, b);
 	}
-	
+
 	public EntityBloodFX(World w, double x, double y, double z, double r, double g, double b, boolean bl)
 	{
 		super(w, x, y, z, r, g, b);
-		
+
 		posX = x;
 		posY = y;
 		posZ = z;
@@ -43,18 +43,18 @@ public class EntityBloodFX extends EntityFX
 		particleMaxAge = 20;
 		isBlood = bl;
 	}
-	
+
 	public EntityBloodFX(World w, EntityGore g, boolean b)
 	{
 		this(w, g.posX, g.posY, g.posZ, b);
 	}
-	
+
 	@Override
 	public void renderParticle(Tessellator t, float par2, float par3, float par4, float par5, float par6, float par7)
 	{
 		Minecraft.getMinecraft().renderEngine.bindTexture(isBlood ? RivalRebels.etblood : RivalRebels.etgoo);
 		float f10 = 0.1F * this.particleScale;
-		
+
 		float f11 = (float) (prevPosX + (posX - prevPosX) * par2 - interpPosX);
 		float f12 = (float) (prevPosY + (posY - prevPosY) * par2 - interpPosY);
 		float f13 = (float) (prevPosZ + (posZ - prevPosZ) * par2 - interpPosZ);

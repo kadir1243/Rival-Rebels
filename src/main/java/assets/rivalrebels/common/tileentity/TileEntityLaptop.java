@@ -32,15 +32,15 @@ import assets.rivalrebels.common.packet.LaptopButtonPacket;
 import assets.rivalrebels.common.packet.LaptopRefreshPacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class TileEntityLaptop extends TileEntity implements IInventory
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
 	private ItemStack[]		chestContents	= new ItemStack[14];
-	
+
 	public double			slide			= 0;
 	double					test			= Math.PI;
 	public int				b2spirit		= 0;
@@ -48,7 +48,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	public int				numUsingPlayers;
 	private int				ticksSinceSync;
 	private boolean			listed;
-	
+
 	/**
 	 * Returns the number of slots in the inventory.
 	 */
@@ -57,7 +57,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	{
 		return 14;
 	}
-	
+
 	/**
 	 * Returns the stack in slot i
 	 */
@@ -66,7 +66,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	{
 		return this.chestContents[par1];
 	}
-	
+
 	/**
 	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
 	 */
@@ -76,7 +76,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		if (this.chestContents[par1] != null)
 		{
 			ItemStack var3;
-			
+
 			if (this.chestContents[par1].stackSize <= par2)
 			{
 				var3 = this.chestContents[par1];
@@ -86,18 +86,18 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 			else
 			{
 				var3 = this.chestContents[par1].splitStack(par2);
-				
+
 				if (this.chestContents[par1].stackSize == 0)
 				{
 					this.chestContents[par1] = null;
 				}
-				
+
 				return var3;
 			}
 		}
 		return null;
 	}
-	
+
 	/**
 	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
 	 */
@@ -112,7 +112,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
 	 */
@@ -120,13 +120,13 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
 	{
 		this.chestContents[par1] = par2ItemStack;
-		
+
 		if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit())
 		{
 			par2ItemStack.stackSize = this.getInventoryStackLimit();
 		}
 	}
-	
+
 	/**
 	 * Reads a tile entity from NBT.
 	 */
@@ -136,28 +136,28 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		super.readFromNBT(nbt);
 		NBTTagList nbttaglist = nbt.getTagList("Items", 10);
 		this.chestContents = new ItemStack[this.getSizeInventory()];
-		
+
 		for (int i = 0; i < nbttaglist.tagCount(); ++i)
 		{
 			NBTTagCompound nbt1 = nbttaglist.getCompoundTagAt(i);
 			int j = nbt1.getByte("Slot") & 255;
-			
+
 			if (j >= 0 && j < this.chestContents.length)
 			{
 				this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbt1);
 			}
 		}
-		
+
 		b2spirit = nbt.getInteger("b2spirit");
 		b2carpet = nbt.getInteger("b2carpet");
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound nbt)
 	{
 		super.writeToNBT(nbt);
 		NBTTagList nbttaglist = new NBTTagList();
-		
+
 		for (int i = 0; i < this.chestContents.length; ++i)
 		{
 			if (this.chestContents[i] != null)
@@ -168,13 +168,13 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 				nbttaglist.appendTag(nbt1);
 			}
 		}
-		
+
 		nbt.setTag("Items", nbttaglist);
-		
+
 		nbt.setInteger("b2spirit", b2spirit);
 		nbt.setInteger("b2carpet", b2carpet);
 	}
-	
+
 	/**
 	 * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't this more of a set than a get?*
 	 */
@@ -183,7 +183,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	{
 		return 64;
 	}
-	
+
 	/**
 	 * Do not make give this method the name canInteractWith because it clashes with Container
 	 */
@@ -192,7 +192,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	{
 		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
 	}
-	
+
 	public void onGoButtonPressed()
 	{
 		if (isReady())
@@ -225,7 +225,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		if (RivalRebels.freeb83nukes) {b2spirit += 10;b2carpet += 10;}
 		refreshTasks();
 	}
-	
+
 	public boolean hasChips()
 	{
 		boolean r = true;
@@ -242,7 +242,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		}
 		return r;
 	}
-	
+
 	/**
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
@@ -251,9 +251,9 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	{
 		super.updateEntity();
 		++this.ticksSinceSync;
-		
+
 		slide = (Math.cos(test) + 1) * 45;
-		
+
 		//if (!listed)
 		//{
 			ItemBinoculars.add(this);
@@ -278,17 +278,17 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		{
 			if (slide > 0.004) test -= 0.05;
 		}
-		
+
 		if (b2spirit > 0 && !hasChips())
 		{
 			b2spirit--;
 			refreshTasks();
 		}
 	}
-	
+
 	/**
 	 * Called when a client event is received with the event number and argument, see World.sendClientEvent
-	 * 
+	 *
 	 * @return
 	 */
 	@Override
@@ -301,7 +301,7 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		}
 		return false;
 	}
-	
+
 	/**
 	 * invalidates a tile entity
 	 */
@@ -312,35 +312,35 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		this.updateContainingBlockInfo();
 		ItemBinoculars.remove(this);
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public String getInventoryName()
 	{
 		return "Laptop";
 	}
-	
+
 	@Override
 	public boolean hasCustomInventoryName()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void openInventory()
 	{
-		
+
 	}
-	
+
 	@Override
 	public void closeInventory()
 	{
-		
+
 	}
 
 	public void refreshTasks() {

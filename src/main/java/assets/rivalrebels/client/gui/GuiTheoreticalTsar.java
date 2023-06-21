@@ -28,28 +28,28 @@ import org.lwjgl.opengl.GL11;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.container.ContainerTheoreticalTsar;
 import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiTheoreticalTsar extends GuiContainer
 {
 	ContainerTheoreticalTsar		container;
 	TileEntityTheoreticalTsarBomba	tsar;
-	
+
 	public GuiTheoreticalTsar(Container container)
 	{
 		super(container);
 		this.container = (ContainerTheoreticalTsar) container;
 	}
-	
+
 	public GuiTheoreticalTsar(InventoryPlayer inventoryPlayer, TileEntityTheoreticalTsarBomba tileEntity)
 	{
 		super(new ContainerTheoreticalTsar(inventoryPlayer, tileEntity));
 		ySize = 206;
 		tsar = tileEntity;
 	}
-	
+
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
 	{
@@ -86,7 +86,7 @@ public class GuiTheoreticalTsar extends GuiContainer
 		{
 			fontRendererObj.drawString(tsar.megaton + " " + StatCollector.translateToLocal("RivalRebels.tsar.megatons"), 6, ySize - 97, 0xFFFFFF);
 		}
-		
+
 		int mousex = par1;
 		int mousey = par2;
 		int posx = (width - xSize) / 2;
@@ -119,9 +119,9 @@ public class GuiTheoreticalTsar extends GuiContainer
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
-	
+
 	boolean	buttondown;
-	
+
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
 	{

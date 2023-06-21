@@ -17,21 +17,21 @@ import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiRotor extends GuiButton
 {
 	protected int		degree;
 	protected boolean	pressed;
-	
+
 	public GuiRotor(int id, int x, int y, int yawLimit, String par6Str)
 	{
 		super(id, x, y, 32, 32, par6Str);
 		degree = yawLimit / 2;
 	}
-	
+
 	/**
 	 * Draws this button to the screen.
 	 */
@@ -50,7 +50,7 @@ public class GuiRotor extends GuiButton
 		this.drawCenteredString(par1Minecraft.fontRenderer, (deg * 2) + "°", xPosition + width / 2, yPosition + height / 2 - 4, 0xffffff);
 		GL11.glPopMatrix();
 	}
-	
+
 	/**
 	 * Fired when the mouse button is dragged. Equivalent of MouseListener.mouseDragged(MouseEvent e).
 	 */
@@ -71,18 +71,18 @@ public class GuiRotor extends GuiButton
 			// degree %= 360;
 		}
 	}
-	
+
 	@Override
 	public void mouseReleased(int par2, int par3)
 	{
 		pressed = false;
 	}
-	
+
 	public int getDegree()
 	{
 		return degree;
 	}
-	
+
 	/**
 	 * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent e).
 	 */

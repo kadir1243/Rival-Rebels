@@ -20,19 +20,19 @@ import org.lwjgl.opengl.GL11;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelObjective;
 import assets.rivalrebels.common.tileentity.TileEntityOmegaObjective;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class TileEntityOmegaObjectiveRenderer extends TileEntitySpecialRenderer
 {
 	private ModelObjective	loaderModel;
-	
+
 	public TileEntityOmegaObjectiveRenderer()
 	{
 		loaderModel = new ModelObjective();
 	}
-	
+
 	/**
 	 * Renders the TileEntity for the chest at a position.
 	 */
@@ -41,7 +41,7 @@ public class TileEntityOmegaObjectiveRenderer extends TileEntitySpecialRenderer
 		GL11.glPushMatrix();
 		GL11.glTranslatef((float) par2 + 0.5F, (float) par4 + 0.5F, (float) par6 + 0.5F);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etomegaobj);
-		
+
 		GL11.glRotatef(90, 1, 0, 0);
 		loaderModel.renderA();
 		GL11.glRotatef(-90, 1, 0, 0);
@@ -60,7 +60,7 @@ public class TileEntityOmegaObjectiveRenderer extends TileEntitySpecialRenderer
 		loaderModel.renderB((float) par1TileEntityLoader.slide, 224f / 256f, 44f / 128f, 0.625f, 0.84375f);
 		GL11.glPopMatrix();
 	}
-	
+
 	@Override
 	public void renderTileEntityAt(TileEntity par1TileEntity, double par2, double par4, double par6, float par8)
 	{

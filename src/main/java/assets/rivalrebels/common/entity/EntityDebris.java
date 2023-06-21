@@ -27,8 +27,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import assets.rivalrebels.common.packet.EntityDebrisPacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
 
 public class EntityDebris extends EntityInanimate
 {
@@ -37,7 +37,7 @@ public class EntityDebris extends EntityInanimate
 	public int				ticksExisted;
 	public boolean			grounded;
 	public NBTTagCompound	tileEntityData;
-	
+
 	public EntityDebris(World w)
 	{
 		super(w);
@@ -71,12 +71,12 @@ public class EntityDebris extends EntityInanimate
 		motionY = my;
 		motionZ = mz;
 	}
-	
+
 	@Override
 	protected void entityInit()
 	{
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
@@ -92,10 +92,10 @@ public class EntityDebris extends EntityInanimate
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
-		
+
 		if (!worldObj.isRemote && worldObj.getBlock(MathHelper.floor_double(posX), MathHelper.floor_double(posY), MathHelper.floor_double(posZ)).isOpaqueCube()) die(prevPosX, prevPosY, prevPosZ);
 	}
-	
+
 	public void die(double X, double Y, double Z)
 	{
 		int x = MathHelper.floor_double(X);
@@ -126,7 +126,7 @@ public class EntityDebris extends EntityInanimate
 			}
 		}
 	}
-	
+
 	@Override
 	protected void writeEntityToNBT(NBTTagCompound nbt)
 	{
@@ -136,7 +136,7 @@ public class EntityDebris extends EntityInanimate
 		nbt.setByte("Time", (byte) ticksExisted);
 		if (tileEntityData != null) nbt.setTag("TileEntityData", tileEntityData);
 	}
-	
+
 	@Override
 	protected void readEntityFromNBT(NBTTagCompound nbt)
 	{
@@ -146,7 +146,7 @@ public class EntityDebris extends EntityInanimate
 		ticksExisted = nbt.getByte("Time") & 255;
 		if (nbt.hasKey("TileEntityData", 10)) tileEntityData = nbt.getCompoundTag("TileEntityData");
 	}
-	
+
 	@Override
 	public void addEntityCrashInfo(CrashReportCategory crash)
 	{

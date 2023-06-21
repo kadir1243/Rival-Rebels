@@ -16,8 +16,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockAutoTower extends BlockAutoTemplate
 {
@@ -25,7 +25,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
@@ -41,7 +41,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 			placeBlockCarefully(world, x + 1, y + y1, z + 1, RivalRebels.steel);
 			placeBlockCarefully(world, x - 1, y + y1, z - 1, RivalRebels.steel);
 			placeBlockCarefully(world, x, y + y1, z, Blocks.air);
-			
+
 			if (y1 <= 1)
 			{
 				placeBlockCarefully(world, x + 1, y + y1, z, Blocks.air);
@@ -95,7 +95,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 		}
 		placeBlockCarefully(world, x, y - 1, z, RivalRebels.jump);
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -108,7 +108,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -121,7 +121,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)

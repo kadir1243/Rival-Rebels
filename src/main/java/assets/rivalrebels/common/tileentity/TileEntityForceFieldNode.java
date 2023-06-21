@@ -25,21 +25,21 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityForceFieldNode extends TileEntityMachineBase
 {
 	public String			username	= null;
 	public RivalRebelsTeam	rrteam		= null;
 	public int				level		= 0;
-	
+
 	public TileEntityForceFieldNode()
 	{
 		pInM = 345;
 		pInR = 345;
 	}
-	
+
 	@Override
 	public void updateEntity()
 	{
@@ -47,13 +47,13 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		else turnOff();
 		pInR -= decay;
 	}
-	
+
 	public void turnOff()
 	{
 		if (level > 0)
 		{
 			int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-			
+
 			level--;
 			for (int y = 0; y < 7; y++)
 			{
@@ -65,21 +65,21 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 							worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord - level - 1, Blocks.air, 0, 3);
 						}
 					break;
-					
+
 					case 3:
 						if (worldObj.getBlock(xCoord, yCoord + (y - 3), zCoord + level + 1) == RivalRebels.forcefield)
 						{
 							worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord + level + 1, Blocks.air, 0, 3);
 						}
 					break;
-					
+
 					case 4:
 						if (worldObj.getBlock(xCoord - level - 1, yCoord + (y - 3), zCoord) == RivalRebels.forcefield)
 						{
 							worldObj.setBlock(xCoord - level - 1, yCoord + (y - 3), zCoord, Blocks.air, 0, 3);
 						}
 					break;
-					
+
 					case 5:
 						if (worldObj.getBlock(xCoord + level + 1, yCoord + (y - 3), zCoord) == RivalRebels.forcefield)
 						{
@@ -90,7 +90,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 			}
 		}
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
@@ -107,14 +107,14 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 			default: return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
 		}
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()
 	{
 		return 16384.0D;
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -123,7 +123,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		if (rrteam == RivalRebelsTeam.NONE) rrteam = null;
 		if (rrteam == null) username = par1NBTTagCompound.getString("username");
 	}
-	
+
 	@Override
 	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -131,19 +131,19 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		if (rrteam != null) par1NBTTagCompound.setInteger("rrteam", rrteam.ordinal());
 		if (username != null) par1NBTTagCompound.setString("username", username);
 	}
-	
+
 	@Override
 	public float powered(float power, float distance)
 	{
 		float hits = (float) Math.random();
 		int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-		
+
 		double randomness = 0.1;
 		float thickness = 0.5f;
 		float length = 35f;
 		float height = 3.52f;
 		double speed = 2;
-		
+
 		if (meta == 2)
 		{
 			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord + 0.5f - thickness, yCoord + 0.5f - height, zCoord - length, xCoord + 0.5f + thickness, yCoord + 0.5f + height, zCoord);
@@ -169,17 +169,17 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 					double cpx = xCoord + 0.5f - e.posX;
 					double cpy = e.posY + e.getEyeHeight() - e.posY;
 					double cpz = e.posZ - e.posZ;
-					
+
 					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
+
 					cpx /= dist;
 					cpy /= dist;
 					cpz /= dist;
-					
+
 					cpx += worldObj.rand.nextGaussian() * randomness;
 					cpy += worldObj.rand.nextGaussian() * randomness;
 					cpz += worldObj.rand.nextGaussian() * randomness;
-					
+
 					e.motionX = -cpx - e.motionX;
 					e.motionY = -cpy - e.motionY;
 					e.motionZ = -cpz - e.motionZ;
@@ -201,7 +201,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 				level++;
 			}
 		}
-		
+
 		if (meta == 3)
 		{
 			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord + 0.5f - thickness, yCoord + 0.5f - height, zCoord + 1f, xCoord + 0.5f + thickness, yCoord + 0.5f + height, zCoord + 1f + length);
@@ -227,17 +227,17 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 					double cpx = xCoord + 0.5f - e.posX;
 					double cpy = e.posY + e.getEyeHeight() - e.posY;
 					double cpz = e.posZ - e.posZ;
-					
+
 					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
+
 					cpx /= dist;
 					cpy /= dist;
 					cpz /= dist;
-					
+
 					cpx += worldObj.rand.nextGaussian() * randomness;
 					cpy += worldObj.rand.nextGaussian() * randomness;
 					cpz += worldObj.rand.nextGaussian() * randomness;
-					
+
 					e.motionX = -cpx - e.motionX;
 					e.motionY = -cpy - e.motionY;
 					e.motionZ = -cpz - e.motionZ;
@@ -259,7 +259,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 				level++;
 			}
 		}
-		
+
 		if (meta == 4)
 		{
 			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord - length, yCoord + 0.5f - height, zCoord + 0.5f - thickness, xCoord, yCoord + 0.5f + height, zCoord + 0.5f + thickness);
@@ -285,17 +285,17 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 					double cpx = e.posX - e.posX;
 					double cpy = e.posY + e.getEyeHeight() - e.posY;
 					double cpz = zCoord + 0.5f - e.posZ;
-					
+
 					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
+
 					cpx /= dist;
 					cpy /= dist;
 					cpz /= dist;
-					
+
 					cpx += worldObj.rand.nextGaussian() * randomness;
 					cpy += worldObj.rand.nextGaussian() * randomness;
 					cpz += worldObj.rand.nextGaussian() * randomness;
-					
+
 					e.motionX = -cpx - e.motionX;
 					e.motionY = -cpy - e.motionY;
 					e.motionZ = -cpz - e.motionZ;
@@ -317,7 +317,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 				level++;
 			}
 		}
-		
+
 		if (meta == 5)
 		{
 			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord + 1f, yCoord + 0.5f - height, zCoord + 0.5f - thickness, xCoord + 1f + length, yCoord + 0.5f + height, zCoord + 0.5f + thickness);
@@ -343,17 +343,17 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 					double cpx = e.posX - e.posX;
 					double cpy = e.posY + e.getEyeHeight() - e.posY;
 					double cpz = zCoord + 0.5f - e.posZ;
-					
+
 					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
+
 					cpx /= dist;
 					cpy /= dist;
 					cpz /= dist;
-					
+
 					cpx += worldObj.rand.nextGaussian() * randomness;
 					cpy += worldObj.rand.nextGaussian() * randomness;
 					cpz += worldObj.rand.nextGaussian() * randomness;
-					
+
 					e.motionX = -cpx - e.motionX;
 					e.motionY = -cpy - e.motionY;
 					e.motionZ = -cpz - e.motionZ;
@@ -377,7 +377,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		}
 		return (power - (hits * 16));
 	}
-	
+
 	public void placeBlockCarefully(World world, int i, int j, int z, Block blockID)
 	{
 		if (world.getBlock(i, j, z) != RivalRebels.reactive && world.getBlock(i, j, z) != RivalRebels.fshield && world.getBlock(i, j, z) != RivalRebels.omegaobj && world.getBlock(i, j, z) != RivalRebels.sigmaobj)
@@ -392,9 +392,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 // import java.util.Iterator;
 // import java.util.List;
 //
-// import cpw.mods.fml.common.FMLCommonHandler;
-// import cpw.mods.fml.relauncher.Side;
-// import cpw.mods.fml.relauncher.SideOnly;
+// import net.minecraftforge.fml.common.FMLCommonHandler;
+// import net.minecraftforge.fml.relauncher.Side;
+// import net.minecraftforge.fml.relauncher.SideOnly;
 //
 // import RivalRebels.Client.Gui.GuiOptiFineWarning;
 // import RivalRebels.Common.Core.RivalRebels;

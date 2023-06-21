@@ -44,10 +44,10 @@ import assets.rivalrebels.common.packet.LaptopEngagePacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ItemCamera extends ItemArmor
 {
@@ -57,7 +57,7 @@ public class ItemCamera extends ItemArmor
 		maxStackSize = 1;
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	float	zoom		= 30f;
 	float 	fovset		= 0f;
 	float	senset		= 0f;
@@ -103,7 +103,7 @@ public class ItemCamera extends ItemArmor
 			}
 		}
 	}
-	
+
 	@Override
 	public void registerIcons(IIconRegister iconregister)
 	{

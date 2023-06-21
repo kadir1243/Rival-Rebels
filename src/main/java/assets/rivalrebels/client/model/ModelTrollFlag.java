@@ -13,8 +13,8 @@ package assets.rivalrebels.client.model;
 
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class ModelTrollFlag
@@ -23,7 +23,7 @@ public class ModelTrollFlag
 	{
 		Tessellator var5 = Tessellator.instance;
 		double var18 = 0.05;
-		
+
 		if (metadata == 5)
 		{
 			var5.startDrawingQuads();
@@ -39,7 +39,7 @@ public class ModelTrollFlag
 			var5.addVertexWithUV(var18, 1, 1, 0, 0);
 			var5.draw();
 		}
-		
+
 		if (metadata == 4)
 		{
 			var5.startDrawingQuads();
@@ -55,7 +55,7 @@ public class ModelTrollFlag
 			var5.addVertexWithUV(1 - var18, 0, 1, 1, 1);
 			var5.draw();
 		}
-		
+
 		if (metadata == 3)
 		{
 			var5.startDrawingQuads();
@@ -71,7 +71,7 @@ public class ModelTrollFlag
 			var5.addVertexWithUV(1, 0, var18, 1, 1);
 			var5.draw();
 		}
-		
+
 		if (metadata == 2)
 		{
 			var5.startDrawingQuads();

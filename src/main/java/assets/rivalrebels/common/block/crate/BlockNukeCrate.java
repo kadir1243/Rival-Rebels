@@ -25,8 +25,8 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.TextPacket;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockNukeCrate extends BlockContainer
 {
@@ -34,7 +34,7 @@ public class BlockNukeCrate extends BlockContainer
 	{
 		super(Material.wood);
 	}
-	
+
 	public int determineOrientation(World world, int x, int y, int z, EntityPlayer entity)
 	{
 		int orientation = 0;
@@ -94,18 +94,18 @@ public class BlockNukeCrate extends BlockContainer
 		}
 		return orientation;
 	}
-	
+
 	@Override
 	public void onNeighborBlockChange(World world, int x, int y, int z, Block par5)
 	{
 		world.setBlockMetadataWithNotify(x, y, z, determineOrientation(world, x, y, z, null), 0);
 	}
-	
+
 	@Override
 	public void onBlockAdded(World world, int x, int y, int z)
 	{
 		world.setBlockMetadataWithNotify(x, y, z, determineOrientation(world, x, y, z, null), 0);
-		
+
 		if (world.getBlock(x, y + 1, z) == RivalRebels.nukeCrateBottom)
 		{
 			onNeighborBlockChange(world, x, y + 1, z, this);
@@ -161,7 +161,7 @@ public class BlockNukeCrate extends BlockContainer
 			world.createExplosion(null, x, y, z, 3, false);
 		}
 	}
-	
+
 	/**
 	 * Called upon block activation (right click on the block.)
 	 */
@@ -464,40 +464,40 @@ public class BlockNukeCrate extends BlockContainer
 		}
 		return false;
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return -1;
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityNukeCrate();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

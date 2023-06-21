@@ -26,64 +26,64 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockNuclearBomb extends BlockContainer
 {
 	public int	orientation;
-	
+
 	public BlockNuclearBomb()
 	{
 		super(Material.iron);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return -1;
 	}
-	
+
 	@Override
 	public boolean renderAsNormalBlock()
 	{
 		return false;
 	}
-	
+
 	@Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
-	
+
 	public static int determineOrientation(World world, int x, int y, int z, EntityPlayer entity)
 	{
 		if (MathHelper.abs((float) entity.posX - x) < 2.0F && MathHelper.abs((float) entity.posZ - z) < 2.0F)
 		{
 			double var5 = entity.posY + 1.82D - entity.yOffset;
-			
+
 			if (var5 - y > 2.0D)
 			{
 				return 1;
 			}
-			
+
 			if (y - var5 > 0.0D)
 			{
 				return 0;
 			}
 		}
-		
+
 		int var7 = MathHelper.floor_double((entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 		return var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)));
 	}
-	
+
 	/**
 	 * Called when the block is placed in the world.
 	 */
@@ -93,13 +93,13 @@ public class BlockNuclearBomb extends BlockContainer
 		if (MathHelper.abs((float) entity.posX - x) < 2.0F && MathHelper.abs((float) entity.posZ - z) < 2.0F)
 		{
 			double var5 = entity.posY + 1.82D - entity.yOffset;
-			
+
 			if (var5 - y > 2.0D)
 			{
 				world.setBlockMetadataWithNotify(x, y, z, 1, 0);
 				return;
 			}
-			
+
 			if (y - var5 > 0.0D)
 			{
 				world.setBlockMetadataWithNotify(x, y, z, 0, 0);
@@ -109,7 +109,7 @@ public class BlockNuclearBomb extends BlockContainer
 		int var7 = MathHelper.floor_double((entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 		world.setBlockMetadataWithNotify(x, y, z, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))), 0);
 	}
-	
+
 	/**
 	 * Called upon block activation (right click on the block.)
 	 */
@@ -130,13 +130,13 @@ public class BlockNuclearBomb extends BlockContainer
 		}
 		return false;
 	}
-	
+
 	@Override
 	public boolean hasTileEntity(int metadata)
 	{
 		return true;
 	}
-	
+
 	/**
 	 * each class overrides this to return a new <className>
 	 */
@@ -145,16 +145,16 @@ public class BlockNuclearBomb extends BlockContainer
 	{
 		return new TileEntityNuclearBomb();
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

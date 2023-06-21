@@ -23,11 +23,11 @@ import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class LaptopEngagePacket implements IMessage
 {
@@ -38,12 +38,12 @@ public class LaptopEngagePacket implements IMessage
 	int ly = -1;
 	int lz = -1;
 	boolean c = false;
-	
+
 	public LaptopEngagePacket()
 	{
-		
+
 	}
-	
+
 	public LaptopEngagePacket(int tX, int tY, int tZ, int lX, int lY, int lZ, boolean carpet)
 	{
 		tx = tX;
@@ -54,7 +54,7 @@ public class LaptopEngagePacket implements IMessage
 		lz = lZ;
 		c = carpet;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -78,7 +78,7 @@ public class LaptopEngagePacket implements IMessage
 		buf.writeInt(lz);
 		buf.writeBoolean(c);
 	}
-	
+
 	public static class Handler implements IMessageHandler<LaptopEngagePacket, IMessage>
 	{
 		@Override

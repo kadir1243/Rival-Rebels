@@ -29,9 +29,9 @@ import net.minecraft.world.World;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class EntityB2Frag extends EntityInanimate
 {
@@ -49,7 +49,7 @@ public class EntityB2Frag extends EntityInanimate
 	float				offset		= 0;
 	double				size		= 0;
 	public int			health;
-	
+
 	public EntityB2Frag(World par1World)
 	{
 		super(par1World);
@@ -58,7 +58,7 @@ public class EntityB2Frag extends EntityInanimate
 		setSize(7.5F, 7.5F);
 		ignoreFrustumCheck = true;
 	}
-	
+
 	public EntityB2Frag(World par1World, Entity toBeGibbed, int Type)
 	{
 		super(par1World);
@@ -66,18 +66,18 @@ public class EntityB2Frag extends EntityInanimate
 		boundingBox.setBounds(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5);
 		setSize(7.5F, 7.5F);
 		ignoreFrustumCheck = true;
-		
+
 		isSliding = false;
 		type = Type;
-		
+
 		motionyaw = (float) ((Math.random() - 0.5) * 35);
 		motionpitch = (float) ((Math.random() - 0.5) * 25);
-		
+
 		setLocationAndAngles(toBeGibbed.posX, toBeGibbed.posY, toBeGibbed.posZ, toBeGibbed.rotationYaw, toBeGibbed.rotationPitch);
-		
+
 		double ox = posX;
 		double oz = posZ;
-		
+
 		if (Type == 1)
 		{
 			posX -= (MathHelper.cos(((-rotationYaw) / 180.0F) * (float) Math.PI) * 7.5F);
@@ -88,37 +88,37 @@ public class EntityB2Frag extends EntityInanimate
 			posX -= (MathHelper.cos(((-rotationYaw + 180) / 180.0F) * (float) Math.PI) * 7.5F);
 			posZ -= (MathHelper.sin(((-rotationYaw + 180) / 180.0F) * (float) Math.PI) * 7.5F);
 		}
-		
+
 		setPosition(posX, posY, posZ);
-		
+
 		motionX = toBeGibbed.motionX;
 		motionY = toBeGibbed.motionY;
 		motionZ = toBeGibbed.motionZ;
-		
+
 		motionX += (-ox + posX) * 0.1;
 		motionZ += (-oz + posZ) * 0.1;
-		
+
 		setFire(10);
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
 		return par1Entity.boundingBox;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getBoundingBox()
 	{
 		return boundingBox;
 	}
-	
+
 	@Override
 	public boolean canBeCollidedWith()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public void onUpdate()
 	{
@@ -151,7 +151,7 @@ public class EntityB2Frag extends EntityInanimate
 						}
 						catch (IOException error)
 						{
-							
+
 						}
 					}
 					//Packet250CustomPayload packet = new Packet250CustomPayload();
@@ -161,23 +161,23 @@ public class EntityB2Frag extends EntityInanimate
 				}
 			}
 		}
-		
+
 		++ticksInAir;
-		
+
 		lastTickPosX = posX;
 		lastTickPosY = posY;
 		lastTickPosZ = posZ;
 		super.onUpdate();
-		
+
 		if (inGround)
 		{
 			++ticksInGround;
-			
+
 			if (ticksInGround == 1200)
 			{
 				setDead();
 			}
-			
+
 			inGround = false;
 			motionX *= (rand.nextFloat() * 0.2F);
 			motionY *= (rand.nextFloat() * 0.2F);
@@ -185,38 +185,38 @@ public class EntityB2Frag extends EntityInanimate
 			ticksInGround = 0;
 			ticksInAir = 0;
 		}
-		
+
 		Vec3 vec3 = Vec3.createVectorHelper(posX, posY, posZ);
 		Vec3 vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
 		MovingObjectPosition movingobjectposition = worldObj.rayTraceBlocks(vec3, vec31);
 		vec3 = Vec3.createVectorHelper(posX, posY, posZ);
 		vec31 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-		
+
 		if (movingobjectposition != null)
 		{
 			isSliding = true;
 			posY = movingobjectposition.hitVec.yCoord + offset;
 		}
-		
+
 		if (!worldObj.isRemote)
 		{
 			List var5 = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
 			Iterator var8 = var5.iterator();
-			
+
 			while (var8.hasNext())
 			{
 				Entity var9 = (Entity) var8.next();
-				
+
 				if (var9 instanceof EntityRocket)
 				{
 					((EntityRocket) var9).explode(null);
 				}
-				
+
 				if (var9 instanceof EntityPlasmoid)
 				{
 					((EntityPlasmoid) var9).explode();
 				}
-				
+
 				if (var9 instanceof EntityLaserBurst)
 				{
 					((EntityLaserBurst) var9).setDead();
@@ -224,19 +224,19 @@ public class EntityB2Frag extends EntityInanimate
 				}
 			}
 		}
-		
+
 		rotationPitch += motionpitch;
 		rotationYaw += motionyaw;
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
-		
+
 		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.5F;
 		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.5F;
-		
+
 		float f2 = 0.99F;
 		float f3 = 0.05F;
-		
+
 		if (isSliding == true)
 		{
 			motionpitch = 0;
@@ -245,17 +245,17 @@ public class EntityB2Frag extends EntityInanimate
 			f2 = 0.7f;
 			f3 = 0.0f;
 		}
-		
+
 		motionpitch *= (double) f2;
 		motionyaw *= (double) f2;
 		motionX *= f2;
 		motionY *= f2;
 		motionZ *= f2;
 		motionY -= f3;
-		
+
 		setPosition(posX, posY, posZ);
 	}
-	
+
 	public static byte[] getBytesString(String str)
 	{
 		char[] buffer = str.toCharArray();
@@ -266,7 +266,7 @@ public class EntityB2Frag extends EntityInanimate
 		}
 		return bytes;
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -277,7 +277,7 @@ public class EntityB2Frag extends EntityInanimate
 		par1NBTTagCompound.setByte("Type", (byte) type);
 		par1NBTTagCompound.setByte("inGround", (byte) (inGround ? 1 : 0));
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
@@ -288,27 +288,27 @@ public class EntityB2Frag extends EntityInanimate
 		type = par1NBTTagCompound.getByte("Type") & 255;
 		inGround = par1NBTTagCompound.getByte("inGround") == 1;
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public float getShadowSize()
 	{
 		return 0.0F;
 	}
-	
+
 	@Override
 	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
 	{
 		if (!isDead)
 		{
 			health -= par2;
-			
+
 			if (health <= 0)
 			{
 				setDead();
@@ -316,10 +316,10 @@ public class EntityB2Frag extends EntityInanimate
 				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	protected void entityInit()
 	{

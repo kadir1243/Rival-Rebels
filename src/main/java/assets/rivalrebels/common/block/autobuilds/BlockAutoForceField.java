@@ -16,8 +16,8 @@ import net.minecraft.init.Blocks;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockAutoForceField extends BlockAutoTemplate
 {
@@ -25,7 +25,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
@@ -34,7 +34,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 		{
 			int r = 2;
 			int h = 6;
-			
+
 			for (int y1 = 0; y1 <= h; y1++)
 			{
 				for (int x1 = -r; x1 <= r; x1++)
@@ -64,7 +64,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 					{
 						placeBlockCarefully(world, x, y + y1, z + z1, RivalRebels.conduit);
 					}
-					
+
 					for (int x1 = -r; x1 <= r; x1++)
 					{
 						placeBlockCarefully(world, x + x1, y + y1, z, RivalRebels.conduit);
@@ -73,7 +73,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 			}
 		}
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
@@ -86,7 +86,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -99,7 +99,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)

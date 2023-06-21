@@ -24,15 +24,15 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class TileEntityMeltDown extends TileEntity
 {
 	public float	size		= 0;
 	float			increment	= 0.075f;
 	float			prevsize	= 0;
-	
+
 	/**
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
@@ -51,7 +51,7 @@ public class TileEntityMeltDown extends TileEntity
 			worldObj.setBlock(xCoord, yCoord, zCoord, Blocks.air);
 			this.invalidate();
 		}
-		
+
 		double fsize = Math.sin(size) * 5.9;
 		fsize *= 2;
 		List l = this.worldObj.getEntitiesWithinAABBExcludingEntity(null, AxisAlignedBB.getBoundingBox(xCoord - fsize + 0.5, yCoord - fsize + 0.5, zCoord - fsize + 0.5, xCoord + fsize + 0.5, yCoord + fsize + 0.5, zCoord + fsize + 0.5));
@@ -59,14 +59,14 @@ public class TileEntityMeltDown extends TileEntity
 		{
 			Entity e = (Entity) l.get(i);
 			double var13 = e.getDistance(xCoord, yCoord, zCoord) / fsize;
-			
+
 			if (var13 <= 1.0D)
 			{
 				double var15 = e.posX - xCoord;
 				double var17 = e.posY + e.getEyeHeight() - yCoord;
 				double var19 = e.posZ - zCoord;
 				double var33 = MathHelper.sqrt_double(var15 * var15 + var17 * var17 + var19 * var19);
-				
+
 				if (var33 != 0.0D)
 				{
 					var15 /= var33;
@@ -86,13 +86,13 @@ public class TileEntityMeltDown extends TileEntity
 		}
 		super.updateEntity();
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
 		return AxisAlignedBB.getBoundingBox(xCoord - 2, yCoord - 2, zCoord - 2, xCoord + 3, yCoord + 3, zCoord + 3);
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()

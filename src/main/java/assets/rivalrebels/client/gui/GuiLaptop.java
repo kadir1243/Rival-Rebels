@@ -20,11 +20,11 @@
 // import RivalRebels.Common.Core.RivalRebels;
 // import RivalRebels.Common.Core.RivalRebelsClientPacketHandler;
 // import RivalRebels.Common.TileEntity.TileEntityLaptop;
-// import cpw.mods.fml.common.FMLCommonHandler;
-// import cpw.mods.fml.common.network.PacketDispatcher;
-// import cpw.mods.fml.common.registry.LanguageRegistry;
-// import cpw.mods.fml.relauncher.Side;
-// import cpw.mods.fml.relauncher.SideOnly;
+// import net.minecraftforge.fml.common.FMLCommonHandler;
+// import net.minecraftforge.fml.common.network.PacketDispatcher;
+// import net.minecraftforge.fml.common.registry.LanguageRegistry;
+// import net.minecraftforge.fml.relauncher.Side;
+// import net.minecraftforge.fml.relauncher.SideOnly;
 // import net.minecraft.inventory.Container;
 // import net.minecraft.network.packet.Packet250CustomPayload;
 // import net.minecraft.client.Minecraft;
@@ -148,9 +148,9 @@ import assets.rivalrebels.common.container.ContainerLaptop;
 import assets.rivalrebels.common.packet.LaptopButtonPacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class GuiLaptop extends GuiContainer
@@ -159,20 +159,20 @@ public class GuiLaptop extends GuiContainer
 	TileEntityLaptop	lt;
 	GuiButton			button;
 	boolean				prevButtonDown;
-	
+
 	public GuiLaptop(Container container)
 	{
 		super(container);
 		this.container = (ContainerLaptop) container;
 	}
-	
+
 	public GuiLaptop(InventoryPlayer inventoryPlayer, TileEntityLaptop tileEntity)
 	{
 		super(new ContainerLaptop(inventoryPlayer, tileEntity));
 		ySize = 206;
 		lt = tileEntity;
 	}
-	
+
 	@Override
 	public void initGui()
 	{
@@ -183,16 +183,16 @@ public class GuiLaptop extends GuiContainer
 		button = new GuiButton(0, x + 131, y + 89, 16, 16, "");
 		buttonList.add(button);
 	}
-	
+
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
 	{
 		super.drawGuiContainerForegroundLayer(par1, par2);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guilaptopnuke);
-		
+
 		if (lt.isReady()) this.drawTexturedModalRect(131, 89, 239, 9, 16, 16);
 		else this.drawTexturedModalRect(131, 89, 131, 89, 16, 16);
-		
+
 		int mousex = par1;
 		int mousey = par2;
 		int posx = (width - xSize) / 2;
@@ -225,9 +225,9 @@ public class GuiLaptop extends GuiContainer
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
-	
+
 	boolean	buttondown;
-	
+
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
 	{
