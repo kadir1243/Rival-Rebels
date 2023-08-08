@@ -11,101 +11,71 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.util.Vec3;
 
 public class Vertice
 {
-	public Vec3			p;
-	public Vec3			n;
-	public Vec2			t;
-	
-	private Tessellator	tes	= Tessellator.instance;
-	
-	public Vertice(float a, float b, float c, float d, float e, float f, float g, float h)
+	public Vec3	p;
+	public Vec3	n;
+	public Vec2	t;
+
+    public Vertice(float a, float b, float c, float d, float e, float f, float g, float h)
 	{
 		p = new Vec3(a, b, c);
 		n = new Vec3(d, e, f);
 		t = new Vec2(g, h);
 	}
-	
+
 	public Vertice(Vec3 P, Vec3 N, Vec2 T)
 	{
 		p = P;
 		n = N;
 		t = T;
 	}
-	
-	public void normalize()
-	{
-		double l = Math.sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
-		n.x /= l;
-		n.y /= l;
-		n.z /= l;
+
+	public void normalize() {
+        n = n.normalize();
 	}
-	
-	public void render()
-	{
-		tes.setTextureUV(t.x, t.y);
-		tes.setNormal(n.x, n.y, n.z);
-		tes.addVertex(p.x, p.y, p.z);
+
+	public void render(WorldRenderer worldRenderer) {
+        worldRenderer.pos(p.xCoord, p.yCoord, p.zCoord).tex(t.x, t.y).normal((float) n.xCoord, (float) n.yCoord, (float) n.zCoord).endVertex();
 	}
-	
-	public void renderWireframe()
+
+	public void renderWireframe(WorldRenderer worldRenderer)
 	{
-		tes.addVertex(p.x, p.y, p.z);
+		worldRenderer.pos(p.xCoord, p.yCoord, p.zCoord).endVertex();
 	}
-	
+
 	@Override
 	public Vertice clone()
 	{
-		return new Vertice(p.clone(), n.clone(), t.clone());
+		return new Vertice(p, n, t.clone());
 	}
-	
+
 	public static Vertice average(Vertice v1, Vertice v2)
 	{
-		Vertice v = new Vertice((v1.p.x + v2.p.x) / 2f, (v1.p.y + v2.p.y) / 2f, (v1.p.z + v2.p.z) / 2f, (v1.n.x + v2.n.x) / 2f, (v1.n.y + v2.n.y) / 2f, (v1.n.z + v2.n.z) / 2f, (v1.t.x + v2.t.x) / 2f, (v1.t.y + v2.t.y) / 2f);
-		return v;
+        return new Vertice((float) ((v1.p.xCoord + v2.p.xCoord) / 2F), (float) ((v1.p.yCoord + v2.p.yCoord) / 2f), (float) ((v1.p.zCoord + v2.p.zCoord) / 2f), (float) ((v1.n.xCoord + v2.n.xCoord) / 2f), (float) ((v1.n.yCoord + v2.n.yCoord) / 2f), (float) ((v1.n.zCoord + v2.n.zCoord) / 2f), (v1.t.x + v2.t.x) / 2f, (v1.t.y + v2.t.y) / 2f);
 	}
-	
-	public void scale(Vec3 v)
-	{
-		p.x *= v.x;
-		p.y *= v.y;
-		p.z *= v.z;
+
+	public void scale(Vec3 v) {
+        p = new Vec3(p.xCoord * v.xCoord, p.yCoord * v.yCoord, p.zCoord * v.zCoord);
 	}
 }
 
 class Vec2
 {
 	float	x, y;
-	
+
 	public Vec2(float X, float Y)
 	{
 		x = X;
 		y = Y;
 	}
-	
+
 	@Override
 	public Vec2 clone()
 	{
 		return new Vec2(x, y);
-	}
-}
-
-class Vec3
-{
-	float	x, y, z;
-	
-	public Vec3(float X, float Y, float Z)
-	{
-		x = X;
-		y = Y;
-		z = Z;
-	}
-	
-	@Override
-	public Vec3 clone()
-	{
-		return new Vec3(x, y, z);
 	}
 }

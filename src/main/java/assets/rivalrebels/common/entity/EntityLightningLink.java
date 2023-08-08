@@ -28,7 +28,6 @@ public class EntityLightningLink extends EntityInanimate
 		ignoreFrustumCheck = true;
 		setSize(0.5F, 0.5F);
 		ticksExisted = 0;
-		yOffset = 0.0F;
 	}
 
 	public EntityLightningLink(World par1World, Entity player, double distance)
@@ -41,7 +40,6 @@ public class EntityLightningLink extends EntityInanimate
 		posY -= 0.12;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		setSize(0.5F, 0.5F);
 		ticksExisted = 0;
 	}
@@ -53,7 +51,6 @@ public class EntityLightningLink extends EntityInanimate
 		setLocationAndAngles(x, y, z, yaw, pitch);
 		motionX = distance / 100;
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		setSize(0.5F, 0.5F);
 		ticksExisted = 0;
 	}

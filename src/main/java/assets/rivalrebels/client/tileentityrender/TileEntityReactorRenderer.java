@@ -37,7 +37,7 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer<TileEnt
 		mr = new ModelReactor();
 		ml = new ModelLaptop();
 		try {
-			mo = ModelFromObj.readObjFile("a.obj");
+			mo = ModelFromObj.readObjFile("electrode.obj");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -91,7 +91,7 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer<TileEnt
 			if (temb.powerGiven > 0)
 			{
 				float radius = (temb.powerGiven * temb.powerGiven) / 40000;
-				radius += 0.03;
+				radius += 0.03F;
 				int steps = 2;
 				if (radius > 0.05) steps++;
 				if (radius > 0.10) steps++;

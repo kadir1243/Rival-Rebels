@@ -9,11 +9,12 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-package assets.rivalrebels.client.blockrenderer;
+/*package assets.rivalrebels.client.blockrenderer;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.util.IIcon;
 import net.minecraft.world.IBlockAccess;
 
@@ -27,9 +28,10 @@ public class SteelBlockRenderer implements ISimpleBlockRenderingHandler
 	@Override
 	public void renderInventoryBlock(Block block, int metadata, int modelID, RenderBlocks renderer)
 	{
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
-		block.setBlockBoundsForItemRender();
+        block.setBlockBoundsForItemRender();
 		renderer.setRenderBoundsFromBlock(block);
 		GL11.glRotatef(90.0F, 0.0F, 1.0F, 0.0F);
 		GL11.glTranslatef(-0.5F, -0.5F, -0.5F);
@@ -110,7 +112,7 @@ public class SteelBlockRenderer implements ISimpleBlockRenderingHandler
 		float f5;
 		float f6;
 		int l = block.getMixedBrightnessForBlock(renderer.blockAccess, x, y, z);
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.getInstance();
 		tessellator.setBrightness(0);
 		boolean flag2;
 		boolean flag3;
@@ -1250,3 +1252,4 @@ public class SteelBlockRenderer implements ISimpleBlockRenderingHandler
 		return true;
 	}
 }
+*/

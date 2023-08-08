@@ -11,24 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
+import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.item.ItemChip;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockRhodesActivator extends BlockContainer
 {
@@ -37,31 +25,18 @@ public class BlockRhodesActivator extends BlockContainer
 		super(Material.iron);
 	}
 
-	@Override
-	public boolean renderAsNormalBlock()
-	{
-		return true;
-	}
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
 
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return true;
-	}
-
-	@Override
-	public boolean hasTileEntity(int metadata)
-	{
-		return true;
-	}
-
-	@Override
+    @Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityRhodesActivator();
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
 	@SideOnly(Side.CLIENT)
 	IIcon	icontop;
@@ -78,5 +53,5 @@ public class BlockRhodesActivator extends BlockContainer
 	{
 		icon = iconregister.registerIcon("RivalRebels:ci");
 		icontop = iconregister.registerIcon("RivalRebels:ch");
-	}
+	}*/
 }

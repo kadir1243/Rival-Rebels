@@ -11,39 +11,36 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockStairs;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.world.World;
 
-public class BlockFlare extends Block
-{
+import java.util.Random;
+
+public class BlockFlare extends Block {
+    public static final PropertyEnum<EnumFacing> FACING = PropertyEnum.create("facing", EnumFacing.class, input -> input == EnumFacing.UP);
 	public BlockFlare()
 	{
 		super(Material.wood);
 	}
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int i)
-	{
-		return null;
-	}
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+        return null;
+    }
 
-	/**
+    /**
 	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
 	 * etc to this block.
 	 */
@@ -57,7 +54,7 @@ public class BlockFlare extends Block
 	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
 	 */
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
@@ -71,116 +68,112 @@ public class BlockFlare extends Block
 		return 2;
 	}
 
-	private boolean canPlaceTorchOn(World par1World, int par2, int par3, int par4)
-	{
-		if (par1World.isBlockNormalCubeDefault(par2, par3, par4, true))
-		{
-			return true;
-		}
-
-		Block i = par1World.getBlock(par2, par3, par4);
-
-		if (i == Blocks.fence || i == Blocks.nether_brick_fence || i == Blocks.glass)
-		{
-			return true;
-		}
-
-		if (i != null && (i instanceof BlockStairs))
-		{
-			int j = par1World.getBlockMetadata(par2, par3, par4);
-
-			if ((4 & j) != 0)
-			{
-				return true;
-			}
-		}
-
-		return false;
+	private boolean canPlaceOn(World world, BlockPos pos) {
+        if (World.doesBlockHaveSolidTopSurface(world, pos)) {
+            return true;
+        } else {
+            Block block = world.getBlockState(pos).getBlock();
+            return block.canPlaceTorchOnTop(world, pos);
+        }
 	}
 
-	/**
-	 * Checks to see if its valid to put this block at the specified coordinates. Args: world, x, y, z
-	 */
-	@Override
-	public boolean canPlaceBlockAt(World par1World, int par2, int par3, int par4)
-	{
-		return canPlaceTorchOn(par1World, par2, par3 - 1, par4);
+    private boolean canPlaceAt(World worldIn, BlockPos pos, EnumFacing facing) {
+        BlockPos blockpos = pos.offset(facing.getOpposite());
+        boolean flag = facing.getAxis().isHorizontal();
+        return flag && worldIn.isSideSolid(blockpos, facing, true) || facing.equals(EnumFacing.UP) && this.canPlaceOn(worldIn, blockpos);
+    }
+
+    @Override
+    public boolean canPlaceBlockAt(World worldIn, BlockPos pos) {
+        for (EnumFacing enumfacing : FACING.getAllowedValues()) {
+            if (this.canPlaceAt(worldIn, pos, enumfacing)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        if (this.canPlaceAt(worldIn, pos, facing)) {
+            return this.getDefaultState().withProperty(FACING, facing);
+        }
+        else
+        {
+            for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
+            {
+                if (worldIn.isSideSolid(pos.offset(enumfacing.getOpposite()), enumfacing, true))
+                {
+                    return this.getDefaultState().withProperty(FACING, enumfacing);
+                }
+            }
+
+            return this.getDefaultState();
+        }
 	}
 
-	/**
-	 * Called when a block is placed using an item. Used often for taking the facing and figuring out how to position the item. Args: x, y, z, facing
-	 */
-	public void onBlockPlaced(World par1World, int par2, int par3, int par4, int par5)
-	{
-		int i = par1World.getBlockMetadata(par2, par3, par4);
-
-		if (par5 == 1 && canPlaceTorchOn(par1World, par2, par3 - 1, par4))
-		{
-			i = 5;
-		}
-
-		if (par5 == 2 && par1World.isBlockNormalCubeDefault(par2, par3, par4 + 1, true))
-		{
-			i = 4;
-		}
-
-		if (par5 == 3 && par1World.isBlockNormalCubeDefault(par2, par3, par4 - 1, true))
-		{
-			i = 3;
-		}
-
-		if (par5 == 4 && par1World.isBlockNormalCubeDefault(par2 + 1, par3, par4, true))
-		{
-			i = 2;
-		}
-
-		if (par5 == 5 && par1World.isBlockNormalCubeDefault(par2 - 1, par3, par4, true))
-		{
-			i = 1;
-		}
-		par1World.setBlockMetadataWithNotify(par2, par3, par4, i, 0);
-		par1World.scheduleBlockUpdate(par2, par3, par4, this, 1);
-	}
-
-	@Override
-	public void randomDisplayTick(World world, int x, int y, int z, Random par5Random)
-	{
-		world.spawnParticle("lava", x + .5, y + .6, z + .5, 0, 0.5, 0);
-		world.spawnParticle("lava", x + .5, y + .8, z + .5, 0, 0.5, 0);
-		world.spawnParticle("lava", x + .5, y + 1, z + .5, 0, 0.5, 0);
-		world.spawnParticle("flame", x + .5, y + 1.2, z + .5, (-0.5 + world.rand.nextFloat()) * 0.1, 0.5 + world.rand.nextFloat() * 0.5, (-0.5 + world.rand.nextFloat()) * 0.1);
-		world.spawnParticle("flame", x + .5, y + 1.4, z + .5, (-0.5 + world.rand.nextFloat()) * 0.1, 0.5 + world.rand.nextFloat() * 0.5, (-0.5 + world.rand.nextFloat()) * 0.1);
-		world.spawnParticle("smoke", x + .5, y + 1.6, z + .5, (-0.5 + world.rand.nextFloat()) * 0.1, 0.5 + world.rand.nextFloat() * 0.5, (-0.5 + world.rand.nextFloat()) * 0.1);
+    @Override
+    public void randomDisplayTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+		world.spawnParticle(EnumParticleTypes.LAVA, x + .5, y + .6, z + .5, 0, 0.5, 0);
+		world.spawnParticle(EnumParticleTypes.LAVA, x + .5, y + .8, z + .5, 0, 0.5, 0);
+		world.spawnParticle(EnumParticleTypes.LAVA, x + .5, y + 1, z + .5, 0, 0.5, 0);
+		world.spawnParticle(EnumParticleTypes.FLAME, x + .5, y + 1.2, z + .5, (-0.5 + world.rand.nextFloat()) * 0.1, 0.5 + world.rand.nextFloat() * 0.5, (-0.5 + world.rand.nextFloat()) * 0.1);
+		world.spawnParticle(EnumParticleTypes.FLAME, x + .5, y + 1.4, z + .5, (-0.5 + world.rand.nextFloat()) * 0.1, 0.5 + world.rand.nextFloat() * 0.5, (-0.5 + world.rand.nextFloat()) * 0.1);
+		world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + .5, y + 1.6, z + .5, (-0.5 + world.rand.nextFloat()) * 0.1, 0.5 + world.rand.nextFloat() * 0.5, (-0.5 + world.rand.nextFloat()) * 0.1);
 		world.playSoundEffect(x, y, z, "random.fizz", 3F, 2);
 	}
 
-	@Override
-	public void updateTick(World world, int x, int y, int z, Random random)
-	{
-		world.scheduleBlockUpdate(x, y, z, this, 1);
-		if (world.getBlock(x + 1, y, z) == Blocks.water || world.getBlock(x - 1, y, z) == Blocks.water || world.getBlock(x, y, z + 1) == Blocks.water || world.getBlock(x, y, z - 1) == Blocks.water)
-		{
-			world.setBlock(x, y, z, Blocks.air);
-			world.spawnEntityInWorld(new EntityItem(world, x, y, z, new ItemStack(RivalRebels.flare)));
+    @Override
+    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
+        if (this.checkForDrop(worldIn, pos, state)) {
+            EnumFacing enumfacing = state.getValue(FACING);
+            EnumFacing.Axis axis = enumfacing.getAxis();
+            EnumFacing opposite = enumfacing.getOpposite();
+            boolean flag = false;
+
+            if (axis.isHorizontal() && !worldIn.isSideSolid(pos.offset(opposite), enumfacing, true)) {
+                flag = true;
+            } else if (axis.isVertical() && !this.canPlaceOn(worldIn, pos.offset(opposite))) {
+                flag = true;
+            }
+
+            if (flag) {
+                this.dropBlockAsItem(worldIn, pos, state, 0);
+                worldIn.setBlockToAir(pos);
+            }
+        }
+    }
+
+    protected boolean checkForDrop(World worldIn, BlockPos pos, IBlockState state) {
+        if (state.getBlock() == this && this.canPlaceAt(worldIn, pos, state.getValue(FACING))) {
+            return true;
+        } else {
+            if (worldIn.getBlockState(pos).getBlock() == this) {
+                this.dropBlockAsItem(worldIn, pos, state, 0);
+                worldIn.setBlockToAir(pos);
+            }
+
+            return false;
+        }
+    }
+
+    @Override
+    public void onBlockDestroyedByPlayer(World world, BlockPos pos, IBlockState state) {
+		if (RivalRebels.flareExplode) {
+            world.setBlockToAir(pos);
+			new Explosion(world, pos.getX(), pos.getY(), pos.getZ(), 3, true, false, RivalRebelsDamageSource.flare);
+			world.playSoundEffect(pos.getX(), pos.getY(), pos.getZ(), "random.explode", 0.5f, 0.3f);
 		}
 	}
 
-	@Override
-	public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int m)
-	{
-		if (RivalRebels.flareExplode)
-		{
-			world.setBlock(x, y, z, Blocks.air);
-			new Explosion(world, x, y, z, 3, true, false, RivalRebelsDamageSource.flare);
-			world.playSoundEffect(x, y, z, "random.explode", 0.5f, 0.3f);
-		}
-	}
-
-	@Override
-	public void onEntityCollidedWithBlock(World par1World, int par2, int par3, int par4, Entity par5Entity)
-	{
-		par5Entity.attackEntityFrom(RivalRebelsDamageSource.flare, 1);
-		par5Entity.setFire(5);
+    @Override
+    public void onEntityCollidedWithBlock(World worldIn, BlockPos pos, Entity entity) {
+		entity.attackEntityFrom(RivalRebelsDamageSource.flare, 1);
+		entity.setFire(5);
 	}
 
 	@Override
@@ -189,18 +182,12 @@ public class BlockFlare extends Block
 		return 0;
 	}
 
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
+    public IBlockState getStateFromMeta(int meta) {
+        return getDefaultState().withProperty(FACING, EnumFacing.VALUES[meta]);
+    }
 
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:an");
-	}
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(FACING).getIndex();
+    }
 }

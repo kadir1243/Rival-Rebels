@@ -11,13 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.World;
 
 public class BlockAutoMineTrap extends BlockAutoTemplate
 {
@@ -32,7 +27,7 @@ public class BlockAutoMineTrap extends BlockAutoTemplate
 		super.build(world, x, y, z);
 		if (!world.isRemote)
 		{
-			world.setBlock(x, y, z, Blocks.air);
+			placeAir(world, x, y, z);
 			int r = 2;
 			for (int z1 = -r; z1 <= r; z1++)
 			{
@@ -44,7 +39,7 @@ public class BlockAutoMineTrap extends BlockAutoTemplate
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -80,5 +75,5 @@ public class BlockAutoMineTrap extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:df"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:df"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:df"); // SIDE E
-	}
+	}*/
 }

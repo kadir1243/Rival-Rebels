@@ -12,11 +12,13 @@
 package assets.rivalrebels.client.renderhelper;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
-
 import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
+
+import static org.lwjgl.opengl.GL11.*;
 
 public class RenderHelper
 {
@@ -68,20 +70,20 @@ public class RenderHelper
 	{
 		GL11.glPushMatrix();
 		GL11.glTranslatef(v1.x, v1.y, v1.z);
-		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.enableRescaleNormal();
 		size /= 2;
 		Tessellator t = Tessellator.getInstance();
 		GL11.glRotatef(180 - Minecraft.getMinecraft().thePlayer.rotationYaw, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(90 - Minecraft.getMinecraft().thePlayer.rotationPitch, 1.0F, 0.0F, 0.0F);
-        WorldRenderer renderer = t.getWorldRenderer();
-        renderer.startDrawingQuads();
-		renderer.setNormal(0.0F, 1.0F, 0.0F);
-		renderer.addVertexWithUV(-size, 0, -size, 0, 0);
-		renderer.addVertexWithUV(size, 0, -size, 1, 0);
-		renderer.addVertexWithUV(size, 0, size, 1, 1);
-		renderer.addVertexWithUV(-size, 0, size, 0, 1);
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.putNormal(0.0F, 1.0F, 0.0F);
+		worldRenderer.pos(-size, 0, -size).tex(0, 0).endVertex();
+		worldRenderer.pos(size, 0, -size).tex(1, 0).endVertex();
+		worldRenderer.pos(size, 0, size).tex(1, 1).endVertex();
+		worldRenderer.pos(-size, 0, size).tex(0, 1).endVertex();
 		t.draw();
-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.disableRescaleNormal();
 		GL11.glPopMatrix();
 	}
 
@@ -89,20 +91,21 @@ public class RenderHelper
 	{
 		GL11.glPushMatrix();
 		GL11.glTranslatef(v1.x, v1.y, v1.z);
-		GL11.glEnable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.enableRescaleNormal();
 		size1 /= 2;
 		size2 /= 2;
-		Tessellator t = Tessellator.instance;
-		GL11.glRotatef(180 - Minecraft.getMinecraft().thePlayer.rotationYaw, 0.0F, 1.0F, 0.0F);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        GL11.glRotatef(180 - Minecraft.getMinecraft().thePlayer.rotationYaw, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(90 - Minecraft.getMinecraft().thePlayer.rotationPitch, 1.0F, 0.0F, 0.0F);
-		t.startDrawingQuads();
-		t.setNormal(0.0F, 1.0F, 0.0F);
-		t.addVertexWithUV(-size1, 0, -size1, 0, 0);
-		t.addVertexWithUV(size1, 0, -size1, 1, 0);
-		t.addVertexWithUV(size1, 0, size1, 1, 1);
-		t.addVertexWithUV(-size1, 0, size1, 0, 1);
+        worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.putNormal(0.0F, 1.0F, 0.0F);
+		worldRenderer.pos(-size1, 0, -size1).tex(0, 0).endVertex();
+		worldRenderer.pos(size1, 0, -size1).tex(1, 0).endVertex();
+		worldRenderer.pos(size1, 0, size1).tex(1, 1).endVertex();
+		worldRenderer.pos(-size1, 0, size1).tex(0, 1).endVertex();
 		t.draw();
-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
+        GlStateManager.disableRescaleNormal();
 		GL11.glPopMatrix();
 	}
 
@@ -130,100 +133,88 @@ public class RenderHelper
 
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4)
 	{
-		Tessellator t = Tessellator.instance;
-		Vertice mv = new Vertice((v1.x + v2.x + v3.x + v4.x) / 4, (v1.y + v2.y + v3.y + v4.y) / 4, (v1.z + v2.z + v3.z + v4.z) / 4);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        Vertice mv = new Vertice((v1.x + v2.x + v3.x + v4.x) / 4, (v1.y + v2.y + v3.y + v4.y) / 4, (v1.z + v2.z + v3.z + v4.z) / 4);
 		TextureVertice mt = new TextureVertice((t1.x + t2.x + t3.x + t4.x) / 4, (t1.y + t2.y + t3.y + t4.y) / 4);
-		t.startDrawing(GL11.GL_TRIANGLES);
-		addVertice(v1, t1);
-		addVertice(v2, t2);
-		addVertice(mv, mt);
+		worldRenderer.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX);
+		addVertice(worldRenderer, v1, t1);
+		addVertice(worldRenderer, v2, t2);
+		addVertice(worldRenderer, mv, mt);
 		t.draw();
-		t.startDrawing(GL11.GL_TRIANGLES);
-		addVertice(v2, t2);
-		addVertice(v3, t3);
-		addVertice(mv, mt);
+		worldRenderer.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX);
+		addVertice(worldRenderer, v2, t2);
+		addVertice(worldRenderer, v3, t3);
+		addVertice(worldRenderer, mv, mt);
 		t.draw();
-		t.startDrawing(GL11.GL_TRIANGLES);
-		addVertice(v3, t3);
-		addVertice(v4, t4);
-		addVertice(mv, mt);
+		worldRenderer.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX);
+		addVertice(worldRenderer, v3, t3);
+		addVertice(worldRenderer, v4, t4);
+		addVertice(worldRenderer, mv, mt);
 		t.draw();
-		t.startDrawing(GL11.GL_TRIANGLES);
-		addVertice(v4, t4);
-		addVertice(v1, t1);
-		addVertice(mv, mt);
+		worldRenderer.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX);
+		addVertice(worldRenderer, v4, t4);
+		addVertice(worldRenderer, v1, t1);
+		addVertice(worldRenderer, mv, mt);
 		t.draw();
 	}
 
-	// private void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4)
-	// {
-	// Tessellator t = Tessellator.instance;
-	// t.startDrawing(GL11.GL_QUADS);
-	// addVertice(v1, t1);
-	// addVertice(v2, t2);
-	// addVertice(v3);
-	// addVertice(v4);
-	// t.draw();
-	// }
-
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4)
 	{
-		Tessellator t = Tessellator.instance;
-		t.startDrawing(GL11.GL_QUADS);
-		addVertice(v1);
-		addVertice(v2);
-		addVertice(v3);
-		addVertice(v4);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION);
+		addVertice(worldRenderer, v1);
+		addVertice(worldRenderer, v2);
+		addVertice(worldRenderer, v3);
+		addVertice(worldRenderer, v4);
 		t.draw();
 	}
 
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureFace t)
 	{
-		Tessellator tess = Tessellator.instance;
-		tess.startDrawingQuads();
-		addVertice(v1, t.v1);
-		addVertice(v2, t.v2);
-		addVertice(v3, t.v3);
-		addVertice(v4, t.v4);
+		Tessellator tess = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tess.getWorldRenderer();
+        worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		addVertice(worldRenderer, v1, t.getV1());
+		addVertice(worldRenderer, v2, t.getV2());
+		addVertice(worldRenderer, v3, t.getV3());
+		addVertice(worldRenderer, v4, t.getV4());
 		tess.draw();
 	}
 
 	public static void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, float par5, float par6, float par7, float par8)
 	{
-		Tessellator t = Tessellator.instance;
-		t.startDrawingQuads();
-		addVertice(v1, par5, par8);
-		addVertice(v2, par6, par8);
-		addVertice(v3, par6, par7);
-		addVertice(v4, par5, par7);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		addVertice(worldRenderer, v1, par5, par8);
+		addVertice(worldRenderer, v2, par6, par8);
+		addVertice(worldRenderer, v3, par6, par7);
+		addVertice(worldRenderer, v4, par5, par7);
 		t.draw();
 	}
 
 	public static void addTri(Vertice v1, Vertice v2, Vertice v3)
 	{
-		Tessellator t = Tessellator.instance;
-		t.startDrawing(6);
-		addVertice(v3);
-		addVertice(v1);
-		addVertice(v2);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        worldRenderer.begin(GL_TRIANGLE_FAN, DefaultVertexFormats.POSITION);
+		addVertice(worldRenderer, v3);
+		addVertice(worldRenderer, v1);
+		addVertice(worldRenderer, v2);
 		t.draw();
 	}
 
-	public static void addVertice(Vertice v, TextureVertice t)
-	{
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.addVertexWithUV(v.x, v.y, v.z, t.x, t.y);
+	public static void addVertice(WorldRenderer worldRenderer, Vertice v, TextureVertice t) {
+		worldRenderer.pos(v.x, v.y, v.z).tex(t.x, t.y).endVertex();
 	}
 
-	public static void addVertice(Vertice v, float x, float y)
-	{
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.addVertexWithUV(v.x, v.y, v.z, x, y);
-	}
+    public static void addVertice(WorldRenderer worldRenderer, Vertice v, float x, float y) {
+        worldRenderer.pos(v.x, v.y, v.z).tex(x, y).endVertex();
+    }
 
-	public static void addVertice(Vertice v)
-	{
-		Tessellator tessellator = Tessellator.instance;
-		tessellator.addVertex(v.x, v.y, v.z);
-	}
+    public static void addVertice(WorldRenderer worldRenderer, Vertice v) {
+        worldRenderer.pos(v.x, v.y, v.z).endVertex();
+    }
 }

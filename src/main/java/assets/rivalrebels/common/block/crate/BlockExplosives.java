@@ -11,22 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockExplosives extends Block
 {
@@ -41,23 +37,22 @@ public class BlockExplosives extends Block
 		return 0;
 	}
 
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
-	{
-		blockActivated(world, x, y, z, player);
-	}
+    @Override
+    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+        blockActivated(worldIn, pos.getX(), pos.getY(), pos.getZ(), playerIn);
+    }
 
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
+    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
 	{
 		if (world.isRemote)
 		{
-			player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("RivalRebels.Inventory")));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.timedbomb.getUnlocalizedName() + ".name") + ". §9(" + "1 minute countdown." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.pliers.getUnlocalizedName() + ".name") + ". §9(" + "to defuse explosives." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.remotecharge.getUnlocalizedName() + ".name") + ". §9(" + "Remote charge." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.remote.getUnlocalizedName() + ".name") + ". §9(" + "Set and detonate charge." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.minetrap.getUnlocalizedName() + ".name") + ". §9(" + "Handle with care." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.flare.getUnlocalizedName() + ".name") + ". §9(" + "Incendiary defense." + ")"));
+			player.addChatMessage(new ChatComponentText(I18n.format("RivalRebels.Inventory")));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.timedbomb.getUnlocalizedName() + ".name") + ". §9(" + "1 minute countdown." + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.pliers.getUnlocalizedName() + ".name") + ". §9(" + "to defuse explosives." + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.remotecharge.getUnlocalizedName() + ".name") + ". §9(" + "Remote charge." + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.remote.getUnlocalizedName() + ".name") + ". §9(" + "Set and detonate charge." + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.minetrap.getUnlocalizedName() + ".name") + ". §9(" + "Handle with care." + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.flare.getUnlocalizedName() + ".name") + ". §9(" + "Incendiary defense." + ")"));
 		}
 		if (!world.isRemote)
 		{
@@ -73,14 +68,14 @@ public class BlockExplosives extends Block
 			world.spawnEntityInWorld(ei3);
 			world.spawnEntityInWorld(ei4);
 			world.spawnEntityInWorld(ei5);
-			world.setBlock(x, y, z, Blocks.air);
+			world.setBlockToAir(new BlockPos(x, y, z));
 			return true;
 		}
 		return true;
 
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -116,5 +111,5 @@ public class BlockExplosives extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:am"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:am"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:am"); // SIDE E
-	}
+	}*/
 }

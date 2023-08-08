@@ -14,8 +14,11 @@ package assets.rivalrebels.client.model;
 import net.minecraft.client.renderer.Tessellator;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.Vertice;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class ModelJump
@@ -35,20 +38,21 @@ public class ModelJump
 
 	public void renderModel()
 	{
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
-		tessellator.startDrawingQuads();
-		RenderHelper.addVertice(v2, 0, 0);
-		RenderHelper.addVertice(v1, 1, 0);
-		RenderHelper.addVertice(v4, 1, 1);
-		RenderHelper.addVertice(v3, 0, 1);
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		RenderHelper.addVertice(worldRenderer, v2, 0, 0);
+		RenderHelper.addVertice(worldRenderer, v1, 1, 0);
+		RenderHelper.addVertice(worldRenderer, v4, 1, 1);
+		RenderHelper.addVertice(worldRenderer, v3, 0, 1);
 		tessellator.draw();
 
-		tessellator.startDrawingQuads();
-		RenderHelper.addVertice(v5, 0, 0);
-		RenderHelper.addVertice(v6, 1, 0);
-		RenderHelper.addVertice(v7, 1, 1);
-		RenderHelper.addVertice(v8, 0, 1);
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		RenderHelper.addVertice(worldRenderer, v5, 0, 0);
+		RenderHelper.addVertice(worldRenderer, v6, 1, 0);
+		RenderHelper.addVertice(worldRenderer, v7, 1, 1);
+		RenderHelper.addVertice(worldRenderer, v8, 0, 1);
 		tessellator.draw();
 	}
 }

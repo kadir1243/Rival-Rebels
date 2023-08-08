@@ -11,22 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.TileEntityOmegaObjective;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+
+import java.util.Random;
 
 public class BlockOmegaObjective extends BlockContainer
 {
@@ -42,32 +41,28 @@ public class BlockOmegaObjective extends BlockContainer
 		return 0;
 	}
 
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		if (x!=RivalRebels.round.oObjx||y!=RivalRebels.round.oObjy||z!=RivalRebels.round.oObjz)
+    @Override
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+		if (!pos.equals(RivalRebels.round.oObj))
 		{
-			world.setBlock(RivalRebels.round.oObjx, RivalRebels.round.oObjy, RivalRebels.round.oObjz, RivalRebels.plasmaexplosion);
-			RivalRebels.round.oObjx = x;
-			RivalRebels.round.oObjy = y;
-			RivalRebels.round.oObjz = z;
-			if (world.getBlock(RivalRebels.round.sObjx, RivalRebels.round.sObjy, RivalRebels.round.sObjz) == RivalRebels.sigmaobj)
+			world.setBlockState(RivalRebels.round.oObj, RivalRebels.plasmaexplosion.getDefaultState());
+            RivalRebels.round.oObj = pos;
+			if (world.getBlockState(RivalRebels.round.oObj).getBlock() == RivalRebels.sigmaobj)
 				RivalRebels.round.roundManualStart();
 		}
 	}
 
-	@Override
-	public void breakBlock(World world, int x, int y, int z, Block par5, int par6)
-	{
-		super.breakBlock(world, x, y, z, par5, par6);
-		if (world.getBlock(x, y, z) != RivalRebels.plasmaexplosion) {
-			world.setBlock(x, y, z, this);
-		}
-	}
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        super.breakBlock(world, pos, state);
+        if (world.getBlockState(pos).getBlock() != RivalRebels.plasmaexplosion) {
+            world.setBlockState(pos, state);
+        }
+    }
 
     @Override
-    public boolean canHarvestBlock(EntityPlayer player, int meta) {
-        return player.capabilities.isCreativeMode || super.canHarvestBlock(player, meta);
+    public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player) {
+        return player.capabilities.isCreativeMode || super.canHarvestBlock(world, pos, player);
     }
 
     /**
@@ -84,7 +79,7 @@ public class BlockOmegaObjective extends BlockContainer
 	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
 	 */
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
@@ -98,18 +93,14 @@ public class BlockOmegaObjective extends BlockContainer
 		return -1;
 	}
 
-	/**
-	 * Called upon block activation (right click on the block.)
-	 */
-	@Override
-	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
-	{
-		RivalRebelsSoundPlayer.playSound(par1World, 10, 3, par2, par3, par4);
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
+        RivalRebelsSoundPlayer.playSound(worldIn, 10, 3, pos);
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
+    /**
 	 * Returns a new instance of a block's tile entity class. Called on placing the block.
 	 */
 	@Override
@@ -118,7 +109,7 @@ public class BlockOmegaObjective extends BlockContainer
 		return new TileEntityOmegaObjective();
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
 
 	@Override
@@ -131,5 +122,5 @@ public class BlockOmegaObjective extends BlockContainer
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
 		icon = iconregister.registerIcon("RivalRebels:ba");
-	}
+	}*/
 }

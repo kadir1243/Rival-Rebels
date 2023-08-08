@@ -11,15 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockSmartCamo extends Block
 {
@@ -28,66 +26,41 @@ public class BlockSmartCamo extends Block
 		super(Material.iron);
 	}
 
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		if (world.getBlock(x + 1, y, z) == Blocks.snow_layer || world.getBlock(x - 1, y, z) == Blocks.snow_layer || world.getBlock(x, y, z - 1) == Blocks.snow_layer || world.getBlock(x, y, z + 1) == Blocks.snow_layer)
+    @Override
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+        Block eastBlock = world.getBlockState(pos.east()).getBlock();
+        Block westBlock = world.getBlockState(pos.west()).getBlock();
+        Block northBlock = world.getBlockState(pos.north()).getBlock();
+        Block southBlock = world.getBlockState(pos.south()).getBlock();
+        if (eastBlock == Blocks.snow_layer || westBlock == Blocks.snow_layer || northBlock == Blocks.snow_layer || southBlock == Blocks.snow_layer)
 		{
-			world.setBlock(x, y, z, RivalRebels.camo3);
+			world.setBlockState(pos, RivalRebels.camo3.getDefaultState());
 		}
 		else
 		{
-			if (world.getBlock(x, y - 1, z) == Blocks.grass || world.getBlock(x, y - 1, z) == Blocks.dirt)
-			{
-				world.setBlock(x, y, z, RivalRebels.camo1);
-			}
-			else
-			{
-				if (world.getBlock(x, y - 1, z) == Blocks.sand || world.getBlock(x, y - 1, z) == Blocks.sandstone)
-				{
-					world.setBlock(x, y, z, RivalRebels.camo2);
-				}
-				else
-				{
-					if (world.getBlock(x, y - 1, z) == Blocks.stone || world.getBlock(x, y - 1, z) == Blocks.gravel || world.getBlock(x, y - 1, z) == Blocks.bedrock || world.getBlock(x, y - 1, z) == Blocks.cobblestone)
-					{
-						world.setBlock(x, y, z, RivalRebels.camo3);
-					}
-					else
-					{
-						if (world.getBlock(x, y - 1, z) == RivalRebels.camo2 || world.getBlock(x + 1, y, z) == RivalRebels.camo2 || world.getBlock(x - 1, y, z) == RivalRebels.camo2 || world.getBlock(x, y, z + 1) == RivalRebels.camo2 || world.getBlock(x, y, z - 1) == RivalRebels.camo2 || world.getBlock(x, y + 1, z) == RivalRebels.camo2)
-						{
-							world.setBlock(x, y, z, RivalRebels.camo2);
-						}
-						else
-						{
-							if (world.getBlock(x, y - 1, z) == RivalRebels.camo3 || world.getBlock(x + 1, y, z) == RivalRebels.camo3 || world.getBlock(x - 1, y, z) == RivalRebels.camo3 || world.getBlock(x, y, z + 1) == RivalRebels.camo3 || world.getBlock(x, y, z - 1) == RivalRebels.camo3 || world.getBlock(x, y + 1, z) == RivalRebels.camo3)
-							{
-								world.setBlock(x, y, z, RivalRebels.camo3);
-							}
-							else
-							{
-								world.setBlock(x, y, z, RivalRebels.camo1);
+            Block downBlock = world.getBlockState(pos.down()).getBlock();
+            if (downBlock == Blocks.grass || downBlock == Blocks.dirt) {
+				world.setBlockState(pos, RivalRebels.camo1.getDefaultState());
+			} else {
+				if (downBlock == Blocks.sand || downBlock == Blocks.sandstone) {
+					world.setBlockState(pos, RivalRebels.camo2.getDefaultState());
+				} else {
+					if (downBlock == Blocks.stone || downBlock == Blocks.gravel || downBlock == Blocks.bedrock || downBlock == Blocks.cobblestone) {
+						world.setBlockState(pos, RivalRebels.camo3.getDefaultState());
+					} else {
+                        Block upBlock = world.getBlockState(pos.up()).getBlock();
+                        if (downBlock == RivalRebels.camo2 || eastBlock == RivalRebels.camo2 || westBlock == RivalRebels.camo2 || southBlock == RivalRebels.camo2 || northBlock == RivalRebels.camo2 || upBlock == RivalRebels.camo2) {
+							world.setBlockState(pos, RivalRebels.camo2.getDefaultState());
+						} else {
+							if (downBlock == RivalRebels.camo3 || eastBlock == RivalRebels.camo3 || westBlock == RivalRebels.camo3 || southBlock == RivalRebels.camo3 || northBlock == RivalRebels.camo3 || upBlock == RivalRebels.camo3) {
+								world.setBlockState(pos, RivalRebels.camo3.getDefaultState());
+							} else {
+								world.setBlockState(pos, RivalRebels.camo1.getDefaultState());
 							}
 						}
 					}
 				}
 			}
 		}
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:bq");
 	}
 }

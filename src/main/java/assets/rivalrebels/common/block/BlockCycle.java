@@ -11,17 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockCycle extends Block
 {
@@ -36,15 +35,14 @@ public class BlockCycle extends Block
 		super(Material.iron);
 	}
 
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		world.scheduleBlockUpdate(x, y, z, this, 1);
-	}
+    @Override
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+        world.scheduleBlockUpdate(pos, this, 1, 1);
+    }
 
-	@Override
-	public int colorMultiplier(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
-	{
+    @Override
+    @SideOnly(Side.CLIENT)
+    public int colorMultiplier(IBlockAccess world, BlockPos pos, int renderPass) {
 		phase += phaseadd;
 		int r = (int) ((Math.sin(phase + pShiftR) + 1f) * 128f);
 		int g = (int) ((Math.sin(phase + pShiftG) + 1f) * 128f);
@@ -52,26 +50,10 @@ public class BlockCycle extends Block
 		return (r & 0xff) << 16 | (g & 0xff) << 8 | b & 0xff;
 	}
 
-	@Override
-	public void updateTick(World world, int par2, int par3, int par4, Random par5Random)
-	{
-		world.scheduleBlockUpdate(par2, par3, par4, this, 1);
-		world.setBlock(par2, par3, par4, Blocks.air);
-		world.setBlock(par2, par3, par4, this);
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+		world.scheduleBlockUpdate(pos, this, 1, 1);
+		world.setBlockToAir(pos);
+		world.setBlockState(pos, this.getDefaultState());
 	}
 }

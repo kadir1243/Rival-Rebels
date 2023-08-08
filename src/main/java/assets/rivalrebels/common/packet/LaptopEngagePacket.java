@@ -68,16 +68,17 @@ public class LaptopEngagePacket implements IMessage
 			if (player.getDistanceSq(m.lpos) < 100)
 			{
 				TileEntity te = world.getTileEntity(m.lpos);
-				if (te instanceof TileEntityLaptop tel)
+				if (te instanceof TileEntityLaptop)
 				{
+                    TileEntityLaptop tel = (TileEntityLaptop) te;
                     if (!m.carpet && tel.b2spirit > 0)
 					{
 						int XX = 11;
 						int ZZ = 10;
 						if (tel.rrteam == RivalRebelsTeam.OMEGA)
 						{
-							XX = (m.tpos.getX() - RivalRebels.round.oObjx);
-							ZZ = (m.tpos.getZ() - RivalRebels.round.oObjz);
+							XX = (m.tpos.getX() - RivalRebels.round.oObj.getX());
+							ZZ = (m.tpos.getZ() - RivalRebels.round.oObj.getZ());
 						}
 						if (tel.rrteam == RivalRebelsTeam.SIGMA)
 						{

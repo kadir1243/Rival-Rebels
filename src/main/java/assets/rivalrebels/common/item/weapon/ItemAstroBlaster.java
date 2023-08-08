@@ -14,7 +14,6 @@ package assets.rivalrebels.common.item.weapon;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityLaserBurst;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
@@ -127,9 +126,9 @@ public class ItemAstroBlaster extends ItemTool
 		if (world.isRemote) item.setRepairCost(0);
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ab");
-	}
+	}*/
 }

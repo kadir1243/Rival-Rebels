@@ -11,16 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.Item;
-import net.minecraft.util.IIcon;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockCamo3 extends Block
 {
@@ -30,23 +27,7 @@ public class BlockCamo3 extends Block
 	}
 
     @Override
-	public Item getItemDropped(int i, Random r, int j)
-	{
-		return Item.getItemFromBlock(RivalRebels.smartcamo);
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:by");
-	}
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return Item.getItemFromBlock(RivalRebels.smartcamo);
+    }
 }

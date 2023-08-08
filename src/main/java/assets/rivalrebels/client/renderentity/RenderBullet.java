@@ -14,8 +14,10 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RivalRebels;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 import org.lwjgl.opengl.GL11;
@@ -25,7 +27,7 @@ public class RenderBullet extends Render<Entity>
 	/**
 	 * Have the icon index (in items.png) that will be used to render the image. Currently, eggs and snowballs uses this classes.
 	 */
-	private String path;
+	private final String path;
 
 	public RenderBullet(RenderManager renderManager, String path)
 	{
@@ -54,19 +56,19 @@ public class RenderBullet extends Render<Entity>
 		}
 	}
 
-	private void renderEntity(Tessellator par1Tessellator)
-	{
-		float var7 = 1.0F;
+	private void renderEntity(Tessellator par1Tessellator) {
+        WorldRenderer worldRenderer = par1Tessellator.getWorldRenderer();
+        float var7 = 1.0F;
 		float var8 = 0.5F;
 		float var9 = 0.25F;
 		GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(-this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-		par1Tessellator.startDrawingQuads();
-		par1Tessellator.setNormal(0.0F, 1.0F, 0.0F);
-		par1Tessellator.addVertexWithUV((0.0F - var8), (0.0F - var9), 0.0D, 0, 0);
-		par1Tessellator.addVertexWithUV((var7 - var8), (0.0F - var9), 0.0D, 1, 0);
-		par1Tessellator.addVertexWithUV((var7 - var8), (var7 - var9), 0.0D, 1, 1);
-		par1Tessellator.addVertexWithUV((0.0F - var8), (var7 - var9), 0.0D, 0, 1);
+		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.putNormal(0.0F, 1.0F, 0.0F);
+		worldRenderer.pos((0.0F - var8), (0.0F - var9), 0.0D).tex(0, 0).endVertex();
+		worldRenderer.pos((var7 - var8), (0.0F - var9), 0.0D).tex(1, 0).endVertex();
+		worldRenderer.pos((var7 - var8), (var7 - var9), 0.0D).tex(1, 1).endVertex();
+		worldRenderer.pos((0.0F - var8), (var7 - var9), 0.0D).tex(0, 1).endVertex();
 		par1Tessellator.draw();
 	}
 

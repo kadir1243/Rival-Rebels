@@ -11,22 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
-import assets.rivalrebels.RivalRebels;
 
 public class RenderBlood extends Render
 {
     public RenderBlood(RenderManager renderManager) {
         super(renderManager);
+        shadowSize = 0F;
     }
 
 	@Override
@@ -49,15 +49,16 @@ public class RenderBlood extends Render
 		float var7 = 1.0F;
 		float var8 = 0.5F;
 		float var9 = 0.25F;
-		Tessellator t = Tessellator.instance;
-		GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        GL11.glRotatef(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(-this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-		t.startDrawingQuads();
-		t.setNormal(0.0F, 1.0F, 0.0F);
-		t.addVertexWithUV((0.0F - var8), (0.0F - var9), 0.0D, 0, 0);
-		t.addVertexWithUV((var7 - var8), (0.0F - var9), 0.0D, 1, 0);
-		t.addVertexWithUV((var7 - var8), (var7 - var9), 0.0D, 1, 1);
-		t.addVertexWithUV((0.0F - var8), (var7 - var9), 0.0D, 0, 1);
+		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.putNormal(0.0F, 1.0F, 0.0F);
+		worldRenderer.pos((0.0F - var8), (0.0F - var9), 0.0D).tex(0, 0).endVertex();
+		worldRenderer.pos((var7 - var8), (0.0F - var9), 0.0D).tex(1, 0).endVertex();
+		worldRenderer.pos((var7 - var8), (var7 - var9), 0.0D).tex(1, 1).endVertex();
+		worldRenderer.pos((0.0F - var8), (var7 - var9), 0.0D).tex(0, 1).endVertex();
 		t.draw();
 	}
 

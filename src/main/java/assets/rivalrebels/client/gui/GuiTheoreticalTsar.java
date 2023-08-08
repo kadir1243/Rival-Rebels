@@ -107,15 +107,11 @@ public class GuiTheoreticalTsar extends GuiContainer
 				{
 					Desktop.getDesktop().browse(new URI("http://rivalrebels.com"));
 				}
-				catch (IOException e)
+				catch (IOException | URISyntaxException e)
 				{
 					e.printStackTrace();
 				}
-				catch (URISyntaxException e)
-				{
-					e.printStackTrace();
-				}
-			}
+            }
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}

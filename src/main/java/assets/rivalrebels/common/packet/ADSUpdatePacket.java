@@ -90,8 +90,9 @@ public class ADSUpdatePacket implements IMessage {
 		{
 			TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(m.pos);
 
-			if (te instanceof TileEntityReciever ter)
+			if (te instanceof TileEntityReciever)
 			{
+                TileEntityReciever ter = (TileEntityReciever) te;
                 ter.yawLimit = m.range;
 				ter.kMobs = m.mob;
 				ter.kTeam = m.chip;

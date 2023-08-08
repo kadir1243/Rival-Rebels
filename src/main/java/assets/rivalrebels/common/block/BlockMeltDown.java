@@ -11,40 +11,32 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import java.util.Random;
-
+import assets.rivalrebels.common.tileentity.TileEntityMeltDown;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.common.tileentity.TileEntityMeltDown;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class BlockMeltDown extends BlockContainer
-{
-	public BlockMeltDown()
-	{
+import java.util.Random;
+
+public class BlockMeltDown extends BlockContainer {
+    public static final PropertyInteger POS = PropertyInteger.create("position", 0, 14);
+	public BlockMeltDown() {
 		super(Material.portal);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(POS, 0));
 	}
 
-	@Override
-	public int getRenderType()
-	{
-		return -1;
-	}
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+        return null;
+    }
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return null;
-	}
-
-	@Override
-	public boolean renderAsNormalBlock()
+    @Override
+	public boolean isFullCube()
 	{
 		return false;
 	}
@@ -67,34 +59,26 @@ public class BlockMeltDown extends BlockContainer
 		return new TileEntityMeltDown();
 	}
 
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		world.scheduleBlockUpdate(x, y, z, this, 1);
-	}
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        worldIn.scheduleBlockUpdate(pos, this, 1, 1);
+    }
 
-	@Override
-	public void updateTick(World world, int x, int y, int z, Random par5Random)
-	{
-		int meta = world.getBlockMetadata(x, y, z);
-		if (meta < 14)
-		{
-			world.setBlock(x, y + 2, z, this, meta + 1, 2);
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+		int position = state.getValue(POS);
+		if (position < 14) {
+			world.setBlockState(pos.up(2), state.withProperty(POS, position + 1));
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(POS, meta);
+    }
 
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
-	}
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(POS);
+    }
 }

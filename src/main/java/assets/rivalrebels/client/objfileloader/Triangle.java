@@ -15,55 +15,53 @@ import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
 import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
 import static org.lwjgl.opengl.GL11.glLineWidth;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.Vec3;
 
 public class Triangle
 {
 	public Vertice[]	pa;
-	private Tessellator	tes	= Tessellator.instance;
-	
-	public Triangle(Vertice[] PA)
-	{
+	private final Tessellator tes	= Tessellator.getInstance();
+
+	public Triangle(Vertice[] PA) {
 		if (PA.length != 3) throw new IllegalArgumentException("Invalid Triangle! Specified Vec3 Array must have 3 Vec3s");
 		pa = PA;
 	}
-	
-	public void render()
-	{
-		tes.startDrawing(GL_TRIANGLES);
-		for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].render();
-		}
+
+	public void render() {
+        WorldRenderer worldRenderer = tes.getWorldRenderer();
+        worldRenderer.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX_NORMAL);
+        for (Vertice vertice : pa) {
+            vertice.render(worldRenderer);
+        }
 		tes.draw();
 	}
-	
-	public void renderWireframe()
-	{
+
+	public void renderWireframe() {
 		glLineWidth(2);
-		tes.startDrawing(GL_LINE_LOOP);
-		for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].renderWireframe();
-		}
+        WorldRenderer worldRenderer = tes.getWorldRenderer();
+        worldRenderer.begin(GL_LINE_LOOP, DefaultVertexFormats.POSITION);
+        for (Vertice vertice : pa) {
+            vertice.renderWireframe(worldRenderer);
+        }
 		tes.draw();
 	}
-	
+
 	public void normalize()
 	{
-		for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].normalize();
-		}
+        for (Vertice vertice : pa) {
+            vertice.normalize();
+        }
 	}
-	
+
 	public void scale(Vec3 v)
 	{
-		for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].scale(v);
-		}
+        for (Vertice vertice : pa) {
+            vertice.scale(v);
+        }
 	}
-	
+
 	public Triangle[] refine()
 	{
 		Triangle[] p = new Triangle[4];

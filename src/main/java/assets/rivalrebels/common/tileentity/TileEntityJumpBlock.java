@@ -14,8 +14,4 @@ package assets.rivalrebels.common.tileentity;
 import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityJumpBlock extends TileEntity {
-	@Override
-	public boolean canUpdate() {
-		return false;
-	}
 }

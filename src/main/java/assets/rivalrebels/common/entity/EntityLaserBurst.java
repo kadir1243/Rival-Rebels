@@ -55,7 +55,6 @@ public class EntityLaserBurst extends EntityInanimate
 		posY -= 0.12D;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
@@ -72,7 +71,6 @@ public class EntityLaserBurst extends EntityInanimate
 		posY -= 0.12D;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
@@ -83,7 +81,6 @@ public class EntityLaserBurst extends EntityInanimate
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
 
@@ -102,7 +99,6 @@ public class EntityLaserBurst extends EntityInanimate
 		shooter = player;
 		setSize(0.5F, 0.5F);
 		setPosition(x, y, z);
-		yOffset = 0.0F;
 		motionX = mx;
 		motionZ = mz;
 		motionY = my;
@@ -224,8 +220,9 @@ public class EntityLaserBurst extends EntityInanimate
 			}
 			else
 			{
-				if (var3.entityHit instanceof EntityPlayer player && shooter != var3.entityHit)
+				if (var3.entityHit instanceof EntityPlayer && shooter != var3.entityHit)
 				{
+                    EntityPlayer player = (EntityPlayer) var3.entityHit;
 
                     ItemStack[] armorSlots = player.inventory.armorInventory;
 					int i = worldObj.rand.nextInt(4);
@@ -247,12 +244,13 @@ public class EntityLaserBurst extends EntityInanimate
 					}
 					setDead();
 				}
-				else if ((var3.entityHit instanceof EntityLivingBase entity
+				else if ((var3.entityHit instanceof EntityLivingBase
 						&& !(var3.entityHit instanceof EntityAnimal)
 						&& !(var3.entityHit instanceof EntityBat)
 						&& !(var3.entityHit instanceof EntityVillager)
 						&& !(var3.entityHit instanceof EntitySquid)))
 				{
+                    EntityLivingBase entity = (EntityLivingBase) var3.entityHit;
                     entity.attackEntityFrom(RivalRebelsDamageSource.laserburst, 6);
 					if (entity.getHealth() < 3)
 					{

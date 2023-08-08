@@ -11,8 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.packet.EntityGorePacket;
+import assets.rivalrebels.common.packet.PacketDispatcher;
 import net.minecraft.client.entity.AbstractClientPlayer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,9 +23,6 @@ import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.packet.EntityGorePacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -64,7 +62,6 @@ public class EntityGore extends EntityInanimate
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 		type = Type;
 		mob = Mob;
@@ -93,7 +90,7 @@ public class EntityGore extends EntityInanimate
 		mob = Mob;
 		if (Mob == 0)
 		{
-			username = ((EntityPlayer) origin).getName();
+			username = origin.getName();
 			setBiped(0);
 		}
 		else if (Mob == 1)
@@ -336,16 +333,12 @@ public class EntityGore extends EntityInanimate
 
 		if (playerSkin == null && FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && !username.equals("Steve"))
 		{
-			Iterator iter = worldObj.playerEntities.iterator();
-			while (iter.hasNext())
-			{
-				EntityPlayer player = (EntityPlayer) iter.next();
-				if (player.getName().equals(username))
-				{
-					AbstractClientPlayer acp = (AbstractClientPlayer) player;
-					playerSkin = acp.getLocationSkin();
-				}
-			}
+            for (EntityPlayer player : worldObj.playerEntities) {
+                if (player.getName().equals(username)) {
+                    AbstractClientPlayer acp = (AbstractClientPlayer) player;
+                    playerSkin = acp.getLocationSkin();
+                }
+            }
 		}
 
 		++ticksExisted;
@@ -418,7 +411,7 @@ public class EntityGore extends EntityInanimate
 		motionZ *= f2;
 		motionY -= f3;
 
-		if (isSliding == true)
+		if (isSliding)
 		{
 			if (bounces == -1) bounces = worldObj.rand.nextInt(2) + 2;
 			if (bounces > 0)
@@ -478,18 +471,5 @@ public class EntityGore extends EntityInanimate
 		mob = par1NBTTagCompound.getByte("Mob") & 255;
 		type = par1NBTTagCompound.getByte("Type") & 255;
 		greenblood = par1NBTTagCompound.getByte("Green") == 1;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public float getShadowSize()
-	{
-		return 0.0F;
-	}
-
-	@Override
-	public void entityInit()
-	{
-
 	}
 }

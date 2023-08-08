@@ -12,7 +12,6 @@
 package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.renderer.texture.IIconRegister;
 
 public class ItemRodHydrogen extends ItemRod
 {
@@ -25,9 +24,9 @@ public class ItemRodHydrogen extends ItemRod
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
-    @Override
+    /*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:au");
-	}
+	}*/
 }

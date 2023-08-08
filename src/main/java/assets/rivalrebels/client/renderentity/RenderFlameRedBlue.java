@@ -13,8 +13,10 @@ package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -28,6 +30,7 @@ public class RenderFlameRedBlue extends Render
 {
     public RenderFlameRedBlue(RenderManager renderManager) {
         super(renderManager);
+        shadowSize = 0F;
     }
 
 	public void renderFlame(EntityFlameBall1 ell, double x, double y, double z, float yaw, float pitch)
@@ -53,18 +56,19 @@ public class RenderFlameRedBlue extends Render
 		size *= size;
 		// if (size >= 0.5) size = 0.5f;
 		size += 0.05;
-		Tessellator t = Tessellator.instance;
-		GL11.glTranslated(x, y, z);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        GL11.glTranslated(x, y, z);
 		GL11.glRotatef(180 - Minecraft.getMinecraft().thePlayer.rotationYaw, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(90 - Minecraft.getMinecraft().thePlayer.rotationPitch, 1.0F, 0.0F, 0.0F);
 		GL11.glPushMatrix();
 		GL11.glRotatef(ell.rotation, 0.0F, 1.0F, 0.0F);
-		t.startDrawingQuads();
-		t.setNormal(0.0F, 1.0F, 0.0F);
-		t.addVertexWithUV(-size, 0, -size, X, Y);
-		t.addVertexWithUV(size, 0, -size, X + 0.25f, Y);
-		t.addVertexWithUV(size, 0, size, X + 0.25f, Y + 0.25f);
-		t.addVertexWithUV(-size, 0, size, X, Y + 0.25f);
+		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.putNormal(0.0F, 1.0F, 0.0F);
+		worldRenderer.pos(-size, 0, -size).tex(X, Y).endVertex();
+		worldRenderer.pos(size, 0, -size).tex(X + 0.25f, Y).endVertex();
+		worldRenderer.pos(size, 0, size).tex(X + 0.25f, Y + 0.25f).endVertex();
+		worldRenderer.pos(-size, 0, size).tex(X, Y + 0.25f).endVertex();
 		t.draw();
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();

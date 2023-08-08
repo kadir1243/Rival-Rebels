@@ -21,7 +21,6 @@ import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -254,13 +253,6 @@ public class EntityB2Frag extends EntityInanimate
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public float getShadowSize()
-	{
-		return 0.0F;
 	}
 
 	@Override

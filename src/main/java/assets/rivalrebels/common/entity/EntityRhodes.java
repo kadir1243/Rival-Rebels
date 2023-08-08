@@ -25,6 +25,7 @@ import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
 import net.minecraft.util.*;
+import net.minecraft.world.EnumSkyBlock;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -164,10 +165,9 @@ public class EntityRhodes extends Entity
 	{
 		super(w);
 		ignoreFrustumCheck = true;
-		boundingBox.setBounds(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale);
+        this.setEntityBoundingBox(new AxisAlignedBB(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
 		noClip = true;
 		entityCollisionReduction = 100;
-		yOffset = 0;
 		stepHeight = 0;
 		actionqueue.add(new RhodesAction(0, 1));
 		RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
@@ -210,9 +210,13 @@ public class EntityRhodes extends Entity
 			rocketcount *= 0.004;
 		}
 		health = health - 5000 + (int)(5000 * Math.min(scale,4));
-		boundingBox.setBounds(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale);
+        this.setEntityBoundingBox(new AxisAlignedBB(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
 		setPosition(x, y, z);
-		if (!worldObj.isRemote) PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING " + getName() + " RivalRebels.tsar.armed"));
+		if (!worldObj.isRemote) {
+            for (EntityPlayer player : worldObj.playerEntities) {
+                player.addChatMessage(new ChatComponentTranslation("RivalRebels.rhodes.armed", getName()));
+            }
+        }
 	}
 
 	/**
@@ -435,7 +439,7 @@ public class EntityRhodes extends Entity
 						{
 							for (int z = sz; z < ez; z++)
 							{
-								worldObj.setBlock(x,y,z, Blocks.air);
+								worldObj.setBlockToAir(new BlockPos(x, y, z));
 							}
 						}
 					}
@@ -524,10 +528,10 @@ public class EntityRhodes extends Entity
 			}
 		}
 
-		boolean bl = blocklist.contains(worldObj.getBlock(ilpx, ilpy-1, ilpz));
-		boolean ol = blocklist.contains(worldObj.getBlock(ilpx, ilpy, ilpz));
-		boolean br = blocklist.contains(worldObj.getBlock(irpx, irpy-1, irpz));
-		boolean or = blocklist.contains(worldObj.getBlock(irpx, irpy, irpz));
+		boolean bl = blocklist.contains(worldObj.getBlockState(new BlockPos(ilpx, ilpy-1, ilpz)).getBlock());
+		boolean ol = blocklist.contains(worldObj.getBlockState(new BlockPos(ilpx, ilpy, ilpz)).getBlock());
+		boolean br = blocklist.contains(worldObj.getBlockState(new BlockPos(irpx, irpy-1, irpz)).getBlock());
+		boolean or = blocklist.contains(worldObj.getBlockState(new BlockPos(irpx, irpy, irpz)).getBlock());
 
 		if (bl||br)
 		{
@@ -578,152 +582,100 @@ public class EntityRhodes extends Entity
 		}
 	}
 
-	private void doCollisions()
-	{
-		Iterator iter = worldObj.loadedEntityList.iterator();
+	private void doCollisions() {
+        for (Entity e : worldObj.loadedEntityList) {
+            if (e == rider || e == passenger1 || e == passenger2) continue;
+            double bbd = (e.width + 10 * scale) * 0.5;
+            double bbh = (e.height + 30 * scale) * 0.5;
+            if (e instanceof EntityRhodes) {
+                bbd = 10 * (((EntityRhodes) e).scale + scale) * 0.5;
+                bbh = 30 * (((EntityRhodes) e).scale + scale) * 0.5;
+            }
+            double dist = (e.posX - posX) * (e.posX - posX) + (e.posZ - posZ) * (e.posZ - posZ);
+            if ((ac == 0 || ac == 1 || ac == 11 || !RivalRebels.rhodesAI) && e instanceof EntityPlayer && dist < bbd * bbd * 0.25f && e.posY < posY + bbh + 1 && e.posY > posY - bbh + 1) {
+                if (rider == null) {
+                    rider = (EntityPlayer) e;
+                    RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
+                } else if (passenger1 == null) {
+                    passenger1 = (EntityPlayer) e;
+                    RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
+                } else if (passenger2 == null) {
+                    passenger2 = (EntityPlayer) e;
+                    RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
+                }
+            } else if (dist < bbd * bbd && e.posY > posY - bbh && e.posY < posY + bbh) {
+                if (e != this && !(e instanceof EntityFallingBlock) && !(e instanceof EntityDebris)) {
+                    if (e.posY > posY + 15) {
+                        e.motionY *= -0.5;
+                        e.posY = posY + bbh;
+                    } else if (e.posY < posY - 15) {
+                        e.motionY *= -0.5;
+                        e.posY = posY - bbh;
+                    } else {
+                        e.motionX *= -1;
+                        e.motionZ *= -1;
+                        double d3 = bbd / Math.sqrt(dist);
+                        e.posX = posX + (e.posX - posX) * d3;
+                        e.posZ = posZ + (e.posZ - posZ) * d3;
+                    }
+                    e.setPosition(e.posX, e.posY, e.posZ);
+                }
 
-		while(iter.hasNext())
-		{
-			Entity e = (Entity) iter.next();
-			if (e == rider || e == passenger1 || e == passenger2) continue;
-			double bbd = (e.width+10*scale)*0.5;
-			double bbh = (e.height+30*scale)*0.5;
-			if (e instanceof EntityRhodes)
-			{
-				bbd = 10 * (((EntityRhodes)e).scale+scale) * 0.5;
-				bbh = 30 * (((EntityRhodes)e).scale+scale) * 0.5;
-			}
-			double dist = (e.posX-posX)*(e.posX-posX)+(e.posZ-posZ)*(e.posZ-posZ);
-			if ((ac == 0 || ac == 1 || ac == 11 || !RivalRebels.rhodesAI) && e instanceof EntityPlayer && dist < bbd*bbd*0.25f && e.posY < posY+bbh+1 && e.posY > posY-bbh+1)
-			{
-				if (rider == null)
-				{
-					rider = (EntityPlayer) e;
-					RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
-				}
-				else if (passenger1 == null)
-				{
-					passenger1 = (EntityPlayer) e;
-					RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
-				}
-				else if (passenger2 == null)
-				{
-					passenger2 = (EntityPlayer) e;
-					RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
-				}
-			}
-			else if (dist < bbd*bbd && e.posY > posY-bbh && e.posY < posY+bbh)
-			{
-				if (e != this && !(e instanceof EntityFallingBlock) && !(e instanceof EntityDebris))
-				{
-					if (e.posY > posY+15)
-					{
-						e.motionY *= -0.5;
-						e.posY = posY+bbh;
-					}
-					else if (e.posY < posY-15)
-					{
-						e.motionY *= -0.5;
-						e.posY = posY-bbh;
-					}
-					else
-					{
-						e.motionX *= -1;
-						e.motionZ *= -1;
-						double d3 = bbd/Math.sqrt(dist);
-						e.posX = posX+(e.posX - posX)*d3;
-						e.posZ = posZ+(e.posZ - posZ)*d3;
-					}
-					e.setPosition(e.posX, e.posY, e.posZ);
-				}
-
-				if (e instanceof EntityRocket)
-				{
-					e.ticksExisted = RivalRebels.rpgDecay;
-					this.attackEntityFrom(DamageSource.generic, 20);
-				}
-				else if (e instanceof EntitySeekB83)
-				{
-					e.ticksExisted = 800;
-					this.attackEntityFrom(DamageSource.generic, 24);
-				}
-				else if (e instanceof EntityHackB83)
-				{
-					((EntityHackB83) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 40);
-				}
-				else if (e instanceof EntityB83)
-				{
-					((EntityB83) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 40);
-				}
-				else if (e instanceof EntityBomb)
-				{
-					((EntityBomb) e).explode(true);
-					for (int i = 0; i < RivalRebels.bombDamageToRhodes; i++) this.attackEntityFrom(DamageSource.generic, 50);
-				}
-				else if (e instanceof EntityNuke)
-				{
-					((EntityNuke) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 80);
-				}
-				else if (e instanceof EntityTsar)
-				{
-					((EntityTsar) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 100);
-				}
-				else if (e instanceof EntityTheoreticalTsar)
-				{
-					((EntityTheoreticalTsar) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 100);
-				}
-				else if (e instanceof EntityAntimatterBomb)
-				{
-					((EntityAntimatterBomb) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 100);
-				}
-				else if (e instanceof EntityTachyonBomb)
-				{
-					((EntityTachyonBomb) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 100);
-				}
-				else if (e instanceof EntityHotPotato)
-				{
-					((EntityHotPotato) e).ticksExisted = -100;
-					this.attackEntityFrom(DamageSource.generic, 100);
-				}
-				else if (e instanceof EntityB83NoShroom)
-				{
-					((EntityB83NoShroom) e).ticksInAir = -100;
-					this.attackEntityFrom(DamageSource.generic, 40);
-				}
-				else if (e instanceof EntityPlasmoid)
-				{
-					((EntityPlasmoid) e).explode();
-					this.attackEntityFrom(DamageSource.generic, 8);
-				}
-				else if (e instanceof EntityFlameBall)
-				{
-					e.setDead();
-					this.attackEntityFrom(DamageSource.generic, 3);
-				}
-				else if (e instanceof EntityFlameBall1)
-				{
-					e.setDead();
-					this.attackEntityFrom(DamageSource.generic, 4);
-				}
-				else if (e instanceof EntityFlameBall2)
-				{
-					e.setDead();
-					this.attackEntityFrom(DamageSource.generic, 2);
-				}
-				else if (e instanceof EntityLaserBurst)
-				{
-					e.setDead();
-					this.attackEntityFrom(DamageSource.generic, 4);
-				}
-			}
-		}
+                if (e instanceof EntityRocket) {
+                    e.ticksExisted = RivalRebels.rpgDecay;
+                    this.attackEntityFrom(DamageSource.generic, 20);
+                } else if (e instanceof EntitySeekB83) {
+                    e.ticksExisted = 800;
+                    this.attackEntityFrom(DamageSource.generic, 24);
+                } else if (e instanceof EntityHackB83) {
+                    ((EntityHackB83) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 40);
+                } else if (e instanceof EntityB83NoShroom) {
+                    ((EntityB83NoShroom) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 40);
+                } else if (e instanceof EntityB83) {
+                    ((EntityB83) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 40);
+                } else if (e instanceof EntityBomb) {
+                    ((EntityBomb) e).explode(true);
+                    for (int i = 0; i < RivalRebels.bombDamageToRhodes; i++)
+                        this.attackEntityFrom(DamageSource.generic, 50);
+                } else if (e instanceof EntityNuke) {
+                    ((EntityNuke) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 80);
+                } else if (e instanceof EntityTsar) {
+                    ((EntityTsar) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 100);
+                } else if (e instanceof EntityTheoreticalTsar) {
+                    ((EntityTheoreticalTsar) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 100);
+                } else if (e instanceof EntityAntimatterBomb) {
+                    ((EntityAntimatterBomb) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 100);
+                } else if (e instanceof EntityTachyonBomb) {
+                    ((EntityTachyonBomb) e).ticksInAir = -100;
+                    this.attackEntityFrom(DamageSource.generic, 100);
+                } else if (e instanceof EntityHotPotato) {
+                    ((EntityHotPotato) e).ticksExisted = -100;
+                    this.attackEntityFrom(DamageSource.generic, 100);
+                } else if (e instanceof EntityPlasmoid) {
+                    ((EntityPlasmoid) e).explode();
+                    this.attackEntityFrom(DamageSource.generic, 8);
+                } else if (e instanceof EntityFlameBall) {
+                    e.setDead();
+                    this.attackEntityFrom(DamageSource.generic, 3);
+                } else if (e instanceof EntityFlameBall1) {
+                    e.setDead();
+                    this.attackEntityFrom(DamageSource.generic, 4);
+                } else if (e instanceof EntityFlameBall2) {
+                    e.setDead();
+                    this.attackEntityFrom(DamageSource.generic, 2);
+                } else if (e instanceof EntityLaserBurst) {
+                    e.setDead();
+                    this.attackEntityFrom(DamageSource.generic, 4);
+                }
+            }
+        }
 	}
 
 	private static class RhodesAction
@@ -888,8 +840,8 @@ public class EntityRhodes extends Entity
 					range = 70*scale;
 					Vec3 start = new Vec3(posX, posY+13*scale, posZ);
 					Vec3 end = new Vec3(0, 0, range);
-					end.rotateAroundX(-headpitch / 180.0F * (float) Math.PI);
-					end.rotateAroundY(bodyyaw / 180.0F * (float) Math.PI);
+					end = end.rotatePitch(-headpitch / 180.0F * (float) Math.PI);
+					end = end.rotateYaw(bodyyaw / 180.0F * (float) Math.PI);
 					end = end.addVector(posX, posY+13*scale, posZ);
 					Iterator<Entity> iter = worldObj.getEntitiesWithinAABBExcludingEntity(this,new AxisAlignedBB(Math.min(start.xCoord,end.xCoord)-5,
 																													Math.min(start.yCoord,end.yCoord)-5,
@@ -911,11 +863,11 @@ public class EntityRhodes extends Entity
 							Vec3 entity = new Vec3(e.posX, e.posY, e.posZ);
 							double bbx = 1;
 							if (e instanceof EntityRhodes) bbx = 20 * ((EntityRhodes)e).scale;
-							if (entity.subtract(start).crossProduct(entity.subtract(end)).squareDistanceTo(0, 0, 0) < 10000 * bbx)
+							if (entity.subtract(start).crossProduct(entity.subtract(end)).squareDistanceTo(new Vec3(0, 0, 0)) < 10000 * bbx)
 							{
 								e.attackEntityFrom(RivalRebelsDamageSource.laserburst, 24);
-								if (e instanceof EntityPlayer player)
-								{
+								if (e instanceof EntityPlayer) {
+                                    EntityPlayer player = (EntityPlayer) e;
                                     ItemStack[] armorSlots = player.inventory.armorInventory;
 									int i = worldObj.rand.nextInt(4);
 									if (armorSlots[i] != null)
@@ -938,9 +890,9 @@ public class EntityRhodes extends Entity
 								{
 									if (e.isDead || (e instanceof EntityLivingBase && ((EntityLivingBase)e).getHealth() < 3))
 									{
-										int legs = -1;
-										int arms = -1;
-										int mobs = -1;
+										int legs;
+										int arms;
+										int mobs;
 										RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
 										if (e instanceof EntityPigZombie)
 										{
@@ -1010,8 +962,8 @@ public class EntityRhodes extends Entity
 										}
 										else
 										{
-											legs = (int) (e.boundingBox.getAverageEdgeLength() * 2);
-											arms = (int) (e.boundingBox.getAverageEdgeLength() * 2);
+											legs = (int) (e.getEntityBoundingBox().getAverageEdgeLength() * 2);
+											arms = (int) (e.getEntityBoundingBox().getAverageEdgeLength() * 2);
 											mobs = 11;
 										}
 										worldObj.spawnEntityInWorld(new EntityGore(worldObj, e, 0, mobs));
@@ -1253,8 +1205,8 @@ public class EntityRhodes extends Entity
 				}
 				if (teamToRaid != 0)
 				{
-					float dx = (float) ((teamToRaid==1?RivalRebels.round.oObjx:RivalRebels.round.sObjx)-posX);
-					float dz = (float) ((teamToRaid==1?RivalRebels.round.oObjz:RivalRebels.round.sObjz)-posZ);
+					float dx = (float) ((teamToRaid==1?RivalRebels.round.oObj.getX():RivalRebels.round.sObjx)-posX);
+					float dz = (float) ((teamToRaid==1?RivalRebels.round.oObj.getZ():RivalRebels.round.sObjz)-posZ);
 					float angle = ((atan2(dx, dz) - bodyyaw)%360);
 					if (angle > 1f)
 					{
@@ -1367,7 +1319,7 @@ public class EntityRhodes extends Entity
 			leftshinpitch   = approach(leftshinpitch,  60);
 			break;
 		case 10:
-			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && worldObj.getBlock(RivalRebels.round.oObjx, RivalRebels.round.oObjy, RivalRebels.round.oObjz) == RivalRebels.omegaobj || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && worldObj.getBlock(RivalRebels.round.sObjx, RivalRebels.round.sObjy, RivalRebels.round.sObjz) == RivalRebels.sigmaobj))
+			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && worldObj.getBlockState(RivalRebels.round.oObj).getBlock() == RivalRebels.omegaobj || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && worldObj.getBlockState(new BlockPos(RivalRebels.round.sObjx, RivalRebels.round.sObjy, RivalRebels.round.sObjz)).getBlock() == RivalRebels.sigmaobj))
 			{
 				rightthighpitch = approach(rightthighpitch,0);
 				leftthighpitch  = approach(leftthighpitch, 0);
@@ -1467,12 +1419,16 @@ public class EntityRhodes extends Entity
 		else movescale = RivalRebels.rhodesSpeedScale;
 		motionX = syaw * 0.125f*movescale;
 		motionZ = cyaw * 0.125f*movescale;
+        int rtg;
+        int ltg;
+        int rsg;
+        int lsg;
         switch (walkstate) {
-            case 0 -> {
-                int rtg = -60;
-                int ltg = 0;
-                int rsg = 60;
-                int lsg = 30;
+            case 0:
+                rtg = -60;
+                ltg = 0;
+                rsg = 60;
+                lsg = 30;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1481,12 +1437,12 @@ public class EntityRhodes extends Entity
                     && (int) (leftthighpitch) == ltg
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) walkstate++;
-            }
-            case 1 -> {
-                int rtg = -60;
-                int ltg = 0;
-                int rsg = 60;
-                int lsg = 60;
+                break;
+            case 1:
+                rtg = -60;
+                ltg = 0;
+                rsg = 60;
+                lsg = 60;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1498,12 +1454,12 @@ public class EntityRhodes extends Entity
                     walkstate++;
                     RivalRebelsSoundPlayer.playSound(this, 0, 2, 4.5f, 0.8f);
                 }
-            }
-            case 2 -> {
-                int rtg = -30;
-                int ltg = 0;
-                int rsg = 30;
-                int lsg = 90;
+                break;
+            case 2:
+                rtg = -30;
+                ltg = 0;
+                rsg = 30;
+                lsg = 90;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1512,12 +1468,12 @@ public class EntityRhodes extends Entity
                     && (int) (leftthighpitch) == ltg
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) walkstate++;
-            }
-            case 3 -> {
-                int rtg = 0;
-                int ltg = -30;
-                int rsg = 0;
-                int lsg = 90;
+                break;
+            case 3:
+                rtg = 0;
+                ltg = -30;
+                rsg = 0;
+                lsg = 90;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1526,12 +1482,12 @@ public class EntityRhodes extends Entity
                     && (int) (leftthighpitch) == ltg
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) walkstate++;
-            }
-            case 4 -> {
-                int rtg = 0;
-                int ltg = -60;
-                int rsg = 30;
-                int lsg = 60;
+                break;
+            case 4:
+                rtg = 0;
+                ltg = -60;
+                rsg = 30;
+                lsg = 60;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1540,12 +1496,12 @@ public class EntityRhodes extends Entity
                     && (int) (leftthighpitch) == ltg
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) walkstate++;
-            }
-            case 5 -> {
-                int rtg = 0;
-                int ltg = -60;
-                int rsg = 60;
-                int lsg = 60;
+                break;
+            case 5:
+                rtg = 0;
+                ltg = -60;
+                rsg = 60;
+                lsg = 60;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1557,12 +1513,12 @@ public class EntityRhodes extends Entity
                     walkstate++;
                     RivalRebelsSoundPlayer.playSound(this, 0, 2, 4.5f, 0.8f);
                 }
-            }
-            case 6 -> {
-                int rtg = 0;
-                int ltg = -30;
-                int rsg = 90;
-                int lsg = 30;
+                break;
+            case 6:
+                rtg = 0;
+                ltg = -30;
+                rsg = 90;
+                lsg = 30;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1571,12 +1527,12 @@ public class EntityRhodes extends Entity
                     && (int) (leftthighpitch) == ltg
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) walkstate++;
-            }
-            case 7 -> {
-                int rtg = -30;
-                int ltg = 0;
-                int rsg = 90;
-                int lsg = 0;
+                break;
+            case 7:
+                rtg = -30;
+                ltg = 0;
+                rsg = 90;
+                lsg = 0;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1585,12 +1541,12 @@ public class EntityRhodes extends Entity
                     && (int) (leftthighpitch) == ltg
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) walkstate++;
-            }
-            case 8 -> {
-                int rtg = -60;
-                int ltg = 0;
-                int rsg = 60;
-                int lsg = 30;
+                break;
+            case 8:
+                rtg = -60;
+                ltg = 0;
+                rsg = 60;
+                lsg = 30;
                 rightthighpitch = approach(rightthighpitch, rtg);
                 leftthighpitch = approach(leftthighpitch, ltg);
                 rightshinpitch = approach(rightshinpitch, rsg);
@@ -1599,7 +1555,7 @@ public class EntityRhodes extends Entity
                     && (int) (leftthighpitch) == ltg
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) walkstate = 0;
-            }
+                break;
         }
 	}
 
@@ -1679,17 +1635,17 @@ public class EntityRhodes extends Entity
 				if (eo instanceof TileEntityRhodesActivator || eo instanceof TileEntityNukeCrate || eo instanceof TileEntityReactor)
 				{
 					TileEntity e = (TileEntity) eo;
-					float dx = (float)e.xCoord-px;
-					float dz = (float)e.zCoord-pz;
+					float dx = (float)e.getPos().getX()-px;
+					float dz = (float)e.getPos().getZ()-pz;
 					float dot = (cyaw * dx + syaw * dz);
 					if (dot*Math.abs(dot) > -0.25 * (dx*dx+dz*dz))
 					{
-						float dy = (float)e.yCoord-py;
+						float dy = (float)e.getPos().getY()-py;
 						float dist = dx*dx+dy*dy+dz*dz;
 						if (dist < 100*100)
 						{
 							float prio = 300-(float)Math.sqrt(dist);
-							if (prio > priority && rayTraceBlocks(px, py, pz, (float)e.xCoord, (float)e.yCoord, (float)e.zCoord) == null)
+							if (prio > priority && rayTraceBlocks(px, py, pz, (float)e.getPos().getX(), (float)e.getPos().getY(), (float)e.getPos().getZ()) == null)
 							{
 								te = e;
 								lastRocketTarget = null;
@@ -1702,9 +1658,9 @@ public class EntityRhodes extends Entity
 		}
 		if (te != null && !nuke)
 		{
-			float x = px - (float)te.xCoord;
-			float y = py - (float)te.yCoord;
-			float z = pz - (float)te.zCoord;
+			float x = px - (float)te.getPos().getX();
+			float y = py - (float)te.getPos().getY();
+			float z = pz - (float)te.getPos().getZ();
 			float yaw = ((atan2(x, z)-bodyyaw+630)%360)-90;
 			float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
 			boolean pointing = true;
@@ -1909,10 +1865,10 @@ public class EntityRhodes extends Entity
 			}
 			if (priority <= 0) lastLaserTarget = null;
 
-			Iterator iter = worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(posX-70*scale, posY+13*scale-70*scale, posZ-70*scale, posX+70*scale, posY+13*scale+70*scale, posZ+70*scale)).iterator();
+			Iterator<Entity> iter = worldObj.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(posX-70*scale, posY+13*scale-70*scale, posZ-70*scale, posX+70*scale, posY+13*scale+70*scale, posZ+70*scale)).iterator();
 			while(iter.hasNext())
 			{
-				Entity e = (Entity) iter.next();
+				Entity e = iter.next();
 				if (!e.isDead && (!(e instanceof EntityLivingBase) || ((EntityLivingBase)e).getHealth()>0) &&
 					!( e instanceof EntityThrowable
 					|| e instanceof EntityInanimate
@@ -1994,9 +1950,9 @@ public class EntityRhodes extends Entity
 					lastLaserTarget.attackEntityFrom(RivalRebelsDamageSource.laserburst, laserOn==3?16:8);
 					if (lastLaserTarget.isDead || (lastLaserTarget instanceof EntityLivingBase && ((EntityLivingBase)lastLaserTarget).getHealth() < 3))
 					{
-						int legs = -1;
-						int arms = -1;
-						int mobs = -1;
+						int legs;
+						int arms;
+						int mobs;
 						RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
 						if (lastLaserTarget instanceof EntityPigZombie)
 						{
@@ -2116,7 +2072,7 @@ public class EntityRhodes extends Entity
 		float tMaxZ = ((1+Z)-sz)*tDeltaZ;
 		while((X-x)*(X-x)+(Y-y)*(Y-y)+(Z-z)*(Z-z) < distsq)
 		{
-			if (worldObj.getBlock(X, Y, Z).isOpaqueCube())
+			if (worldObj.getBlockState(new BlockPos(X, Y, Z)).getBlock().isOpaqueCube())
 			{
 				return new Vec3(X, Y, Z);
 			}
@@ -2308,12 +2264,12 @@ public class EntityRhodes extends Entity
     @SideOnly(Side.CLIENT)
     public int getBrightnessForRender(float p_70070_1_)
     {
-        int i = MathHelper.floor_double(this.posX);
-        int j = MathHelper.floor_double(this.posZ);
-
-        if (this.worldObj.blockExists(i, 0, j))
+        int x = MathHelper.floor_double(this.posX);
+        int y = MathHelper.floor_double(this.posY);
+        int z = MathHelper.floor_double(this.posZ);
+        if (!this.worldObj.isAirBlock(new BlockPos(x, y, z)))
         {
-            return this.worldObj.getLightBrightnessForSkyBlocks(i, 255, j, 0);
+            return this.worldObj.getLightFor(EnumSkyBlock.BLOCK, new BlockPos(x, y, z));
         }
         else
         {
@@ -2326,12 +2282,12 @@ public class EntityRhodes extends Entity
      */
     public float getBrightness(float p_70013_1_)
     {
-        int i = MathHelper.floor_double(this.posX);
-        int j = MathHelper.floor_double(this.posZ);
-
-        if (this.worldObj.blockExists(i, 0, j))
+        int x = MathHelper.floor_double(this.posX);
+        int y = MathHelper.floor_double(this.posY);
+        int z = MathHelper.floor_double(this.posZ);
+        if (!this.worldObj.isAirBlock(new BlockPos(x, y, z)))
         {
-            return this.worldObj.getLightBrightness(new BlockPos(i, 255, j));
+            return this.worldObj.getLightBrightness(new BlockPos(x, y, z));
         }
         else
         {

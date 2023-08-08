@@ -11,8 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
@@ -21,9 +22,6 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 
 public class ItemExPill extends Item
 {
@@ -63,7 +61,7 @@ public class ItemExPill extends Item
 				player.addPotionEffect(new PotionEffect(Potion.resistance.id, 450, 20));
 				player.addPotionEffect(new PotionEffect(Potion.damageBoost.id, 500, 20));
 				player.addPotionEffect(new PotionEffect(Potion.jump.id, 300, 2));
-				player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 500, 02));
+				player.addPotionEffect(new PotionEffect(Potion.digSpeed.id, 500, 2));
 				player.addPotionEffect(new PotionEffect(Potion.moveSpeed.id, 550, 2));
 				player.addPotionEffect(new PotionEffect(Potion.waterBreathing.id, 800, 20));
 				player.addPotionEffect(new PotionEffect(Potion.fireResistance.id, 800, 20));
@@ -106,9 +104,9 @@ public class ItemExPill extends Item
 		return 32;
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ai");
-	}
+	}*/
 }

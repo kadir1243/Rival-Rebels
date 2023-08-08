@@ -20,16 +20,16 @@ import assets.rivalrebels.common.packet.ResetPacket;
 import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiPlayerInfo;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.network.NetworkPlayerInfo;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.StatCollector;
+import net.minecraftforge.fml.common.registry.LanguageRegistry;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
-
-import java.util.Random;
 
 public class GuiSpawn extends GuiScreen
 {
@@ -105,8 +105,9 @@ public class GuiSpawn extends GuiScreen
 		omegaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
 		sigmaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
 		resetButton.enabled = nw.resets > 0 && !nw.isreset;
-		Tessellator tessellator = Tessellator.instance;
-		float f = 0.00390625F;
+		Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+        float f = 0.00390625F;
 		drawDefaultBackground();
 		drawGradientRect(posX, posY, posX + xSizeOfTexture, posY + ySizeOfTexture, 0xFF000000, 0xFF000000); // 0xFF587075, 0xFF041010);
 		drawPanel(posX + 10, posY + 142, 80, omegaScroll.getScroll(), omegaScroll.limit, RivalRebelsTeam.OMEGA);
@@ -115,24 +116,23 @@ public class GuiSpawn extends GuiScreen
 		drawGradientRect(posX + 6, posY + 99, posX + 161, posY + 131, 0xFF000000, 0xFF000000);
 		drawPanel(posX + 10, posY + 105, 50, playerScroll.getScroll(), playerScroll.limit, new String[] { rrclass.name }, new int[] { rrclass.color });
 
-		Random rand = new Random();
 		GL11.glColor3f(1F, 1F, 1F);
 		this.mc.renderEngine.bindTexture(RivalRebels.guitspawn);
-		tessellator.startDrawingQuads();
-		tessellator.addVertexWithUV(posX, posY + ySizeOfTexture, zLevel, 0, ySizeOfTexture * f);
-		tessellator.addVertexWithUV(posX + xSizeOfTexture, posY + ySizeOfTexture, zLevel, xSizeOfTexture * f, ySizeOfTexture * f);
-		tessellator.addVertexWithUV(posX + xSizeOfTexture, posY, zLevel, xSizeOfTexture * f, 0);
-		tessellator.addVertexWithUV(posX, posY, zLevel, 0, 0);
+		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.pos(posX, posY + ySizeOfTexture, zLevel).tex(0, ySizeOfTexture * f);
+		worldRenderer.pos(posX + xSizeOfTexture, posY + ySizeOfTexture, zLevel).tex(xSizeOfTexture * f, ySizeOfTexture * f);
+		worldRenderer.pos(posX + xSizeOfTexture, posY, zLevel).tex(xSizeOfTexture * f, 0);
+		worldRenderer.pos(posX, posY, zLevel).tex(0, 0);
 		tessellator.draw();
 
 		if (RivalRebels.banner != null)
 		{
 			this.mc.renderEngine.bindTexture(RivalRebels.banner);
-			tessellator.startDrawingQuads();
-			tessellator.addVertexWithUV(posX + 3, posY + 61, zLevel, 0, 1);
-			tessellator.addVertexWithUV(posX + 253, posY + 61, zLevel, 1, 1);
-			tessellator.addVertexWithUV(posX + 253, posY + 3, zLevel, 1, 0);
-			tessellator.addVertexWithUV(posX + 3, posY + 3, zLevel, 0, 0);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(posX + 3, posY + 61, zLevel).tex(0, 1).endVertex();
+			worldRenderer.pos(posX + 253, posY + 61, zLevel).tex(1, 1).endVertex();
+			worldRenderer.pos(posX + 253, posY + 3, zLevel).tex(1, 0).endVertex();
+			worldRenderer.pos(posX + 3, posY + 3, zLevel).tex(0, 0).endVertex();
 			tessellator.draw();
 		}
 
@@ -264,9 +264,9 @@ public class GuiSpawn extends GuiScreen
 
 	protected boolean isOnline(String user)
 	{
-		if (Minecraft.getMinecraft().getNetHandler() == null || Minecraft.getMinecraft().getNetHandler().playerInfoList == null) return false;
-        for (GuiPlayerInfo guiPlayerInfo : Minecraft.getMinecraft().getNetHandler().playerInfoList) {
-            if (user.equals(guiPlayerInfo.name)) return true;
+		if (Minecraft.getMinecraft().getNetHandler() == null || Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap() == null) return false;
+        for (NetworkPlayerInfo guiPlayerInfo : Minecraft.getMinecraft().getNetHandler().getPlayerInfoMap()) {
+            if (user.equals(guiPlayerInfo.getGameProfile().getName())) return true;
         }
 		return false;
 	}

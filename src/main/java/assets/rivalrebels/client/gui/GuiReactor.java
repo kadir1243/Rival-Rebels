@@ -11,25 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import java.awt.Desktop;
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.text.DecimalFormat;
-
-import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.guihelper.GuiCustomButton;
 import assets.rivalrebels.client.guihelper.GuiScroll;
@@ -42,16 +23,29 @@ import assets.rivalrebels.common.noise.RivalRebelsSimplexNoise;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.ReactorGUIPacket;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.inventory.IInventory;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
+import org.lwjgl.opengl.GL11;
+
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.text.DecimalFormat;
 
 @SideOnly(Side.CLIENT)
 public class GuiReactor extends GuiContainer
 {
-	private IInventory				upperChestInventory;
-	private IInventory				lowerChestInventory;
-	private static DecimalFormat	df					= new DecimalFormat("0.0");
+    private static DecimalFormat	df					= new DecimalFormat("0.0");
 	private float					frame				= 0;
 	private float					resolution			= 4f;
 	private TileEntityReactor		ter;
@@ -69,9 +63,7 @@ public class GuiReactor extends GuiContainer
 	{
 		super(new ContainerReactor(par1IInventory, par2IInventory));
 		this.ter = (TileEntityReactor) par2IInventory;
-		this.upperChestInventory = par1IInventory;
-		this.lowerChestInventory = par2IInventory;
-		this.ySize = 200;
+        this.ySize = 200;
 		RivalRebelsSimplexNoise.refresh();
 	}
 
@@ -193,9 +185,9 @@ public class GuiReactor extends GuiContainer
 			if (ter.fuel.getTagCompound() != null) radius += (((((ItemRod) ter.fuel.getItem()).power * ((ItemCore) ter.core.getItem()).timemult) - ter.fuel.getTagCompound().getInteger("fuelLeft")) / (((ItemRod) ter.fuel.getItem()).power * ((ItemCore) ter.core.getItem()).timemult)) * 30;
 			melttick = 30;
 			float brightness = 0;
-			if (ter.core.getItem() == RivalRebels.core1) brightness = -0.4f;
-			if (ter.core.getItem() == RivalRebels.core2) brightness = -0.25f;
-			if (ter.core.getItem() == RivalRebels.core3) brightness = -0.1f;
+			if (ter.core.getItem() == RivalRebels.copperCore) brightness = -0.4f;
+			if (ter.core.getItem() == RivalRebels.tungstenCore) brightness = -0.25f;
+			if (ter.core.getItem() == RivalRebels.titaniumCore) brightness = -0.1f;
 			if (ter.fuel.getItem() == RivalRebels.nuclearelement) drawNoiseSphere(0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
 			if (ter.fuel.getItem() == RivalRebels.hydrod) drawNoiseSphere(1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
 			if (ter.fuel.getItem() == RivalRebels.redrod) drawNoiseSphere(1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
@@ -242,7 +234,7 @@ public class GuiReactor extends GuiContainer
 		{
 			if (machines[i] == null) return;
 
-			Block display = machines[i];
+			/*Block display = machines[i];
 			int meta = 2;
 			String toppath = "Minecraft:textures/blocks/" + display.getIcon(1, meta).getIconName() + ".png";
 			String lsidepath = "Minecraft:textures/blocks/" + display.getIcon(4, meta).getIconName() + ".png";
@@ -263,38 +255,39 @@ public class GuiReactor extends GuiContainer
 				rsidepath = "RivalRebels:textures/blocks/" + display.getBlockTextureFromSide(2).getIconName().split("RivalRebels:")[1] + ".png";
 			}
 			Tessellator tessellator = Tessellator.getInstance();
+            WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
-			GL11.glEnable(GL11.GL_BLEND);
+            GL11.glEnable(GL11.GL_BLEND);
 			float alpha = 0.5f;
 			if (onmachines[i]) alpha = 1;
 			GL11.glColor4f(1F, 1F, 1F, alpha);
 			this.mc.renderEngine.bindTexture(new ResourceLocation(toppath));
-			tessellator.startDrawingQuads();
-			tessellator.addVertexWithUV(X + 1, Y + 3.5, zLevel, 0, 1);
-			tessellator.addVertexWithUV(X + 8, Y + 7, zLevel, 0, 0);
-			tessellator.addVertexWithUV(X + 15, Y + 3.5, zLevel, 1, 0);
-			tessellator.addVertexWithUV(X + 8, Y, zLevel, 1, 1);
+			worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(X + 1, Y + 3.5, zLevel).tex(0, 1).endVertex();
+			worldRenderer.pos(X + 8, Y + 7, zLevel).tex(0, 0).endVertex();
+			worldRenderer.pos(X + 15, Y + 3.5, zLevel).tex(1, 0).endVertex();
+			worldRenderer.pos(X + 8, Y, zLevel).tex(1, 1).endVertex();
 			tessellator.draw();
 			GL11.glColor4f(0.666F, 0.666F, 0.666F, alpha);
 			this.mc.renderEngine.bindTexture(new ResourceLocation(lsidepath));
-			tessellator.startDrawingQuads();
-			tessellator.addVertexWithUV(X + 1, Y + 3.5, zLevel, 0, 0);
-			tessellator.addVertexWithUV(X + 1, Y + 12.5, zLevel, 0, 1);
-			tessellator.addVertexWithUV(X + 8, Y + 16, zLevel, 1, 1);
-			tessellator.addVertexWithUV(X + 8, Y + 7, zLevel, 1, 0);
+			worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(X + 1, Y + 3.5, zLevel).tex(0, 0).endVertex();
+			worldRenderer.pos(X + 1, Y + 12.5, zLevel).tex(0, 1).endVertex();
+			worldRenderer.pos(X + 8, Y + 16, zLevel).tex(1, 1).endVertex();
+			worldRenderer.pos(X + 8, Y + 7, zLevel).tex(1, 0).endVertex();
 			tessellator.draw();
 			GL11.glColor4f(0.5F, 0.5F, 0.5F, alpha);
 			this.mc.renderEngine.bindTexture(new ResourceLocation(rsidepath));
-			tessellator.startDrawingQuads();
-			tessellator.addVertexWithUV(X + 15, Y + 12.5, zLevel, 1, 1);
-			tessellator.addVertexWithUV(X + 15, Y + 3.5, zLevel, 1, 0);
-			tessellator.addVertexWithUV(X + 8, Y + 7, zLevel, 0, 0);
-			tessellator.addVertexWithUV(X + 8, Y + 16, zLevel, 0, 1);
+			worldRenderer.begin(GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(X + 15, Y + 12.5, zLevel).tex(1, 1).endVertex();
+			worldRenderer.pos(X + 15, Y + 3.5, zLevel).tex(1, 0).endVertex();
+			worldRenderer.pos(X + 8, Y + 7, zLevel).tex(0, 0).endVertex();
+			worldRenderer.pos(X + 8, Y + 16, zLevel).tex(0, 1).endVertex();
 			tessellator.draw();
 
 			GL11.glDisable(GL11.GL_BLEND);
 
-			Y += 18;
+			Y += 18;*/
 		}
 	}
 
@@ -329,13 +322,14 @@ public class GuiReactor extends GuiContainer
 
 	protected void drawNoiseSphere(float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol)
 	{
-		Tessellator t = Tessellator.instance;
-		ScaledResolution scaledresolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        ScaledResolution scaledresolution = new ScaledResolution(mc);
 		GL11.glPushMatrix();
 		GL11.glPointSize(scaledresolution.getScaleFactor() / resolution);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
-		t.startDrawing(GL11.GL_POINTS);
+		worldRenderer.begin(GL11.GL_POINTS, DefaultVertexFormats.POSITION_COLOR);
 		radius *= resolution;
 		int outerR = (int) (radius + (outer * resolution));
 		int maxdist = outerR - radius;
@@ -363,8 +357,7 @@ public class GuiReactor extends GuiContainer
 						a /= 2;
 					}
 					v *= 1f - (fdist - radius) / maxdist;
-					t.setColorRGBA_F(lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v), v);
-					t.addVertex(X, Y, 4);
+					worldRenderer.pos(X, Y, 4).color(lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v), v).endVertex();
 				}
 				else
 				{
@@ -379,8 +372,7 @@ public class GuiReactor extends GuiContainer
 						a /= 2;
 					}
 
-					t.setColorRGBA_F(lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v), v);
-					t.addVertex(X, Y, 4);
+                    worldRenderer.pos(X, Y, 4).color(lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v), v).endVertex();
 				}
 			}
 		}
@@ -396,12 +388,13 @@ public class GuiReactor extends GuiContainer
 
 	protected void drawInfographic(float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2)
 	{
-		Tessellator t = Tessellator.instance;
-		GL11.glPushMatrix();
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        GL11.glPushMatrix();
 		GL11.glPointSize(4 / resolution);
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
-		t.startDrawing(GL11.GL_POINTS);
+		worldRenderer.begin(GL11.GL_POINTS, DefaultVertexFormats.POSITION_COLOR);
 		radius *= resolution;
 		sep *= resolution;
 		width1 *= resolution;
@@ -417,55 +410,40 @@ public class GuiReactor extends GuiContainer
 		int outerR = (midR2 + width2);
 		float hheight = (height / 2);
 		float hwidth = (width / 2);
-		for (int x = 1 - outerR; x < outerR; x++)
-		{
+		for (int x = 1 - outerR; x < outerR; x++) {
 			int xs = x * x;
 			double X = (double) x / (double) resolution;
-			for (int y = 1 - outerR; y < outerR; y++)
-			{
+			for (int y = 1 - outerR; y < outerR; y++) {
 				int ys = y * y;
 				double fdist = Math.sqrt(xs + ys);
-				if (fdist >= radius && fdist < midR1)
-				{
+				if (fdist >= radius && fdist < midR1) {
 					double Y = (double) y / (double) resolution;
 					double angle = Math.PI + Math.atan2(X, Y);
-					if (angle <= outerRatio)
-					{
-						if (angle <= innerRatio1)
-						{
-							t.setColorRGBA_F(0.25f, 0.25f, 1, 1);
+                    worldRenderer.pos(hwidth + X, hheight + Y - 45, 4);
+                    if (angle <= outerRatio) {
+						if (angle <= innerRatio1) {
+							worldRenderer.color(0.25f, 0.25f, 1, 1);
+						} else {
+							worldRenderer.color(0.75f, 0.75f, 1, 1);
 						}
-						else
-						{
-							t.setColorRGBA_F(0.75f, 0.75f, 1, 1);
-						}
-					}
-					else
-					{
-						if (angle <= innerRatio2)
-						{
-							t.setColorRGBA_F(1, 0.25f, 0.25f, 1);
-						}
-						else
-						{
-							t.setColorRGBA_F(1, 0.75f, 0.75f, 1);
+					} else {
+						if (angle <= innerRatio2) {
+							worldRenderer.color(1, 0.25f, 0.25f, 1);
+						} else {
+                            worldRenderer.color(1, 0.75f, 0.75f, 1);
 						}
 					}
-					t.addVertex(hwidth + X, hheight + Y - 45, 4);
-				}
-				else if (fdist >= midR2 && fdist < outerR)
-				{
+                    worldRenderer.endVertex();
+				} else if (fdist >= midR2 && fdist < outerR) {
 					double Y = (double) y / (double) resolution;
 					double angle = Math.PI + Math.atan2(X, Y);
-					if (angle <= outerRatio)
-					{
-						t.setColorRGBA_F(0, 0, 1, 1);
+                    worldRenderer.pos(hwidth + X, hheight + Y - 45, 4);
+					if (angle <= outerRatio) {
+                        worldRenderer.color(0, 0, 1, 1);
+					} else {
+                        worldRenderer.color(1, 0, 0, 1);
 					}
-					else
-					{
-						t.setColorRGBA_F(1, 0, 0, 1);
-					}
-					t.addVertex(hwidth + X, hheight + Y - 45, 4);
+					worldRenderer.endVertex();
 				}
 			}
 		}

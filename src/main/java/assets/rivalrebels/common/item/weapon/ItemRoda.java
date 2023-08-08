@@ -17,7 +17,6 @@ import assets.rivalrebels.common.explosion.NuclearExplosion;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityTNTPrimed;
 import net.minecraft.entity.monster.*;
@@ -419,31 +418,31 @@ public class ItemRoda extends Item
 		double dist = Math.sqrt(x * x + y * y + z * z);
 
         switch (r.nextInt(4)) {
-            case 0 -> {
+            case 0:
                 x /= -dist;
                 y /= -dist;
                 z /= -dist;
                 entity.motionX = x * 3 + (r.nextFloat() - 0.5f) * 0.1;
                 entity.motionY = y * 3 + (r.nextFloat() - 0.5f) * 0.1;
                 entity.motionZ = z * 3 + (r.nextFloat() - 0.5f) * 0.1;
-            }
-            case 1 -> {
+                break;
+            case 1:
                 x /= dist;
                 y /= dist;
                 z /= dist;
                 entity.motionX = x * 2 + (r.nextFloat() - 0.5f) * 0.1;
                 entity.motionY = y * 2 + (r.nextFloat() - 0.5f) * 0.1;
                 entity.motionZ = z * 2 + (r.nextFloat() - 0.5f) * 0.1;
-            }
+                break;
         }
 		return true;
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:be");
-	}
+	}*/
 
 	@Override
 	public boolean isFull3D()

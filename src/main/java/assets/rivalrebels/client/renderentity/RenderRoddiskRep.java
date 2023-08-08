@@ -11,43 +11,34 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
+import assets.rivalrebels.client.model.ModelDisk;
+import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
+import assets.rivalrebels.common.entity.EntityRoddiskRep;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
 
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.model.ModelDisk;
-import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
-import assets.rivalrebels.common.entity.EntityRoddiskLeader;
-import assets.rivalrebels.common.entity.EntityRoddiskRep;
+public class RenderRoddiskRep extends Render<EntityRoddiskRep> {
+	private int er = 0;
+	private final ModelDisk	model;
 
-public class RenderRoddiskRep extends Render
-{
-	int					er	= 0;
-	private ModelDisk	model;
-
-	public RenderRoddiskRep(RenderManager renderManager)
-	{
+	public RenderRoddiskRep(RenderManager renderManager) {
         super(renderManager);
 		model = new ModelDisk();
 	}
 
-	@Override
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9)
-	{
+    @Override
+    public void doRender(EntityRoddiskRep erd, double x, double y, double z, float entityYaw, float partialTicks) {
 		er += 13.46;
-		EntityRoddiskRep erd = (EntityRoddiskRep) var1;
 		GL11.glBindTexture(GL11.GL_TEXTURE_2D, TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
 		GL11.glEnable(GL11.GL_BLEND);
 		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glPushMatrix();
 		GL11.glScalef(0.4f, 0.4f, 0.4f);
-		GL11.glTranslatef((float) var2, (float) var4, (float) var6);
+		GL11.glTranslatef((float) x, (float) y, (float) z);
 		GL11.glPushMatrix();
 		GL11.glRotatef(erd.rotationPitch, 0.0F, 0.0F, 1.0F);
 		GL11.glRotatef(erd.rotationYaw - 90.0f + er, 0.0F, 1.0F, 0.0F);
@@ -63,7 +54,7 @@ public class RenderRoddiskRep extends Render
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityRoddiskRep entity)
 	{
 		return null;
 	}

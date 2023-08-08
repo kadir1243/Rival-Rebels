@@ -11,13 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 
 public class BlockAutoTower extends BlockAutoTemplate
 {
@@ -40,14 +36,14 @@ public class BlockAutoTower extends BlockAutoTemplate
 			placeBlockCarefully(world, x + 1, y + y1, z - 1, RivalRebels.steel);
 			placeBlockCarefully(world, x + 1, y + y1, z + 1, RivalRebels.steel);
 			placeBlockCarefully(world, x - 1, y + y1, z - 1, RivalRebels.steel);
-			placeBlockCarefully(world, x, y + y1, z, Blocks.air);
+			placeAir(world, x, y + y1, z);
 
 			if (y1 <= 1)
 			{
-				placeBlockCarefully(world, x + 1, y + y1, z, Blocks.air);
-				placeBlockCarefully(world, x - 1, y + y1, z, Blocks.air);
-				placeBlockCarefully(world, x, y + y1, z + 1, Blocks.air);
-				placeBlockCarefully(world, x, y + y1, z - 1, Blocks.air);
+				placeAir(world, x + 1, y + y1, z);
+				placeAir(world, x - 1, y + y1, z);
+				placeAir(world, x, y + y1, z + 1);
+				placeAir(world, x, y + y1, z - 1);
 			}
 			else if (y1 == 8)
 			{
@@ -65,24 +61,24 @@ public class BlockAutoTower extends BlockAutoTemplate
 			}
 			else if (y1 == 9)
 			{
-				placeBlockCarefully(world, x - 1, y + y1, z + 1, Blocks.air);
-				placeBlockCarefully(world, x + 1, y + y1, z - 1, Blocks.air);
-				placeBlockCarefully(world, x + 1, y + y1, z + 1, Blocks.air);
-				placeBlockCarefully(world, x - 1, y + y1, z - 1, Blocks.air);
+				placeAir(world, x - 1, y + y1, z + 1);
+				placeAir(world, x + 1, y + y1, z - 1);
+				placeAir(world, x + 1, y + y1, z + 1);
+				placeAir(world, x - 1, y + y1, z - 1);
 			}
 			else if (y1 == 10)
 			{
-				placeBlockCarefully(world, x - 1, y + y1, z, Blocks.air);
-				placeBlockCarefully(world, x + 1, y + y1, z, Blocks.air);
-				placeBlockCarefully(world, x, y + y1, z + 1, Blocks.air);
-				placeBlockCarefully(world, x, y + y1, z - 1, Blocks.air);
+				placeAir(world, x - 1, y + y1, z);
+				placeAir(world, x + 1, y + y1, z);
+				placeAir(world, x, y + y1, z + 1);
+				placeAir(world, x, y + y1, z - 1);
 			}
 			else if (y1 == 12)
 			{
-				placeBlockCarefully(world, x - 1, y + y1, z + 1, Blocks.air);
-				placeBlockCarefully(world, x + 1, y + y1, z - 1, Blocks.air);
-				placeBlockCarefully(world, x + 1, y + y1, z + 1, Blocks.air);
-				placeBlockCarefully(world, x - 1, y + y1, z - 1, Blocks.air);
+				placeAir(world, x - 1, y + y1, z + 1);
+				placeAir(world, x + 1, y + y1, z - 1);
+				placeAir(world, x + 1, y + y1, z + 1);
+				placeAir(world, x - 1, y + y1, z - 1);
 			}
 			else if (y1 == 16)
 			{
@@ -96,7 +92,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 		placeBlockCarefully(world, x, y - 1, z, RivalRebels.jump);
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -132,5 +128,5 @@ public class BlockAutoTower extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:cy"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:cy"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:cy"); // SIDE E
-	}
+	}*/
 }

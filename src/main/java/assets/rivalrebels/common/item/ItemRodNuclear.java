@@ -11,15 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import java.util.Random;
-
-import net.minecraft.client.renderer.texture.IIconRegister;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+
+import java.util.Random;
 
 public class ItemRodNuclear extends ItemRod
 {
@@ -30,7 +29,7 @@ public class ItemRodNuclear extends ItemRod
 		maxStackSize = 1;
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	@Override
 	public void onUpdate(ItemStack item, World world, Entity entity, int par4, boolean par5)
 	{
@@ -47,10 +46,10 @@ public class ItemRodNuclear extends ItemRod
 			}
 		}
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:av");
-	}
+	}*/
 }

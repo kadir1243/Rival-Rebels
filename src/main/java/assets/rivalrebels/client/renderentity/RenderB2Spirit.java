@@ -11,22 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.entity.EntityB2Spirit;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class RenderB2Spirit extends Render
+public class RenderB2Spirit extends Render<EntityB2Spirit>
 {
 	ModelFromObj	b2;
 	public static ModelFromObj	shuttle;
@@ -37,18 +34,18 @@ public class RenderB2Spirit extends Render
         super(renderManager);
 		try
 		{
-			b2 = ModelFromObj.readObjFile("d.obj");
+			b2 = ModelFromObj.readObjFile("b2spirit.obj");
 			b2.scale(3, 3, 3);
 			tupolev = ModelFromObj.readObjFile("tupolev.obj");
 			shuttle = ModelFromObj.readObjFile("shuttle.obj");
 		}
 		catch (Exception e)
 		{
-			e.printStackTrace();
+            RivalRebels.LOGGER.error(e);
 		}
 	}
 
-	public void renderB2Spirit(EntityB2Spirit b2spirit, double x, double y, double z, float par8, float par9)
+	public void doRender(EntityB2Spirit b2spirit, double x, double y, double z, float par8, float par9)
 	{
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glPushMatrix();
@@ -75,19 +72,8 @@ public class RenderB2Spirit extends Render
 		GL11.glPopMatrix();
 	}
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
 	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderB2Spirit((EntityB2Spirit) par1Entity, par2, par4, par6, par8, par9);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityB2Spirit entity)
 	{
 		return null;
 	}

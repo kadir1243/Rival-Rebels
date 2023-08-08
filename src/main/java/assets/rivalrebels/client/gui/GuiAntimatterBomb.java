@@ -11,27 +11,24 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.container.ContainerAntimatterBomb;
+import assets.rivalrebels.common.container.ContainerTsar;
+import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.StatCollector;
-
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.container.ContainerAntimatterBomb;
-import assets.rivalrebels.common.container.ContainerTsar;
-import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @SideOnly(Side.CLIENT)
 public class GuiAntimatterBomb extends GuiContainer
@@ -65,7 +62,7 @@ public class GuiAntimatterBomb extends GuiContainer
 		}
 		else
 		{
-			milli = "" + millis;
+			milli = String.valueOf(millis);
 		}
 		if (tsar.countdown % 20 >= 10)
 		{

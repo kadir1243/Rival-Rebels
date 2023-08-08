@@ -11,22 +11,20 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockFlagBox3 extends Block
 {
@@ -36,70 +34,35 @@ public class BlockFlagBox3 extends Block
 	}
 
 	@Override
-	public int quantityDropped(Random par1Random)
-	{
+	public int quantityDropped(Random par1Random) {
 		return 0;
 	}
 
-	@Override
-	public void onBlockClicked(World par1World, int par2, int par3, int par4, EntityPlayer player)
-	{
-		blockActivated(par1World, par2, par3, par4, player);
-	}
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
+        return null;
+    }
 
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
+    @Override
+    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+        blockActivated(worldIn, pos.getX(), pos.getY(), pos.getZ(), playerIn);
+    }
+
+    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
 	{
 		if (player.isSneaking() && !world.isRemote)
 		{
 			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.flag3, 10));
 			world.spawnEntityInWorld(ei);
-			world.setBlock(x, y, z, Blocks.air);
+			world.setBlockToAir(new BlockPos(x, y, z));
 			return false;
 		}
 		if (!player.isSneaking() && !world.isRemote)
 		{
 			player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("RivalRebels.Orders") + " " + StatCollector.translateToLocal("RivalRebels.sneak")));
-			world.setBlock(x, y, z, RivalRebels.flagbox4);
+			world.setBlockState(new BlockPos(x, y, z), RivalRebels.flagbox4.getDefaultState());
 			return false;
 		}
 		return false;
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon6;
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ah"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ar"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:ai"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:ai"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:ah"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:ah"); // SIDE E
 	}
 }

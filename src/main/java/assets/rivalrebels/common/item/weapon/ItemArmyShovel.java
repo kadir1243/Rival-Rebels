@@ -11,15 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
-import assets.rivalrebels.RivalRebels;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ItemArmyShovel extends ItemTool
 {
@@ -98,9 +97,9 @@ public class ItemArmyShovel extends ItemTool
 		blocksEffectiveAgainst.add(RivalRebels.petrifiedwood);
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:aw");
-	}
+	}*/
 }

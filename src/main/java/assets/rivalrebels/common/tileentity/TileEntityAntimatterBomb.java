@@ -25,9 +25,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -282,7 +280,7 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory, 
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
 				{
-					dist = getDistanceSq(RivalRebels.round.oObjx, getPos().getY(), RivalRebels.round.oObjz);
+					dist = getDistanceSq(RivalRebels.round.oObj.getX(), getPos().getY(), RivalRebels.round.oObj.getZ());
 				}
 				if (rrteam == RivalRebelsTeam.SIGMA)
 				{
@@ -323,13 +321,24 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory, 
 			worldObj.setBlockToAir(getPos());
 			worldObj.setLastLightningBolt(2);
 			float pitch = 0;
-			float yaw = switch (this.getBlockMetadata()) {
-                case 2 -> 180;
-                case 3 -> 0;
-                case 4 -> 270;
-                case 5 -> 90;
-                default -> 0;
-            };
+            float yaw;
+            switch (this.getBlockMetadata()) {
+                case 2:
+                    yaw = 180;
+                    break;
+                case 3:
+                    yaw = 0;
+                    break;
+                case 4:
+                    yaw = 270;
+                    break;
+                case 5:
+                    yaw = 90;
+                    break;
+                default:
+                    yaw = 0;
+                    break;
+            }
 
             EntityAntimatterBomb tsar = new EntityAntimatterBomb(worldObj, getPos().getX()+0.5f, getPos().getY() + 1f, getPos().getZ() + 0.5f, yaw, pitch, hydrogen, hasTrollface);
 			worldObj.spawnEntityInWorld(tsar);
@@ -404,4 +413,29 @@ public class TileEntityAntimatterBomb extends TileEntity implements IInventory, 
 	@Override
 	public void closeInventory(EntityPlayer player) {
 	}
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return new ChatComponentText(getName());
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public void clear() {
+
+    }
 }

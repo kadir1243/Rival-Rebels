@@ -44,7 +44,6 @@ public class EntityTachyonBomb extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setLocationAndAngles(x, y, z, yaw, pitch);
-		yOffset = 0.0F;
 		prevRotationYaw = rotationYaw = yaw;
 		prevRotationPitch = rotationPitch = pitch;
 		aoc = charges;
@@ -59,7 +58,6 @@ public class EntityTachyonBomb extends EntityThrowable
 	{
 		this(worldObj);
 		setPosition(px, py, pz);
-		yOffset = 0.0F;
 		motionX = f;
 		motionY = g;
 		motionZ = h;
@@ -71,7 +69,6 @@ public class EntityTachyonBomb extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		aoc = charges;
 		setAnglesMotion(mx, my, mz);
 	}

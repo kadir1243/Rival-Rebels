@@ -57,8 +57,9 @@ public class RhodesPiecePacket implements IMessage
 		public IMessage onMessage(RhodesPiecePacket m, MessageContext ctx)
 		{
 			Entity e = Minecraft.getMinecraft().theWorld.getEntityByID(m.id);
-			if (e instanceof EntityRhodesPiece er)
+			if (e instanceof EntityRhodesPiece)
 			{
+                EntityRhodesPiece er = (EntityRhodesPiece) e;
                 er.color = m.color;
 				er.scale = m.scale;
 			}

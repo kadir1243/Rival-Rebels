@@ -18,6 +18,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.tileentity.TileEntity;
 
 import org.lwjgl.BufferUtils;
@@ -79,19 +80,18 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer<
 		GL11.glTranslatef(0, 0, 0.5f);
 		Tessellator tess = Tessellator.getInstance();
         WorldRenderer worldRenderer = tess.getWorldRenderer();
-        tess.startDrawingQuads();
-
-		tess.addVertexWithUV(-0.0625f, 3.5f, 0f, 0, 0);
-		tess.addVertexWithUV(-0.0625f, -3.5f, 0f, 0, 1);
-		tess.addVertexWithUV(-0.0625f, -3.5f, 35f, 5, 1);
-		tess.addVertexWithUV(-0.0625f, 3.5f, 35f, 5, 0);
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.pos(-0.0625f, 3.5f, 0f).tex(0, 0).endVertex();
+		worldRenderer.pos(-0.0625f, -3.5f, 0f).tex(0, 1).endVertex();
+		worldRenderer.pos(-0.0625f, -3.5f, 35f).tex(5, 1).endVertex();
+		worldRenderer.pos(-0.0625f, 3.5f, 35f).tex(5, 0).endVertex();
 		tess.draw();
 
-		tess.startDrawingQuads();
-		tess.addVertexWithUV(0.0625f, -3.5f, 0f, 0, 1);
-		tess.addVertexWithUV(0.0625f, 3.5f, 0f, 0, 0);
-		tess.addVertexWithUV(0.0625f, 3.5f, 35f, 5, 0);
-		tess.addVertexWithUV(0.0625f, -3.5f, 35f, 5, 1);
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.pos(0.0625f, -3.5f, 0f).tex(0, 1).endVertex();
+		worldRenderer.pos(0.0625f, 3.5f, 0f).tex(0, 0).endVertex();
+		worldRenderer.pos(0.0625f, 3.5f, 35f).tex(5, 0).endVertex();
+		worldRenderer.pos(0.0625f, -3.5f, 35f).tex(5, 1).endVertex();
 		tess.draw();
 
 		GL11.glEnable(GL11.GL_TEXTURE_2D);
@@ -101,7 +101,6 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer<
 		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT && RivalRebels.optiFineWarn)
 		{
 			FMLNetworkHandler.openGui(Minecraft.getMinecraft().thePlayer, RivalRebels.instance, 24, tile.getWorld(), 0, 0, 0);
-			// Minecraft.getMinecraft().thePlayer.openGui(RivalRebels.instance, 24, tile.getWorldObj(), 0, 0, 0);
 			RivalRebels.optiFineWarn = false;
 		}
 	}

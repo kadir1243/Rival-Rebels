@@ -9,7 +9,7 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-package assets.rivalrebels.client.itemrenders;
+/*package assets.rivalrebels.client.itemrenders;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -23,32 +23,32 @@ import assets.rivalrebels.client.objfileloader.ModelFromObj;
 public class GasRenderer implements IItemRenderer
 {
 	ModelFromObj	ft;
-	
+
 	public GasRenderer()
 	{
 		try
 		{
-			ft = ModelFromObj.readObjFile("o.obj");
+			ft = ModelFromObj.readObjFile("gas.obj");
 		}
 		catch (Exception e)
 		{
 			System.err.println("Please make sure the model files are in the correct directory.");
 		}
 	}
-	
+
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type)
 	{
 		if (type == ItemRenderType.FIRST_PERSON_MAP || type == ItemRenderType.EQUIPPED || type == ItemRenderType.ENTITY || type == ItemRenderType.EQUIPPED_FIRST_PERSON) return true;
 		return false;
 	}
-	
+
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data)
 	{
@@ -61,9 +61,10 @@ public class GasRenderer implements IItemRenderer
 		GL11.glRotatef(160, 0.0F, 0.0F, 1.0F);
 		GL11.glScalef(0.15f, 0.15f, 0.15f);
 		// GL11.glTranslatef(0.3f, 0.05f, -0.1f);
-		
+
 		ft.render();
-		
+
 		GL11.glPopMatrix();
 	}
 }
+*/

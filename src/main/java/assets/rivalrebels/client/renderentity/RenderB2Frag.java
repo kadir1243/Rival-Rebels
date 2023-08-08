@@ -11,22 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.entity.EntityB2Frag;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
-public class RenderB2Frag extends Render
+public class RenderB2Frag extends Render<EntityB2Frag>
 {
 	ModelFromObj	md1;
 	ModelFromObj	md2;
@@ -34,11 +31,12 @@ public class RenderB2Frag extends Render
 	public RenderB2Frag(RenderManager renderManager)
 	{
         super(renderManager);
-		try
+        shadowSize = 0F;
+        try
 		{
-			md1 = ModelFromObj.readObjFile("f.obj");
+			md1 = ModelFromObj.readObjFile("b2side1.obj");
 			md1.scale(3, 3, 3);
-			md2 = ModelFromObj.readObjFile("g.obj");
+			md2 = ModelFromObj.readObjFile("b2side2.obj");
 			md2.scale(3, 3, 3);
 		}
 		catch (Exception e)
@@ -47,7 +45,7 @@ public class RenderB2Frag extends Render
 		}
 	}
 
-	public void renderB2Frag(EntityB2Frag b2spirit, double x, double y, double z, float par8, float par9)
+	public void doRender(EntityB2Frag b2spirit, double x, double y, double z, float par8, float par9)
 	{
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glPushMatrix();
@@ -61,19 +59,9 @@ public class RenderB2Frag extends Render
 		GL11.glPopMatrix();
 	}
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderB2Frag((EntityB2Frag) par1Entity, par2, par4, par6, par8, par9);
-	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityB2Frag entity)
 	{
 		return null;
 	}

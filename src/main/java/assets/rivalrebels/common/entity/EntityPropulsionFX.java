@@ -35,7 +35,6 @@ public class EntityPropulsionFX extends EntityThrowable
 		ticksInAir = 0;
 		setSize(0.5F, 0.5F);
 		setPosition(par2, par4, par6);
-		yOffset = 0.0F;
 	}
 
 	public EntityPropulsionFX(World world2, double x, double y, double z, double mX, double mY, double mZ)
@@ -45,7 +44,6 @@ public class EntityPropulsionFX extends EntityThrowable
 		setSize(0.5F, 0.5F);
 		setPosition(x, y, z);
 		setVelocity(mX, mY, mZ);
-		yOffset = 0.0F;
 	}
 
 	@Override

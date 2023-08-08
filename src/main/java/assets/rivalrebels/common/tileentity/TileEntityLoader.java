@@ -20,10 +20,13 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class TileEntityLoader extends TileEntity implements IInventory, ITickable
@@ -347,8 +350,9 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 				}
 			}
 			TileEntity te = worldObj.getTileEntity(pos.down());
-			if (te instanceof TileEntityLoader tel)
+			if (te instanceof TileEntityLoader)
 			{
+                TileEntityLoader tel = (TileEntityLoader) te;
                 for (int q = 0; q < chestContents.length; q++)
 				{
 					if (chestContents[q] != null)
@@ -404,4 +408,29 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 	{
 
 	}
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+        Arrays.fill(chestContents, null);
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return new ChatComponentText(getName());
+    }
 }

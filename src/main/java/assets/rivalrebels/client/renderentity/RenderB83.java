@@ -34,7 +34,7 @@ public class RenderB83 extends Render
         super(renderManager);
 		try
 		{
-			md = ModelFromObj.readObjFile("c.obj");
+			md = ModelFromObj.readObjFile("b83.obj");
 		}
 		catch (Exception e)
 		{

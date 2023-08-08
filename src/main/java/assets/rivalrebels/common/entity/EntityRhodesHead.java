@@ -48,7 +48,7 @@ public class EntityRhodesHead extends EntityRhodesPiece
 			{
 				setDead();
 				worldObj.spawnEntityInWorld(new EntityItem(worldObj, posX, posY, posZ, new ItemStack(RivalRebels.nuclearelement, 4)));
-				worldObj.spawnEntityInWorld(new EntityItem(worldObj, posX, posY, posZ, new ItemStack(RivalRebels.core3, 1)));
+				worldObj.spawnEntityInWorld(new EntityItem(worldObj, posX, posY, posZ, new ItemStack(RivalRebels.titaniumCore, 1)));
 				worldObj.spawnEntityInWorld(new EntityItem(worldObj, posX, posY, posZ, new ItemStack(RivalRebels.einsten, 1)));
 				if (rand.nextBoolean())
 				{

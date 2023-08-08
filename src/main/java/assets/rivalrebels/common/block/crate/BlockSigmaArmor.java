@@ -11,21 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockSigmaArmor extends Block
 {
@@ -40,33 +36,29 @@ public class BlockSigmaArmor extends Block
 		return 0;
 	}
 
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
-	{
-		blockActivated(world, x, y, z, player);
-	}
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        if (!world.isRemote)
+        {
+            player.addChatMessage(new ChatComponentText("§7[§2Inventory§7]"));
+            player.addChatMessage(new ChatComponentText("§aArmor. §9(Sigma's color armor.)"));
+            player.addChatMessage(new ChatComponentText("§7[§4Orders§7] §cEquipt your set of armor."));
+            EntityItem ei7 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camohat2));
+            EntityItem ei8 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camoshirt2));
+            EntityItem ei9 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camopants2));
+            EntityItem ei10 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camoshoes2));
+            world.spawnEntityInWorld(ei7);
+            world.spawnEntityInWorld(ei8);
+            world.spawnEntityInWorld(ei9);
+            world.spawnEntityInWorld(ei10);
+            world.setBlockToAir(pos);
+        }
+    }
 
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
-	{
-		if (!world.isRemote)
-		{
-			player.addChatMessage(new ChatComponentText("§7[§2Inventory§7]"));
-			player.addChatMessage(new ChatComponentText("§aArmor. §9(Sigma's color armor.)"));
-			player.addChatMessage(new ChatComponentText("§7[§4Orders§7] §cEquipt your set of armor."));
-			EntityItem ei7 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camohat2));
-			EntityItem ei8 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camoshirt2));
-			EntityItem ei9 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camopants2));
-			EntityItem ei10 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camoshoes2));
-			world.spawnEntityInWorld(ei7);
-			world.spawnEntityInWorld(ei8);
-			world.spawnEntityInWorld(ei9);
-			world.spawnEntityInWorld(ei10);
-			world.setBlock(x, y, z, Blocks.air);
-		}
-		return true;
-	}
-
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -102,5 +94,5 @@ public class BlockSigmaArmor extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:bo"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:ah"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ah"); // SIDE E
-	}
+	}*/
 }

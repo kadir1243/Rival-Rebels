@@ -9,7 +9,7 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-package assets.rivalrebels.client.itemrenders;
+/*package assets.rivalrebels.client.itemrenders;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -27,9 +27,9 @@ public class PlasmaCannonRenderer implements IItemRenderer
 	// ModelPlasmaCannon md;
 	ModelRod		md2;
 	ModelRod		md3;
-	
+
 	ModelFromObj	model;
-	
+
 	public PlasmaCannonRenderer()
 	{
 		// md = new ModelPlasmaCannon();
@@ -45,20 +45,20 @@ public class PlasmaCannonRenderer implements IItemRenderer
 			System.err.println("Please make sure the model files are in the correct directory.");
 		}
 	}
-	
+
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type)
 	{
 		if (type == ItemRenderType.FIRST_PERSON_MAP || type == ItemRenderType.EQUIPPED || type == ItemRenderType.ENTITY || type == ItemRenderType.EQUIPPED_FIRST_PERSON) return true;
 		return false;
 	}
-	
+
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data)
 	{
@@ -71,7 +71,7 @@ public class PlasmaCannonRenderer implements IItemRenderer
 		GL11.glRotatef(35, 0.0F, 0.0F, 1.0F);
 		GL11.glScalef(0.03125f, 0.03125f, 0.03125f);
 		GL11.glPushMatrix();
-		
+
 		model.render();
 		if (item.getEnchantmentTagList() != null)
 		{
@@ -83,10 +83,10 @@ public class PlasmaCannonRenderer implements IItemRenderer
 			GL11.glDisable(GL11.GL_BLEND);
 			GL11.glEnable(GL11.GL_LIGHTING);
 		}
-		
+
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
-		
+
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ethydrod);
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0.5f, 0.2f, -0.03f);
@@ -108,7 +108,7 @@ public class PlasmaCannonRenderer implements IItemRenderer
 		}
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0.5f, 0.2f, -0.03f);
 		GL11.glRotatef(35, 0.0F, 0.0F, 1.0F);
@@ -132,3 +132,4 @@ public class PlasmaCannonRenderer implements IItemRenderer
 		GL11.glPopMatrix();
 	}
 }
+*/

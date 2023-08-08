@@ -11,18 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.common.entity.EntityLaserBurst;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.ResourceLocation;
-
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
 
-import assets.rivalrebels.common.entity.EntityLaserBurst;
-
-public class RenderLaserBurst extends Render
+public class RenderLaserBurst extends Render<EntityLaserBurst>
 {
 	static float	red		= 1F;
 	static float	green	= 0.0F;
@@ -32,13 +30,14 @@ public class RenderLaserBurst extends Render
         super(renderManager);
     }
 
-	public void renderLaserBurst(EntityLaserBurst ell, double x, double y, double z, float yaw, float pitch)
-	{
+    @Override
+    public void doRender(EntityLaserBurst ell, double x, double y, double z, float entityYaw, float partialTicks) {
 		float radius = 0.12F;
 		int distance = 4;
-		Tessellator tessellator = Tessellator.instance;
+		Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
-		GL11.glPushMatrix();
+        GL11.glPushMatrix();
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glDisable(GL11.GL_CULL_FACE);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -54,33 +53,33 @@ public class RenderLaserBurst extends Render
 		{
 			float color = 1f - (o * 8.333f);
 			if (color < 0) color = 0;
-			tessellator.startDrawingQuads();
-			tessellator.setColorRGBA_F(red, color, color, 1f);
-			tessellator.addVertex(0 + o, 0 - o, 0);
-			tessellator.addVertex(0 + o, 0 + o, 0);
-			tessellator.addVertex(0 + o, 0 + o, 0 + distance);
-			tessellator.addVertex(0 + o, 0 - o, 0 + distance);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+			worldRenderer.color(red, color, color, 1f);
+			worldRenderer.pos(0 + o, 0 - o, 0).endVertex();
+			worldRenderer.pos(0 + o, 0 + o, 0).endVertex();
+			worldRenderer.pos(0 + o, 0 + o, 0 + distance).endVertex();
+			worldRenderer.pos(0 + o, 0 - o, 0 + distance).endVertex();
 			tessellator.draw();
-			tessellator.startDrawingQuads();
-			tessellator.setColorRGBA_F(red, color, color, 1f);
-			tessellator.addVertex(0 - o, 0 - o, 0);
-			tessellator.addVertex(0 + o, 0 - o, 0);
-			tessellator.addVertex(0 + o, 0 - o, 0 + distance);
-			tessellator.addVertex(0 - o, 0 - o, 0 + distance);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+			worldRenderer.color(red, color, color, 1f);
+			worldRenderer.pos(0 - o, 0 - o, 0).endVertex();
+			worldRenderer.pos(0 + o, 0 - o, 0).endVertex();
+			worldRenderer.pos(0 + o, 0 - o, 0 + distance).endVertex();
+			worldRenderer.pos(0 - o, 0 - o, 0 + distance).endVertex();
 			tessellator.draw();
-			tessellator.startDrawingQuads();
-			tessellator.setColorRGBA_F(red, color, color, 1f);
-			tessellator.addVertex(0 - o, 0 + o, 0);
-			tessellator.addVertex(0 - o, 0 - o, 0);
-			tessellator.addVertex(0 - o, 0 - o, 0 + distance);
-			tessellator.addVertex(0 - o, 0 + o, 0 + distance);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+			worldRenderer.color(red, color, color, 1f);
+			worldRenderer.pos(0 - o, 0 + o, 0).endVertex();
+			worldRenderer.pos(0 - o, 0 - o, 0).endVertex();
+			worldRenderer.pos(0 - o, 0 - o, 0 + distance).endVertex();
+			worldRenderer.pos(0 - o, 0 + o, 0 + distance).endVertex();
 			tessellator.draw();
-			tessellator.startDrawingQuads();
-			tessellator.setColorRGBA_F(red, color, color, 1f);
-			tessellator.addVertex(0 + o, 0 + o, 0);
-			tessellator.addVertex(0 - o, 0 + o, 0);
-			tessellator.addVertex(0 - o, 0 + o, 0 + distance);
-			tessellator.addVertex(0 + o, 0 + o, 0 + distance);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+			worldRenderer.color(red, color, color, 1f);
+			worldRenderer.pos(0 + o, 0 + o, 0).endVertex();
+			worldRenderer.pos(0 - o, 0 + o, 0).endVertex();
+			worldRenderer.pos(0 - o, 0 + o, 0 + distance).endVertex();
+			worldRenderer.pos(0 + o, 0 + o, 0 + distance).endVertex();
 			tessellator.draw();
 		}
 		GL11.glDisable(GL11.GL_BLEND);
@@ -89,13 +88,7 @@ public class RenderLaserBurst extends Render
 	}
 
 	@Override
-	public void doRender(Entity entityLaserBurst, double x, double y, double z, float yaw, float pitch)
-	{
-		this.renderLaserBurst((EntityLaserBurst) entityLaserBurst, x, y, z, yaw, pitch);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityLaserBurst entity)
 	{
 		return null;
 	}

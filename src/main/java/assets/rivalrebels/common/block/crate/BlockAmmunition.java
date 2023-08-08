@@ -11,22 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockAmmunition extends Block
 {
@@ -41,23 +40,21 @@ public class BlockAmmunition extends Block
 		return 0;
 	}
 
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
-	{
-		blockActivated(world, x, y, z, player);
-	}
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumFacing side, float hitX, float hitY, float hitZ) {
+        return blockActivated(worldIn, pos.getX(), pos.getY(), pos.getZ(), playerIn);
+    }
 
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
+    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
 	{
-		if (world.isRemote)
-		{
-			player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("RivalRebels.Inventory")));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.rocket.getUnlocalizedName() + ".name") + ". §9(" + StatCollector.translateToLocal(RivalRebels.rpg.getUnlocalizedName() + ".name") + " " + StatCollector.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.battery.getUnlocalizedName() + ".name") + ". §9(" + StatCollector.translateToLocal(RivalRebels.tesla.getUnlocalizedName() + ".name") + " " + StatCollector.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.hydrod.getUnlocalizedName() + ".name") + ". §9(" + StatCollector.translateToLocal(RivalRebels.plasmacannon.getUnlocalizedName() + ".name") + " " + StatCollector.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.fuel.getUnlocalizedName() + ".name") + ". §9(" + StatCollector.translateToLocal(RivalRebels.flamethrower.getUnlocalizedName() + ".name") + " " + StatCollector.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.redrod.getUnlocalizedName() + ".name") + ". §9(" + StatCollector.translateToLocal(RivalRebels.einsten.getUnlocalizedName() + ".name") + " " + StatCollector.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.gasgrenade.getUnlocalizedName() + ".name") + ". §9(" + StatCollector.translateToLocal("RivalRebels.chemicalweapon") + ")"));
+		if (world.isRemote) {
+			player.addChatMessage(new ChatComponentText(I18n.format("RivalRebels.Inventory")));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.rocket.getUnlocalizedName() + ".name") + ". §9(" + I18n.format(RivalRebels.rpg.getUnlocalizedName() + ".name") + " " + I18n.format("RivalRebels.ammunition") + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.battery.getUnlocalizedName() + ".name") + ". §9(" + I18n.format(RivalRebels.tesla.getUnlocalizedName() + ".name") + " " + I18n.format("RivalRebels.ammunition") + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.hydrod.getUnlocalizedName() + ".name") + ". §9(" + I18n.format(RivalRebels.plasmacannon.getUnlocalizedName() + ".name") + " " + I18n.format("RivalRebels.ammunition") + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.fuel.getUnlocalizedName() + ".name") + ". §9(" + I18n.format(RivalRebels.flamethrower.getUnlocalizedName() + ".name") + " " + I18n.format("RivalRebels.ammunition") + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.redrod.getUnlocalizedName() + ".name") + ". §9(" + I18n.format(RivalRebels.einsten.getUnlocalizedName() + ".name") + " " + I18n.format("RivalRebels.ammunition") + ")"));
+			player.addChatMessage(new ChatComponentText("§a" + I18n.format(RivalRebels.gasgrenade.getUnlocalizedName() + ".name") + ". §9(" + I18n.format("RivalRebels.chemicalweapon") + ")"));
 		}
 		if (!world.isRemote)
 		{
@@ -85,52 +82,12 @@ public class BlockAmmunition extends Block
 			world.spawnEntityInWorld(ei13);
 			world.spawnEntityInWorld(ei14);
 			world.spawnEntityInWorld(ei15);
-			world.setBlock(x, y, z, Blocks.air);
-			if (world.rand.nextInt(3) == 0)
-			{
+			world.setBlockToAir(new BlockPos(x, y, z));
+			if (world.rand.nextInt(3) == 0) {
 				world.spawnEntityInWorld(new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.nuclearelement, 1)));
 				player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.nuclearelement.getUnlocalizedName() + ".name") + ". §9(" + "Used in nuclear weapons" + ")"));
 			}
-			return true;
 		}
 		return true;
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon6;
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ah"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ai"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:aa"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:aa"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:aa"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:aa"); // SIDE E
 	}
 }

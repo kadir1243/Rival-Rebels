@@ -11,37 +11,36 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import assets.rivalrebels.RivalRebels;
 
 public class ItemClassArmor extends ItemArmor
 
 {
 	private static final int	maxDamageArray[]	= { 0, 0, 0, 0 };
-	
+
 	/**
 	 * Stores the armor type: 0 is helmet, 1 is plate, 2 is legs and 3 is boots
 	 */
 	public final int			armorType;
-	
+
 	/** Holds the amount of damage that the armor reduces at full durability. */
 	public final int			damageReduceAmount;
-	
+
 	/**
 	 * Used on RenderPlayer to select the correspondent armor to be rendered on the player: 0 is cloth, 1 is chain, 2 is iron, 3 is diamond and 4 is gold.
 	 */
 	public final int			renderIndex;
-	
+
 	public int					team;
 	public int					stateclass;
-	
+
 	/** The EnumArmorMaterial used for this ItemArmor */
 	private final ArmorMaterial	material;
-	
+
 	public ItemClassArmor(ArmorMaterial par2EnumArmorMaterial, int par3, int par4, int team, int stateclass)
 	{
 		super(par2EnumArmorMaterial, par3, par4);
@@ -59,7 +58,7 @@ public class ItemClassArmor extends ItemArmor
 			maxDamageArray[i] = material.getDamageReductionAmount(i);
 		}
 	}
-	
+
 	/**
 	 * Returns the 'max damage' factor array for the armor, each piece of armor have a durability factor (that gets multiplied by armor material factor)
 	 */
@@ -67,7 +66,7 @@ public class ItemClassArmor extends ItemArmor
 	{
 		return maxDamageArray;
 	}
-	
+
 	@Override
 	public String getArmorTexture(ItemStack item, Entity entity, int slot, String type)
 	{
@@ -106,8 +105,8 @@ public class ItemClassArmor extends ItemArmor
 		if (itemstack == RivalRebels.shackerboots) return "rivalrebels:textures/armors/f.png";
 		return "";
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		String str = "";
@@ -121,5 +120,5 @@ public class ItemClassArmor extends ItemArmor
 		if (armorType == 1) itemIcon = iconregister.registerIcon("rivalrebels:" + str + "c");
 		if (armorType == 2) itemIcon = iconregister.registerIcon("rivalrebels:" + str + "p");
 		if (armorType == 3) itemIcon = iconregister.registerIcon("rivalrebels:" + str + "b");
-	}
+	}*/
 }

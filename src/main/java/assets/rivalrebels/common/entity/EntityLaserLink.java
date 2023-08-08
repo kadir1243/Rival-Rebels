@@ -41,7 +41,6 @@ public class EntityLaserLink extends EntityInanimate
 		posY -= 0.08;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		setSize(0.5F, 0.5F);
 	}
 
@@ -52,7 +51,6 @@ public class EntityLaserLink extends EntityInanimate
 		motionX = distance/100f;
 		ticksExisted = 0;
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		setSize(0.5F, 0.5F);
 	}
 

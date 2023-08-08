@@ -11,13 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.World;
 
 public class BlockAutoQuickSandTrap extends BlockAutoTemplate
 {
@@ -32,21 +27,21 @@ public class BlockAutoQuickSandTrap extends BlockAutoTemplate
 		super.build(world, x, y, z);
 		if (!world.isRemote)
 		{
-			world.setBlock(x, y, z, Blocks.air);
+            placeAir(world, x, y, z);
 			int r = 2;
 			for (int z1 = -r; z1 <= r; z1++)
 			{
 				for (int x1 = -r; x1 <= r; x1++)
 				{
 					placeBlockCarefully(world, x + x1, y - 1, z + z1, RivalRebels.aquicksand);
-					placeBlockCarefully(world, x + x1, y - 2, z + z1, Blocks.air);
-					placeBlockCarefully(world, x + x1, y - 3, z + z1, Blocks.air);
+					placeAir(world, x + x1, y - 2, z + z1);
+					placeAir(world, x + x1, y - 3, z + z1);
 				}
 			}
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -82,5 +77,5 @@ public class BlockAutoQuickSandTrap extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:dg"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:dg"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:dg"); // SIDE E
-	}
+	}*/
 }

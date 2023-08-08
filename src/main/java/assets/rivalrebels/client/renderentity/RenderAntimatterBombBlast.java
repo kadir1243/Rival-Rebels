@@ -11,23 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelAntimatterBombBlast;
 import assets.rivalrebels.client.model.ModelBlastRing;
 import assets.rivalrebels.client.model.ModelBlastSphere;
-import assets.rivalrebels.client.model.ModelTsarBlast;
 import assets.rivalrebels.common.entity.EntityAntimatterBombBlast;
-import assets.rivalrebels.common.entity.EntityTsarBlast;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
-public class RenderAntimatterBombBlast extends Render
+public class RenderAntimatterBombBlast extends Render<EntityAntimatterBombBlast>
 {
 	private ModelBlastSphere modelsphere;
 	private ModelBlastRing modelring;
@@ -42,9 +37,7 @@ public class RenderAntimatterBombBlast extends Render
 	}
 
 	@Override
-	public void doRender(Entity var1, double x, double y, double z, float var8, float var9)
-	{
-		EntityAntimatterBombBlast tsar = (EntityAntimatterBombBlast) var1;
+	public void doRender(EntityAntimatterBombBlast tsar, double x, double y, double z, float var8, float var9) {
 		tsar.time++;
 		double radius = (((tsar.motionX * 10) - 1) * ((tsar.motionX * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;
 		GL11.glPushMatrix();
@@ -119,7 +112,7 @@ public class RenderAntimatterBombBlast extends Render
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityAntimatterBombBlast entity)
 	{
 		return null;
 	}

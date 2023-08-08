@@ -11,9 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.item.Item;
 import assets.rivalrebels.RivalRebels;
+import net.minecraft.item.Item;
 
 public class ItemBattery extends Item
 {
@@ -23,10 +22,10 @@ public class ItemBattery extends Item
 		maxStackSize = 64;
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ac");
-	}
+	}*/
 }

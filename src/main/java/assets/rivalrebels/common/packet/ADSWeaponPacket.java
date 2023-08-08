@@ -58,8 +58,9 @@ public class ADSWeaponPacket implements IMessage
 		public IMessage onMessage(ADSWeaponPacket m, MessageContext ctx)
 		{
 			TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.pos);
-			if (te instanceof TileEntityReciever ter)
+			if (te instanceof TileEntityReciever)
 			{
+                TileEntityReciever ter = (TileEntityReciever) te;
                 if (ter.hasWepReqs())
 				{
 					ter.setWep(m.wep);

@@ -11,18 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.IBlockAccess;
+
+import java.util.Random;
 
 public class BlockForceShield extends Block
 {
@@ -37,33 +32,11 @@ public class BlockForceShield extends Block
 		return 0;
 	}
 
-	boolean	Destroy	= false;
+    @Override
+    public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player) {
+        return player.capabilities.isCreativeMode && player.isSneaking();
+    }
 
-	@Override
-	public void breakBlock(World world, int i, int j, int k, Block l, int s)
-	{
-		Block id = world.getBlock(i, j, k);
-		if (!Destroy && id != RivalRebels.fshield && id != RivalRebels.omegaobj && id != RivalRebels.sigmaobj && id != RivalRebels.reactive)
-		{
-			world.setBlock(i, j, k, this);
-		}
-		Destroy = false;
-	}
-
-	@Override
-	public void onBlockHarvested(World world, int x, int y, int z, int m, EntityPlayer player)
-	{
-		if (!world.isRemote && player.capabilities.isCreativeMode && player.isSneaking())
-		{
-			Destroy = true;
-			world.setBlock(x, y, z, Blocks.air);
-		}
-		else
-		{
-			Destroy = false;
-			world.setBlock(x, y, z, this);
-		}
-	}
 	/**
 	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
 	 * etc to this block.
@@ -78,23 +51,5 @@ public class BlockForceShield extends Block
 	public int getMobilityFlag()
 	{
 		return 2;
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon1;
-	IIcon	icon2;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0 || side == 1) return icon2;
-		return icon1;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ao");
-		icon2 = iconregister.registerIcon("RivalRebels:ap");
 	}
 }

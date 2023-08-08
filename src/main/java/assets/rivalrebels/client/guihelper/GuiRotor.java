@@ -47,7 +47,7 @@ public class GuiRotor extends GuiButton
 		if (deg < 22) deg = 22;
 		degree = deg;
 		this.drawTexturedModalRect(this.xPosition, this.yPosition, 224, 66, this.width, this.height * deg / (180));
-		this.drawCenteredString(par1Minecraft.fontRenderer, (deg * 2) + "°", xPosition + width / 2, yPosition + height / 2 - 4, 0xffffff);
+		this.drawCenteredString(par1Minecraft.fontRendererObj, (deg * 2) + "°", xPosition + width / 2, yPosition + height / 2 - 4, 0xffffff);
 		GL11.glPopMatrix();
 	}
 

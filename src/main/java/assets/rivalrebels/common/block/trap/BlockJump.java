@@ -12,18 +12,13 @@
 package assets.rivalrebels.common.block.trap;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.common.tileentity.TileEntityJumpBlock;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class BlockJump extends Block
 {
@@ -32,28 +27,23 @@ public class BlockJump extends Block
 		super(Material.sponge);
 	}
 
-	@Override
-	public void onEntityCollidedWithBlock(World par1World, int par2, int par3, int par4, Entity par5Entity)
-	{
-		if (par5Entity instanceof EntityLivingBase)
-		{
-			par5Entity.motionY += 2;
-			par1World.playSoundEffect(par2, par3, par4, "random.bowhit", 3F, 2);
-		}
-	}
+    @Override
+    public void onEntityCollidedWithBlock(World world, BlockPos pos, IBlockState state, Entity entity) {
+        if (entity instanceof EntityLivingBase) {
+            entity.motionY += 2;
+            world.playSoundEffect(pos.getX(), pos.getY(), pos.getZ(), "random.bowhit", 3F, 2);
+        }
+    }
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		float f = 0.0625F;
-		return new AxisAlignedBB(par2, par3, par4, par2 + 1, par3 + 1 - f, par4 + 1);
-	}
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+        return new AxisAlignedBB(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 0.9375f, pos.getZ() + 1);
+    }
 
-	@Override
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return new AxisAlignedBB(par2, par3, par4, par2 + 1, par3 + 1, par4 + 1);
-	}
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(World world, BlockPos pos) {
+        return new AxisAlignedBB(pos, pos.add(1, 1, 1));
+    }
 
 	@Override
 	public boolean isOpaqueCube()
@@ -62,12 +52,12 @@ public class BlockJump extends Block
 	}
 
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -103,5 +93,5 @@ public class BlockJump extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:at"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:at"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:at"); // SIDE E
-	}
+	}*/
 }

@@ -11,13 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.World;
 
 public class BlockAutoForceField extends BlockAutoTemplate
 {
@@ -47,7 +42,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 						}
 						else
 						{
-							placeBlockCarefully(world, x + x1, y + y1, z + z1, Blocks.air, 0, 2);
+							placeAir(world, x + x1, y + y1, z + z1);
 						}
 					}
 				}
@@ -74,7 +69,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -110,5 +105,5 @@ public class BlockAutoForceField extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:db"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:db"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:db"); // SIDE E
-	}
+	}*/
 }

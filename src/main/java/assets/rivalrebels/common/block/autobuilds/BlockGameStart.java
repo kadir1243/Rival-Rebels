@@ -11,13 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.World;
 
 public class BlockGameStart extends BlockAutoTemplate
 {
@@ -31,10 +26,10 @@ public class BlockGameStart extends BlockAutoTemplate
 	{
 		super.build(world, x, y, z);
 		RivalRebels.round.startRound(x, z);
-		world.setBlock(x, y, z, Blocks.air);
+		placeAir(world, x, y, z);
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -70,5 +65,5 @@ public class BlockGameStart extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:ai"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:ah"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ah"); // SIDE E
-	}
+	}*/
 }

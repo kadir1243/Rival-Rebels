@@ -11,13 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.World;
 
 public class BlockAutoBunker extends BlockAutoTemplate
 {
@@ -40,7 +35,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 				{
 					for (int z1 = -r; z1 <= r; z1++)
 					{
-						placeBlockCarefully(world, x + x1, y + y1, z + z1, Blocks.air);
+						placeAir(world, x + x1, y + y1, z + z1);
 					}
 				}
 			}
@@ -62,7 +57,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 			{
 				for (int c = -(r - 1); c <= (r - 1); c++)
 				{
-					if ((a == -(r - 1) && c == -(r - 1)) || (a == -(r - 1) && c == +(r - 1)) || (a == +(r - 1) && c == -(r - 1)) || (a == +(r - 1) && c == +(r - 1)))
+					if ((a == -(r - 1) && c == -(r - 1)) || (a == -(r - 1) && c == (r - 1)) || (a == (r - 1) && c == -(r - 1)) || (a == (r - 1) && c == (r - 1)))
 					{
 						placeBlockCarefully(world, x + a, y - 3, z + c, RivalRebels.smartcamo);
 						placeBlockCarefully(world, x + a, y - 2, z + c, RivalRebels.smartcamo);
@@ -118,7 +113,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -154,5 +149,5 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:bl"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:bl"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:bl"); // SIDE E
-	}
+	}*/
 }

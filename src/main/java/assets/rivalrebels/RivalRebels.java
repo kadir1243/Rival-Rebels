@@ -15,7 +15,6 @@
 package assets.rivalrebels;
 
 import assets.rivalrebels.client.gui.RivalRebelsRenderOverlay;
-import assets.rivalrebels.client.itemrenders.*;
 import assets.rivalrebels.client.model.RenderLibrary;
 import assets.rivalrebels.common.block.*;
 import assets.rivalrebels.common.block.autobuilds.*;
@@ -33,9 +32,18 @@ import assets.rivalrebels.common.item.weapon.*;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsRound;
 import assets.rivalrebels.common.tileentity.*;
+import net.minecraft.block.Block;
+import net.minecraft.client.renderer.entity.RendererLivingEntity;
+import net.minecraft.command.ICommandManager;
+import net.minecraft.command.ServerCommandManager;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemArmor.ArmorMaterial;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.config.Configuration;
+import net.minecraftforge.common.util.EnumHelper;
 import net.minecraftforge.fml.client.FMLClientHandler;
-import net.minecraftforge.fml.common.FMLCommonHandler;
-import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -46,26 +54,14 @@ import net.minecraftforge.fml.common.event.FMLServerStoppedEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.EntityRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraft.block.Block;
-import net.minecraft.client.renderer.entity.RendererLivingEntity;
-import net.minecraft.command.ICommandManager;
-import net.minecraft.command.ServerCommandManager;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemArmor.ArmorMaterial;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.MinecraftForgeClient;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.util.EnumHelper;
-
-import java.io.File;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(
-		modid = RivalRebels.MODID,
-		name = RivalRebels.rrname,
-		version = RivalRebels.rrversion
-	)
+    modid = RivalRebels.MODID,
+    name = RivalRebels.rrname,
+    version = RivalRebels.rrversion
+)
 public class RivalRebels {
 	public static final String				MODID			= "rivalrebels";
 	public static final String				rrname			= "Rival Rebels";
@@ -74,6 +70,7 @@ public class RivalRebels {
 	public static final String				packagename		= "assets.rivalrebels.";
 	@SidedProxy(clientSide = packagename+"ClientProxy", serverSide = packagename+"CommonProxy")
 	public static CommonProxy				proxy;
+    public static final Logger LOGGER = LogManager.getLogger();
 
 	@Mod.Instance(MODID)
 	public static RivalRebels				instance;
@@ -85,16 +82,16 @@ public class RivalRebels {
 
 	public static RivalRebelsRound			round;
 
-	static ArmorMaterial					armorCamo		= EnumHelper.addArmorMaterial("Camo", 50, new int[] { 2, 9, 5, 2 }, 10);
-	static ArmorMaterial					armorCamo2		= EnumHelper.addArmorMaterial("Camo2", 50, new int[] { 2, 9, 5, 2 }, 10);
-	static ArmorMaterial					orebelarmor		= EnumHelper.addArmorMaterial("rebelo", 150, new int[] { 6, 18, 6, 6 }, 6);	// 36
-	static ArmorMaterial					onukerarmor		= EnumHelper.addArmorMaterial("nukero", 100, new int[] { 8, 20, 8, 6 }, 2);	// 42
-	static ArmorMaterial					ointelarmor		= EnumHelper.addArmorMaterial("intelo", 80, new int[] { 4, 11, 6, 5 }, 10);	// 26
-	static ArmorMaterial					ohackerarmor	= EnumHelper.addArmorMaterial("hackero", 60, new int[] { 2, 11, 6, 5 }, 10);	// 24
-	static ArmorMaterial					srebelarmor		= EnumHelper.addArmorMaterial("rebels", 150, new int[] { 6, 18, 6, 6 }, 6);	// 36
-	static ArmorMaterial					snukerarmor		= EnumHelper.addArmorMaterial("nukers", 100, new int[] { 8, 20, 8, 6 }, 2);	// 42
-	static ArmorMaterial					sintelarmor		= EnumHelper.addArmorMaterial("intels", 80, new int[] { 4, 11, 6, 5 }, 10);	// 26
-	static ArmorMaterial					shackerarmor	= EnumHelper.addArmorMaterial("hackers", 60, new int[] { 2, 11, 6, 5 }, 10);	// 24
+	public static ArmorMaterial				armorCamo		= EnumHelper.addArmorMaterial("Camo", "Camo", 50, new int[] { 2, 9, 5, 2 }, 10);
+	public static ArmorMaterial				armorCamo2		= EnumHelper.addArmorMaterial("Camo2", "Camo2", 50, new int[] { 2, 9, 5, 2 }, 10);
+	public static ArmorMaterial				orebelarmor		= EnumHelper.addArmorMaterial("rebelo", "rebelo", 150, new int[] { 6, 18, 6, 6 }, 6);
+	public static ArmorMaterial				onukerarmor		= EnumHelper.addArmorMaterial("nukero", "nukero", 100, new int[] { 8, 20, 8, 6 }, 2);
+	public static ArmorMaterial				ointelarmor		= EnumHelper.addArmorMaterial("intelo", "intelo", 80, new int[] { 4, 11, 6, 5 }, 10);
+	public static ArmorMaterial				ohackerarmor	= EnumHelper.addArmorMaterial("hackero", "hackero", 60, new int[] { 2, 11, 6, 5 }, 10);
+	public static ArmorMaterial				srebelarmor		= EnumHelper.addArmorMaterial("rebels", "rebels", 150, new int[] { 6, 18, 6, 6 }, 6);
+	public static ArmorMaterial				snukerarmor		= EnumHelper.addArmorMaterial("nukers", "nukers", 100, new int[] { 8, 20, 8, 6 }, 2);
+	public static ArmorMaterial				sintelarmor		= EnumHelper.addArmorMaterial("intels", "intels", 80, new int[] { 4, 11, 6, 5 }, 10);
+	public static ArmorMaterial				shackerarmor	= EnumHelper.addArmorMaterial("hackers", "hackers", 60, new int[] { 2, 11, 6, 5 }, 10);
 
 	public static int						teleportDist;
 	public static boolean					flareExplode;
@@ -124,8 +121,7 @@ public class RivalRebels {
 	public static boolean					rtarget;
 	public static boolean					lctarget;
 	public static boolean					bzoom;
-	public static int						roundsperreset;
-	public static boolean					goodRender;
+    public static boolean					goodRender;
 	public static int						teslasegments;
 	public static boolean					goreEnabled;
 	public static boolean					stopSelfnukeinSP;
@@ -261,9 +257,9 @@ public class RivalRebels {
 	public static Item						roddisk;
 	public static Item						antenna;
 	public static Item						emptyrod;
-	public static Item						core1;
-	public static Item						core2;
-	public static Item						core3;
+	public static Item copperCore;
+	public static Item tungstenCore;
+	public static Item titaniumCore;
 	public static Item						binoculars;
 	public static Item						camera;
 	public static Item						b2spirit;
@@ -375,7 +371,6 @@ public class RivalRebels {
 	public static ResourceLocation			eteinstenhandle;
 	public static ResourceLocation			etblood;
 	public static ResourceLocation			etgoo;
-	public static ResourceLocation			etcorona;
 	public static ResourceLocation			etemptyrod;
 	public static ResourceLocation			etzombie;
 	public static ResourceLocation			etrocketlauncherbody;
@@ -440,16 +435,6 @@ public class RivalRebels {
 		config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 
-		if (!config.get("Version", "RRVersion", rrversion).getString().equals(rrversion))
-		{
-			config.save();
-			File file = new File("config/rivalrebels.cfg");
-			file.delete();
-			config = new Configuration(event.getSuggestedConfigurationFile());
-			config.load();
-			config.get("Version", "RRVersion", rrversion);
-		}
-
 		teleportDist = config.get("buildsize", "TeleportDistance", 150).getInt();
 		spawnradius = config.get("buildsize", "SpawnDomeRadius", 20).getInt();
 		bunkerradius = config.get("buildsize", "BunkerRadius", 10).getInt();
@@ -498,7 +483,7 @@ public class RivalRebels {
 
 		String tempstring = config.get("modblacklist", "modblacklist", "").getString().toLowerCase();
 		modblacklist = tempstring.split(",");
-		enforceblacklist = tempstring.length() > 0;
+		enforceblacklist = !tempstring.isEmpty();
 		config.addCustomCategoryComment("modblacklist", "Write illegal mods in comma separated format. Not case sensitive, use nonplural for more matches eg. hack instead of hacks. Do not put spaces unless intended for matching the spaces in mod names. Example: hack,xray,x-ray,x ray,cheat,fly,wireframe,wire-frame,wire frame");
 
 		landmineExplodeSize = config.get("explosionsize", "LandmineExplosionSize", 2).getInt();
@@ -544,7 +529,7 @@ public class RivalRebels {
 		registerClientSide(event);
 		PacketDispatcher.registerPackets();
 
-		FMLCommonHandler.instance().bus().register(round = new RivalRebelsRound(spawnradius,teleportDist,objectivedistance));
+		MinecraftForge.EVENT_BUS.register(round = new RivalRebelsRound(spawnradius,teleportDist,objectivedistance));
     }
 
 	@EventHandler
@@ -594,9 +579,7 @@ public class RivalRebels {
 		if (rhodesHealth < 15000) rhodesHealth = 15000;
 	}
 
-	private void registerTextures()
-	{
-		Loader.instance().getModList().iterator().next();
+	private void registerTextures() {
 		guitbutton = new ResourceLocation("rivalrebels:textures/gui/a.png");
 		guitspawn = new ResourceLocation("rivalrebels:textures/gui/b.png");
 		guitclass = new ResourceLocation("rivalrebels:textures/gui/c.png");
@@ -714,26 +697,26 @@ public class RivalRebels {
 			RendererLivingEntity.NAME_TAG_RANGE_SNEAK = nametagrange;
 			RendererLivingEntity.NAME_TAG_RANGE = nametagrange;
 			MinecraftForge.EVENT_BUS.register(new RivalRebelsSoundEventHandler());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.roddisk, new RodDiskRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.plasmacannon, new PlasmaCannonRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.einsten, new AstroBlasterRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.hydrod, new HydrogenRodRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.redrod, new RedstoneRodRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.nuclearelement, new NuclearRodRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.emptyrod, new EmptyRodRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.reactor.getItemDropped(1, null, 1), new ReactorRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.loader.getItemDropped(1, null, 1), new LoaderRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.controller.getItemDropped(1, null, 1), new LaptopRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.rpg, new RocketLauncherRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.binoculars, new BinocularsRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.tesla, new TeslaRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.battery, new BatteryRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.flamethrower, new FlamethrowerRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.fuel, new GasRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.roda, new RodaRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.hackm202, new HackRocketLauncherRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.seekm202, new SeekRocketLauncherRenderer());
-			MinecraftForgeClient.registerItemRenderer(RivalRebels.rocket, new RocketRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.roddisk, new RodDiskRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.plasmacannon, new PlasmaCannonRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.einsten, new AstroBlasterRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.hydrod, new HydrogenRodRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.redrod, new RedstoneRodRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.nuclearelement, new NuclearRodRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.emptyrod, new EmptyRodRenderer());
+			// MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RivalRebels.reactor), new ReactorRenderer());
+			// MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RivalRebels.loader), new LoaderRenderer());
+			// MinecraftForgeClient.registerItemRenderer(Item.getItemFromBlock(RivalRebels.controller), new LaptopRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.rpg, new RocketLauncherRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.binoculars, new BinocularsRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.tesla, new TeslaRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.battery, new BatteryRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.flamethrower, new FlamethrowerRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.fuel, new GasRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.roda, new RodaRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.hackm202, new HackRocketLauncherRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.seekm202, new SeekRocketLauncherRenderer());
+			// MinecraftForgeClient.registerItemRenderer(RivalRebels.rocket, new RocketRenderer());
 			rrro = new RivalRebelsRenderOverlay();
 			RenderLibrary rl = new RenderLibrary();
 			rl.init();
@@ -781,13 +764,13 @@ public class RivalRebels {
 		camo2 = (new BlockCamo2()).setHardness(2F).setResistance(25F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		camo3 = (new BlockCamo3()).setHardness(2F).setResistance(25F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		steel = (new BlockSteel()).setHardness(1.0F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		flag1 = (new BlockFlag("bi")).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		flag2 = (new BlockFlag("dd")).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		flag3 = (new BlockFlag("ar")).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		flag4 = (new BlockFlag("aw")).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		flag5 = (new BlockFlag("aq")).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		flag6 = (new BlockFlag("al")).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		flag7 = (new BlockFlag("aj")).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		flag1 = (new BlockFlag()).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		flag2 = (new BlockFlag()).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		flag3 = (new BlockFlag()).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		flag4 = (new BlockFlag()).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		flag5 = (new BlockFlag()).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		flag6 = (new BlockFlag()).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		flag7 = (new BlockFlag()).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		flagbox1 = (new BlockFlagBox1()).setBlockUnbreakable().setCreativeTab(rrarmortab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		flagbox5 = (new BlockFlagBox5()).setBlockUnbreakable().setCreativeTab(rrarmortab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		flagbox6 = (new BlockFlagBox6()).setBlockUnbreakable().setCreativeTab(rrarmortab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
@@ -826,10 +809,10 @@ public class RivalRebels {
 		omegaobj = (new BlockOmegaObjective()).setLightLevel(1.0F).setHardness(1.0F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		sigmaobj = (new BlockSigmaObjective()).setLightLevel(1.0F).setHardness(1.0F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		petrifiedwood = (new BlockPetrifiedWood()).setHardness(1.25F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		petrifiedstone1 = (new BlockPetrifiedStone("c")).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		petrifiedstone2 = (new BlockPetrifiedStone("d")).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		petrifiedstone3 = (new BlockPetrifiedStone("e")).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
-		petrifiedstone4 = (new BlockPetrifiedStone("f")).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		petrifiedstone1 = (new BlockPetrifiedStone()).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		petrifiedstone2 = (new BlockPetrifiedStone()).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		petrifiedstone3 = (new BlockPetrifiedStone()).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
+		petrifiedstone4 = (new BlockPetrifiedStone()).setHardness(1.5F).setResistance(10F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		tsarbombablock = (new BlockTsarBomba()).setHardness(5.0F).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		forcefieldnode = (new BlockForceFieldNode()).setHardness(5.0F).setCreativeTab(rralltab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		goreblock = (new BlockGore()).setHardness(0.0F).setCreativeTab(rrarmortab).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
@@ -849,85 +832,84 @@ public class RivalRebels {
 		antimatterbombblock = (new BlockAntimatterBomb()).setHardness(5.0F).setLightLevel(0.4F).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 		tachyonbombblock = (new BlockTachyonBomb()).setHardness(5.0F).setLightLevel(0.4F).setUnlocalizedName("rivalrebels.blocks." + (nextNum++));
 
-		nextNum = 0;
-		GameRegistry.registerBlock(amario, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(aquicksand, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(barricade, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(tower, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(easteregg, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(bunker, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flag1, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flag2, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flag3, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flag4, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flag5, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flag6, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flag7, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flagbox1, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flagbox5, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flagbox6, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flagbox3, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flagbox4, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flagbox7, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(smartcamo, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(camo1, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(camo2, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(camo3, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(steel, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(sigmaarmor, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(omegaarmor, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(weapons, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(ammunition, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(explosives, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(supplies, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(mario, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(jump, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(quicksand, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(landmine, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(remotecharge, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(timedbomb, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(flare, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(light, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(cycle, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(light2, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(toxicgas, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(fshield, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(gamestart, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(breadbox, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(alandmine, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(nuclearBomb, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(nukeCrateTop, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(nukeCrateBottom, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(radioactivedirt, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(radioactivesand, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(plasmaexplosion, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(reactor, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(loader, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(omegaobj, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(sigmaobj, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(petrifiedwood, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(petrifiedstone1, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(petrifiedstone2, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(petrifiedstone3, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(petrifiedstone4, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(tsarbombablock, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(forcefieldnode, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(goreblock, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(reactive, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(ffreciever, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(bastion, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(conduit, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(controller, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(mariotrap, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(minetrap, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(quicksandtrap, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(forcefield, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(meltdown, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(buildrhodes, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(rhodesactivator, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(theoreticaltsarbombablock, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(antimatterbombblock, "rivalrebelsblock" + (nextNum++));
-		GameRegistry.registerBlock(tachyonbombblock, "rivalrebelsblock" + (nextNum++));
+		GameRegistry.registerBlock(amario, "amario");
+		GameRegistry.registerBlock(aquicksand, "aquicksand");
+		GameRegistry.registerBlock(barricade, "barricade");
+		GameRegistry.registerBlock(tower, "tower");
+		GameRegistry.registerBlock(easteregg, "easteregg");
+		GameRegistry.registerBlock(bunker, "bunker");
+		GameRegistry.registerBlock(flag1, "flag1");
+		GameRegistry.registerBlock(flag2, "flag2");
+		GameRegistry.registerBlock(flag3, "flag3");
+		GameRegistry.registerBlock(flag4, "flag4");
+		GameRegistry.registerBlock(flag5, "flag5");
+		GameRegistry.registerBlock(flag6, "flag6");
+		GameRegistry.registerBlock(flag7, "flag7");
+		GameRegistry.registerBlock(flagbox1, "flagbox1");
+		GameRegistry.registerBlock(flagbox5, "flagbox5");
+		GameRegistry.registerBlock(flagbox6, "flagbox6");
+		GameRegistry.registerBlock(flagbox3, "flagbox3");
+		GameRegistry.registerBlock(flagbox4, "flagbox4");
+		GameRegistry.registerBlock(flagbox7, "flagbox7");
+		GameRegistry.registerBlock(smartcamo, "smartcamo");
+		GameRegistry.registerBlock(camo1, "camo1");
+		GameRegistry.registerBlock(camo2, "camo2");
+		GameRegistry.registerBlock(camo3, "camo3");
+		GameRegistry.registerBlock(steel, "steel");
+		GameRegistry.registerBlock(sigmaarmor, "sigmaarmor");
+		GameRegistry.registerBlock(omegaarmor, "omegaarmor");
+		GameRegistry.registerBlock(weapons, "weapons");
+		GameRegistry.registerBlock(ammunition, "ammunition");
+		GameRegistry.registerBlock(explosives, "explosives");
+		GameRegistry.registerBlock(supplies, "supplies");
+		GameRegistry.registerBlock(mario, "mario");
+		GameRegistry.registerBlock(jump, "jump");
+		GameRegistry.registerBlock(quicksand, "quicksand");
+		GameRegistry.registerBlock(landmine, "landmine");
+		GameRegistry.registerBlock(remotecharge, "remotecharge");
+		GameRegistry.registerBlock(timedbomb, "timedbomb");
+		GameRegistry.registerBlock(flare, "flare");
+		GameRegistry.registerBlock(light, "light");
+		GameRegistry.registerBlock(cycle, "cycle");
+		GameRegistry.registerBlock(light2, "light2");
+		GameRegistry.registerBlock(toxicgas, "toxicgas");
+		GameRegistry.registerBlock(fshield, "fshield");
+		GameRegistry.registerBlock(gamestart, "gamestart");
+		GameRegistry.registerBlock(breadbox, "breadbox");
+		GameRegistry.registerBlock(alandmine, "alandmine");
+		GameRegistry.registerBlock(nuclearBomb, "nuclear_bomb");
+		GameRegistry.registerBlock(nukeCrateTop, "nuke_crate_top");
+		GameRegistry.registerBlock(nukeCrateBottom, "nuke_crate_bottom");
+		GameRegistry.registerBlock(radioactivedirt, "radioactivedirt");
+		GameRegistry.registerBlock(radioactivesand, "radioactivesand");
+		GameRegistry.registerBlock(plasmaexplosion, "plasmaexplosion");
+		GameRegistry.registerBlock(reactor, "reactor");
+		GameRegistry.registerBlock(loader, "loader");
+		GameRegistry.registerBlock(omegaobj, "omegaobj");
+		GameRegistry.registerBlock(sigmaobj, "sigmaobj");
+		GameRegistry.registerBlock(petrifiedwood, "petrifiedwood");
+		GameRegistry.registerBlock(petrifiedstone1, "petrifiedstone1");
+		GameRegistry.registerBlock(petrifiedstone2, "petrifiedstone2");
+		GameRegistry.registerBlock(petrifiedstone3, "petrifiedstone3");
+		GameRegistry.registerBlock(petrifiedstone4, "petrifiedstone4");
+		GameRegistry.registerBlock(tsarbombablock, "tsarbombablock");
+		GameRegistry.registerBlock(forcefieldnode, "forcefieldnode");
+		GameRegistry.registerBlock(goreblock, "goreblock");
+		GameRegistry.registerBlock(reactive, "reactive");
+		GameRegistry.registerBlock(ffreciever, "ffreciever");
+		GameRegistry.registerBlock(bastion, "bastion");
+		GameRegistry.registerBlock(conduit, "conduit");
+		GameRegistry.registerBlock(controller, "controller");
+		GameRegistry.registerBlock(mariotrap, "mariotrap");
+		GameRegistry.registerBlock(minetrap, "minetrap");
+		GameRegistry.registerBlock(quicksandtrap, "quicksandtrap");
+		GameRegistry.registerBlock(forcefield, "forcefield");
+		GameRegistry.registerBlock(meltdown, "meltdown");
+		GameRegistry.registerBlock(buildrhodes, "buildrhodes");
+		GameRegistry.registerBlock(rhodesactivator, "rhodesactivator");
+		GameRegistry.registerBlock(theoreticaltsarbombablock, "theoreticaltsarbombablock");
+		GameRegistry.registerBlock(antimatterbombblock, "antimatterbombblock");
+		GameRegistry.registerBlock(tachyonbombblock, "tachyonbombblock");
 	}
 
 	private void registerItems()
@@ -955,9 +937,9 @@ public class RivalRebels {
 		einsten = (new ItemAstroBlaster()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
 		redrod = (new ItemRodRedstone()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
 		emptyrod = (new ItemRodEmpty()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
-		core1 = (new ItemCoreCopper()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
-		core2 = (new ItemCoreTungsten()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
-		core3 = (new ItemCoreTitanium()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
+		copperCore = (new ItemCoreCopper()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
+		tungstenCore = (new ItemCoreTungsten()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
+		titaniumCore = (new ItemCoreTitanium()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
 		binoculars = (new ItemBinoculars()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
 		chip = (new ItemChip()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
 		roda = (new ItemRoda()).setUnlocalizedName("rivalrebelsitems" + (nextNum++));
@@ -966,40 +948,38 @@ public class RivalRebels {
 		seekm202 = (new ItemSeekM202()).setUnlocalizedName("rivalrebelsitems" + (nextNum++));
 		camera = (new ItemCamera()).setUnlocalizedName("rivalrebelsitem" + (nextNum++));
 
-		nextNum = 0;
-
-		GameRegistry.registerItem(rpg, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(flamethrower, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(tesla, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(rocket, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(fuel, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(battery, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(pliers, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(armyshovel, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(knife, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(gasgrenade, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(safepill, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(expill, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(remote, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(fuse, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(nuclearelement, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(hydrod, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(plasmacannon, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(roddisk, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(antenna, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(einsten, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(redrod, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(emptyrod, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(binoculars, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(core1, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(core2, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(core3, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(chip, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(roda, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(trollmask, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(hackm202, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(seekm202, "rivalrebelsitem" + nextNum++);
-		GameRegistry.registerItem(camera, "rivalrebelsitem" + nextNum++);
+		GameRegistry.registerItem(rpg, "rpg");
+		GameRegistry.registerItem(flamethrower, "flamethrower");
+		GameRegistry.registerItem(tesla, "tesla");
+		GameRegistry.registerItem(rocket, "rocket");
+		GameRegistry.registerItem(fuel, "fuel");
+		GameRegistry.registerItem(battery, "battery");
+		GameRegistry.registerItem(pliers, "pliers");
+		GameRegistry.registerItem(armyshovel, "armyshovel");
+		GameRegistry.registerItem(knife, "knife");
+		GameRegistry.registerItem(gasgrenade, "gasgrenade");
+		GameRegistry.registerItem(safepill, "safepill");
+		GameRegistry.registerItem(expill, "expill");
+		GameRegistry.registerItem(remote, "remote");
+		GameRegistry.registerItem(fuse, "fuse");
+		GameRegistry.registerItem(nuclearelement, "nuclearelement");
+		GameRegistry.registerItem(hydrod, "hydrod");
+		GameRegistry.registerItem(plasmacannon, "plasmacannon");
+		GameRegistry.registerItem(roddisk, "roddisk");
+		GameRegistry.registerItem(antenna, "antenna");
+		GameRegistry.registerItem(einsten, "einsten");
+		GameRegistry.registerItem(redrod, "redrod");
+		GameRegistry.registerItem(emptyrod, "emptyrod");
+		GameRegistry.registerItem(binoculars, "binoculars");
+		GameRegistry.registerItem(copperCore, "copperCore");
+		GameRegistry.registerItem(tungstenCore, "tungstenCore");
+		GameRegistry.registerItem(titaniumCore, "titaniumCore");
+		GameRegistry.registerItem(chip, "chip");
+		GameRegistry.registerItem(roda, "roda");
+		GameRegistry.registerItem(trollmask, "trollmask");
+		GameRegistry.registerItem(hackm202, "hackm202");
+		GameRegistry.registerItem(seekm202, "seekm202");
+		GameRegistry.registerItem(camera, "camera");
 	}
 
 	private void registerArmor()

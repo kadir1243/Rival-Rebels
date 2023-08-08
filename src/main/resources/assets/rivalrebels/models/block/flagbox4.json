@@ -1,0 +1,11 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "down": "rivalrebels:blocks/ah",
+    "up": "rivalrebels:blocks/aw",
+    "north": "rivalrebels:blocks/ai",
+    "east": "rivalrebels:blocks/ah",
+    "south": "rivalrebels:blocks/ai",
+    "west": "rivalrebels:blocks/ah"
+  }
+}

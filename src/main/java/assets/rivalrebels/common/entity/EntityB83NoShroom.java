@@ -30,7 +30,6 @@ public class EntityB83NoShroom extends EntityB83
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x, y, z);
-		yOffset = 0.0F;
 		setThrowableHeading(mx, my, mz, 5, 1);
 	}
 

@@ -12,10 +12,11 @@
 package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.renderentity.RenderRhodes;
 import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.item.weapon.ItemBinoculars;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraftforge.fml.common.eventhandler.EventPriority;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
@@ -77,8 +78,9 @@ public class RivalRebelsRenderOverlay
 				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			}*/
-			Tessellator t = Tessellator.instance;
-			GL11.glDisable(GL11.GL_DEPTH_TEST);
+			Tessellator t = Tessellator.getInstance();
+            WorldRenderer worldRenderer = t.getWorldRenderer();
+            GL11.glDisable(GL11.GL_DEPTH_TEST);
 			GL11.glDepthMask(false);
 			GL11.glEnable(GL11.GL_BLEND);
 			FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
@@ -90,11 +92,11 @@ public class RivalRebelsRenderOverlay
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			GL11.glColor4f(1.0F, 0.0F, 0.0F, 0.5F);
-			t.startDrawingQuads();
-			t.addVertexWithUV(0, h, -90, 0, 1);
-			t.addVertexWithUV(w, h, -90, 1, 1);
-			t.addVertexWithUV(w, 0, -90, 1, 0);
-			t.addVertexWithUV(0, 0, -90, 0, 0);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(0, h, -90).tex(0, 1).endVertex();
+			worldRenderer.pos(w, h, -90).tex(1, 1).endVertex();
+			worldRenderer.pos(w, 0, -90).tex(1, 0).endVertex();
+			worldRenderer.pos(0, 0, -90).tex(0, 0).endVertex();
 			t.draw();
 
 			GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
@@ -102,11 +104,11 @@ public class RivalRebelsRenderOverlay
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.333f);
-			t.startDrawingQuads();
-			t.addVertexWithUV(0, h, -90, 0, 1);
-			t.addVertexWithUV(w, h, -90, 1, 1);
-			t.addVertexWithUV(w, 0, -90, 1, 0);
-			t.addVertexWithUV(0, 0, -90, 0, 0);
+            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(0, h, -90).tex(0, 1).endVertex();
+			worldRenderer.pos(w, h, -90).tex(1, 1).endVertex();
+			worldRenderer.pos(w, 0, -90).tex(1, 0).endVertex();
+			worldRenderer.pos(0, 0, -90).tex(0, 0).endVertex();
 			t.draw();
 
 			if (Keyboard.isKeyDown(Keyboard.KEY_H))
@@ -116,27 +118,27 @@ public class RivalRebelsRenderOverlay
 				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
 				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				t.startDrawingQuads();
-				t.addVertexWithUV(w*0.25f, h*0.75f, -90, 0, 1);
-				t.addVertexWithUV(w*0.75f, h*0.75f, -90, 1, 1);
-				t.addVertexWithUV(w*0.75f, h*0.25f, -90, 1, 0);
-				t.addVertexWithUV(w*0.25f, h*0.25f, -90, 0, 0);
+                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+				worldRenderer.pos(w*0.25f, h*0.75f, -90).tex(0, 1).endVertex();
+				worldRenderer.pos(w*0.75f, h*0.75f, -90).tex(1, 1).endVertex();
+				worldRenderer.pos(w*0.75f, h*0.25f, -90).tex(1, 0).endVertex();
+				worldRenderer.pos(w*0.25f, h*0.25f, -90).tex(0, 0).endVertex();
 				t.draw();
 			}
 
 			if (rhodes.itexfolder > -1 && rhodes.itexfolder < 4)
 			{
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-				Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation(RivalRebels.MODID, "textures/" + RenderRhodes.texfolders[rhodes.itexfolder] + rhodes.itexloc + ".png"));
+				// Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation(RivalRebels.MODID, "textures/" + RenderRhodes.texfolders[rhodes.itexfolder] + rhodes.itexloc + ".png"));
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0f);
-				t.startDrawingQuads();
+                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 				float s = 8;
 				float wl = w*0.5f;
 				float hl = h*0.05f;
-				t.addVertexWithUV(wl-s, hl+s, -90, 0, 1);
-				t.addVertexWithUV(wl+s, hl+s, -90, 1, 1);
-				t.addVertexWithUV(wl+s, hl-s, -90, 1, 0);
-				t.addVertexWithUV(wl-s, hl-s, -90, 0, 0);
+				worldRenderer.pos(wl-s, hl+s, -90).tex(0, 1).endVertex();
+				worldRenderer.pos(wl+s, hl+s, -90).tex(1, 1).endVertex();
+				worldRenderer.pos(wl+s, hl-s, -90).tex(1, 0).endVertex();
+				worldRenderer.pos(wl-s, hl-s, -90).tex(0, 0).endVertex();
 				t.draw();
 			}
 			GL11.glDisable(GL11.GL_BLEND);
@@ -175,11 +177,11 @@ public class RivalRebelsRenderOverlay
 				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
 				GL11.glDisable(GL11.GL_LIGHTING);
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.7f);
-				t.startDrawingQuads();
-				t.addVertexWithUV(0, h, -90, 0, h*0.003f);
-				t.addVertexWithUV(w, h, -90, w*0.003f, h*0.003f);
-				t.addVertexWithUV(w, 0, -90, w*0.003f, 0);
-				t.addVertexWithUV(0, 0, -90, 0, 0);
+                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+				worldRenderer.pos(0, h, -90).tex(0, h*0.003f).endVertex();
+				worldRenderer.pos(w, h, -90).tex(w*0.003f, h*0.003f).endVertex();
+				worldRenderer.pos(w, 0, -90).tex(w*0.003f, 0).endVertex();
+				worldRenderer.pos(0, 0, -90).tex(0, 0).endVertex();
 				t.draw();
 				GL11.glDisable(GL11.GL_BLEND);
 				GL11.glEnable(GL11.GL_LIGHTING);
@@ -194,32 +196,33 @@ public class RivalRebelsRenderOverlay
 			if (event.isCancelable()) event.setCanceled(true);
 			if (event.type == ElementType.HOTBAR)
 			{
-				Tessellator t = Tessellator.instance;
-				tic++;
+				Tessellator t = Tessellator.getInstance();
+                WorldRenderer worldRenderer = t.getWorldRenderer();
+                tic++;
 				GL11.glDisable(GL11.GL_DEPTH_TEST);
 				GL11.glDepthMask(false);
 				Minecraft.getMinecraft().getTextureManager().bindTexture(RivalRebels.guibinoculars);
-				FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
+				FontRenderer fr = Minecraft.getMinecraft().fontRendererObj;
 				int w = event.resolution.getScaledWidth();
 				int h = event.resolution.getScaledHeight();
 
 				GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 				GL11.glEnable(GL11.GL_BLEND);
 				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				t.startDrawingQuads();
-				t.addVertexWithUV(0, h, -90, 0, 1);
-				t.addVertexWithUV(w, h, -90, 1, 1);
-				t.addVertexWithUV(w, 0, -90, 1, 0);
-				t.addVertexWithUV(0, 0, -90, 0, 0);
+                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+				worldRenderer.pos(0, h, -90).tex(0, 1).endVertex();
+				worldRenderer.pos(w, h, -90).tex(1, 1).endVertex();
+				worldRenderer.pos(w, 0, -90).tex(1, 0).endVertex();
+				worldRenderer.pos(0, 0, -90).tex(0, 0).endVertex();
 				t.draw();
 
 				Minecraft.getMinecraft().getTextureManager().bindTexture(RivalRebels.guibinocularsoverlay);
 				GL11.glColor4f(0.333F, 0.333F, 0.333F, 0.5F);
-				t.startDrawingQuads();
-				t.addVertexWithUV(0, h, -90, 0, 1);
-				t.addVertexWithUV(w, h, -90, 1, 1);
-				t.addVertexWithUV(w, 0, -90, 1, 0);
-				t.addVertexWithUV(0, 0, -90, 0, 0);
+                worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+				worldRenderer.pos(0, h, -90).tex(0, 1).endVertex();
+				worldRenderer.pos(w, h, -90).tex(1, 1).endVertex();
+				worldRenderer.pos(w, 0, -90).tex(1, 0).endVertex();
+				worldRenderer.pos(0, 0, -90).tex(0, 0).endVertex();
 				t.draw();
 
 				// GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
@@ -271,11 +274,11 @@ public class RivalRebelsRenderOverlay
 					GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
 					float col = 1.0f - ItemBinoculars.dist / 10f;
 					GL11.glColor4f(col, col, col, 1.0f);
-					t.startDrawingQuads();
-					t.addVertexWithUV(w * 0.72, h * 0.85 + 16, -90, 0, 1);
-					t.addVertexWithUV(w * 0.72 + 16, h * 0.85 + 16, -90, 1, 1);
-					t.addVertexWithUV(w * 0.72 + 16, h * 0.85, -90, 1, 0);
-					t.addVertexWithUV(w * 0.72, h * 0.85, -90, 0, 0);
+                    worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+					worldRenderer.pos(w * 0.72, h * 0.85 + 16, -90).tex(0, 1).endVertex();
+					worldRenderer.pos(w * 0.72 + 16, h * 0.85 + 16, -90).tex(1, 1).endVertex();
+					worldRenderer.pos(w * 0.72 + 16, h * 0.85, -90).tex(1, 0).endVertex();
+					worldRenderer.pos(w * 0.72, h * 0.85, -90).tex(0, 0).endVertex();
 					t.draw();
 
 					disp = "x" + ItemBinoculars.tasks;

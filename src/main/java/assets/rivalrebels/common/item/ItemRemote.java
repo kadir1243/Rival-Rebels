@@ -11,7 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -19,9 +21,6 @@ import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 
 public class ItemRemote extends Item {
     private BlockPos remoteChargePos;
@@ -61,9 +60,9 @@ public class ItemRemote extends Item {
         return false;
     }
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:am");
-	}
+	}*/
 }

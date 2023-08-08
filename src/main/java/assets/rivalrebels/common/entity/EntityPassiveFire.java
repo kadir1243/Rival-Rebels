@@ -57,7 +57,6 @@ public class EntityPassiveFire extends EntityInanimate
 		damage = 2D;
 		setSize(0.1F, 0.1F);
 		setPosition(par2, par4, par6);
-		yOffset = 0.0F;
 	}
 
 	public EntityPassiveFire(World par1World, EntityLiving par2EntityLiving, EntityLiving par3EntityLiving, float par4, float par5)
@@ -84,7 +83,6 @@ public class EntityPassiveFire extends EntityInanimate
             double d4 = d / d3;
             double d5 = d2 / d3;
             setLocationAndAngles(par2EntityLiving.posX + d4, posY, par2EntityLiving.posZ + d5, f, f1);
-            yOffset = 0.0F;
             float f2 = (float) d3 * 0.2F;
             setVelocity(d, d1 + f2, d2);
         }
@@ -109,7 +107,6 @@ public class EntityPassiveFire extends EntityInanimate
 		posY -= 0.2D;
 		posZ -= MathHelper.sin((rotationYaw / 180F) * (float) Math.PI) * 0.16F;
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = -MathHelper.sin((rotationYaw / 180F) * (float) Math.PI) * MathHelper.cos((rotationPitch / 180F) * (float) Math.PI);
 		motionZ = MathHelper.cos((rotationYaw / 180F) * (float) Math.PI) * MathHelper.cos((rotationPitch / 180F) * (float) Math.PI);
 		motionY = -MathHelper.sin((rotationPitch / 180F) * (float) Math.PI);
@@ -150,7 +147,6 @@ public class EntityPassiveFire extends EntityInanimate
 		motionX = mx;
 		motionY = my;
 		motionZ = mz;
-		yOffset = 0.0F;
 	}
 
     /**
@@ -228,12 +224,6 @@ public class EntityPassiveFire extends EntityInanimate
 		{
 			damage = par1NBTTagCompound.getDouble("damage");
 		}
-	}
-
-	@Override
-	public float getShadowSize()
-	{
-		return 0.0F;
 	}
 
 	/**

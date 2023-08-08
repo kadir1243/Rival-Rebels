@@ -31,20 +31,16 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 @SideOnly(Side.CLIENT)
 public class GuiLoader extends GuiContainer
 {
-	private IInventory	upperChestInventory;
-	private IInventory	lowerChestInventory;
 
-	/**
+    /**
 	 * window height is calculated with this values, the more rows, the heigher
 	 */
-	private int			inventoryRows	= 0;
+	private final int inventoryRows;
 
 	public GuiLoader(IInventory par1IInventory, IInventory par2IInventory)
 	{
 		super(new ContainerLoader(par1IInventory, par2IInventory));
-		this.upperChestInventory = par1IInventory;
-		this.lowerChestInventory = par2IInventory;
-		this.allowUserInput = false;
+        this.allowUserInput = false;
 		short var3 = 222;
 		int var4 = var3 - 108;
 		this.inventoryRows = par2IInventory.getSizeInventory() / 9;
@@ -82,15 +78,11 @@ public class GuiLoader extends GuiContainer
 				{
 					Desktop.getDesktop().browse(new URI("http://rivalrebels.com"));
 				}
-				catch (IOException e)
+				catch (IOException | URISyntaxException e)
 				{
 					e.printStackTrace();
 				}
-				catch (URISyntaxException e)
-				{
-					e.printStackTrace();
-				}
-			}
+            }
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}

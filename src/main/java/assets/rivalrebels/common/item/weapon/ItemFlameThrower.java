@@ -11,32 +11,27 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-
-import java.util.HashSet;
-
-import org.lwjgl.input.Keyboard;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityFlameBall;
 import assets.rivalrebels.common.entity.EntityFlameBall1;
 import assets.rivalrebels.common.entity.EntityFlameBall2;
 import assets.rivalrebels.common.entity.EntityFlameBallGreen;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.StatCollector;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
+import org.lwjgl.input.Keyboard;
+
+import java.util.HashSet;
 
 public class ItemFlameThrower extends ItemTool
 {
@@ -117,12 +112,16 @@ public class ItemFlameThrower extends ItemTool
 					if (!item.isItemEnchanted())
 					{
                         switch (getMode(item)) {
-                            case 0 -> {
+                            case 0:
                                 for (int i = 0; i < 4; i++)
                                     world.spawnEntityInWorld(new EntityFlameBall2(world, entity, (float) (Math.random() + 0.5f)));
-                            }
-                            case 1 -> world.spawnEntityInWorld(new EntityFlameBall1(entity.worldObj, entity, 1));
-                            case 2 -> world.spawnEntityInWorld(new EntityFlameBall(world, entity, 1));
+                                break;
+                            case 1:
+                                world.spawnEntityInWorld(new EntityFlameBall1(entity.worldObj, entity, 1));
+                                break;
+                            case 2:
+                                world.spawnEntityInWorld(new EntityFlameBall(world, entity, 1));
+                                break;
                         }
 					}
 				}
@@ -139,8 +138,9 @@ public class ItemFlameThrower extends ItemTool
 			item.getTagCompound().setBoolean("isReady", true);
 			item.getTagCompound().setInteger("mode", 2);
 		}
-		if (entity instanceof EntityPlayer player)
+		if (entity instanceof EntityPlayer)
 		{
+            EntityPlayer player = (EntityPlayer) entity;
             if (player.inventory.getCurrentItem() != null)
 			{
 				if (player.inventory.getCurrentItem().getItem() == this)
@@ -171,9 +171,9 @@ public class ItemFlameThrower extends ItemTool
 		else return item.getTagCompound().getInteger("mode");
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ae");
-	}
+	}*/
 }

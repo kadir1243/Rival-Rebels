@@ -11,17 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -32,13 +21,20 @@ import assets.rivalrebels.common.item.ItemRodNuclear;
 import assets.rivalrebels.common.item.ItemRodRedstone;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.ReactorUpdatePacket;
-import assets.rivalrebels.common.packet.TextPacket;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.ITickable;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.*;
 import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class TileEntityReactor extends TileEntity implements IInventory, ITickable
 {
@@ -177,7 +173,13 @@ public class TileEntityReactor extends TileEntity implements IInventory, ITickab
 					on = true;
 					meltTick++;
 					if (meltTick == 300) meltDown(10);
-					else if (meltTick == 1) PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.meltdown"));
+					else if (meltTick == 1) {
+                        for (EntityPlayer player : worldObj.playerEntities) {
+                            if (player.getPosition().distanceSq(this.getPos()) < 50) {
+                                player.addChatMessage(new ChatComponentTranslation("RivalRebels.reactor.meltdown"));
+                            }
+                        }
+                    }
 				}
 				else
 				{
@@ -220,9 +222,11 @@ public class TileEntityReactor extends TileEntity implements IInventory, ITickab
 				meltTick = 0;
 			}
 
-			if (on && core != null && fuel != null && core.getItem() instanceof ItemCore c && fuel.getItem() instanceof ItemRod r)
+			if (on && core != null && fuel != null && core.getItem() instanceof ItemCore && fuel.getItem() instanceof ItemRod)
 			{
-				if (!prevOn && on) RivalRebelsSoundPlayer.playSound(worldObj, 21, 3, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
+                ItemCore c = (ItemCore) core.getItem();
+                ItemRod r = (ItemRod) fuel.getItem();
+                if (!prevOn && on) RivalRebelsSoundPlayer.playSound(worldObj, 21, 3, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
 				else
 				{
 					tick++;
@@ -232,7 +236,8 @@ public class TileEntityReactor extends TileEntity implements IInventory, ITickab
 				float power = ((r.power * c.timemult) - fuel.getTagCompound().getInteger("fuelLeft"));
 				float temp = power;
                 for (TileEntity te : worldObj.loadedTileEntityList) {
-                    if (te instanceof TileEntityMachineBase temb) {
+                    if (te instanceof TileEntityMachineBase) {
+                        TileEntityMachineBase temb = (TileEntityMachineBase) te;
                         if (worldObj.getTileEntity(temb.rpos) == null) {
                             double dist = temb.getDistanceSq(pos.getX(), pos.getY(), pos.getZ());
                             if (dist < 1024) {
@@ -456,4 +461,29 @@ public class TileEntityReactor extends TileEntity implements IInventory, ITickab
 	{
 		eject = true;
 	}
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return new ChatComponentText(getName());
+    }
 }

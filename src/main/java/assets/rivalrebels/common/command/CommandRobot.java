@@ -15,8 +15,8 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -59,8 +59,8 @@ public class CommandRobot extends CommandBase
 				try
 				{
 					float scale = Float.parseFloat(str2);
-					ChunkCoordinates cc = sender.getPlayerCoordinates();
-					EntityRhodes er = new EntityRhodes(sender.getEntityWorld(), cc.posX, cc.posY, cc.posZ, scale / 30.0f);
+					BlockPos cc = sender.getPosition();
+					EntityRhodes er = new EntityRhodes(sender.getEntityWorld(), cc.getX(), cc.getY(), cc.getZ(), scale / 30.0f);
 					sender.getEntityWorld().spawnEntityInWorld(er);
 				}
 				catch(Exception e)
@@ -301,28 +301,34 @@ public class CommandRobot extends CommandBase
 		}
 		sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot [model|logo|ai|ff|tff|exit|stop|rekt|speedscale|spawn]"));
 	}
-	/**
-     * Adds the strings available in this command to the given list of tab completion options.
-     */
-    public List<String> addTabCompletionOptions(ICommandSender p, String[] s)
-    {
+
+    @Override
+    public List<String> addTabCompletionOptions(ICommandSender sender, String[] args, BlockPos pos) {
     	List<String> l = new ArrayList<>();
-    	if (s.length > 0 && s[0] != null)
-    	{
-            switch (s[0]) {
-                case "model" -> l.addAll(Arrays.asList(names));
-                case "logo" -> {
+    	if (args.length > 0 && args[0] != null) {
+            switch (args[0]) {
+                case "model":
+                    l.addAll(Arrays.asList(names));
+                    break;
+                case "logo":
                     l.add("flags/");
                     l.add("items/");
                     l.add("blocks/");
                     l.add("entity/");
-                }
-                case "ai", "ff", "tff", "exit", "rekt", "speedscale" -> {
+                    break;
+                case "ai":
+                case "ff":
+                case "tff":
+                case "exit":
+                case "rekt":
+                case "speedscale":
                     l.add("on");
                     l.add("off");
-                }
-                case "spawn" -> l.add("30");
-                default -> {
+                    break;
+                case "spawn":
+                    l.add("30");
+                    break;
+                default:
                     l.add("logo");
                     l.add("model");
                     l.add("ai");
@@ -332,11 +338,9 @@ public class CommandRobot extends CommandBase
                     l.add("stop");
                     l.add("speedscale");
                     l.add("spawn");
-                }
+                    break;
             }
-    	}
-    	else
-    	{
+    	} else {
     		l.add("logo");
     		l.add("model");
     		l.add("ai");
@@ -350,7 +354,8 @@ public class CommandRobot extends CommandBase
     	}
 		return l;
     }
-	//Thanks to RosettaCode Java Levenshtein Distance: http://rosettacode.org/wiki/Levenshtein_distance#Java
+
+    //Thanks to RosettaCode Java Levenshtein Distance: http://rosettacode.org/wiki/Levenshtein_distance#Java
 	public static int distance(String a, String b)
 	{
         a = a.toLowerCase();
@@ -369,8 +374,7 @@ public class CommandRobot extends CommandBase
         }
         return costs[b.length()];
     }
-	private static String[] names =
-	{
+	private static final String[] names = {
 		"rhodes",
 		"magnesium",
 		"arsenic",

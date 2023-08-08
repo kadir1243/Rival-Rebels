@@ -45,7 +45,6 @@ public class EntityRaytrace extends EntityInanimate
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 		c = 1.0f;
 		range = MathHelper.sqrt_double(mx*mx+my*my+mz*mz);
@@ -69,7 +68,6 @@ public class EntityRaytrace extends EntityInanimate
 		setSize(0.5F, 0.5F);
 		setLocationAndAngles(player.posX, player.posY + player.getEyeHeight(), player.posZ, player.rotationYaw, player.rotationPitch);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
@@ -185,8 +183,9 @@ public class EntityRaytrace extends EntityInanimate
 			else
 			{
 				if (!worldObj.isRemote) worldObj.spawnEntityInWorld(new EntityLightningLink(worldObj, this, getDistanceToEntity(MOP.entityHit)));
-				if (MOP.entityHit instanceof EntityPlayer entityPlayerHit)
+				if (MOP.entityHit instanceof EntityPlayer)
 				{
+                    EntityPlayer entityPlayerHit = (EntityPlayer) MOP.entityHit;
                     ItemStack[] armorSlots = entityPlayerHit.inventory.armorInventory;
 					int i = worldObj.rand.nextInt(4);
 					if (armorSlots[i] != null)

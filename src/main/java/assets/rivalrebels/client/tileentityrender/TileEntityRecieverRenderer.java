@@ -31,9 +31,9 @@ public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer<TileEn
 	{
 		try
 		{
-			base = ModelFromObj.readObjFile("p.obj");
+			base = ModelFromObj.readObjFile("tray.obj");
 			arm = ModelFromObj.readObjFile("q.obj");
-			adsdragon = ModelFromObj.readObjFile("r.obj");
+			adsdragon = ModelFromObj.readObjFile("dragon.obj");
 		}
 		catch (Exception e)
 		{

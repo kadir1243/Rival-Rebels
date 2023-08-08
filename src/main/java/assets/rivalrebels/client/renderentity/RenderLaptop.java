@@ -23,7 +23,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.common.entity.EntityLaptop;
 
-public class RenderLaptop extends Render
+public class RenderLaptop extends Render<EntityLaptop>
 {
 	ModelLaptop	ml;
 
@@ -34,22 +34,20 @@ public class RenderLaptop extends Render
 	}
 
 	@Override
-	public void doRender(Entity var1, double d, double d1, double d2, float var8, float var9)
-	{
+	public void doRender(EntityLaptop laptop, double x, double y, double z, float entityYaw, float partialTicks) {
 		GL11.glEnable(GL11.GL_LIGHTING);
-		EntityLaptop tile = (EntityLaptop) var1;
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d, (float) d1, (float) d2);
-		GL11.glRotatef(180 - var1.rotationYaw, 0, 1, 0);
+        GL11.glPushMatrix();
+		GL11.glTranslatef((float) x, (float) y, (float) z);
+		GL11.glRotatef(180 - laptop.rotationYaw, 0, 1, 0);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
-		ml.renderModel((float) -tile.slide);
+		ml.renderModel((float) -laptop.slide);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etubuntu);
-		ml.renderScreen((float) -tile.slide);
+		ml.renderScreen((float) -laptop.slide);
 		GL11.glPopMatrix();
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityLaptop entity)
 	{
 		return null;
 	}

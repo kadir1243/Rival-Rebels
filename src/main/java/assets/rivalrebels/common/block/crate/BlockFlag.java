@@ -11,43 +11,44 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyBool;
+import net.minecraft.block.state.BlockState;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockFlag extends Block
 {
-	String	texpath	= "rivalrebels:";
+    public static final PropertyBool UP = PropertyBool.create("up");
+    public static final PropertyBool NORTH = PropertyBool.create("north");
+    public static final PropertyBool EAST = PropertyBool.create("east");
+    public static final PropertyBool SOUTH = PropertyBool.create("south");
+    public static final PropertyBool WEST = PropertyBool.create("west");
+    public static final PropertyBool[] ALL_FACES = new PropertyBool[] {UP, NORTH, SOUTH, WEST, EAST};
 
-	public BlockFlag(String name)
-	{
+	public BlockFlag() {
 		super(Material.cloth);
-		texpath += name;
-		//this.setCreativeTab(RivalRebels.rrarmortab);
-	}
+        this.setDefaultState(this.blockState.getBaseState().withProperty(UP, false).withProperty(NORTH, false).withProperty(EAST, false).withProperty(SOUTH, false).withProperty(WEST, false));
+    }
 
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 1;
-	}
-
-	@Override
-	public Item getItemDropped(int meta, Random random, int fortune)
-    {
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		if (this == RivalRebels.flag2) return RivalRebels.trollmask;
         return Item.getItemFromBlock(this);
+    }
+
+    public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+        return state.withProperty(UP, worldIn.getBlockState(pos.up()).getBlock().isBlockNormalCube());
     }
 
 	@Override
@@ -69,189 +70,219 @@ public class BlockFlag extends Block
 	}
 
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
 
-	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess worldIn, int x, int y, int z)
-	{
-		int l = worldIn.getBlockMetadata(x, y, z);
-		float f1 = 1.0F;
-		float f2 = 1.0F;
-		float f3 = 1.0F;
-		float f4 = 0.0F;
-		float f5 = 0.0F;
-		float f6 = 0.0F;
-		boolean flag = l > 0;
+    public void setBlockBoundsBasedOnState(IBlockAccess worldIn, BlockPos pos)
+    {
+        float f1 = 1.0F;
+        float f2 = 1.0F;
+        float f3 = 1.0F;
+        float f4 = 0.0F;
+        float f5 = 0.0F;
+        float f6 = 0.0F;
+        boolean flag = false;
 
-		if ((l & 2) != 0)
-		{
-			f4 = Math.max(f4, 0.0625F);
-			f1 = 0.0F;
-			f2 = 0.0F;
-			f5 = 1.0F;
-			f3 = 0.0F;
-			f6 = 1.0F;
-			flag = true;
-		}
+        if (worldIn.getBlockState(pos).getValue(WEST))
+        {
+            f4 = 0.0625F;
+            f1 = 0.0F;
+            f2 = 0.0F;
+            f5 = 1.0F;
+            f3 = 0.0F;
+            f6 = 1.0F;
+            flag = true;
+        }
 
-		if ((l & 8) != 0)
-		{
-			f1 = Math.min(f1, 0.9375F);
-			f4 = 1.0F;
-			f2 = 0.0F;
-			f5 = 1.0F;
-			f3 = 0.0F;
-			f6 = 1.0F;
-			flag = true;
-		}
+        if (worldIn.getBlockState(pos).getValue(EAST))
+        {
+            f1 = Math.min(f1, 0.9375F);
+            f4 = 1.0F;
+            f2 = 0.0F;
+            f5 = 1.0F;
+            f3 = 0.0F;
+            f6 = 1.0F;
+            flag = true;
+        }
 
-		if ((l & 4) != 0)
-		{
-			f6 = Math.max(f6, 0.0625F);
-			f3 = 0.0F;
-			f1 = 0.0F;
-			f4 = 1.0F;
-			f2 = 0.0F;
-			f5 = 1.0F;
-			flag = true;
-		}
+        if (worldIn.getBlockState(pos).getValue(NORTH))
+        {
+            f6 = Math.max(f6, 0.0625F);
+            f3 = 0.0F;
+            f1 = 0.0F;
+            f4 = 1.0F;
+            f2 = 0.0F;
+            f5 = 1.0F;
+            flag = true;
+        }
 
-		if ((l & 1) != 0)
-		{
-			f3 = Math.min(f3, 0.9375F);
-			f6 = 1.0F;
-			f1 = 0.0F;
-			f4 = 1.0F;
-			f2 = 0.0F;
-			f5 = 1.0F;
-			flag = true;
-		}
+        if (worldIn.getBlockState(pos).getValue(SOUTH))
+        {
+            f3 = Math.min(f3, 0.9375F);
+            f6 = 1.0F;
+            f1 = 0.0F;
+            f4 = 1.0F;
+            f2 = 0.0F;
+            f5 = 1.0F;
+            flag = true;
+        }
 
-		if (!flag && this.func_150093_a(worldIn.getBlock(x, y + 1, z)))
-		{
-			f2 = Math.min(f2, 0.9375F);
-			f5 = 1.0F;
-			f1 = 0.0F;
-			f4 = 1.0F;
-			f3 = 0.0F;
-			f6 = 1.0F;
-		}
+        if (!flag && this.canPlaceOn(worldIn.getBlockState(pos.up()).getBlock())) {
+            f2 = 0.9375F;
+            f5 = 1.0F;
+            f1 = 0.0F;
+            f4 = 1.0F;
+            f3 = 0.0F;
+            f6 = 1.0F;
+        }
 
-		this.setBlockBounds(f1, f2, f3, f4, f5, f6);
-	}
+        this.setBlockBounds(f1, f2, f3, f4, f5, f6);
+    }
 
 	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World worldIn, int x, int y, int z)
-	{
-		return null;
-	}
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state)
+    {
+        return null;
+    }
 
 	@Override
-	public boolean canPlaceBlockOnSide(World worldIn, int x, int y, int z, int side)
-	{
-		switch (side)
-		{
-			case 1:
-				return this.func_150093_a(worldIn.getBlock(x, y + 1, z));
-			case 2:
-				return this.func_150093_a(worldIn.getBlock(x, y, z + 1));
-			case 3:
-				return this.func_150093_a(worldIn.getBlock(x, y, z - 1));
-			case 4:
-				return this.func_150093_a(worldIn.getBlock(x + 1, y, z));
-			case 5:
-				return this.func_150093_a(worldIn.getBlock(x - 1, y, z));
-			default:
-				return false;
-		}
+    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
+        switch (side) {
+            case UP:
+                return this.canPlaceOn(worldIn.getBlockState(pos.up()).getBlock());
+            case NORTH:
+            case SOUTH:
+            case EAST:
+            case WEST:
+                return this.canPlaceOn(worldIn.getBlockState(pos.offset(side.getOpposite())).getBlock());
+            default:
+                return false;
+        }
+    }
+
+	private boolean canPlaceOn(Block block) {
+        return block.isFullCube() && block.getMaterial().blocksMovement();
 	}
 
-	private boolean func_150093_a(Block p_150093_1_)
-	{
-		return p_150093_1_.renderAsNormalBlock();
-	}
+    private boolean recheckGrownSides(World worldIn, BlockPos pos, IBlockState state)
+    {
+        IBlockState iblockstate = state;
 
-	private boolean func_150094_e(World p_150094_1_, int p_150094_2_, int p_150094_3_, int p_150094_4_)
-	{
-		int l = p_150094_1_.getBlockMetadata(p_150094_2_, p_150094_3_, p_150094_4_);
-		int i1 = l;
+        for (EnumFacing enumfacing : EnumFacing.Plane.HORIZONTAL)
+        {
+            PropertyBool propertybool = getPropertyFor(enumfacing);
 
-		if (l > 0)
-		{
-			for (int j1 = 0; j1 <= 3; ++j1)
-			{
-				int k1 = 1 << j1;
+            if (state.getValue(propertybool) && !this.canPlaceOn(worldIn.getBlockState(pos.offset(enumfacing)).getBlock()))
+            {
+                IBlockState iblockstate1 = worldIn.getBlockState(pos.up());
 
-				if ((l & k1) != 0 && !this.func_150093_a(p_150094_1_.getBlock(p_150094_2_ + Direction.offsetX[j1], p_150094_3_, p_150094_4_ + Direction.offsetZ[j1])) && (p_150094_1_.getBlock(p_150094_2_, p_150094_3_ + 1, p_150094_4_) != this || (p_150094_1_.getBlockMetadata(p_150094_2_, p_150094_3_ + 1, p_150094_4_) & k1) == 0))
-				{
-					i1 &= ~k1;
-				}
-			}
-		}
+                if (iblockstate1.getBlock() != this || !iblockstate1.getValue(propertybool))
+                {
+                    state = state.withProperty(propertybool, false);
+                }
+            }
+        }
 
-		if (i1 == 0 && !this.func_150093_a(p_150094_1_.getBlock(p_150094_2_, p_150094_3_ + 1, p_150094_4_)))
-		{
-			return false;
-		}
-		else
-		{
-			if (i1 != l)
-			{
-				p_150094_1_.setBlockMetadataWithNotify(p_150094_2_, p_150094_3_, p_150094_4_, i1, 2);
-			}
+        if (getNumGrownFaces(state) == 0)
+        {
+            return false;
+        }
+        else
+        {
+            if (iblockstate != state)
+            {
+                worldIn.setBlockState(pos, state, 2);
+            }
 
-			return true;
-		}
-	}
+            return true;
+        }
+    }
 
-	@Override
-	public void onNeighborBlockChange(World worldIn, int x, int y, int z, Block neighbor)
-	{
-		if (!worldIn.isRemote && !this.func_150094_e(worldIn, x, y, z))
-		{
-			this.dropBlockAsItem(worldIn, x, y, z, worldIn.getBlockMetadata(x, y, z), 0);
-			worldIn.setBlockToAir(x, y, z);
-		}
-	}
+    @Override
+    public void onNeighborBlockChange(World worldIn, BlockPos pos, IBlockState state, Block neighborBlock) {
+        if (!worldIn.isRemote && !this.recheckGrownSides(worldIn, pos, state)) {
+            this.dropBlockAsItem(worldIn, pos, state, 0);
+            worldIn.setBlockToAir(pos);
+        }
+    }
 
-	@Override
-	public int onBlockPlaced(World worldIn, int x, int y, int z, int side, float subX, float subY, float subZ, int meta)
-	{
-		byte b0 = 0;
+    @Override
+    public IBlockState onBlockPlaced(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
+    {
+        IBlockState iblockstate = this.getDefaultState().withProperty(UP, false).withProperty(NORTH, false).withProperty(EAST, false).withProperty(SOUTH, false).withProperty(WEST, false);
+        return facing.getAxis().isHorizontal() ? iblockstate.withProperty(getPropertyFor(facing.getOpposite()), true) : iblockstate;
+    }
 
-		switch (side)
-		{
-			case 2:
-				b0 = 1;
-			break;
-			case 3:
-				b0 = 4;
-			break;
-			case 4:
-				b0 = 8;
-			break;
-			case 5:
-				b0 = 2;
-		}
+    @Override
+    public IBlockState getStateFromMeta(int meta)
+    {
+        return this.getDefaultState().withProperty(SOUTH, (meta & 1) > 0).withProperty(WEST, (meta & 2) > 0).withProperty(NORTH, (meta & 4) > 0).withProperty(EAST, (meta & 8) > 0);
+    }
 
-		return b0 != 0 ? b0 : meta;
-	}
+    @Override
+    public int getMetaFromState(IBlockState state)
+    {
+        int i = 0;
 
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
+        if (state.getValue(SOUTH))
+        {
+            i |= 1;
+        }
 
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
+        if (state.getValue(WEST))
+        {
+            i |= 2;
+        }
 
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon(texpath);
-	}
+        if (state.getValue(NORTH))
+        {
+            i |= 4;
+        }
+
+        if (state.getValue(EAST))
+        {
+            i |= 8;
+        }
+
+        return i;
+    }
+
+    @Override
+    protected BlockState createBlockState()
+    {
+        return new BlockState(this, UP, NORTH, EAST, SOUTH, WEST);
+    }
+
+    public static PropertyBool getPropertyFor(EnumFacing side) {
+        switch (side) {
+            case UP:
+                return UP;
+            case NORTH:
+                return NORTH;
+            case SOUTH:
+                return SOUTH;
+            case EAST:
+                return EAST;
+            case WEST:
+                return WEST;
+            default:
+                throw new IllegalArgumentException(side + " is an invalid choice");
+        }
+    }
+
+    public static int getNumGrownFaces(IBlockState state) {
+        int i = 0;
+
+        for (PropertyBool propertybool : ALL_FACES)
+        {
+            if (state.getValue(propertybool))
+            {
+                ++i;
+            }
+        }
+
+        return i;
+    }
 }

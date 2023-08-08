@@ -11,29 +11,24 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.container.ContainerTachyonBomb;
+import assets.rivalrebels.common.container.ContainerTsar;
+import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.util.StatCollector;
-
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.container.ContainerAntimatterBomb;
-import assets.rivalrebels.common.container.ContainerTachyonBomb;
-import assets.rivalrebels.common.container.ContainerTsar;
-import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
-import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import java.awt.Desktop;
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 @SideOnly(Side.CLIENT)
 public class GuiTachyonBomb extends GuiContainer
@@ -115,15 +110,11 @@ public class GuiTachyonBomb extends GuiContainer
 				{
 					Desktop.getDesktop().browse(new URI("http://rivalrebels.com"));
 				}
-				catch (IOException e)
+				catch (IOException | URISyntaxException e)
 				{
 					e.printStackTrace();
 				}
-				catch (URISyntaxException e)
-				{
-					e.printStackTrace();
-				}
-			}
+            }
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}

@@ -23,8 +23,11 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.IChatComponent;
 import net.minecraft.util.ITickable;
 
+import java.util.Arrays;
 import java.util.List;
 
 public class TileEntityLaptop extends TileEntity implements IInventory, ITickable
@@ -37,11 +40,8 @@ public class TileEntityLaptop extends TileEntity implements IInventory, ITickabl
 	double					test			= Math.PI;
 	public int				b2spirit		= 0;
 	public int				b2carpet		= 0;
-	public int				numUsingPlayers;
-	private int				ticksSinceSync;
-	private boolean			listed;
 
-	/**
+    /**
 	 * Returns the number of slots in the inventory.
 	 */
 	@Override
@@ -238,11 +238,8 @@ public class TileEntityLaptop extends TileEntity implements IInventory, ITickabl
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
 	@Override
-	public void update()
-	{
-		++this.ticksSinceSync;
-
-		slide = (Math.cos(test) + 1) * 45;
+	public void update() {
+        slide = (Math.cos(test) + 1) * 45;
 
 		//if (!listed)
 		//{
@@ -270,22 +267,6 @@ public class TileEntityLaptop extends TileEntity implements IInventory, ITickabl
 			b2spirit--;
 			refreshTasks();
 		}
-	}
-
-	/**
-	 * Called when a client event is received with the event number and argument, see World.sendClientEvent
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean receiveClientEvent(int par1, int par2)
-	{
-		if (par1 == 1)
-		{
-			this.numUsingPlayers = par2;
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -325,7 +306,32 @@ public class TileEntityLaptop extends TileEntity implements IInventory, ITickabl
 	public void closeInventory(EntityPlayer player) {
 	}
 
-	public void refreshTasks() {
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+        Arrays.fill(chestContents, null);
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return new ChatComponentText(getName());
+    }
+
+    public void refreshTasks() {
 		PacketDispatcher.packetsys.sendToAll(new LaptopRefreshPacket(getPos(), b2spirit, b2carpet));
 	}
 

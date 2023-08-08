@@ -23,11 +23,11 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.ChatComponentTranslation;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Arrays;
 
 public class TileEntityNuclearBomb extends TileEntity implements IInventory, ITickable
 {
@@ -245,12 +245,9 @@ public class TileEntityNuclearBomb extends TileEntity implements IInventory, ITi
         hasExplosive = getStackInSlot(11) != null;// getStackInSlot(11).canHarvestBlock(RivalRebels.timedbomb);
 
 		boolean sp = false;
-		try
-		{
+		try {
 			sp = !MinecraftServer.getServer().isDedicatedServer() && MinecraftServer.getServer().getConfigurationManager().playerEntityList.size() == 1;
-		}
-		catch (NullPointerException e)
-		{
+		} catch (NullPointerException ignored) {
 
 		}
 		if (hasFuse && hasExplosive && hasChip)
@@ -260,7 +257,7 @@ public class TileEntityNuclearBomb extends TileEntity implements IInventory, ITi
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
 				{
-					dist = getDistanceSq(RivalRebels.round.oObjx, pos.getY(), RivalRebels.round.oObjz);
+					dist = getDistanceSq(RivalRebels.round.oObj.getX(), pos.getY(), RivalRebels.round.oObj.getZ());
 				}
 				if (rrteam == RivalRebelsTeam.SIGMA)
 				{
@@ -300,12 +297,24 @@ public class TileEntityNuclearBomb extends TileEntity implements IInventory, ITi
 			float pitch = 0;
 			float yaw = 0;
             switch (this.getBlockMetadata()) {
-                default -> pitch = -90;
-                case 1 -> pitch = 90;
-                case 2 -> yaw = 180;
-                case 3 -> yaw = 0;
-                case 4 -> yaw = 270;
-                case 5 -> yaw = 90;
+                default:
+                    pitch = -90;
+                    break;
+                case 1:
+                    pitch = 90;
+                    break;
+                case 2:
+                    yaw = 180;
+                    break;
+                case 3:
+                    yaw = 0;
+                    break;
+                case 4:
+                    yaw = 270;
+                    break;
+                case 5:
+                    yaw = 90;
+                    break;
             }
 
 			worldObj.spawnEntityInWorld(new EntityNuke(worldObj, pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f, yaw, pitch, AmountOfCharges, hasTrollface));
@@ -382,4 +391,29 @@ public class TileEntityNuclearBomb extends TileEntity implements IInventory, ITi
 	@Override
 	public void closeInventory(EntityPlayer player) {
 	}
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public void clear() {
+        Arrays.fill(chestContents, null);
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return new ChatComponentText(getName());
+    }
 }

@@ -114,7 +114,8 @@ public class ReactorUpdatePacket implements IMessage {
                 BlockPos pos = m.pos;
                 TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(pos);
 
-                if (te instanceof TileEntityReactor ter) {
+                if (te instanceof TileEntityReactor) {
+                    TileEntityReactor ter = (TileEntityReactor) te;
                     ter.consumed = m.consumed;
                     ter.lasttickconsumed = m.lasttick;
                     ter.melt = m.melt;

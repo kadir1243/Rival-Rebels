@@ -62,7 +62,7 @@ public class TileEntityNuclearBombRenderer extends TileEntitySpecialRenderer<Til
 			GL11.glRotatef(90, 0, 1, 0);
 		}
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etwacknuke);
-		RenderNuke.model.renderAll();
+		//RenderNuke.model.renderAll();
 		GL11.glPopMatrix();
 	}
 }

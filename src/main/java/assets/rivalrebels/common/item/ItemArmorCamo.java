@@ -11,11 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import assets.rivalrebels.RivalRebels;
 
 public class ItemArmorCamo extends ItemArmor
 
@@ -25,7 +24,7 @@ public class ItemArmorCamo extends ItemArmor
 	public final int			damageReduceAmount;
 	public final int			renderIndex;
 	public int					team;
-	
+
 	public ItemArmorCamo(ArmorMaterial par2EnumArmorMaterial, int par3, int par4, int team)
 	{
 		super(par2EnumArmorMaterial, par3, par4);
@@ -37,12 +36,12 @@ public class ItemArmorCamo extends ItemArmor
 		maxStackSize = 1;
 		this.team = team;
 	}
-	
+
 	static int[] getMaxDamageArray()
 	{
 		return maxDamageArray;
 	}
-	
+
 	@Override
 	public String getArmorTexture(ItemStack itemstack, Entity entity, int slot, String layer)
 	{
@@ -64,8 +63,8 @@ public class ItemArmorCamo extends ItemArmor
 		}
 		return null;
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		String str = "";
@@ -75,5 +74,5 @@ public class ItemArmorCamo extends ItemArmor
 		if (armorType == 1) itemIcon = iconregister.registerIcon("RivalRebels:" + str + "v");
 		if (armorType == 2) itemIcon = iconregister.registerIcon("RivalRebels:" + str + "p");
 		if (armorType == 3) itemIcon = iconregister.registerIcon("RivalRebels:" + str + "b");
-	}
+	}*/
 }

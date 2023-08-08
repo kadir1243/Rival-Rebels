@@ -17,7 +17,6 @@ import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.client.settings.GameSettings;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
@@ -100,8 +99,9 @@ public class ItemBinoculars extends Item
 	public void onUpdate(ItemStack item, World world, Entity entity, int par4, boolean par5)
 	{
 		Side side = FMLCommonHandler.instance().getEffectiveSide();
-		if (entity instanceof EntityPlayer player && side == Side.CLIENT && entity == Minecraft.getMinecraft().thePlayer)
+		if (entity instanceof EntityPlayer && side == Side.CLIENT && entity == Minecraft.getMinecraft().thePlayer)
 		{
+            EntityPlayer player = (EntityPlayer) entity;
             boolean strike = isMousePressed() && !prevmclick;
 			c ^= Keyboard.isKeyDown(Keyboard.KEY_C) && !sc;
 			sc = Keyboard.isKeyDown(Keyboard.KEY_C);
@@ -181,8 +181,8 @@ public class ItemBinoculars extends Item
 								int ZZ = 10;
 								if (t.rrteam == RivalRebelsTeam.OMEGA)
 								{
-									XX = (MOP.getBlockPos().getX() - RivalRebels.round.oObjx);
-									ZZ = (MOP.getBlockPos().getZ() - RivalRebels.round.oObjz);
+									XX = (MOP.getBlockPos().getX() - RivalRebels.round.oObj.getX());
+									ZZ = (MOP.getBlockPos().getZ() - RivalRebels.round.oObj.getZ());
 								}
 								if (t.rrteam == RivalRebelsTeam.SIGMA)
 								{
@@ -230,9 +230,9 @@ public class ItemBinoculars extends Item
 		ltel.remove(tel);
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bb");
-	}
+	}*/
 }

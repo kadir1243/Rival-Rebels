@@ -11,22 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
 import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
 import net.minecraft.util.StatCollector;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockWeapons extends Block
 {
@@ -41,13 +37,12 @@ public class BlockWeapons extends Block
 		return 0;
 	}
 
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
-	{
-		blockActivated(world, x, y, z, player);
-	}
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        blockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player);
+    }
 
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
+    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
 	{
 		if (world.isRemote)
 		{
@@ -88,14 +83,14 @@ public class BlockWeapons extends Block
 			world.spawnEntityInWorld(ei7);
 			world.spawnEntityInWorld(ei8);
 			world.spawnEntityInWorld(ei9);
-			world.setBlock(x, y, z, Blocks.air);
+			world.setBlockToAir(new BlockPos(x, y, z));
 			return true;
 		}
 		return true;
 
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -131,5 +126,5 @@ public class BlockWeapons extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:ce"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:ce"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ce"); // SIDE E
-	}
+	}*/
 }

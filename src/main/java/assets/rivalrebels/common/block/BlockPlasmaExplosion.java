@@ -11,18 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import java.util.Random;
-
+import assets.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockPlasmaExplosion extends BlockContainer
 {
@@ -31,20 +29,13 @@ public class BlockPlasmaExplosion extends BlockContainer
 		super(Material.portal);
 	}
 
-	@Override
-	public int getRenderType()
-	{
-		return -1;
-	}
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+        return null;
+    }
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return null;
-	}
-
-	@Override
-	public boolean renderAsNormalBlock()
+    @Override
+	public boolean isFullCube()
 	{
 		return false;
 	}
@@ -65,20 +56,5 @@ public class BlockPlasmaExplosion extends BlockContainer
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityPlasmaExplosion();
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
 	}
 }

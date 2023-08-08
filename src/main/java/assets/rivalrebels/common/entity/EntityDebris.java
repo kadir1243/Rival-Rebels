@@ -43,7 +43,6 @@ public class EntityDebris extends EntityInanimate
         blockState = w.getBlockState(new BlockPos(x, y, z));
 		w.setBlockToAir(new BlockPos(x, y, z));
 		setSize(1F, 1F);
-		yOffset = 0.5f;
 		setPosition(x + 0.5f, y + 0.5f, z + 0.5f);
 		prevPosX = x + 0.5f;
 		prevPosY = y + 0.5f;
@@ -54,7 +53,6 @@ public class EntityDebris extends EntityInanimate
 		super(w);
         blockState = b.getDefaultState();
 		setSize(1F, 1F);
-		yOffset = 0.5f;
 		setPosition(x, y, z);
 		prevPosX = x;
 		prevPosY = y;
@@ -63,6 +61,11 @@ public class EntityDebris extends EntityInanimate
 		motionY = my;
 		motionZ = mz;
 	}
+
+    @Override
+    public double getYOffset() {
+        return 0.5D;
+    }
 
     @Override
 	public void onUpdate()
@@ -88,7 +91,7 @@ public class EntityDebris extends EntityInanimate
         BlockPos pos = new BlockPos(x, y, z);
 		setDead();
 		worldObj.setBlockState(pos, blockState);
-		if (blockState.getBlock() instanceof BlockFalling) ((BlockFalling) blockState.getBlock()).playSoundWhenFallen(worldObj, pos.getX(), pos.getY(), pos.getZ(), blockState.getBlock().getMetaFromState(blockState));
+		if (blockState.getBlock() instanceof BlockFalling) ((BlockFalling) blockState.getBlock()).onEndFalling(worldObj, pos);
 		if (tileEntityData != null && blockState.getBlock() instanceof ITileEntityProvider) {
 			TileEntity tileentity = worldObj.getTileEntity(pos);
 			if (tileentity != null) {
@@ -107,7 +110,7 @@ public class EntityDebris extends EntityInanimate
 	}
 
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound nbt)
+    public void writeEntityToNBT(NBTTagCompound nbt)
 	{
         nbt.setString("Block", Block.blockRegistry.getNameForObject(blockState.getBlock()).toString());
 		nbt.setByte("Data", (byte) blockState.getBlock().getMetaFromState(blockState));
@@ -116,7 +119,7 @@ public class EntityDebris extends EntityInanimate
 	}
 
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound nbt) {
+    public void readEntityFromNBT(NBTTagCompound nbt) {
         int metaData = nbt.getByte("Data") & 255;
         blockState = Block.getBlockFromName(nbt.getString("Block")).getStateFromMeta(metaData);
 		ticksExisted = nbt.getByte("Time") & 255;

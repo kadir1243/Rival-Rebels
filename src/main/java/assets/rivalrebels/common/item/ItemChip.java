@@ -13,7 +13,6 @@ package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -30,15 +29,16 @@ public class ItemChip extends Item
 	public ItemChip()
 	{
 		super();
-		maxStackSize = 1;
+        setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
 	@Override
 	public void onUpdate(ItemStack item, World world, Entity entity, int count, boolean flag) {
 		if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
-		if (RivalRebels.round.isStarted() && !item.getTagCompound().getBoolean("isReady") && entity instanceof EntityPlayer player)
+		if (RivalRebels.round.isStarted() && !item.getTagCompound().getBoolean("isReady") && entity instanceof EntityPlayer)
 		{
+            EntityPlayer player = (EntityPlayer) entity;
             item.getTagCompound().setString("username", player.getName());
 			item.getTagCompound().setInteger("team", RivalRebels.round.rrplayerlist.getForName(player.getName()).rrteam.ordinal());
 			item.getTagCompound().setBoolean("isReady", true);
@@ -87,9 +87,9 @@ public class ItemChip extends Item
 		}
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bd");
-	}
+	}*/
 }

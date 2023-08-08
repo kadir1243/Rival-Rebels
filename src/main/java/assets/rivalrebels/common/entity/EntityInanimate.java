@@ -23,17 +23,17 @@ public class EntityInanimate extends Entity
 	}
 
 	@Override
-	protected void entityInit()
+	public void entityInit()
 	{
 	}
 
 	@Override
-	protected void readEntityFromNBT(NBTTagCompound nbt)
+	public void readEntityFromNBT(NBTTagCompound nbt)
 	{
 	}
 
 	@Override
-	protected void writeEntityToNBT(NBTTagCompound nbt)
+	public void writeEntityToNBT(NBTTagCompound nbt)
 	{
 	}
 }

@@ -11,9 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.item.EntityItem;
@@ -21,12 +21,10 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+
+import java.util.List;
 
 public class EntityRoddiskRegular extends EntityInanimate
 {
@@ -48,7 +46,6 @@ public class EntityRoddiskRegular extends EntityInanimate
 		this.posY -= 0.1;
 		this.posZ -= (MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
 		this.setPosition(this.posX, this.posY, this.posZ);
-		this.yOffset = 0.0F;
 		this.motionX = (-MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
 		this.motionZ = (MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
 		this.motionY = (-MathHelper.sin(this.rotationPitch / 180.0F * (float) Math.PI));
@@ -280,19 +277,7 @@ public class EntityRoddiskRegular extends EntityInanimate
 		return true;
 	}
 
-	@Override
-	public void readEntityFromNBT(NBTTagCompound var1)
-	{
-
-	}
-
-	@Override
-	public void writeEntityToNBT(NBTTagCompound var1)
-	{
-
-	}
-
-	@Override
+    @Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
 		return par1Entity.getEntityBoundingBox();

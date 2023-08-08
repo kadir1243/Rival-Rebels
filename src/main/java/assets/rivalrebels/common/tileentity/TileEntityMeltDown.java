@@ -37,16 +37,14 @@ public class TileEntityMeltDown extends TileEntity implements ITickable
 	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
 	 */
 	@Override
-	public void update()
-	{
+	public void update() {
 		prevsize = size;
 		size += increment;
-		if (prevsize == 0)
-		{
+		if (prevsize == 0) {
 			RivalRebelsSoundPlayer.playSound(worldObj, 16, 0, pos, 4);
 		}
-		if (size > 9.3f)
-		{
+
+		if (size > 9.3f) {
 			size = 0f;
 			worldObj.setBlockToAir(pos);
 			this.invalidate();

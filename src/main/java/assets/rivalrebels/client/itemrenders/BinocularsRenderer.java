@@ -9,7 +9,7 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-package assets.rivalrebels.client.itemrenders;
+/*package assets.rivalrebels.client.itemrenders;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
@@ -26,32 +26,32 @@ import assets.rivalrebels.client.objfileloader.ModelFromObj;
 public class BinocularsRenderer implements IItemRenderer
 {
 	ModelFromObj	model;
-	
+
 	public BinocularsRenderer()
 	{
 		try
 		{
-			model = ModelFromObj.readObjFile("b.obj");
+			model = ModelFromObj.readObjFile("binocular.obj");
 		}
 		catch (Exception e)
 		{
 			System.err.println("Please make sure the model files are in the correct directory.");
 		}
 	}
-	
+
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type)
 	{
 		if (type == ItemRenderType.FIRST_PERSON_MAP || type == ItemRenderType.EQUIPPED || type == ItemRenderType.ENTITY || type == ItemRenderType.EQUIPPED_FIRST_PERSON) return true;
 		return false;
 	}
-	
+
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data)
 	{
@@ -68,10 +68,11 @@ public class BinocularsRenderer implements IItemRenderer
 			return;
 		}
 		GL11.glTranslatef(0.6f, 0.05f, 0.3f);
-		
+
 		if (model.name.equals("")) Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("§43D ERROR:§f Cannot find RivalRebels.zip or RivalRebels folder inside mods folder. Please make sure the RivalRebels mod file is named RivalRebels.zip, or visit §2www.rivalrebels.com §ffor support."));
 		model.render();
-		
+
 		GL11.glPopMatrix();
 	}
 }
+*/

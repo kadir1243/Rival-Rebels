@@ -13,6 +13,8 @@ package assets.rivalrebels.client.model;
 
 import net.minecraft.client.renderer.Tessellator;
 
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
@@ -24,7 +26,7 @@ public class ModelObjective
 	float			m			= 0.3125f;
 	float			l			= 0.4375f;
 	float			o			= 0.5f;
-	
+
 	Vertice			lloader1	= new Vertice(-m, o, o);
 	Vertice			lloader2	= new Vertice(-l, l, o);
 	Vertice			lloader3	= new Vertice(-o, m, o);
@@ -37,7 +39,7 @@ public class ModelObjective
 	Vertice			lloader10	= new Vertice(o, m, o);
 	Vertice			lloader11	= new Vertice(l, l, o);
 	Vertice			lloader12	= new Vertice(m, o, o);
-	
+
 	Vertice			rloader1	= new Vertice(-m, o, -o);
 	Vertice			rloader2	= new Vertice(-l, l, -o);
 	Vertice			rloader3	= new Vertice(-o, m, -o);
@@ -50,7 +52,7 @@ public class ModelObjective
 	Vertice			rloader10	= new Vertice(o, m, -o);
 	Vertice			rloader11	= new Vertice(l, l, -o);
 	Vertice			rloader12	= new Vertice(m, o, -o);
-	
+
 	float			a			= 0f;
 	float			b			= 0.09375f;
 	float			c			= 0.1875f;
@@ -60,7 +62,7 @@ public class ModelObjective
 	float			g			= 1f;
 	float			h			= 0.25f;
 	float			i			= 0.75f;
-	
+
 	TextureVertice	l1f			= new TextureVertice(i, f);
 	TextureVertice	l1s			= new TextureVertice(i, c);
 	TextureVertice	l2			= new TextureVertice(i, b);
@@ -77,7 +79,7 @@ public class ModelObjective
 	TextureVertice	l11			= new TextureVertice(h, b);
 	TextureVertice	l12f		= new TextureVertice(h, a);
 	TextureVertice	l12s		= new TextureVertice(i, g);
-	
+
 	TextureVertice	r1f			= new TextureVertice(g, f);
 	TextureVertice	r1s			= new TextureVertice(g, c);
 	TextureVertice	r2			= new TextureVertice(g, b);
@@ -94,13 +96,13 @@ public class ModelObjective
 	TextureVertice	r11			= new TextureVertice(d, b);
 	TextureVertice	r12f		= new TextureVertice(d, a);
 	TextureVertice	r12s		= new TextureVertice(g, g);
-	
+
 	float			p			= 0.125f;
 	float			q			= 0.1093755f;
 	float			r			= 0.078125f;
 	float			k			= 0.34375f;
 	float			t			= 0.125f;
-	
+
 	TextureVertice	ls1			= new TextureVertice(t - r, k + p * 2);
 	TextureVertice	ls2			= new TextureVertice(t - q, k + q * 2);
 	TextureVertice	ls3			= new TextureVertice(t - p, k + r * 2);
@@ -113,9 +115,9 @@ public class ModelObjective
 	TextureVertice	ls10		= new TextureVertice(t + p, k + r * 2);
 	TextureVertice	ls11		= new TextureVertice(t + q, k + q * 2);
 	TextureVertice	ls12		= new TextureVertice(t + r, k + p * 2);
-	
+
 	float			u			= 0.625f;
-	
+
 	TextureVertice	rs1			= new TextureVertice(u - r, k + p * 2);
 	TextureVertice	rs2			= new TextureVertice(u - q, k + q * 2);
 	TextureVertice	rs3			= new TextureVertice(u - p, k + r * 2);
@@ -128,7 +130,7 @@ public class ModelObjective
 	TextureVertice	rs10		= new TextureVertice(u + p, k + r * 2);
 	TextureVertice	rs11		= new TextureVertice(u + q, k + q * 2);
 	TextureVertice	rs12		= new TextureVertice(u + r, k + p * 2);
-	
+
 	public void renderA()
 	{
 		GL11.glPushMatrix();
@@ -145,13 +147,13 @@ public class ModelObjective
 		RenderHelper.addFace(lloader10, lloader9, rloader9, rloader10, l10, l9, r9, r10);
 		RenderHelper.addFace(lloader11, lloader10, rloader10, rloader11, l11, l10, r10, r11);
 		RenderHelper.addFace(lloader12, lloader11, rloader11, rloader12, l12f, l11, r11, r12f);
-		
+
 		RenderHelper.addFace(lloader1, lloader2, lloader11, lloader12, ls6, ls5, ls8, ls7);
 		RenderHelper.addFace(lloader2, lloader3, lloader10, lloader11, ls5, ls4, ls9, ls8);
 		RenderHelper.addFace(lloader3, lloader4, lloader9, lloader10, ls4, ls3, ls10, ls9);
 		RenderHelper.addFace(lloader4, lloader5, lloader8, lloader9, ls3, ls2, ls11, ls10);
 		RenderHelper.addFace(lloader5, lloader6, lloader7, lloader8, ls2, ls1, ls12, ls11);
-		
+
 		RenderHelper.addFace(rloader2, rloader1, rloader12, rloader11, rs8, rs7, rs6, rs5);
 		RenderHelper.addFace(rloader3, rloader2, rloader11, rloader10, rs9, rs8, rs5, rs4);
 		RenderHelper.addFace(rloader4, rloader3, rloader10, rloader9, rs10, rs9, rs4, rs3);
@@ -159,17 +161,17 @@ public class ModelObjective
 		RenderHelper.addFace(rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1);
 		GL11.glPopMatrix();
 	}
-	
+
 	Vertice	vfront1	= new Vertice(0.5f, 0.3125f, 0.3125f);
 	Vertice	vfront2	= new Vertice(0.5f, -0.3125f, 0.3125f);
 	Vertice	vfront3	= new Vertice(0.5f, -0.3125f, -0.3125f);
 	Vertice	vfront4	= new Vertice(0.5f, 0.3125f, -0.3125f);
-	
+
 	Vertice	vcside2	= new Vertice(-0.125f, 0.3125f, 0.3125f);
 	Vertice	vcside3	= new Vertice(-0.125f, -0.3125f, 0.3125f);
 	Vertice	vcside4	= new Vertice(-0.125f, -0.3125f, -0.3125f);
 	Vertice	vcside5	= new Vertice(-0.125f, 0.3125f, -0.3125f);
-	
+
 	public void renderB(float slide, float x, float y, float X, float Y)
 	{
 		GL11.glPushMatrix();
@@ -182,15 +184,16 @@ public class ModelObjective
 		addFace(vcside4, vfront3, vfront2, vcside3, X, Y);
 		GL11.glPopMatrix();
 	}
-	
+
 	private void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, float x, float y)
 	{
-		Tessellator t = Tessellator.instance;
-		t.startDrawingQuads();
-		RenderHelper.addVertice(v1, new TextureVertice(x + 0.078125f, y + 0.15625f));
-		RenderHelper.addVertice(v2, new TextureVertice(x + 0.078125f, y - 0.15625f));
-		RenderHelper.addVertice(v3, new TextureVertice(x - 0.078125f, y - 0.15625f));
-		RenderHelper.addVertice(v4, new TextureVertice(x - 0.078125f, y + 0.15625f));
+		Tessellator t = Tessellator.getInstance();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		RenderHelper.addVertice(worldRenderer, v1, new TextureVertice(x + 0.078125f, y + 0.15625f));
+		RenderHelper.addVertice(worldRenderer, v2, new TextureVertice(x + 0.078125f, y - 0.15625f));
+		RenderHelper.addVertice(worldRenderer, v3, new TextureVertice(x - 0.078125f, y - 0.15625f));
+		RenderHelper.addVertice(worldRenderer, v4, new TextureVertice(x - 0.078125f, y + 0.15625f));
 		t.draw();
 	}
 }

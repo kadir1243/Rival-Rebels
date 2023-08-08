@@ -11,17 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -34,9 +33,6 @@ public class TileEntitySigmaObjective extends TileEntity implements IInventory, 
 
 	public double		slide			= 0;
 	double				test			= Math.PI - 0.05;
-
-	/** The number of players currently using this chest */
-	public int			numUsingPlayers;
 
     /**
 	 * Returns the number of slots in the inventory.
@@ -174,7 +170,7 @@ public class TileEntitySigmaObjective extends TileEntity implements IInventory, 
 	@Override
 	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
 	{
-		return this.worldObj.getTileEntity(this.pos) != this ? false : par1EntityPlayer.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
+		return this.worldObj.getTileEntity(this.pos) == this && par1EntityPlayer.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
 
 	/**
@@ -199,32 +195,6 @@ public class TileEntitySigmaObjective extends TileEntity implements IInventory, 
 		{
 			if (slide > 0.004) test -= 0.05;
 		}
-	}
-
-	/**
-	 * Called when a client event is received with the event number and argument, see World.sendClientEvent
-	 *
-	 * @return
-	 */
-	@Override
-	public boolean receiveClientEvent(int par1, int par2)
-	{
-		if (par1 == 1)
-		{
-			this.numUsingPlayers = par2;
-			return true;
-		}
-		return false;
-	}
-
-	public void openChest()
-	{
-		++this.numUsingPlayers;
-	}
-
-	public void closeChest()
-	{
-		--this.numUsingPlayers;
 	}
 
 	@Override
@@ -302,4 +272,44 @@ public class TileEntitySigmaObjective extends TileEntity implements IInventory, 
 	@Override
 	public void closeInventory(EntityPlayer player) {
 	}
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public Vec3 getPositionVector() {
+        return new Vec3(getPos());
+    }
+
+    @Override
+    public Entity getCommandSenderEntity() {
+        return null;
+    }
+
+    @Override
+    public boolean sendCommandFeedback() {
+        return false;
+    }
+
+    @Override
+    public void setCommandStat(CommandResultStats.Type type, int amount) {
+
+    }
 }

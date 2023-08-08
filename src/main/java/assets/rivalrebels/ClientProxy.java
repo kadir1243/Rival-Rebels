@@ -11,18 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels;
 
-import assets.rivalrebels.client.blockrenderer.SteelBlockRenderer;
 import assets.rivalrebels.client.gui.*;
 import assets.rivalrebels.client.renderentity.*;
 import assets.rivalrebels.client.tileentityrender.*;
 import assets.rivalrebels.common.entity.*;
 import assets.rivalrebels.common.tileentity.*;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.World;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.client.registry.RenderingRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraft.client.Minecraft;
-import net.minecraft.world.World;
 import org.lwjgl.input.Keyboard;
 
 public class ClientProxy extends CommonProxy
@@ -50,7 +49,7 @@ public class ClientProxy extends CommonProxy
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTachyonBomb.class, new TileEntityTachyonBombRenderer());
 		RenderingRegistry.registerEntityRenderingHandler(EntityGasGrenade.class, RenderGasGrenade::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityPropulsionFX.class, manager -> new RenderBullet(manager, "fire"));
-		RenderingRegistry.registerEntityRenderingHandler(EntityPassiveFire.class, manager -> new RenderBullet(manager, "fire"));
+		RenderingRegistry.registerEntityRenderingHandler(EntityPassiveFire.class, manager -> new RenderBullet(manager, "fire") {{shadowSize = 0F;}});
 		RenderingRegistry.registerEntityRenderingHandler(EntityCuchillo.class, RenderCuchillo::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall.class, RenderFlame::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall1.class, RenderFlameRedBlue::new);
@@ -76,17 +75,17 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityDebris.class, RenderDebris::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityHackB83.class, RenderHackB83::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySeekB83.class, RenderSeeker::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodes.class, RenderRhodes::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesHead.class, RenderRhodesHead::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesTorso.class, RenderRhodesTorso::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperArm.class, RenderRhodesLeftUpperArm::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperArm.class, RenderRhodesRightUpperArm::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerArm.class, RenderRhodesLeftLowerArm::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerArm.class, RenderRhodesRightLowerArm::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperLeg.class, RenderRhodesLeftUpperLeg::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperLeg.class, RenderRhodesRightUpperLeg::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerLeg.class, RenderRhodesLeftLowerLeg::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerLeg.class, RenderRhodesRightLowerLeg::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodes.class, RenderRhodes::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesHead.class, RenderRhodesHead::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesTorso.class, RenderRhodesTorso::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperArm.class, RenderRhodesLeftUpperArm::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperArm.class, RenderRhodesRightUpperArm::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerArm.class, RenderRhodesLeftLowerArm::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerArm.class, RenderRhodesRightLowerArm::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperLeg.class, RenderRhodesLeftUpperLeg::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperLeg.class, RenderRhodesRightUpperLeg::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerLeg.class, RenderRhodesLeftLowerLeg::new);
+		//RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerLeg.class, RenderRhodesRightLowerLeg::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityB83NoShroom.class, RenderB83::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntitySphereBlast.class, RenderSphereBlast::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityNuke.class, RenderNuke::new);
@@ -99,15 +98,15 @@ public class ClientProxy extends CommonProxy
 		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBallGreen.class, RenderFlameBallGreen::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityAntimatterBomb.class, RenderAntimatterBomb::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityAntimatterBombBlast.class, RenderAntimatterBombBlast::new);
-		RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBomb.class, RenderTachyonBomb::new);
+		// RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBomb.class, RenderTachyonBomb::new);
 		RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBombBlast.class, RenderTachyonBombBlast::new);
-		RenderingRegistry.registerBlockHandler(new SteelBlockRenderer());
+		// RenderingRegistry.registerBlockHandler(new SteelBlockRenderer());
 	}
 
 	@Override
 	public int addArmor(String armor)
 	{
-		return RenderingRegistry.addNewArmourRendererPrefix(armor);
+		 return 0 /*RenderingRegistry.addNewArmourRendererPrefix(armor)*/;
 	}
 
 	@Override

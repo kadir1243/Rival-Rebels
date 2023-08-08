@@ -11,21 +11,20 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.tileentity.TileEntityReciever;
+
+import java.util.Iterator;
+import java.util.List;
 
 public class EntityFlameBall2 extends EntityInanimate
 {
@@ -222,8 +221,9 @@ public class EntityFlameBall2 extends EntityInanimate
 			{
 				mop.entityHit.setFire(3);
 				mop.entityHit.attackEntityFrom(RivalRebelsDamageSource.cooked, 12);
-				if (mop.entityHit != null && mop.entityHit instanceof EntityPlayer player)
+				if (mop.entityHit instanceof EntityPlayer)
 				{
+                    EntityPlayer player = (EntityPlayer) mop.entityHit;
                     ItemStack[] armorSlots = player.inventory.armorInventory;
 					int i = worldObj.rand.nextInt(4);
 					if (armorSlots[i] != null && !worldObj.isRemote)
@@ -254,16 +254,6 @@ public class EntityFlameBall2 extends EntityInanimate
 		setPosition(posX, posY, posZ);
 	}
 
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-	{
-	}
-
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
-	}
-
     @Override
 	public int getBrightnessForRender(float par1)
 	{
@@ -280,12 +270,6 @@ public class EntityFlameBall2 extends EntityInanimate
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
-	}
-
-	@Override
-	public float getShadowSize()
-	{
-		return 0.0F;
 	}
 
 	@Override
@@ -326,7 +310,7 @@ public class EntityFlameBall2 extends EntityInanimate
 			else if (id == RivalRebels.flare) RivalRebels.flare.onBlockDestroyedByPlayer(worldObj, getPosition(), state);
 			else if (id == RivalRebels.timedbomb) RivalRebels.timedbomb.onBlockDestroyedByPlayer(worldObj, getPosition(), state);
 			else if (id == RivalRebels.remotecharge) RivalRebels.remotecharge.onBlockDestroyedByPlayer(worldObj, getPosition(), state);
-			else if (id == RivalRebels.landmine) RivalRebels.remotecharge.onBlockDestroyedByPlayer(worldObj, getPosition(), state);
+			else if (id == RivalRebels.landmine) RivalRebels.landmine.onBlockDestroyedByPlayer(worldObj, getPosition(), state);
 			else if (id == RivalRebels.alandmine) RivalRebels.remotecharge.onBlockDestroyedByPlayer(worldObj, getPosition(), state);
 			else if (id == Blocks.tnt) {
 				worldObj.setBlockToAir(getPosition());

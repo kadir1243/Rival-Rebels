@@ -32,10 +32,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.*;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
@@ -251,8 +248,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	private boolean isValidTarget(Entity e)
 	{
 		if (e == null) return false;
-		else if (e instanceof EntityPlayer p)
+		else if (e instanceof EntityPlayer)
 		{
+            EntityPlayer p = (EntityPlayer) e;
             if (p.capabilities.isCreativeMode) return false;
 			else
 			{
@@ -524,4 +522,29 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	@Override
 	public void closeInventory(EntityPlayer player) {
 	}
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public void clear() {
+
+    }
+
+    @Override
+    public IChatComponent getDisplayName() {
+        return new ChatComponentText(getName());
+    }
 }

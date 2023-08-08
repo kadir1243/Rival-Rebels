@@ -14,7 +14,6 @@ package assets.rivalrebels.common.item;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityLaptop;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -57,9 +56,9 @@ public class ItemLaptop extends Item
         return true;
     }
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:aj");
-	}
+	}*/
 }

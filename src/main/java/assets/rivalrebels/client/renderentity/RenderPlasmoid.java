@@ -11,31 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
-public class RenderPlasmoid extends Render
+public class RenderPlasmoid extends Render<EntityPlasmoid>
 {
     public RenderPlasmoid(RenderManager renderManager) {
         super(renderManager);
     }
 	ModelBlastSphere	model	= new ModelBlastSphere();
 
-	@Override
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9)
-	{
-		renderPlasmoid((EntityPlasmoid) var1, var2, var4, var6, var8, var9);
-	}
-
-	public void renderPlasmoid(EntityPlasmoid e, double x, double y, double z, float var8, float var9)
-	{
+    @Override
+    public void doRender(EntityPlasmoid e, double x, double y, double z, float entityYaw, float partialTicks) {
 		GL11.glPushMatrix();
 		GL11.glTranslated(x, y, z);
 		GL11.glRotatef(e.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
@@ -66,7 +57,7 @@ public class RenderPlasmoid extends Render
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityPlasmoid entity)
 	{
 		return null;
 	}

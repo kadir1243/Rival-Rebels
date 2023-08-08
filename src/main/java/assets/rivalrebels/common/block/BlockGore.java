@@ -14,22 +14,21 @@ package assets.rivalrebels.common.block;
 import assets.rivalrebels.common.entity.EntityBlood;
 import assets.rivalrebels.common.entity.EntityGoo;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.world.World;
 
 import java.util.Random;
 
-public class BlockGore extends BlockContainer
-{
+public class BlockGore extends BlockContainer {
+    public static final PropertyInteger TYPE = PropertyInteger.create("type", 0, 5);
 	public BlockGore()
 	{
 		super(Material.cake);
@@ -41,113 +40,81 @@ public class BlockGore extends BlockContainer
 		return 0;
 	}
 
-	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9)
-	{
-		if (player.capabilities.isCreativeMode)
-		{
-			int meta = world.getBlockMetadata(x, y, z) + 1;
-			if (meta >= 6) meta = 0;
-			world.setBlockMetadataWithNotify(x, y, z, meta, 3);
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+		if (player.capabilities.isCreativeMode) {
+			int type = state.getValue(TYPE) + 1;
+			if (type >= 6) type = 0;
+			world.setBlockState(pos, state.withProperty(TYPE, type));
 			return true;
 		}
 		return false;
 	}
 
-	@Override
-	public void randomDisplayTick(World world, int x, int y, int z, Random random)
-	{
-		if (world.getBlock(x, y - 1, z) == Blocks.air && world.getBlockMetadata(x, y, z) < 2) world.spawnEntityInWorld(new EntityBlood(world, x + Math.random(), y + 0.9f, z + Math.random()));
-		else if (world.getBlock(x, y - 1, z) == Blocks.air && world.getBlockMetadata(x, y, z) < 4) world.spawnEntityInWorld(new EntityGoo(world, x + Math.random(), y + 0.9f, z + Math.random()));
-	}
+    @Override
+    public void randomDisplayTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        if (world.isAirBlock(pos.down())) {
+            int x = pos.getX();
+            int y = pos.getY();
+            int z = pos.getZ();
+            if (state.getValue(TYPE) < 2) {
+                world.spawnEntityInWorld(new EntityBlood(world, x + Math.random(), y + 0.9f, z + Math.random()));
+            } else if (state.getValue(TYPE) < 4) {
+                world.spawnEntityInWorld(new EntityGoo(world, x + Math.random(), y + 0.9f, z + Math.random()));
+            }
+        }
+    }
 
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
 
-	@Override
-	public int getRenderType()
-	{
-		return -1;
-	}
-
-	@Override
+    @Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return null;
-	}
-
-	@Override
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return null;
-	}
-
-	@Override
-	public void updateTick(World world, int xx, int yy, int zz, Random par5Random)
-	{
-		if (world.isBlockNormalCubeDefault(xx, yy - 1, zz, false) || world.isBlockNormalCubeDefault(xx + 1, yy, zz, false) || world.isBlockNormalCubeDefault(xx - 1, yy, zz, false) || world.isBlockNormalCubeDefault(xx, yy, zz + 1, false) || world.isBlockNormalCubeDefault(xx, yy, zz - 1, false) || world.isBlockNormalCubeDefault(xx, yy + 1, zz, false))
-		{
-			world.setBlock(xx, yy, zz, Blocks.air);
-		}
-	}
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+        return null;
+    }
 
     @Override
-	public boolean hasTileEntity(int metadata)
-	{
-		return true;
-	}
+    public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos) {
+        return null;
+    }
 
-	@Override
+    @Override
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if (worldIn.isBlockNormalCube(pos.offset(facing), false)) {
+                worldIn.setBlockToAir(pos);
+                break;
+            }
+        }
+    }
+
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
+
+    @Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityGore();
 	}
 
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
-	IIcon	icon6;
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(TYPE, meta);
+    }
 
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (meta == 0) return icon;
-		if (meta == 1) return icon2;
-		if (meta == 2) return icon3;
-		if (meta == 3) return icon4;
-		if (meta == 4) return icon5;
-		if (meta == 5) return icon6;
-		else
-		{
-			return icon;
-		}
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:br");
-		icon2 = iconregister.registerIcon("RivalRebels:bs");
-		icon3 = iconregister.registerIcon("RivalRebels:bt");
-		icon4 = iconregister.registerIcon("RivalRebels:bu");
-		icon5 = iconregister.registerIcon("RivalRebels:bv");
-		icon6 = iconregister.registerIcon("RivalRebels:bw");
-	}
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(TYPE);
+    }
 }

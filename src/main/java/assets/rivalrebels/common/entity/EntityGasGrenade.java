@@ -43,7 +43,6 @@ public class EntityGasGrenade extends EntityInanimate
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(par2, par4, par6);
-		yOffset = 0.0F;
 	}
 
 	public EntityGasGrenade(World par1World, double x, double y,double z, double mx, double my, double mz)
@@ -51,7 +50,6 @@ public class EntityGasGrenade extends EntityInanimate
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
 
@@ -82,7 +80,6 @@ public class EntityGasGrenade extends EntityInanimate
 			double var16 = var6 / var12;
 			double var18 = var10 / var12;
 			setLocationAndAngles(par2EntityLiving.posX + var16, posY, par2EntityLiving.posZ + var18, var14, var15);
-			yOffset = 0.0F;
 			float var20 = (float) var12 * 0.2F;
 			setArrowHeading(var6, var8 + var20, var10, par4, par5);
 		}
@@ -99,7 +96,6 @@ public class EntityGasGrenade extends EntityInanimate
 		posY -= 0.10000000149011612D;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
@@ -107,8 +103,7 @@ public class EntityGasGrenade extends EntityInanimate
 	}
 
 	@Override
-	protected void entityInit()
-	{
+	public void entityInit() {
 		dataWatcher.addObject(16, (byte) 0);
 	}
 
@@ -296,13 +291,6 @@ public class EntityGasGrenade extends EntityInanimate
 	 */
 	@Override
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) {
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public float getShadowSize()
-	{
-		return 0.0F;
 	}
 
 	/**

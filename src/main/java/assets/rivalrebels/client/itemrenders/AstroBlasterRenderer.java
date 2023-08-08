@@ -9,7 +9,7 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-package assets.rivalrebels.client.itemrenders;
+/*package assets.rivalrebels.client.itemrenders;
 
 import java.util.Random;
 
@@ -42,7 +42,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 	int						spin			= 0;
 	int						time			= 1;
 	int						reloadcooldown	= 0;
-	
+
 	public AstroBlasterRenderer()
 	{
 		md1 = new ModelAstroBlasterBarrel();
@@ -51,20 +51,20 @@ public class AstroBlasterRenderer implements IItemRenderer
 		md4 = new ModelAstroBlasterBack();
 		md5 = new ModelRod();
 	}
-	
+
 	@Override
 	public boolean handleRenderType(ItemStack item, ItemRenderType type)
 	{
 		if (type == ItemRenderType.FIRST_PERSON_MAP || type == ItemRenderType.EQUIPPED || type == ItemRenderType.ENTITY || type == ItemRenderType.EQUIPPED_FIRST_PERSON) return true;
 		return false;
 	}
-	
+
 	@Override
 	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper)
 	{
 		return false;
 	}
-	
+
 	@Override
 	public void renderItem(ItemRenderType type, ItemStack item, Object... data)
 	{
@@ -90,14 +90,14 @@ public class AstroBlasterRenderer implements IItemRenderer
 				reloadcooldown = 60;
 				rotation = 0;
 			}
-			
+
 		}
 		GL11.glPushMatrix();
 		GL11.glDisable(GL11.GL_LIGHTING);
 		GL11.glTranslatef(0.4f, 0.35f, -0.03f);
 		GL11.glRotatef(-55, 0.0F, 0.0F, 1.0F);
 		GL11.glTranslatef(0f, -0.05f, 0.05f);
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0f, 0.9f, 0f);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.eteinstenbarrel);
@@ -113,7 +113,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 			GL11.glEnable(GL11.GL_LIGHTING);
 		}
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0.22f, -0.025f, 0f);
 		GL11.glRotatef(90, 0.0F, 0.0F, 1.0F);
@@ -131,14 +131,14 @@ public class AstroBlasterRenderer implements IItemRenderer
 			GL11.glEnable(GL11.GL_LIGHTING);
 		}
 		GL11.glPopMatrix();
-		
+
 		// GL11.glPushMatrix();
 		// GL11.glTranslatef(0f, 0.8f, 0f);
 		// GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
 		// GL11.glScaled(0.9, 4.5, 0.9);
 		// md3.render(0.2f, 0.3f, 0.3f, 0.3f, 1f);
 		// GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0f, 0.2f, 0f);
 		GL11.glScaled(0.85, 0.85, 0.85);
@@ -155,7 +155,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 			GL11.glEnable(GL11.GL_LIGHTING);
 		}
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0f, -pullback, 0f);
 		GL11.glRotatef(rotation, 0.0F, 1.0F, 0.0F);
@@ -166,7 +166,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etredrod);
 		md5.render();
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(-0.12f, 0.1f, 0.12f);
 		GL11.glRotatef(pullback * 270, 0.0F, 1.0F, 0.0F);
@@ -174,7 +174,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etredrod);
 		md5.render();
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(-0.12f, 0.1f, -0.12f);
 		GL11.glRotatef(pullback * 270, 0.0F, 1.0F, 0.0F);
@@ -182,7 +182,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etredrod);
 		md5.render();
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0.12f, 0.1f, -0.12f);
 		GL11.glRotatef(pullback * 270, 0.0F, 1.0F, 0.0F);
@@ -191,7 +191,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 		md5.render();
 		GL11.glPopMatrix();
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glDisable(GL11.GL_TEXTURE_2D);
 		GL11.glEnable(GL11.GL_BLEND);
@@ -202,7 +202,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 		float radius = 0.01F;
 		Random rand = new Random();
 		Tessellator tessellator = Tessellator.instance;
-		
+
 		double AddedX = 0;
 		double AddedZ = 0;
 		double prevAddedX = 0;
@@ -233,7 +233,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 			{
 				AddedX = AddedZ = 0;
 			}
-			
+
 			for (float o = 0; o <= radius; o += radius / 2f)
 			{
 				tessellator.startDrawingQuads();
@@ -300,9 +300,9 @@ public class AstroBlasterRenderer implements IItemRenderer
 			// tessellator.draw();
 			// GL11.glPopMatrix();
 		}
-		
+
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0f, 0.8f, 0f);
 		GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
@@ -310,7 +310,7 @@ public class AstroBlasterRenderer implements IItemRenderer
 		GL11.glScaled(0.9, 4.1, 0.9);
 		md3.render((float) (0.22f + (Math.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
 		GL11.glPopMatrix();
-		
+
 		GL11.glPushMatrix();
 		GL11.glTranslatef(0f, 0.8f, 0f);
 		GL11.glRotatef(180, 0.0F, 0.0F, 1.0F);
@@ -319,7 +319,8 @@ public class AstroBlasterRenderer implements IItemRenderer
 		md3.render((float) (0.22f + (Math.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
 		GL11.glDisable(GL11.GL_BLEND);
 		GL11.glPopMatrix();
-		
+
 		GL11.glPopMatrix();
 	}
 }
+*/

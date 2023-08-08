@@ -15,6 +15,8 @@ import java.util.Random;
 
 import net.minecraft.client.renderer.Tessellator;
 
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
@@ -67,31 +69,31 @@ public class RenderLibrary {
 		yv[0] = 0;
 		zv[0] = 0;
 
-		for (int o = 0; o < steps; o++)
-		{
-			t.startDrawingQuads();
+        WorldRenderer worldRenderer = t.getWorldRenderer();
+        for (int o = 0; o < steps; o++) {
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
 			for (int i = 1; i < segNum; i++)
 			{
 				double s = rs * o;
-				t.addVertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s);
-				t.addVertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s);
-				t.addVertex(xv[i], yv[i] + s, zv[i] + s);
-				t.addVertex(xv[i], yv[i] + s, zv[i] - s);
+				worldRenderer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).endVertex();
+				worldRenderer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] + s, zv[i] + s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] + s, zv[i] - s).endVertex();
 
-				t.addVertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s);
-				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s);
-				t.addVertex(xv[i], yv[i] - s, zv[i] + s);
-				t.addVertex(xv[i], yv[i] + s, zv[i] + s);
+				worldRenderer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).endVertex();
+				worldRenderer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] - s, zv[i] + s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] + s, zv[i] + s).endVertex();
 
-				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s);
-				t.addVertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s);
-				t.addVertex(xv[i], yv[i] + s, zv[i] - s);
-				t.addVertex(xv[i], yv[i] - s, zv[i] - s);
+				worldRenderer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).endVertex();
+				worldRenderer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] + s, zv[i] - s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] - s, zv[i] - s).endVertex();
 
-				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s);
-				t.addVertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s);
-				t.addVertex(xv[i], yv[i] - s, zv[i] - s);
-				t.addVertex(xv[i], yv[i] - s, zv[i] + s);
+				worldRenderer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).endVertex();
+				worldRenderer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] - s, zv[i] - s).endVertex();
+				worldRenderer.pos(xv[i], yv[i] - s, zv[i] + s).endVertex();
 			}
 			t.draw();
 		}

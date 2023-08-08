@@ -29,7 +29,7 @@ public class TileEntityLoaderRenderer extends TileEntitySpecialRenderer<TileEnti
 	public TileEntityLoaderRenderer() {
 		loaderModel = new ModelLoader();
 		try {
-			tube = ModelFromObj.readObjFile("l.obj");
+			tube = ModelFromObj.readObjFile("tube.obj");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

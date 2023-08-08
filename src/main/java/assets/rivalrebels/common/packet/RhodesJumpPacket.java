@@ -90,8 +90,9 @@ public class RhodesJumpPacket implements IMessage
 		public IMessage onMessage(RhodesJumpPacket m, MessageContext ctx)
 		{
 			Entity e = MinecraftServer.getServer().worldServers[0].getEntityByID(m.id);
-			if (e instanceof EntityRhodes er)
+			if (e instanceof EntityRhodes)
 			{
+                EntityRhodes er = (EntityRhodes) e;
                 er.stop ^= m.stop;
 				er.rocket = m.rocket;
 				er.laser = m.laser;

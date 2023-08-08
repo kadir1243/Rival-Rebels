@@ -13,7 +13,6 @@ package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
@@ -77,9 +76,9 @@ public class ItemCamera extends ItemArmor
 		}
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bi");
-	}
+	}*/
 }

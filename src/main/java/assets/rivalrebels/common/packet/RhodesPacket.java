@@ -182,8 +182,9 @@ public class RhodesPacket implements IMessage
 		public IMessage onMessage(RhodesPacket m, MessageContext ctx)
 		{
 			Entity e = Minecraft.getMinecraft().theWorld.getEntityByID(m.id);
-			if (e instanceof EntityRhodes er)
+			if (e instanceof EntityRhodes)
 			{
+                EntityRhodes er = (EntityRhodes) e;
                 er.lastbodyyaw = er.bodyyaw;
 				er.lastheadyaw = er.headyaw;
 				er.lastheadpitch = er.headpitch;

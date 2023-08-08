@@ -24,6 +24,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.scoreboard.IScoreObjectiveCriteria;
 import net.minecraft.scoreboard.ScoreObjective;
 import net.minecraft.scoreboard.ScorePlayerTeam;
@@ -54,7 +55,7 @@ public class RivalRebelsRound implements IMessage
 {
 	private File					rounddata;
 	private int						cSpawnx			= -1, cSpawnz = -1;
-	public int						oObjx			= -1, oObjy = -1, oObjz = -1;
+    public BlockPos oObj = new BlockPos(-1, -1, -1);
 	public int						sObjx			= -1, sObjy = -1, sObjz = -1;
 	private String					MotD			= "Select your class and nuke the enemy team's objective to win.";
 	public RivalRebelsPlayerList	rrplayerlist	= new RivalRebelsPlayerList();
@@ -91,48 +92,44 @@ public class RivalRebelsRound implements IMessage
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		roundstarted = buf.readBoolean();
-		cSpawnx = buf.readInt();
-		cSpawnz = buf.readInt();
-		oObjx = buf.readInt();
-		oObjy = buf.readInt();
-		oObjz = buf.readInt();
-		sObjx = buf.readInt();
-		sObjy = buf.readInt();
-		sObjz = buf.readInt();
-		winCountdown = buf.readInt();
-		omegaWins = buf.readInt();
-		sigmaWins = buf.readInt();
-		lastwinomega = buf.readBoolean();
-		fatnuke = buf.readBoolean();
-		byte[] bytes = new byte[buf.readInt()];
-		buf.readBytes(bytes);
+	public void fromBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+		roundstarted = buffer.readBoolean();
+		cSpawnx = buffer.readInt();
+		cSpawnz = buffer.readInt();
+        oObj = buffer.readBlockPos();
+		sObjx = buffer.readInt();
+		sObjy = buffer.readInt();
+		sObjz = buffer.readInt();
+		winCountdown = buffer.readInt();
+		omegaWins = buffer.readInt();
+		sigmaWins = buffer.readInt();
+		lastwinomega = buffer.readBoolean();
+		fatnuke = buffer.readBoolean();
+		byte[] bytes = new byte[buffer.readInt()];
+		buffer.readBytes(bytes);
 		MotD = FileRW.getStringBytes(bytes);
-		rrplayerlist.fromBytes(buf);
+		rrplayerlist.fromBytes(buffer);
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeBoolean(roundstarted);
-		buf.writeInt(cSpawnx);
-		buf.writeInt(cSpawnz);
-		buf.writeInt(oObjx);
-		buf.writeInt(oObjy);
-		buf.writeInt(oObjz);
-		buf.writeInt(sObjx);
-		buf.writeInt(sObjy);
-		buf.writeInt(sObjz);
-		buf.writeInt(winCountdown);
-		buf.writeInt(omegaWins);
-		buf.writeInt(sigmaWins);
-		buf.writeBoolean(lastwinomega);
-		buf.writeBoolean(fatnuke);
-		buf.writeInt(MotD.length());
-		buf.writeBytes(FileRW.getBytesString(MotD));
-		rrplayerlist.toBytes(buf);
+	public void toBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+		buffer.writeBoolean(roundstarted);
+		buffer.writeInt(cSpawnx);
+		buffer.writeInt(cSpawnz);
+		buffer.writeBlockPos(oObj);
+		buffer.writeInt(sObjx);
+		buffer.writeInt(sObjy);
+		buffer.writeInt(sObjz);
+		buffer.writeInt(winCountdown);
+		buffer.writeInt(omegaWins);
+		buffer.writeInt(sigmaWins);
+		buffer.writeBoolean(lastwinomega);
+		buffer.writeBoolean(fatnuke);
+		buffer.writeInt(MotD.length());
+		buffer.writeBytes(FileRW.getBytesString(MotD));
+		rrplayerlist.toBytes(buffer);
 	}
 
 	public static class Handler implements IMessageHandler<RivalRebelsRound, IMessage>
@@ -150,9 +147,7 @@ public class RivalRebelsRound implements IMessage
 		roundstarted = m.roundstarted;
 		cSpawnx = m.cSpawnx;
 		cSpawnz = m.cSpawnz;
-		oObjx = m.oObjx;
-		oObjy = m.oObjy;
-		oObjz = m.oObjz;
+		oObj = m.oObj;
 		sObjx = m.sObjx;
 		sObjy = m.sObjy;
 		sObjz = m.sObjz;
@@ -208,8 +203,8 @@ public class RivalRebelsRound implements IMessage
 			fatnuke = true;
 			roundstarted = true;
 			rrplayerlist = new RivalRebelsPlayerList();
-			cSpawnx = (oObjx+sObjx)/2;
-			cSpawnz = (oObjz+sObjz)/2;
+			cSpawnx = (oObj.getX()+sObjx)/2;
+			cSpawnz = (oObj.getZ()+sObjz)/2;
 			world.setSpawnPoint(world.getHeight(new BlockPos(cSpawnx, 0, cSpawnz)));
 			omegaHealth=RivalRebels.objectiveHealth;
 			sigmaHealth=RivalRebels.objectiveHealth;
@@ -403,21 +398,20 @@ public class RivalRebelsRound implements IMessage
 			}
 		}
 
-		oObjx = cSpawnx + objDist;
-		oObjz = cSpawnz;
+        oObj = new BlockPos(cSpawnx + objDist, oObj.getY(), cSpawnz);
 		sObjx = cSpawnx - objDist;
 		sObjz = cSpawnz;
 
-		Chunk chunk = world.getChunkFromBlockCoords(new BlockPos(oObjx, 0, oObjz));
-        int x = oObjx&15;
-        int z = oObjz&15;
-        for (oObjy = chunk.getTopFilledSegment() + 15; oObjy > 0; --oObjy)
-        {
-            Block block = chunk.getBlock(x, oObjy, z);
-            if (block != Blocks.air)
-            {
+		Chunk chunk = world.getChunkFromBlockCoords(oObj);
+        int x = oObj.getX()&15;
+        int z = oObj.getZ()&15;
+        oObj = new BlockPos(oObj.getX(), chunk.getTopFilledSegment() + 15, oObj.getZ());
+        while (oObj.getY() > 0) {
+            Block block = chunk.getBlock(x, oObj.getY(), z);
+            if (block != Blocks.air) {
                 break;
             }
+            oObj = oObj.down();
         }
         chunk = world.getChunkFromBlockCoords(new BlockPos(sObjx, 0, sObjz));
         x = sObjx&15;
@@ -439,7 +433,7 @@ public class RivalRebelsRound implements IMessage
 				int ZZ = zz * zz + XX;
 				if (ZZ <= objRadius2)
 				{
-                    BlockPos omegaPosition = new BlockPos(oObjx + xx, oObjy, oObjz + zz);
+                    BlockPos omegaPosition = new BlockPos(oObj.getX() + xx, oObj.getY(), oObj.getZ() + zz);
                     BlockPos sigmaPosition = new BlockPos(sObjx + xx, sObjy, sObjz + zz);
                     if (Math.abs(xx) == 15 && Math.abs(zz) == 15)
 					{
@@ -460,10 +454,10 @@ public class RivalRebelsRound implements IMessage
 			}
 		}
 
-		world.setBlockState(new BlockPos(oObjx + 21, oObjy, oObjz + 21), RivalRebels.conduit.getDefaultState());
-		world.setBlockState(new BlockPos(oObjx + 21, oObjy, oObjz - 21), RivalRebels.conduit.getDefaultState());
-		world.setBlockState(new BlockPos(oObjx - 21, oObjy, oObjz + 21), RivalRebels.conduit.getDefaultState());
-		world.setBlockState(new BlockPos(oObjx - 21, oObjy, oObjz - 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(oObj.getX() + 21, oObj.getY(), oObj.getZ() + 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(oObj.getX() + 21, oObj.getY(), oObj.getZ() - 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(oObj.getX() - 21, oObj.getY(), oObj.getZ() + 21), RivalRebels.conduit.getDefaultState());
+		world.setBlockState(new BlockPos(oObj.getX() - 21, oObj.getY(), oObj.getZ() - 21), RivalRebels.conduit.getDefaultState());
 		world.setBlockState(new BlockPos(sObjx + 21, sObjy, sObjz + 21), RivalRebels.conduit.getDefaultState());
 		world.setBlockState(new BlockPos(sObjx + 21, sObjy, sObjz - 21), RivalRebels.conduit.getDefaultState());
 		world.setBlockState(new BlockPos(sObjx - 21, sObjy, sObjz + 21), RivalRebels.conduit.getDefaultState());
@@ -471,21 +465,21 @@ public class RivalRebelsRound implements IMessage
 
 		for (int i = 0; i < 4; i++)
 		{
-			world.setBlockToAir(new BlockPos(oObjx + 21, oObjy + 1 + i, oObjz + 21));
-			world.setBlockToAir(new BlockPos(oObjx + 21, oObjy + 1 + i, oObjz - 21));
-			world.setBlockToAir(new BlockPos(oObjx - 21, oObjy + 1 + i, oObjz + 21));
-			world.setBlockToAir(new BlockPos(oObjx - 21, oObjy + 1 + i, oObjz - 21));
+			world.setBlockToAir(new BlockPos(oObj.getX() + 21, oObj.getY() + 1 + i, oObj.getZ() + 21));
+			world.setBlockToAir(new BlockPos(oObj.getX() + 21, oObj.getY() + 1 + i, oObj.getZ() - 21));
+			world.setBlockToAir(new BlockPos(oObj.getX() - 21, oObj.getY() + 1 + i, oObj.getZ() + 21));
+			world.setBlockToAir(new BlockPos(oObj.getX() - 21, oObj.getY() + 1 + i, oObj.getZ() - 21));
 			world.setBlockToAir(new BlockPos(sObjx + 21, sObjy + 1 + i, sObjz + 21));
 			world.setBlockToAir(new BlockPos(sObjx + 21, sObjy + 1 + i, sObjz - 21));
 			world.setBlockToAir(new BlockPos(sObjx - 21, sObjy + 1 + i, sObjz + 21));
 			world.setBlockToAir(new BlockPos(sObjx - 21, sObjy + 1 + i, sObjz - 21));
 		}
 
-		world.setBlockState(new BlockPos(oObjx, oObjy + 1, oObjz), RivalRebels.omegaobj.getDefaultState());
+		world.setBlockState(new BlockPos(oObj.up()), RivalRebels.omegaobj.getDefaultState());
 		world.setBlockState(new BlockPos(sObjx, sObjy + 1, sObjz), RivalRebels.sigmaobj.getDefaultState());
 		if (RivalRebels.rhodesRoundsBase)
 		{
-			world.setBlockState(new BlockPos(oObjx, oObjy + 2, oObjz), RivalRebels.buildrhodes.getDefaultState());
+			world.setBlockState(new BlockPos(oObj.up(2)), RivalRebels.buildrhodes.getDefaultState());
 			world.setBlockState(new BlockPos(sObjx, sObjy + 2, sObjz), RivalRebels.buildrhodes.getDefaultState());
 		}
 	}
@@ -501,7 +495,7 @@ public class RivalRebelsRound implements IMessage
 		winCountdown = 1400;
 		sigmaWins++;
 		lastwinomega = false;
-		world.setBlockState(new BlockPos(oObjx, oObjy, oObjz), RivalRebels.plasmaexplosion.getDefaultState());
+		world.setBlockState(new BlockPos(oObj), RivalRebels.plasmaexplosion.getDefaultState());
 		world.setBlockState(new BlockPos(sObjx, sObjy, sObjz), RivalRebels.plasmaexplosion.getDefaultState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++)
 		{
@@ -513,7 +507,7 @@ public class RivalRebelsRound implements IMessage
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						world.setBlockToAir(new BlockPos(oObjx + xpl, oObjy + ypl, oObjz + zpl));
+						world.setBlockToAir(oObj.add(xpl, ypl, zpl));
 					}
 				}
 			}
@@ -527,7 +521,7 @@ public class RivalRebelsRound implements IMessage
 		winCountdown = 1400;
 		omegaWins++;
 		lastwinomega = true;
-		world.setBlockState(new BlockPos(oObjx, oObjy, oObjz), RivalRebels.plasmaexplosion.getDefaultState());
+		world.setBlockState(oObj, RivalRebels.plasmaexplosion.getDefaultState());
 		world.setBlockState(new BlockPos(sObjx, sObjy, sObjz), RivalRebels.plasmaexplosion.getDefaultState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++)
 		{
@@ -550,7 +544,7 @@ public class RivalRebelsRound implements IMessage
 	public void stopRounds()
 	{
 		if (!roundstarted) return;
-		world.setBlockState(new BlockPos(oObjx, oObjy, oObjz), RivalRebels.plasmaexplosion.getDefaultState());
+		world.setBlockState(oObj, RivalRebels.plasmaexplosion.getDefaultState());
 		world.setBlockState(new BlockPos(sObjx, sObjy, sObjz), RivalRebels.plasmaexplosion.getDefaultState());
 		winCountdown = 0;
 		roundstarted = false;

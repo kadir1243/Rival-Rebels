@@ -39,7 +39,6 @@ public class EntityBomb extends EntityThrowable
 	{
 		this(par1World);
 		setLocationAndAngles(x, y, z, yaw, pitch);
-		yOffset = 0.0F;
 		motionX = -(-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
@@ -49,7 +48,6 @@ public class EntityBomb extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x+mx*1.4f,y+my*1.4f,z+mz*1.4f);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
 
@@ -59,7 +57,6 @@ public class EntityBomb extends EntityThrowable
 		setSize(0.5F, 0.5F);
 		setLocationAndAngles(entity2.posX, entity2.posY + entity2.getEyeHeight(), entity2.posZ, entity2.rotationYaw, entity2.rotationPitch);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));

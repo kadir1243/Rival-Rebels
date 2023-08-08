@@ -11,21 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.entity.EntityLightningLink;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
-
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL12;
 
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.entity.EntityLightningLink;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import java.util.Random;
 
 @SideOnly(Side.CLIENT)
 public class RenderLightningLink extends Render
@@ -54,9 +54,10 @@ public class RenderLightningLink extends Render
 		{
 			Random rand = new Random(ell.randLong);
 			float radius = 0.07F;
-			Tessellator tessellator = Tessellator.instance;
+			Tessellator tessellator = Tessellator.getInstance();
+            WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
-			GL11.glPushMatrix();
+            GL11.glPushMatrix();
 			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
 			GL11.glDisable(GL11.GL_TEXTURE_2D);
 			GL11.glEnable(GL11.GL_BLEND);
@@ -67,8 +68,8 @@ public class RenderLightningLink extends Render
 
 			double AddedX = 0;
 			double AddedY = 0;
-			double prevAddedX = 0;
-			double prevAddedY = 0;
+			double prevAddedX;
+			double prevAddedY;
 			for (int addedZ = (int) distance; addedZ >= 0; addedZ -= segmentDistance)
 			{
 				prevAddedX = AddedX;
@@ -83,40 +84,40 @@ public class RenderLightningLink extends Render
 					if (Math.abs(tempAddedX) < Math.abs(AddedX)) AddedX = tempAddedX;
 					if (Math.abs(tempAddedY) < Math.abs(AddedY)) AddedY = tempAddedY;
 				}
-				if (addedZ <= 0)
+				if (addedZ == 0)
 				{
 					AddedX = AddedY = 0;
 				}
 
 				for (float o = 0; o <= radius; o += radius / 8)
 				{
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX + o, AddedY - o, addedZ);
-					tessellator.addVertex(AddedX + o, AddedY + o, addedZ);
-					tessellator.addVertex(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance);
+					worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+					worldRenderer.color(red, green, blue, 0.95f);
+					worldRenderer.pos(AddedX + o, AddedY - o, addedZ).endVertex();
+					worldRenderer.pos(AddedX + o, AddedY + o, addedZ).endVertex();
+					worldRenderer.pos(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).endVertex();
+					worldRenderer.pos(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).endVertex();
 					tessellator.draw();
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX - o, AddedY - o, addedZ);
-					tessellator.addVertex(AddedX + o, AddedY - o, addedZ);
-					tessellator.addVertex(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance);
+					worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+					worldRenderer.color(red, green, blue, 0.95f);
+					worldRenderer.pos(AddedX - o, AddedY - o, addedZ).endVertex();
+					worldRenderer.pos(AddedX + o, AddedY - o, addedZ).endVertex();
+					worldRenderer.pos(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).endVertex();
+					worldRenderer.pos(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).endVertex();
 					tessellator.draw();
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX - o, AddedY + o, addedZ);
-					tessellator.addVertex(AddedX - o, AddedY - o, addedZ);
-					tessellator.addVertex(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance);
+					worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+					worldRenderer.color(red, green, blue, 0.95f);
+					worldRenderer.pos(AddedX - o, AddedY + o, addedZ).endVertex();
+					worldRenderer.pos(AddedX - o, AddedY - o, addedZ).endVertex();
+					worldRenderer.pos(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).endVertex();
+					worldRenderer.pos(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).endVertex();
 					tessellator.draw();
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX + o, AddedY + o, addedZ);
-					tessellator.addVertex(AddedX - o, AddedY + o, addedZ);
-					tessellator.addVertex(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance);
+					worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
+					worldRenderer.color(red, green, blue, 0.95f);
+					worldRenderer.pos(AddedX + o, AddedY + o, addedZ).endVertex();
+					worldRenderer.pos(AddedX - o, AddedY + o, addedZ).endVertex();
+					worldRenderer.pos(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).endVertex();
+					worldRenderer.pos(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).endVertex();
 					tessellator.draw();
 				}
 			}

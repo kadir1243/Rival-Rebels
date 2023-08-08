@@ -52,7 +52,8 @@ public class EntityDebrisPacket implements IMessage {
 		@Override
 		public IMessage onMessage(EntityDebrisPacket m, MessageContext ctx) {
             for (Entity e : Minecraft.getMinecraft().theWorld.loadedEntityList) {
-                if (e.getEntityId() == m.id && e instanceof EntityDebris ed) {
+                if (e.getEntityId() == m.id && e instanceof EntityDebris) {
+                    EntityDebris ed = (EntityDebris) e;
                     ed.blockState = m.blockState;
                     break;
                 }

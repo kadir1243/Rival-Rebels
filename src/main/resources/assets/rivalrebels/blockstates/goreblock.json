@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "type=0": { "model": "rivalrebels:goreblock0" },
+    "type=1": { "model": "rivalrebels:goreblock1" },
+    "type=2": { "model": "rivalrebels:goreblock2" },
+    "type=3": { "model": "rivalrebels:goreblock3" },
+    "type=4": { "model": "rivalrebels:goreblock4" },
+    "type=5": { "model": "rivalrebels:goreblock5" }
+  }
+}

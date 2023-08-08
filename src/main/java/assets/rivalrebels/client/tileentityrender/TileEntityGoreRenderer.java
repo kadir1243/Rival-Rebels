@@ -16,7 +16,9 @@ import assets.rivalrebels.client.renderhelper.Vertice;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
@@ -62,73 +64,72 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer<TileEntity
 		else Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash1);
 		GL11.glDisable(GL11.GL_LIGHTING);
 		Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
 
-		if (side1)
+        if (side1)
 		{
-			tessellator.startDrawingQuads();
-			addVertex(v1, 0, 0, true);
-			addVertex(v5, 1, 0, true);
-			addVertex(v8, 1, 1, true);
-			addVertex(v4, 0, 1, true);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			addVertex(worldRenderer, v1, 0, 0);
+			addVertex(worldRenderer, v5, 1, 0);
+			addVertex(worldRenderer, v8, 1, 1);
+			addVertex(worldRenderer, v4, 0, 1);
 			tessellator.draw();
 		}
 
 		if (side2)
 		{
-			tessellator.startDrawingQuads();
-			addVertex(v4, 0, 0, true);
-			addVertex(v8, 1, 0, true);
-			addVertex(v7, 1, 1, true);
-			addVertex(v3, 0, 1, true);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			addVertex(worldRenderer, v4, 0, 0);
+			addVertex(worldRenderer, v8, 1, 0);
+			addVertex(worldRenderer, v7, 1, 1);
+			addVertex(worldRenderer, v3, 0, 1);
 			tessellator.draw();
 		}
 
 		if (side3)
 		{
-			tessellator.startDrawingQuads();
-			addVertex(v3, 0, 0, true);
-			addVertex(v7, 1, 0, true);
-			addVertex(v6, 1, 1, true);
-			addVertex(v2, 0, 1, true);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			addVertex(worldRenderer, v3, 0, 0);
+			addVertex(worldRenderer, v7, 1, 0);
+			addVertex(worldRenderer, v6, 1, 1);
+			addVertex(worldRenderer, v2, 0, 1);
 			tessellator.draw();
 		}
 
 		if (side4)
 		{
-			tessellator.startDrawingQuads();
-			addVertex(v2, 0, 0, true);
-			addVertex(v6, 1, 0, true);
-			addVertex(v5, 1, 1, true);
-			addVertex(v1, 0, 1, true);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			addVertex(worldRenderer, v2, 0, 0);
+			addVertex(worldRenderer, v6, 1, 0);
+			addVertex(worldRenderer, v5, 1, 1);
+			addVertex(worldRenderer, v1, 0, 1);
 			tessellator.draw();
 		}
 
 		if (ceil)
 		{
-			tessellator.startDrawingQuads();
-			addVertex(v4, 0, 0, true);
-			addVertex(v3, 1, 0, true);
-			addVertex(v2, 1, 1, true);
-			addVertex(v1, 0, 1, true);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			addVertex(worldRenderer, v4, 0, 0);
+			addVertex(worldRenderer, v3, 1, 0);
+			addVertex(worldRenderer, v2, 1, 1);
+			addVertex(worldRenderer, v1, 0, 1);
 			tessellator.draw();
 		}
 
 		if (floor)
 		{
-			tessellator.startDrawingQuads();
-			addVertex(v5, 0, 0, true);
-			addVertex(v6, 1, 0, true);
-			addVertex(v7, 1, 1, true);
-			addVertex(v8, 0, 1, true);
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			addVertex(worldRenderer, v5, 0, 0);
+			addVertex(worldRenderer, v6, 1, 0);
+			addVertex(worldRenderer, v7, 1, 1);
+			addVertex(worldRenderer, v8, 0, 1);
 			tessellator.draw();
 		}
 
 		GL11.glPopMatrix();
 	}
 
-	private void addVertex(Vertice v, double t, double t2, boolean offset)
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-		tessellator.addVertexWithUV(v.x * 0.999, v.y * 0.999, v.z * 0.999, t, t2);
+	private void addVertex(WorldRenderer worldRenderer, Vertice vertice, double u, double v) {
+        worldRenderer.pos(vertice.x * 0.999, vertice.y * 0.999, vertice.z * 0.999).tex(u, v).endVertex();
 	}
 }

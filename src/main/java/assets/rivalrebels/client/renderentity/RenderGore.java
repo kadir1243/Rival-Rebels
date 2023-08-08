@@ -11,19 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityGore;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
-public class RenderGore extends Render
+public class RenderGore extends Render<EntityGore>
 {
 	private static final ResourceLocation	player			= new ResourceLocation("textures/entity/steve.png");
 	private static final ResourceLocation	creeper			= new ResourceLocation("textures/entity/creeper/creeper.png");
@@ -39,16 +36,15 @@ public class RenderGore extends Render
 
     public RenderGore(RenderManager renderManager) {
         super(renderManager);
+        shadowSize = 0F;
     }
 	@Override
-	public void doRender(Entity entity, double x, double y, double z, float f, float f1)
-	{
+	public void doRender(EntityGore eg, double x, double y, double z, float f, float f1) {
 		GL11.glPushMatrix();
 		GL11.glEnable(GL11.GL_LIGHTING);
 		GL11.glTranslated(x, y, z);
-		GL11.glRotatef(-entity.rotationYaw + 180, 0.0F, 1.0F, 0.0F);
-		GL11.glRotatef(entity.rotationPitch, 1.0F, 0.0F, 0.0F);
-		EntityGore eg = (EntityGore) entity;
+		GL11.glRotatef(-eg.rotationYaw + 180, 0.0F, 1.0F, 0.0F);
+		GL11.glRotatef(eg.rotationPitch, 1.0F, 0.0F, 0.0F);
 		int mob = eg.mob;
 		int type = eg.type;
 		double size = eg.size;
@@ -173,7 +169,7 @@ public class RenderGore extends Render
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityGore entity)
 	{
 		return null;
 	}

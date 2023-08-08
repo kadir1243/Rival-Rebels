@@ -69,8 +69,9 @@ public class ADSClosePacket implements IMessage {
 		public IMessage onMessage(ADSClosePacket m, MessageContext ctx)
 		{
 			TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.pos);
-			if (te instanceof TileEntityReciever ter && ctx.getServerHandler().playerEntity.getDistanceSq(m.pos) < 100)
+			if (te instanceof TileEntityReciever && ctx.getServerHandler().playerEntity.getDistanceSq(m.pos) < 100)
 			{
+                TileEntityReciever ter = (TileEntityReciever) te;
                 ter.kMobs = m.mobs;
 				ter.kTeam = m.chip;
 				ter.kPlayers = m.player;

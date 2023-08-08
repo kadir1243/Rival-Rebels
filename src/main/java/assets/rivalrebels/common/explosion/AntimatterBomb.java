@@ -163,7 +163,7 @@ public class AntimatterBomb {
 					} else {
 						isTree = false;
 						for (int Yy = 0; Yy >= -treeHeight; Yy--) {
-							worldObj.setBlockState(new BlockPos(x + posX, yy + Yy, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
+							worldObj.setBlockState(new BlockPos(x + posX, yy + Yy, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.RADIOACTIVITY, metadata));
 						}
 						break;
 					}

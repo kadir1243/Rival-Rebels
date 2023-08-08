@@ -27,7 +27,6 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.projectile.EntityArrow;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.*;
 import net.minecraft.world.World;
 
@@ -53,7 +52,6 @@ public class EntityRoddiskRep extends EntityInanimate
 		this.posY -= 0.1;
 		this.posZ -= (MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
 		this.setPosition(this.posX, this.posY, this.posZ);
-		this.yOffset = 0.0F;
 		this.motionX = (-MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
 		this.motionZ = (MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
 		this.motionY = (-MathHelper.sin(this.rotationPitch / 180.0F * (float) Math.PI));
@@ -184,8 +182,9 @@ public class EntityRoddiskRep extends EntityInanimate
 			if (var3.entityHit != null)
 			{
 				RivalRebelsSoundPlayer.playSound(this, 5, 1);
-				if (var3.entityHit instanceof EntityPlayer entityPlayerHit && var3.entityHit != shooter)
+				if (var3.entityHit instanceof EntityPlayer && var3.entityHit != shooter)
 				{
+                    EntityPlayer entityPlayerHit = (EntityPlayer) var3.entityHit;
                     ItemStack[] armorSlots = entityPlayerHit.inventory.armorInventory;
 					for (int i = 0; i < 4; i++)
 					{
@@ -211,12 +210,13 @@ public class EntityRoddiskRep extends EntityInanimate
 						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 3, 0));
 					}
 				}
-				else if ((var3.entityHit instanceof EntityLivingBase entity
+				else if ((var3.entityHit instanceof EntityLivingBase
 						&& !(var3.entityHit instanceof EntityAnimal)
 						&& !(var3.entityHit instanceof EntityBat)
 						&& !(var3.entityHit instanceof EntityVillager)
 						&& !(var3.entityHit instanceof EntitySquid)))
 				{
+                    EntityLivingBase entity = (EntityLivingBase) var3.entityHit;
                     entity.attackEntityFrom(RivalRebelsDamageSource.tron, 40);
 					if (entity.getHealth() < 3)
 					{
@@ -408,19 +408,7 @@ public class EntityRoddiskRep extends EntityInanimate
 		return true;
 	}
 
-	@Override
-	public void readEntityFromNBT(NBTTagCompound var1)
-	{
-
-	}
-
-	@Override
-	public void writeEntityToNBT(NBTTagCompound var1)
-	{
-
-	}
-
-	@Override
+    @Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
 		return par1Entity.getEntityBoundingBox();

@@ -44,7 +44,6 @@ public class EntityNuke extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setLocationAndAngles(x, y, z, yaw, pitch);
-		yOffset = 0.0F;
 		prevRotationYaw = rotationYaw = yaw;
 		prevRotationPitch = rotationPitch = pitch;
 		aoc = charges;
@@ -59,7 +58,6 @@ public class EntityNuke extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		aoc = 1;
 		setAnglesMotion(mx, my, mz);
 	}

@@ -50,7 +50,6 @@ public class EntityB2Spirit extends Entity
 		ignoreFrustumCheck = true;
         setEntityBoundingBox(new AxisAlignedBB(-10, -3, -10, 10, 4, 10));
 		health = RivalRebels.b2spirithealth;
-		yOffset = 0.0F;
 	}
 
     public EntityB2Spirit(World world, BlockPos tpos, double x1, double y1, double z1, boolean carpet, boolean dropOnlyOne) {

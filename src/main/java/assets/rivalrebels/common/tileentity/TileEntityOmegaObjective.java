@@ -12,24 +12,24 @@
 package assets.rivalrebels.common.tileentity;
 
 import assets.rivalrebels.RivalRebels;
+import net.minecraft.command.CommandResultStats;
 import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.BlockPos;
-import net.minecraft.util.IChatComponent;
-import net.minecraft.util.ITickable;
+import net.minecraft.util.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
+import java.util.Arrays;
 import java.util.List;
 
-public class TileEntityOmegaObjective extends TileEntity/*MachineBase*/ implements IInventory, ICommandSender, ITickable
+public class TileEntityOmegaObjective extends TileEntity implements IInventory, ICommandSender, ITickable
 {
 	private ItemStack[]	chestContents	= new ItemStack[16];
 
@@ -252,7 +252,27 @@ public class TileEntityOmegaObjective extends TileEntity/*MachineBase*/ implemen
 		return true;
 	}
 
-	@Override
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+        Arrays.fill(chestContents, null);
+    }
+
+    @Override
 	public String getName()
 	{
 		return "RivalRebelsOmega";
@@ -302,10 +322,24 @@ public class TileEntityOmegaObjective extends TileEntity/*MachineBase*/ implemen
 	{
 
 	}
-/*
-	@Override
-	public float powered(float power, float distance)
-	{
-		return RivalRebels.round.addOmegaHealth(power);
-	}*/
+
+    @Override
+    public Vec3 getPositionVector() {
+        return new Vec3(getPos());
+    }
+
+    @Override
+    public Entity getCommandSenderEntity() {
+        return null;
+    }
+
+    @Override
+    public boolean sendCommandFeedback() {
+        return false;
+    }
+
+    @Override
+    public void setCommandStat(CommandResultStats.Type type, int amount) {
+
+    }
 }

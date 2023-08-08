@@ -23,20 +23,20 @@ public class GuiScroll extends GuiButton
 {
 	/** Scroll limit */
 	public int		limit;
-	
+
 	/** Current scroll amount (from the top down) */
 	public int		scroll;
-	
+
 	/** Keeps if the scroll is active */
-	public boolean	pressed	= false;
-	
+	public boolean	pressed;
+
 	public GuiScroll(int par1, int par2, int par3, int par4)
 	{
 		super(par1, par2, par3, 5, 11, "");
 		this.limit = par4;
 		pressed = false;
 	}
-	
+
 	/**
 	 * Draws this button to the screen.
 	 */
@@ -52,7 +52,7 @@ public class GuiScroll extends GuiButton
 		if (pressed || mousePressed(par1Minecraft, par2, par3)) state = 11;
 		this.drawTexturedModalRect(this.xPosition, this.yPosition + scroll, 0, state, this.width, this.height);
 	}
-	
+
 	/**
 	 * Fired when the mouse button is dragged. Equivalent of MouseListener.mouseDragged(MouseEvent e).
 	 */
@@ -69,18 +69,18 @@ public class GuiScroll extends GuiButton
 			pressed = false;
 		}
 	}
-	
+
 	@Override
 	public void mouseReleased(int par2, int par3)
 	{
 		pressed = false;
 	}
-	
+
 	public int getScroll()
 	{
 		return scroll;
 	}
-	
+
 	/**
 	 * Returns true if the mouse has been pressed on this control. Equivalent of MouseListener.mousePressed(MouseEvent e).
 	 */

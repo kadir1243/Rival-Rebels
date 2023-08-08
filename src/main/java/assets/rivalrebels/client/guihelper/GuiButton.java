@@ -42,11 +42,11 @@ public class GuiButton extends net.minecraft.client.gui.GuiButton
 	{
 		if (this.visible)
 		{
-			FontRenderer fontrenderer = par1Minecraft.fontRenderer;
+			FontRenderer fontrenderer = par1Minecraft.fontRendererObj;
 			par1Minecraft.renderEngine.bindTexture(RivalRebels.guitbutton);
 			GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-			this.field_146123_n = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + this.width && par3 < this.yPosition + this.height;
-			int k = this.getHoverState(this.field_146123_n);
+			this.hovered = par2 >= this.xPosition && par3 >= this.yPosition && par2 < this.xPosition + this.width && par3 < this.yPosition + this.height;
+			int k = this.getHoverState(this.hovered);
 			this.drawTexturedModalRect(this.xPosition, this.yPosition, 5, k * 11, this.width, this.height);
 			this.mouseDragged(par1Minecraft, par2, par3);
 			int l = 0xffffff;
@@ -55,7 +55,7 @@ public class GuiButton extends net.minecraft.client.gui.GuiButton
 			{
 				l = 0xcccccc;
 			}
-			else if (this.field_146123_n)
+			else if (this.hovered)
 			{
 				l = 0x88e8ff;
 			}

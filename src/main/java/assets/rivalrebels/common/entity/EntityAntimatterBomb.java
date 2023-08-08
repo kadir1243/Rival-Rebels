@@ -11,9 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.explosion.AntimatterBomb;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
 import net.minecraft.entity.Entity;
@@ -25,8 +24,8 @@ import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.explosion.AntimatterBomb;
+
+import java.util.List;
 
 public class EntityAntimatterBomb extends EntityThrowable
 {
@@ -45,7 +44,6 @@ public class EntityAntimatterBomb extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setLocationAndAngles(x, y, z, yaw, pitch);
-		yOffset = 0.0F;
 		prevRotationYaw = rotationYaw = yaw;
 		prevRotationPitch = rotationPitch = pitch;
 		aoc = charges;
@@ -60,7 +58,6 @@ public class EntityAntimatterBomb extends EntityThrowable
 	{
 		this(worldObj);
 		setPosition(px, py, pz);
-		yOffset = 0.0F;
 		motionX = f;
 		motionY = g;
 		motionZ = h;
@@ -72,7 +69,6 @@ public class EntityAntimatterBomb extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		aoc = charges;
 		setAnglesMotion(mx, my, mz);
 	}

@@ -154,7 +154,7 @@ public class TsarBomba
 					else if (blockType == 2) worldObj.setBlockState(pos, RivalRebels.petrifiedstone2.getDefaultState());
 					else if (blockType == 3) worldObj.setBlockState(pos, RivalRebels.petrifiedstone3.getDefaultState());
 					else worldObj.setBlockState(pos, RivalRebels.petrifiedstone4.getDefaultState());
-					worldObj.setBlockState(pos, worldObj.getBlockState(pos).withProperty(BlockPetrifiedStone.STATE, metadata));
+					worldObj.setBlockState(pos, worldObj.getBlockState(pos).withProperty(BlockPetrifiedStone.RADIOACTIVITY, metadata));
 				}
 			}
 
@@ -168,7 +168,7 @@ public class TsarBomba
 				for (int Y = ylimit; Y > ylimit - treeHeight; Y--)
 				{
 					if (Y == 0) break;
-					worldObj.setBlockState(new BlockPos(x + posX, Y, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
+					worldObj.setBlockState(new BlockPos(x + posX, Y, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.RADIOACTIVITY, metadata));
 				}
 			}
 
@@ -197,7 +197,7 @@ public class TsarBomba
 					else {
 						isTree = false;
 						for (int Yy = 0; Yy >= -treeHeight; Yy--) {
-                            worldObj.setBlockState(pos.up(Yy), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
+                            worldObj.setBlockState(pos.up(Yy), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.RADIOACTIVITY, metadata));
 						}
 						break;
 					}
@@ -218,7 +218,7 @@ public class TsarBomba
 					if (metadata > 15) metadata = 15;
 					for (int Y = ylimit; Y > ylimit - treeHeight; Y--)
 					{
-                        worldObj.setBlockState(new BlockPos(x + posX, Y, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.STATE, metadata));
+                        worldObj.setBlockState(new BlockPos(x + posX, Y, z + posZ), RivalRebels.petrifiedwood.getDefaultState().withProperty(BlockPetrifiedWood.RADIOACTIVITY, metadata));
 					}
 				}
 			}

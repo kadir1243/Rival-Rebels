@@ -1,0 +1,8 @@
+{
+  "parent": "block/cube_bottom_top",
+  "textures": {
+    "bottom": "rivalrebels:blocks/ah",
+    "top": "rivalrebels:blocks/ai",
+    "side": "rivalrebels:blocks/aa"
+  }
+}

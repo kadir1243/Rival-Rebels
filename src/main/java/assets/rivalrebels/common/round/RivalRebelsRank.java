@@ -29,12 +29,17 @@ public enum RivalRebelsRank
 
 	public static RivalRebelsRank getForID(int i)
 	{
-        return switch (i) {
-            case 1 -> REBEL;
-            case 2 -> OFFICER;
-            case 3 -> LEADER;
-            case 4 -> REP;
-            default -> REGULAR;
-        };
+        switch (i) {
+            case 1:
+                return REBEL;
+            case 2:
+                return OFFICER;
+            case 3:
+                return LEADER;
+            case 4:
+                return REP;
+            default:
+                return REGULAR;
+        }
     }
 }

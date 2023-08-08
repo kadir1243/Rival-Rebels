@@ -11,23 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityGasGrenade;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GL11;
 
 public class RenderGasGrenade extends Render<EntityGasGrenade>
 {
 	public RenderGasGrenade(RenderManager renderManager) {
         super(renderManager);
+        shadowSize = 0F;
     }
 
     @Override
@@ -38,8 +37,9 @@ public class RenderGasGrenade extends Render<EntityGasGrenade>
 		GL11.glTranslatef((float) x, (float) y, (float) z);
 		GL11.glRotatef(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks - 90.0F, 0.0F, 1.0F, 0.0F);
 		GL11.glRotatef(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 0.0F, 0.0F, 1.0F);
-		Tessellator var10 = Tessellator.getInstance();
-		byte var11 = 0;
+		Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+        byte var11 = 0;
 		float var12 = 0.0F;
 		float var13 = 0.5F;
 		float var14 = (0 + var11 * 10) / 32.0F;
@@ -54,30 +54,30 @@ public class RenderGasGrenade extends Render<EntityGasGrenade>
 		GL11.glScalef(var20, var20, var20);
 		GL11.glTranslatef(-4.0F, 0.0F, 0.0F);
 		GL11.glNormal3f(var20, 0.0F, 0.0F);
-		var10.startDrawingQuads();
-		var10.addVertexWithUV(-7.0D, -2.0D, -2.0D, var16, var18);
-		var10.addVertexWithUV(-7.0D, -2.0D, 2.0D, var17, var18);
-		var10.addVertexWithUV(-7.0D, 2.0D, 2.0D, var17, var19);
-		var10.addVertexWithUV(-7.0D, 2.0D, -2.0D, var16, var19);
-		var10.draw();
+		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.pos(-7.0D, -2.0D, -2.0D).tex(var16, var18).endVertex();
+		worldRenderer.pos(-7.0D, -2.0D, 2.0D).tex(var17, var18).endVertex();
+		worldRenderer.pos(-7.0D, 2.0D, 2.0D).tex(var17, var19).endVertex();
+		worldRenderer.pos(-7.0D, 2.0D, -2.0D).tex(var16, var19).endVertex();
+		tessellator.draw();
 		GL11.glNormal3f(-var20, 0.0F, 0.0F);
-		var10.startDrawingQuads();
-		var10.addVertexWithUV(-7.0D, 2.0D, -2.0D, var16, var18);
-		var10.addVertexWithUV(-7.0D, 2.0D, 2.0D, var17, var18);
-		var10.addVertexWithUV(-7.0D, -2.0D, 2.0D, var17, var19);
-		var10.addVertexWithUV(-7.0D, -2.0D, -2.0D, var16, var19);
-		var10.draw();
+		worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		worldRenderer.pos(-7.0D, 2.0D, -2.0D).tex(var16, var18).endVertex();
+		worldRenderer.pos(-7.0D, 2.0D, 2.0D).tex(var17, var18).endVertex();
+		worldRenderer.pos(-7.0D, -2.0D, 2.0D).tex(var17, var19).endVertex();
+		worldRenderer.pos(-7.0D, -2.0D, -2.0D).tex(var16, var19).endVertex();
+		tessellator.draw();
 
 		for (int var23 = 0; var23 < 4; ++var23)
 		{
 			GL11.glRotatef(90.0F, 1.0F, 0.0F, 0.0F);
 			GL11.glNormal3f(0.0F, 0.0F, var20);
-			var10.startDrawingQuads();
-			var10.addVertexWithUV(-8.0D, -2.0D, 0.0D, var12, var14);
-			var10.addVertexWithUV(8.0D, -2.0D, 0.0D, var13, var14);
-			var10.addVertexWithUV(8.0D, 2.0D, 0.0D, var13, var15);
-			var10.addVertexWithUV(-8.0D, 2.0D, 0.0D, var12, var15);
-			var10.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(-8.0D, -2.0D, 0.0D).tex(var12, var14).endVertex();
+			worldRenderer.pos(8.0D, -2.0D, 0.0D).tex(var13, var14).endVertex();
+			worldRenderer.pos(8.0D, 2.0D, 0.0D).tex(var13, var15).endVertex();
+			worldRenderer.pos(-8.0D, 2.0D, 0.0D).tex(var12, var15).endVertex();
+			tessellator.draw();
 		}
 
 		GL11.glPopMatrix();

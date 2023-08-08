@@ -62,7 +62,7 @@ public class GuiNuclearBomb extends GuiContainer
 		}
 		else
 		{
-			milli = "" + millis;
+			milli = String.valueOf(millis);
 		}
 		if (nuclearbomb.Countdown % 20 >= 10)
 		{
@@ -110,15 +110,11 @@ public class GuiNuclearBomb extends GuiContainer
 				{
 					Desktop.getDesktop().browse(new URI("http://rivalrebels.com"));
 				}
-				catch (IOException e)
+				catch (IOException | URISyntaxException e)
 				{
 					e.printStackTrace();
 				}
-				catch (URISyntaxException e)
-				{
-					e.printStackTrace();
-				}
-			}
+            }
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}

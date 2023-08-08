@@ -24,21 +24,18 @@ import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ModelTsarBlast;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
 
-public class RenderTheoreticalTsarBlast extends Render
-{
-	private ModelTsarBlast		model;
-	private ModelBlastSphere	modelsphere;
+public class RenderTheoreticalTsarBlast extends Render {
+	private ModelTsarBlast model;
+	private ModelBlastSphere modelsphere;
 
-	public RenderTheoreticalTsarBlast(RenderManager renderManager)
-	{
+	public RenderTheoreticalTsarBlast(RenderManager renderManager) {
         super(renderManager);
 		model = new ModelTsarBlast();
 		modelsphere = new ModelBlastSphere();
 	}
 
 	@Override
-	public void doRender(Entity var1, double x, double y, double z, float var8, float var9)
-	{
+	public void doRender(Entity var1, double x, double y, double z, float var8, float var9) {
 		EntityTsarBlast tsar = (EntityTsarBlast) var1;
 		tsar.time++;
 		double radius = (((tsar.motionX * 10) - 1) * ((tsar.motionX * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;

@@ -126,9 +126,9 @@ public class JoinTeamPacket implements IMessage
 			}
 			if (m.rrteam == RivalRebelsTeam.OMEGA)
 			{
-				double sx = RivalRebels.round.oObjx + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
-				double sy = RivalRebels.round.oObjy + 1;
-				double sz = RivalRebels.round.oObjz + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
+				double sx = RivalRebels.round.oObj.getX() + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
+				double sy = RivalRebels.round.oObj.getY() + 1;
+				double sz = RivalRebels.round.oObj.getZ() + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
 				ctx.getServerHandler().playerEntity.playerNetServerHandler.setPlayerLocation(sx, sy, sz,0,0);
 			}
 			else if (m.rrteam == RivalRebelsTeam.SIGMA)

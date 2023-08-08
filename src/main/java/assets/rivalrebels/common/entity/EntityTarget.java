@@ -20,7 +20,7 @@ import net.minecraft.world.World;
 
 public class EntityTarget extends EntityLivingBase
 {
-	private Entity e;
+	private Entity relay;
 	public EntityTarget(World par1World)
 	{
 		super(par1World);
@@ -28,29 +28,30 @@ public class EntityTarget extends EntityLivingBase
 	public EntityTarget(World par1World, Entity relay)
 	{
 		super(par1World);
-		e = relay;
-        this.setEntityBoundingBox(e.getEntityBoundingBox());
-		ySize=e.ySize;
-		height=e.height;
-		width = e.width;
-		yOffset=e.yOffset;
+		this.relay = relay;
+        this.setEntityBoundingBox(this.relay.getEntityBoundingBox());
+		height= this.relay.height;
+		width = this.relay.width;
     }
-	@Override
+
+    @Override
+    public double getYOffset() {
+        return relay.getYOffset();
+    }
+
+    @Override
 	public void onUpdate()
 	{
-		if (e==null||e.isDead)
-		{
+		if (relay ==null|| relay.isDead) {
 			setDead();
-		}
-		else
-		{
-			setPosition(e.posX, e.posY, e.posZ);
+		} else {
+			setPosition(relay.posX, relay.posY, relay.posZ);
 		}
 	}
 	@Override
 	public boolean attackEntityFrom(DamageSource ds, float f)
     {
-		e.attackEntityFrom(ds, f);
+		relay.attackEntityFrom(ds, f);
 		return true;
     }
 	@Override
@@ -81,11 +82,11 @@ public class EntityTarget extends EntityLivingBase
     @Override
 	public void writeEntityToNBT(NBTTagCompound nbt)
 	{
-		nbt.setInteger("id", e.getEntityId());
+		nbt.setInteger("id", relay.getEntityId());
 	}
 	@Override
 	public void readEntityFromNBT(NBTTagCompound nbt)
 	{
-		e = worldObj.getEntityByID(nbt.getInteger("id"));
+		relay = worldObj.getEntityByID(nbt.getInteger("id"));
 	}
 }

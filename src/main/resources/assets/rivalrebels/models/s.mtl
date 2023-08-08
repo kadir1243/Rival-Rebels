@@ -8,4 +8,4 @@ Kd 0.8 0.8 0.8
 Ks 0.8 0.8 0.8
 d 1
 illum 2
-map_Kd /Users/atlas/Desktop/Projects/Rival Rebels Mod/forge-1.7.10-10.13.4.1614-1.7.10-src/src/main/resources/assets/rivalrebels/textures/entity/flame.png
+map_Kd rivalrebels:textures/entity/flame.png

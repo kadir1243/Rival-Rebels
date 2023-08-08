@@ -56,7 +56,6 @@ public class EntityNuclearBlast extends EntityInanimate
 		}
 		setSize(0.5F, 0.5F);
 		setPosition(par2, par4, par6);
-		yOffset = 0.0F;
 	}
 
 	@Override

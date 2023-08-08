@@ -11,8 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.explosion.Explosion;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -20,16 +22,13 @@ import net.minecraft.entity.IProjectile;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumParticleTypes;
 import net.minecraft.util.MathHelper;
 import net.minecraft.util.MovingObjectPosition;
 import net.minecraft.util.Vec3;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.explosion.Explosion;
+
+import java.util.List;
 
 public class EntityRocket extends EntityInanimate implements IProjectile
 {
@@ -51,7 +50,6 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(par2, par4, par6);
-		yOffset = 0.0F;
 	}
 
 	public EntityRocket(World par1World, EntityPlayer entity2, float par3)
@@ -65,7 +63,6 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		posY -= 0.0D;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
@@ -78,7 +75,6 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		fins = false;
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
 
@@ -216,22 +212,11 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		++ticksExisted;
 	}
 
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
+    public void explode(MovingObjectPosition mop)
 	{
-
-	}
-
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
-
-	}
-
-	public void explode(MovingObjectPosition mop)
-	{
-		if (mop != null && mop.entityHit instanceof EntityPlayer player)
+		if (mop != null && mop.entityHit instanceof EntityPlayer)
 		{
+            EntityPlayer player = (EntityPlayer) mop.entityHit;
             ItemStack[] armorSlots = player.inventory.armorInventory;
 			if (armorSlots[0] != null) armorSlots[0].damageItem(48, player);
 			if (armorSlots[1] != null) armorSlots[1].damageItem(48, player);

@@ -12,7 +12,6 @@
 package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.renderentity.RenderTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
@@ -54,7 +53,7 @@ public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer<Til
 			GL11.glRotatef(90, 0, 1, 0);
 		}
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettachyonbomb);
-		RenderTachyonBomb.bomb.renderAll();
+		//RenderTachyonBomb.bomb.renderAll();
 		GL11.glPopMatrix();
 	}
 }

@@ -80,7 +80,8 @@ public class EntityGorePacket implements IMessage
 		public IMessage onMessage(EntityGorePacket m, MessageContext ctx)
 		{
             for (Entity e : Minecraft.getMinecraft().theWorld.loadedEntityList) {
-                if (e.getEntityId() == m.id && e instanceof EntityGore eg) {
+                if (e.getEntityId() == m.id && e instanceof EntityGore) {
+                    EntityGore eg = (EntityGore) e;
                     eg.mob = m.mob;
                     eg.type = m.type;
                     eg.greenblood = m.green;

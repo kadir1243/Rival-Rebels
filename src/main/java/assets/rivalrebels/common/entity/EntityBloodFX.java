@@ -59,9 +59,9 @@ public class EntityBloodFX extends EntityFX
 		float f12 = (float) (prevPosY + (posY - prevPosY) * partialTicks - interpPosY);
 		float f13 = (float) (prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ);
 		worldRenderer.putColorRGB_F(1, 1, 1, 1);
-		worldRenderer.addVertexWithUV(f11 - rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 - rotationYZ * f10 - rotationXZ * f10, 1, 1);
-		worldRenderer.addVertexWithUV(f11 - rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 - rotationYZ * f10 + rotationXZ * f10, 1, 0);
-		worldRenderer.addVertexWithUV(f11 + rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 + rotationYZ * f10 + rotationXZ * f10, 0, 0);
-		worldRenderer.addVertexWithUV(f11 + rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 + rotationYZ * f10 - rotationXZ * f10, 0, 1);
+		worldRenderer.pos(f11 - rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 - rotationYZ * f10 - rotationXZ * f10).tex(1, 1).endVertex();
+		worldRenderer.pos(f11 - rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 - rotationYZ * f10 + rotationXZ * f10).tex(1, 0).endVertex();
+		worldRenderer.pos(f11 + rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 + rotationYZ * f10 + rotationXZ * f10).tex(0, 0).endVertex();
+		worldRenderer.pos(f11 + rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 + rotationYZ * f10 - rotationXZ * f10).tex(0, 1).endVertex();
 	}
 }

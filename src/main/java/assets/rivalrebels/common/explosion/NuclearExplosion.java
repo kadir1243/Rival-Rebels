@@ -253,7 +253,7 @@ public class NuclearExplosion
 				{
 					int zz = z + Z;
                     BlockPos pos = new BlockPos(xx, yy, zz);
-                    if (world.isAirBlock(pos) && world.getBlockLightValue(xx, yy, zz) == 0)
+                    if (world.isAirBlock(pos) && world.getLight(pos) == 0)
 					{
 						if (!world.isAirBlock(pos.up()) && !world.isAirBlock(pos.down()) && !world.isAirBlock(pos.east()) && !world.isAirBlock(pos.west()) && !world.isAirBlock(pos.south()) && !world.isAirBlock(pos.north()))
 						{

@@ -12,80 +12,84 @@
 package assets.rivalrebels.client.model;
 
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
 
 @SideOnly(Side.CLIENT)
 public class ModelTrollFlag
 {
 	public void renderModel(World world, double x, double y, double z, int metadata)
 	{
-		Tessellator var5 = Tessellator.instance;
-		double var18 = 0.05;
+		Tessellator tessellator = Tessellator.getInstance();
+        WorldRenderer worldRenderer = tessellator.getWorldRenderer();
+        double var18 = 0.05;
 
 		if (metadata == 5)
 		{
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(var18, 1, 1, 0, 0);
-			var5.addVertexWithUV(var18, 0, 1, 0, 1);
-			var5.addVertexWithUV(var18, 0, 0, 1, 1);
-			var5.addVertexWithUV(var18, 1, 0, 1, 0);
-			var5.draw();
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(var18, 1, 0, 1, 0);
-			var5.addVertexWithUV(var18, 0, 0, 1, 1);
-			var5.addVertexWithUV(var18, 0, 1, 0, 1);
-			var5.addVertexWithUV(var18, 1, 1, 0, 0);
-			var5.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(var18, 1, 1).tex(0, 0).endVertex();
+			worldRenderer.pos(var18, 0, 1).tex(0, 1).endVertex();
+			worldRenderer.pos(var18, 0, 0).tex(1, 1).endVertex();
+			worldRenderer.pos(var18, 1, 0).tex(1, 0).endVertex();
+			tessellator.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(var18, 1, 0).tex(1, 0).endVertex();
+			worldRenderer.pos(var18, 0, 0).tex(1, 1).endVertex();
+			worldRenderer.pos(var18, 0, 1).tex(0, 1).endVertex();
+			worldRenderer.pos(var18, 1, 1).tex(0, 0).endVertex();
+			tessellator.draw();
 		}
 
 		if (metadata == 4)
 		{
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(1 - var18, 0, 1, 1, 1);
-			var5.addVertexWithUV(1 - var18, 1, 1, 1, 0);
-			var5.addVertexWithUV(1 - var18, 1, 0, 0, 0);
-			var5.addVertexWithUV(1 - var18, 0, 0, 0, 1);
-			var5.draw();
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(1 - var18, 0, 0, 0, 1);
-			var5.addVertexWithUV(1 - var18, 1, 0, 0, 0);
-			var5.addVertexWithUV(1 - var18, 1, 1, 1, 0);
-			var5.addVertexWithUV(1 - var18, 0, 1, 1, 1);
-			var5.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(1 - var18, 0, 1).tex(1, 1).endVertex();
+			worldRenderer.pos(1 - var18, 1, 1).tex(1, 0).endVertex();
+			worldRenderer.pos(1 - var18, 1, 0).tex(0, 0).endVertex();
+			worldRenderer.pos(1 - var18, 0, 0).tex(0, 1).endVertex();
+			tessellator.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(1 - var18, 0, 0).tex(0, 1).endVertex();
+			worldRenderer.pos(1 - var18, 1, 0).tex(0, 0).endVertex();
+			worldRenderer.pos(1 - var18, 1, 1).tex(1, 0).endVertex();
+			worldRenderer.pos(1 - var18, 0, 1).tex(1, 1).endVertex();
+			tessellator.draw();
 		}
 
 		if (metadata == 3)
 		{
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(1, 0, var18, 1, 1);
-			var5.addVertexWithUV(1, 1, var18, 1, 0);
-			var5.addVertexWithUV(0, 1, var18, 0, 0);
-			var5.addVertexWithUV(0, 0, var18, 0, 1);
-			var5.draw();
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(0, 0, var18, 0, 1);
-			var5.addVertexWithUV(0, 1, var18, 0, 0);
-			var5.addVertexWithUV(1, 1, var18, 1, 0);
-			var5.addVertexWithUV(1, 0, var18, 1, 1);
-			var5.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(1, 0, var18).tex(1, 1).endVertex();
+			worldRenderer.pos(1, 1, var18).tex(1, 0).endVertex();
+			worldRenderer.pos(0, 1, var18).tex(0, 0).endVertex();
+			worldRenderer.pos(0, 0, var18).tex(0, 1).endVertex();
+			tessellator.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(0, 0, var18).tex(0, 1).endVertex();
+			worldRenderer.pos(0, 1, var18).tex(0, 0).endVertex();
+			worldRenderer.pos(1, 1, var18).tex(1, 0).endVertex();
+			worldRenderer.pos(1, 0, var18).tex(1, 1).endVertex();
+			tessellator.draw();
 		}
 
 		if (metadata == 2)
 		{
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(1, 1, 1 - var18, 0, 0);
-			var5.addVertexWithUV(1, 0, 1 - var18, 0, 1);
-			var5.addVertexWithUV(0, 0, 1 - var18, 1, 1);
-			var5.addVertexWithUV(0, 1, 1 - var18, 1, 0);
-			var5.draw();
-			var5.startDrawingQuads();
-			var5.addVertexWithUV(0, 1, 1 - var18, 1, 0);
-			var5.addVertexWithUV(0, 0, 1 - var18, 1, 1);
-			var5.addVertexWithUV(1, 0, 1 - var18, 0, 1);
-			var5.addVertexWithUV(1, 1, 1 - var18, 0, 0);
-			var5.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(1, 1, 1 - var18).tex(0, 0).endVertex();
+			worldRenderer.pos(1, 0, 1 - var18).tex(0, 1).endVertex();
+			worldRenderer.pos(0, 0, 1 - var18).tex(1, 1).endVertex();
+			worldRenderer.pos(0, 1, 1 - var18).tex(1, 0).endVertex();
+			tessellator.draw();
+			worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+			worldRenderer.pos(0, 1, 1 - var18).tex(1, 0).endVertex();
+			worldRenderer.pos(0, 0, 1 - var18).tex(1, 1).endVertex();
+			worldRenderer.pos(1, 0, 1 - var18).tex(0, 1).endVertex();
+			worldRenderer.pos(1, 1, 1 - var18).tex(0, 0).endVertex();
+			tessellator.draw();
 		}
 	}
 }

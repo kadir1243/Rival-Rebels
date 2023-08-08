@@ -54,7 +54,7 @@ public class TileEntityAntimatterBombRenderer extends TileEntitySpecialRenderer<
 			GL11.glRotatef(90, 0, 1, 0);
 		}
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etantimatterbomb);
-		RenderAntimatterBomb.bomb.renderAll();
+		//RenderAntimatterBomb.bomb.renderAll();
 		GL11.glPopMatrix();
 	}
 }

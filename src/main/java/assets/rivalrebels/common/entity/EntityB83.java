@@ -40,7 +40,6 @@ public class EntityB83 extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setLocationAndAngles(x, y, z, yaw, pitch);
-		yOffset = 0.0F;
 		motionX = -(-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
@@ -51,7 +50,6 @@ public class EntityB83 extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setLocationAndAngles(x, y, z, yaw, pitch);
-		yOffset = 0.0F;
 		motionX = -(-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI)) * strength;
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI)) * strength;
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI)) * strength;
@@ -61,7 +59,6 @@ public class EntityB83 extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
 

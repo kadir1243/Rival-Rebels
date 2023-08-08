@@ -9,15 +9,17 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-package assets.rivalrebels.client.renderentity;
+/*package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.OpenGlHelper;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.entity.Render;
 import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.MathHelper;
@@ -99,7 +101,7 @@ public class RenderRhodes extends Render
 		modelsphere = new ModelBlastSphere();
 		try
 		{
-			md = ModelFromObj.readObjFile("d.obj");
+			md = ModelFromObj.readObjFile("b2spirit.obj");
 			b2jet = ModelFromObj.readObjFile("s.obj");
 			md.scale(2.5f, 2.5f, 2.5f);
 			b2jet.scale(2.5f, 2.5f, 2.5f);
@@ -154,37 +156,38 @@ public class RenderRhodes extends Render
             GL11.glDisable(GL11.GL_DEPTH_TEST);
             GL11.glEnable(GL11.GL_BLEND);
             OpenGlHelper.glBlendFunc(770, 771, 1, 0);
-            Tessellator tessellator = Tessellator.instance;
+            Tessellator tessellator = Tessellator.getInstance();
+            WorldRenderer worldRenderer = tessellator.getWorldRenderer();
             GL11.glDisable(GL11.GL_TEXTURE_2D);
-            tessellator.startDrawingQuads();
+            worldRenderer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
             String name = rhodes.getName();
             int color = -1;
             if (rhodes.rider != null)
             {
             	name += " - " + rhodes.rider.getDisplayName();
-            	RivalRebelsPlayer rrp = RivalRebels.instance.round.rrplayerlist.getForName(rhodes.rider.getName());
+            	RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForName(rhodes.rider.getName());
             	if (rrp!=null)
             	{
-            		switch (rrp.rrteam)
-            		{
-            		case OMEGA:
-            			color = 0x44FF44;
-            		break;
-            		case SIGMA:
-            			color = 0x4444FF;
-            		break;
-            		case NONE:
-            			color = -1;
-            		break;
-            		}
+                    switch (rrp.rrteam) {
+                        case OMEGA:
+                            color = 0x44FF44;
+                            break;
+                        case SIGMA:
+                            color = 0x4444FF;
+                            break;
+                        case NONE:
+                            break;
+                        default:
+                            throw new IllegalArgumentException();
+                    }
             	}
             }
             int j = fontrenderer.getStringWidth(name) / 2;
-            tessellator.setColorRGBA_F(0.0F, 0.0F, 0.0F, 0.25F);
-            tessellator.addVertex((double)(-j - 1), -1, 0.0D);
-            tessellator.addVertex((double)(-j - 1), 8, 0.0D);
-            tessellator.addVertex((double)(j + 1), 8, 0.0D);
-            tessellator.addVertex((double)(j + 1), -1, 0.0D);
+            worldRenderer.color(0.0F, 0.0F, 0.0F, 0.25F);
+            worldRenderer.pos(-j - 1, -1, 0.0D).endVertex();
+            worldRenderer.pos(-j - 1, 8, 0.0D).endVertex();
+            worldRenderer.pos(j + 1, 8, 0.0D).endVertex();
+            worldRenderer.pos(j + 1, -1, 0.0D).endVertex();
             tessellator.draw();
             GL11.glEnable(GL11.GL_TEXTURE_2D);
             fontrenderer.drawString(name, -fontrenderer.getStringWidth(name) / 2, 0, color);
@@ -230,7 +233,7 @@ public class RenderRhodes extends Render
 				//TORSO
 				GL11.glPushMatrix();
 				GL11.glColor3f(colors[rhodes.colorType*3], colors[rhodes.colorType*3+1], colors[rhodes.colorType*3+2]);
-				GL11.glTranslatef(0, (leftlegheight > rightlegheight) ? leftlegheight : rightlegheight, 0);
+				GL11.glTranslatef(0, Math.max(leftlegheight, rightlegheight), 0);
 
 				Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etb2spirit);
 				GL11.glPushMatrix();
@@ -366,7 +369,7 @@ public class RenderRhodes extends Render
 				//TORSO
 				GL11.glPushMatrix();
 					GL11.glColor3f(1,1,1);
-					GL11.glTranslatef(0, (leftlegheight > rightlegheight) ? leftlegheight : rightlegheight, 0);
+					GL11.glTranslatef(0, Math.max(leftlegheight, rightlegheight), 0);
 					if (rhodes.itexfolder != -1)
 					{
 						try
@@ -485,11 +488,6 @@ public class RenderRhodes extends Render
 		}
 	}
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
 	@Override
 	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
 	{
@@ -501,4 +499,4 @@ public class RenderRhodes extends Render
 	{
 		return null;
 	}
-}
+}*/

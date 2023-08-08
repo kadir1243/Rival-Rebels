@@ -160,11 +160,11 @@ public class RivalRebelsRecipes
 		GameRegistry.addRecipe(new ItemStack(RivalRebels.conduit, 16), "CEC", "EBE", "CEC", 'B', RivalRebels.redrod, 'E', RivalRebels.emptyrod, 'C', RivalRebels.steel);
 		// End Tier 4
 
-		GameRegistry.addRecipe(new ItemStack(RivalRebels.core1, 1), " DS", "CPD", " DS", 'S', RivalRebels.steel, 'P', RivalRebels.pliers, 'C', RivalRebels.chip, 'D', RivalRebels.conduit);
+		GameRegistry.addRecipe(new ItemStack(RivalRebels.copperCore, 1), " DS", "CPD", " DS", 'S', RivalRebels.steel, 'P', RivalRebels.pliers, 'C', RivalRebels.chip, 'D', RivalRebels.conduit);
 
-		GameRegistry.addRecipe(new ItemStack(RivalRebels.core2, 1), " DS", "CP1", " DS", 'S', RivalRebels.steel, 'P', RivalRebels.pliers, 'C', RivalRebels.chip, 'D', RivalRebels.conduit, '1', RivalRebels.core1);
+		GameRegistry.addRecipe(new ItemStack(RivalRebels.tungstenCore, 1), " DS", "CP1", " DS", 'S', RivalRebels.steel, 'P', RivalRebels.pliers, 'C', RivalRebels.chip, 'D', RivalRebels.conduit, '1', RivalRebels.copperCore);
 
-		GameRegistry.addRecipe(new ItemStack(RivalRebels.core3, 1), " DS", "CP2", " DS", 'S', RivalRebels.steel, 'P', RivalRebels.pliers, 'C', RivalRebels.chip, 'D', RivalRebels.conduit, '2', RivalRebels.core2);
+		GameRegistry.addRecipe(new ItemStack(RivalRebels.titaniumCore, 1), " DS", "CP2", " DS", 'S', RivalRebels.steel, 'P', RivalRebels.pliers, 'C', RivalRebels.chip, 'D', RivalRebels.conduit, '2', RivalRebels.tungstenCore);
 
 		GameRegistry.addRecipe(new ItemStack(RivalRebels.minetrap, 2), "SDS", "DPD", "SDS", 'S', RivalRebels.alandmine, 'P', RivalRebels.pliers, 'D', RivalRebels.conduit);
 
@@ -174,6 +174,6 @@ public class RivalRebelsRecipes
 
 		GameRegistry.addRecipe(new ItemStack(RivalRebels.ffreciever, 2), "LPS", "RCR", 'L', RivalRebels.binoculars, 'P', RivalRebels.pliers, 'S', RivalRebels.supplies, 'R', RivalRebels.reactive, 'C', RivalRebels.conduit);
 
-		GameRegistry.addRecipe(new ItemStack(RivalRebels.buildrhodes, 2), "SAS", "CPT", "RLB", 'B', RivalRebels.binoculars, 'P', RivalRebels.pliers, 'S', RivalRebels.supplies, 'A', RivalRebels.antenna, 'C', RivalRebels.chip, 'T', RivalRebels.core3, 'R', RivalRebels.controller, 'L', RivalRebels.loader);
+		GameRegistry.addRecipe(new ItemStack(RivalRebels.buildrhodes, 2), "SAS", "CPT", "RLB", 'B', RivalRebels.binoculars, 'P', RivalRebels.pliers, 'S', RivalRebels.supplies, 'A', RivalRebels.antenna, 'C', RivalRebels.chip, 'T', RivalRebels.titaniumCore, 'R', RivalRebels.controller, 'L', RivalRebels.loader);
 	}
 }

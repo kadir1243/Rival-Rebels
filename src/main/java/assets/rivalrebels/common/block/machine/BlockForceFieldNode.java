@@ -11,33 +11,35 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.MathHelper;
+import net.minecraft.world.World;
 
 public class BlockForceFieldNode extends BlockContainer
 {
+    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 4);
 	public BlockForceFieldNode()
 	{
 		super(Material.iron);
+        this.setDefaultState(this.blockState.getBaseState().withProperty(META, 0));
 	}
 
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
@@ -48,15 +50,14 @@ public class BlockForceFieldNode extends BlockContainer
 		return false;
 	}
 
-	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9)
-	{
-		TileEntity te = world.getTileEntity(x, y, z);
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+		TileEntity te = world.getTileEntity(pos);
 		if (te instanceof TileEntityForceFieldNode && !world.isRemote)
 		{
 			TileEntityForceFieldNode teffn = (TileEntityForceFieldNode) te;
 			ItemStack is = player.inventory.getCurrentItem();
-			if (is != null && is.getItem() instanceof ItemChip && (teffn.username == null || teffn.username.equals("")) && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
+			if (is != null && is.getItem() instanceof ItemChip && (teffn.username == null || teffn.username.isEmpty()) && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForName(player.getName()).rrteam;
 				if (teffn.rrteam == RivalRebelsTeam.NONE || teffn.rrteam == null)
@@ -64,51 +65,47 @@ public class BlockForceFieldNode extends BlockContainer
 					teffn.username = player.getName();
 					teffn.rrteam = null;
 				}
-				RivalRebelsSoundPlayer.playSound(world, 10, 5, x, y, z);
+				RivalRebelsSoundPlayer.playSound(world, 10, 5, pos.getX(), pos.getY(), pos.getZ());
 			}
 		}
 		return false;
 	}
 
-	@Override
-	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLiving, ItemStack par6ItemStack)
-	{
-		int l = MathHelper.floor_double((par5EntityLiving.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+		int rotation = MathHelper.floor_double((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 
-		if (l == 0)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
-		}
+        int meta;
+        switch (rotation) {
+            case 0:
+                meta = 2;
+                break;
+            case 1:
+                meta = 5;
+                break;
+            case 2:
+                meta = 3;
+                break;
+            default:
+                meta = 4;
+                break;
+        }
 
-		if (l == 1)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
-		}
-
-		if (l == 2)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
-		}
-
-		if (l == 3)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
-		}
+        world.setBlockState(pos, state.withProperty(META, meta));
 	}
 
-	@Override
-	public boolean hasTileEntity(int metadata)
-	{
-		return true;
-	}
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
 
-	@Override
+    @Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityForceFieldNode();
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -144,5 +141,5 @@ public class BlockForceFieldNode extends BlockContainer
 		icontop2 = iconregister.registerIcon("RivalRebels:ck");
 		icontop3 = iconregister.registerIcon("RivalRebels:cl");
 		icontop4 = iconregister.registerIcon("RivalRebels:cm");
-	}
+	}*/
 }

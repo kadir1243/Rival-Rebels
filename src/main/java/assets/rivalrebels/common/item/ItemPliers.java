@@ -16,7 +16,6 @@ import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.command.CommandHotPotato;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.TextPacket;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -78,8 +77,9 @@ public class ItemPliers extends Item
 					return true;
 				}
 			}
-			if (world.getBlockState(pos).getBlock() instanceof BlockAutoTemplate block)
+			if (world.getBlockState(pos).getBlock() instanceof BlockAutoTemplate)
 			{
+                BlockAutoTemplate block = (BlockAutoTemplate) world.getBlockState(pos).getBlock();
                 i = i + 1;
 				PacketDispatcher.packetsys.sendTo(new TextPacket("RivalRebels.Status RivalRebels.building " + i * 100 / block.time + "§7'/."),(EntityPlayerMP) player);
 				if (i >= block.time)
@@ -106,9 +106,9 @@ public class ItemPliers extends Item
 		return false;
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ap");
-	}
+	}*/
 }

@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_column",
+  "textures": {
+    "end": "rivalrebels:blocks/cn",
+    "side": "rivalrebels:blocks/cf"
+  }
+}

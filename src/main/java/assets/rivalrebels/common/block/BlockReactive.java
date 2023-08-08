@@ -12,13 +12,10 @@
 package assets.rivalrebels.common.block;
 
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
 import net.minecraft.world.World;
 
 import java.util.Random;
@@ -31,33 +28,14 @@ public class BlockReactive extends BlockContainer
 	}
 
     @Override
-    public boolean hasTileEntity(int metadata) {
+    public boolean hasTileEntity(IBlockState state) {
         return true;
     }
 
-	@Override
+    @Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
-	@SideOnly(Side.CLIENT)
-	IIcon	icontop;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0 || side == 1) return icontop;
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:cf");
-		icontop = iconregister.registerIcon("RivalRebels:cn");
 	}
 
 	@Override

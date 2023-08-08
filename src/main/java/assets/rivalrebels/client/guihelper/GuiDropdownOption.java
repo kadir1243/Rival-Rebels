@@ -48,16 +48,16 @@ public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
 		if (on)
 		{
 			int team = 0;
-			if (t.r.chestContents[6] != null && t.r.chestContents[6].stackTagCompound != null)
+			if (t.r.chestContents[6] != null && t.r.chestContents[6].hasTagCompound())
 			{
-				team = t.r.chestContents[6].stackTagCompound.getInteger("team");
+				team = t.r.chestContents[6].getTagCompound().getInteger("team");
 			}
 			if (team == 0) color = 0xffff55;
 			if (team == 1) color = 0x55ff55;
 			if (team == 2) color = 0x5555ff;
 		}
 		if (inside && on) color = 0xffffff;
-		drawString(Minecraft.getMinecraft().fontRenderer, StatCollector.translateToLocal(text), bbox.xMin + 1, bbox.yMin + 1, color);
+		drawString(Minecraft.getMinecraft().fontRendererObj, StatCollector.translateToLocal(text), bbox.xMin + 1, bbox.yMin + 1, color);
 		mouseDown = current;
 	}
 }

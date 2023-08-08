@@ -57,7 +57,8 @@ public class ReactorGUIPacket implements IMessage
 		public IMessage onMessage(ReactorGUIPacket m, MessageContext ctx) {
 			if (ctx.getServerHandler().playerEntity.getDistanceSq(m.pos) < 100) {
 				TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.pos);
-				if (te instanceof TileEntityReactor ter) {
+				if (te instanceof TileEntityReactor) {
+                    TileEntityReactor ter = (TileEntityReactor) te;
                     if (m.type == 0) ter.toggleOn();
 					if (m.type == 1) ter.ejectCore();
 				}

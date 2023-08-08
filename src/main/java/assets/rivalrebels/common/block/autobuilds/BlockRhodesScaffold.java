@@ -11,13 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.util.BlockPos;
+import net.minecraft.world.World;
 
 public class BlockRhodesScaffold extends BlockAutoTemplate
 {
@@ -67,16 +63,16 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 		if (!world.isRemote)
 		{
 			int scale = 1;
-			if (world.getBlock(x, y-1, z) == RivalRebels.buildrhodes && world.getBlock(x, y-2, z) == RivalRebels.buildrhodes)
+			if (world.getBlockState(new BlockPos(x, y-1, z)).getBlock() == RivalRebels.buildrhodes && world.getBlockState(new BlockPos(x, y-2, z)).getBlock() == RivalRebels.buildrhodes)
 			{
-				if (world.getBlock(x, y-3, z) == RivalRebels.buildrhodes && world.getBlock(x, y-4, z) == RivalRebels.buildrhodes) scale = 3;
+				if (world.getBlockState(new BlockPos(x, y-3, z)).getBlock() == RivalRebels.buildrhodes && world.getBlockState(new BlockPos(x, y-4, z)).getBlock() == RivalRebels.buildrhodes) scale = 3;
 				else scale = 2;
 			}
 			for (int i = 0; i < 32*9; i++)
 			{
-				int fy = +30-(i/9);
+				int fy = 30 -(i/9);
 				int fx1 = -8+(i%9);
-				int fx2 = +9-(i%9);
+				int fx2 = 9 -(i%9);
 				fy *= scale;
 				fx1 *= scale;
 				fx2 *= scale;
@@ -126,104 +122,104 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 	{
 		if (b == 0)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+4, Blocks.air);
+			placeAir(world, x+fx1, y+fy, z-4);
+			placeAir(world, x+fx1, y+fy, z-3);
+			placeAir(world, x+fx1, y+fy, z-2);
+			placeAir(world, x+fx1, y+fy, z-1);
+			placeBlockCarefully(world, x+fx1, y+fy, z, RivalRebels.steel);
+			placeAir(world, x+fx1, y+fy, z+1);
+			placeAir(world, x+fx1, y+fy, z+2);
+			placeAir(world, x+fx1, y+fy, z+3);
+			placeAir(world, x+fx1, y+fy, z+4);
 		}
 		if (b == 1)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-1, Blocks.air);
-			if (RivalRebels.prefillrhodes) world.setBlock(x+fx1, y+fy, z, RivalRebels.conduit);
-			else world.setBlock(x+fx1, y+fy, z, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+4, Blocks.air);
+			placeAir(world, x+fx1, y+fy, z-4);
+			placeAir(world, x+fx1, y+fy, z-3);
+			placeAir(world, x+fx1, y+fy, z-2);
+			placeAir(world, x+fx1, y+fy, z-1);
+			if (RivalRebels.prefillrhodes) placeBlockCarefully(world, x+fx1, y+fy, z, RivalRebels.conduit);
+			else placeAir(world, x+fx1, y+fy, z);
+			placeAir(world, x+fx1, y+fy, z+1);
+			placeAir(world, x+fx1, y+fy, z+2);
+			placeAir(world, x+fx1, y+fy, z+3);
+			placeAir(world, x+fx1, y+fy, z+4);
 		}
 		if (b == 2)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z, RivalRebels.rhodesactivator);
-			world.setBlock(x+fx1, y+fy, z+1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+4, Blocks.air);
+			placeAir(world, x+fx1, y+fy, z-4);
+			placeAir(world, x+fx1, y+fy, z-3);
+			placeAir(world, x+fx1, y+fy, z-2);
+			placeAir(world, x+fx1, y+fy, z-1);
+			placeBlockCarefully(world, x+fx1, y+fy, z, RivalRebels.rhodesactivator);
+			placeAir(world, x+fx1, y+fy, z+1);
+			placeAir(world, x+fx1, y+fy, z+2);
+			placeAir(world, x+fx1, y+fy, z+3);
+			placeAir(world, x+fx1, y+fy, z+4);
 		}
 		if (b == 3)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-3, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z-2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+3, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+4, Blocks.air);
+			placeAir(world, x+fx1, y+fy, z-4);
+			placeBlockCarefully(world, x+fx1, y+fy, z-3, RivalRebels.steel);
+			placeAir(world, x+fx1, y+fy, z-2);
+			placeAir(world, x+fx1, y+fy, z-1);
+			placeBlockCarefully(world, x+fx1, y+fy, z, RivalRebels.steel);
+			placeAir(world, x+fx1, y+fy, z+1);
+			placeAir(world, x+fx1, y+fy, z+2);
+			placeBlockCarefully(world, x+fx1, y+fy, z+3, RivalRebels.steel);
+			placeAir(world, x+fx1, y+fy, z+4);
 		}
 		if (b == 4)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-3, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z-2, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z-1, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+1, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+2, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+3, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+4, Blocks.air);
+			placeAir(world, x+fx1, y+fy, z-4);
+			placeBlockCarefully(world, x+fx1, y+fy, z-3, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z-2, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z-1, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z+1, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z+2, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z+3, RivalRebels.steel);
+			placeAir(world, x+fx1, y+fy, z+4);
 		}
 		if (b == 5)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-3, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z-2, RivalRebels.conduit);
-			world.setBlock(x+fx1, y+fy, z-1, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+1, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+2, RivalRebels.conduit);
-			world.setBlock(x+fx1, y+fy, z+3, RivalRebels.steel);
-			world.setBlock(x+fx1, y+fy, z+4, Blocks.air);
+			placeAir(world, x+fx1, y+fy, z-4);
+			placeBlockCarefully(world, x+fx1, y+fy, z-3, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z-2, RivalRebels.conduit);
+			placeBlockCarefully(world, x+fx1, y+fy, z-1, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z+1, RivalRebels.steel);
+			placeBlockCarefully(world, x+fx1, y+fy, z+2, RivalRebels.conduit);
+			placeBlockCarefully(world, x+fx1, y+fy, z+3, RivalRebels.steel);
+			placeAir(world, x+fx1, y+fy, z+4);
 		}
 		if (b == 6)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z-3, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z-2, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z-1, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z+1, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z+2, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z+3, RivalRebels.reactive);
-			world.setBlock(x+fx1, y+fy, z+4, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z-4, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z-3, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z-2, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z-1, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z+1, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z+2, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z+3, RivalRebels.reactive);
+			placeBlockCarefully(world, x+fx1, y+fy, z+4, RivalRebels.reactive);
 		}
 		if (b == 7)
 		{
-			world.setBlock(x+fx1, y+fy, z-4, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z-1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+1, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+2, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+3, Blocks.air);
-			world.setBlock(x+fx1, y+fy, z+4, Blocks.air);
+			placeAir(world, x+fx1, y+fy, z-4);
+			placeAir(world, x+fx1, y+fy, z-3);
+			placeAir(world, x+fx1, y+fy, z-2);
+			placeAir(world, x+fx1, y+fy, z-1);
+			placeAir(world, x+fx1, y+fy, z);
+			placeAir(world, x+fx1, y+fy, z+1);
+			placeAir(world, x+fx1, y+fy, z+2);
+			placeAir(world, x+fx1, y+fy, z+3);
+			placeAir(world, x+fx1, y+fy, z+4);
 		}
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -259,5 +255,5 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:dk"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:dk"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:dk"); // SIDE E
-	}
+	}*/
 }

@@ -244,6 +244,10 @@ public class RivalRebelsSoundPlayer
 		return playSound(world, dir, num, x, y, z, 1, 1);
 	}
 
+    public static boolean playSound(World world, int dir, int num, BlockPos pos) {
+        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ());
+    }
+
 	public static boolean playSound(Entity entity, int dir, int num, float volume, float pitch)
 	{
 		if (entity != null)

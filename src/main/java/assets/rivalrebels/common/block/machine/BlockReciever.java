@@ -11,28 +11,29 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
 import net.minecraft.util.MathHelper;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import net.minecraftforge.fml.common.network.internal.FMLNetworkHandler;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockReciever extends BlockContainer
 {
-	public BlockReciever()
+    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 4);
+    public BlockReciever()
 	{
 		super(Material.iron);
 	}
@@ -43,79 +44,63 @@ public class BlockReciever extends BlockContainer
 		return 0;
 	}
 
-	@Override
-	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLiving, ItemStack par6ItemStack)
-	{
-		int l = MathHelper.floor_double((par5EntityLiving.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+        int rotation = MathHelper.floor_double((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
 
-		if (l == 0)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
-		}
+        int meta;
+        switch (rotation) {
+            case 0:
+                meta = 2;
+                break;
+            case 1:
+                meta = 5;
+                break;
+            case 2:
+                meta = 3;
+                break;
+            default:
+                meta = 4;
+                break;
+        }
 
-		if (l == 1)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
-		}
+        world.setBlockState(pos, state.withProperty(META, meta));
+    }
 
-		if (l == 2)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
-		}
+    @Override
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
 
-		if (l == 3)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
-		}
-	}
-
-	@Override
-	public boolean hasTileEntity(int metadata)
-	{
-		return true;
-	}
-
-	@Override
+    @Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityReciever();
 	}
 
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
 
-	@Override
-	public int getRenderType()
-	{
-		return -1;
-	}
-
-	@Override
+    @Override
 	public boolean isOpaqueCube()
 	{
 		return false;
 	}
 
-	/**
-	 * Called upon block activation (right click on the block.)
-	 */
-	@Override
-	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
-	{
-		if (!par1World.isRemote)
-		{
-			// par5EntityPlayer.openGui(RivalRebels.instance, RivalRebels.recieverGuiID, par1World, par2, par3, par4);
-			FMLNetworkHandler.openGui(par5EntityPlayer, RivalRebels.instance, 0, par1World, par2, par3, par4);
-		}
-		RivalRebelsSoundPlayer.playSound(par1World, 10, 3, par2, par3, par4);
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumFacing side, float hitX, float hitY, float hitZ) {
+        if (!world.isRemote) {
+            FMLNetworkHandler.openGui(player, RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
+        }
+        RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
 
-		return true;
-	}
+        return true;
+    }
 
-	@SideOnly(Side.CLIENT)
+    /*@SideOnly(Side.CLIENT)
 	IIcon	icon;
 
 	@Override
@@ -128,5 +113,5 @@ public class BlockReciever extends BlockContainer
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
 		icon = iconregister.registerIcon("RivalRebels:dj");
-	}
+	}*/
 }

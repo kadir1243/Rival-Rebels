@@ -11,22 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockLight extends Block
 {
-	public int	rendertype;
+	public int rendertype;
 
 	public BlockLight(int Render)
 	{
@@ -41,7 +38,7 @@ public class BlockLight extends Block
 	}
 
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isFullCube()
 	{
 		return false;
 	}
@@ -58,45 +55,25 @@ public class BlockLight extends Block
 		return rendertype;
 	}
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return null;
-	}
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(World worldIn, BlockPos pos, IBlockState state) {
+        return null;
+    }
 
-	@Override
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return new AxisAlignedBB(par2, par3, par4, par2, par3, par4);
-	}
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(World worldIn, BlockPos pos) {
+        return new AxisAlignedBB(pos, pos);
+    }
 
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		if (this == RivalRebels.light)
-		{
-			world.scheduleBlockUpdate(x, y, z, this, 10);
-		}
-	}
+    @Override
+    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
+        if (this == RivalRebels.light) {
+            worldIn.scheduleBlockUpdate(pos, this, 10, 1);
+        }
+    }
 
-	@Override
-	public void updateTick(World par1World, int x, int y, int z, Random par5Random)
-	{
-		par1World.setBlock(x, y, z, Blocks.air);
-	}
-
-	@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ad");
-	}
+    @Override
+    public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
+        worldIn.setBlockToAir(pos);
+    }
 }

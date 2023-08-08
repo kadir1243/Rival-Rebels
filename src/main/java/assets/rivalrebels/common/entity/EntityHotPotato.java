@@ -46,7 +46,6 @@ public class EntityHotPotato extends EntityThrowable
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x+0.5f, y+0.5f, z+0.5f);
-		yOffset = 0.0F;
 		round = count;
 		nextx = x;
 		nexty = y;
@@ -62,7 +61,6 @@ public class EntityHotPotato extends EntityThrowable
 		motionX = f;
 		motionY = g;
 		motionZ = h;
-		yOffset = 0.0F;
 		round = 1;
 		nextx = (int)px;
 		nexty = (int)py;
@@ -90,7 +88,6 @@ public class EntityHotPotato extends EntityThrowable
 			motionZ = 0;
 			setSize(0.5F, 0.5F);
 			setPosition(nextx+0.5f, nexty+0.5f, nextz+0.5f);
-			yOffset = 0.0F;
 			worldObj.setBlockState(new BlockPos(nextx, nexty-400, nextz), RivalRebels.jump.getDefaultState());
 			setPosition(posX, posY, posZ);
 			return;
@@ -228,13 +225,7 @@ public class EntityHotPotato extends EntityThrowable
 		explode();
 	}
 
-	@Override
-	protected float getGravityVelocity()
-	{
-		return 0.03F;
-	}
-
-	public void explode()
+    public void explode()
 	{
 		if (!worldObj.isRemote)
 		{
