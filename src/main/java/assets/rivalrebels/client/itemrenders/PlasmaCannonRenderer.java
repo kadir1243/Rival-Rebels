@@ -11,124 +11,98 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraftforge.client.IItemRenderer;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelRod;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.item.ItemStack;
 
-public class PlasmaCannonRenderer implements IItemRenderer
-{
-	// ModelPlasmaCannon md;
-	ModelRod		md2;
-	ModelRod		md3;
-	
-	ModelFromObj	model;
-	
+public class PlasmaCannonRenderer extends TileEntityItemStackRenderer {
+	private final ModelRod md2;
+	private final ModelRod md3;
+	private final ModelFromObj model;
+
 	public PlasmaCannonRenderer()
 	{
-		// md = new ModelPlasmaCannon();
 		md2 = new ModelRod();
 		md2.rendersecondcap = false;
 		md3 = new ModelRod();
-		try
-		{
-			model = ModelFromObj.readObjFile("m.obj");
-		}
-		catch (Exception e)
-		{
-			System.err.println("Please make sure the model files are in the correct directory.");
-		}
+        model = ModelFromObj.readObjFile("m.obj");
 	}
-	
-	@Override
-	public boolean handleRenderType(ItemStack item, ItemRenderType type)
-	{
-		if (type == ItemRenderType.FIRST_PERSON_MAP || type == ItemRenderType.EQUIPPED || type == ItemRenderType.ENTITY || type == ItemRenderType.EQUIPPED_FIRST_PERSON) return true;
-		return false;
-	}
-	
-	@Override
-	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper)
-	{
-		return false;
-	}
-	
-	@Override
-	public void renderItem(ItemRenderType type, ItemStack item, Object... data)
-	{
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glPushMatrix();
-		GL11.glTranslatef(-0.1f, 0f, 0f);
+
+    @Override
+    public void renderByItem(ItemStack stack) {
+		GlStateManager.enableLighting();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(-0.1f, 0f, 0f);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etplasmacannon);
-		GL11.glPushMatrix();
-		GL11.glTranslatef(0.5f, 0.2f, -0.03f);
-		GL11.glRotatef(35, 0.0F, 0.0F, 1.0F);
-		GL11.glScalef(0.03125f, 0.03125f, 0.03125f);
-		GL11.glPushMatrix();
-		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0.5f, 0.2f, -0.03f);
+		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
+		GlStateManager.scale(0.03125f, 0.03125f, 0.03125f);
+		GlStateManager.pushMatrix();
+
 		model.render();
-		if (item.getEnchantmentTagList() != null)
+		if (stack.isItemEnchanted())
 		{
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-			GL11.glDisable(GL11.GL_LIGHTING);
+			GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			GlStateManager.enableBlend();
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+			GlStateManager.disableLighting();
 			model.render();
-			GL11.glDisable(GL11.GL_BLEND);
-			GL11.glEnable(GL11.GL_LIGHTING);
+			GlStateManager.disableBlend();
+			GlStateManager.enableLighting();
 		}
-		
-		GL11.glPopMatrix();
-		GL11.glPopMatrix();
-		
+
+		GlStateManager.popMatrix();
+		GlStateManager.popMatrix();
+
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ethydrod);
-		GL11.glPushMatrix();
-		GL11.glTranslatef(0.5f, 0.2f, -0.03f);
-		GL11.glRotatef(35, 0.0F, 0.0F, 1.0F);
-		GL11.glPushMatrix();
-		GL11.glRotatef(225, 0.0F, 0.0F, 1.0F);
-		GL11.glTranslatef(-0.5f, 0.5f, 0.0f);
-		GL11.glScalef(0.25f, 0.5f, 0.25f);
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0.5f, 0.2f, -0.03f);
+		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
+		GlStateManager.pushMatrix();
+		GlStateManager.rotate(225, 0.0F, 0.0F, 1.0F);
+		GlStateManager.translate(-0.5f, 0.5f, 0.0f);
+		GlStateManager.scale(0.25f, 0.5f, 0.25f);
 		md2.render();
-		if (item.getEnchantmentTagList() != null)
+		if (stack.isItemEnchanted())
 		{
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-			GL11.glDisable(GL11.GL_LIGHTING);
+            GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			GlStateManager.enableBlend();
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+			GlStateManager.disableLighting();
 			md2.render();
-			GL11.glDisable(GL11.GL_BLEND);
-			GL11.glEnable(GL11.GL_LIGHTING);
+			GlStateManager.disableBlend();
+			GlStateManager.enableLighting();
 		}
-		GL11.glPopMatrix();
-		GL11.glPopMatrix();
-		
-		GL11.glPushMatrix();
-		GL11.glTranslatef(0.5f, 0.2f, -0.03f);
-		GL11.glRotatef(35, 0.0F, 0.0F, 1.0F);
-		GL11.glPushMatrix();
-		GL11.glRotatef(247.5f, 0.0F, 0.0F, 1.0F);
-		GL11.glTranslatef(-0.175f, 0.1f, 0.0f);
-		GL11.glScalef(0.25f, 0.5f, 0.25f);
+		GlStateManager.popMatrix();
+		GlStateManager.popMatrix();
+
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0.5f, 0.2f, -0.03f);
+		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
+		GlStateManager.pushMatrix();
+		GlStateManager.rotate(247.5f, 0.0F, 0.0F, 1.0F);
+		GlStateManager.translate(-0.175f, 0.1f, 0.0f);
+		GlStateManager.scale(0.25f, 0.5f, 0.25f);
 		md3.render();
-		if (item.getEnchantmentTagList() != null)
+		if (stack.isItemEnchanted())
 		{
-			GL11.glBindTexture(GL11.GL_TEXTURE_2D, TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-			GL11.glDisable(GL11.GL_LIGHTING);
+			GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			GlStateManager.enableBlend();
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+			GlStateManager.disableLighting();
 			md3.render();
-			GL11.glDisable(GL11.GL_BLEND);
-			GL11.glEnable(GL11.GL_LIGHTING);
+			GlStateManager.disableBlend();
+			GlStateManager.enableLighting();
 		}
-		GL11.glPopMatrix();
-		GL11.glPopMatrix();
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
+		GlStateManager.popMatrix();
+		GlStateManager.popMatrix();
 	}
 }
+

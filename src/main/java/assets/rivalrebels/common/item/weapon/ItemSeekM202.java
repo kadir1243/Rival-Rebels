@@ -11,41 +11,35 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.entity.EntitySeekB83;
+import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 import java.util.HashSet;
-
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.entity.EntityB83;
-import assets.rivalrebels.common.entity.EntityHackB83;
-import assets.rivalrebels.common.entity.EntityRocket;
-import assets.rivalrebels.common.entity.EntitySeekB83;
-import assets.rivalrebels.common.explosion.Explosion;
 
 public class ItemSeekM202 extends ItemTool
 {
 	public ItemSeekM202()
 	{
-		super(1, ToolMaterial.EMERALD, new HashSet<>());
-		maxStackSize = 1;
+		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
 
 	@Override
@@ -62,46 +56,47 @@ public class ItemSeekM202 extends ItemTool
         return 90;
     }
 
-	/**
-	 * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
-	 */
-	@Override
-	public ItemStack onItemRightClick(ItemStack i, World w, EntityPlayer p)
-	{
-		if (p.capabilities.isCreativeMode || p.inventory.hasItem(RivalRebels.rocket) || RivalRebels.infiniteAmmo)
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+
+        ItemStack itemStack = ItemUtil.getItemStack(player, RivalRebels.rocket);
+        if (player.capabilities.isCreativeMode || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
 		{
-			p.setItemInUse(i, getMaxItemUseDuration(i));
-			if (!p.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
+			player.setActiveHand(hand);
+			if (!player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
 			{
-				p.inventory.consumeInventoryItem(RivalRebels.rocket);
+                itemStack.shrink(1);
+				if (itemStack.isEmpty())
+                    player.inventory.deleteStack(itemStack);
 			}
-			RivalRebelsSoundPlayer.playSound(p, 23, 2, 0.4f);
-			if (!w.isRemote)
+			RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
+			if (!world.isRemote)
 			{
-				if (i.getEnchantmentTagList() == null)
+				if (!stack.isItemEnchanted())
 				{
-					w.spawnEntityInWorld(new EntitySeekB83(w, p, 0.1F));
+					world.spawnEntity(new EntitySeekB83(world, player, 0.1F));
 				}
 				else
 				{
-					w.spawnEntityInWorld(new EntitySeekB83(w, p, 0.1F, 15.0f));
-					w.spawnEntityInWorld(new EntitySeekB83(w, p, 0.1F, 7.5f));
-					w.spawnEntityInWorld(new EntitySeekB83(w, p, 0.1F));
-					w.spawnEntityInWorld(new EntitySeekB83(w, p, 0.1F, -7.5f));
-					w.spawnEntityInWorld(new EntitySeekB83(w, p, 0.1F, -15.0f));
+					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, 15.0f));
+					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, 7.5f));
+					world.spawnEntity(new EntitySeekB83(world, player, 0.1F));
+					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, -7.5f));
+					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, -15.0f));
 				}
 			}
 		}
-		else if (!w.isRemote)
+		else if (!world.isRemote)
 		{
-			p.addChatMessage(new ChatComponentText("§cOut of ammunition"));
+			player.sendMessage(new TextComponentString("§cOut of ammunition"));
 		}
-		return i;
+		return ActionResult.newResult(EnumActionResult.PASS, stack);
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bh");
-	}
+	}*/
 }

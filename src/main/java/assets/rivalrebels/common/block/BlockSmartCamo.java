@@ -11,83 +11,91 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockSmartCamo extends Block
 {
 	public BlockSmartCamo()
 	{
-		super(Material.iron);
+		super(Material.IRON);
 	}
-	
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		if (world.getBlock(x + 1, y, z) == Blocks.snow_layer || world.getBlock(x - 1, y, z) == Blocks.snow_layer || world.getBlock(x, y, z - 1) == Blocks.snow_layer || world.getBlock(x, y, z + 1) == Blocks.snow_layer)
-		{
-			world.setBlock(x, y, z, RivalRebels.camo3);
-		}
-		else
-		{
-			if (world.getBlock(x, y - 1, z) == Blocks.grass || world.getBlock(x, y - 1, z) == Blocks.dirt)
-			{
-				world.setBlock(x, y, z, RivalRebels.camo1);
-			}
-			else
-			{
-				if (world.getBlock(x, y - 1, z) == Blocks.sand || world.getBlock(x, y - 1, z) == Blocks.sandstone)
-				{
-					world.setBlock(x, y, z, RivalRebels.camo2);
-				}
-				else
-				{
-					if (world.getBlock(x, y - 1, z) == Blocks.stone || world.getBlock(x, y - 1, z) == Blocks.gravel || world.getBlock(x, y - 1, z) == Blocks.bedrock || world.getBlock(x, y - 1, z) == Blocks.cobblestone)
-					{
-						world.setBlock(x, y, z, RivalRebels.camo3);
-					}
-					else
-					{
-						if (world.getBlock(x, y - 1, z) == RivalRebels.camo2 || world.getBlock(x + 1, y, z) == RivalRebels.camo2 || world.getBlock(x - 1, y, z) == RivalRebels.camo2 || world.getBlock(x, y, z + 1) == RivalRebels.camo2 || world.getBlock(x, y, z - 1) == RivalRebels.camo2 || world.getBlock(x, y + 1, z) == RivalRebels.camo2)
-						{
-							world.setBlock(x, y, z, RivalRebels.camo2);
-						}
-						else
-						{
-							if (world.getBlock(x, y - 1, z) == RivalRebels.camo3 || world.getBlock(x + 1, y, z) == RivalRebels.camo3 || world.getBlock(x - 1, y, z) == RivalRebels.camo3 || world.getBlock(x, y, z + 1) == RivalRebels.camo3 || world.getBlock(x, y, z - 1) == RivalRebels.camo3 || world.getBlock(x, y + 1, z) == RivalRebels.camo3)
-							{
-								world.setBlock(x, y, z, RivalRebels.camo3);
-							}
-							else
-							{
-								world.setBlock(x, y, z, RivalRebels.camo1);
-							}
-						}
-					}
-				}
-			}
-		}
-	}
-	
-	@SideOnly(Side.CLIENT)
+
+    @Override
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        if (getBlock(world, x + 1, y, z) == Blocks.SNOW_LAYER || getBlock(world, x - 1, y, z) == Blocks.SNOW_LAYER || getBlock(world, x, y, z - 1) == Blocks.SNOW_LAYER || getBlock(world, x, y, z + 1) == Blocks.SNOW_LAYER)
+        {
+            setBlock(world, x, y, z, RivalRebels.camo3);
+        }
+        else
+        {
+            if (getBlock(world, x, y - 1, z) == Blocks.GRASS || getBlock(world, x, y - 1, z) == Blocks.DIRT)
+            {
+                setBlock(world, x, y, z, RivalRebels.camo1);
+            }
+            else
+            {
+                if (getBlock(world, x, y - 1, z) == Blocks.SAND || getBlock(world, x, y - 1, z) == Blocks.SANDSTONE)
+                {
+                    setBlock(world, x, y, z, RivalRebels.camo2);
+                }
+                else
+                {
+                    if (getBlock(world, x, y - 1, z) == Blocks.STONE || getBlock(world, x, y - 1, z) == Blocks.GRAVEL || getBlock(world, x, y - 1, z) == Blocks.BEDROCK || getBlock(world, x, y - 1, z) == Blocks.COBBLESTONE)
+                    {
+                        setBlock(world, x, y, z, RivalRebels.camo3);
+                    }
+                    else
+                    {
+                        if (getBlock(world, x, y - 1, z) == RivalRebels.camo2 || getBlock(world, x + 1, y, z) == RivalRebels.camo2 || getBlock(world, x - 1, y, z) == RivalRebels.camo2 || getBlock(world, x, y, z + 1) == RivalRebels.camo2 || getBlock(world, x, y, z - 1) == RivalRebels.camo2 || getBlock(world, x, y + 1, z) == RivalRebels.camo2)
+                        {
+                            setBlock(world, x, y, z, RivalRebels.camo2);
+                        }
+                        else
+                        {
+                            if (getBlock(world, x, y - 1, z) == RivalRebels.camo3 || getBlock(world, x + 1, y, z) == RivalRebels.camo3 || getBlock(world, x - 1, y, z) == RivalRebels.camo3 || getBlock(world, x, y, z + 1) == RivalRebels.camo3 || getBlock(world, x, y, z - 1) == RivalRebels.camo3 || getBlock(world, x, y + 1, z) == RivalRebels.camo3)
+                            {
+                                setBlock(world, x, y, z, RivalRebels.camo3);
+                            }
+                            else
+                            {
+                                setBlock(world, x, y, z, RivalRebels.camo1);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private static void setBlock(World world, int x, int y, int z, Block block) {
+        world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
+    }
+
+    private static Block getBlock(World world, int x, int y, int z) {
+        return world.getBlockState(new BlockPos(x, y, z)).getBlock();
+    }
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
 		icon = iconregister.registerIcon("RivalRebels:bq");
-	}
+	}*/
 }

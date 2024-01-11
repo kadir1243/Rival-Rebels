@@ -25,7 +25,7 @@ import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
 public class ContainerNuclearBomb extends Container
 {
 	protected TileEntityNuclearBomb	tileEntity;
-	
+
 	public ContainerNuclearBomb(InventoryPlayer inventoryPlayer, TileEntityNuclearBomb te)
 	{
 		tileEntity = te;
@@ -39,13 +39,13 @@ public class ContainerNuclearBomb extends Container
 		addSlotToContainer(new SlotRR(tileEntity, 12, 152, 34, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
 	}
-	
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return tileEntity.isUseableByPlayer(player);
+		return tileEntity.isUsableByPlayer(player);
 	}
-	
+
 	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
@@ -55,16 +55,16 @@ public class ContainerNuclearBomb extends Container
 				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
 			}
 		}
-		
+
 		for (int i = 0; i < 9; i++)
 		{
 			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 139));
 		}
 	}
-	
+
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
+	public ItemStack transferStackInSlot(EntityPlayer player, int index)
 	{
-		return null;
+		return ItemStack.EMPTY;
 	}
 }

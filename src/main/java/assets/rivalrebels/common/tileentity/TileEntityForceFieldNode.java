@@ -11,364 +11,339 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.block.Block;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.World;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
+import java.util.UUID;
 
 public class TileEntityForceFieldNode extends TileEntityMachineBase
 {
-	public String			username	= null;
+    public UUID uuid;
 	public RivalRebelsTeam	rrteam		= null;
 	public int				level		= 0;
-	
+
 	public TileEntityForceFieldNode()
 	{
 		pInM = 345;
 		pInR = 345;
 	}
-	
+
 	@Override
-	public void updateEntity()
+	public void update()
 	{
 		if (pInR > 0) pInR = powered(pInR, edist);
 		else turnOff();
 		pInR -= decay;
 	}
-	
+
 	public void turnOff()
 	{
 		if (level > 0)
 		{
-			int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-			
+			int meta = this.getBlockMetadata();
+
 			level--;
 			for (int y = 0; y < 7; y++)
 			{
 				switch (meta)
 				{
 					case 2:
-						if (worldObj.getBlock(xCoord, yCoord + (y - 3), zCoord - level - 1) == RivalRebels.forcefield)
+						if (world.getBlockState(new BlockPos(getPos().getX(), getPos().getY() + (y - 3), getPos().getZ() - level - 1)).getBlock() == RivalRebels.forcefield)
 						{
-							worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord - level - 1, Blocks.air, 0, 3);
+							world.setBlockToAir(new BlockPos(getPos().getX(), getPos().getY() + (y - 3), getPos().getZ() - level - 1));
 						}
 					break;
-					
+
 					case 3:
-						if (worldObj.getBlock(xCoord, yCoord + (y - 3), zCoord + level + 1) == RivalRebels.forcefield)
+						if (world.getBlockState(getPos().add(0, y, level).down(3).south()).getBlock() == RivalRebels.forcefield)
 						{
-							worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord + level + 1, Blocks.air, 0, 3);
+							world.setBlockToAir(getPos().add(0, y, level).down(3).south());
 						}
 					break;
-					
+
 					case 4:
-						if (worldObj.getBlock(xCoord - level - 1, yCoord + (y - 3), zCoord) == RivalRebels.forcefield)
+						if (world.getBlockState(getPos().add(-level, y, 0).down(3).west()).getBlock() == RivalRebels.forcefield)
 						{
-							worldObj.setBlock(xCoord - level - 1, yCoord + (y - 3), zCoord, Blocks.air, 0, 3);
+							world.setBlockToAir(getPos().add(-level, y, 0).down(3).west());
 						}
 					break;
-					
+
 					case 5:
-						if (worldObj.getBlock(xCoord + level + 1, yCoord + (y - 3), zCoord) == RivalRebels.forcefield)
+						if (world.getBlockState(getPos().add(level, y, 0).down(3).east()).getBlock() == RivalRebels.forcefield)
 						{
-							worldObj.setBlock(xCoord + level + 1, yCoord + (y - 3), zCoord, Blocks.air, 0, 3);
+							world.setBlockToAir(getPos().add(level, y, 0).down(3).east());
 						}
 					break;
 				}
 			}
 		}
 	}
-	
+
 	@Override
-	public AxisAlignedBB getRenderBoundingBox()
-	{
-		int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
+	public AxisAlignedBB getRenderBoundingBox() {
 		float t = 0.0625f;
 		float l = 35f;
 		float h = 3.5f;
-		switch (meta)
-		{
-			case 2: return AxisAlignedBB.getBoundingBox(xCoord + 0.5f - t, yCoord + 0.5f - h, zCoord - l, xCoord + 0.5f + t, yCoord + 0.5f + h, zCoord);
-			case 3: return AxisAlignedBB.getBoundingBox(xCoord + 0.5f - t, yCoord + 0.5f - h, zCoord + 1f, xCoord + 0.5f + t, yCoord + 0.5f + h, zCoord + 1f + l);
-			case 4: return AxisAlignedBB.getBoundingBox(xCoord - l, yCoord + 0.5f - h, zCoord + 0.5f - t, xCoord, yCoord + 0.5f + h, zCoord + 0.5f + t);
-			case 5: return AxisAlignedBB.getBoundingBox(xCoord + 1f, yCoord + 0.5f - h, zCoord + 0.5f - t, xCoord + 1f + l, yCoord + 0.5f + h, zCoord + 0.5f + t);
-			default: return AxisAlignedBB.getBoundingBox(xCoord, yCoord, zCoord, xCoord, yCoord, zCoord);
-		}
+        return switch (this.getBlockMetadata()) {
+            case 2 ->
+                    new AxisAlignedBB(getPos().getX() + 0.5f - t, getPos().getY() + 0.5f - h, getPos().getZ() - l, getPos().getX() + 0.5f + t, getPos().getY() + 0.5f + h, getPos().getZ());
+            case 3 ->
+                    new AxisAlignedBB(getPos().getX() + 0.5f - t, getPos().getY() + 0.5f - h, getPos().getZ() + 1f, getPos().getX() + 0.5f + t, getPos().getY() + 0.5f + h, getPos().getZ() + 1f + l);
+            case 4 ->
+                    new AxisAlignedBB(getPos().getX() - l, getPos().getY() + 0.5f - h, getPos().getZ() + 0.5f - t, getPos().getX(), getPos().getY() + 0.5f + h, getPos().getZ() + 0.5f + t);
+            case 5 ->
+                    new AxisAlignedBB(getPos().getX() + 1f, getPos().getY() + 0.5f - h, getPos().getZ() + 0.5f - t, getPos().getX() + 1f + l, getPos().getY() + 0.5f + h, getPos().getZ() + 0.5f + t);
+            default -> new AxisAlignedBB(getPos(), getPos());
+        };
 	}
-	
+
 	@Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()
 	{
 		return 16384.0D;
 	}
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
 		super.readFromNBT(par1NBTTagCompound);
 		rrteam = RivalRebelsTeam.getForID(par1NBTTagCompound.getInteger("rrteam"));
 		if (rrteam == RivalRebelsTeam.NONE) rrteam = null;
-		if (rrteam == null) username = par1NBTTagCompound.getString("username");
+		if (rrteam == null) uuid = par1NBTTagCompound.getUniqueId("uuid");
 	}
-	
+
 	@Override
-	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
+	public NBTTagCompound writeToNBT(NBTTagCompound par1NBTTagCompound)
 	{
 		super.writeToNBT(par1NBTTagCompound);
 		if (rrteam != null) par1NBTTagCompound.setInteger("rrteam", rrteam.ordinal());
-		if (username != null) par1NBTTagCompound.setString("username", username);
-	}
-	
+		if (uuid != null) par1NBTTagCompound.setUniqueId("uuid", uuid);
+        return par1NBTTagCompound;
+    }
+
 	@Override
 	public float powered(float power, float distance)
 	{
-		float hits = (float) Math.random();
-		int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-		
+		float hits = world.rand.nextFloat();
+		int meta = this.getBlockMetadata();
+
 		double randomness = 0.1;
 		float thickness = 0.5f;
 		float length = 35f;
 		float height = 3.52f;
 		double speed = 2;
-		
+
 		if (meta == 2)
 		{
-			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord + 0.5f - thickness, yCoord + 0.5f - height, zCoord - length, xCoord + 0.5f + thickness, yCoord + 0.5f + height, zCoord);
-			List<?> list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-			Iterator<?> iter = list.iterator();
-			while (iter.hasNext())
-			{
-				Entity e = (Entity) iter.next();
-				boolean shouldContinue = true;
-				if (e instanceof EntityPlayer && e != null)
-				{
-					EntityPlayer p = (EntityPlayer) e;
-					RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForName(p.getCommandSenderName());
-					if (p.getCommandSenderName().equals(username) || (player != null && player.rrteam == rrteam))
-					{
-						shouldContinue = false;
-						hits++;
-						p.setPositionAndUpdate(p.posX + (p.posX > (xCoord + 0.5) ? -2 : 2), p.posY, p.posZ);
-					}
-				}
-				if (shouldContinue && e != null)
-				{
-					double cpx = xCoord + 0.5f - e.posX;
-					double cpy = e.posY + e.getEyeHeight() - e.posY;
-					double cpz = e.posZ - e.posZ;
-					
-					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
-					cpx /= dist;
-					cpy /= dist;
-					cpz /= dist;
-					
-					cpx += worldObj.rand.nextGaussian() * randomness;
-					cpy += worldObj.rand.nextGaussian() * randomness;
-					cpz += worldObj.rand.nextGaussian() * randomness;
-					
-					e.motionX = -cpx - e.motionX;
-					e.motionY = -cpy - e.motionY;
-					e.motionZ = -cpz - e.motionZ;
-					RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-					if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-				}
-			}
+			AxisAlignedBB aabb = new AxisAlignedBB(getPos().getX() + 0.5f - thickness, getPos().getY() + 0.5f - height, getPos().getZ() - length, getPos().getX() + 0.5f + thickness, getPos().getY() + 0.5f + height, getPos().getZ());
+			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(null, aabb);
+            for (Entity e : list) {
+                boolean shouldContinue = true;
+                if (e instanceof EntityPlayer p) {
+                    RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
+                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                        shouldContinue = false;
+                        hits++;
+                        p.setPositionAndUpdate(p.posX + (p.posX > (getPos().getX() + 0.5) ? -2 : 2), p.posY, p.posZ);
+                    }
+                }
+                if (shouldContinue && e != null) {
+                    double cpx = getPos().getX() + 0.5f - e.posX;
+                    double cpy = e.posY + e.getEyeHeight() - e.posY;
+                    double cpz = e.posZ - e.posZ;
+
+                    double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
+
+                    cpx /= dist;
+                    cpy /= dist;
+                    cpz /= dist;
+
+                    cpx += world.rand.nextGaussian() * randomness;
+                    cpy += world.rand.nextGaussian() * randomness;
+                    cpz += world.rand.nextGaussian() * randomness;
+
+                    e.motionX = -cpx - e.motionX;
+                    e.motionY = -cpy - e.motionY;
+                    e.motionZ = -cpz - e.motionZ;
+                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    if (e.getEntityBoundingBox() != null) hits += e.getEntityBoundingBox().getAverageEdgeLength();
+                }
+            }
 			if (level < length)
 			{
-				placeBlockCarefully(worldObj, xCoord, yCoord, (int) (zCoord - length - 1), RivalRebels.reactive);
+				placeBlockCarefully(world, getPos().getX(), getPos().getY(), (int) (getPos().getZ() - length - 1), RivalRebels.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (worldObj.getBlock(xCoord, yCoord + (y - 3), zCoord - level - 1) != RivalRebels.forcefield)
+					if (world.getBlockState(new BlockPos(getPos().getX(), getPos().getY() + (y - 3), getPos().getZ() - level - 1)) != RivalRebels.forcefield)
 					{
-						worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord - level - 1, RivalRebels.forcefield, meta, 3);
+						world.setBlockState(new BlockPos(getPos().getX(), getPos().getY() + (y - 3), getPos().getZ() - level - 1), RivalRebels.forcefield.getStateFromMeta(meta));
 						hits++;
 					}
 				}
 				level++;
 			}
 		}
-		
+
 		if (meta == 3)
 		{
-			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord + 0.5f - thickness, yCoord + 0.5f - height, zCoord + 1f, xCoord + 0.5f + thickness, yCoord + 0.5f + height, zCoord + 1f + length);
-			List<?> list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-			Iterator<?> iter = list.iterator();
-			while (iter.hasNext())
-			{
-				Entity e = (Entity) iter.next();
-				boolean shouldContinue = true;
-				if (e instanceof EntityPlayer && e != null)
-				{
-					EntityPlayer p = (EntityPlayer) e;
-					RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForName(p.getCommandSenderName());
-					if (p.getCommandSenderName().equals(username) || (player != null && player.rrteam == rrteam))
-					{
-						shouldContinue = false;
-						hits++;
-						p.setPositionAndUpdate(p.posX + (p.posX > (xCoord + 0.5) ? -2 : 2), p.posY, p.posZ);
-					}
-				}
-				if (shouldContinue && e != null)
-				{
-					double cpx = xCoord + 0.5f - e.posX;
-					double cpy = e.posY + e.getEyeHeight() - e.posY;
-					double cpz = e.posZ - e.posZ;
-					
-					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
-					cpx /= dist;
-					cpy /= dist;
-					cpz /= dist;
-					
-					cpx += worldObj.rand.nextGaussian() * randomness;
-					cpy += worldObj.rand.nextGaussian() * randomness;
-					cpz += worldObj.rand.nextGaussian() * randomness;
-					
-					e.motionX = -cpx - e.motionX;
-					e.motionY = -cpy - e.motionY;
-					e.motionZ = -cpz - e.motionZ;
-					RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-					if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-				}
-			}
+			AxisAlignedBB aabb = new AxisAlignedBB(getPos().getX() + 0.5f - thickness, getPos().getY() + 0.5f - height, getPos().getZ() + 1f, getPos().getX() + 0.5f + thickness, getPos().getY() + 0.5f + height, getPos().getZ() + 1f + length);
+			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(null, aabb);
+            for (Entity e : list) {
+                boolean shouldContinue = true;
+                if (e instanceof EntityPlayer && e != null) {
+                    EntityPlayer p = (EntityPlayer) e;
+                    RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
+                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                        shouldContinue = false;
+                        hits++;
+                        p.setPositionAndUpdate(p.posX + (p.posX > (getPos().getX() + 0.5) ? -2 : 2), p.posY, p.posZ);
+                    }
+                }
+                if (shouldContinue && e != null) {
+                    double cpx = getPos().getX() + 0.5f - e.posX;
+                    double cpy = e.posY + e.getEyeHeight() - e.posY;
+                    double cpz = e.posZ - e.posZ;
+
+                    double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
+
+                    cpx /= dist;
+                    cpy /= dist;
+                    cpz /= dist;
+
+                    cpx += world.rand.nextGaussian() * randomness;
+                    cpy += world.rand.nextGaussian() * randomness;
+                    cpz += world.rand.nextGaussian() * randomness;
+
+                    e.motionX = -cpx - e.motionX;
+                    e.motionY = -cpy - e.motionY;
+                    e.motionZ = -cpz - e.motionZ;
+                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    if (e.getEntityBoundingBox() != null) hits += e.getEntityBoundingBox().getAverageEdgeLength();
+                }
+            }
 			if (level < length)
 			{
-				placeBlockCarefully(worldObj, xCoord, yCoord, (int) (zCoord + length + 1), RivalRebels.reactive);
+				placeBlockCarefully(world, getPos().getX(), getPos().getY(), (int) (getPos().getZ() + length + 1), RivalRebels.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (worldObj.getBlock(xCoord, yCoord + (y - 3), zCoord + level + 1) != RivalRebels.forcefield)
+					if (world.getBlockState(getPos().add(0, y, level).down(3).south()).getBlock() != RivalRebels.forcefield)
 					{
-						worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord + level + 1, RivalRebels.forcefield, meta, 3);
+						world.setBlockState(getPos().add(0, y, level).down(3).south(), RivalRebels.forcefield.getStateFromMeta(meta));
 						hits++;
 					}
 				}
 				level++;
 			}
 		}
-		
+
 		if (meta == 4)
 		{
-			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord - length, yCoord + 0.5f - height, zCoord + 0.5f - thickness, xCoord, yCoord + 0.5f + height, zCoord + 0.5f + thickness);
-			List<?> list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-			Iterator<?> iter = list.iterator();
-			while (iter.hasNext())
-			{
-				Entity e = (Entity) iter.next();
-				boolean shouldContinue = true;
-				if (e instanceof EntityPlayer && e != null)
-				{
-					EntityPlayer p = (EntityPlayer) e;
-					RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForName(p.getCommandSenderName());
-					if (p.getCommandSenderName().equals(username) || (player != null && player.rrteam == rrteam))
-					{
-						shouldContinue = false;
-						hits++;
-						p.setPositionAndUpdate(p.posX, p.posY, p.posZ + (p.posZ > (zCoord + 0.5) ? -2 : 2));
-					}
-				}
-				if (shouldContinue && e != null)
-				{
-					double cpx = e.posX - e.posX;
-					double cpy = e.posY + e.getEyeHeight() - e.posY;
-					double cpz = zCoord + 0.5f - e.posZ;
-					
-					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
-					cpx /= dist;
-					cpy /= dist;
-					cpz /= dist;
-					
-					cpx += worldObj.rand.nextGaussian() * randomness;
-					cpy += worldObj.rand.nextGaussian() * randomness;
-					cpz += worldObj.rand.nextGaussian() * randomness;
-					
-					e.motionX = -cpx - e.motionX;
-					e.motionY = -cpy - e.motionY;
-					e.motionZ = -cpz - e.motionZ;
-					RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-					if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-				}
-			}
+			AxisAlignedBB aabb = new AxisAlignedBB(getPos().getX() - length, getPos().getY() + 0.5f - height, getPos().getZ() + 0.5f - thickness, getPos().getX(), getPos().getY() + 0.5f + height, getPos().getZ() + 0.5f + thickness);
+			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(null, aabb);
+            for (Entity e : list) {
+                boolean shouldContinue = true;
+                if (e instanceof EntityPlayer p) {
+                    RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
+                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                        shouldContinue = false;
+                        hits++;
+                        p.setPositionAndUpdate(p.posX, p.posY, p.posZ + (p.posZ > (getPos().getZ() + 0.5) ? -2 : 2));
+                    }
+                }
+                if (shouldContinue && e != null) {
+                    double cpx = e.posX - e.posX;
+                    double cpy = e.posY + e.getEyeHeight() - e.posY;
+                    double cpz = getPos().getZ() + 0.5f - e.posZ;
+
+                    double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
+
+                    cpx /= dist;
+                    cpy /= dist;
+                    cpz /= dist;
+
+                    cpx += world.rand.nextGaussian() * randomness;
+                    cpy += world.rand.nextGaussian() * randomness;
+                    cpz += world.rand.nextGaussian() * randomness;
+
+                    e.motionX = -cpx - e.motionX;
+                    e.motionY = -cpy - e.motionY;
+                    e.motionZ = -cpz - e.motionZ;
+                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    if (e.getEntityBoundingBox() != null) hits += e.getEntityBoundingBox().getAverageEdgeLength();
+                }
+            }
 			if (level < length)
 			{
-				placeBlockCarefully(worldObj, (int) (xCoord - length - 1), yCoord, zCoord, RivalRebels.reactive);
+				placeBlockCarefully(world, (int) (getPos().getX() - length - 1), getPos().getY(), getPos().getZ(), RivalRebels.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (worldObj.getBlock(xCoord - level - 1, yCoord + (y - 3), zCoord) != RivalRebels.forcefield)
+					if (world.getBlockState(getPos().add(-level, y, 0).down(3).west()).getBlock() != RivalRebels.forcefield)
 					{
-						worldObj.setBlock(xCoord - level - 1, yCoord + (y - 3), zCoord, RivalRebels.forcefield, meta, 3);
+						world.setBlockState(getPos().add(-level, y, 0).down(3).west(), RivalRebels.forcefield.getStateFromMeta(meta));
 						hits++;
 					}
 				}
 				level++;
 			}
 		}
-		
+
 		if (meta == 5)
 		{
-			AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord + 1f, yCoord + 0.5f - height, zCoord + 0.5f - thickness, xCoord + 1f + length, yCoord + 0.5f + height, zCoord + 0.5f + thickness);
-			List<?> list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-			Iterator<?> iter = list.iterator();
-			while (iter.hasNext())
-			{
-				Entity e = (Entity) iter.next();
-				boolean shouldContinue = true;
-				if (e instanceof EntityPlayer && e != null)
-				{
-					EntityPlayer p = (EntityPlayer) e;
-					RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForName(p.getCommandSenderName());
-					if (p.getCommandSenderName().equals(username) || (player != null && player.rrteam == rrteam))
-					{
-						shouldContinue = false;
-						hits++;
-						p.setPositionAndUpdate(p.posX, p.posY, p.posZ + (p.posZ > (zCoord + 0.5) ? -2 : 2));
-					}
-				}
-				if (shouldContinue && e != null)
-				{
-					double cpx = e.posX - e.posX;
-					double cpy = e.posY + e.getEyeHeight() - e.posY;
-					double cpz = zCoord + 0.5f - e.posZ;
-					
-					double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
-					
-					cpx /= dist;
-					cpy /= dist;
-					cpz /= dist;
-					
-					cpx += worldObj.rand.nextGaussian() * randomness;
-					cpy += worldObj.rand.nextGaussian() * randomness;
-					cpz += worldObj.rand.nextGaussian() * randomness;
-					
-					e.motionX = -cpx - e.motionX;
-					e.motionY = -cpy - e.motionY;
-					e.motionZ = -cpz - e.motionZ;
-					RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-					if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-				}
-			}
+			AxisAlignedBB aabb = new AxisAlignedBB(getPos().getX() + 1f, getPos().getY() + 0.5f - height, getPos().getZ() + 0.5f - thickness, getPos().getX() + 1f + length, getPos().getY() + 0.5f + height, getPos().getZ() + 0.5f + thickness);
+			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(null, aabb);
+            for (Entity e : list) {
+                boolean shouldContinue = true;
+                if (e instanceof EntityPlayer p) {
+                    RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
+                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                        shouldContinue = false;
+                        hits++;
+                        p.setPositionAndUpdate(p.posX, p.posY, p.posZ + (p.posZ > (getPos().getZ() + 0.5) ? -2 : 2));
+                    }
+                }
+                if (shouldContinue && e != null) {
+                    double cpx = e.posX - e.posX;
+                    double cpy = e.posY + e.getEyeHeight() - e.posY;
+                    double cpz = getPos().getZ() + 0.5f - e.posZ;
+
+                    double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
+
+                    cpx /= dist;
+                    cpy /= dist;
+                    cpz /= dist;
+
+                    cpx += world.rand.nextGaussian() * randomness;
+                    cpy += world.rand.nextGaussian() * randomness;
+                    cpz += world.rand.nextGaussian() * randomness;
+
+                    e.motionX = -cpx - e.motionX;
+                    e.motionY = -cpy - e.motionY;
+                    e.motionZ = -cpz - e.motionZ;
+                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    if (e.getEntityBoundingBox() != null) hits += e.getEntityBoundingBox().getAverageEdgeLength();
+                }
+            }
 			if (level < length)
 			{
-				placeBlockCarefully(worldObj, (int) (xCoord + length + 1), yCoord, zCoord, RivalRebels.reactive);
+				placeBlockCarefully(world, (int) (getPos().getX() + length + 1), getPos().getY(), getPos().getZ(), RivalRebels.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (worldObj.getBlock(xCoord + level + 1, yCoord + (y - 3), zCoord) != RivalRebels.forcefield)
+					if (world.getBlockState(getPos().add(level, y, 0).down(3).east()).getBlock() != RivalRebels.forcefield)
 					{
-						worldObj.setBlock(xCoord + level + 1, yCoord + (y - 3), zCoord, RivalRebels.forcefield, meta, 3);
+						world.setBlockState(getPos().add(level, y, 0).down(3).east(), RivalRebels.forcefield.getStateFromMeta(meta));
 						hits++;
 					}
 				}
@@ -377,340 +352,16 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		}
 		return (power - (hits * 16));
 	}
-	
-	public void placeBlockCarefully(World world, int i, int j, int z, Block blockID)
+
+	public void placeBlockCarefully(World world, int i, int j, int z, Block block)
 	{
-		if (world.getBlock(i, j, z) != RivalRebels.reactive && world.getBlock(i, j, z) != RivalRebels.fshield && world.getBlock(i, j, z) != RivalRebels.omegaobj && world.getBlock(i, j, z) != RivalRebels.sigmaobj)
+        BlockPos pos = new BlockPos(i, j, z);
+        if (world.getBlockState(pos).getBlock() != RivalRebels.reactive &&
+            world.getBlockState(pos).getBlock() != RivalRebels.fshield &&
+            world.getBlockState(pos).getBlock() != RivalRebels.omegaobj &&
+            world.getBlockState(pos).getBlock() != RivalRebels.sigmaobj)
 		{
-			world.setBlock(i, j, z, blockID);
+			world.setBlockState(pos, block.getDefaultState());
 		}
 	}
 }
-
-// package RivalRebels.Common.TileEntity;
-//
-// import java.util.Iterator;
-// import java.util.List;
-//
-// import cpw.mods.fml.common.FMLCommonHandler;
-// import cpw.mods.fml.relauncher.Side;
-// import cpw.mods.fml.relauncher.SideOnly;
-//
-// import RivalRebels.Client.Gui.GuiOptiFineWarning;
-// import RivalRebels.Common.Core.RivalRebels;
-// import RivalRebels.Common.Core.RivalRebelsPlayer;
-// import RivalRebels.Common.Core.RivalRebelsSoundPlayer;
-// import RivalRebels.Common.Core.RivalRebelsTeam;
-//
-// import net.minecraft.client.Minecraft;
-// import net.minecraft.entity.Entity;
-// import net.minecraft.entity.player.EntityPlayer;
-// import net.minecraft.item.ItemStack;
-// import net.minecraft.nbt.NBTTagCompound;
-// import net.minecraft.tileentity.TileEntity;
-// import net.minecraft.util.AxisAlignedBB;
-// import net.minecraft.world.World;
-//
-// public class TileEntityForceFieldNode extends TileEntityMachineBase
-// {
-// public String username = null;
-// public RivalRebelsTeam rrteam = null;
-// public boolean first = false;
-// public TileEntityForceFieldNode()
-// {
-// pInM = 345;
-// pInR = 0;
-// }
-//
-// public AxisAlignedBB getRenderBoundingBox()
-// {
-// return this.INFINITE_EXTENT_AABB;
-// }
-//
-// @SideOnly(Side.CLIENT)
-// public double getMaxRenderDistanceSquared()
-// {
-// return 16384.0D;
-// }
-//
-// public void readFromNBT(NBTTagCompound par1NBTTagCompound)
-// {
-// super.readFromNBT(par1NBTTagCompound);
-// rrteam = RivalRebelsTeam.getForID(par1NBTTagCompound.getInteger("rrteam"));
-// if (rrteam == RivalRebelsTeam.NONE) rrteam = null;
-// if (rrteam == null) username = par1NBTTagCompound.getString("username");
-// }
-//
-// public void writeToNBT(NBTTagCompound par1NBTTagCompound)
-// {
-// super.writeToNBT(par1NBTTagCompound);
-// if (rrteam != null) par1NBTTagCompound.setInteger("rrteam", rrteam.ordinal());
-// if (username != null) par1NBTTagCompound.setString("username", username);
-// }
-//
-// @Override
-// public float powered(float power, float distance)
-// {
-// float hits = 0;
-// int meta = worldObj.getBlockMetadata(xCoord, yCoord, zCoord);
-//
-// double randomness = 0.1;
-// float thickness = 0.5f;
-// float length = 35f;
-// float height = 3.52f;
-// double speed = 2;
-//
-// if (meta == 2)
-// {
-// AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord+0.5f-thickness, yCoord+0.5f-height, zCoord-length, xCoord+0.5f+thickness, yCoord+0.5f+height, zCoord);
-// List list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-// Iterator iter = list.iterator();
-// while (iter.hasNext())
-// {
-// Entity e = (Entity) iter.next();
-// boolean shouldContinue = true;
-// if (e instanceof EntityPlayer && e != null)
-// {
-// EntityPlayer p = (EntityPlayer)e;
-// RivalRebelsPlayer player = RivalRebels.rrplayerlist.getForName(p.username);
-// if (p.username.equals(username) || (player != null && player.rrteam == rrteam))
-// {
-// shouldContinue = false;
-// hits++;
-// p.setPositionAndUpdate(p.posX + (p.posX > (xCoord + 0.5) ? -2 : 2), p.posY, p.posZ);
-// }
-// }
-// if (shouldContinue && e != null)
-// {
-// double cpx = xCoord + 0.5f - e.posX;
-// double cpy = e.posY + e.getEyeHeight() - e.posY;
-// double cpz = e.posZ - e.posZ;
-//
-// double dist = Math.sqrt(cpx*cpx + cpy*cpy + cpz*cpz) / speed;
-//
-// cpx /= dist;
-// cpy /= dist;
-// cpz /= dist;
-//
-// cpx += worldObj.rand.nextGaussian() * randomness;
-// cpy += worldObj.rand.nextGaussian() * randomness;
-// cpz += worldObj.rand.nextGaussian() * randomness;
-//
-// e.motionX = -cpx-e.motionX;
-// e.motionY = -cpy-e.motionY;
-// e.motionZ = -cpz-e.motionZ;
-// RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-// if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-// }
-// }
-// for (int i = 0; i < length; i++)
-// {
-// for (int y = 0; y < 7; y++)
-// {
-// if (worldObj.getBlockId(xCoord, yCoord + (y - 3), zCoord - i - 1) != RivalRebels.forcefield.blockID)
-// {
-// worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord - i - 1, RivalRebels.forcefield.blockID, meta, 3);
-// hits++;
-// }
-// }
-// }
-// if (!first)
-// {
-// first = true;
-// placeBlockCarefully(worldObj, xCoord, yCoord, (int) (zCoord-length-1), RivalRebels.reactive.blockID);
-// }
-// }
-//
-// if (meta == 3)
-// {
-// AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord+0.5f-thickness, yCoord+0.5f-height, zCoord+1f, xCoord+0.5f+thickness, yCoord+0.5f+height, zCoord+1f+length);
-// List list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-// Iterator iter = list.iterator();
-// while (iter.hasNext())
-// {
-// Entity e = (Entity) iter.next();
-// boolean shouldContinue = true;
-// if (e instanceof EntityPlayer && e != null)
-// {
-// EntityPlayer p = (EntityPlayer)e;
-// RivalRebelsPlayer player = RivalRebels.rrplayerlist.getForName(p.username);
-// if (p.username.equals(username) || (player != null && player.rrteam == rrteam))
-// {
-// shouldContinue = false;
-// hits++;
-// p.setPositionAndUpdate(p.posX + (p.posX > (xCoord + 0.5) ? -2 : 2), p.posY, p.posZ);
-// }
-// }
-// if (shouldContinue && e != null)
-// {
-// double cpx = xCoord + 0.5f - e.posX;
-// double cpy = e.posY + e.getEyeHeight() - e.posY;
-// double cpz = e.posZ - e.posZ;
-//
-// double dist = Math.sqrt(cpx*cpx + cpy*cpy + cpz*cpz) / speed;
-//
-// cpx /= dist;
-// cpy /= dist;
-// cpz /= dist;
-//
-// cpx += worldObj.rand.nextGaussian() * randomness;
-// cpy += worldObj.rand.nextGaussian() * randomness;
-// cpz += worldObj.rand.nextGaussian() * randomness;
-//
-// e.motionX = -cpx-e.motionX;
-// e.motionY = -cpy-e.motionY;
-// e.motionZ = -cpz-e.motionZ;
-// RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-// if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-// }
-// }
-// for (int i = 0; i < length; i++)
-// {
-// for (int y = 0; y < 7; y++)
-// {
-// if (worldObj.getBlockId(xCoord, yCoord + (y - 3), zCoord + i + 1) != RivalRebels.forcefield.blockID)
-// {
-// worldObj.setBlock(xCoord, yCoord + (y - 3), zCoord + i + 1, RivalRebels.forcefield.blockID, meta, 3);
-// hits++;
-// }
-// }
-// }
-// if (!first)
-// {
-// first = true;
-// placeBlockCarefully(worldObj, xCoord, yCoord, (int) (zCoord+length+1), RivalRebels.reactive.blockID);
-// }
-// }
-//
-// if (meta == 4)
-// {
-// AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord-length, yCoord+0.5f-height, zCoord+0.5f-thickness, xCoord, yCoord+0.5f+height, zCoord+0.5f+thickness);
-// List list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-// Iterator iter = list.iterator();
-// while (iter.hasNext())
-// {
-// Entity e = (Entity) iter.next();
-// boolean shouldContinue = true;
-// if (e instanceof EntityPlayer && e != null)
-// {
-// EntityPlayer p = (EntityPlayer)e;
-// RivalRebelsPlayer player = RivalRebels.rrplayerlist.getForName(p.username);
-// if (p.username.equals(username) || (player != null && player.rrteam == rrteam))
-// {
-// shouldContinue = false;
-// hits++;
-// p.setPositionAndUpdate(p.posX, p.posY, p.posZ + (p.posZ > (zCoord + 0.5) ? -2 : 2));
-// }
-// }
-// if (shouldContinue && e != null)
-// {
-// double cpx = e.posX - e.posX;
-// double cpy = e.posY + e.getEyeHeight() - e.posY;
-// double cpz = zCoord + 0.5f - e.posZ;
-//
-// double dist = Math.sqrt(cpx*cpx + cpy*cpy + cpz*cpz) / speed;
-//
-// cpx /= dist;
-// cpy /= dist;
-// cpz /= dist;
-//
-// cpx += worldObj.rand.nextGaussian() * randomness;
-// cpy += worldObj.rand.nextGaussian() * randomness;
-// cpz += worldObj.rand.nextGaussian() * randomness;
-//
-// e.motionX = -cpx-e.motionX;
-// e.motionY = -cpy-e.motionY;
-// e.motionZ = -cpz-e.motionZ;
-// RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-// if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-// }
-// }
-// for (int i = 0; i < length; i++)
-// {
-// for (int y = 0; y < 7; y++)
-// {
-// if (worldObj.getBlockId(xCoord - i - 1, yCoord + (y - 3), zCoord) != RivalRebels.forcefield.blockID)
-// {
-// worldObj.setBlock(xCoord - i - 1, yCoord + (y - 3), zCoord, RivalRebels.forcefield.blockID, meta, 3);
-// hits++;
-// }
-// }
-// }
-// if (!first)
-// {
-// first = true;
-// placeBlockCarefully(worldObj, (int) (xCoord-length-1), yCoord, zCoord, RivalRebels.reactive.blockID);
-// }
-// }
-//
-// if (meta == 5)
-// {
-// AxisAlignedBB aabb = AxisAlignedBB.getBoundingBox(xCoord+1f, yCoord+0.5f-height, zCoord+0.5f-thickness, xCoord+1f+length, yCoord+0.5f+height, zCoord+0.5f+thickness);
-// List list = worldObj.getEntitiesWithinAABBExcludingEntity(null, aabb);
-// Iterator iter = list.iterator();
-// while (iter.hasNext())
-// {
-// Entity e = (Entity) iter.next();
-// boolean shouldContinue = true;
-// if (e instanceof EntityPlayer && e != null)
-// {
-// EntityPlayer p = (EntityPlayer)e;
-// RivalRebelsPlayer player = RivalRebels.rrplayerlist.getForName(p.username);
-// if (p.username.equals(username) || (player != null && player.rrteam == rrteam))
-// {
-// shouldContinue = false;
-// hits++;
-// p.setPositionAndUpdate(p.posX, p.posY, p.posZ + (p.posZ > (zCoord + 0.5) ? -2 : 2));
-// }
-// }
-// if (shouldContinue && e != null)
-// {
-// double cpx = e.posX - e.posX;
-// double cpy = e.posY + e.getEyeHeight() - e.posY;
-// double cpz = zCoord + 0.5f - e.posZ;
-//
-// double dist = Math.sqrt(cpx*cpx + cpy*cpy + cpz*cpz) / speed;
-//
-// cpx /= dist;
-// cpy /= dist;
-// cpz /= dist;
-//
-// cpx += worldObj.rand.nextGaussian() * randomness;
-// cpy += worldObj.rand.nextGaussian() * randomness;
-// cpz += worldObj.rand.nextGaussian() * randomness;
-//
-// e.motionX = -cpx-e.motionX;
-// e.motionY = -cpy-e.motionY;
-// e.motionZ = -cpz-e.motionZ;
-// RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
-// if (e.boundingBox != null) hits += e.boundingBox.getAverageEdgeLength();
-// }
-// }
-// for (int i = 0; i < length; i++)
-// {
-// for (int y = 0; y < 7; y++)
-// {
-// if (worldObj.getBlockId(xCoord + i + 1, yCoord + (y - 3), zCoord) != RivalRebels.forcefield.blockID)
-// {
-// worldObj.setBlock(xCoord + i + 1, yCoord + (y - 3), zCoord, RivalRebels.forcefield.blockID, meta, 3);
-// hits++;
-// }
-// }
-// }
-// if (!first)
-// {
-// first = true;
-// placeBlockCarefully(worldObj, (int) (xCoord+length+1), yCoord, zCoord, RivalRebels.reactive.blockID);
-// }
-// }
-// return (power - (hits * 16));
-// }
-// public void placeBlockCarefully(World world, int i, int j, int z, int blockID)
-// {
-// if (world.getBlockId(i, j, z) != RivalRebels.reactive.blockID && world.getBlockId(i, j, z) != RivalRebels.fshield.blockID && world.getBlockId(i, j, z) != RivalRebels.omegaobj.blockID &&
-// world.getBlockId(i, j, z) != RivalRebels.sigmaobj.blockID)
-// {
-// world.setBlock(i, j, z, blockID);
-// }
-// }
-// }

@@ -11,68 +11,50 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.tileentity.TileEntity;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.network.PacketBuffer;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class LaptopButtonPacket implements IMessage
-{
-	int x;
-	int y;
-	int z;
-	
-	public LaptopButtonPacket()
-	{
-		
+public class LaptopButtonPacket implements IMessage {
+    private BlockPos pos;
+
+	public LaptopButtonPacket() {
 	}
-	
-	public LaptopButtonPacket(int X, int Y, int Z)
-	{
-		x = X;
-		y = Y;
-		z = Z;
-	}
-	
+
+    public LaptopButtonPacket(BlockPos pos) {
+        this.pos = pos;
+    }
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		x = buf.readInt();
-		y = buf.readInt();
-		z = buf.readInt();
+        pos = new PacketBuffer(buf).readBlockPos();
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
+	public void toBytes(ByteBuf buf) {
+        new PacketBuffer(buf).writeBlockPos(pos);
 	}
-	
+
 	public static class Handler implements IMessageHandler<LaptopButtonPacket, IMessage>
 	{
 		@Override
-		public IMessage onMessage(LaptopButtonPacket m, MessageContext ctx)
-		{
-			if (ctx.getServerHandler().playerEntity.getDistanceSq(m.x, m.y, m.z) < 100)
-			{
-				TileEntity te = ctx.getServerHandler().playerEntity.worldObj.getTileEntity(m.x, m.y, m.z);
-				if (te != null && te instanceof TileEntityLaptop)
-				{
-					((TileEntityLaptop)te).onGoButtonPressed();
-				}
-			}
+        public IMessage onMessage(LaptopButtonPacket m, MessageContext ctx) {
+            EntityPlayerMP player = ctx.getServerHandler().player;
+            player.getServer().addScheduledTask(() -> {
+                if (player.getDistanceSq(m.pos) < 100) {
+                    TileEntity te = player.world.getTileEntity(m.pos);
+                    if (te instanceof TileEntityLaptop) {
+                        ((TileEntityLaptop) te).onGoButtonPressed();
+                    }
+                }
+            });
 			return null;
 		}
 	}

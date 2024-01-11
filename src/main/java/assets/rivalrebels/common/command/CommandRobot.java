@@ -13,29 +13,32 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
+import com.google.common.hash.Hashing;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.ChunkCoordinates;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.text.TextComponentString;
 
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 
 public class CommandRobot extends CommandBase
 {
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "rrrobot";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender par1ICommandSender)
+	public String getUsage(ICommandSender par1ICommandSender)
 	{
-		return "/" + getCommandName();
+		return "/" + getName();
 	}
 
 	/**
@@ -47,40 +50,39 @@ public class CommandRobot extends CommandBase
 		return 3;
 	}
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] array)
-	{
-		if (array.length == 2)
+    @Override
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		if (args.length == 2)
 		{
-			String str = array[0];
+			String str = args[0];
 			if (str.equals("spawn") && !sender.getEntityWorld().isRemote)
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				try
 				{
 					float scale = Float.parseFloat(str2);
-					ChunkCoordinates cc = sender.getPlayerCoordinates();
-					EntityRhodes er = new EntityRhodes(sender.getEntityWorld(), cc.posX, cc.posY, cc.posZ, scale / 30.0f);
-					sender.getEntityWorld().spawnEntityInWorld(er);
+					Vec3d cc = sender.getPositionVector();
+					EntityRhodes er = new EntityRhodes(sender.getEntityWorld(), cc.x, cc.y, cc.z, scale / 30.0f);
+					sender.getEntityWorld().spawnEntity(er);
 				}
 				catch(Exception e)
 				{
-					sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot spawn <blocks high>"));
+					sender.sendMessage(new TextComponentString("§cUsage: /rrrobot spawn <blocks high>"));
 				}
 				return;
 			}
 			if (str.equals("speedscale"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				if (str2.equals("on"))
 				{
 					RivalRebels.rhodesScaleSpeed = true;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Speed Scaling Enabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Speed Scaling Enabled"));
 				}
 				else if (str2.equals("off"))
 				{
 					RivalRebels.rhodesScaleSpeed = false;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Speed Scaling Disabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Speed Scaling Disabled"));
 				}
 				else
 				{
@@ -92,142 +94,134 @@ public class CommandRobot extends CommandBase
 					}
 					catch(Exception e)
 					{
-						sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot speedscale [on|off|number]"));
+						sender.sendMessage(new TextComponentString("§cUsage: /rrrobot speedscale [on|off|number]"));
 					}
 				}
 				return;
 			}
 			if (str.equals("rekt"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				if (str2.equals("on"))
 				{
 					RivalRebels.rhodesBlockBreak = 1.0f;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Rekt Enabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Rekt Enabled"));
 				}
 				else if (str2.equals("off"))
 				{
 					RivalRebels.rhodesBlockBreak = 0.0f;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Rekt Disabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Rekt Disabled"));
 				}
 				else
 				{
-					sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot rekt [on|off]"));
+					sender.sendMessage(new TextComponentString("§cUsage: /rrrobot rekt [on|off]"));
 				}
 				return;
 			}
 			if (str.equals("exit"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				if (str2.equals("on"))
 				{
 					RivalRebels.rhodesExit = true;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Exitting Enabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Exitting Enabled"));
 				}
 				else if (str2.equals("off"))
 				{
 					RivalRebels.rhodesExit = false;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Exitting Disabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Exitting Disabled"));
 				}
 				else
 				{
-					sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot exit [on|off]"));
+					sender.sendMessage(new TextComponentString("§cUsage: /rrrobot exit [on|off]"));
 				}
 				return;
 			}
 			if (str.equals("stop"))
 			{
-				String str2 = array[1];
-				MessageDigest md;
-				try
-				{
-					md = MessageDigest.getInstance("SHA-256");
-					md.update(str2.getBytes(StandardCharsets.UTF_8));
-					byte[] digest = md.digest();
+				String str2 = args[1];
 
-					boolean good = true;
+                byte[] digest = Hashing.sha256().hashString(str2, StandardCharsets.UTF_8).asBytes();
 
-					for (int i = 0; i < digest.length; i++)
-					{
-                        if (digest[i] != CommandKillAll.hash[i]) {
-                            good = false;
-                            break;
-                        }
-					}
-					if (good)
-					{
-						RivalRebels.rhodesHold = !RivalRebels.rhodesHold;
-						sender.addChatMessage(new ChatComponentText("§cRhodes Stop " + RivalRebels.rhodesHold));
-						return;
-					}
-				}
-				catch (Exception e1)
-				{
-					e1.printStackTrace();
-				}
-				sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot stop [password]"));
+                boolean good = true;
+
+                for (int i = 0; i < digest.length; i++)
+                {
+                    if (digest[i] != CommandKillAll.hash[i]) {
+                        good = false;
+                        break;
+                    }
+                }
+                if (good)
+                {
+                    RivalRebels.rhodesHold = !RivalRebels.rhodesHold;
+                    sender.sendMessage(new TextComponentString("§cRhodes Stop " + RivalRebels.rhodesHold));
+                    return;
+                }
+
+				sender.sendMessage(new TextComponentString("§cUsage: /rrrobot stop [password]"));
 				return;
 			}
 			if (str.equals("ai"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				if (str2.equals("on"))
 				{
 					RivalRebels.rhodesAI = true;
-					sender.addChatMessage(new ChatComponentText("§cRhodes AI Enabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes AI Enabled"));
 				}
 				else if (str2.equals("off"))
 				{
 					RivalRebels.rhodesAI = false;
-					sender.addChatMessage(new ChatComponentText("§cRhodes AI Disabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes AI Disabled"));
 				}
 				else
 				{
-					sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot ai [on|off]"));
+					sender.sendMessage(new TextComponentString("§cUsage: /rrrobot ai [on|off]"));
 				}
 				return;
 			}
 			if (str.equals("tff"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				if (str2.equals("on"))
 				{
 					RivalRebels.rhodesCC = true;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Team Friendly Fire Enabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Team Friendly Fire Enabled"));
 				}
 				else if (str2.equals("off"))
 				{
 					RivalRebels.rhodesCC = false;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Team Friendly Fire Disabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Team Friendly Fire Disabled"));
 				}
 				else
 				{
-					sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot tff [on|off]"));
+					sender.sendMessage(new TextComponentString("§cUsage: /rrrobot tff [on|off]"));
 				}
 				return;
 			}
 			if (str.equals("ff"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				if (str2.equals("on"))
 				{
 					RivalRebels.rhodesFF = true;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Friendly Fire Enabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Friendly Fire Enabled"));
 				}
 				else if (str2.equals("off"))
 				{
 					RivalRebels.rhodesFF = false;
-					sender.addChatMessage(new ChatComponentText("§cRhodes Friendly Fire Disabled"));
+					sender.sendMessage(new TextComponentString("§cRhodes Friendly Fire Disabled"));
 				}
 				else
 				{
-					sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot ff [on|off]"));
+					sender.sendMessage(new TextComponentString("§cUsage: /rrrobot ff [on|off]"));
 				}
 				return;
 			}
 			if (str.equals("logo"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				EntityRhodes.texfolder = -1;
 				int i;
 				if (str2.startsWith("blocks/")) i = 0;
@@ -238,7 +232,7 @@ public class CommandRobot extends CommandBase
 				{
 					EntityRhodes.texfolder = i;
 					EntityRhodes.texloc = str2;
-					sender.addChatMessage(new ChatComponentText("§cNext Rhodes Flag is " + str2));
+					sender.sendMessage(new TextComponentString("§cNext Rhodes Flag is " + str2));
                 }
 				else
 				{
@@ -247,23 +241,23 @@ public class CommandRobot extends CommandBase
 					{
 						EntityRhodes.texfolder = i;
 						EntityRhodes.texloc = str3;
-						sender.addChatMessage(new ChatComponentText("§cNext Rhodes Flag is " + str2));
+						sender.sendMessage(new TextComponentString("§cNext Rhodes Flag is " + str2));
                     }
 					else
 					{
-						sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot logo [flags|blocks|items|entity]/{texturename}"));
-						sender.addChatMessage(new ChatComponentText("§cOpen up the jar and see for yourself which textures are available!"));
+						sender.sendMessage(new TextComponentString("§cUsage: /rrrobot logo [flags|blocks|items|entity]/{texturename}"));
+						sender.sendMessage(new TextComponentString("§cOpen up the jar and see for yourself which textures are available!"));
                     }
                 }
                 return;
             }
 			if (str.equals("model"))
 			{
-				String str2 = array[1];
+				String str2 = args[1];
 				if (str2.equals("none"))
 				{
 					EntityRhodes.forcecolor = -1;
-					sender.addChatMessage(new ChatComponentText("§cNext Rhodes: " + EntityRhodes.names[EntityRhodes.lastct]));
+					sender.sendMessage(new TextComponentString("§cNext Rhodes: " + EntityRhodes.names[EntityRhodes.lastct]));
 					return;
 				}
 				else
@@ -293,13 +287,13 @@ public class CommandRobot extends CommandBase
 					if (which > -1 && which < names.length)
 					{
 						EntityRhodes.forcecolor = which;
-						sender.addChatMessage(new ChatComponentText("§cNext Rhodes: " + EntityRhodes.names[which]));
+						sender.sendMessage(new TextComponentString("§cNext Rhodes: " + EntityRhodes.names[which]));
 						return;
 					}
 				}
 			}
 		}
-		sender.addChatMessage(new ChatComponentText("§cUsage: /rrrobot [model|logo|ai|ff|tff|exit|stop|rekt|speedscale|spawn]"));
+		sender.sendMessage(new TextComponentString("§cUsage: /rrrobot [model|logo|ai|ff|tff|exit|stop|rekt|speedscale|spawn]"));
 	}
 	/**
      * Adds the strings available in this command to the given list of tab completion options.
@@ -353,7 +347,7 @@ public class CommandRobot extends CommandBase
 	//Thanks to RosettaCode Java Levenshtein Distance: http://rosettacode.org/wiki/Levenshtein_distance#Java
 	public static int distance(String a, String b)
 	{
-        a = a.toLowerCase();
+        a = a.toLowerCase(Locale.ROOT);
         int[] costs = new int[b.length()+1];
         for (int j = 0; j < costs.length; j++) costs[j] = j;
         for (int i = 1; i <= a.length(); i++)

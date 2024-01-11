@@ -11,43 +11,46 @@
  *******************************************************************************/
 package assets.rivalrebels.common.command;
 
-import java.security.MessageDigest;
-import java.util.List;
-
-import net.minecraft.command.CommandBase;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
+import com.google.common.hash.Hashing;
+import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import org.jetbrains.annotations.Nullable;
+
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.List;
 
 public class CommandPassword extends CommandBase
 {
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "rr";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender par1ICommandSender)
+	public String getUsage(ICommandSender par1ICommandSender)
 	{
-		return "/" + getCommandName() + " <code> [player]";
+		return "/" + getName() + " <code> [player]";
 	}
 
-	@Override
-	public boolean canCommandSenderUseCommand(ICommandSender par1)
-	{
-		return true;
-	}
+    @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+        return true;
+    }
 
-	String[] rhashes = new String[]{
+    String[] rhashes = new String[]{
 			"23742137371982715120014159120241255637172",
 			"1518918615824625494170109603025017352201241"
 	};
@@ -64,83 +67,56 @@ public class CommandPassword extends CommandBase
 			"107170188164102246158207236028166217204217177"
 	};
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] array)
-	{
-		ChatComponentText message = new ChatComponentText("nope.");
-		if (array.length == 0)
+    @Override
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+		ITextComponent message = new TextComponentString("nope.");
+		if (args.length == 0)
 		{
-			sender.addChatMessage(message);
+			sender.sendMessage(message);
 			return;
 		}
 		EntityPlayer person = getCommandSenderAsPlayer(sender);
-		String code = array[0];
+		String code = args[0];
 		String encrypted = encrypt(code);
 
-		System.out.println(encrypted);
 		RivalRebelsRank rank = RivalRebelsRank.REGULAR;
 		if (rhashes[0].equals(encrypted)||rhashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.REBEL;
-			message = new ChatComponentText("Welcome, rebel!");
+			message = new TextComponentString("Welcome, rebel!");
 		}
 		else if (ohashes[0].equals(encrypted)||ohashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.OFFICER;
-			message = new ChatComponentText("Welcome, officer!");
+			message = new TextComponentString("Welcome, officer!");
 		}
 		else if (lhashes[0].equals(encrypted)||lhashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.LEADER;
-			message = new ChatComponentText("Welcome, leader!");
+			message = new TextComponentString("Welcome, leader!");
 		}
 		else if (shashes[0].equals(encrypted)||shashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.REP;
-			message = new ChatComponentText("Welcome, representative!");
+			message = new TextComponentString("Welcome, representative!");
 		}
-		RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(person.getCommandSenderName());
+		RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(person.getGameProfile());
 		if (p.rrrank != rank || rank == RivalRebelsRank.REGULAR)
 		{
 			p.rrrank = rank;
 			RivalRebelsSoundPlayer.playSound(person, 28, rank.snf);
 			PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
-			sender.addChatMessage(message);
+			sender.sendMessage(message);
 		}
-	}
-
-	private String getString(byte[] bytes)
-	{
-		StringBuilder sb = new StringBuilder();
-		for (int i = 0; i < bytes.length; i++)
-		{
-			byte b = bytes[i];
-			sb.append((0x00FF & b));
-		}
-		return sb.toString();
 	}
 
 	public String encrypt(String source)
 	{
-		try
-		{
-			MessageDigest md = MessageDigest.getInstance("MD5");
-			byte[] bytes = md.digest(source.getBytes());
-			return getString(bytes);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-			return null;
-		}
+        return Hashing.md5().hashString(source, StandardCharsets.UTF_8).toString();
 	}
 
-	/**
-	 * Adds the strings available in this command to the given list of tab completion options.
-	 */
-	@Override
-	public List<String> addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
-	{
-		return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
+    @Override
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
+		return args.length >= 1 ? getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames()) : Collections.emptyList();
 	}
 }

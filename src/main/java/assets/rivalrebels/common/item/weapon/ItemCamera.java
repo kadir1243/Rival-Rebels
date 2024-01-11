@@ -11,53 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.util.ArrayList;
-import java.util.Iterator;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.EntityRenderer;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.client.settings.GameSettings;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
-
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.gui.RivalRebelsRenderOverlay;
-import assets.rivalrebels.common.packet.LaptopEngagePacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.common.ObfuscationReflectionHelper;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class ItemCamera extends ItemArmor
 {
 	public ItemCamera()
 	{
-		super(ArmorMaterial.CHAIN, 0, 0);
-		maxStackSize = 1;
+		super(ArmorMaterial.CHAIN, 0, EntityEquipmentSlot.HEAD);
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	float	zoom		= 30f;
 	float 	fovset		= 0f;
 	float	senset		= 0f;
@@ -69,7 +42,7 @@ public class ItemCamera extends ItemArmor
 	{
 		if (world.isRemote)
 		{
-			if (entity == Minecraft.getMinecraft().thePlayer)
+			if (entity == Minecraft.getMinecraft().player)
 			{
 				boolean key = Keyboard.isKeyDown(Keyboard.KEY_B) && Minecraft.getMinecraft().currentScreen == null;
 				if (key != bkey && key) zoomed = !zoomed;
@@ -87,7 +60,7 @@ public class ItemCamera extends ItemArmor
 					if (zoom > 67) zoom = 67;
 					Minecraft.getMinecraft().gameSettings.hideGUI = true;
 					Minecraft.getMinecraft().gameSettings.fovSetting = zoom + (Minecraft.getMinecraft().gameSettings.fovSetting - zoom) * 0.85f;
-					Minecraft.getMinecraft().gameSettings.mouseSensitivity = senset * MathHelper.sqrt_float(zoom) * 0.1f;
+					Minecraft.getMinecraft().gameSettings.mouseSensitivity = senset * MathHelper.sqrt(zoom) * 0.1f;
 				}
 				else
 				{
@@ -103,10 +76,10 @@ public class ItemCamera extends ItemArmor
 			}
 		}
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bi");
-	}
+	}*/
 }

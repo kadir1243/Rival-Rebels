@@ -11,50 +11,47 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelDisk;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.ResourceLocation;
 
-public class RenderRoddiskRebel extends Render
+public class RenderRoddiskRebel extends Render<EntityRoddiskRebel>
 {
 	int					er	= 0;
 	private ModelDisk	model;
-	
-	public RenderRoddiskRebel()
+
+	public RenderRoddiskRebel(RenderManager manager)
 	{
+        super(manager);
 		model = new ModelDisk();
 	}
-	
+
 	@Override
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9)
+	public void doRender(EntityRoddiskRebel erd, double x, double y, double z, float var8, float var9)
 	{
 		er += 13.46;
-		EntityRoddiskRebel erd = (EntityRoddiskRebel) var1;
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etdisk1);
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) var2, (float) var4, (float) var6);
-		GL11.glRotatef(erd.rotationPitch, 0.0F, 0.0F, 1.0F);
-		GL11.glRotatef(erd.rotationYaw - 90.0f + er, 0.0F, 1.0F, 0.0F);
-		GL11.glScalef(0.4f, 0.4f, 0.4f);
-		GL11.glPushMatrix();
-		
+		GlStateManager.pushMatrix();
+		GlStateManager.translate((float) x, (float) y, (float) z);
+		GlStateManager.rotate(erd.rotationPitch, 0.0F, 0.0F, 1.0F);
+		GlStateManager.rotate(erd.rotationYaw - 90.0f + er, 0.0F, 1.0F, 0.0F);
+		GlStateManager.scale(0.4f, 0.4f, 0.4f);
+		GlStateManager.pushMatrix();
+
 		model.render();
-		
-		GL11.glPopMatrix();
-		GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-		GL11.glPopMatrix();
+
+		GlStateManager.popMatrix();
+		GlStateManager.disableRescaleNormal();
+		GlStateManager.popMatrix();
 	}
-	
+
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityRoddiskRebel entity)
 	{
 		return null;
 	}

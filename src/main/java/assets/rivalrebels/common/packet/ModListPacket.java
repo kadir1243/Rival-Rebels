@@ -11,51 +11,44 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayerMP;
-import io.netty.buffer.ByteBuf;
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.FileRW;
-import cpw.mods.fml.common.Loader;
-import cpw.mods.fml.common.ModContainer;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+
+import java.util.Locale;
 
 public class ModListPacket implements IMessage
 {
 	public static EntityPlayerMP asker;
 	String text;
-	
+
 	public ModListPacket()
 	{
-		
+
 	}
-	
+
 	public ModListPacket(String t)
 	{
 		text = t;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
-		byte[] dst = new byte[buf.readInt()];
-		buf.readBytes(dst);
-		text = FileRW.getStringBytes(dst);
+        text = ByteBufUtils.readUTF8String(buf);
 	}
 
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
-		buf.writeInt(text.length());
-		buf.writeBytes(FileRW.getBytesString(text));
+        ByteBufUtils.writeUTF8String(buf, text);
 	}
-	
+
 	public static class Handler implements IMessageHandler<ModListPacket, IMessage>
 	{
 		@Override
@@ -73,7 +66,7 @@ public class ModListPacket implements IMessage
 				if (i+1 < d.length) str.append(",\n§6");
 				for (int j = 0; j < RivalRebels.modblacklist.length && RivalRebels.enforceblacklist; j++)
 				{
-					if (d[i].toLowerCase().contains(RivalRebels.modblacklist[j]))
+					if (d[i].toLowerCase(Locale.ROOT).contains(RivalRebels.modblacklist[j]))
 					{
 						isillegal = true;
 						illegalmods.append(d[i]);
@@ -83,8 +76,11 @@ public class ModListPacket implements IMessage
 				}
 			}
 			String s = str.toString();
-			if (isillegal) ctx.getServerHandler().kickPlayerFromServer(illegalmods.toString());
-			if (asker != null) PacketDispatcher.packetsys.sendTo(new TextPacket(s), asker);
+            boolean finalIsillegal = isillegal;
+            ctx.getServerHandler().player.getServer().addScheduledTask(() -> {
+                if (finalIsillegal) ctx.getServerHandler().disconnect(new TextComponentString(illegalmods.toString()));
+                if (asker != null) PacketDispatcher.packetsys.sendTo(new TextPacket(s), asker);
+            });
 			return null;
 		}
 	}

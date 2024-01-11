@@ -19,28 +19,22 @@ public enum ADSEnum
 	EINSTEN(3),
 	PLASMACANNON(4),
 	TESLA(5);
-	public int	id;
-	
+	public final int id;
+
 	ADSEnum(int i)
 	{
 		id = i;
 	}
-	
+
 	public static ADSEnum getForID(int i)
 	{
-		switch (i)
-		{
-			case 1:
-				return FLAMETHROWER;
-			case 2:
-				return M202RR;
-			case 3:
-				return EINSTEN;
-			case 4:
-				return PLASMACANNON;
-			case 5:
-				return TESLA;
-		}
-		return NONE;
-	}
+        return switch (i) {
+            case 1 -> FLAMETHROWER;
+            case 2 -> M202RR;
+            case 3 -> EINSTEN;
+            case 4 -> PLASMACANNON;
+            case 5 -> TESLA;
+            default -> NONE;
+        };
+    }
 }

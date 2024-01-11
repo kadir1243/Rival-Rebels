@@ -11,23 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.common.entity.EntityRhodes;
 import io.netty.buffer.ByteBuf;
-
-import java.util.Iterator;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.util.DamageSource;
-import assets.rivalrebels.common.core.FileRW;
-import assets.rivalrebels.common.entity.EntityGore;
-import assets.rivalrebels.common.entity.EntityRhodes;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class RhodesPacket implements IMessage
-{
+public class RhodesPacket implements IMessage {
 	int		id			= 0;
 	boolean	fire		= false;
 	boolean forcefield = false;
@@ -57,11 +51,11 @@ public class RhodesPacket implements IMessage
 	public float bodyyaw;
 	String texloc;
 	int texfolder;
-	
+
 	public RhodesPacket()
 	{
 	}
-	
+
 	public RhodesPacket(EntityRhodes er)
 	{
 		id = er.getEntityId();
@@ -94,7 +88,7 @@ public class RhodesPacket implements IMessage
 		texfolder = er.itexfolder;
 		scale = er.scale;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -126,11 +120,8 @@ public class RhodesPacket implements IMessage
 		flamecount = buf.readShort();
 		nukecount = buf.readByte();
 		texfolder = buf.readByte();
-		if (texfolder != 0)
-		{
-			byte[] dst = new byte[texfolder%10];
-			buf.readBytes(dst);
-			texloc = FileRW.getStringBytes(dst);
+		if (texfolder != 0) {
+			texloc = ByteBufUtils.readUTF8String(buf);
 			texfolder -= texfolder%10;
 			texfolder /= 10;
 		}
@@ -139,7 +130,7 @@ public class RhodesPacket implements IMessage
 			texfolder = -1;
 		}
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
@@ -177,81 +168,75 @@ public class RhodesPacket implements IMessage
 		else
 		{
 			buf.writeByte(texfolder*10+texloc.length());
-			buf.writeBytes(FileRW.getBytesString(texloc));
+            ByteBufUtils.writeUTF8String(buf, texloc);
 		}
 	}
-	
+
 	public static class Handler implements IMessageHandler<RhodesPacket, IMessage>
 	{
 		@Override
 		public IMessage onMessage(RhodesPacket m, MessageContext ctx)
 		{
-			Entity e = Minecraft.getMinecraft().theWorld.getEntityByID(m.id);
-			if (e instanceof EntityRhodes)
-			{
-				EntityRhodes er = (EntityRhodes) e;
-				er.lastbodyyaw = er.bodyyaw;
-				er.lastheadyaw = er.headyaw;
-				er.lastheadpitch = er.headpitch;
-				er.lastleftarmyaw = er.leftarmyaw;
-				er.lastleftarmpitch = er.leftarmpitch;
-				er.lastrightarmyaw = er.rightarmyaw;
-				er.lastrightarmpitch = er.rightarmpitch;
-				er.lastleftthighpitch = er.leftthighpitch;
-				er.lastrightthighpitch = er.rightthighpitch;
-				er.lastleftshinpitch = er.leftshinpitch;
-				er.lastrightshinpitch = er.rightshinpitch;
-				er.fire = m.fire;
-				er.plasma = m.plasma;
-				if (Math.abs(er.bodyyaw-m.bodyyaw)>90)
-				{
-					er.lastbodyyaw = m.bodyyaw;
-				}
-				if (Math.abs(er.rightarmyaw-m.rightarmyaw)>90)
-				{
-					er.lastrightarmyaw = m.rightarmyaw;
-				}
-				if (Math.abs(er.leftarmyaw-m.leftarmyaw)>90)
-				{
-					er.lastleftarmyaw = m.leftarmyaw;
-				}
-				er.bodyyaw 		   = m.bodyyaw         ;
-				er.headyaw         = m.headyaw         ;
-				er.headpitch       = m.headpitch       ;
-				er.leftarmyaw      = m.leftarmyaw      ;
-				er.leftarmpitch    = m.leftarmpitch    ;
-				er.rightarmyaw     = m.rightarmyaw     ;
-				er.rightarmpitch   = m.rightarmpitch   ;
-				er.leftthighpitch  = m.leftthighpitch  ;
-				er.rightthighpitch = m.rightthighpitch ;
-				er.leftshinpitch   = m.leftshinpitch   ;
-				er.rightshinpitch  = m.rightshinpitch  ;
-				er.health = m.health;
-				er.laserOn = m.laserOn;
-				er.forcefield = m.forcefield;
-				er.colorType = m.colorType;
-				er.b2energy = m.b2energy;
-				er.ticksSinceLastPacket = 0;
-				er.rocketcount = m.rocketcount;
-				er.energy = m.energy;
-				er.flamecount = m.flamecount;
-				er.nukecount = m.nukecount;
-				er.itexloc = m.texloc;
-				er.itexfolder = m.texfolder;
-				er.scale = m.scale;
-				if (er.health <= 0 && er.rider != null)
-				{
-					er.rider.setPosition(er.posX+5, er.posY-12, er.posZ);
-					er.rider.capabilities.disableDamage = false;
-					er.rider = null;
-				}
-				else
-				{
-					er.rider = m.riderid == -1 ? null : (EntityPlayer) er.worldObj.getEntityByID(m.riderid);
-					er.passenger1 = m.pass1id == -1 ? null : (EntityPlayer) er.worldObj.getEntityByID(m.pass1id);
-					er.passenger2 = m.pass2id == -1 ? null : (EntityPlayer) er.worldObj.getEntityByID(m.pass2id);
-				}
-			}
+             Minecraft.getMinecraft().addScheduledTask(() -> {
+                Entity e = Minecraft.getMinecraft().world.getEntityByID(m.id);
+                if (e instanceof EntityRhodes er) {
+                    er.lastbodyyaw = er.bodyyaw;
+                    er.lastheadyaw = er.headyaw;
+                    er.lastheadpitch = er.headpitch;
+                    er.lastleftarmyaw = er.leftarmyaw;
+                    er.lastleftarmpitch = er.leftarmpitch;
+                    er.lastrightarmyaw = er.rightarmyaw;
+                    er.lastrightarmpitch = er.rightarmpitch;
+                    er.lastleftthighpitch = er.leftthighpitch;
+                    er.lastrightthighpitch = er.rightthighpitch;
+                    er.lastleftshinpitch = er.leftshinpitch;
+                    er.lastrightshinpitch = er.rightshinpitch;
+                    er.fire = m.fire;
+                    er.plasma = m.plasma;
+                    if (Math.abs(er.bodyyaw - m.bodyyaw) > 90) {
+                        er.lastbodyyaw = m.bodyyaw;
+                    }
+                    if (Math.abs(er.rightarmyaw - m.rightarmyaw) > 90) {
+                        er.lastrightarmyaw = m.rightarmyaw;
+                    }
+                    if (Math.abs(er.leftarmyaw - m.leftarmyaw) > 90) {
+                        er.lastleftarmyaw = m.leftarmyaw;
+                    }
+                    er.bodyyaw = m.bodyyaw;
+                    er.headyaw = m.headyaw;
+                    er.headpitch = m.headpitch;
+                    er.leftarmyaw = m.leftarmyaw;
+                    er.leftarmpitch = m.leftarmpitch;
+                    er.rightarmyaw = m.rightarmyaw;
+                    er.rightarmpitch = m.rightarmpitch;
+                    er.leftthighpitch = m.leftthighpitch;
+                    er.rightthighpitch = m.rightthighpitch;
+                    er.leftshinpitch = m.leftshinpitch;
+                    er.rightshinpitch = m.rightshinpitch;
+                    er.health = m.health;
+                    er.laserOn = m.laserOn;
+                    er.forcefield = m.forcefield;
+                    er.colorType = m.colorType;
+                    er.b2energy = m.b2energy;
+                    er.ticksSinceLastPacket = 0;
+                    er.rocketcount = m.rocketcount;
+                    er.energy = m.energy;
+                    er.flamecount = m.flamecount;
+                    er.nukecount = m.nukecount;
+                    er.itexloc = m.texloc;
+                    er.itexfolder = m.texfolder;
+                    er.scale = m.scale;
+                    if (er.health <= 0 && er.rider != null) {
+                        er.rider.setPosition(er.posX + 5, er.posY - 12, er.posZ);
+                        er.rider.capabilities.disableDamage = false;
+                        er.rider = null;
+                    } else {
+                        er.rider = m.riderid == -1 ? null : (EntityPlayer) er.world.getEntityByID(m.riderid);
+                        er.passenger1 = m.pass1id == -1 ? null : (EntityPlayer) er.world.getEntityByID(m.pass1id);
+                        er.passenger2 = m.pass2id == -1 ? null : (EntityPlayer) er.world.getEntityByID(m.pass2id);
+                    }
+                }
+            });
 			return null;
 		}
 	}

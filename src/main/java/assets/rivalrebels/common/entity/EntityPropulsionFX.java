@@ -13,31 +13,30 @@ package assets.rivalrebels.common.entity;
 
 import net.minecraft.entity.projectile.EntityThrowable;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MovingObjectPosition;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.world.World;
 
 public class EntityPropulsionFX extends EntityThrowable
 {
 	private int	ticksInAir;
-	
+
 	public EntityPropulsionFX(World par1World)
 	{
 		super(par1World);
 		ticksInAir = 0;
 		setSize(0.1F, 0.1F);
-		
+
 	}
-	
+
 	public EntityPropulsionFX(World par1World, double par2, double par4, double par6)
 	{
 		super(par1World);
-		par4 += -0.2;
+        par4 -= 0.2;
 		ticksInAir = 0;
 		setSize(0.5F, 0.5F);
 		setPosition(par2, par4, par6);
-		yOffset = 0.0F;
 	}
-	
+
 	public EntityPropulsionFX(World world2, double x, double y, double z, double mX, double mY, double mZ)
 	{
 		super(world2);
@@ -45,9 +44,8 @@ public class EntityPropulsionFX extends EntityThrowable
 		setSize(0.5F, 0.5F);
 		setPosition(x, y, z);
 		setVelocity(mX, mY, mZ);
-		yOffset = 0.0F;
 	}
-	
+
 	@Override
 	public void setVelocity(double mX, double mY, double mZ)
 	{
@@ -55,25 +53,25 @@ public class EntityPropulsionFX extends EntityThrowable
 		motionY = mY;
 		motionZ = mZ;
 	}
-	
+
 	@Override
-	public int getBrightnessForRender(float par1)
+	public int getBrightnessForRender()
 	{
 		return 1000;
 	}
-	
+
 	@Override
-	public float getBrightness(float par1)
+	public float getBrightness()
 	{
 		return 1000F;
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -82,38 +80,38 @@ public class EntityPropulsionFX extends EntityThrowable
 	{
 		super.onUpdate();
 		ticksInAir++;
-		if ((ticksInAir >= 5 && worldObj.rand.nextInt(2) == 1) || this.inWater)
+		if ((ticksInAir >= 5 && world.rand.nextInt(2) == 1) || this.inWater)
 		{
 			setDead();
 		}
 		posY += 0.005;
-		posX += (worldObj.rand.nextDouble() - 0.5) * 0.07;
-		posY += (worldObj.rand.nextDouble() - 0.5) * 0.07;
-		posZ += (worldObj.rand.nextDouble() - 0.5) * 0.07;
+		posX += (world.rand.nextDouble() - 0.5) * 0.07;
+		posY += (world.rand.nextDouble() - 0.5) * 0.07;
+		posZ += (world.rand.nextDouble() - 0.5) * 0.07;
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
 		setPosition(posX, posY, posZ);
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound var1)
 	{
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound var1)
 	{
 	}
-	
+
 	@Override
 	protected float getGravityVelocity()
 	{
 		return 0F;
 	}
-	
+
 	@Override
-	protected void onImpact(MovingObjectPosition var1)
+	protected void onImpact(RayTraceResult var1)
 	{
 	}
 }

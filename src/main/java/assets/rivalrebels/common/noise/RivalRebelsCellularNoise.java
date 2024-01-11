@@ -11,50 +11,28 @@
  *******************************************************************************/
 package assets.rivalrebels.common.noise;
 
-public class RivalRebelsCellularNoise
-{
-	public static int		pointa2D	= 32;
-	public static Point[]	points2D	= new Point[pointa2D];
-	public static int		pointa3D	= 32;
-	public static Point[]	points3D	= new Point[pointa3D];
-	
-	public static void refresh2D()
-	{
-		for (int i = 0; i < pointa2D; i++)
-		{
-			points2D[i] = new Point(Math.random(), Math.random());
-		}
-	}
-	
-	public static void refresh3D()
+import net.minecraft.util.math.Vec3d;
+
+import java.util.Random;
+
+public class RivalRebelsCellularNoise {
+    public static int		pointa3D	= 32;
+	public static Vec3d[]	points3D	= new Vec3d[pointa3D];
+
+    public static void refresh3D(Random random)
 	{
 		for (int i = 0; i < pointa3D; i++)
 		{
-			points3D[i] = new Point(Math.random(), Math.random(), Math.random());
+			points3D[i] = new Vec3d(random.nextDouble(), random.nextDouble(), random.nextDouble());
 		}
 	}
-	
-	public static double noise(double xin, double yin)
-	{
-		double result = 1;
-		for (int i = 0; i < pointa2D; i++)
-		{
-			Point point = points2D[i];
-			double dist = getDist(point, xin, yin);
-			if (dist <= result)
-			{
-				result = dist;
-			}
-		}
-		return (Math.sqrt(result) * 2d) - 1d;
-	}
-	
-	public static double noise(double xin, double yin, double zin)
+
+    public static double noise(double xin, double yin, double zin)
 	{
 		double result = 1;
 		for (int i = 0; i < pointa3D; i++)
 		{
-			Point point = points3D[i];
+            Vec3d point = points3D[i];
 			double dist = getDist(point, xin, yin, zin);
 			if (dist <= result)
 			{
@@ -63,8 +41,8 @@ public class RivalRebelsCellularNoise
 		}
 		return (Math.sqrt(result) * 4) - 0.75d;
 	}
-	
-	private static double getDist(Point point, double xin, double yin)
+
+	private static double getDist(Vec3d point, double xin, double yin)
 	{
 		double result = 1;
 		for (int x = -1; x <= 1; x++)
@@ -80,8 +58,8 @@ public class RivalRebelsCellularNoise
 		}
 		return result;
 	}
-	
-	private static double getDist(Point point, double xin, double yin, double zin)
+
+	private static double getDist(Vec3d point, double xin, double yin, double zin)
 	{
 		double result = 1;
 		for (int x = -1; x <= 1; x++)
@@ -101,23 +79,5 @@ public class RivalRebelsCellularNoise
 			}
 		}
 		return result;
-	}
-	
-	private static class Point
-	{
-		double	x, y, z;
-		
-		Point(double x, double y)
-		{
-			this.x = x;
-			this.y = y;
-		}
-		
-		Point(double x, double y, double z)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
-		}
 	}
 }

@@ -11,102 +11,70 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.BlockSnow;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemArmor;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.util.EnumHelper;
-import assets.rivalrebels.RivalRebels;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemTrollHelmet extends ItemArmor
 {
-	public ItemTrollHelmet()
-	{
-		super(EnumHelper.addArmorMaterial("Troll", 5000, new int[] { 0, 0, 0, 0 }, 1000), 0, 0);
+
+    private static final ArmorMaterial TROLL_MATERIAL = EnumHelper.addArmorMaterial("Troll", "", 5000, new int[]{0, 0, 0, 0}, 1000, SoundEvents.ITEM_ARMOR_EQUIP_GENERIC, 1);
+
+    public ItemTrollHelmet() {
+		super(TROLL_MATERIAL, 0, EntityEquipmentSlot.HEAD);
 		setCreativeTab(RivalRebels.rrarmortab);
 		setMaxDamage(5000);
-		maxStackSize = 64;
 	}
-	
-	@Override
-	public String getArmorTexture(ItemStack itemstack, Entity entity, int slot, String layer)
-	{
+
+    @Nullable
+    @Override
+    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
 		return "rivalrebels:textures/armors/o.png";
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bf");
-	}
-	
-	@Override
-	public boolean onItemUse(ItemStack item, EntityPlayer player, World world, int x, int y, int z, int s, float px, float py, float pz)
-    {
-        Block block = world.getBlock(x, y, z);
+	}*/
 
-        if (block == Blocks.snow_layer && (world.getBlockMetadata(x, y, z) & 7) < 1)
-        {
-            s = 1;
+    @Override
+    public EnumActionResult onItemUse(EntityPlayer player, World world, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        ItemStack stack = player.getHeldItem(hand);
+        IBlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
+        if (block == Blocks.SNOW_LAYER && state.getValue(BlockSnow.LAYERS) < 1) {
+            facing = EnumFacing.UP;
+        } else if (block != Blocks.VINE && block != Blocks.TALLGRASS && block != Blocks.DEADBUSH && !block.isReplaceable(world, pos)) {
+            pos = pos.offset(facing);
         }
-        else if (block != Blocks.vine && block != Blocks.tallgrass && block != Blocks.deadbush && !block.isReplaceable(world, x, y, z))
-        {
-            if (s == 0)
-            {
-                --y;
-            }
-
-            if (s == 1)
-            {
-                ++y;
-            }
-
-            if (s == 2)
-            {
-                --z;
-            }
-
-            if (s == 3)
-            {
-                ++z;
-            }
-
-            if (s == 4)
-            {
-                --x;
-            }
-
-            if (s == 5)
-            {
-                ++x;
-            }
+        if (stack.isItemEnchanted() || !player.canPlayerEdit(pos, facing, stack)) {
+            return EnumActionResult.FAIL;
         }
-
-        if (item.stackSize == 0)
-        {
-            return false;
+        if (world.mayPlace(RivalRebels.flag2, pos, false, facing, player)) {
+            int meta = this.getMetadata(stack.getItemDamage());
+            IBlockState flagState = RivalRebels.flag2.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, meta, player, hand);
+            world.setBlockState(pos, flagState);
+            world.playSound((double)((float) pos.getX() + 0.5F), (double)((float) pos.getY() + 0.5F), (double)((float) pos.getZ() + 0.5F), RivalRebels.flag2.getSoundType().getStepSound(), SoundCategory.PLAYERS, (RivalRebels.flag2.getSoundType().getVolume() + 1.0F) / 2.0F, RivalRebels.flag2.getSoundType().getPitch() * 0.8F, false);
+            stack.shrink(1);
+            return EnumActionResult.SUCCESS;
         }
-        else if (!player.canPlayerEdit(x, y, z, s, item))
-        {
-            return false;
-        }
-        else if (world.canPlaceEntityOnSide(RivalRebels.flag2, x, y, z, false, s, player, item))
-        {
-            int i1 = this.getMetadata(item.getItemDamage());
-            int j1 = RivalRebels.flag2.onBlockPlaced(world, x, y, z, s, px, py, pz, i1);
-            world.setBlock(x, y, z, RivalRebels.flag2, j1, 3);
-            world.playSoundEffect((double)((float)x + 0.5F), (double)((float)y + 0.5F), (double)((float)z + 0.5F), RivalRebels.flag2.stepSound.func_150496_b(), (RivalRebels.flag2.stepSound.getVolume() + 1.0F) / 2.0F, RivalRebels.flag2.stepSound.getPitch() * 0.8F);
-            --item.stackSize;
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return EnumActionResult.PASS;
     }
 }

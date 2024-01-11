@@ -11,22 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.item.Item;
 import assets.rivalrebels.RivalRebels;
+import net.minecraft.item.Item;
 
 public class ItemRocket extends Item
 {
 	public ItemRocket()
 	{
 		super();
-		maxStackSize = 32;
+        setMaxStackSize(32);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ar");
-	}
+	}*/
 }

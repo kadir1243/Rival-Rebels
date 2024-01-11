@@ -11,18 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityGore;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.GlStateManager.DestFactor;
+import net.minecraft.client.renderer.GlStateManager.SourceFactor;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.util.ResourceLocation;
 
-public class RenderGore extends Render
+public class RenderGore extends Render<EntityGore>
 {
 	private static final ResourceLocation	player			= new ResourceLocation("textures/entity/steve.png");
 	private static final ResourceLocation	creeper			= new ResourceLocation("textures/entity/creeper/creeper.png");
@@ -35,24 +35,27 @@ public class RenderGore extends Render
 	private static final ResourceLocation	cavespider		= new ResourceLocation("textures/entity/spider/cave_spider.png");
 	private static final ResourceLocation	zombiepigman	= new ResourceLocation("textures/entity/zombie_pigman.png");
 	private static final ResourceLocation	zombie			= new ResourceLocation("textures/entity/zombie/zombie.png");
-	RenderHelper							md				= new RenderHelper();
-	
-	@Override
-	public void doRender(Entity entity, double x, double y, double z, float f, float f1)
+
+    public RenderGore(RenderManager renderManager) {
+        super(renderManager);
+        this.shadowSize = 0F;
+    }
+
+    @Override
+	public void doRender(EntityGore entity, double x, double y, double z, float f, float f1)
 	{
-		GL11.glPushMatrix();
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glTranslated(x, y, z);
-		GL11.glRotatef(-entity.rotationYaw + 180, 0.0F, 1.0F, 0.0F);
-		GL11.glRotatef(entity.rotationPitch, 1.0F, 0.0F, 0.0F);
-		EntityGore eg = (EntityGore) entity;
-		int mob = eg.mob;
-		int type = eg.type;
-		double size = eg.size;
-		
+		GlStateManager.pushMatrix();
+		GlStateManager.enableLighting();
+		GlStateManager.translate(x, y, z);
+		GlStateManager.rotate(-entity.rotationYaw + 180, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(entity.rotationPitch, 1.0F, 0.0F, 0.0F);
+        int mob = entity.mob;
+		int type = entity.type;
+		double size = entity.size;
+
 		if (mob == 0)
 		{
-			if (eg.playerSkin != null) Minecraft.getMinecraft().renderEngine.bindTexture(eg.playerSkin);
+			if (entity.playerSkin != null) Minecraft.getMinecraft().renderEngine.bindTexture(entity.playerSkin);
 			else Minecraft.getMinecraft().renderEngine.bindTexture(player);
 			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
 			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 16, 16, 64, 32, 16);
@@ -78,7 +81,7 @@ public class RenderGore extends Render
 		else if (mob == 3)
 		{
 			Minecraft.getMinecraft().renderEngine.bindTexture(skeleton);
-			GL11.glDisable(GL11.GL_CULL_FACE);
+			GlStateManager.disableCull();
 			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
 			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 16, 16, 64, 32, 16);
 			else if (type == 2) RenderHelper.renderBox(2, 10, 2, 40, 16, 64, 32, 16);
@@ -90,8 +93,8 @@ public class RenderGore extends Render
 			if (type == 0)
 			{
 				RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
-				GL11.glTranslated(0, -0.125, 0);
-				GL11.glScaled(0.875, 0.875, 0.875);
+				GlStateManager.translate(0, -0.125, 0);
+				GlStateManager.scale(0.875, 0.875, 0.875);
 				RenderHelper.renderBox(8, 8, 8, 0, 16, 64, 32, 16);
 			}
 			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 32, 16, 64, 32, 16);
@@ -110,14 +113,14 @@ public class RenderGore extends Render
 			Minecraft.getMinecraft().renderEngine.bindTexture(slime);
 			if (type == 0)
 			{
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GlStateManager.enableBlend();
+                GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 				RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
 			}
 			else if (type == 1)
 			{
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				GlStateManager.enableBlend();
+				GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
 				RenderHelper.renderBox(6, 6, 6, 0, 16, 64, 32, 16);
 			}
 		}
@@ -133,7 +136,7 @@ public class RenderGore extends Render
 			if (type == 0) RenderHelper.renderBox(8, 8, 8, 32, 4, 64, 32, 16);
 			else if (type == 1)
 			{
-				GL11.glRotatef(90, 0, 1, 0);
+                GlStateManager.rotate(90, 0, 1, 0);
 				RenderHelper.renderBox(8, 12, 10, 4, 12, 64, 32, 16);
 			}
 			else if (type == 3) RenderHelper.renderBox(2, 2, 16, 18, 0, 64, 32, 16);
@@ -141,11 +144,11 @@ public class RenderGore extends Render
 		else if (mob == 9)
 		{
 			Minecraft.getMinecraft().renderEngine.bindTexture(cavespider);
-			GL11.glScalef(0.666f, 0.666f, 0.666f);
+			GlStateManager.scale(0.666f, 0.666f, 0.666f);
 			if (type == 0) RenderHelper.renderBox(8, 8, 8, 32, 4, 64, 32, 16);
 			else if (type == 1)
 			{
-				GL11.glRotatef(90, 0, 1, 0);
+                GlStateManager.rotate(90, 0, 1, 0);
 				RenderHelper.renderBox(8, 12, 10, 4, 12, 64, 32, 16);
 			}
 			else if (type == 3) RenderHelper.renderBox(2, 2, 16, 18, 0, 64, 32, 16);
@@ -166,11 +169,11 @@ public class RenderGore extends Render
 			else if (type == 2) RenderHelper.renderBox((int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
 			else if (type == 3) RenderHelper.renderBox((int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
 		}
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
-	
+
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityGore entity)
 	{
 		return null;
 	}

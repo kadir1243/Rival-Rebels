@@ -11,34 +11,30 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.tileentity.TileEntity;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class TileEntityLaptopRenderer extends TileEntitySpecialRenderer
-{
-	private ModelLaptop	model;
-	
+public class TileEntityLaptopRenderer extends TileEntitySpecialRenderer<TileEntityLaptop> {
+	private final ModelLaptop model;
+
 	public TileEntityLaptopRenderer()
 	{
 		model = new ModelLaptop();
 	}
-	
-	public void renderAModelAt(TileEntityLaptop tile, double d, double d1, double d2, float f)
-	{
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) d + 0.5F, (float) d1, (float) d2 + 0.5F);
-		int var9 = tile.getBlockMetadata();
+
+    @Override
+    public void render(TileEntityLaptop te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
+		GlStateManager.disableLighting();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate((float) x + 0.5F, (float) y, (float) z + 0.5F);
+		int var9 = te.getBlockMetadata();
 		short var11 = 0;
 		if (var9 == 2)
 		{
@@ -56,17 +52,11 @@ public class TileEntityLaptopRenderer extends TileEntitySpecialRenderer
 		{
 			var11 = 90;
 		}
-		GL11.glRotatef(var11, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(var11, 0.0F, 1.0F, 0.0F);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
-		model.renderModel((float) -tile.slide);
+		model.renderModel((float) -te.slide);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etubuntu);
-		model.renderScreen((float) -tile.slide);
-		GL11.glPopMatrix();
-	}
-	
-	@Override
-	public void renderTileEntityAt(TileEntity tileentity, double d, double d1, double d2, float f)
-	{
-		renderAModelAt((TileEntityLaptop) tileentity, d, d1, d2, f);
+		model.renderScreen((float) -te.slide);
+		GlStateManager.popMatrix();
 	}
 }

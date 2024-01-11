@@ -12,8 +12,12 @@
 package assets.rivalrebels.client.renderentity;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ResourceLocation;
 
@@ -25,57 +29,61 @@ import assets.rivalrebels.common.entity.EntityFlameBall2;
 
 public class RenderFlameBlue extends Render
 {
-	public void renderFlame(EntityFlameBall2 ell, double x, double y, double z, float yaw, float pitch)
+    public RenderFlameBlue(RenderManager renderManager) {
+        super(renderManager);
+    }
+
+    public void renderFlame(EntityFlameBall2 ell, double x, double y, double z, float yaw, float pitch)
 	{
 		if (ell.ticksExisted < 3) return;
-		GL11.glPushMatrix();
-		GL11.glDepthMask(false);
-		GL11.glEnable(GL11.GL_TEXTURE_2D);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glEnable(GL11.GL_BLEND);
+		GlStateManager.pushMatrix();
+		GlStateManager.depthMask(false);
+		GlStateManager.enableTexture2D();
+		GlStateManager.disableCull();
+		GlStateManager.disableLighting();
+		GlStateManager.enableBlend();
 		// GL11.glBlendEquationSeparate(GL14.GL_FUNC_ADD, GL14.GL_FUNC_ADD);
-		GL14.glBlendFuncSeparate(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA, GL11.GL_ONE, GL11.GL_ZERO);
-		GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-		GL14.glBlendEquation(GL14.GL_FUNC_ADD);
-		GL11.glColor4f(1f, 1f, 1f, 1f);
+		GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
+		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+		GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
+		GlStateManager.color(1f, 1f, 1f, 1f);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etflameblue);
-		
-		GL11.glPushMatrix();
+
+		GlStateManager.pushMatrix();
 		float X = (ell.sequence % 4) / 4f;
 		float Y = (ell.sequence - (ell.sequence % 4)) / 16f;
 		float size = 0.070f * ell.ticksExisted;
 		size *= size;
 		if (size >= 0.3) size = 0.3f;
-		Tessellator t = Tessellator.instance;
-		GL11.glTranslated(x, y, z);
-		GL11.glRotatef(180 - Minecraft.getMinecraft().thePlayer.rotationYaw, 0.0F, 1.0F, 0.0F);
-		GL11.glRotatef(90 - Minecraft.getMinecraft().thePlayer.rotationPitch, 1.0F, 0.0F, 0.0F);
-		GL11.glPushMatrix();
-		GL11.glRotatef(ell.rotation, 0.0F, 1.0F, 0.0F);
-		t.startDrawingQuads();
-		t.setNormal(0.0F, 1.0F, 0.0F);
-		t.addVertexWithUV(-size, 0, -size, X, Y);
-		t.addVertexWithUV(size, 0, -size, X + 0.25f, Y);
-		t.addVertexWithUV(size, 0, size, X + 0.25f, Y + 0.25f);
-		t.addVertexWithUV(-size, 0, size, X, Y + 0.25f);
+		Tessellator t = Tessellator.getInstance();
+        BufferBuilder buffer = t.getBuffer();
+        GlStateManager.translate(x, y, z);
+		GlStateManager.rotate(180 - Minecraft.getMinecraft().player.rotationYaw, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(90 - Minecraft.getMinecraft().player.rotationPitch, 1.0F, 0.0F, 0.0F);
+		GlStateManager.pushMatrix();
+		GlStateManager.rotate(ell.rotation, 0.0F, 1.0F, 0.0F);
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
+		buffer.pos(-size, 0, -size).tex(X, Y).normal(0, 1, 0).endVertex();
+		buffer.pos(size, 0, -size).tex(X + 0.25f, Y).normal(0, 1, 0).endVertex();
+		buffer.pos(size, 0, size).tex(X + 0.25f, Y + 0.25f).normal(0, 1, 0).endVertex();
+		buffer.pos(-size, 0, size).tex(X, Y + 0.25f).normal(0, 1, 0).endVertex();
 		t.draw();
-		GL11.glPopMatrix();
-		GL11.glPopMatrix();
-		
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glEnable(GL11.GL_CULL_FACE);
-		GL11.glDisable(GL11.GL_BLEND);
-		GL11.glDepthMask(true);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
+		GlStateManager.popMatrix();
+
+		GlStateManager.enableLighting();
+		GlStateManager.enableCull();
+		GlStateManager.disableBlend();
+		GlStateManager.depthMask(true);
+		GlStateManager.popMatrix();
 	}
-	
+
 	@Override
 	public void doRender(Entity entityLaserLink, double x, double y, double z, float yaw, float pitch)
 	{
 		renderFlame((EntityFlameBall2) entityLaserLink, x, y, z, yaw, pitch);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

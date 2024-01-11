@@ -11,65 +11,42 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import java.util.HashSet;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
-import assets.rivalrebels.RivalRebels;
+
+import java.util.HashSet;
+import java.util.Set;
 
 public class ItemArmyShovel extends ItemTool
 {
-	private static HashSet<Block>	blocksEffectiveAgainst;
-	
+	private static final Set<Block> blocksEffectiveAgainst;
+
 	public ItemArmyShovel()
 	{
-		super(1, ToolMaterial.IRON, blocksEffectiveAgainst);
+		super(1, 1, ToolMaterial.IRON, blocksEffectiveAgainst);
 		setCreativeTab(RivalRebels.rralltab);
+        setHarvestLevel("shovel", 3);
+        setHarvestLevel("pickaxe", 3);
+        setHarvestLevel("axe", 3);
 	}
-	
+
 	@Override
 	public boolean isDamageable()
 	{
 		return false;
 	}
-	
-	@Override
-	public boolean canHarvestBlock(Block par1Block, ItemStack is)
+
+    @Override
+    public boolean canHarvestBlock(IBlockState state, ItemStack stack) {
+        return blocksEffectiveAgainst.contains(state.getBlock());
+    }
+
+    static
 	{
-		return blocksEffectiveAgainst.contains(par1Block);
-	}
-	
-	static
-	{
-		blocksEffectiveAgainst = new HashSet<Block>();
-		blocksEffectiveAgainst.add(Blocks.stone);
-		blocksEffectiveAgainst.add(Blocks.grass);
-		blocksEffectiveAgainst.add(Blocks.dirt);
-		blocksEffectiveAgainst.add(Blocks.cobblestone);
-		blocksEffectiveAgainst.add(Blocks.sand);
-		blocksEffectiveAgainst.add(Blocks.gravel);
-		blocksEffectiveAgainst.add(Blocks.snow);
-		blocksEffectiveAgainst.add(Blocks.snow_layer);
-		blocksEffectiveAgainst.add(Blocks.clay);
-		blocksEffectiveAgainst.add(Blocks.farmland);
-		blocksEffectiveAgainst.add(Blocks.soul_sand);
-		blocksEffectiveAgainst.add(Blocks.mycelium);
-		blocksEffectiveAgainst.add(Blocks.chest);
-		blocksEffectiveAgainst.add(Blocks.redstone_ore);
-		blocksEffectiveAgainst.add(Blocks.iron_ore);
-		blocksEffectiveAgainst.add(Blocks.gold_ore);
-		blocksEffectiveAgainst.add(Blocks.lapis_ore);
-		blocksEffectiveAgainst.add(Blocks.diamond_ore);
-		blocksEffectiveAgainst.add(Blocks.emerald_ore);
-		blocksEffectiveAgainst.add(Blocks.redstone_block);
-		blocksEffectiveAgainst.add(Blocks.iron_block);
-		blocksEffectiveAgainst.add(Blocks.gold_block);
-		blocksEffectiveAgainst.add(Blocks.lapis_block);
-		blocksEffectiveAgainst.add(Blocks.diamond_block);
-		blocksEffectiveAgainst.add(Blocks.emerald_block);
+		blocksEffectiveAgainst = new HashSet<>();
 		blocksEffectiveAgainst.add(RivalRebels.barricade);
 		blocksEffectiveAgainst.add(RivalRebels.reactive);
 		blocksEffectiveAgainst.add(RivalRebels.conduit);
@@ -96,10 +73,10 @@ public class ItemArmyShovel extends ItemTool
 		blocksEffectiveAgainst.add(RivalRebels.petrifiedstone4);
 		blocksEffectiveAgainst.add(RivalRebels.petrifiedwood);
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:aw");
-	}
+	}*/
 }

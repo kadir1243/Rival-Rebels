@@ -11,17 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -30,147 +19,148 @@ import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
 import assets.rivalrebels.common.explosion.Explosion;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockFalling;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class BlockRemoteCharge extends Block
-{
+import java.util.Random;
+
+public class BlockRemoteCharge extends BlockFalling {
+    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
 	public BlockRemoteCharge()
 	{
-		super(Material.cloth);
+		super(Material.CLOTH);
 		setTickRandomly(true);
-		float f = 0.0625F;
-		float f1 = (1 + 0 * 2) / 16F;
-		float f2 = 0.5F;
-		setBlockBounds(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
-	}
-	
+        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
+    }
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(META);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(META, meta);
+    }
+    @Override
+    public BlockStateContainer getBlockState() {
+        return new BlockStateContainer(this, META);
+    }
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
-	/**
-	 * Updates the blocks bounds based on its current state. Args: world, x, y, z
-	 */
-	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
-	{
-		int i = par1IBlockAccess.getBlockMetadata(par2, par3, par4);
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		int i = state.getValue(META);
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		setBlockBounds(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
+		return new AxisAlignedBB(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
 	}
-	
-	/**
-	 * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been cleared to be reused)
-	 */
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		int i = par1World.getBlockMetadata(par2, par3, par4);
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+		int meta = state.getValue(META);
 		float f = 0.0625F;
-		float f1 = (1 + i * 2) / 16F;
+		float f1 = (1 + meta * 2) / 16F;
 		float f2 = 0.5F;
-		return AxisAlignedBB.getBoundingBox(par2 + f1, par3, par4 + f, (par2 + 1) - f, (par3 + f2) - f, (par4 + 1) - f);
+		return new AxisAlignedBB(x + f1, y, z + f, (x + 1) - f, (y + f2) - f, (z + 1) - f);
 	}
-	
-	/**
-	 * How many world ticks before ticking
-	 */
-	@Override
-	public int tickRate(World par1World)
+
+    @Override
+	public int tickRate(World world)
 	{
 		return 1;
 	}
-	
-	/**
-	 * Returns the bounding box of the wired rectangular prism to render.
-	 */
-	@Override
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		int i = par1World.getBlockMetadata(par2, par3, par4);
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        int i = state.getValue(META);
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return AxisAlignedBB.getBoundingBox(par2 + f1, par3, par4 + f, (par2 + 1) - f, par3 + f2, (par4 + 1) - f);
+		return new AxisAlignedBB(x + f1, y, z + f, (x + 1) - f, y + f2, (z + 1) - f);
 	}
-	
-	/**
-	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
-	 */
-	@Override
-	public boolean renderAsNormalBlock()
+
+    @Override
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
-	/**
-	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
-	 * etc to this block.
-	 */
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return false;
+
+    @Override
+    public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state) {
+        explode(worldIn, pos);
+    }
+
+    @Override
+    public void onExplosionDestroy(World worldIn, BlockPos pos, net.minecraft.world.Explosion explosionIn) {
+		explode(worldIn, pos);
 	}
-	
-	@Override
-	public void onBlockDestroyedByPlayer(World world, int x, int y, int z, int l)
-	{
-		explode(world, x, y, z);
+
+	public boolean boom = false;
+
+    @Override
+    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+		world.scheduleBlockUpdate(pos, this, this.tickRate(world), 1);
 	}
-	
-	@Override
-	public void onBlockDestroyedByExplosion(World world, int x, int y, int z, net.minecraft.world.Explosion explosion)
-	{
-		explode(world, x, y, z);
-	}
-	
-	public boolean	boom	= false;
-	
-	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
-	{
-		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
-	}
-	
-	@Override
-	public void updateTick(World world, int x, int y, int z, Random rand)
-	{
-		if (world.getBlock(x + 1, y, z) == Blocks.fire || world.getBlock(x - 1, y, z) == Blocks.fire || world.getBlock(x, y + 1, z) == Blocks.fire || world.getBlock(x, y - 1, z) == Blocks.fire || world.getBlock(x, y, z + 1) == Blocks.fire || world.getBlock(x, y, z - 1) == Blocks.fire)
-		{
-			explode(world, x, y, z);
-		}
-		
+
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        for (EnumFacing facing : EnumFacing.VALUES) {
+            if (world.getBlockState(pos.offset(facing)).getBlock() == Blocks.FIRE) {
+                explode(world, pos);
+            }
+        }
+
 		if (boom)
 		{
-			explode(world, x, y, z);
+			explode(world, pos);
 			boom = false;
 		}
-		world.scheduleBlockUpdate(x, y, z, this, this.tickRate(world));
+		world.scheduleBlockUpdate(pos, this, this.tickRate(world), 1);
 	}
-	
-	@Override
-	public void onEntityCollidedWithBlock(World world, int x, int y, int z, Entity entity)
-	{
+
+    @Override
+    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
 		if (entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader)
 		{
-			explode(world, x, y, z);
+			explode(world, pos);
 		}
 	}
-	
-	public static void explode(World world, int x, int y, int z)
+
+	public static void explode(World world, BlockPos pos)
 	{
-		world.setBlock(x, y, z, Blocks.air);
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+
+        world.setBlockToAir(pos);
 		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge);
 		RivalRebelsSoundPlayer.playSound(world, 22, 0, x, y, z, 1f, 0.3f);
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -182,7 +172,7 @@ public class BlockRemoteCharge extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -195,7 +185,7 @@ public class BlockRemoteCharge extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -206,13 +196,10 @@ public class BlockRemoteCharge extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:af"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:af"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:af"); // SIDE E
-	}
-	
-	/**
-	 * Called when the falling block entity for this block hits the ground and turns back into a block
-	 */
-	public void onFinishFalling(World par1World, int par2, int par3, int par4, int par5)
-	{
-		explode(par1World, par2, par3, par4);
-	}
+	}*/
+
+    @Override
+    public void onEndFalling(World worldIn, BlockPos pos, IBlockState fallingState, IBlockState hitState) {
+        explode(worldIn, pos);
+    }
 }

@@ -13,13 +13,18 @@ package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -28,68 +33,66 @@ public class ItemChip extends Item
 	public ItemChip()
 	{
 		super();
-		maxStackSize = 1;
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
 	@Override
-	public void onUpdate(ItemStack item, World world, Entity entity, int count, boolean flag)
+	public void onUpdate(ItemStack stack, World world, Entity entity, int count, boolean flag)
 	{
-		if (item.getTagCompound() == null) item.stackTagCompound = new NBTTagCompound();
-		if (RivalRebels.round.isStarted() && !item.getTagCompound().getBoolean("isReady") && entity instanceof EntityPlayer player)
+		if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
+		if (RivalRebels.round.isStarted() && !stack.getTagCompound().getBoolean("isReady") && entity instanceof EntityPlayer player)
 		{
-            item.getTagCompound().setString("username", player.getCommandSenderName());
-			item.getTagCompound().setInteger("team", RivalRebels.round.rrplayerlist.getForName(player.getCommandSenderName()).rrteam.ordinal());
-			item.getTagCompound().setBoolean("isReady", true);
+            stack.getTagCompound().setString("username", player.getName());
+			stack.getTagCompound().setInteger("team", RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam.ordinal());
+			stack.getTagCompound().setBoolean("isReady", true);
 		}
 	}
 
-	@Override
-	public boolean onItemUseFirst(ItemStack item, EntityPlayer player, World world, int x, int y, int z, int m, float hitX, float hitZ, float hitY)
-	{
-		player.swingItem();
+    @Override
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+		player.swingArm(hand);
 		if (!world.isRemote)
 		{
-			if (world.getBlock(x, y, z) == RivalRebels.buildrhodes)
+			if (world.getBlockState(pos).getBlock() == RivalRebels.buildrhodes)
 			{
-				world.setBlock(x-1, y, z, RivalRebels.steel);
-				world.setBlock(x+1, y, z, RivalRebels.steel);
-				world.setBlock(x, y+1, z, RivalRebels.conduit);
-				world.setBlock(x-1, y+1, z, RivalRebels.steel);
-				world.setBlock(x+1, y+1, z, RivalRebels.steel);
-				world.setBlock(x, y+2, z, RivalRebels.steel);
-				world.setBlock(x-1, y+2, z, RivalRebels.steel);
-				world.setBlock(x+1, y+2, z, RivalRebels.steel);
-				if (world.getBlock(x, y-1, z) == RivalRebels.buildrhodes)
+				world.setBlockState(pos.west(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.east(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.up(), RivalRebels.conduit.getDefaultState());
+				world.setBlockState(pos.west().up(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.east().up(), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.up(2), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.west().up(2), RivalRebels.steel.getDefaultState());
+				world.setBlockState(pos.east().up(2), RivalRebels.steel.getDefaultState());
+				if (world.getBlockState(pos.down()).getBlock() == RivalRebels.buildrhodes)
 				{
-					world.setBlock(x, y, z, RivalRebels.conduit);
-					world.setBlock(x, y-1, z, RivalRebels.rhodesactivator);
-					world.setBlock(x-1, y-1, z, RivalRebels.steel);
-					world.setBlock(x+1, y-1, z, RivalRebels.steel);
+					world.setBlockState(pos, RivalRebels.conduit.getDefaultState());
+					world.setBlockState(pos.down(), RivalRebels.rhodesactivator.getDefaultState());
+					world.setBlockState(pos.west().down(), RivalRebels.steel.getDefaultState());
+					world.setBlockState(pos.east().down(), RivalRebels.steel.getDefaultState());
 				}
 				else
 				{
-					world.setBlock(x, y, z, RivalRebels.rhodesactivator);
+					world.setBlockState(pos, RivalRebels.rhodesactivator.getDefaultState());
 				}
-				return true;
+				return EnumActionResult.SUCCESS;
 			}
 		}
-		return false;
+		return EnumActionResult.PASS;
 	}
 
-	@Override
-	public void addInformation(ItemStack item, EntityPlayer player, List<String> list, boolean par4)
-	{
-		if (item.stackTagCompound != null)
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<String> tooltip, ITooltipFlag flagIn) {
+		if (stack.hasTagCompound())
 		{
-			list.add(RivalRebelsTeam.getForID(item.stackTagCompound.getInteger("team")).name());
-			list.add(item.stackTagCompound.getString("username"));
+			tooltip.add(RivalRebelsTeam.getForID(stack.getTagCompound().getInteger("team")).name());
+			tooltip.add(stack.getTagCompound().getString("username"));
 		}
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bd");
-	}
+	}*/
 }

@@ -11,69 +11,60 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
 
-public class ItemRemote extends Item
-{
-	int	RCpX;
-	int	RCpY;
-	int	RCpZ;
-	
+public class ItemRemote extends Item {
+    private BlockPos RCpos;
+
 	public ItemRemote()
 	{
 		super();
-		maxStackSize = 1;
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
-	@Override
-	public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
-	{
-		if (player.worldObj.getBlock(RCpX, RCpY + 1, RCpZ) == RivalRebels.remotecharge && player.isSneaking())
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		if (player.world.getBlockState(RCpos.up()).getBlock() == RivalRebels.remotecharge && player.isSneaking())
 		{
-			player.swingItem();
+			player.swingArm(hand);
 			RivalRebelsSoundPlayer.playSound(player, 22, 3);
-			BlockRemoteCharge.explode(world, RCpX, RCpY + 1, RCpZ);
+			BlockRemoteCharge.explode(world, RCpos.up());
 		}
-		return item;
+		return super.onItemRightClick(world, player, hand);
 	}
-	
-	@Override
-	public boolean onItemUseFirst(ItemStack stack, EntityPlayer player, World world, int x, int y, int z, int side, float hitX, float hitY, float hitZ)
-	{
-		if (((player.capabilities.isCreativeMode && world.getBlock(x, y + 1, z) == Blocks.air || player.inventory.hasItem(Item.getItemFromBlock(RivalRebels.remotecharge)) && world.getBlock(x, y + 1, z) == Blocks.air)) && !player.isSneaking())
+
+    @Override
+    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
+		if (((player.capabilities.isCreativeMode && world.isAirBlock(pos.up()) || player.inventory.hasItemStack(Item.getItemFromBlock(RivalRebels.remotecharge).getDefaultInstance()) && world.isAirBlock(pos.up()))) && !player.isSneaking())
 		{
 			RivalRebelsSoundPlayer.playSound(player, 22, 2);
-			player.swingItem();
-			if (!world.isRemote)
-			{
-				player.addChatMessage(new ChatComponentText("§7[§4Orders§7] §cShift-click (Sneak) to detonate."));
+			player.swingArm(hand);
+			if (!world.isRemote) {
+				player.sendMessage(new TextComponentString("§7[§4Orders§7] §cShift-click (Sneak) to detonate."));
 			}
-			RCpX = x;
-			RCpY = y;
-			RCpZ = z;
-			player.inventory.consumeInventoryItem(Item.getItemFromBlock(RivalRebels.remotecharge));
-			world.setBlock(x, y + 1, z, RivalRebels.remotecharge);
-			return false;
-		}
-		else
-		{
-			return false;
-		}
-	}
-	
-	@Override
+            RCpos = pos;
+			player.inventory.deleteStack(Item.getItemFromBlock(RivalRebels.remotecharge).getDefaultInstance());
+			world.setBlockState(pos.up(), RivalRebels.remotecharge.getDefaultState());
+        }
+        return EnumActionResult.FAIL;
+    }
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:am");
-	}
+	}*/
 }

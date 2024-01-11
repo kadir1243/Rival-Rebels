@@ -11,40 +11,39 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelRocket;
-import assets.rivalrebels.common.entity.EntityRocket;
 import assets.rivalrebels.common.entity.EntitySeekB83;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
 public class RenderSeeker extends Render
 {
 	ModelRocket	md;
 
-	public RenderSeeker()
+	public RenderSeeker(RenderManager manager)
 	{
+        super(manager);
 		md = new ModelRocket();
 	}
 
 	public void renderRocket(EntitySeekB83 rocket, double x, double y, double z, float par8, float par9)
 	{
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) x, (float) y, (float) z);
-		GL11.glRotatef(rocket.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-		GL11.glRotatef(rocket.rotationPitch - 90.0f, 0.0F, 0.0F, 1.0F);
-		GL11.glScalef(2.0f, 2.0f, 2.0f);
+		GlStateManager.pushMatrix();
+		GlStateManager.translate((float) x, (float) y, (float) z);
+		GlStateManager.rotate(rocket.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
+		GlStateManager.rotate(rocket.rotationPitch - 90.0f, 0.0F, 0.0F, 1.0F);
+		GlStateManager.scale(2.0f, 2.0f, 2.0f);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etrocketseek202);
 		md.render(true);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 
 	/**

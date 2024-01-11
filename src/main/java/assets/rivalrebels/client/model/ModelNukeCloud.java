@@ -12,11 +12,10 @@
 // Copyrighted Rodolian Material
 package assets.rivalrebels.client.model;
 
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
+import net.minecraft.client.renderer.GlStateManager;
 
 public class ModelNukeCloud
 {
@@ -24,19 +23,19 @@ public class ModelNukeCloud
 	private float[]	topy		= { 6.5f, 5f, 6f, 7f, 7.1f, 7.25f, 7.5f, 8.25f, 9f, 9.25f, 9.4f, 9.75f, 10.1f, 10.25f, 10.25f };
 	private float[]	bottomx		= { 1.22f, 1.12f, 1.03f, 0.95f, 0.88f, 0.82f, 0.77f, 0.73f, 0.71f, 0.7f, 0.7f };
 	private float[]	bottomy		= { -4f, -3f, -2f, -1f, 0f, 1f, 2f, 3.25f, 4.5f, 5.5f, 6.5f };
-	
+
 	private int		segments	= 18;
 	private float	deg			= (float) Math.PI * 2f / segments;
 	private float	sin			= (float) Math.sin(deg);
 	private float	cos			= (float) Math.cos(deg);
 	private float	add			= 360 / segments;
-	
+
 	public void renderTop()
 	{
 		for (float i = 0; i < segments; i++)
 		{
-			GL11.glPushMatrix();
-			GL11.glRotatef(add * i, 0, 1, 0);
+			GlStateManager.pushMatrix();
+			GlStateManager.rotate(add * i, 0, 1, 0);
 			for (int f = 1; f < topx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / topx.length) * f);
@@ -48,16 +47,16 @@ public class ModelNukeCloud
 						new Vertice(topx[f - 1] * sin, topy[f - 1], topx[f - 1] * cos),
 						new Vertice(topx[f] * sin, topy[f], topx[f] * cos), t1, t2, t3, t4);
 			}
-			GL11.glPopMatrix();
+			GlStateManager.popMatrix();
 		}
 	}
-	
+
 	public void renderBottom()
 	{
 		for (float i = 0; i < segments; i++)
 		{
-			GL11.glPushMatrix();
-			GL11.glRotatef(add * i, 0, 1, 0);
+			GlStateManager.pushMatrix();
+			GlStateManager.rotate(add * i, 0, 1, 0);
 			for (int f = 1; f < bottomx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / bottomx.length) * f);
@@ -69,7 +68,7 @@ public class ModelNukeCloud
 						new Vertice(bottomx[f - 1] * sin, bottomy[f - 1], bottomx[f - 1] * cos),
 						new Vertice(bottomx[f] * sin, bottomy[f], bottomx[f] * cos), t1, t2, t3, t4);
 			}
-			GL11.glPopMatrix();
+			GlStateManager.popMatrix();
 		}
 	}
 }

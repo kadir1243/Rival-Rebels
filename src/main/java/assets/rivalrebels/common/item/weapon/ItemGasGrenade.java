@@ -11,36 +11,41 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityGasGrenade;
+import assets.rivalrebels.common.util.ItemUtil;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.potion.PotionEffect;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.world.World;
 
 public class ItemGasGrenade extends Item
 {
 	public ItemGasGrenade()
 	{
 		super();
-		maxStackSize = 6;
+		setMaxStackSize(6);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
+
 	/**
 	 * returns the action that specifies what animation to play when the items is being used
 	 */
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
-	
+
 	/**
 	 * How long it takes to use or consume an item
 	 */
@@ -49,66 +54,68 @@ public class ItemGasGrenade extends Item
 	{
 		return 75;
 	}
-	
-	@Override
-	public void onPlayerStoppedUsing(ItemStack itemstack, World world, EntityPlayer player, int i)
-	{
-		if (player.capabilities.isCreativeMode || player.inventory.hasItem(RivalRebels.gasgrenade) || RivalRebels.infiniteGrenades)
+
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entityLiving, int timeLeft) {
+        EntityPlayer player;
+        if (entityLiving instanceof EntityPlayer) player = (EntityPlayer) entityLiving;
+        else return;
+
+        ItemStack itemStack = ItemUtil.getItemStack(player, RivalRebels.gasgrenade);
+        if (player.capabilities.isCreativeMode || !itemStack.isEmpty() || RivalRebels.infiniteGrenades)
 		{
-			float f = (getMaxItemUseDuration(itemstack) - i) / 20.0F;
+			float f = (getMaxItemUseDuration(stack) - timeLeft) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
 			EntityGasGrenade entitysuperarrow = new EntityGasGrenade(world, player, 0.3f + f * 0.5f);
 			if (!player.capabilities.isCreativeMode)
 			{
-				player.inventory.consumeInventoryItem(RivalRebels.gasgrenade);
+                itemStack.shrink(1);
+                if (itemStack.isEmpty())
+                    player.inventory.deleteStack(itemStack);
 			}
 			RivalRebelsSoundPlayer.playSound(player, 4, 3, 1, 0.9f);
 			if (!world.isRemote)
 			{
-				world.spawnEntityInWorld(entitysuperarrow);
+				world.spawnEntity(entitysuperarrow);
 				entitysuperarrow.setPosition(entitysuperarrow.posX, entitysuperarrow.posY - 0.05, entitysuperarrow.posZ);
 			}
 		}
 	}
-	
-	/**
-	 * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
-	 */
-	@Override
-	public ItemStack onItemRightClick(ItemStack par1ItemStack, World world, EntityPlayer player)
-	{
-		player.setItemInUse(par1ItemStack, getMaxItemUseDuration(par1ItemStack));
-		world.playSoundAtEntity(player, "mob.slimeattack", 1.0F, 1.0F);
-		return par1ItemStack;
-		
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		player.setActiveHand(hand);
+		world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_SLIME_ATTACK, SoundCategory.PLAYERS, 1.0F, 1.0F);
+		return super.onItemRightClick(world, player, hand);
 	}
-	
-	@Override
-	public void onUsingTick(ItemStack stack, EntityPlayer player, int count)
-	{
+
+    @Override
+    public void onUsingTick(ItemStack stack, EntityLivingBase entityLiving, int count) {
 		int time = 75 - count;
 		if (time == 15 || time == 30 || time == 45 || time == 60)
 		{
-			player.worldObj.playSoundAtEntity(player, "note.snare", 1.0F, 1.0F);
+			entityLiving.world.playSound(entityLiving.posX, entityLiving.posY, entityLiving.posZ, SoundEvents.BLOCK_NOTE_SNARE, SoundCategory.PLAYERS, 1.0F, 1.0F, true);
 		}
 		if (time == 75)
 		{
-			player.worldObj.playSoundAtEntity(player, "note.snare", 1.0F, 1.0F);
-			player.addPotionEffect(new PotionEffect(Potion.poison.id, 80, 1));
-			player.addPotionEffect(new PotionEffect(Potion.confusion.id, 200, 0));
-			player.addPotionEffect(new PotionEffect(Potion.blindness.id, 80, 0));
-			player.addPotionEffect(new PotionEffect(Potion.moveSlowdown.id, 80, 0));
-			if (!player.capabilities.isCreativeMode)
-			{
-				player.inventory.consumeInventoryItem(RivalRebels.gasgrenade);
+			entityLiving.world.playSound(entityLiving.posX, entityLiving.posY, entityLiving.posZ, SoundEvents.BLOCK_NOTE_SNARE, SoundCategory.PLAYERS, 1.0F, 1.0F, true);
+			entityLiving.addPotionEffect(new PotionEffect(MobEffects.POISON, 80, 1));
+			entityLiving.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 200, 0));
+			entityLiving.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 80, 0));
+			entityLiving.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 80, 0));
+			if (entityLiving instanceof EntityPlayer player && !player.capabilities.isCreativeMode) {
+                ItemStack itemStack = ItemUtil.getItemStack(player, RivalRebels.gasgrenade);
+                itemStack.shrink(1);
+                if (itemStack.isEmpty())
+                    player.inventory.deleteStack(itemStack);
 			}
 		}
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ah");
-	}
+	}*/
 }

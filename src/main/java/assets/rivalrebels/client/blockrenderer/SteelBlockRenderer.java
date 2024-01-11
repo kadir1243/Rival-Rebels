@@ -9,7 +9,7 @@
  *
  * http://RivalRebels.com/
  *******************************************************************************/
-package assets.rivalrebels.client.blockrenderer;
+/*package assets.rivalrebels.client.blockrenderer;
 
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.RenderBlocks;
@@ -20,7 +20,7 @@ import net.minecraft.world.IBlockAccess;
 import org.lwjgl.opengl.GL11;
 
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.client.registry.ISimpleBlockRenderingHandler;
+import net.minecraftforge.fml.client.registry.ISimpleBlockRenderingHandler;
 
 public class SteelBlockRenderer implements ISimpleBlockRenderingHandler
 {
@@ -1250,3 +1250,4 @@ public class SteelBlockRenderer implements ISimpleBlockRenderingHandler
 		return true;
 	}
 }
+*/

@@ -11,7 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.core;
 
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class RivalRebelsSoundPlayer
@@ -77,7 +82,7 @@ public class RivalRebelsSoundPlayer
 			// voice 28
 			"ba"
 									};
-	
+
 	static String[][]	number		=
 									{
 									// artillery
@@ -215,13 +220,13 @@ public class RivalRebelsSoundPlayer
 			"r",
 			"s"}
 									};
-	
+
 	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume, float pitch)
 	{
 		if (world != null && dir >= 0 && dir < directory.length && num >= 0 && num < number[dir].length)
 		{
-			String sound = "rivalrebels:" + dir + "." + num;
-			world.playSoundEffect(x, y, z, sound, volume, pitch);
+			String sound = dir + "." + num;
+			world.playSound(x, y, z, new SoundEvent(new ResourceLocation(RivalRebels.MODID, sound)), SoundCategory.MASTER, volume, pitch, false);
 			return true;
 		}
 		else
@@ -229,34 +234,49 @@ public class RivalRebelsSoundPlayer
 			return false;
 		}
 	}
-	
+
+    public static boolean playSound(World world, int dir, int num, BlockPos pos, float volume, float pitch)
+    {
+        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ(), volume, pitch);
+    }
+
 	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume)
 	{
 		return playSound(world, dir, num, x, y, z, volume, 1);
 	}
-	
+
+    public static boolean playSound(World world, int dir, int num, BlockPos pos, float volume)
+    {
+        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ(), volume);
+    }
+
 	public static boolean playSound(World world, int dir, int num, double x, double y, double z)
 	{
 		return playSound(world, dir, num, x, y, z, 1, 1);
 	}
-	
+
+    public static boolean playSound(World world, int dir, int num, BlockPos pos)
+    {
+        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ());
+    }
+
 	public static boolean playSound(Entity entity, int dir, int num, float volume, float pitch)
 	{
 		if (entity != null)
 		{
-			return playSound(entity.worldObj, dir, num, entity.posX, entity.posY, entity.posZ, volume, pitch);
+			return playSound(entity.world, dir, num, entity.posX, entity.posY, entity.posZ, volume, pitch);
 		}
 		else
 		{
 			return false;
 		}
 	}
-	
+
 	public static boolean playSound(Entity entity, int dir, int num, float volume)
 	{
 		return playSound(entity, dir, num, volume, 1);
 	}
-	
+
 	public static boolean playSound(Entity entity, int dir, int num)
 	{
 		return playSound(entity, dir, num, 1, 1);

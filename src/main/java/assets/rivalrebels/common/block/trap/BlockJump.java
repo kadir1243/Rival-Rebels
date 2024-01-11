@@ -12,62 +12,56 @@
 package assets.rivalrebels.common.block.trap;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.init.SoundEvents;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import assets.rivalrebels.common.tileentity.TileEntityJumpBlock;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockJump extends Block
 {
 	public BlockJump()
 	{
-		super(Material.sponge);
+		super(Material.SPONGE);
 	}
-	
-	@Override
-	public void onEntityCollidedWithBlock(World par1World, int par2, int par3, int par4, Entity par5Entity)
-	{
-		if (par5Entity instanceof EntityLivingBase)
+
+    @Override
+    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+		if (entity instanceof EntityLivingBase)
 		{
-			par5Entity.motionY += 2;
-			par1World.playSoundEffect(par2, par3, par4, "random.bowhit", 3F, 2);
+			entity.motionY += 2;
+			world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ENTITY_ARROW_HIT, SoundCategory.BLOCKS, 3F, 2, true);
 		}
 	}
-	
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		float f = 0.0625F;
-		return AxisAlignedBB.getBoundingBox(par2, par3, par4, par2 + 1, par3 + 1 - f, par4 + 1);
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+		int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        float f = 0.0625F;
+		return new AxisAlignedBB(x, y, z, x + 1, y + 1 - f, z + 1);
 	}
-	
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+        return new AxisAlignedBB(pos, pos.add(1, 1, 1));
+    }
+
 	@Override
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return AxisAlignedBB.getBoundingBox(par2, par3, par4, par2 + 1, par3 + 1, par4 + 1);
-	}
-	
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -79,7 +73,7 @@ public class BlockJump extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -92,7 +86,7 @@ public class BlockJump extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -103,5 +97,5 @@ public class BlockJump extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:at"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:at"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:at"); // SIDE E
-	}
+	}*/
 }

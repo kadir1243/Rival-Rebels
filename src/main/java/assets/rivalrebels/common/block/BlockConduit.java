@@ -11,58 +11,48 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import java.util.Random;
-
-import net.minecraft.block.BlockContainer;
+import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.common.tileentity.TileEntityConduit;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockConduit extends BlockContainer
+public class BlockConduit extends Block
 {
+    public static final PropertyInteger VARIANT = PropertyInteger.create("variant", 0, 8);
 	public BlockConduit()
 	{
-		super(Material.iron);
-	}
-	
-	@Override
-	public boolean renderAsNormalBlock()
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return false;
-	}
-	
-	@Override
-	public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase par5EntityLiving, ItemStack par6ItemStack)
-	{
-		world.setBlock(x, y, z, this, new Random().nextInt(9) + 1, 0x3);
-	}
-	
-	@Override
-	public boolean hasTileEntity(int metadata)
-	{
-		return true;
-	}
-	
-	@Override
-	public TileEntity createNewTileEntity(World var1, int var2)
-	{
-		return new TileEntityConduit();
-	}
-	
-	@SideOnly(Side.CLIENT)
+		super(Material.IRON);
+        this.setDefaultState(this.getBlockState().getBaseState().withProperty(VARIANT, 0));
+    }
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(VARIANT);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(VARIANT, meta);
+    }
+    @Override
+    public BlockStateContainer getBlockState() {
+        return new BlockStateContainer(this, VARIANT);
+    }@Override
+    public boolean isOpaqueCube(IBlockState state) {
+        return false;
+    }
+
+    @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        return this.getDefaultState().withProperty(VARIANT, world.rand.nextInt(9));
+    }
+
+    /*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -80,7 +70,7 @@ public class BlockConduit extends BlockContainer
 	IIcon	icon8;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon9;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -95,7 +85,7 @@ public class BlockConduit extends BlockContainer
 		if (meta == 9) return icon9;
 		return icon1;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
@@ -108,5 +98,5 @@ public class BlockConduit extends BlockContainer
 		icon7 = iconregister.registerIcon("RivalRebels:cu");
 		icon8 = iconregister.registerIcon("RivalRebels:cv");
 		icon9 = iconregister.registerIcon("RivalRebels:cw");
-	}
+	}*/
 }

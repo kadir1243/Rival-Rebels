@@ -11,67 +11,66 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.entity.*;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.entity.EntityRoddiskLeader;
-import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
-import assets.rivalrebels.common.entity.EntityRoddiskRebel;
-import assets.rivalrebels.common.entity.EntityRoddiskRegular;
-import assets.rivalrebels.common.entity.EntityRoddiskRep;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
 
 public class ItemRodDisk extends Item
 {
-	public ItemRodDisk()
-	{
+	public ItemRodDisk() {
 		super();
-		this.maxStackSize = 1;
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
-	@Override
+
+    @Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
-	
+
 	@Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
+	public int getMaxItemUseDuration(ItemStack stack)
 	{
 		return 300;
 	}
-	
+
 	boolean pass = false;
-	
-	@Override
-	public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
-	{
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+
 		if (!pass)
 		{
-			par3EntityPlayer.addChatMessage(new ChatComponentText("Password?"));
+			player.sendMessage(new TextComponentString("Password?"));
 			pass = true;
 		}
-		par3EntityPlayer.setItemInUse(par1ItemStack, getMaxItemUseDuration(par1ItemStack));
-		if (RivalRebels.round.rrplayerlist.getForName(par3EntityPlayer.getCommandSenderName()).rrrank.id > 1) RivalRebelsSoundPlayer.playSound(par3EntityPlayer, 6, 2);
-		else RivalRebelsSoundPlayer.playSound(par3EntityPlayer, 7, 2);
-		return par1ItemStack;
+		player.setActiveHand(hand);
+		if (RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank.id > 1) RivalRebelsSoundPlayer.playSound(player, 6, 2);
+		else RivalRebelsSoundPlayer.playSound(player, 7, 2);
+		return ActionResult.newResult(EnumActionResult.PASS, stack);
 	}
-	
-	@Override
-	public void onPlayerStoppedUsing(ItemStack item, World world, EntityPlayer player, int i)
-	{
-		if (!world.isRemote)
-		{
-			if (!player.capabilities.isCreativeMode) player.inventory.consumeInventoryItem(this);
-			int rank = RivalRebels.round.rrplayerlist.getForName(player.getCommandSenderName()).rrrank.id;
+
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entityLiving, int timeLeft) {
+		EntityPlayer player;
+        if (entityLiving instanceof EntityPlayer) player = (EntityPlayer) entityLiving;
+        else return;
+        if (!world.isRemote) {
+			if (!player.capabilities.isCreativeMode) player.inventory.deleteStack(stack);
+			int rank = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank.id;
 			//float f = (getMaxItemUseDuration(item) - i) / 20.0F;
 			//f = (f * f + f * 2) * 0.33333f;
 			//if (f > 1.0F) f = 1.0F;
@@ -80,39 +79,39 @@ public class ItemRodDisk extends Item
 			if (rank == 0)
 			{
 				Entity entity = new EntityRoddiskRegular(world, player, 1);
-				world.spawnEntityInWorld(entity);
+				world.spawnEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 7, 3);
 			}
 			else if (rank == 1)
 			{
 				Entity entity = new EntityRoddiskRebel(world, player, 1.1f);
-				world.spawnEntityInWorld(entity);
+				world.spawnEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 7, 3);
 			}
 			else if (rank == 2)
 			{
 				Entity entity = new EntityRoddiskOfficer(world, player, 1.2f);
-				world.spawnEntityInWorld(entity);
+				world.spawnEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 6, 3);
 			}
 			else if (rank == 3)
 			{
 				Entity entity = new EntityRoddiskLeader(world, player, 4f);
-				world.spawnEntityInWorld(entity);
+				world.spawnEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 6, 3);
 			}
 			else if (rank == 4)
 			{
 				Entity entity = new EntityRoddiskRep(world, player, 4f);
-				world.spawnEntityInWorld(entity);
+				world.spawnEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 6, 3);
 			}
 		}
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:as");
-	}
+	}*/
 }

@@ -27,7 +27,7 @@ import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 public class ContainerLaptop extends Container
 {
 	protected TileEntityLaptop	entity;
-	
+
 	public ContainerLaptop(InventoryPlayer inventoryPlayer, TileEntityLaptop tileEntity)
 	{
 		entity = tileEntity;
@@ -47,13 +47,13 @@ public class ContainerLaptop extends Container
 		addSlotToContainer(new SlotRR(entity, 13, 98, 94, 1, ItemRodHydrogen.class).setAcceptsTimedBomb(true));
 		bindPlayerInventory(inventoryPlayer);
 	}
-	
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return entity.isUseableByPlayer(player);
+		return entity.isUsableByPlayer(player);
 	}
-	
+
 	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
@@ -63,16 +63,16 @@ public class ContainerLaptop extends Container
 				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
 			}
 		}
-		
+
 		for (int i = 0; i < 9; i++)
 		{
 			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
 		}
 	}
-	
+
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
 	{
-		return null;
+		return ItemStack.EMPTY;
 	}
 }

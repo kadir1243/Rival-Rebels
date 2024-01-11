@@ -11,54 +11,39 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import java.util.Random;
-
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+
+import java.util.Random;
 
 public class BlockRadioactiveSand extends Block
 {
 	public BlockRadioactiveSand()
 	{
-		super(Material.sand);
+		super(Material.SAND);
 	}
-	
-	@Override
-	public void onEntityWalking(World world, int par2, int par3, int par4, Entity entity)
-	{
-		if (world.rand.nextInt(2) == 0)
-		{
+
+    @Override
+    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+		if (world.rand.nextInt(2) == 0) {
 			entity.attackEntityFrom(RivalRebelsDamageSource.radioactivepoisoning, world.rand.nextInt(2));
 		}
 	}
-	
-	@Override
-	public void randomDisplayTick(World world, int x, int y, int z, Random random)
-	{
-		world.spawnParticle("reddust", x + random.nextFloat(), y + 1.1 + random.nextFloat() * 0.1, z + random.nextFloat(), 0.3F, 6F, 0.5F);
+
+    @Override
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+		world.spawnParticle(EnumParticleTypes.REDSTONE, pos.getX() + rand.nextFloat(), pos.getY() + 1.1 + rand.nextFloat() * 0.1, pos.getZ() + rand.nextFloat(), 0.3F, 6F, 0.5F);
 	}
-	
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 1;
-	}
-	
-	@Override
+
+	/*@Override
 	public final IIcon getIcon(int side, int meta)
 	{
-		return Blocks.sand.getIcon(side, meta);
-	}
-	
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		
-	}
+		return Blocks.SAND.getIcon(side, meta);
+	}*/
 }

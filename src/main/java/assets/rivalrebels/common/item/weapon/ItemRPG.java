@@ -15,12 +15,15 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityBomb;
 import assets.rivalrebels.common.entity.EntityRocket;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemTool;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 import java.util.HashSet;
@@ -29,8 +32,8 @@ public class ItemRPG extends ItemTool
 {
 	public ItemRPG()
 	{
-		super(1, ToolMaterial.EMERALD, new HashSet<>());
-		maxStackSize = 1;
+		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
@@ -43,7 +46,7 @@ public class ItemRPG extends ItemTool
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
 
 	@Override
@@ -52,37 +55,37 @@ public class ItemRPG extends ItemTool
 		return 144;
 	}
 
-	/**
-	 * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
-	 */
-	@Override
-	public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
-	{
-		if (par3EntityPlayer.capabilities.isCreativeMode || par3EntityPlayer.inventory.hasItem(RivalRebels.rocket) || RivalRebels.infiniteAmmo)
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        ItemStack itemStack = ItemUtil.getItemStack(player, RivalRebels.rocket);
+        if (player.capabilities.isCreativeMode || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
 		{
-			par3EntityPlayer.setItemInUse(par1ItemStack, getMaxItemUseDuration(par1ItemStack));
-			if (!par2World.isRemote && !par3EntityPlayer.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
+			player.setActiveHand(hand);
+			if (!world.isRemote && !player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
 			{
-				par3EntityPlayer.inventory.consumeInventoryItem(RivalRebels.rocket);
+                itemStack.shrink(1);
+                if (itemStack.isEmpty())
+                    player.inventory.deleteStack(itemStack);
 			}
-			if (par1ItemStack.getEnchantmentTagList() == null) RivalRebelsSoundPlayer.playSound(par3EntityPlayer, 23, 2, 0.4f);
-			else RivalRebelsSoundPlayer.playSound(par3EntityPlayer, 10, 4, 1.0f);
-			if (!par2World.isRemote)
+			if (!stack.isItemEnchanted()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
+			else RivalRebelsSoundPlayer.playSound(player, 10, 4, 1.0f);
+			if (!world.isRemote)
 			{
-				if (par1ItemStack.getEnchantmentTagList() == null) par2World.spawnEntityInWorld(new EntityRocket(par2World, par3EntityPlayer, 0.1F));
-				else par2World.spawnEntityInWorld(new EntityBomb(par2World, par3EntityPlayer, 0.1F));
+				if (!stack.isItemEnchanted()) world.spawnEntity(new EntityRocket(world, player, 0.1F));
+				else world.spawnEntity(new EntityBomb(world, player, 0.1F));
 			}
 		}
-		else if (!par2World.isRemote)
+		else if (!world.isRemote)
 		{
-			par3EntityPlayer.addChatMessage(new ChatComponentText("§cOut of ammunition"));
+			player.sendMessage(new TextComponentString("§cOut of ammunition"));
 		}
-		return par1ItemStack;
+		return ActionResult.newResult(EnumActionResult.PASS, stack);
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:aq");
-	}
+	}*/
 }

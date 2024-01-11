@@ -13,66 +13,31 @@ package assets.rivalrebels;
 
 import assets.rivalrebels.common.entity.EntityGore;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import cpw.mods.fml.common.network.IGuiHandler;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.world.World;
 
-public class CommonProxy implements IGuiHandler
-{
-	@Override
-	public Object getServerGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		return null;
+public class CommonProxy {
+    public void closeGui() {
 	}
 
-	@Override
-	public Object getClientGuiElement(int ID, EntityPlayer player, World world, int x, int y, int z)
-	{
-		return null;
+	public void nextBattle() {
 	}
 
-    public int addArmor(String armor)
-	{
-		return 0;
+	public void teamWin(boolean winner) {
 	}
 
-	public void closeGui()
-	{
-
+	public void guiClass() {
 	}
 
-	public void nextBattle()
-	{
-
+	public void guiSpawn() {
 	}
 
-	public void teamWin(boolean winner)
-	{
-
+	public void flamethrowerGui(int i) {
 	}
 
-	public void guiClass()
-	{
-
+	public void teslaGui(int i) {
 	}
 
-	public void guiSpawn()
-	{
-
-	}
-
-	public void flamethrowerGui(int i)
-	{
-
-	}
-
-	public void teslaGui(int i)
-	{
-
-	}
-
-	public void spawnGore(World world, EntityGore g, boolean greenblood)
-	{
+	public void spawnGore(World world, EntityGore g, boolean greenblood) {
 	}
 
 	public boolean spacebar()
@@ -116,8 +81,6 @@ public class CommonProxy implements IGuiHandler
 		return false;
 	}
 
-	public void setOverlay(EntityRhodes rhodes)
-	{
-
+	public void setOverlay(EntityRhodes rhodes) {
 	}
 }

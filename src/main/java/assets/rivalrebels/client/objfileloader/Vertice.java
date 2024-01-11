@@ -11,101 +11,57 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
-import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
+@SideOnly(Side.CLIENT)
 public class Vertice
 {
-	public Vec3			p;
-	public Vec3			n;
-	public Vec2			t;
-	
-	private Tessellator	tes	= Tessellator.instance;
-	
-	public Vertice(float a, float b, float c, float d, float e, float f, float g, float h)
+	public Vec3d p;
+	public Vec3d n;
+	public Vec2f t;
+
+    public Vertice(float a, float b, float c, float d, float e, float f, float g, float h)
 	{
-		p = new Vec3(a, b, c);
-		n = new Vec3(d, e, f);
-		t = new Vec2(g, h);
+		p = new Vec3d(a, b, c);
+		n = new Vec3d(d, e, f);
+		t = new Vec2f(g, h);
 	}
-	
-	public Vertice(Vec3 P, Vec3 N, Vec2 T)
+
+	public Vertice(Vec3d P, Vec3d N, Vec2f T)
 	{
 		p = P;
 		n = N;
 		t = T;
 	}
-	
-	public void normalize()
-	{
-		double l = Math.sqrt(n.x * n.x + n.y * n.y + n.z * n.z);
-		n.x /= l;
-		n.y /= l;
-		n.z /= l;
+
+	public void normalize() {
+        n = n.normalize();
 	}
-	
-	public void render()
+
+	public void render(BufferBuilder buffer)
 	{
-		tes.setTextureUV(t.x, t.y);
-		tes.setNormal(n.x, n.y, n.z);
-		tes.addVertex(p.x, p.y, p.z);
+        buffer.pos(p.x, p.y, p.z).tex(t.x, t.y).normal((float) n.x, (float) n.y, (float) n.z).endVertex();
 	}
-	
-	public void renderWireframe()
+
+	public void renderWireframe(BufferBuilder buffer)
 	{
-		tes.addVertex(p.x, p.y, p.z);
+		buffer.pos(p.x, p.y, p.z).endVertex();
 	}
-	
-	@Override
-	public Vertice clone()
-	{
-		return new Vertice(p.clone(), n.clone(), t.clone());
-	}
-	
+
+    public Vertice copy() {
+        return new Vertice(p, n, t);
+    }
+
 	public static Vertice average(Vertice v1, Vertice v2)
 	{
-		Vertice v = new Vertice((v1.p.x + v2.p.x) / 2f, (v1.p.y + v2.p.y) / 2f, (v1.p.z + v2.p.z) / 2f, (v1.n.x + v2.n.x) / 2f, (v1.n.y + v2.n.y) / 2f, (v1.n.z + v2.n.z) / 2f, (v1.t.x + v2.t.x) / 2f, (v1.t.y + v2.t.y) / 2f);
-		return v;
+        return new Vertice((float) ((v1.p.x + v2.p.x) / 2F), (float) ((v1.p.y + v2.p.y) / 2f), (float) ((v1.p.z + v2.p.z) / 2f), (float) ((v1.n.x + v2.n.x) / 2f), (float) ((v1.n.y + v2.n.y) / 2f), (float) ((v1.n.z + v2.n.z) / 2f), (v1.t.x + v2.t.x) / 2f, (v1.t.y + v2.t.y) / 2f);
 	}
-	
-	public void scale(Vec3 v)
-	{
-		p.x *= v.x;
-		p.y *= v.y;
-		p.z *= v.z;
-	}
-}
 
-class Vec2
-{
-	float	x, y;
-	
-	public Vec2(float X, float Y)
-	{
-		x = X;
-		y = Y;
-	}
-	
-	@Override
-	public Vec2 clone()
-	{
-		return new Vec2(x, y);
-	}
-}
-
-class Vec3
-{
-	float	x, y, z;
-	
-	public Vec3(float X, float Y, float Z)
-	{
-		x = X;
-		y = Y;
-		z = Z;
-	}
-	
-	@Override
-	public Vec3 clone()
-	{
-		return new Vec3(x, y, z);
+	public void scale(Vec3d v) {
+        p = new Vec3d(p.x * v.x, p.y * v.y, p.z * v.z);
 	}
 }

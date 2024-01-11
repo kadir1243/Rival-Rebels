@@ -11,36 +11,34 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
-import net.minecraft.world.World;
-
-import java.util.HashSet;
-
-import org.lwjgl.input.Keyboard;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRaytrace;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import assets.rivalrebels.common.util.ItemUtil;
+import net.minecraft.client.Minecraft;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.world.World;
+import org.lwjgl.input.Keyboard;
+
+import java.util.HashSet;
 
 public class ItemTesla extends ItemTool
 {
 	public ItemTesla()
 	{
-		super(1, ToolMaterial.EMERALD, new HashSet<>());
-		maxStackSize = 1;
+		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
@@ -59,7 +57,7 @@ public class ItemTesla extends ItemTool
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
 
 	@Override
@@ -68,57 +66,55 @@ public class ItemTesla extends ItemTool
 		return 20;
 	}
 
-	@Override
-	public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
-	{
-		int degree = getDegree(item);
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		ItemStack stack = player.getHeldItem(hand);
+        int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
-		if (player.capabilities.isCreativeMode || player.inventory.hasItem(RivalRebels.battery) || RivalRebels.infiniteAmmo)
+        ItemStack battery = ItemUtil.getItemStack(player, RivalRebels.battery);
+        if (player.capabilities.isCreativeMode || !battery.isEmpty() || RivalRebels.infiniteAmmo)
 		{
 			if (!player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
 			{
-				player.inventory.consumeInventoryItem(RivalRebels.battery);
-				if (chance > 0.33333) player.inventory.consumeInventoryItem(RivalRebels.battery);
-				if (chance > 0.66666) player.inventory.consumeInventoryItem(RivalRebels.battery);
-			}
-			player.setItemInUse(item, getMaxItemUseDuration(item));
+                battery.shrink(1);
+				if (chance > 0.33333) battery.shrink(1);
+				if (chance > 0.66666) battery.shrink(1);
+                if (battery.isEmpty()) {
+                    player.inventory.deleteStack(battery);
+                }
+            }
+			player.setActiveHand(hand);
 		}
 		else if (!world.isRemote)
 		{
-			player.addChatMessage(new ChatComponentText("§cOut of batteries"));
+			player.sendMessage(new TextComponentString("§cOut of batteries"));
 		}
 		if (message && world.isRemote)
 		{
-			player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("RivalRebels.Orders")+" "+StatCollector.translateToLocal("RivalRebels.message.use")+" [R]."));
+			player.sendMessage(new TextComponentTranslation("RivalRebels.Orders").appendText(" ").appendSibling(new TextComponentTranslation("RivalRebels.message.use")).appendText(" [R]."));
 			message = false;
 		}
-		return item;
+		return ActionResult.newResult(EnumActionResult.PASS, stack);
 	}
 	boolean message = true;
 
-	@Override
-	/**
-	 * Called each tick as long the item is on a player inventory. Uses by maps to check if is on a player hand and
-	 * update it's contents.
-	 */
-	public void onUpdate(ItemStack item, World world, Entity entity, int par4, boolean par5)
-	{
-		if (FMLCommonHandler.instance().getEffectiveSide() == Side.CLIENT)
-		if ((RivalRebels.altRkey?Keyboard.isKeyDown(Keyboard.KEY_F):Keyboard.isKeyDown(Keyboard.KEY_R)) && item == ((EntityPlayer) entity).inventory.getCurrentItem() && Minecraft.getMinecraft().currentScreen == null)
-		{
-			RivalRebels.proxy.teslaGui(getDegree(item));
-		}
-	}
+    @Override
+    public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
+        if (world.isRemote) {
+            if ((RivalRebels.altRkey ? Keyboard.isKeyDown(Keyboard.KEY_F) : Keyboard.isKeyDown(Keyboard.KEY_R)) && isSelected && Minecraft.getMinecraft().currentScreen == null) {
+                RivalRebels.proxy.teslaGui(getDegree(stack));
+            }
+        }
+    }
 
-	@Override
-	public void onUsingTick(ItemStack stack, EntityPlayer player, int count)
-	{
-		if (player.isWet() && !player.capabilities.isCreativeMode)
+    @Override
+    public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
+		if (player.isWet() && !player.isEntityInvulnerable(RivalRebelsDamageSource.electricity))
 		{
 			player.attackEntityFrom(RivalRebelsDamageSource.electricity, 2);
 		}
-		World world = player.worldObj;
-		if (player.worldObj.rand.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(player, 25, 1);
+		World world = player.world;
+		if (player.world.rand.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(player, 25, 1);
 
 		int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
@@ -131,18 +127,18 @@ public class ItemTesla extends ItemTool
 		int num = (degree / 25) + 1;
 
 		if (!world.isRemote) for (int i = 0; i < num; i++)
-			world.spawnEntityInWorld(new EntityRaytrace(world, player, dist, randomness, chance, !stack.isItemEnchanted()));
+			world.spawnEntity(new EntityRaytrace(world, player, dist, randomness, chance, !stack.isItemEnchanted()));
 	}
 
 	public int getDegree(ItemStack item)
 	{
-		if (item.stackTagCompound == null) return 0;
-		else return item.stackTagCompound.getInteger("dial") + 90;
+		if (!item.hasTagCompound()) return 0;
+		else return item.getTagCompound().getInteger("dial") + 90;
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ax");
-	}
+	}*/
 }

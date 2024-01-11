@@ -11,14 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.StatCollector;
-
-import org.lwjgl.input.Mouse;
-
 import assets.rivalrebels.client.gui.GuiTray;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.I18n;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.input.Mouse;
 
 @SideOnly(Side.CLIENT)
 public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
@@ -26,9 +24,9 @@ public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
 	Rectangle		bbox;
 	public boolean	isPressed	= false;
 	public boolean	mouseDown	= false;
-	public String	text		= "";
+	public String	text;
 	public GuiTray	t;
-	
+
 	public GuiDropdownOption(int id, Vector p, int l, int n, String text, GuiTray tray)
 	{
 		super(id, p.x, p.y + n * 10, l, (n + 1) * 10, text);
@@ -36,11 +34,10 @@ public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
 		this.text = text;
 		t = tray;
 	}
-	
-	@Override
-	public void drawButton(Minecraft par1Minecraft, int par2, int par3)
-	{
-		boolean inside = bbox.isVecInside(new Vector(par2, par3));
+
+    @Override
+    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+		boolean inside = bbox.isVecInside(new Vector(mouseX, mouseY));
 		boolean current = Mouse.isButtonDown(0) && inside;
 		boolean on = t.r.hasWepReqs();
 		if (current && !mouseDown && on) isPressed = !isPressed;
@@ -48,16 +45,16 @@ public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
 		if (on)
 		{
 			int team = 0;
-			if (t.r.chestContents[6] != null && t.r.chestContents[6].stackTagCompound != null)
+			if (!t.r.chestContents.get(6).isEmpty() && t.r.chestContents.get(6).hasTagCompound())
 			{
-				team = t.r.chestContents[6].stackTagCompound.getInteger("team");
+				team = t.r.chestContents.get(6).getTagCompound().getInteger("team");
 			}
 			if (team == 0) color = 0xffff55;
 			if (team == 1) color = 0x55ff55;
 			if (team == 2) color = 0x5555ff;
 		}
 		if (inside && on) color = 0xffffff;
-		drawString(Minecraft.getMinecraft().fontRenderer, StatCollector.translateToLocal(text), bbox.xMin + 1, bbox.yMin + 1, color);
+		drawString(Minecraft.getMinecraft().fontRenderer, I18n.format(text), bbox.xMin + 1, bbox.yMin + 1, color);
 		mouseDown = current;
 	}
 }

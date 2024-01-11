@@ -11,29 +11,30 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.item.Item.ToolMaterial;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-
-import java.util.HashSet;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
+import assets.rivalrebels.common.util.ItemUtil;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.EnumAction;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.World;
+
+import java.util.HashSet;
 
 public class ItemPlasmaCannon extends ItemTool
 {
 	public ItemPlasmaCannon()
 	{
-		super(1, ToolMaterial.EMERALD, new HashSet<>());
-		maxStackSize = 1;
+		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
@@ -50,78 +51,67 @@ public class ItemPlasmaCannon extends ItemTool
 	}
 
 	@Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
+	public EnumAction getItemUseAction(ItemStack stack)
 	{
-		return EnumAction.bow;
+		return EnumAction.BOW;
 	}
 
 	@Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
+	public int getMaxItemUseDuration(ItemStack stack)
 	{
 		return 64;
 	}
 
-	@Override
-	public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer par3EntityPlayer)
-	{
-		if (par3EntityPlayer.capabilities.isCreativeMode || par3EntityPlayer.inventory.hasItem(RivalRebels.hydrod) || RivalRebels.infiniteAmmo)
-		{
-			par3EntityPlayer.setItemInUse(par1ItemStack, getMaxItemUseDuration(par1ItemStack));
-			if (!par3EntityPlayer.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
-			{
-				int item = -1;
-				for (int i = 0; i < 36; i++)
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+        ItemStack hydrodStack = ItemUtil.getItemStack(player, RivalRebels.hydrod);
+        if (player.capabilities.isCreativeMode || !hydrodStack.isEmpty() || RivalRebels.infiniteAmmo) {
+			player.setActiveHand(hand);
+			if (!player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo) {
+				if (!hydrodStack.isEmpty())
 				{
-					if (par3EntityPlayer.inventory.mainInventory[i] != null)
+					hydrodStack.damageItem(1, player);
+					if (hydrodStack.getItemDamage() == hydrodStack.getMaxDamage())
 					{
-						if (par3EntityPlayer.inventory.mainInventory[i].getItem() == RivalRebels.hydrod)
-						{
-							item = i;
-						}
+						hydrodStack.shrink(1);
+                        if (hydrodStack.isEmpty())
+                            player.inventory.deleteStack(hydrodStack);
+						player.inventory.addItemStackToInventory(RivalRebels.emptyrod.getDefaultInstance());
 					}
-				}
-				if (item != -1)
-				{
-					par3EntityPlayer.inventory.mainInventory[item].damageItem(1, par3EntityPlayer);
-					if (par3EntityPlayer.inventory.mainInventory[item].getItemDamage() == par3EntityPlayer.inventory.mainInventory[item].getMaxDamage())
-					{
-						par3EntityPlayer.inventory.decrStackSize(item, 1);
-						par3EntityPlayer.inventory.addItemStackToInventory(new ItemStack(RivalRebels.emptyrod, 1));
-					}
-					par3EntityPlayer.setItemInUse(par1ItemStack, getMaxItemUseDuration(par1ItemStack));
+					player.setActiveHand(hand);
 				}
 				else
 				{
-					return par1ItemStack;
+					return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 				}
 			}
-			RivalRebelsSoundPlayer.playSound(par3EntityPlayer, 16, 1, 0.25f);
+			RivalRebelsSoundPlayer.playSound(player, 16, 1, 0.25f);
 		}
-		else if (!par2World.isRemote)
+		else if (!world.isRemote)
 		{
-			par3EntityPlayer.addChatMessage(new ChatComponentText("§cOut of Hydrogen"));
+			player.sendMessage(new TextComponentString("§cOut of Hydrogen"));
 		}
-		return par1ItemStack;
+		return ActionResult.newResult(EnumActionResult.PASS, stack);
 	}
 
-	@Override
-	public void onPlayerStoppedUsing(ItemStack item, World world, EntityPlayer player, int i)
-	{
-		if (!player.worldObj.isRemote)
+    @Override
+    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entityLiving, int timeLeft) {
+		if (!world.isRemote)
 		{
-			float f = (getMaxItemUseDuration(item) - i) / 20.0F;
+			float f = (getMaxItemUseDuration(stack) - timeLeft) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
 			f+=0.2f;
-			RivalRebelsSoundPlayer.playSound(player, 16, 2);
-			Entity entity = new EntityPlasmoid(player.worldObj, player, f+0.5f, item.getEnchantmentTagList() != null);
-			player.worldObj.spawnEntityInWorld(entity);
+			RivalRebelsSoundPlayer.playSound(entityLiving, 16, 2);
+			Entity entity = new EntityPlasmoid(world, entityLiving, f+0.5f, stack.isItemEnchanted());
+			world.spawnEntity(entity);
 		}
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ao");
-	}
+	}*/
 }

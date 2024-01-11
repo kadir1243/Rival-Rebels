@@ -11,53 +11,57 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.MobEffects;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.item.EnumAction;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.Potion;
 import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 
 public class ItemSafePill extends Item
 {
 	public ItemSafePill()
 	{
 		super();
-		maxStackSize = 6;
+		setMaxStackSize(6);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
-	@Override
-	public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
-	{
-		player.setItemInUse(item, getMaxItemUseDuration(item));
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+		player.setActiveHand(hand);
 		if (!world.isRemote)
 		{
-			player.addChatMessage(new ChatComponentText("§7[§6Status§7]§e Regenerating..."));
+			player.sendMessage(new TextComponentString("§7[§6Status§7]§e Regenerating..."));
 			RivalRebelsSoundPlayer.playSound(player, 15, 1);
 			RivalRebelsSoundPlayer.playSound(player, 28, 18);
-			world.playSoundAtEntity(player, "mob.magmacube.jump", 1.0F, 1.0F);
-			world.playSoundAtEntity(player, "mob.ghast.scream", 1.0F, 1.0F);
-			((EntityLivingBase) player).addPotionEffect(new PotionEffect(Potion.blindness.id, 10, 20));
+			world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_MAGMACUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+			world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
+			player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 10, 20));
 			player.getFoodStats().addStats(10, 200);
 			player.heal(10);
-			player.inventory.consumeInventoryItem(item.getItem());
+            ItemStack stack = player.getHeldItem(hand);
+            stack.shrink(1);
+            if (stack.isEmpty()) stack = ItemStack.EMPTY;
+            player.setHeldItem(hand, stack);
 		}
-		return item;
+		return super.onItemRightClick(world, player, hand);
 	}
-	
+
 	@Override
 	public EnumAction getItemUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.eat;
+		return EnumAction.EAT;
 	}
-	
+
 	/**
 	 * How long it takes to use or consume an item
 	 */
@@ -66,10 +70,10 @@ public class ItemSafePill extends Item
 	{
 		return 32;
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:ak");
-	}
+	}*/
 }

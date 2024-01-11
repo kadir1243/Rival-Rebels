@@ -11,53 +11,49 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockExplosives extends Block
 {
 	public BlockExplosives()
 	{
-		super(Material.wood);
+		super(Material.WOOD);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
-	{
-		blockActivated(world, x, y, z, player);
-	}
-	
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
+
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        blockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player);
+    }
+
+    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
 	{
 		if (world.isRemote)
 		{
-			player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("RivalRebels.Inventory")));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.timedbomb.getUnlocalizedName() + ".name") + ". §9(" + "1 minute countdown." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.pliers.getUnlocalizedName() + ".name") + ". §9(" + "to defuse explosives." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.remotecharge.getUnlocalizedName() + ".name") + ". §9(" + "Remote charge." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.remote.getUnlocalizedName() + ".name") + ". §9(" + "Set and detonate charge." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.minetrap.getUnlocalizedName() + ".name") + ". §9(" + "Handle with care." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.flare.getUnlocalizedName() + ".name") + ". §9(" + "Incendiary defense." + ")"));
+			player.sendMessage(new TextComponentTranslation("RivalRebels.Inventory"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.timedbomb.getTranslationKey() + ".name") + ". §9(" + "1 minute countdown." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.pliers.getTranslationKey() + ".name") + ". §9(" + "to defuse explosives." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.remotecharge.getTranslationKey() + ".name") + ". §9(" + "Remote charge." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.remote.getTranslationKey() + ".name") + ". §9(" + "Set and detonate charge." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.minetrap.getTranslationKey() + ".name") + ". §9(" + "Handle with care." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.flare.getTranslationKey() + ".name") + ". §9(" + "Incendiary defense." + ")"));
 		}
 		if (!world.isRemote)
 		{
@@ -67,20 +63,20 @@ public class BlockExplosives extends Block
 			EntityItem ei3 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.flare, 8));
 			EntityItem ei4 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.remote));
 			EntityItem ei5 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.pliers));
-			world.spawnEntityInWorld(ei);
-			world.spawnEntityInWorld(ei1);
-			world.spawnEntityInWorld(ei2);
-			world.spawnEntityInWorld(ei3);
-			world.spawnEntityInWorld(ei4);
-			world.spawnEntityInWorld(ei5);
-			world.setBlock(x, y, z, Blocks.air);
+			world.spawnEntity(ei);
+			world.spawnEntity(ei1);
+			world.spawnEntity(ei2);
+			world.spawnEntity(ei3);
+			world.spawnEntity(ei4);
+			world.spawnEntity(ei5);
+			world.setBlockToAir(new BlockPos(x, y, z));
 			return true;
 		}
 		return true;
-		
+
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -92,7 +88,7 @@ public class BlockExplosives extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -105,7 +101,7 @@ public class BlockExplosives extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -116,5 +112,5 @@ public class BlockExplosives extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:am"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:am"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:am"); // SIDE E
-	}
+	}*/
 }

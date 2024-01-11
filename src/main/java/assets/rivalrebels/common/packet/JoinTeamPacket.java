@@ -11,28 +11,29 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.item.ItemStack;
-import net.minecraft.scoreboard.Scoreboard;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.inventory.EntityEquipmentSlot;
+import net.minecraft.item.ItemStack;
+import net.minecraft.scoreboard.Scoreboard;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class JoinTeamPacket implements IMessage
 {
 	RivalRebelsClass rrclass;
 	RivalRebelsTeam rrteam;
-	
+
 	public JoinTeamPacket()
 	{
-		
+
 	}
-	
+
 	public JoinTeamPacket(RivalRebelsTeam rrt, RivalRebelsClass rrc)
 	{
 		rrclass = rrc;
@@ -52,92 +53,106 @@ public class JoinTeamPacket implements IMessage
 		buf.writeByte(rrclass.id);
 		buf.writeByte(rrteam.id);
 	}
-	
+
 	public static class Handler implements IMessageHandler<JoinTeamPacket, IMessage>
 	{
 		@Override
 		public IMessage onMessage(JoinTeamPacket m, MessageContext ctx)
 		{
-			RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForName(ctx.getServerHandler().playerEntity.getCommandSenderName());
-			
+            EntityPlayerMP player = ctx.getServerHandler().player;
+            RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
+
 			if (p.isreset)
 			{
 				p.isreset = false;
 				p.rrclass=m.rrclass;
 				p.rrteam=m.rrteam;
 				Scoreboard scrb = RivalRebels.round.world.getScoreboard();
-				scrb.removePlayerFromTeams(p.username);
-				scrb.func_151392_a(p.username, p.rrteam.toString());
+				scrb.removePlayerFromTeams(p.getUsername());
+				scrb.addPlayerToTeam(p.getUsername(), p.rrteam.toString());
 				ItemStack[] inventory = m.rrclass.inventory;
-				
-				for (int i = 0; i < inventory.length; i++)
-				{
-					ctx.getServerHandler().playerEntity.inventory.addItemStackToInventory(inventory[i].copy());
-				}
-				
+
+                for (ItemStack stack : inventory) {
+                    player.inventory.addItemStackToInventory(stack.copy());
+                }
+
 				if (m.rrteam == RivalRebelsTeam.OMEGA)
 				{
-					switch (m.rrclass)
-					{
-						case REBEL:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.orebelboots), new ItemStack(RivalRebels.orebelpants), new ItemStack(RivalRebels.orebelchest), new ItemStack(RivalRebels.orebelhelmet) };
-						break;
-						
-						case NUKER:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.onukerboots), new ItemStack(RivalRebels.onukerpants), new ItemStack(RivalRebels.onukerchest), new ItemStack(RivalRebels.onukerhelmet) };
-						break;
-						
-						case INTEL:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.ointelboots), new ItemStack(RivalRebels.ointelpants), new ItemStack(RivalRebels.ointelchest), new ItemStack(RivalRebels.ointelhelmet) };
-						break;
-						
-						case HACKER:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.ohackerboots), new ItemStack(RivalRebels.ohackerpants), new ItemStack(RivalRebels.ohackerchest), new ItemStack(RivalRebels.ohackerhelmet) };
-						break;
-						case NONE:
-							
-						break;
-					}
+                    switch (m.rrclass) {
+                        case REBEL -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.orebelboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.orebelpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST, RivalRebels.orebelchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.orebelhelmet.getDefaultInstance());
+                        }
+                        case NUKER -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.onukerboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.onukerpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST, RivalRebels.onukerchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.onukerhelmet.getDefaultInstance());
+                        }
+                        case INTEL -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.ointelboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.ointelpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST, RivalRebels.ointelchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.ointelhelmet.getDefaultInstance());
+                        }
+                        case HACKER -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.ohackerboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.ohackerpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST,RivalRebels.ohackerchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.ohackerhelmet.getDefaultInstance());
+                        }
+                        case NONE -> {
+                        }
+                    }
 				}
 				else if (m.rrteam == RivalRebelsTeam.SIGMA)
 				{
-					switch (m.rrclass)
-					{
-						case REBEL:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.srebelboots), new ItemStack(RivalRebels.srebelpants), new ItemStack(RivalRebels.srebelchest), new ItemStack(RivalRebels.srebelhelmet) };
-						break;
-						
-						case NUKER:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.snukerboots), new ItemStack(RivalRebels.snukerpants), new ItemStack(RivalRebels.snukerchest), new ItemStack(RivalRebels.snukerhelmet) };
-						break;
-						
-						case INTEL:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.sintelboots), new ItemStack(RivalRebels.sintelpants), new ItemStack(RivalRebels.sintelchest), new ItemStack(RivalRebels.sintelhelmet) };
-						break;
-						
-						case HACKER:
-							ctx.getServerHandler().playerEntity.inventory.armorInventory = new ItemStack[] { new ItemStack(RivalRebels.shackerboots), new ItemStack(RivalRebels.shackerpants), new ItemStack(RivalRebels.shackerchest), new ItemStack(RivalRebels.shackerhelmet) };
-						break;
-						case NONE:
-							
-						break;
-					}
+                    switch (m.rrclass) {
+                        case REBEL -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.srebelboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.srebelpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST,RivalRebels.srebelchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.srebelhelmet.getDefaultInstance());
+                        }
+                        case NUKER -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.snukerboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.snukerpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST,RivalRebels.snukerchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.snukerhelmet.getDefaultInstance());
+                        }
+                        case INTEL -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.sintelboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.sintelpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST,RivalRebels.sintelchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.sintelhelmet.getDefaultInstance());
+                        }
+                        case HACKER -> {
+                            player.setItemStackToSlot(EntityEquipmentSlot.FEET, RivalRebels.shackerboots.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.LEGS, RivalRebels.shackerpants.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.CHEST,RivalRebels.shackerchest.getDefaultInstance());
+                            player.setItemStackToSlot(EntityEquipmentSlot.HEAD, RivalRebels.shackerhelmet.getDefaultInstance());
+                        }
+                        case NONE -> {
+                        }
+                    }
 				}
 				PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
 			}
 			if (m.rrteam == RivalRebelsTeam.OMEGA)
 			{
-				double sx = RivalRebels.round.oObjx + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
-				double sy = RivalRebels.round.oObjy + 1;
-				double sz = RivalRebels.round.oObjz + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
-				ctx.getServerHandler().playerEntity.playerNetServerHandler.setPlayerLocation(sx, sy, sz,0,0);
+				double sx = RivalRebels.round.omegaObjPos.getX() + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
+				double sy = RivalRebels.round.omegaObjPos.getY() + 1;
+				double sz = RivalRebels.round.omegaObjPos.getZ() + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
+				player.connection.setPlayerLocation(sx, sy, sz,0,0);
 			}
 			else if (m.rrteam == RivalRebelsTeam.SIGMA)
 			{
-				double sx = RivalRebels.round.sObjx + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
-				double sy = RivalRebels.round.sObjy + 1;
-				double sz = RivalRebels.round.sObjz + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
-				ctx.getServerHandler().playerEntity.playerNetServerHandler.setPlayerLocation(sx, sy, sz,0,0);
+				double sx = RivalRebels.round.sigmaObjPos.getX() + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
+				double sy = RivalRebels.round.sigmaObjPos.getY() + 1;
+				double sz = RivalRebels.round.sigmaObjPos.getZ() + (RivalRebels.round.world.rand.nextInt(2)-0.5)*30+0.5f;
+				player.connection.setPlayerLocation(sx, sy, sz,0,0);
 			}
 			return null;
 		}

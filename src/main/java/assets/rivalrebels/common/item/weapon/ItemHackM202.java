@@ -11,32 +11,27 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.world.World;
-
-import java.util.HashSet;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.entity.EntityB83;
 import assets.rivalrebels.common.entity.EntityHackB83;
-import assets.rivalrebels.common.entity.EntityRocket;
 import assets.rivalrebels.common.explosion.Explosion;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemTool;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.world.World;
+
+import java.util.HashSet;
 
 public class ItemHackM202 extends ItemTool
 {
 	public ItemHackM202()
 	{
-		super(1, ToolMaterial.EMERALD, new HashSet<>());
-		maxStackSize = 1;
+		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 
@@ -52,25 +47,22 @@ public class ItemHackM202 extends ItemTool
 		return true;
 	}
 
-	/**
-	 * Called whenever this item is equipped and the right mouse button is pressed. Args: itemStack, world, entityPlayer
-	 */
-	@Override
-	public ItemStack onItemRightClick(ItemStack par1ItemStack, World par2World, EntityPlayer p)
-	{
-		p.inventory.mainInventory[p.inventory.currentItem] = null;
-		if (!par2World.isRemote)
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+		player.setHeldItem(hand, ItemStack.EMPTY);
+		if (!world.isRemote)
 		{
-			par2World.spawnEntityInWorld(new EntityHackB83(par2World, p.posX, p.posY, p.posZ, -p.rotationYawHead, p.rotationPitch, par1ItemStack.getEnchantmentTagList() != null));
+			world.spawnEntity(new EntityHackB83(world, player.posX, player.posY, player.posZ, -player.rotationYawHead, player.rotationPitch, stack.isItemEnchanted()));
 		}
-		RivalRebelsSoundPlayer.playSound(p, 23, 2, 0.4f);
-		new Explosion(par2World, p.posX, p.posY, p.posZ, 2, true, false, RivalRebelsDamageSource.flare);
-		return par1ItemStack;
+		RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
+		new Explosion(world, player.posX, player.posY, player.posZ, 2, true, false, RivalRebelsDamageSource.flare);
+		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 	}
 
-	@Override
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:bg");
-	}
+	}*/
 }

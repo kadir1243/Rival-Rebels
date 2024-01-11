@@ -11,29 +11,32 @@
  *******************************************************************************/
 package assets.rivalrebels.common.command;
 
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.packet.PacketDispatcher;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.Collections;
+import java.util.List;
 
 public class CommandResetGame extends CommandBase
 {
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "rrreset";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender par1ICommandSender)
+	public String getUsage(ICommandSender par1ICommandSender)
 	{
-		return "/" + getCommandName() + " <player>";
+		return "/" + getName() + " <player>";
 	}
 
 	/**
@@ -45,37 +48,32 @@ public class CommandResetGame extends CommandBase
 		return 3;
 	}
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] array)
-	{
+    @Override
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		EntityPlayer player = getCommandSenderAsPlayer(sender);
-		if (array.length == 1 && array[0].length() > 0)
+		if (args.length == 1 && !args[0].isEmpty())
 		{
-			if (array[0].equals("all"))
+			if (args[0].equals("all"))
 			{
 				RivalRebels.round.rrplayerlist.clearTeam();
 				PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
-				player.addChatMessage(new ChatComponentText("§7All players have been reset."));
+				player.sendMessage(new TextComponentString("§7All players have been reset."));
 			}
-			else if (RivalRebels.round.rrplayerlist.contains(array[0]))
+			else if (RivalRebels.round.rrplayerlist.contains(server.getPlayerList().getPlayerByUsername(args[0]).getGameProfile()))
 			{
-				RivalRebels.round.rrplayerlist.getForName(array[0]).clearTeam();
+				RivalRebels.round.rrplayerlist.getForGameProfile(server.getPlayerList().getPlayerByUsername(args[0]).getGameProfile()).clearTeam();
 				PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
-				player.addChatMessage(new ChatComponentText("§7Player successfully reset."));
+				player.sendMessage(new TextComponentString("§7Player successfully reset."));
 			}
 			else
 			{
-				player.addChatMessage(new ChatComponentText("§7No player by that name."));
+				player.sendMessage(new TextComponentString("§7No player by that name."));
 			}
 		}
 	}
 
-	/**
-	 * Adds the strings available in this command to the given list of tab completion options.
-	 */
-	@Override
-	public List<String> addTabCompletionOptions(ICommandSender par1ICommandSender, String[] par2ArrayOfStr)
-	{
-		return par2ArrayOfStr.length >= 1 ? getListOfStringsMatchingLastWord(par2ArrayOfStr, MinecraftServer.getServer().getAllUsernames()) : null;
+    @Override
+    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
+		return args.length >= 1 ? getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames()) : Collections.emptyList();
 	}
 }

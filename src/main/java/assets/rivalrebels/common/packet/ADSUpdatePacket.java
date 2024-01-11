@@ -11,49 +11,31 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import assets.rivalrebels.common.tileentity.TileEntityList;
-import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
-import assets.rivalrebels.common.tileentity.TileEntityReactive;
-import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class ADSUpdatePacket implements IMessage
-{
-	int x;
-	int y;
-	int z;
+public class ADSUpdatePacket implements IMessage {
+    private BlockPos pos;
 	int range;
 	boolean mob;
 	boolean chip;
 	boolean player;
 	boolean haswep;
 	String user;
-	
-	public ADSUpdatePacket()
-	{
-		
+
+	public ADSUpdatePacket() {
 	}
-	
-	public ADSUpdatePacket(int X, int Y, int Z, int r, boolean m, boolean c, boolean p, boolean h, String u)
-	{
-		x = X;
-		y = Y;
-		z = Z;
+
+	public ADSUpdatePacket(BlockPos pos, int r, boolean m, boolean c, boolean p, boolean h, String u) {
+		this.pos = pos;
 		range = r;
 		mob = m;
 		chip = c;
@@ -63,62 +45,46 @@ public class ADSUpdatePacket implements IMessage
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		x=buf.readInt();
-		y=buf.readInt();
-		z=buf.readInt();
-		
+	public void fromBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+        pos = buffer.readBlockPos();
+
 		range=buf.readInt();
 		mob=buf.readBoolean();
 		chip=buf.readBoolean();
 		player=buf.readBoolean();
 		haswep=buf.readBoolean();
-		StringBuilder r = new StringBuilder();
-		while (buf.isReadable())
-		{
-			byte b = buf.readByte();
-			r.append((char) b);
-		}
-		user = r.toString();
+		user = ByteBufUtils.readUTF8String(buf);
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(x);
-		buf.writeInt(y);
-		buf.writeInt(z);
-		
-		buf.writeInt(range);
+	public void toBytes(ByteBuf buf) {
+        PacketBuffer buffer = new PacketBuffer(buf);
+        buffer.writeBlockPos(pos);
+
+        buf.writeInt(range);
 		buf.writeBoolean(mob);
 		buf.writeBoolean(chip);
 		buf.writeBoolean(player);
 		buf.writeBoolean(haswep);
-		for (int i = 0; i < user.length(); i++)
-		{
-			buf.writeByte((byte)user.charAt(i));
-		}
+        ByteBufUtils.writeUTF8String(buf, user);
 	}
-	
-	public static class Handler implements IMessageHandler<ADSUpdatePacket, IMessage>
-	{
+
+	public static class Handler implements IMessageHandler<ADSUpdatePacket, IMessage> {
 		@Override
-		public IMessage onMessage(ADSUpdatePacket m, MessageContext ctx)
-		{
-			TileEntity te = Minecraft.getMinecraft().theWorld.getTileEntity(m.x, m.y, m.z);
-			
-			if (te instanceof TileEntityReciever)
-			{
-				TileEntityReciever ter = (TileEntityReciever) te;
-				ter.yawLimit = m.range;
-				ter.kMobs = m.mob;
-				ter.kTeam = m.chip;
-				ter.kPlayers = m.player;
-				ter.hasWeapon = m.haswep;
-				ter.username = m.user;
-			}
-			return null;
+		public IMessage onMessage(ADSUpdatePacket m, MessageContext ctx) {
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                TileEntity te = Minecraft.getMinecraft().world.getTileEntity(m.pos);
+
+                if (te instanceof TileEntityReciever ter) {
+                    ter.yawLimit = m.range;
+                    ter.kMobs = m.mob;
+                    ter.kTeam = m.chip;
+                    ter.kPlayers = m.player;
+                    ter.hasWeapon = m.haswep;
+                    ter.username = m.user;
+                }});
+            return null;
 		}
 	}
 }

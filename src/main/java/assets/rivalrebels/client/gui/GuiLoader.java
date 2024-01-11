@@ -11,57 +11,47 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import java.awt.Desktop;
-import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.inventory.IInventory;
-
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.container.ContainerLoader;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.inventory.IInventory;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.Sys;
+import org.lwjgl.input.Mouse;
 
 @SideOnly(Side.CLIENT)
 public class GuiLoader extends GuiContainer
 {
-	private IInventory	upperChestInventory;
-	private IInventory	lowerChestInventory;
-	
-	/**
+
+    /**
 	 * window height is calculated with this values, the more rows, the heigher
 	 */
 	private int			inventoryRows	= 0;
-	
+
 	public GuiLoader(IInventory par1IInventory, IInventory par2IInventory)
 	{
 		super(new ContainerLoader(par1IInventory, par2IInventory));
-		this.upperChestInventory = par1IInventory;
-		this.lowerChestInventory = par2IInventory;
-		this.allowUserInput = false;
+        this.allowUserInput = false;
 		short var3 = 222;
 		int var4 = var3 - 108;
 		this.inventoryRows = par2IInventory.getSizeInventory() / 9;
 		this.ySize = var4 + this.inventoryRows * 18;
 		this.xSize = 256;
 	}
-	
+
 	/**
 	 * Draw the foreground layer for the GuiContainer (everything in front of the items)
 	 */
 	@Override
 	protected void drawGuiContainerForegroundLayer(int par1, int par2)
 	{
-		GL11.glPushMatrix();
-		GL11.glRotated(-13, 0, 0, 1);
-		fontRendererObj.drawString("Loader", 165, 237, 0x444444);
-		GL11.glPopMatrix();
+		GlStateManager.pushMatrix();
+		GlStateManager.rotate(-13, 0, 0, 1);
+		fontRenderer.drawString("Loader", 165, 237, 0x444444);
+		GlStateManager.popMatrix();
 		int mousex = par1;
 		int mousey = par2;
 		int posx = (width - xSize) / 2;
@@ -74,36 +64,25 @@ public class GuiLoader extends GuiContainer
 		{
 			mousex -= posx;
 			mousey -= posy;
-			drawGradientRect(mousex, mousey, mousex + fontRendererObj.getStringWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			fontRendererObj.drawString("rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
-			if (Desktop.isDesktopSupported() && !buttondown && Mouse.isButtonDown(0))
+			drawGradientRect(mousex, mousey, mousex + fontRenderer.getStringWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			fontRenderer.drawString("rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			if (!buttondown && Mouse.isButtonDown(0))
 			{
-				try
-				{
-					Desktop.getDesktop().browse(new URI("http://rivalrebels.com"));
-				}
-				catch (IOException e)
-				{
-					e.printStackTrace();
-				}
-				catch (URISyntaxException e)
-				{
-					e.printStackTrace();
-				}
-			}
+                Sys.openURL("http://rivalrebels.com");
+            }
 		}
 		buttondown = Mouse.isButtonDown(0);
 	}
-	
+
 	boolean	buttondown;
-	
+
 	/**
 	 * Draw the background layer for the GuiContainer (everything behind the items)
 	 */
 	@Override
 	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
 	{
-		GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guitloader);
 		this.drawTexturedModalRect(width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
 	}

@@ -11,13 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 
 public class BlockGameStart extends BlockAutoTemplate
 {
@@ -25,16 +21,16 @@ public class BlockGameStart extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
 		RivalRebels.round.startRound(x, z);
-		world.setBlock(x, y, z, Blocks.air);
+		placeBlockCarefully(world, x, y, z, Blocks.AIR);
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -46,7 +42,7 @@ public class BlockGameStart extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -59,7 +55,7 @@ public class BlockGameStart extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -70,5 +66,5 @@ public class BlockGameStart extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:ai"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:ah"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ah"); // SIDE E
-	}
+	}*/
 }

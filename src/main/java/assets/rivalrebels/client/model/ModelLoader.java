@@ -11,18 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
+import net.minecraft.client.renderer.GlStateManager;
 
 public class ModelLoader
 {
 	float			m			= 0.3125f;
 	float			l			= 0.4375f;
 	float			o			= 0.5f;
-	
+
 	Vertice			lloader1	= new Vertice(-m, o, o);
 	Vertice			lloader2	= new Vertice(-l, l, o);
 	Vertice			lloader3	= new Vertice(-o, m, o);
@@ -35,7 +34,7 @@ public class ModelLoader
 	Vertice			lloader10	= new Vertice(o, m, o);
 	Vertice			lloader11	= new Vertice(l, l, o);
 	Vertice			lloader12	= new Vertice(m, o, o);
-	
+
 	Vertice			rloader1	= new Vertice(-m, o, -o);
 	Vertice			rloader2	= new Vertice(-l, l, -o);
 	Vertice			rloader3	= new Vertice(-o, m, -o);
@@ -48,7 +47,7 @@ public class ModelLoader
 	Vertice			rloader10	= new Vertice(o, m, -o);
 	Vertice			rloader11	= new Vertice(l, l, -o);
 	Vertice			rloader12	= new Vertice(m, o, -o);
-	
+
 	float			a			= 0f;
 	float			b			= 0.09375f;
 	float			c			= 0.1875f;
@@ -58,7 +57,7 @@ public class ModelLoader
 	float			g			= 1f;
 	float			h			= 0.25f;
 	float			i			= 0.75f;
-	
+
 	TextureVertice	l1f			= new TextureVertice(i, f);
 	TextureVertice	l1s			= new TextureVertice(i, c);
 	TextureVertice	l2			= new TextureVertice(i, b);
@@ -75,7 +74,7 @@ public class ModelLoader
 	TextureVertice	l11			= new TextureVertice(h, b);
 	TextureVertice	l12f		= new TextureVertice(h, a);
 	TextureVertice	l12s		= new TextureVertice(i, g);
-	
+
 	TextureVertice	r1f			= new TextureVertice(g, f);
 	TextureVertice	r1s			= new TextureVertice(g, c);
 	TextureVertice	r2			= new TextureVertice(g, b);
@@ -92,13 +91,13 @@ public class ModelLoader
 	TextureVertice	r11			= new TextureVertice(d, b);
 	TextureVertice	r12f		= new TextureVertice(d, a);
 	TextureVertice	r12s		= new TextureVertice(g, g);
-	
+
 	float			p			= 0.125f;
 	float			q			= 0.1093755f;
 	float			r			= 0.078125f;
 	float			k			= 0.34375f;
 	float			t			= 0.125f;
-	
+
 	TextureVertice	ls1			= new TextureVertice(t - r, k + p * 2);
 	TextureVertice	ls2			= new TextureVertice(t - q, k + q * 2);
 	TextureVertice	ls3			= new TextureVertice(t - p, k + r * 2);
@@ -111,9 +110,9 @@ public class ModelLoader
 	TextureVertice	ls10		= new TextureVertice(t + p, k + r * 2);
 	TextureVertice	ls11		= new TextureVertice(t + q, k + q * 2);
 	TextureVertice	ls12		= new TextureVertice(t + r, k + p * 2);
-	
+
 	float			u			= 0.625f;
-	
+
 	TextureVertice	rs1			= new TextureVertice(u - r, k + p * 2);
 	TextureVertice	rs2			= new TextureVertice(u - q, k + q * 2);
 	TextureVertice	rs3			= new TextureVertice(u - p, k + r * 2);
@@ -126,11 +125,11 @@ public class ModelLoader
 	TextureVertice	rs10		= new TextureVertice(u + p, k + r * 2);
 	TextureVertice	rs11		= new TextureVertice(u + q, k + q * 2);
 	TextureVertice	rs12		= new TextureVertice(u + r, k + p * 2);
-	
+
 	public void renderA()
 	{
-		GL11.glPushMatrix();
-		GL11.glDisable(GL11.GL_LIGHTING);
+		GlStateManager.pushMatrix();
+		GlStateManager.disableLighting();
 		RenderHelper.addFace(lloader1, lloader12, rloader12, rloader1, l1f, l12s, r12s, r1f);
 		RenderHelper.addFace(lloader2, lloader1, rloader1, rloader2, l2, l1s, r1s, r2);
 		RenderHelper.addFace(lloader3, lloader2, rloader2, rloader3, l3f, l2, r2, r3f);
@@ -153,16 +152,16 @@ public class ModelLoader
 		RenderHelper.addFace(rloader4, rloader3, rloader10, rloader9, rs10, rs9, rs4, rs3);
 		RenderHelper.addFace(rloader5, rloader4, rloader9, rloader8, rs11, rs10, rs3, rs2);
 		RenderHelper.addFace(rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
-	
+
 	TextureVertice	front1	= new TextureVertice(70f / 256f, 24f / 128f);
 	TextureVertice	front2	= new TextureVertice(70f / 256f, 64f / 128f);
 	TextureVertice	front3	= new TextureVertice(122f / 256f, 64f / 128f);
 	TextureVertice	front4	= new TextureVertice(122f / 256f, 24f / 128f);
 	TextureVertice	front5	= new TextureVertice(70f / 256f, 12f / 128f);
 	TextureVertice	front6	= new TextureVertice(122f / 256f, 12f / 128f);
-	
+
 	TextureVertice	panel1	= new TextureVertice(92f / 256f, 28f / 128f);
 	TextureVertice	panel2	= new TextureVertice(92f / 256f, 60f / 128f);
 	TextureVertice	panel3	= new TextureVertice(120f / 256f, 60f / 128f);
@@ -171,26 +170,26 @@ public class ModelLoader
 	TextureVertice	panel6	= new TextureVertice(96f / 256f, 44f / 128f);
 	TextureVertice	panel7	= new TextureVertice(116f / 256f, 44f / 128f);
 	TextureVertice	panel8	= new TextureVertice(116f / 256f, 32f / 128f);
-	
+
 	TextureVertice	cside1	= new TextureVertice(4f / 256f, 76f / 128f);
 	TextureVertice	cside2	= new TextureVertice(0, 88f / 128f);
 	TextureVertice	cside3	= new TextureVertice(0, 1);
 	TextureVertice	cside4	= new TextureVertice(60f / 256f, 1);
 	TextureVertice	cside5	= new TextureVertice(60f / 256f, 88f / 128f);
 	TextureVertice	cside6	= new TextureVertice(60f / 256f, 76f / 128f);
-	
+
 	TextureVertice	ctop1	= new TextureVertice(0.5f, 76f / 128f);
 	TextureVertice	ctop2	= new TextureVertice(0.5f, 1);
 	TextureVertice	ctop3	= new TextureVertice(192f / 256f, 1);
 	TextureVertice	ctop4	= new TextureVertice(192f / 256f, 76f / 128f);
-	
+
 	Vertice			vfront1	= new Vertice(0.5f, 0.3125f, 0.40625f);
 	Vertice			vfront2	= new Vertice(0.5f, -0.3125f, 0.40625f);
 	Vertice			vfront3	= new Vertice(0.5f, -0.3125f, -0.40625f);
 	Vertice			vfront4	= new Vertice(0.5f, 0.3125f, -0.40625f);
 	Vertice			vfront5	= new Vertice(0.4375f, 0.4375f, 0.40625f);
 	Vertice			vfront6	= new Vertice(0.4375f, 0.4375f, -0.40625f);
-	
+
 	Vertice			vpanel1	= new Vertice(0.5f, 0.25f, 0.0625f);
 	Vertice			vpanel2	= new Vertice(0.5f, -0.25f, 0.0625f);
 	Vertice			vpanel3	= new Vertice(0.5f, -0.25f, -0.375f);
@@ -199,19 +198,19 @@ public class ModelLoader
 	Vertice			vpanel6	= new Vertice(0.6f, 0f, 0f);
 	Vertice			vpanel7	= new Vertice(0.6f, 0f, -0.3125f);
 	Vertice			vpanel8	= new Vertice(0.6f, 0.1875f, -0.3125f);
-	
+
 	Vertice			vcside1	= new Vertice(-0.4375f, 0.4375f, 0.40625f);
 	Vertice			vcside2	= new Vertice(-0.4375f, 0.3125f, 0.40625f);
 	Vertice			vcside3	= new Vertice(-0.4375f, -0.3125f, 0.40625f);
 	Vertice			vcside4	= new Vertice(-0.4375f, -0.3125f, -0.40625f);
 	Vertice			vcside5	= new Vertice(-0.4375f, 0.3125f, -0.40625f);
 	Vertice			vcside6	= new Vertice(-0.4375f, 0.4375f, -0.40625f);
-	
+
 	public void renderB(float slide)
 	{
-		GL11.glPushMatrix();
-		GL11.glTranslatef(slide * 0.9f, 0, 0);
-		GL11.glDisable(GL11.GL_LIGHTING);
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(slide * 0.9f, 0, 0);
+		GlStateManager.disableLighting();
 		RenderHelper.addFace(vfront1, vfront2, vfront3, vfront4, front1, front2, front3, front4);
 		RenderHelper.addFace(vfront5, vfront1, vfront4, vfront6, front5, front1, front4, front6);
 		RenderHelper.addFace(vpanel5, vpanel6, vpanel7, vpanel8, panel5, panel6, panel7, panel8);
@@ -225,6 +224,6 @@ public class ModelLoader
 		RenderHelper.addFace(vfront4, vfront3, vcside4, vcside5, cside2, cside3, cside4, cside5);
 		RenderHelper.addFace(vcside1, vfront5, vfront6, vcside6, ctop4, ctop1, ctop2, ctop3);
 		RenderHelper.addFace(vfront2, vcside3, vcside4, vfront3, ctop2, ctop3, ctop4, ctop1);
-		GL11.glPopMatrix();
+		GlStateManager.popMatrix();
 	}
 }

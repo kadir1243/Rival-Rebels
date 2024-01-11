@@ -11,13 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 
 public class BlockAutoEaster extends BlockAutoTemplate
 {
@@ -25,13 +21,13 @@ public class BlockAutoEaster extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World par1World, int x, int y, int z)
 	{
 		super.build(par1World, x, y, z);
 		int h = 0;
-		placeBlockCarefully(par1World, x, y, z, Blocks.air);
+		placeBlockCarefully(par1World, x, y, z, Blocks.AIR);
 		placeBlockCarefully(par1World, x + 1, y + h, z, RivalRebels.jump);
 		placeBlockCarefully(par1World, x + 2, y + h, z, RivalRebels.jump);
 		placeBlockCarefully(par1World, x + 3, y + h, z, RivalRebels.jump);
@@ -49,59 +45,59 @@ public class BlockAutoEaster extends BlockAutoTemplate
 		placeBlockCarefully(par1World, x + 3, y + h, z + 3, RivalRebels.jump);
 		placeBlockCarefully(par1World, x + 4, y + h, z + 3, RivalRebels.jump);
 		h = h + 1;
-		placeBlockCarefully(par1World, x + 1, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 3, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 3, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 3, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 3, Blocks.snow);
+		placeBlockCarefully(par1World, x + 1, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 3, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 3, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 3, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 3, Blocks.SNOW);
 		h = h + 1;
-		placeBlockCarefully(par1World, x + 1, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z, Blocks.snow);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 1, Blocks.snow);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 2, Blocks.snow);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 3, Blocks.snow);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 3, Blocks.snow);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 3, Blocks.snow);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 3, Blocks.snow);
+		placeBlockCarefully(par1World, x + 1, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 1, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 2, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 3, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 3, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 3, Blocks.SNOW);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 3, Blocks.SNOW);
 		h = h + 1;
-		placeBlockCarefully(par1World, x + 1, y + h, z, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 2, y + h, z, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 3, y + h, z, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 4, y + h, z, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 1, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 1, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 1, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 1, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 2, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 2, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 2, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 2, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 3, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 3, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 3, Blocks.pumpkin);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 3, Blocks.pumpkin);
+		placeBlockCarefully(par1World, x + 1, y + h, z, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 2, y + h, z, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 3, y + h, z, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 4, y + h, z, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 1, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 1, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 1, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 1, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 2, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 2, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 2, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 2, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 3, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 3, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 3, Blocks.PUMPKIN);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 3, Blocks.PUMPKIN);
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -113,7 +109,7 @@ public class BlockAutoEaster extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -126,7 +122,7 @@ public class BlockAutoEaster extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -137,5 +133,5 @@ public class BlockAutoEaster extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:ah"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:ah"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ah"); // SIDE E
-	}
+	}*/
 }

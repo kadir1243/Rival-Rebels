@@ -11,61 +11,55 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockFlagBox5 extends Block
 {
 	public BlockFlagBox5()
 	{
-		super(Material.wood);
+		super(Material.WOOD);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
-	@Override
-	public void onBlockClicked(World par1World, int par2, int par3, int par4, EntityPlayer player)
-	{
-		blockActivated(par1World, par2, par3, par4, player);
-	}
-	
+
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        blockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player);
+    }
+
 	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
 	{
 		if (player.isSneaking() && !world.isRemote)
 		{
 			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.flag5, 10));
-			world.spawnEntityInWorld(ei);
-			world.setBlock(x, y, z, Blocks.air);
+			world.spawnEntity(ei);
+            world.setBlockToAir(new BlockPos(x, y, z));
 			return false;
 		}
 		if (!player.isSneaking() && !world.isRemote)
 		{
-			player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("RivalRebels.Orders") + " " + StatCollector.translateToLocal("RivalRebels.sneak")));
-			world.setBlock(x, y, z, RivalRebels.flagbox6);
+            player.sendMessage(new TextComponentTranslation("RivalRebels.Orders").appendText(" ").appendSibling(new TextComponentTranslation("RivalRebels.sneak")));
+			world.setBlockState(new BlockPos(x, y, z), RivalRebels.flagbox6.getDefaultState());
 			return false;
 		}
 		return false;
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -77,7 +71,7 @@ public class BlockFlagBox5 extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -90,7 +84,7 @@ public class BlockFlagBox5 extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -101,5 +95,5 @@ public class BlockFlagBox5 extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:ai"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:ah"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ah"); // SIDE E
-	}
+	}*/
 }

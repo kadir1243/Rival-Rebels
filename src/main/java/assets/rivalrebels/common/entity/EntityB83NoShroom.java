@@ -30,8 +30,7 @@ public class EntityB83NoShroom extends EntityB83
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x, y, z);
-		yOffset = 0.0F;
-		setThrowableHeading(mx, my, mz, 5, 1);
+		shoot(mx, my, mz, 5, 1);
 	}
 
 	@Override
@@ -45,10 +44,10 @@ public class EntityB83NoShroom extends EntityB83
 
 	public void explode()
 	{
-		new NuclearExplosion(worldObj, (int) posX, (int) posY, (int) posZ, RivalRebels.b83Strength/2);
-		EntitySphereBlast etb = new EntitySphereBlast(worldObj, posX, posY, posZ, RivalRebels.b83Strength * 1.333333333f);
+		new NuclearExplosion(world, (int) posX, (int) posY, (int) posZ, RivalRebels.b83Strength/2);
+		EntitySphereBlast etb = new EntitySphereBlast(world, posX, posY, posZ, RivalRebels.b83Strength * 1.333333333f);
 		etb.time = -920;
-		worldObj.spawnEntityInWorld(etb);
+		world.spawnEntity(etb);
 		this.setDead();
 	}
 }

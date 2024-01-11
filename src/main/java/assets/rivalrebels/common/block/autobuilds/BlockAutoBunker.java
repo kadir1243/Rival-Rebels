@@ -11,13 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 
 public class BlockAutoBunker extends BlockAutoTemplate
 {
@@ -25,7 +21,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
@@ -33,18 +29,18 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		if (!world.isRemote)
 		{
 			int r = RivalRebels.bunkerradius;
-			
+
 			for (int x1 = -r; x1 <= r; x1++)
 			{
 				for (int y1 = 0; y1 <= 5; y1++)
 				{
 					for (int z1 = -r; z1 <= r; z1++)
 					{
-						placeBlockCarefully(world, x + x1, y + y1, z + z1, Blocks.air);
+						placeBlockCarefully(world, x + x1, y + y1, z + z1, Blocks.AIR);
 					}
 				}
 			}
-			
+
 			for (int a = -r; a <= r; a++)
 			{
 				for (int c = -r; c <= r; c++)
@@ -74,7 +70,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 						placeBlockCarefully(world, x + a, y, z + c, RivalRebels.smartcamo);
 						placeBlockCarefully(world, x + a, y + 1, z + c, RivalRebels.smartcamo);
 					}
-					
+
 				}
 			}
 			for (int a = -r; a <= r; a++)
@@ -88,7 +84,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 					}
 				}
 			}
-			
+
 			r = r - 2;
 			for (int a = -r; a <= r; a++)
 			{
@@ -117,8 +113,8 @@ public class BlockAutoBunker extends BlockAutoTemplate
 			placeBlockCarefully(world, x, y + 3, z - r + 5, RivalRebels.light2);
 		}
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -130,7 +126,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -143,7 +139,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -154,5 +150,5 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:bl"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:bl"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:bl"); // SIDE E
-	}
+	}*/
 }

@@ -25,7 +25,7 @@ import assets.rivalrebels.common.tileentity.TileEntityReciever;
 public class ContainerReciever extends Container
 {
 	protected TileEntityReciever	entity;
-	
+
 	public ContainerReciever(InventoryPlayer inventoryPlayer, TileEntityReciever tileEntity)
 	{
 		entity = tileEntity;
@@ -40,13 +40,13 @@ public class ContainerReciever extends Container
 		addSlotToContainer(new SlotRR(entity, 8, 152, 94, 1, BlockWeapons.class));
 		bindPlayerInventory(inventoryPlayer);
 	}
-	
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return entity.isUseableByPlayer(player);
+		return entity.isUsableByPlayer(player);
 	}
-	
+
 	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
@@ -56,16 +56,16 @@ public class ContainerReciever extends Container
 				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
 			}
 		}
-		
+
 		for (int i = 0; i < 9; i++)
 		{
 			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
 		}
 	}
-	
+
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
 	{
-		return null;
+		return ItemStack.EMPTY;
 	}
 }

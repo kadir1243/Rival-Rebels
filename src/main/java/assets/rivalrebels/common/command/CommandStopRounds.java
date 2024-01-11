@@ -13,21 +13,23 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import net.minecraft.command.CommandBase;
+import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
-import net.minecraft.util.ChatComponentText;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 
 public class CommandStopRounds extends CommandBase
 {
 	@Override
-	public String getCommandName()
+	public String getName()
 	{
 		return "rrstopround";
 	}
 
 	@Override
-	public String getCommandUsage(ICommandSender par1ICommandSender)
+	public String getUsage(ICommandSender par1ICommandSender)
 	{
-		return "/" + getCommandName();
+		return "/" + getName();
 	}
 
 	/**
@@ -39,10 +41,9 @@ public class CommandStopRounds extends CommandBase
 		return 3;
 	}
 
-	@Override
-	public void processCommand(ICommandSender sender, String[] array)
-	{
+    @Override
+    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
 		RivalRebels.round.stopRounds();
-		sender.addChatMessage(new ChatComponentText("The current round has been successfully stopped."));
+		sender.sendMessage(new TextComponentString("The current round has been successfully stopped."));
 	}
 }

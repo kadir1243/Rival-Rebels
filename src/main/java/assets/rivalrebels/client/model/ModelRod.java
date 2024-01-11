@@ -11,16 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
+import net.minecraft.client.renderer.GlStateManager;
 
 public class ModelRod
 {
 	public boolean	rendersecondcap	= true;
-	
+
 	int				numOfSegs		= 16;
 	float			deg				= (float) Math.PI * 2 / numOfSegs;
 	TextureVertice	t1				= new TextureVertice(0.03125f * 2, 0.03125f * 0);
@@ -32,7 +31,7 @@ public class ModelRod
 	TextureVertice	t7				= new TextureVertice(0.03125f * 3, 0.03125f * 7);
 	TextureVertice	t8				= new TextureVertice(0.03125f * 1, 0.03125f * 19);
 	TextureVertice	t9				= new TextureVertice(0.03125f * 3, 0.03125f * 19);
-	
+
 	Vertice			v0				= new Vertice(0f, 0.03125f * 10, 0f);
 	Vertice			v1				= new Vertice(0.03125f * 8, 0.03125f * 9, 0f);
 	Vertice			v2				= new Vertice(0.03125f * 9, 0.03125f * 6, 0f);
@@ -41,21 +40,21 @@ public class ModelRod
 	Vertice			v5				= new Vertice(0.03125f * 9, 0.03125f * -6, 0f);
 	Vertice			v6				= new Vertice(0.03125f * 8, 0.03125f * -9, 0f);
 	Vertice			v7				= new Vertice(0f, 0.03125f * -10, 0f);
-	
+
 	Vertice			vd1				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 9, 0.03125f * 8 * (float) Math.sin(deg));
 	Vertice			vd2				= new Vertice(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * 6, 0.03125f * 9 * (float) Math.sin(deg));
 	Vertice			vd3				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 5, 0.03125f * 8 * (float) Math.sin(deg));
 	Vertice			vd4				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -5, 0.03125f * 8 * (float) Math.sin(deg));
 	Vertice			vd5				= new Vertice(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * -6, 0.03125f * 9 * (float) Math.sin(deg));
 	Vertice			vd6				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -9, 0.03125f * 8 * (float) Math.sin(deg));
-	
+
 	public void render()
 	{
 		for (float i = 0; i < 360; i += 360 / numOfSegs)
 		{
-			GL11.glPushMatrix();
-			GL11.glDisable(GL11.GL_LIGHTING);
-			GL11.glRotatef(i, 0, 1, 0);
+			GlStateManager.pushMatrix();
+			GlStateManager.disableLighting();
+			GlStateManager.rotate(i, 0, 1, 0);
 			RenderHelper.addFace(v0, vd1, v1, v0, t1, t3, t2, t1);
 			RenderHelper.addFace(vd1, vd2, v2, v1, t2, t4, t5, t3);
 			RenderHelper.addFace(vd2, vd3, v3, v2, t4, t6, t7, t5);
@@ -66,8 +65,8 @@ public class ModelRod
 				RenderHelper.addFace(v6, v5, vd5, vd6, t2, t4, t5, t3);
 				RenderHelper.addFace(v5, v4, vd4, vd5, t4, t6, t7, t5);
 			}
-			
-			GL11.glPopMatrix();
+
+			GlStateManager.popMatrix();
 		}
 	}
 }

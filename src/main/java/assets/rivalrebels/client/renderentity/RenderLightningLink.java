@@ -11,20 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import java.util.Random;
-
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
-import org.lwjgl.opengl.GL12;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityLightningLink;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.entity.Render;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
+import org.lwjgl.opengl.GL11;
+
+import java.util.Random;
 
 @SideOnly(Side.CLIENT)
 public class RenderLightningLink extends Render
@@ -32,38 +33,39 @@ public class RenderLightningLink extends Render
 	static float	red		= 0.65F;
 	static float	green	= 0.75F;
 	static float	blue	= 1F;
-	
-	public RenderLightningLink()
-	{
-	}
-	
-	public void renderLightningLink(EntityLightningLink ell, double x, double y, double z, float yaw, float pitch)
+
+    public RenderLightningLink(RenderManager renderManager) {
+        super(renderManager);
+    }
+
+    public void renderLightningLink(EntityLightningLink ell, double x, double y, double z, float yaw, float pitch)
 	{
 		float segmentDistance = RivalRebels.teslasegments;
 		float distance = (float) ell.motionX * 100;
 		distance = 100;
-		
+
 		// RenderLibrary.instance.renderModel((float) x, (float) y, (float) z,
 		// (float) Math.sin(-ell.rotationYaw / 180 * Math.PI) * distance,
 		// (float) Math.sin(-ell.rotationPitch / 180 * Math.PI) * distance,
 		// (float) Math.cos(-ell.rotationYaw / 180 * Math.PI) * distance,
 		// 2f, 0.07f, 8, 5f, 0.5f, red, green, blue, 1);
-		
+
 		if (distance > 0)
 		{
-			Random rand = new Random(ell.randLong);
+			Random rand = ell.world.rand;
 			float radius = 0.07F;
-			Tessellator tessellator = Tessellator.instance;
-			
-			GL11.glPushMatrix();
-			GL11.glEnable(GL12.GL_RESCALE_NORMAL);
-			GL11.glDisable(GL11.GL_TEXTURE_2D);
-			GL11.glEnable(GL11.GL_BLEND);
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-			GL11.glTranslatef((float) x, (float) y, (float) z);
-			GL11.glRotatef(ell.rotationYaw, 0.0F, 1.0F, 0.0F);
-			GL11.glRotatef(-ell.rotationPitch, 1.0F, 0.0F, 0.0F);
-			
+			Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+
+            GlStateManager.pushMatrix();
+			GlStateManager.enableRescaleNormal();
+			GlStateManager.disableTexture2D();
+			GlStateManager.enableBlend();
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+			GlStateManager.translate((float) x, (float) y, (float) z);
+			GlStateManager.rotate(ell.rotationYaw, 0.0F, 1.0F, 0.0F);
+			GlStateManager.rotate(-ell.rotationPitch, 1.0F, 0.0F, 0.0F);
+
 			double AddedX = 0;
 			double AddedY = 0;
 			double prevAddedX = 0;
@@ -86,53 +88,35 @@ public class RenderLightningLink extends Render
 				{
 					AddedX = AddedY = 0;
 				}
-				
+
 				for (float o = 0; o <= radius; o += radius / 8)
 				{
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX + o, AddedY - o, addedZ);
-					tessellator.addVertex(AddedX + o, AddedY + o, addedZ);
-					tessellator.addVertex(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance);
-					tessellator.draw();
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX - o, AddedY - o, addedZ);
-					tessellator.addVertex(AddedX + o, AddedY - o, addedZ);
-					tessellator.addVertex(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance);
-					tessellator.draw();
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX - o, AddedY + o, addedZ);
-					tessellator.addVertex(AddedX - o, AddedY - o, addedZ);
-					tessellator.addVertex(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance);
-					tessellator.draw();
-					tessellator.startDrawingQuads();
-					tessellator.setColorRGBA_F(red, green, blue, 0.95f);
-					tessellator.addVertex(AddedX + o, AddedY + o, addedZ);
-					tessellator.addVertex(AddedX - o, AddedY + o, addedZ);
-					tessellator.addVertex(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance);
-					tessellator.addVertex(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance);
+                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+					buffer.pos(AddedX + o, AddedY - o, addedZ).color(red, green, blue, 0.95f).endVertex();
+					buffer.pos(AddedX + o, AddedY + o, addedZ).color(red, green, blue, 0.95f).endVertex();
+					buffer.pos(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
+					buffer.pos(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
+					buffer.pos(AddedX - o, AddedY - o, addedZ).color(red, green, blue, 0.95f).endVertex();
+					buffer.pos(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
+					buffer.pos(AddedX - o, AddedY + o, addedZ).color(red, green, blue, 0.95f).endVertex();
+					buffer.pos(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
 					tessellator.draw();
 				}
 			}
-			
-			GL11.glDisable(GL11.GL_BLEND);
-			GL11.glEnable(GL11.GL_TEXTURE_2D);
-			GL11.glDisable(GL12.GL_RESCALE_NORMAL);
-			GL11.glPopMatrix();
+
+			GlStateManager.disableBlend();
+			GlStateManager.enableTexture2D();
+			GlStateManager.disableRescaleNormal();
+			GlStateManager.popMatrix();
 		}
 	}
-	
+
 	@Override
 	public void doRender(Entity entityLightningLink, double x, double y, double z, float yaw, float pitch)
 	{
 		this.renderLightningLink((EntityLightningLink) entityLightningLink, x, y, z, yaw, pitch);
 	}
-	
+
 	@Override
 	protected ResourceLocation getEntityTexture(Entity entity)
 	{

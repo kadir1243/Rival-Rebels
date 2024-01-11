@@ -21,9 +21,11 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -38,21 +40,20 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 	public float				slide			= 0;
 	private boolean				inwaterprevtick	= false;
 	private int					soundfile		= 0;
-	
+
 	public EntityRocket(World par1World)
 	{
 		super(par1World);
 		setSize(0.5F, 0.5F);
 	}
-	
+
 	public EntityRocket(World par1World, double par2, double par4, double par6)
 	{
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(par2, par4, par6);
-		yOffset = 0.0F;
 	}
-	
+
 	public EntityRocket(World par1World, EntityPlayer entity2, float par3)
 	{
 		super(par1World);
@@ -64,36 +65,34 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		posY -= 0.0D;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		setThrowableHeading(motionX, motionY, motionZ, 0.5f, 0.1f);
+        shoot(motionX, motionY, motionZ, 0.5f, 0.1f);
 	}
-	
+
 	public EntityRocket(World par1World, double x, double y,double z, double mx, double my, double mz)
 	{
 		super(par1World);
 		fins = false;
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
-	
+
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
 		motionX = mx;
 		motionY = my;
 		motionZ = mz;
 		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt_double(mx * mx + mz * mz)) * 180.0D / Math.PI);
+		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
 	}
-	
-	@Override
-	public void setThrowableHeading(double mx, double my, double mz, float speed, float randomness)
+
+    @Override
+	public void shoot(double mx, double my, double mz, float speed, float randomness)
 	{
-		float f2 = MathHelper.sqrt_double(mx * mx + my * my + mz * mz);
+		float f2 = MathHelper.sqrt(mx * mx + my * my + mz * mz);
 		mx /= f2;
 		my /= f2;
 		mz /= f2;
@@ -105,7 +104,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		mz *= speed;
 		setAnglesMotion(mx, my, mz);
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -113,63 +112,58 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 	public void onUpdate()
 	{
 		super.onUpdate();
-		
+
 		if (ticksExisted == 0)
 		{
-			rotation = worldObj.rand.nextInt(360);
-			slide = worldObj.rand.nextInt(21) - 10;
+			rotation = world.rand.nextInt(360);
+			slide = world.rand.nextInt(21) - 10;
 			for (int i = 0; i < 10; i++)
 			{
-				worldObj.spawnParticle("explode", posX - motionX * 2, posY - motionY * 2, posZ - motionZ * 2, -motionX + (worldObj.rand.nextFloat() - 0.5f) * 0.1f, -motionY + (worldObj.rand.nextFloat() - 0.5) * 0.1f, -motionZ + (worldObj.rand.nextFloat() - 0.5f) * 0.1f);
+				world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, posX - motionX * 2, posY - motionY * 2, posZ - motionZ * 2, -motionX + (world.rand.nextFloat() - 0.5f) * 0.1f, -motionY + (world.rand.nextFloat() - 0.5) * 0.1f, -motionZ + (world.rand.nextFloat() - 0.5f) * 0.1f);
 			}
 		}
 		rotation += (int) slide;
 		slide *= 0.9;
-		
+
 		if (ticksExisted >= RivalRebels.rpgDecay)
 		{
 			explode(null);
 		}
-		// worldObj.spawnEntityInWorld(new EntityLightningLink(worldObj, posX, posY, posZ, rotationYaw, rotationPitch, 100));
-		
-		if (worldObj.isRemote && ticksExisted >= 5 && !inWater && ticksExisted <= 100)
+		// world.spawnEntity(new EntityLightningLink(world, posX, posY, posZ, rotationYaw, rotationPitch, 100));
+
+		if (world.isRemote && ticksExisted >= 5 && !inWater && ticksExisted <= 100)
 		{
-			worldObj.spawnEntityInWorld(new EntityPropulsionFX(worldObj, posX, posY, posZ, -motionX * 0.5, -motionY * 0.5 - 0.1, -motionZ * 0.5));
+			world.spawnEntity(new EntityPropulsionFX(world, posX, posY, posZ, -motionX * 0.5, -motionY * 0.5 - 0.1, -motionZ * 0.5));
 		}
-		Vec3 vec31 = Vec3.createVectorHelper(posX, posY, posZ);
-		Vec3 vec3 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-		MovingObjectPosition mop = worldObj.func_147447_a(vec31, vec3, false, true, false);
-		if (!worldObj.isRemote)
+		Vec3d vec31 = new Vec3d(posX, posY, posZ);
+		Vec3d vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		RayTraceResult mop = world.rayTraceBlocks(vec31, vec3, false, true, false);
+		if (!world.isRemote)
 		{
-			vec31 = Vec3.createVectorHelper(posX, posY, posZ);
-			if (mop != null) vec3 = Vec3.createVectorHelper(mop.hitVec.xCoord, mop.hitVec.yCoord, mop.hitVec.zCoord);
-			else vec3 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-			
-			List list = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
+			vec31 = new Vec3d(posX, posY, posZ);
+			if (mop != null) vec3 = mop.hitVec;
+			else vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+
+			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
-			for (int i = 0; i < list.size(); ++i)
-			{
-				Entity entity = (Entity) list.get(i);
-				if (entity.canBeCollidedWith() && ticksExisted >= 7 && entity != thrower)
-				{
-					MovingObjectPosition mop1 = entity.boundingBox.expand(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
-					if (mop1 != null)
-					{
-						double d1 = vec31.squareDistanceTo(mop1.hitVec);
-						if (d1 < d0)
-						{
-							mop = new MovingObjectPosition(entity, mop1.hitVec);
-							d0 = d1;
-						}
-					}
-				}
-			}
+            for (Entity entity : list) {
+                if (entity.canBeCollidedWith() && ticksExisted >= 7 && entity != thrower) {
+                    RayTraceResult mop1 = entity.getEntityBoundingBox().grow(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
+                    if (mop1 != null) {
+                        double d1 = vec31.squareDistanceTo(mop1.hitVec);
+                        if (d1 < d0) {
+                            mop = new RayTraceResult(entity, mop1.hitVec);
+                            d0 = d1;
+                        }
+                    }
+                }
+            }
 		}
 		if (mop != null) explode(mop);
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
-		float var16 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+		float var16 = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
 		rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
 		for (rotationPitch = (float) (Math.atan2(motionY, var16) * 180.0D / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F)
 			;
@@ -183,12 +177,12 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
 		float var17 = 1.1f;
 		if (ticksExisted > 25) var17 = 0.9999F;
-		
+
 		if (isInWater())
 		{
 			for (int var7 = 0; var7 < 4; ++var7)
 			{
-				worldObj.spawnParticle("bubble", posX - motionX * 0.25F, posY - motionY * 0.25F, posZ - motionZ * 0.25F, motionX, motionY, motionZ);
+				world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * 0.25F, posY - motionY * 0.25F, posZ - motionZ * 0.25F, motionX, motionY, motionZ);
 			}
 			if (!inwaterprevtick)
 			{
@@ -202,7 +196,7 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		{
 			soundfile = 0;
 		}
-		
+
 		motionX *= var17;
 		motionY *= var17;
 		motionZ *= var17;
@@ -214,98 +208,60 @@ public class EntityRocket extends EntityInanimate implements IProjectile
 		setPosition(posX, posY, posZ);
 		++ticksExisted;
 	}
-	
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
 	{
-		
+
 	}
-	
+
 	@Override
 	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
-		
+
 	}
-	
-	public void explode(MovingObjectPosition mop)
+
+	public void explode(RayTraceResult mop)
 	{
-		if (mop != null && mop.entityHit instanceof EntityPlayer)
+		if (mop != null && mop.entityHit instanceof EntityPlayer player)
 		{
-			EntityPlayer player = (EntityPlayer) mop.entityHit;
-			ItemStack armorSlots[] = player.inventory.armorInventory;
-			if (armorSlots[0] != null) armorSlots[0].damageItem(48, player);
-			if (armorSlots[1] != null) armorSlots[1].damageItem(48, player);
-			if (armorSlots[2] != null) armorSlots[2].damageItem(48, player);
-			if (armorSlots[3] != null) armorSlots[3].damageItem(48, player);
+            NonNullList<ItemStack> armorSlots = player.inventory.armorInventory;
+			if (!armorSlots.get(0).isEmpty()) armorSlots.get(0).damageItem(48, player);
+			if (!armorSlots.get(1).isEmpty()) armorSlots.get(1).damageItem(48, player);
+			if (!armorSlots.get(2).isEmpty()) armorSlots.get(2).damageItem(48, player);
+			if (!armorSlots.get(3).isEmpty()) armorSlots.get(3).damageItem(48, player);
 		}
 		if (mop != null && mop.entityHit == null)
 		{
-			Block block = worldObj.getBlock(mop.blockX, mop.blockY, mop.blockZ);
-			if (block == Blocks.glass || block == Blocks.glass_pane || block == Blocks.stained_glass || block == Blocks.stained_glass_pane)
+			Block block = world.getBlockState(mop.getBlockPos()).getBlock();
+			if (block == Blocks.GLASS || block == Blocks.GLASS_PANE || block == Blocks.STAINED_GLASS || block == Blocks.STAINED_GLASS_PANE)
 			{
-				worldObj.setBlock(mop.blockX, mop.blockY, mop.blockZ, Blocks.air);
+				world.setBlockToAir(mop.getBlockPos());
 				RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
 				return;
 			}
 		}
 		RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-		new Explosion(worldObj, posX, posY, posZ, RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+		new Explosion(world, posX, posY, posZ, RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
 		setDead();
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	@Override
-	public int getBrightnessForRender(float par1)
+	public int getBrightnessForRender()
 	{
 		return 1000;
 	}
-	
+
 	@Override
-	public float getBrightness(float par1)
+	public float getBrightness()
 	{
 		return 1000F;
 	}
-	
-	@Override
-	protected void entityInit()
-	{
-	}
-}
 
-/*
- * package RivalRebels.Common.Entity; import net.minecraft.block.Block; import net.minecraft.entity.Entity; import net.minecraft.entity.player.EntityPlayer; import net.minecraft.item.ItemStack; import
- * net.minecraft.nbt.NBTTagCompound; import net.minecraft.world.World; import RivalRebels.Common.Core.RivalRebels; import RivalRebels.Common.Core.RivalRebelsDamageSource; import
- * RivalRebels.Common.Core.RivalRebelsSoundPlayer; import RivalRebels.Common.Explosion.Explosion; public class EntityRocket extends EntityPhysics { public boolean fins = false; public int rotation =
- * 45; public float slide = 0; private int soundfile = 0; public EntityRocket(World par1World, EntityPlayer entity2, float par3) { super(par1World, entity2, par3); }
- * @Override public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound) { }
- * @Override public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound) { }
- * @Override protected double getGravity() { if (ticksExisted > 3) return 0; else return 0.0125F; }
- * @Override protected double getFriction() { if (ticksExisted > 25) return 0.9999F; return 1.1f; }
- * @Override protected double getWaterFriction() { return 0.8F; }
- * @Override protected int getMaxAge() { return RivalRebels.rpgDecay; }
- * @Override protected double getWidth() { return 0; }
- * @Override protected double getVOff() { return 0; }
- * @Override protected double getFOff() { return 0; }
- * @Override protected double getSOff() { return 0; }
- * @Override protected void onImpactBlock(Block block, int x, int y, int z, int s, int m, double vx, double vy, double vz) { explode(); }
- * @Override protected void onImpactEntity(Entity entity, int subHit, Object hitInfo, double vx, double vy, double vz) { if (entity instanceof EntityPlayer) { EntityPlayer player = (EntityPlayer)
- * entity; ItemStack armorSlots[] = player.inventory.armorInventory; int i = worldObj.rand.nextInt(4); if (armorSlots[i] != null && !worldObj.isRemote) { armorSlots[i].damageItem(28, player); } }
- * explode(); }
- * @Override protected void onEnterWater() { RivalRebelsSoundPlayer.playSound(this, 23, 4, 0.5F, 0.5F); soundfile = 3; }
- * @Override protected boolean onTick() { if (ticksExisted == 3) { fins = true; rotationPitch += 22.5; motionY += 0.075; } rotation += (int) slide; slide *= 0.9; if (ticksExisted >= 5 && !inWater &&
- * ticksExisted <= 100) { if (!worldObj.isRemote) { EntityPropulsionFX entitypfx = new EntityPropulsionFX(worldObj, posX, posY, posZ, -motionX * 0.5, -motionY * 0.5 -0.1, -motionZ * 0.5);
- * worldObj.spawnEntityInWorld(entitypfx); } } return false; }
- * @Override protected void onDecay() { explode(); } public void explode() { RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 10F, 0.3F); new Explosion(worldObj, posX, posY, posZ,
- * RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket); setDead(); }
- * @Override protected void entityInit() { }
- * @Override protected boolean onFirstTick() { rotation = worldObj.rand.nextInt(360); slide = worldObj.rand.nextInt(21)-10; for (int i = 0; i < 10; i++) { worldObj.spawnParticle("explode", posX -
- * motionX*2, posY - motionY*2, posZ - motionZ*2, -motionX + (worldObj.rand.nextFloat() - 0.5f)*0.1f, -motionY + (worldObj.rand.nextFloat() - 0.5)*0.1f, -motionZ+ (worldObj.rand.nextFloat() -
- * 0.5f)*0.1f); } return false; }
- * @Override protected void onTickInWater() { for (int var7 = 0; var7 < 4; ++var7) { float var19 = 0.25F; worldObj.spawnParticle("bubble", posX - motionX * var19, posY - motionY * var19, posZ -
- * motionZ * var19, motionX, motionY, motionZ); } } }
- */
+}

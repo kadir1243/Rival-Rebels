@@ -11,122 +11,103 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.item.weapon.ItemBinoculars;
-import assets.rivalrebels.common.packet.LaptopButtonPacket;
 import assets.rivalrebels.common.packet.LaptopRefreshPacket;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.NonNullList;
 
-public class TileEntityLaptop extends TileEntity implements IInventory
+public class TileEntityLaptop extends TileEntity implements IInventory, ITickable
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
-	private ItemStack[]		chestContents	= new ItemStack[14];
-	
+	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(14, ItemStack.EMPTY);
+
 	public double			slide			= 0;
 	double					test			= Math.PI;
 	public int				b2spirit		= 0;
 	public int				b2carpet		= 0;
-	public int				numUsingPlayers;
-	private int				ticksSinceSync;
-	private boolean			listed;
-	
-	/**
-	 * Returns the number of slots in the inventory.
-	 */
-	@Override
+
+    @Override
 	public int getSizeInventory()
 	{
 		return 14;
 	}
-	
-	/**
-	 * Returns the stack in slot i
-	 */
-	@Override
-	public ItemStack getStackInSlot(int par1)
+
+    @Override
+    public boolean isEmpty() {
+        for (ItemStack stack : this.chestContents) {
+            if (!stack.isEmpty()) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+	public ItemStack getStackInSlot(int index)
 	{
-		return this.chestContents[par1];
+		return this.chestContents.get(index);
 	}
-	
-	/**
-	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
-	 */
+
 	@Override
-	public ItemStack decrStackSize(int par1, int par2)
+	public ItemStack decrStackSize(int index, int count)
 	{
-		if (this.chestContents[par1] != null)
+		if (!this.chestContents.get(index).isEmpty())
 		{
 			ItemStack var3;
-			
-			if (this.chestContents[par1].stackSize <= par2)
+
+			if (this.chestContents.get(index).getCount() <= count)
 			{
-				var3 = this.chestContents[par1];
-				this.chestContents[par1] = null;
-				return var3;
-			}
+				var3 = this.chestContents.get(index);
+				this.chestContents.set(index, ItemStack.EMPTY);
+            }
 			else
 			{
-				var3 = this.chestContents[par1].splitStack(par2);
-				
-				if (this.chestContents[par1].stackSize == 0)
+				var3 = this.chestContents.get(index).splitStack(count);
+
+				if (this.chestContents.get(index).isEmpty())
 				{
-					this.chestContents[par1] = null;
+					this.chestContents.set(index, ItemStack.EMPTY);
 				}
-				
-				return var3;
-			}
-		}
-		return null;
+
+            }
+            return var3;
+        }
+		return ItemStack.EMPTY;
 	}
-	
-	/**
-	 * When some containers are closed they call this on each slot, then drop whatever it returns as an EntityItem - like when you close a workbench GUI.
-	 */
-	@Override
-	public ItemStack getStackInSlotOnClosing(int par1)
-	{
-		if (this.chestContents[par1] != null)
-		{
-			ItemStack var2 = this.chestContents[par1];
-			this.chestContents[par1] = null;
+
+    @Override
+    public ItemStack removeStackFromSlot(int index) {
+		if (!this.chestContents.get(index).isEmpty()) {
+			ItemStack var2 = this.chestContents.get(index);
+			this.chestContents.set(index, ItemStack.EMPTY);
 			return var2;
 		}
-		return null;
+		return ItemStack.EMPTY;
 	}
-	
-	/**
-	 * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
-	 */
+
 	@Override
-	public void setInventorySlotContents(int par1, ItemStack par2ItemStack)
+	public void setInventorySlotContents(int index, ItemStack stack)
 	{
-		this.chestContents[par1] = par2ItemStack;
-		
-		if (par2ItemStack != null && par2ItemStack.stackSize > this.getInventoryStackLimit())
+		this.chestContents.set(index, stack);
+
+		if (!stack.isEmpty() && stack.getCount() > this.getInventoryStackLimit())
 		{
-			par2ItemStack.stackSize = this.getInventoryStackLimit();
+			stack.setCount(this.getInventoryStackLimit());
 		}
 	}
-	
+
 	/**
 	 * Reads a tile entity from NBT.
 	 */
@@ -134,47 +115,23 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	public void readFromNBT(NBTTagCompound nbt)
 	{
 		super.readFromNBT(nbt);
-		NBTTagList nbttaglist = nbt.getTagList("Items", 10);
-		this.chestContents = new ItemStack[this.getSizeInventory()];
-		
-		for (int i = 0; i < nbttaglist.tagCount(); ++i)
-		{
-			NBTTagCompound nbt1 = nbttaglist.getCompoundTagAt(i);
-			int j = nbt1.getByte("Slot") & 255;
-			
-			if (j >= 0 && j < this.chestContents.length)
-			{
-				this.chestContents[j] = ItemStack.loadItemStackFromNBT(nbt1);
-			}
-		}
-		
+
+        ItemStackHelper.loadAllItems(nbt, this.chestContents);
 		b2spirit = nbt.getInteger("b2spirit");
 		b2carpet = nbt.getInteger("b2carpet");
 	}
-	
+
 	@Override
-	public void writeToNBT(NBTTagCompound nbt)
+	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
 	{
 		super.writeToNBT(nbt);
-		NBTTagList nbttaglist = new NBTTagList();
-		
-		for (int i = 0; i < this.chestContents.length; ++i)
-		{
-			if (this.chestContents[i] != null)
-			{
-				NBTTagCompound nbt1 = new NBTTagCompound();
-				nbt1.setByte("Slot", (byte) i);
-				this.chestContents[i].writeToNBT(nbt1);
-				nbttaglist.appendTag(nbt1);
-			}
-		}
-		
-		nbt.setTag("Items", nbttaglist);
-		
+
+        ItemStackHelper.saveAllItems(nbt, this.chestContents);
 		nbt.setInteger("b2spirit", b2spirit);
 		nbt.setInteger("b2carpet", b2carpet);
-	}
-	
+        return nbt;
+    }
+
 	/**
 	 * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't this more of a set than a get?*
 	 */
@@ -183,93 +140,77 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 	{
 		return 64;
 	}
-	
+
 	/**
 	 * Do not make give this method the name canInteractWith because it clashes with Container
 	 */
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer par1EntityPlayer)
+	public boolean isUsableByPlayer(EntityPlayer player)
 	{
-		return this.worldObj.getTileEntity(this.xCoord, this.yCoord, this.zCoord) != this ? false : par1EntityPlayer.getDistanceSq(this.xCoord + 0.5D, this.yCoord + 0.5D, this.zCoord + 0.5D) <= 64.0D;
+		return this.world.getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
-	
+
 	public void onGoButtonPressed()
 	{
 		if (isReady())
 		{
 			for (int j = 0; j < 3; j++)
 			{
-				if (getStackInSlot(j + 6) != null && getStackInSlot(j + 11) != null)
+				if (!getStackInSlot(j + 6).isEmpty() && !getStackInSlot(j + 11).isEmpty())
 				{
 					if (getStackInSlot(j + 6).getItem() == RivalRebels.nuclearelement
 							&& getStackInSlot(j + 11).getItem() == RivalRebels.hydrod)
 					{
 						b2spirit++;
-						setInventorySlotContents(j+6, null);
-						setInventorySlotContents(j+11, null);
+						setInventorySlotContents(j+6, ItemStack.EMPTY);
+						setInventorySlotContents(j+11, ItemStack.EMPTY);
 					}
 					else if (getStackInSlot(j + 6).getItem() == Item.getItemFromBlock(RivalRebels.timedbomb)
 							&& getStackInSlot(j + 11).getItem() == Item.getItemFromBlock(RivalRebels.timedbomb))
 					{
 						b2carpet++;
-						setInventorySlotContents(j+6, null);
-						setInventorySlotContents(j+11, null);
+						setInventorySlotContents(j+6, ItemStack.EMPTY);
+						setInventorySlotContents(j+11, ItemStack.EMPTY);
 					}
 				}
 			}
-			setInventorySlotContents(4, null);
-			setInventorySlotContents(5, null);
-			setInventorySlotContents(9, null);
-			setInventorySlotContents(10, null);
+			setInventorySlotContents(4, ItemStack.EMPTY);
+			setInventorySlotContents(5, ItemStack.EMPTY);
+			setInventorySlotContents(9, ItemStack.EMPTY);
+			setInventorySlotContents(10, ItemStack.EMPTY);
 		}
 		if (RivalRebels.freeb83nukes) {b2spirit += 10;b2carpet += 10;}
 		refreshTasks();
 	}
-	
+
 	public boolean hasChips()
 	{
 		boolean r = true;
 		rrteam = RivalRebelsTeam.NONE;
 		for (int j = 0; j < 4; j++)
 		{
-			if (getStackInSlot(j) == null) r = false;
+			if (getStackInSlot(j).isEmpty()) r = false;
 			else
 			{
-				if (getStackInSlot(j).stackTagCompound==null) getStackInSlot(j).stackTagCompound = new NBTTagCompound();
-				if (rrteam == RivalRebelsTeam.NONE) rrteam = RivalRebelsTeam.getForID(getStackInSlot(j).stackTagCompound.getInteger("team"));
-				else if (rrteam != RivalRebelsTeam.getForID(getStackInSlot(j).stackTagCompound.getInteger("team"))) r = false;
+				if (!getStackInSlot(j).hasTagCompound()) getStackInSlot(j).setTagCompound(new NBTTagCompound());
+				if (rrteam == RivalRebelsTeam.NONE) rrteam = RivalRebelsTeam.getForID(getStackInSlot(j).getTagCompound().getInteger("team"));
+				else if (rrteam != RivalRebelsTeam.getForID(getStackInSlot(j).getTagCompound().getInteger("team"))) r = false;
 			}
 		}
 		return r;
 	}
-	
-	/**
-	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
-	 */
-	@Override
-	public void updateEntity()
-	{
-		super.updateEntity();
-		++this.ticksSinceSync;
-		
+
+    @Override
+	public void update() {
 		slide = (Math.cos(test) + 1) * 45;
-		
-		//if (!listed)
-		//{
-			ItemBinoculars.add(this);
-		//	listed = true;
-		//}
-		List players = worldObj.playerEntities;
-		Iterator iter = players.iterator();
-		boolean i = false;
-		while (iter.hasNext())
-		{
-			EntityPlayer player = (EntityPlayer) iter.next();
-			if (player.getDistanceSq(xCoord + 0.5f, yCoord + 0.5f, zCoord + 0.5f) <= 9)
-			{
-				i = true;
-			}
-		}
+
+        ItemBinoculars.add(this);
+        boolean i = false;
+        for (EntityPlayer player : world.playerEntities) {
+            if (player.getDistanceSq(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f) <= 9) {
+                i = true;
+            }
+        }
 		if (i)
 		{
 			if (slide < 89.995) test += 0.05;
@@ -278,81 +219,77 @@ public class TileEntityLaptop extends TileEntity implements IInventory
 		{
 			if (slide > 0.004) test -= 0.05;
 		}
-		
+
 		if (b2spirit > 0 && !hasChips())
 		{
 			b2spirit--;
 			refreshTasks();
 		}
 	}
-	
-	/**
-	 * Called when a client event is received with the event number and argument, see World.sendClientEvent
-	 * 
-	 * @return
-	 */
-	@Override
-	public boolean receiveClientEvent(int par1, int par2)
-	{
-		if (par1 == 1)
-		{
-			this.numUsingPlayers = par2;
-			return true;
-		}
-		return false;
-	}
-	
-	/**
-	 * invalidates a tile entity
-	 */
-	@Override
+
+    @Override
 	public void invalidate()
 	{
 		super.invalidate();
 		this.updateContainingBlockInfo();
 		ItemBinoculars.remove(this);
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack)
 	{
 		return true;
 	}
-	
-	@Override
-	public String getInventoryName()
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
+    public void clear() {
+        this.chestContents.clear();
+    }
+
+    @Override
+	public String getName()
 	{
 		return "Laptop";
 	}
-	
+
 	@Override
-	public boolean hasCustomInventoryName()
+	public boolean hasCustomName()
 	{
 		return false;
 	}
-	
+
 	@Override
-	public void openInventory()
-	{
-		
+	public void openInventory(EntityPlayer player) {
 	}
-	
+
 	@Override
-	public void closeInventory()
-	{
-		
+	public void closeInventory(EntityPlayer player) {
 	}
 
 	public void refreshTasks() {
-		PacketDispatcher.packetsys.sendToAll(new LaptopRefreshPacket(xCoord, yCoord, zCoord, b2spirit, b2carpet));
+		PacketDispatcher.packetsys.sendToAll(new LaptopRefreshPacket(getPos(), b2spirit, b2carpet));
 	}
 
 	public boolean isReady()
 	{
 		return hasChips()
-				&& getStackInSlot(4) != null
-				&& getStackInSlot(5) != null
-				&& getStackInSlot(9) != null
-				&& getStackInSlot(10) != null;
+				&& !getStackInSlot(4).isEmpty()
+				&& !getStackInSlot(5).isEmpty()
+				&& !getStackInSlot(9).isEmpty()
+				&& !getStackInSlot(10).isEmpty();
 	}
 }

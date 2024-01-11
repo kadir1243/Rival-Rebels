@@ -11,73 +11,77 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.Direction;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.Nullable;
 
-public class BlockFlag extends Block
-{
+import java.util.Random;
+
+public class BlockFlag extends Block {
+    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
 	String	texpath	= "rivalrebels:";
-	
+
 	public BlockFlag(String name)
 	{
-		super(Material.cloth);
+		super(Material.CLOTH);
 		texpath += name;
 		//this.setCreativeTab(RivalRebels.rrarmortab);
+        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
 	}
-	
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 1;
-	}
-	
-	@Override
-	public Item getItemDropped(int meta, Random random, int fortune)
-    {
+
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(META);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(META, meta);
+    }
+
+    @Override
+    public BlockStateContainer getBlockState() {
+        return new BlockStateContainer(this, META);
+    }
+
+    @Override
+    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
 		if (this == RivalRebels.flag2) return RivalRebels.trollmask;
         return Item.getItemFromBlock(this);
     }
-	
-	@Override
+
+	/*@Override
 	public void setBlockBoundsForItemRender()
 	{
 		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
 	}
-	
+
 	@Override
 	public int getRenderType()
 	{
 		return 20;
-	}
-	
+	}*/
+
 	@Override
-	public boolean isOpaqueCube()
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
-	@Override
-	public boolean renderAsNormalBlock()
-	{
-		return false;
-	}
-	
-	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess worldIn, int x, int y, int z)
-	{
-		int l = worldIn.getBlockMetadata(x, y, z);
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess worldIn, BlockPos pos) {
+		int l = state.getValue(META);
 		float f1 = 1.0F;
 		float f2 = 1.0F;
 		float f3 = 1.0F;
@@ -85,7 +89,7 @@ public class BlockFlag extends Block
 		float f5 = 0.0F;
 		float f6 = 0.0F;
 		boolean flag = l > 0;
-		
+
 		if ((l & 2) != 0)
 		{
 			f4 = Math.max(f4, 0.0625F);
@@ -96,7 +100,7 @@ public class BlockFlag extends Block
 			f6 = 1.0F;
 			flag = true;
 		}
-		
+
 		if ((l & 8) != 0)
 		{
 			f1 = Math.min(f1, 0.9375F);
@@ -107,7 +111,7 @@ public class BlockFlag extends Block
 			f6 = 1.0F;
 			flag = true;
 		}
-		
+
 		if ((l & 4) != 0)
 		{
 			f6 = Math.max(f6, 0.0625F);
@@ -118,7 +122,7 @@ public class BlockFlag extends Block
 			f5 = 1.0F;
 			flag = true;
 		}
-		
+
 		if ((l & 1) != 0)
 		{
 			f3 = Math.min(f3, 0.9375F);
@@ -129,8 +133,8 @@ public class BlockFlag extends Block
 			f5 = 1.0F;
 			flag = true;
 		}
-		
-		if (!flag && this.func_150093_a(worldIn.getBlock(x, y + 1, z)))
+
+		if (!flag && this.func_150093_a(worldIn.getBlockState(pos.up())))
 		{
 			f2 = Math.min(f2, 0.9375F);
 			f5 = 1.0F;
@@ -139,60 +143,47 @@ public class BlockFlag extends Block
 			f3 = 0.0F;
 			f6 = 1.0F;
 		}
-		
-		this.setBlockBounds(f1, f2, f3, f4, f5, f6);
+
+		return new AxisAlignedBB(f1, f2, f3, f4, f5, f6);
 	}
-	
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World worldIn, int x, int y, int z)
-	{
-		return null;
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return null;
+    }
+
+    @Override
+    public boolean canPlaceBlockOnSide(World worldIn, BlockPos pos, EnumFacing side) {
+        if (side == EnumFacing.DOWN) return false;
+        return this.func_150093_a(worldIn.getBlockState(pos.offset(side)));
 	}
-	
-	@Override
-	public boolean canPlaceBlockOnSide(World worldIn, int x, int y, int z, int side)
+
+	private boolean func_150093_a(IBlockState p_150093_1_)
 	{
-		switch (side)
-		{
-			case 1:
-				return this.func_150093_a(worldIn.getBlock(x, y + 1, z));
-			case 2:
-				return this.func_150093_a(worldIn.getBlock(x, y, z + 1));
-			case 3:
-				return this.func_150093_a(worldIn.getBlock(x, y, z - 1));
-			case 4:
-				return this.func_150093_a(worldIn.getBlock(x + 1, y, z));
-			case 5:
-				return this.func_150093_a(worldIn.getBlock(x - 1, y, z));
-			default:
-				return false;
-		}
+		return p_150093_1_.isFullBlock();
 	}
-	
-	private boolean func_150093_a(Block p_150093_1_)
+
+	private boolean func_150094_e(IBlockState state, World world, BlockPos pos)
 	{
-		return p_150093_1_.renderAsNormalBlock();
-	}
-	
-	private boolean func_150094_e(World p_150094_1_, int p_150094_2_, int p_150094_3_, int p_150094_4_)
-	{
-		int l = p_150094_1_.getBlockMetadata(p_150094_2_, p_150094_3_, p_150094_4_);
+		int l = state.getValue(META);
 		int i1 = l;
-		
+
 		if (l > 0)
 		{
 			for (int j1 = 0; j1 <= 3; ++j1)
 			{
 				int k1 = 1 << j1;
-				
-				if ((l & k1) != 0 && !this.func_150093_a(p_150094_1_.getBlock(p_150094_2_ + Direction.offsetX[j1], p_150094_3_, p_150094_4_ + Direction.offsetZ[j1])) && (p_150094_1_.getBlock(p_150094_2_, p_150094_3_ + 1, p_150094_4_) != this || (p_150094_1_.getBlockMetadata(p_150094_2_, p_150094_3_ + 1, p_150094_4_) & k1) == 0))
+                EnumFacing facing = EnumFacing.byIndex(j1);
+
+                if ((l & k1) != 0 && !this.func_150093_a(world.getBlockState(pos.offset(facing))) && (world.getBlockState(pos.up()).getBlock() != this || (world.getBlockState(pos.up()).getBlock().getMetaFromState(world.getBlockState(pos.up())) & k1) == 0))
 				{
 					i1 &= ~k1;
 				}
 			}
 		}
-		
-		if (i1 == 0 && !this.func_150093_a(p_150094_1_.getBlock(p_150094_2_, p_150094_3_ + 1, p_150094_4_)))
+
+		if (i1 == 0 && !this.func_150093_a(world.getBlockState(pos.up())))
 		{
 			return false;
 		}
@@ -200,58 +191,46 @@ public class BlockFlag extends Block
 		{
 			if (i1 != l)
 			{
-				p_150094_1_.setBlockMetadataWithNotify(p_150094_2_, p_150094_3_, p_150094_4_, i1, 2);
+				world.setBlockState(pos, state.withProperty(META, i1), 2);
 			}
-			
+
 			return true;
 		}
 	}
-	
-	@Override
-	public void onNeighborBlockChange(World worldIn, int x, int y, int z, Block neighbor)
-	{
-		if (!worldIn.isRemote && !this.func_150094_e(worldIn, x, y, z))
+
+    @Override
+    public void neighborChanged(IBlockState state, World worldIn, BlockPos pos, Block blockIn, BlockPos fromPos) {
+        if (!worldIn.isRemote && !this.func_150094_e(state, worldIn, pos))
 		{
-			this.dropBlockAsItem(worldIn, x, y, z, worldIn.getBlockMetadata(x, y, z), 0);
-			worldIn.setBlockToAir(x, y, z);
+			this.dropBlockAsItem(worldIn, pos, worldIn.getBlockState(pos), 0);
+			worldIn.setBlockToAir(pos);
 		}
 	}
-	
-	@Override
-	public int onBlockPlaced(World worldIn, int x, int y, int z, int side, float subX, float subY, float subZ, int meta)
-	{
-		byte b0 = 0;
-		
-		switch (side)
-		{
-			case 2:
-				b0 = 1;
-			break;
-			case 3:
-				b0 = 4;
-			break;
-			case 4:
-				b0 = 8;
-			break;
-			case 5:
-				b0 = 2;
-		}
-		
-		return b0 != 0 ? b0 : meta;
-	}
-	
-	@SideOnly(Side.CLIENT)
+
+    @Override
+    public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+        byte m = switch (facing) {
+            case NORTH -> 1;
+            case SOUTH -> 4;
+            case EAST -> 8;
+            case WEST -> 2;
+            default -> 0;
+        };
+        return super.getStateForPlacement(worldIn, pos, facing, hitX, hitY, hitZ, m != 0 ? m : meta, placer);
+    }
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
 		icon = iconregister.registerIcon(texpath);
-	}
+	}*/
 }

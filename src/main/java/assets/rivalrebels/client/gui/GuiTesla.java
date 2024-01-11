@@ -13,7 +13,9 @@ package assets.rivalrebels.client.gui;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 
@@ -24,6 +26,7 @@ import assets.rivalrebels.client.guihelper.GuiKnob;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.common.packet.PacketDispatcher;
+import org.lwjgl.opengl.GL11;
 
 public class GuiTesla extends GuiScreen
 {
@@ -32,13 +35,13 @@ public class GuiTesla extends GuiScreen
 	private int			posX;
 	private int			posY;
 	private GuiKnob		knob;
-	private int			s				= 0;
-	
+	private final int s;
+
 	public GuiTesla(int start)
 	{
 		s = start - 90;
 	}
-	
+
 	@Override
 	public void initGui()
 	{
@@ -49,43 +52,38 @@ public class GuiTesla extends GuiScreen
 		this.buttonList.add(knob);
 		// mc.inGameHasFocus = true;
 	}
-	
+
 	@Override
 	public boolean doesGuiPauseGame()
 	{
 		return false;
 	}
-	
-	@Override
-	public void updateScreen()
-	{
-		
-	}
-	
-	@Override
+
+    @Override
 	public void drawScreen(int x, int y, float d)
 	{
-		Tessellator tessellator = Tessellator.instance;
-		float f = 0.00390625F;
+		Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        float f = 0.00390625F;
 		mc = Minecraft.getMinecraft();
 		mc.renderEngine.bindTexture(RivalRebels.guitesla);
-		tessellator.startDrawingQuads();
-		tessellator.addVertexWithUV(posX, posY + ySizeOfTexture, zLevel, 0, ySizeOfTexture * f);
-		tessellator.addVertexWithUV(posX + xSizeOfTexture, posY + ySizeOfTexture, zLevel, xSizeOfTexture * f, ySizeOfTexture * f);
-		tessellator.addVertexWithUV(posX + xSizeOfTexture, posY, zLevel, xSizeOfTexture * f, 0);
-		tessellator.addVertexWithUV(posX, posY, zLevel, 0, 0);
+		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		buffer.pos(posX, posY + ySizeOfTexture, zLevel).tex(0, ySizeOfTexture * f).endVertex();
+		buffer.pos(posX + xSizeOfTexture, posY + ySizeOfTexture, zLevel).tex(xSizeOfTexture * f, ySizeOfTexture * f).endVertex();
+		buffer.pos(posX + xSizeOfTexture, posY, zLevel).tex(xSizeOfTexture * f, 0).endVertex();
+		buffer.pos(posX, posY, zLevel).tex(0, 0).endVertex();
 		tessellator.draw();
 		super.drawScreen(x, y, d);
 		if (!(RivalRebels.altRkey?Keyboard.isKeyDown(Keyboard.KEY_F):Keyboard.isKeyDown(Keyboard.KEY_R)))
 		{
-			this.mc.displayGuiScreen((GuiScreen) null);
+			this.mc.displayGuiScreen(null);
 			this.mc.setIngameFocus();
-			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(mc.thePlayer.inventory.currentItem, knob.getDegree()));
-			ItemStack itemstack = mc.thePlayer.inventory.getStackInSlot(mc.thePlayer.inventory.currentItem);
-			if (itemstack != null && itemstack.getItem() instanceof ItemTesla)
+			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(mc.player.inventory.currentItem, knob.getDegree()));
+			ItemStack stack = mc.player.inventory.getStackInSlot(mc.player.inventory.currentItem);
+			if (stack.getItem() instanceof ItemTesla)
 			{
-				if (itemstack.stackTagCompound == null) itemstack.stackTagCompound = new NBTTagCompound();
-				itemstack.stackTagCompound.setInteger("dial", knob.getDegree());
+				if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
+				stack.getTagCompound().setInteger("dial", knob.getDegree());
 			}
 		}
 	}

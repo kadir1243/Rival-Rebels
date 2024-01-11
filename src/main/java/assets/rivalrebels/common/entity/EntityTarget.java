@@ -11,23 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.SharedMonsterAttributes;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.EnumDifficulty;
-import net.minecraft.world.EnumSkyBlock;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.EnumHandSide;
 import net.minecraft.world.World;
+
+import java.util.Collections;
 
 public class EntityTarget extends EntityLivingBase
 {
-	private Entity e;
+	private Entity relay;
 	public EntityTarget(World par1World)
 	{
 		super(par1World);
@@ -35,58 +33,84 @@ public class EntityTarget extends EntityLivingBase
 	public EntityTarget(World par1World, Entity relay)
 	{
 		super(par1World);
-		e = relay;
-		boundingBox.setBB(e.boundingBox);
-		ySize=e.ySize;
-		height=e.height;
-		width = e.width;
-		yOffset=e.yOffset;
+		this.relay = relay;
+		setEntityBoundingBox(this.relay.getEntityBoundingBox());
+		height= this.relay.height;
+		width = this.relay.width;
     }
-	@Override
+
+    @Override
+    public double getYOffset() {
+        return relay.getYOffset();
+    }
+
+    @Override
 	public void onUpdate()
 	{
-		if (e==null||e.isDead)
+		if (relay ==null|| relay.isDead)
 		{
 			setDead();
 		}
 		else
 		{
-			setPosition(e.posX, e.posY, e.posZ);
+			setPosition(relay.posX, relay.posY, relay.posZ);
 		}
 	}
-	@Override
+
+    @Override
+    public EnumHandSide getPrimaryHand() {
+        return EnumHandSide.RIGHT;
+    }
+
+    @Override
 	public boolean attackEntityFrom(DamageSource ds, float f)
     {
-		e.attackEntityFrom(ds, f);
+		relay.attackEntityFrom(ds, f);
 		return true;
     }
-	@Override
-	public ItemStack getHeldItem()
-	{
-		return null;
-	}
-	@Override
-	public ItemStack getEquipmentInSlot(int p_71124_1_)
-	{
-		return null;
-	}
-	@Override
-	public void setCurrentItemOrArmor(int slotIn, ItemStack itemStackIn)
-	{
-	}
-	@Override
-	public ItemStack[] getLastActiveItems()
-	{
-		return null;
-	}
+
+    @Override
+    public ItemStack getHeldItem(EnumHand hand) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public boolean hasItemInSlot(EntityEquipmentSlot slot) {
+        return false;
+    }
+
+    @Override
+    public Iterable<ItemStack> getArmorInventoryList() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public ItemStack getItemStackFromSlot(EntityEquipmentSlot slotIn) {
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public Iterable<ItemStack> getEquipmentAndArmor() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public Iterable<ItemStack> getHeldEquipment() {
+        return Collections.emptyList();
+    }
+
+    @Override
+    public void setItemStackToSlot(EntityEquipmentSlot slot, ItemStack stack) {
+    }
+
 	@Override
 	public void writeEntityToNBT(NBTTagCompound nbt)
 	{
-		nbt.setInteger("id", e.getEntityId());
+		nbt.setInteger("id", relay.getEntityId());
 	}
 	@Override
 	public void readEntityFromNBT(NBTTagCompound nbt)
 	{
-		e = worldObj.getEntityByID(nbt.getInteger("id"));
+		relay = world.getEntityByID(nbt.getInteger("id"));
 	}
 }

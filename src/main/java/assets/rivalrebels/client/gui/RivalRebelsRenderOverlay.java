@@ -16,8 +16,12 @@ import assets.rivalrebels.client.renderentity.RenderRhodes;
 import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.item.weapon.ItemBinoculars;
-import cpw.mods.fml.common.eventhandler.EventPriority;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.init.Blocks;
+import net.minecraftforge.fml.common.eventhandler.EventPriority;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -25,7 +29,7 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.StatCollector;
+import net.minecraft.client.resources.I18n;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.event.RenderGameOverlayEvent.ElementType;
 import org.lwjgl.input.Keyboard;
@@ -44,18 +48,18 @@ public class RivalRebelsRenderOverlay
 	{
 		if (rhodes != null)
 		{
-			renderRhodes(event, Minecraft.getMinecraft().thePlayer, rhodes);
+			renderRhodes(event, Minecraft.getMinecraft().player, rhodes);
 		}
 		renderItems(event);
 	}
 	private void renderItems(RenderGameOverlayEvent event)
 	{
-		if (event.type == RenderGameOverlayEvent.ElementType.HOTBAR)
+		if (event.getType() == RenderGameOverlayEvent.ElementType.HOTBAR)
 		{
-			EntityPlayer player = Minecraft.getMinecraft().thePlayer;
-			ItemStack item = player.inventory.getCurrentItem();
-			if (item == null) return;
-			if (item.getItem() instanceof ItemBinoculars) renderBinoculars(item, event, player);
+			EntityPlayer player = Minecraft.getMinecraft().player;
+			ItemStack stack = player.inventory.getCurrentItem();
+			if (stack.isEmpty()) return;
+			if (stack.getItem() instanceof ItemBinoculars) renderBinoculars(stack, event, player);
 		}
 	}
 
@@ -63,7 +67,7 @@ public class RivalRebelsRenderOverlay
 
 	private void renderRhodes(RenderGameOverlayEvent event, EntityPlayer player, EntityRhodes rhodes)
 	{
-		if (event.type == ElementType.HOTBAR)
+		if (event.getType() == ElementType.HOTBAR)
 		{
 			counter--;
 			if (counter <= 0)
@@ -73,73 +77,74 @@ public class RivalRebelsRenderOverlay
 			}
 			/*for (int i = 0; i < 65536; i++)
 			{
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, i);
-				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+				GlStateManager.bindTexture(i);
+				GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+				GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			}*/
-			Tessellator t = Tessellator.instance;
-			GL11.glDisable(GL11.GL_DEPTH_TEST);
-			GL11.glDepthMask(false);
-			GL11.glEnable(GL11.GL_BLEND);
+			Tessellator t = Tessellator.getInstance();
+            BufferBuilder buffer = t.getBuffer();
+            GlStateManager.disableDepth();
+			GlStateManager.depthMask(false);
+            GlStateManager.enableBlend();
 			FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
-			int w = event.resolution.getScaledWidth();
-			int h = event.resolution.getScaledHeight();
+			int w = event.getResolution().getScaledWidth();
+			int h = event.getResolution().getScaledHeight();
 
-			GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 			Minecraft.getMinecraft().getTextureManager().bindTexture(RivalRebels.guirhodesline);
-			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-			GL11.glColor4f(1.0F, 0.0F, 0.0F, 0.5F);
-			t.startDrawingQuads();
-			t.addVertexWithUV(0, h, -90, 0, 1);
-			t.addVertexWithUV(w, h, -90, 1, 1);
-			t.addVertexWithUV(w, 0, -90, 1, 0);
-			t.addVertexWithUV(0, 0, -90, 0, 0);
+			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			GlStateManager.color(1.0F, 0.0F, 0.0F, 0.5F);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+			buffer.pos(0, h, -90).tex(0, 1).endVertex();
+			buffer.pos(w, h, -90).tex(1, 1).endVertex();
+			buffer.pos(w, 0, -90).tex(1, 0).endVertex();
+			buffer.pos(0, 0, -90).tex(0, 0).endVertex();
 			t.draw();
 
-			GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+			GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 			Minecraft.getMinecraft().getTextureManager().bindTexture(RivalRebels.guirhodesout);
-			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-			GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-			GL11.glColor4f(0.0F, 0.0F, 0.0F, 0.333f);
-			t.startDrawingQuads();
-			t.addVertexWithUV(0, h, -90, 0, 1);
-			t.addVertexWithUV(w, h, -90, 1, 1);
-			t.addVertexWithUV(w, 0, -90, 1, 0);
-			t.addVertexWithUV(0, 0, -90, 0, 0);
+			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			GlStateManager.color(0.0F, 0.0F, 0.0F, 0.333f);
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+			buffer.pos(0, h, -90).tex(0, 1).endVertex();
+			buffer.pos(w, h, -90).tex(1, 1).endVertex();
+			buffer.pos(w, 0, -90).tex(1, 0).endVertex();
+			buffer.pos(0, 0, -90).tex(0, 0).endVertex();
 			t.draw();
 
 			if (Keyboard.isKeyDown(Keyboard.KEY_H))
 			{
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 				Minecraft.getMinecraft().getTextureManager().bindTexture(RivalRebels.guirhodeshelp);
-				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				GL11.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				t.startDrawingQuads();
-				t.addVertexWithUV(w*0.25f, h*0.75f, -90, 0, 1);
-				t.addVertexWithUV(w*0.75f, h*0.75f, -90, 1, 1);
-				t.addVertexWithUV(w*0.75f, h*0.25f, -90, 1, 0);
-				t.addVertexWithUV(w*0.25f, h*0.25f, -90, 0, 0);
+				GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+				GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+				buffer.pos(w*0.25f, h*0.75f, -90).tex(0, 1).endVertex();
+				buffer.pos(w*0.75f, h*0.75f, -90).tex(1, 1).endVertex();
+				buffer.pos(w*0.75f, h*0.25f, -90).tex(1, 0).endVertex();
+				buffer.pos(w*0.25f, h*0.25f, -90).tex(0, 0).endVertex();
 				t.draw();
 			}
 
 			if (rhodes.itexfolder > -1 && rhodes.itexfolder < 4)
 			{
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 				Minecraft.getMinecraft().renderEngine.bindTexture(new ResourceLocation(RivalRebels.MODID, "textures/" + RenderRhodes.texfolders[rhodes.itexfolder] + rhodes.itexloc + ".png"));
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0f);
-				t.startDrawingQuads();
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0f);
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 				float s = 8;
 				float wl = w*0.5f;
 				float hl = h*0.05f;
-				t.addVertexWithUV(wl-s, hl+s, -90, 0, 1);
-				t.addVertexWithUV(wl+s, hl+s, -90, 1, 1);
-				t.addVertexWithUV(wl+s, hl-s, -90, 1, 0);
-				t.addVertexWithUV(wl-s, hl-s, -90, 0, 0);
+				buffer.pos(wl-s, hl+s, -90).tex(0, 1).endVertex();
+				buffer.pos(wl+s, hl+s, -90).tex(1, 1).endVertex();
+				buffer.pos(wl+s, hl-s, -90).tex(1, 0).endVertex();
+				buffer.pos(wl-s, hl-s, -90).tex(0, 0).endVertex();
 				t.draw();
 			}
-			GL11.glDisable(GL11.GL_BLEND);
+			GlStateManager.disableBlend();
 
 			String disp = "Rival Rebels";
 			fr.drawString(disp, (int) (w * 0.05), (int) (h * 0.05), 0xffffff, false);
@@ -149,18 +154,18 @@ public class RivalRebelsRenderOverlay
 			float val = (rhodes.health / (float) RivalRebels.rhodesHealth);
 			fr.drawString(disp, (int) (w * 0.05), (int) (h * 0.15), (((int)((1-val)*255)&255)<<16) | (((int)(val*255)&255)<<8), false);
 			float yaw = (player.rotationYaw + 360000) % 360;
-			disp = (yaw >= 315 || yaw < 45) ? StatCollector.translateToLocal("RivalRebels.binoculars.south") : (yaw >= 45 && yaw < 135) ? StatCollector.translateToLocal("RivalRebels.binoculars.west") : (yaw >= 135 && yaw < 225) ? StatCollector.translateToLocal("RivalRebels.binoculars.north") : (yaw >= 225 && yaw < 315) ? StatCollector.translateToLocal("RivalRebels.binoculars.east") : "Whut";
+			disp = (yaw >= 315 || yaw < 45) ? I18n.format("RivalRebels.binoculars.south") : (yaw >= 45 && yaw < 135) ? I18n.format("RivalRebels.binoculars.west") : (yaw >= 135 && yaw < 225) ? I18n.format("RivalRebels.binoculars.north") : (yaw >= 225 && yaw < 315) ? I18n.format("RivalRebels.binoculars.east") : "Whut";
 			fr.drawString(disp, (int) (w * 0.05), (int) (h * 0.2), 0xffffff, false);
 
-			disp = StatCollector.translateToLocal(RivalRebels.einsten.getUnlocalizedName()+".name") + ": " + rhodes.energy;
+			disp = I18n.format(RivalRebels.einsten.getTranslationKey()+".name") + ": " + rhodes.energy;
 			fr.drawString(disp, (int) (w * 0.8), (int) (h * 0.05), (rhodes.laserOn>0)?0xff3333:0xffffff, false);
 			disp = "Jet: " + rhodes.energy;
 			fr.drawString(disp, (int) (w * 0.8), (int) (h * 0.1), RivalRebels.proxy.spacebar()?0x6666ff:0xffffff, false);
 			disp = RivalRebels.forcefieldnode.getLocalizedName() + ": " + rhodes.energy;
 			fr.drawString(disp, (int) (w * 0.8), (int) (h * 0.15), rhodes.forcefield?0xBB88FF:0xffffff, false);
-			disp = StatCollector.translateToLocal(RivalRebels.seekm202.getUnlocalizedName()+".name") + ": " + rhodes.rocketcount;
+			disp = I18n.format(RivalRebels.seekm202.getTranslationKey()+".name") + ": " + rhodes.rocketcount;
 			fr.drawString(disp, (int) (w * 0.8), (int) (h * 0.2), 0xffffff, false);
-			disp = (rhodes.plasma?"Plasma: " : (StatCollector.translateToLocal(RivalRebels.fuel.getUnlocalizedName()+".name") + ": ")) + rhodes.flamecount;
+			disp = (rhodes.plasma?"Plasma: " : (I18n.format(RivalRebels.fuel.getTranslationKey()+".name") + ": ")) + rhodes.flamecount;
 			fr.drawString(disp, (int) (w * 0.8), (int) (h * 0.25), 0xffffff, false);
 			disp = RivalRebels.nuclearBomb.getLocalizedName()+": " + rhodes.nukecount;
 			fr.drawString(disp, (int) (w * 0.8), (int) (h * 0.3), 0xffffff, false);
@@ -170,19 +175,19 @@ public class RivalRebelsRenderOverlay
 			fr.drawString(disp, (int) (w * 0.05), (int) (h * 0.95), Keyboard.isKeyDown(Keyboard.KEY_H) ? 0xffff00 : 0xffffff, false);
 			if (rhodes.forcefield)
 			{
-				GL11.glBindTexture(GL11.GL_TEXTURE_2D, TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-		    	GL11.glEnable(GL11.GL_BLEND);
-				GL11.glBlendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE);
-				GL11.glDisable(GL11.GL_LIGHTING);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 0.7f);
-				t.startDrawingQuads();
-				t.addVertexWithUV(0, h, -90, 0, h*0.003f);
-				t.addVertexWithUV(w, h, -90, w*0.003f, h*0.003f);
-				t.addVertexWithUV(w, 0, -90, w*0.003f, 0);
-				t.addVertexWithUV(0, 0, -90, 0, 0);
+				GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+                GlStateManager.enableBlend();
+				GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
+				GlStateManager.disableLighting();
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 0.7f);
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+				buffer.pos(0, h, -90).tex(0, h*0.003f).endVertex();
+				buffer.pos(w, h, -90).tex(w*0.003f, h*0.003f).endVertex();
+				buffer.pos(w, 0, -90).tex(w*0.003f, 0).endVertex();
+				buffer.pos(0, 0, -90).tex(0, 0).endVertex();
 				t.draw();
-				GL11.glDisable(GL11.GL_BLEND);
-				GL11.glEnable(GL11.GL_LIGHTING);
+				GlStateManager.disableBlend();
+				GlStateManager.enableLighting();
 			}
 		}
 	}
@@ -192,51 +197,52 @@ public class RivalRebelsRenderOverlay
 		if (Mouse.isButtonDown(1))
 		{
 			if (event.isCancelable()) event.setCanceled(true);
-			if (event.type == ElementType.HOTBAR)
+			if (event.getType() == ElementType.HOTBAR)
 			{
-				Tessellator t = Tessellator.instance;
-				tic++;
-				GL11.glDisable(GL11.GL_DEPTH_TEST);
-				GL11.glDepthMask(false);
+				Tessellator t = Tessellator.getInstance();
+                BufferBuilder buffer = t.getBuffer();
+                tic++;
+				GlStateManager.disableDepth();
+				GlStateManager.depthMask(false);
 				Minecraft.getMinecraft().getTextureManager().bindTexture(RivalRebels.guibinoculars);
 				FontRenderer fr = Minecraft.getMinecraft().fontRenderer;
-				int w = event.resolution.getScaledWidth();
-				int h = event.resolution.getScaledHeight();
+				int w = event.getResolution().getScaledWidth();
+				int h = event.getResolution().getScaledHeight();
 
-				GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
-				GL11.glEnable(GL11.GL_BLEND);
-				GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
-				t.startDrawingQuads();
-				t.addVertexWithUV(0, h, -90, 0, 1);
-				t.addVertexWithUV(w, h, -90, 1, 1);
-				t.addVertexWithUV(w, 0, -90, 1, 0);
-				t.addVertexWithUV(0, 0, -90, 0, 0);
+                GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+                GlStateManager.enableBlend();
+				GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+				buffer.pos(0, h, -90).tex(0, 1).endVertex();
+				buffer.pos(w, h, -90).tex(1, 1).endVertex();
+				buffer.pos(w, 0, -90).tex(1, 0).endVertex();
+				buffer.pos(0, 0, -90).tex(0, 0).endVertex();
 				t.draw();
 
 				Minecraft.getMinecraft().getTextureManager().bindTexture(RivalRebels.guibinocularsoverlay);
-				GL11.glColor4f(0.333F, 0.333F, 0.333F, 0.5F);
-				t.startDrawingQuads();
-				t.addVertexWithUV(0, h, -90, 0, 1);
-				t.addVertexWithUV(w, h, -90, 1, 1);
-				t.addVertexWithUV(w, 0, -90, 1, 0);
-				t.addVertexWithUV(0, 0, -90, 0, 0);
+				GlStateManager.color(0.333F, 0.333F, 0.333F, 0.5F);
+                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+				buffer.pos(0, h, -90).tex(0, 1).endVertex();
+				buffer.pos(w, h, -90).tex(1, 1).endVertex();
+				buffer.pos(w, 0, -90).tex(1, 0).endVertex();
+				buffer.pos(0, 0, -90).tex(0, 0).endVertex();
 				t.draw();
 
-				// GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE);
+				// GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
 				// GL11.glDisable(GL11.GL_BLEND);
-				// GL11.glColor4f(1.0F, 1.0F, 1.0F, 1.0F);
+				// GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 				// t.startDrawing(GL11.GL_LINES);
 				// t.addVertex(1, 100, -90);
 				// t.addVertex(100, 100, -90);
 				// t.addVertex(100, 1, -90);
 				// t.addVertex(1, 1, -90);
 				// t.draw();
-				// GL11.glEnable(GL11.GL_BLEND);
-				Block id = player.worldObj.getBlock(ItemBinoculars.tx, ItemBinoculars.ty, ItemBinoculars.tz);
+				// GlStateManager.enableBlend();
+				Block id = player.world.getBlockState(ItemBinoculars.tpos).getBlock();
 				String disp = "X";
-				if (id != null) disp = StatCollector.translateToLocal(id.getUnlocalizedName()+".name");
+				if (id != Blocks.AIR) disp = I18n.format(id.getTranslationKey()+".name");
 				fr.drawString(disp, (int) ((w * 0.50) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.18), 0x00ff00, false);
-				if (!ItemBinoculars.tooFar) disp = "(" + ItemBinoculars.tx + ", " + ItemBinoculars.ty + ", " + ItemBinoculars.tz + ")";
+				if (!ItemBinoculars.tooFar) disp = "(" + ItemBinoculars.tpos.getX() + ", " + ItemBinoculars.tpos.getY() + ", " + ItemBinoculars.tpos.getZ() + ")";
 				else disp = "";
 				fr.drawString(disp, (int) ((w * 0.50) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.13), 0x00ff00, false);
 				disp = "";
@@ -249,47 +255,47 @@ public class RivalRebelsRenderOverlay
 				disp = ((int)ItemBinoculars.distblock) + "m";
 				fr.drawString(disp, (int) ((w * 0.637) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.205), 0xffffff, false);
 				float yaw = (player.rotationYaw + 360000) % 360;
-				disp = (yaw >= 315 || yaw < 45) ? StatCollector.translateToLocal("RivalRebels.binoculars.south") : (yaw >= 45 && yaw < 135) ? StatCollector.translateToLocal("RivalRebels.binoculars.west") : (yaw >= 135 && yaw < 225) ? StatCollector.translateToLocal("RivalRebels.binoculars.north") : (yaw >= 225 && yaw < 315) ? StatCollector.translateToLocal("RivalRebels.binoculars.east") : "Whut";
+				disp = (yaw >= 315 || yaw < 45) ? I18n.format("RivalRebels.binoculars.south") : (yaw >= 45 && yaw < 135) ? I18n.format("RivalRebels.binoculars.west") : (yaw >= 135 && yaw < 225) ? I18n.format("RivalRebels.binoculars.north") : (yaw >= 225 && yaw < 315) ? I18n.format("RivalRebels.binoculars.east") : "Whut";
 				fr.drawString(disp, (int) ((w * 0.370) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.205), 0xffffff, false);
-				if (ItemBinoculars.tooFar) fr.drawString(StatCollector.translateToLocal("RivalRebels.controller.range"), (int) ((w * 0.5) - (fr.getStringWidth(StatCollector.translateToLocal("RivalRebels.controller.range")) / 2f)), (int) (h * 0.85), 0xff0000, false);
-				else if (ItemBinoculars.tooClose) fr.drawString(StatCollector.translateToLocal("RivalRebels.nextbattle.no"), (int) ((w * 0.5) - (fr.getStringWidth(StatCollector.translateToLocal("RivalRebels.nextbattle.no")) / 2f)), (int) (h * 0.85), 0xff0000, false);
+				if (ItemBinoculars.tooFar) fr.drawString(I18n.format("RivalRebels.controller.range"), (int) ((w * 0.5) - (fr.getStringWidth(I18n.format("RivalRebels.controller.range")) / 2f)), (int) (h * 0.85), 0xff0000, false);
+				else if (ItemBinoculars.tooClose) fr.drawString(I18n.format("RivalRebels.nextbattle.no"), (int) ((w * 0.5) - (fr.getStringWidth(I18n.format("RivalRebels.nextbattle.no")) / 2f)), (int) (h * 0.85), 0xff0000, false);
 				//else if (dist2 < 40)
 				//{
-				//	disp = StatCollector.translateToLocal("RivalRebels.nextbattle.no");
+				//	disp = I18n.format("RivalRebels.nextbattle.no");
 				//	fr.drawString(disp, (int) ((w * 0.5) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.90), 0xff0000, false);
 				//	disp = (team == RivalRebelsTeam.OMEGA ? RivalRebels.omegaobj.getLocalizedName() : RivalRebels.omegaobj.getLocalizedName());
 				//	fr.drawString(disp, (int) ((w * 0.5) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.94), 0xff0000, false);
 				//}
-				else if (ItemBinoculars.ready) fr.drawString(StatCollector.translateToLocal("RivalRebels.binoculars.target"), (int) ((w * 0.5) - (fr.getStringWidth(StatCollector.translateToLocal("RivalRebels.binoculars.target")) / 2f)), (int) (h * 0.85), 0xff0000, false);
+				else if (ItemBinoculars.ready) fr.drawString(I18n.format("RivalRebels.binoculars.target"), (int) ((w * 0.5) - (fr.getStringWidth(I18n.format("RivalRebels.binoculars.target")) / 2f)), (int) (h * 0.85), 0xff0000, false);
 
-				fr.drawString(StatCollector.translateToLocal("RivalRebels.message.use")+" "+StatCollector.translateToLocal("RivalRebels.sneak")+" B-83 x2", (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
+				fr.drawString(I18n.format("RivalRebels.message.use")+" "+I18n.format("RivalRebels.sneak")+" B-83 x2", (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
 				fr.drawString("Press C to select bomb type", (int) (w * 0.60), (int) (h * 0.95), 0xff0000, false);
 
 				if ((ItemBinoculars.tasks > 0 || ItemBinoculars.carpet > 0) && ItemBinoculars.dist < 10f)
 				{
 					Minecraft.getMinecraft().getTextureManager().bindTexture(ItemBinoculars.c?RivalRebels.guicarpet:RivalRebels.ittaskb83);
 
-					GL11.glBlendFunc(GL11.GL_ONE, GL11.GL_ONE_MINUS_SRC_ALPHA);
+                    GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
 					float col = 1.0f - ItemBinoculars.dist / 10f;
-					GL11.glColor4f(col, col, col, 1.0f);
-					t.startDrawingQuads();
-					t.addVertexWithUV(w * 0.72, h * 0.85 + 16, -90, 0, 1);
-					t.addVertexWithUV(w * 0.72 + 16, h * 0.85 + 16, -90, 1, 1);
-					t.addVertexWithUV(w * 0.72 + 16, h * 0.85, -90, 1, 0);
-					t.addVertexWithUV(w * 0.72, h * 0.85, -90, 0, 0);
+					GlStateManager.color(col, col, col, 1.0f);
+                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+					buffer.pos(w * 0.72, h * 0.85 + 16, -90).tex(0, 1).endVertex();
+					buffer.pos(w * 0.72 + 16, h * 0.85 + 16, -90).tex(1, 1).endVertex();
+					buffer.pos(w * 0.72 + 16, h * 0.85, -90).tex(1, 0).endVertex();
+					buffer.pos(w * 0.72, h * 0.85, -90).tex(0, 0).endVertex();
 					t.draw();
 
 					disp = "x" + ItemBinoculars.tasks;
 					fr.drawString(disp, (int) (w * 0.76), (int) (h * 0.85), ItemBinoculars.c?0xffff00:0xff0000, false);
 					disp = "x" + ItemBinoculars.carpet;
 					fr.drawString(disp, (int) (w * 0.76), (int) (h * 0.9), ItemBinoculars.c?0xff0000:0xffff00, false);
-					disp = StatCollector.translateToLocal("RivalRebels.tacticalnuke.name");
+					disp = I18n.format("RivalRebels.tacticalnuke.name");
 					if (!r) fr.drawString(disp, (int) ((w * 0.5) - (fr.getStringWidth(disp) / 2f)), (int) (h * 0.71), 0x00ff00, false);
 				}
 				else if ((ItemBinoculars.tasks > 0 || ItemBinoculars.carpet > 0) && ItemBinoculars.hasLaptop)
 				{
-					GL11.glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-					disp = RivalRebels.controller.getLocalizedName() + " " + StatCollector.translateToLocal("RivalRebels.controller.range");
+					GlStateManager.color(1.0f, 1.0f, 1.0f, 1.0f);
+					disp = RivalRebels.controller.getLocalizedName() + " " + I18n.format("RivalRebels.controller.range");
 					fr.drawString(disp, (int) (w * 0.63), (int) (h * 0.87), 0xffff00, false);
 				}
 			}

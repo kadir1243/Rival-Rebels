@@ -11,65 +11,49 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
 public class BlockBreadBox extends Block
 {
 	public BlockBreadBox()
 	{
-		super(Material.iron);
+		super(Material.IRON);
 	}
-	
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 1;
-	}
-	
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
-	{
-		blockActivated(world, x, y, z, player);
-	}
-	
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
-	{
-		if (!player.isSneaking())
-		{
-			EntityItem ei = new EntityItem(world, x + .5, y + 1, z + .5, new ItemStack(Items.bread, 1));
-			if (!world.isRemote)
-			{
-				world.spawnEntityInWorld(ei);
-				if (world.rand.nextInt(64) == 0) player.addChatMessage(new ChatComponentText("§7[§4Orders§7] §cShift-click (Sneak) to pack up toaster."));
-			}
-		}
-		else
-		{
-			world.setBlock(x, y, z, Blocks.air);
-			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(this));
-			if (!world.isRemote)
-			{
-				world.spawnEntityInWorld(ei);
-			}
-		}
-		return true;
-	}
-	
-	@SideOnly(Side.CLIENT)
+
+    @Override
+    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+        if (!player.isSneaking())
+        {
+            EntityItem ei = new EntityItem(world, x + .5, y + 1, z + .5, Items.BREAD.getDefaultInstance());
+            if (!world.isRemote)
+            {
+                world.spawnEntity(ei);
+                if (world.rand.nextInt(64) == 0) player.sendMessage(new TextComponentString("§7[§4Orders§7] §cShift-click (Sneak) to pack up toaster."));
+            }
+        }
+        else
+        {
+            world.setBlockToAir(pos);
+            EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(this));
+            if (!world.isRemote)
+            {
+                world.spawnEntity(ei);
+            }
+        }
+    }
+
+    /*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -81,7 +65,7 @@ public class BlockBreadBox extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -94,7 +78,7 @@ public class BlockBreadBox extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -105,5 +89,5 @@ public class BlockBreadBox extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:ca"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:ca"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:ca"); // SIDE E
-	}
+	}*/
 }

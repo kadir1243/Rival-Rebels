@@ -11,67 +11,39 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraftforge.client.IItemRenderer;
-
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.item.ItemStack;
 
-public class BinocularsRenderer implements IItemRenderer
-{
-	ModelFromObj	model;
-	
-	public BinocularsRenderer()
-	{
-		try
-		{
-			model = ModelFromObj.readObjFile("b.obj");
-		}
-		catch (Exception e)
-		{
-			System.err.println("Please make sure the model files are in the correct directory.");
-		}
+public class BinocularsRenderer extends TileEntityItemStackRenderer {
+	private final ModelFromObj model;
+
+	public BinocularsRenderer() {
+        model = ModelFromObj.readObjFile("b.obj");
 	}
-	
-	@Override
-	public boolean handleRenderType(ItemStack item, ItemRenderType type)
-	{
-		if (type == ItemRenderType.FIRST_PERSON_MAP || type == ItemRenderType.EQUIPPED || type == ItemRenderType.ENTITY || type == ItemRenderType.EQUIPPED_FIRST_PERSON) return true;
-		return false;
-	}
-	
-	@Override
-	public boolean shouldUseRenderHelper(ItemRenderType type, ItemStack item, ItemRendererHelper helper)
-	{
-		return false;
-	}
-	
-	@Override
-	public void renderItem(ItemRenderType type, ItemStack item, Object... data)
-	{
+
+    @Override
+    public void renderByItem(ItemStack stack) {
 		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etbinoculars);
-		GL11.glEnable(GL11.GL_LIGHTING);
-		GL11.glPushMatrix();
-		GL11.glTranslatef(0.5f, 0.5f, -0.03f);
-		GL11.glRotatef(35, 0.0F, 0.0F, 1.0F);
-		GL11.glRotatef(90, 0.0F, 1.0F, 0.0F);
-		GL11.glScalef(0.35f, 0.35f, 0.35f);
-		if (type == ItemRenderType.EQUIPPED_FIRST_PERSON && (Mouse.isButtonDown(1)))
+		GlStateManager.enableLighting();
+		GlStateManager.pushMatrix();
+		GlStateManager.translate(0.5f, 0.5f, -0.03f);
+		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
+		GlStateManager.rotate(90, 0.0F, 1.0F, 0.0F);
+		GlStateManager.scale(0.35f, 0.35f, 0.35f);
+		/*if (type == ItemRenderType.EQUIPPED_FIRST_PERSON && (Mouse.isButtonDown(1)))
 		{
-			GL11.glPopMatrix();
+			GlStateManager.popMatrix();
 			return;
-		}
-		GL11.glTranslatef(0.6f, 0.05f, 0.3f);
-		
-		if (model.name.equals("")) Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText("§43D ERROR:§f Cannot find RivalRebels.zip or RivalRebels folder inside mods folder. Please make sure the RivalRebels mod file is named RivalRebels.zip, or visit §2www.rivalrebels.com §ffor support."));
+		}*/
+		GlStateManager.translate(0.6f, 0.05f, 0.3f);
+
 		model.render();
-		
-		GL11.glPopMatrix();
+
+		GlStateManager.popMatrix();
 	}
 }
+

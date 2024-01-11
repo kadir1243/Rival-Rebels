@@ -13,53 +13,46 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityTachyonBomb;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.AdvancedModelLoader;
-import net.minecraftforge.client.model.IModelCustom;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.client.model.IModel;
+import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderTachyonBomb extends Render
-{
-    public static IModelCustom bomb;
+public class RenderTachyonBomb extends Render<EntityTachyonBomb> {
+    public static IModel bomb;
 
-	public RenderTachyonBomb()
-	{
-    	bomb = AdvancedModelLoader.loadModel(new ResourceLocation(RivalRebels.MODID, "models/t.obj"));
-	}
-
-	public void renderB83(EntityTachyonBomb b83, double x, double y, double z, float par8, float par9)
-	{
-		GL11.glDisable(GL11.GL_LIGHTING);
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) x, (float) y, (float) z);
-		GL11.glScalef(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-		GL11.glRotatef(b83.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-		//GL11.glRotatef(90.0f, 1.0F, 0.0F, 0.0F);
-		GL11.glRotatef(b83.rotationPitch, 0.0F, 0.0F, 1.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettachyonbomb);
-    	bomb.renderAll();
-		GL11.glPopMatrix();
-	}
-
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderB83((EntityTachyonBomb) par1Entity, par2, par4, par6, par8, par9);
-	}
+	public RenderTachyonBomb(RenderManager manager) {
+        super(manager);
+        try {
+            bomb = OBJLoader.INSTANCE.loadModel(new ResourceLocation(RivalRebels.MODID, "models/t.obj"));
+        } catch (Exception e) {
+            RivalRebels.LOGGER.error(e);
+        }
+    }
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	public void doRender(EntityTachyonBomb entity, double x, double y, double z, float par8, float par9)
+	{
+        GlStateManager.disableLighting();
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float) x, (float) y, (float) z);
+        GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
+        GlStateManager.rotate(entity.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
+        // GlStateManager.rotate(90.0f, 1.0F, 0.0F, 0.0F);
+        GlStateManager.rotate(entity.rotationPitch, 0.0F, 0.0F, 1.0F);
+        Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettachyonbomb);
+        //bomb.renderAll();
+        GlStateManager.popMatrix();
+    }
+
+	@Override
+	protected ResourceLocation getEntityTexture(EntityTachyonBomb entity)
 	{
 		return null;
 	}

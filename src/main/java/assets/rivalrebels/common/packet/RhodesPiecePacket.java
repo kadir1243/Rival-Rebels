@@ -11,27 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.common.entity.EntityRhodesPiece;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.entity.EntityRhodes;
-import assets.rivalrebels.common.entity.EntityRhodesPiece;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
-public class RhodesPiecePacket implements IMessage
-{
+public class RhodesPiecePacket implements IMessage {
 	int	id = 0;
 	float scale;
 	int color;
-	public RhodesPiecePacket()
-	{
-		
+	public RhodesPiecePacket() {
 	}
-	
+
 	public RhodesPiecePacket(EntityRhodesPiece piece)
 	{
 		id = piece.getEntityId();
@@ -53,19 +47,19 @@ public class RhodesPiecePacket implements IMessage
 		buf.writeFloat(scale);
 		buf.writeByte(color);
 	}
-	
+
 	public static class Handler implements IMessageHandler<RhodesPiecePacket, IMessage>
 	{
 		@Override
 		public IMessage onMessage(RhodesPiecePacket m, MessageContext ctx)
 		{
-			Entity e = Minecraft.getMinecraft().theWorld.getEntityByID(m.id);
-			if (e instanceof EntityRhodesPiece)
-			{
-				EntityRhodesPiece er = (EntityRhodesPiece) e;
-				er.color = m.color;
-				er.scale = m.scale;
-			}
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                Entity e = Minecraft.getMinecraft().world.getEntityByID(m.id);
+                if (e instanceof EntityRhodesPiece er) {
+                    er.color = m.color;
+                    er.scale = m.scale;
+                }
+            });
 			return null;
 		}
 	}

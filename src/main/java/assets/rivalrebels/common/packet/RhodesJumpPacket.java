@@ -13,12 +13,12 @@ package assets.rivalrebels.common.packet;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.Entity;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class RhodesJumpPacket implements IMessage
 {
@@ -89,33 +89,31 @@ public class RhodesJumpPacket implements IMessage
 		@Override
 		public IMessage onMessage(RhodesJumpPacket m, MessageContext ctx)
 		{
-			Entity e = MinecraftServer.getServer().worldServers[0].getEntityByID(m.id);
-			if (e instanceof EntityRhodes)
-			{
-				EntityRhodes er = (EntityRhodes) e;
-				er.stop ^= m.stop;
-				er.rocket = m.rocket;
-				er.laser = m.laser;
-				er.flame = m.fire;
-				er.forcefield = m.forcefield;
-				er.plasma ^= m.plasma;
-				er.bomb = m.nuke;
-				er.jet = m.jump;
-				er.b2spirit = m.b2spirit;
-				er.guard = m.guard;
-				if (m.guard && RivalRebels.rhodesExit)
-				{
-					if (er.rider != null)
-					{
-						er.rider.capabilities.disableDamage = false;
-						er.rider = null;
-					}
-				}
-				if (m.jump && !er.stop)
-				{
-					er.flying = 2;
-				}
-			}
+            EntityPlayerMP player = ctx.getServerHandler().player;
+            Entity e = player.world.getEntityByID(m.id);
+            player.getServer().addScheduledTask(() -> {
+                if (e instanceof EntityRhodes er) {
+                    er.stop ^= m.stop;
+                    er.rocket = m.rocket;
+                    er.laser = m.laser;
+                    er.flame = m.fire;
+                    er.forcefield = m.forcefield;
+                    er.plasma ^= m.plasma;
+                    er.bomb = m.nuke;
+                    er.jet = m.jump;
+                    er.b2spirit = m.b2spirit;
+                    er.guard = m.guard;
+                    if (m.guard && RivalRebels.rhodesExit) {
+                        if (er.rider != null) {
+                            er.rider.capabilities.disableDamage = false;
+                            er.rider = null;
+                        }
+                    }
+                    if (m.jump && !er.stop) {
+                        er.flying = 2;
+                    }
+                }
+            });
 			return null;
 		}
 	}

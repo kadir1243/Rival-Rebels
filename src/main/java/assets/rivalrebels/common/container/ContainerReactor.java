@@ -25,7 +25,7 @@ public class ContainerReactor extends Container
 	protected TileEntityReactor	entity;
 	public SlotRR				fuel;
 	public SlotRR				core;
-	
+
 	public ContainerReactor(IInventory par1iInventory, IInventory par2iInventory)
 	{
 		entity = (TileEntityReactor) par2iInventory;
@@ -35,13 +35,13 @@ public class ContainerReactor extends Container
 		addSlotToContainer(core);
 		bindPlayerInventory(par1iInventory);
 	}
-	
+
 	@Override
 	public boolean canInteractWith(EntityPlayer player)
 	{
-		return entity.isUseableByPlayer(player);
+		return entity.isUsableByPlayer(player);
 	}
-	
+
 	protected void bindPlayerInventory(IInventory inventoryPlayer)
 	{
 		for (int i = 0; i < 9; i++)
@@ -49,10 +49,10 @@ public class ContainerReactor extends Container
 			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 172));
 		}
 	}
-	
+
 	@Override
 	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
 	{
-		return null;
+		return ItemStack.EMPTY;
 	}
 }

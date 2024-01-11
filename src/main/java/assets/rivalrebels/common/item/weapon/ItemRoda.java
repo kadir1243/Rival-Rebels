@@ -11,56 +11,29 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.entity.*;
+import assets.rivalrebels.common.explosion.NuclearExplosion;
+import assets.rivalrebels.common.round.RivalRebelsPlayer;
+import assets.rivalrebels.common.round.RivalRebelsRank;
 import net.minecraft.block.Block;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityFallingBlock;
 import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityIronGolem;
-import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.entity.monster.EntitySnowman;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.*;
 import net.minecraft.entity.passive.EntityChicken;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.EnumActionResult;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.entity.EntityAntimatterBomb;
-import assets.rivalrebels.common.entity.EntityB83;
-import assets.rivalrebels.common.entity.EntityBomb;
-import assets.rivalrebels.common.entity.EntityCuchillo;
-import assets.rivalrebels.common.entity.EntityDebris;
-import assets.rivalrebels.common.entity.EntityFlameBall;
-import assets.rivalrebels.common.entity.EntityFlameBall1;
-import assets.rivalrebels.common.entity.EntityFlameBall2;
-import assets.rivalrebels.common.entity.EntityGasGrenade;
-import assets.rivalrebels.common.entity.EntityGore;
-import assets.rivalrebels.common.entity.EntityHackB83;
-import assets.rivalrebels.common.entity.EntityHotPotato;
-import assets.rivalrebels.common.entity.EntityLaserBurst;
-import assets.rivalrebels.common.entity.EntityNuclearBlast;
-import assets.rivalrebels.common.entity.EntityNuke;
-import assets.rivalrebels.common.entity.EntityPlasmoid;
-import assets.rivalrebels.common.entity.EntityRaytrace;
-import assets.rivalrebels.common.entity.EntityRocket;
-import assets.rivalrebels.common.entity.EntityRoddiskRebel;
-import assets.rivalrebels.common.entity.EntitySeekB83;
-import assets.rivalrebels.common.entity.EntityTachyonBomb;
-import assets.rivalrebels.common.entity.EntityTheoreticalTsar;
-import assets.rivalrebels.common.entity.EntityTsar;
-import assets.rivalrebels.common.explosion.NuclearExplosion;
-import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import assets.rivalrebels.common.round.RivalRebelsRank;
+
+import java.util.Random;
 
 public class ItemRoda extends Item
 {
@@ -100,7 +73,7 @@ public class ItemRoda extends Item
 			"tachyon"
 		};
 	static float[] randoms = new float[]{
-			0.1f,			
+			0.1f,
 			0.1f,
 			0.1f,
 			0.0f,
@@ -207,10 +180,10 @@ public class ItemRoda extends Item
 			1
 		};
 	public static int rodaindex = 23;
-	
+
 	public static void spawn(int index, World world, double x, double y, double z, double mx, double my, double mz, double speed, double random)
 	{
-		if (entities[index] == "roda")
+		if ("roda".equals(entities[index]))
 		{
 			int newindex = world.rand.nextInt(index);
 			spawn(newindex, world, x,y,z,mx,my,mz,speed,random);
@@ -311,7 +284,7 @@ public class ItemRoda extends Item
 			e.motionX = mx;
 			e.motionY = my;
 			e.motionZ = mz;
-			((EntityTNTPrimed)e).fuse = 80;
+			((EntityTNTPrimed) e).setFuse(80);
 		break;
 		case 18:
 			e = new EntityIronGolem(world);
@@ -326,13 +299,13 @@ public class ItemRoda extends Item
 			zomb.motionX = mx;
 			zomb.motionY = my;
 			zomb.motionZ = mz;
-			world.spawnEntityInWorld(zomb);
+			world.spawnEntity(zomb);
 			e = new EntityChicken(world);
 			e.setPosition(x,y,z);
 			e.motionX = mx;
 			e.motionY = my;
 			e.motionZ = mz;
-			zomb.mountEntity(e);
+			zomb.startRiding(e);
 		break;
 		case 20:
 			Block[] blocks1 = NuclearExplosion.prblocks;
@@ -345,7 +318,7 @@ public class ItemRoda extends Item
 			e = new EntityDebris(world,x,y,z,mx,my,mz,b2);
 		break;
 		case 22:
-			Block[] blocks3 = new Block[]{Blocks.sand,Blocks.gravel,Blocks.cobblestone,Blocks.dirt};
+			Block[] blocks3 = new Block[]{Blocks.SAND,Blocks.GRAVEL,Blocks.COBBLESTONE,Blocks.DIRT};
 			Block b3 = blocks3[world.rand.nextInt(blocks3.length)];
 			e = new EntityDebris(world,x,y,z,mx,my,mz,b3);
 		break;
@@ -382,77 +355,78 @@ public class ItemRoda extends Item
 		if (world.isRemote) return;
 		if (e != null)
 		{
-			world.spawnEntityInWorld(e);
+			world.spawnEntity(e);
 		}
 	}
-	
-	
-	
+
+
+
 	boolean pass = false;
 	public ItemRoda()
 	{
 		super();
-		maxStackSize = 1;
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
-	
-	@Override
-	public ItemStack onItemRightClick(ItemStack item, World world, EntityPlayer player)
-	{
-		if (!pass)
+
+    @Override
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
+        ItemStack stack = player.getHeldItem(hand);
+
+        if (!pass)
 		{
-			player.addChatMessage(new ChatComponentText("Password?"));
+			player.sendMessage(new TextComponentString("Password?"));
 			pass = true;
 		}
-		player.swingItem();
-		//if (world.isRemote) return item;
-		RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForName(player.getCommandSenderName());
-		if ((MinecraftServer.getServer() != null && MinecraftServer.getServer().isSinglePlayer())
+		player.swingArm(hand);
+		//if (world.isRemote) return stack;
+		RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
+		if ((!world.isRemote && world.getMinecraftServer().isSinglePlayer())
 		 || (rrp != null && (rrp.rrrank == RivalRebelsRank.LEADER || rrp.rrrank == RivalRebelsRank.OFFICER || rrp.rrrank == RivalRebelsRank.REP)))
 		{
-			//if (world.isRemote) return item;
-			player.setItemInUse(item, 256);
-			item.stackTagCompound.setInteger("happynewyear",item.stackTagCompound.getInteger("happynewyear")+10);
-			if (item.stackTagCompound.getInteger("happynewyear") > 1400 && !world.isRemote) //EXPLODE
+			//if (world.isRemote) return stack;
+			player.setActiveHand(hand);
+			stack.getTagCompound().setInteger("happynewyear",stack.getTagCompound().getInteger("happynewyear")+10);
+			if (stack.getTagCompound().getInteger("happynewyear") > 1400 && !world.isRemote) //EXPLODE
 			{
-				world.spawnEntityInWorld(new EntityNuclearBlast(world, player.posX, player.posY, player.posZ, 6, true));
-				player.inventory.mainInventory[player.inventory.currentItem] = null;
-				return item;
+				world.spawnEntity(new EntityNuclearBlast(world, player.posX, player.posY, player.posZ, 6, true));
+				player.setHeldItem(hand, ItemStack.EMPTY);
+				return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
 			}
 			double motionX = (-MathHelper.sin(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI));
 			double motionZ = (MathHelper.cos(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI));
 			double motionY = (-MathHelper.sin(player.rotationPitch / 180.0F * (float) Math.PI));
 			spawn(rodaindex, world, player.posX,player.posY + 3.0,player.posZ,motionX,motionY,motionZ, 1.0,0.0);
 		}
-		return item;
+		return ActionResult.newResult(EnumActionResult.PASS, stack);
 	}
-	
+
 	@Override
 	public void onUpdate(ItemStack item, World world, Entity entity, int par4, boolean par5)
 	{
 		if (world.isRemote) return;
-		if (item.getTagCompound() == null) item.stackTagCompound = new NBTTagCompound();
-		if (item.stackTagCompound.getInteger("happynewyear")>0)item.stackTagCompound.setInteger("happynewyear",item.stackTagCompound.getInteger("happynewyear")-1);
+		if (!item.hasTagCompound()) item.setTagCompound(new NBTTagCompound());
+		if (item.getTagCompound().getInteger("happynewyear")>0)item.getTagCompound().setInteger("happynewyear",item.getTagCompound().getInteger("happynewyear")-1);
 	}
-	
+
 	@Override
 	public boolean onLeftClickEntity(ItemStack stack, EntityPlayer player, Entity entity)
 	{
-		if (player.worldObj.isRemote) return true;
-		Random r = player.worldObj.rand;
+		if (player.world.isRemote) return true;
+		Random r = player.world.rand;
 		double x = entity.posX - player.posX;
 		double y = entity.posY - player.posY;
 		double z = entity.posZ - player.posZ;
-		
+
 		double dist = Math.sqrt(x * x + y * y + z * z);
-		
+
 		switch (r.nextInt(4))
 		{
 			case 0:
 				x /= -dist;
 				y /= -dist;
 				z /= -dist;
-				
+
 				entity.motionX = x * 3 + (r.nextFloat() - 0.5f) * 0.1;
 				entity.motionY = y * 3 + (r.nextFloat() - 0.5f) * 0.1;
 				entity.motionZ = z * 3 + (r.nextFloat() - 0.5f) * 0.1;
@@ -461,7 +435,7 @@ public class ItemRoda extends Item
 				x /= dist;
 				y /= dist;
 				z /= dist;
-				
+
 				entity.motionX = x * 2 + (r.nextFloat() - 0.5f) * 0.1;
 				entity.motionY = y * 2 + (r.nextFloat() - 0.5f) * 0.1;
 				entity.motionZ = z * 2 + (r.nextFloat() - 0.5f) * 0.1;
@@ -469,13 +443,13 @@ public class ItemRoda extends Item
 		}
 		return true;
 	}
-	
-	@Override
+
+	/*@Override
 	public void registerIcons(IIconRegister iconregister)
 	{
 		itemIcon = iconregister.registerIcon("RivalRebels:be");
-	}
-	
+	}*/
+
 	@Override
 	public boolean isFull3D()
 	{

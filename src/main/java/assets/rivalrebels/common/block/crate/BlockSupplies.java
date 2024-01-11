@@ -11,92 +11,88 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import java.util.Random;
-
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.init.Items;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.StatCollector;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockSupplies extends Block
 {
 	public BlockSupplies()
 	{
-		super(Material.wood);
+		super(Material.WOOD);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random par1Random)
 	{
 		return 0;
 	}
-	
-	@Override
-	public void onBlockClicked(World world, int x, int y, int z, EntityPlayer player)
-	{
-		blockActivated(world, x, y, z, player);
-	}
-	
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
+
+    @Override
+    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
+        blockActivated(worldIn, pos.getX(), pos.getY(), pos.getZ(), playerIn);
+    }
+
+    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
 	{
 		if (world.isRemote)
 		{
-			player.addChatMessage(new ChatComponentText(StatCollector.translateToLocal("RivalRebels.Inventory")));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.armyshovel.getUnlocalizedName() + ".name") + ". §9(" + "Ideal for special blocks." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.jump.getUnlocalizedName() + ".name") + ". §9(" + "Use at your own risk." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.quicksand.getUnlocalizedName() + ".name") + ". §9(" + "Sand that is quick" + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.mario.getUnlocalizedName() + ".name") + ". §9(" + "For trap making." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.loader.getUnlocalizedName() + ".name") + ". §9(" + "Modular item container." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.steel.getUnlocalizedName() + ".name") + ". §9(" + "Climbable and blast resistant." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.expill.getUnlocalizedName() + ".name") + ". §9(" + "Take at your own risk." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.safepill.getUnlocalizedName() + ".name") + ". §9(" + "Restores health." + ")"));
-			player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.breadbox.getUnlocalizedName() + ".name") + ". §9(" + "Unlimited toast! You don't say..." + ")"));
+			player.sendMessage(new TextComponentTranslation("RivalRebels.Inventory"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.armyshovel.getTranslationKey() + ".name") + ". §9(" + "Ideal for special blocks." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.jump.getTranslationKey() + ".name") + ". §9(" + "Use at your own risk." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.quicksand.getTranslationKey() + ".name") + ". §9(" + "Sand that is quick" + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.mario.getTranslationKey() + ".name") + ". §9(" + "For trap making." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.loader.getTranslationKey() + ".name") + ". §9(" + "Modular item container." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.steel.getTranslationKey() + ".name") + ". §9(" + "Climbable and blast resistant." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.expill.getTranslationKey() + ".name") + ". §9(" + "Take at your own risk." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.safepill.getTranslationKey() + ".name") + ". §9(" + "Restores health." + ")"));
+			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.breadbox.getTranslationKey() + ".name") + ". §9(" + "Unlimited toast! You don't say..." + ")"));
 		}
 		if (!world.isRemote)
 		{
-			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.breadbox, 1));
+			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.breadbox));
 			EntityItem ei1 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.armyshovel));
 			EntityItem ei2 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.jump, 4));
 			EntityItem ei3 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.quicksandtrap, 4));
 			EntityItem ei4 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.steel, 32));
 			EntityItem ei5 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.loader, 2));
-			EntityItem ei6 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(Items.bucket, 2));
+			EntityItem ei6 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(Items.BUCKET, 2));
 			EntityItem ei7 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.mariotrap, 4));
 			EntityItem ei8 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.expill, 6));
 			EntityItem ei9 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.safepill, 3));
-			world.spawnEntityInWorld(ei);
-			world.spawnEntityInWorld(ei1);
-			world.spawnEntityInWorld(ei2);
-			world.spawnEntityInWorld(ei3);
-			world.spawnEntityInWorld(ei4);
-			world.spawnEntityInWorld(ei5);
-			world.spawnEntityInWorld(ei6);
-			world.spawnEntityInWorld(ei7);
-			world.spawnEntityInWorld(ei8);
-			world.spawnEntityInWorld(ei9);
-			world.setBlock(x, y, z, Blocks.air);
+			world.spawnEntity(ei);
+			world.spawnEntity(ei1);
+			world.spawnEntity(ei2);
+			world.spawnEntity(ei3);
+			world.spawnEntity(ei4);
+			world.spawnEntity(ei5);
+			world.spawnEntity(ei6);
+			world.spawnEntity(ei7);
+			world.spawnEntity(ei8);
+			world.spawnEntity(ei9);
+			world.setBlockToAir(new BlockPos(x, y, z));
 			if (world.rand.nextInt(5) == 0)
 			{
-				world.spawnEntityInWorld(new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.nuclearelement, 1)));
-				player.addChatMessage(new ChatComponentText("§a" + StatCollector.translateToLocal(RivalRebels.nuclearelement.getUnlocalizedName() + ".name") + ". §9" + "(Used in nuclear weapons)"));
+				world.spawnEntity(new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.nuclearelement, 1)));
+				player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.nuclearelement.getTranslationKey() + ".name") + ". §9" + "(Used in nuclear weapons)"));
 			}
 			return true;
 		}
 		return true;
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -108,7 +104,7 @@ public class BlockSupplies extends Block
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -121,7 +117,7 @@ public class BlockSupplies extends Block
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -132,5 +128,5 @@ public class BlockSupplies extends Block
 		icon4 = iconregister.registerIcon("RivalRebels:bz"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:bz"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:bz"); // SIDE E
-	}
+	}*/
 }

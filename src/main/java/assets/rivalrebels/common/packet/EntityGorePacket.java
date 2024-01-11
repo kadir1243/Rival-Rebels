@@ -11,17 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.common.entity.EntityGore;
 import io.netty.buffer.ByteBuf;
-
-import java.util.Iterator;
-
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.Entity;
-import assets.rivalrebels.common.core.FileRW;
-import assets.rivalrebels.common.entity.EntityGore;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class EntityGorePacket implements IMessage
 {
@@ -31,11 +28,11 @@ public class EntityGorePacket implements IMessage
 	boolean	green		= false;
 	String	username	= "Steve";
 	float	size		= -1;
-	
+
 	public EntityGorePacket()
 	{
 	}
-	
+
 	public EntityGorePacket(EntityGore eg)
 	{
 		mob = (byte) eg.mob;
@@ -45,7 +42,7 @@ public class EntityGorePacket implements IMessage
 		username = eg.username;
 		size = (float) eg.size;
 	}
-	
+
 	@Override
 	public void fromBytes(ByteBuf buf)
 	{
@@ -55,13 +52,11 @@ public class EntityGorePacket implements IMessage
 		green = buf.readBoolean();
 		if (mob == 0)
 		{
-			byte[] b = new byte[buf.readByte()];
-			buf.readBytes(b);
-			username = FileRW.getStringBytes(b);
+            username = ByteBufUtils.readUTF8String(buf);
 		}
 		if (mob == 11) size = buf.readFloat();
 	}
-	
+
 	@Override
 	public void toBytes(ByteBuf buf)
 	{
@@ -71,33 +66,27 @@ public class EntityGorePacket implements IMessage
 		buf.writeBoolean(green);
 		if (mob == 0)
 		{
-			buf.writeByte(username.length());
-			buf.writeBytes(FileRW.getBytesString(username));
+            ByteBufUtils.writeUTF8String(buf, username);
 		}
 		if (mob == 11) buf.writeFloat(size);
 	}
-	
+
 	public static class Handler implements IMessageHandler<EntityGorePacket, IMessage>
 	{
 		@Override
 		public IMessage onMessage(EntityGorePacket m, MessageContext ctx)
 		{
-			Iterator iter = Minecraft.getMinecraft().theWorld.loadedEntityList.iterator();
-			while (iter.hasNext())
-			{
-				Entity e = (Entity) iter.next();
-				if (e.getEntityId() == m.id && e instanceof EntityGore)
-				{
-					EntityGore eg = (EntityGore) e;
-					eg.mob = m.mob;
-					eg.type = m.type;
-					eg.greenblood = m.green;
-					
-					if (m.mob == 0) eg.username = m.username;
-					if (m.mob == 11) eg.size = m.size;
-					break;
-				}
-			}
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                Entity entity = Minecraft.getMinecraft().world.getEntityByID(m.id);
+                if (entity instanceof EntityGore eg) {
+                    eg.mob = m.mob;
+                    eg.type = m.type;
+                    eg.greenblood = m.green;
+                    if (m.mob == 0) eg.username = m.username;
+                    if (m.mob == 11) eg.size = m.size;
+                }
+            });
+
 			return null;
 		}
 	}

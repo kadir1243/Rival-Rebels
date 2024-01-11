@@ -11,19 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
-import static org.lwjgl.opengl.GL11.GL_TEXTURE_2D;
-import static org.lwjgl.opengl.GL11.glDisable;
-import static org.lwjgl.opengl.GL11.glEnable;
+import assets.rivalrebels.RivalRebels;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
-import assets.rivalrebels.RivalRebels;
-
+@SideOnly(Side.CLIENT)
 public class ModelFromObj
 {
 	Triangle[]		pa;
@@ -34,53 +36,37 @@ public class ModelFromObj
 		pa = PA;
 	}
 
-	public static ModelFromObj readObjFile(String path) throws Exception
-	{
-		String text = "";
-		File file = new File("mods");
-		String[] files = file.list();
-		text = readZippedFile("/assets/rivalrebels/models/" + path);
+	public static ModelFromObj readObjFile(String path) {
+        String text = readZippedFile("/assets/rivalrebels/models/" + path);
 		String[] lines = text.split("\n");
 		String name = "";
-		ArrayList<Triangle> tri = new ArrayList<>();
-		ArrayList<Vec3> v = new ArrayList<>();
-		ArrayList<Vec3> nv = new ArrayList<>();
-		ArrayList<Vec2> tv = new ArrayList<>();
-		for (int i = 0; i < lines.length; i++)
-		{
-			String line = lines[i];
-			if (line.startsWith("vt"))
-			{
-				String[] tex = line.split(" ");
-				tv.add(new Vec2(Float.parseFloat(tex[1]), 1f - Float.parseFloat(tex[2])));
-			}
-			else if (line.startsWith("vn"))
-			{
-				String[] norm = line.split(" ");
-				nv.add(new Vec3(Float.parseFloat(norm[1]), Float.parseFloat(norm[2]), Float.parseFloat(norm[3])));
-			}
-			else if (line.startsWith("v"))
-			{
-				String[] vert = line.split(" ");
-				v.add(new Vec3(Float.parseFloat(vert[1]), Float.parseFloat(vert[2]), Float.parseFloat(vert[3])));
-			}
-			else if (line.startsWith("f"))
-			{
-				String[] coords = lines[i].split(" ");
-				Vertice[] vs = new Vertice[coords.length - 1];
-				for (int j = 1; j < coords.length; j++)
-				{
-					String[] v1 = coords[j].split("/");
-					vs[j - 1] = new Vertice(v.get(Integer.parseInt(v1[0]) - 1).clone(), nv.get(Integer.parseInt(v1[2]) - 1).clone(), tv.get(Integer.parseInt(v1[1]) - 1).clone());
-				}
-				tri.add(new Triangle(vs));
-			}
-			else if (line.startsWith("o"))
-			{
-				String[] l = line.split(" ");
-				name = l[1];
-			}
-		}
+		List<Triangle> tri = new ArrayList<>();
+		List<Vec3d> v = new ArrayList<>();
+		List<Vec3d> nv = new ArrayList<>();
+		List<Vec2f> tv = new ArrayList<>();
+        for (String line : lines) {
+            if (line.startsWith("vt")) {
+                String[] tex = line.split(" ");
+                tv.add(new Vec2f(Float.parseFloat(tex[1]), 1f - Float.parseFloat(tex[2])));
+            } else if (line.startsWith("vn")) {
+                String[] norm = line.split(" ");
+                nv.add(new Vec3d(Float.parseFloat(norm[1]), Float.parseFloat(norm[2]), Float.parseFloat(norm[3])));
+            } else if (line.startsWith("v")) {
+                String[] vert = line.split(" ");
+                v.add(new Vec3d(Float.parseFloat(vert[1]), Float.parseFloat(vert[2]), Float.parseFloat(vert[3])));
+            } else if (line.startsWith("f")) {
+                String[] coords = line.split(" ");
+                Vertice[] vs = new Vertice[coords.length - 1];
+                for (int j = 1; j < coords.length; j++) {
+                    String[] v1 = coords[j].split("/");
+                    vs[j - 1] = new Vertice(v.get(Integer.parseInt(v1[0]) - 1), nv.get(Integer.parseInt(v1[2]) - 1), tv.get(Integer.parseInt(v1[1]) - 1));
+                }
+                tri.add(new Triangle(vs));
+            } else if (line.startsWith("o")) {
+                String[] l = line.split(" ");
+                name = l[1];
+            }
+        }
 
 		Triangle[] polygon = new Triangle[tri.size()];
 
@@ -95,56 +81,37 @@ public class ModelFromObj
 
 	public void renderWireframe()
 	{
-		glDisable(GL_TEXTURE_2D);
+		GlStateManager.disableTexture2D();
 
-		for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].renderWireframe();
-		}
+        for (Triangle triangle : pa) {
+            triangle.renderWireframe();
+        }
 
-		glEnable(GL_TEXTURE_2D);
+		GlStateManager.enableTexture2D();
 	}
 
 	public void normalize()
 	{
-		for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].normalize();
-		}
+        for (Triangle triangle : pa) {
+            triangle.normalize();
+        }
 	}
 
 	public void scale(float x, float y, float z)
 	{
-		for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].scale(new Vec3(x, y, z));
-		}
+        for (Triangle triangle : pa) {
+            triangle.scale(new Vec3d(x, y, z));
+        }
 	}
 
-	public void render()
-	{
-		/*
-		 * if (!render) { Minecraft.getMinecraft().thePlayer.sendChatMessage("3D ERROR: Please close Minecraft, empty the config folder and remove all other mods, then re-open Minecraft.");
-		 * Minecraft.getMinecraft().thePlayer.sendChatMessage("If you still get this message contact rodol. http://www.rivalrebels.com"); } else
-		 */for (int i = 0; i < pa.length; i++)
-		{
-			pa[i].render();
-		}
+	public void render() {
+        for (Triangle triangle : pa) {
+            triangle.render();
+        }
 	}
 
-	public void refine()
-	{
-		ArrayList<Triangle> lp = new ArrayList<>();
-		for (int i = 0; i < pa.length; i++)
-		{
-			Triangle[] p = pa[i].refine();
-            lp.addAll(Arrays.asList(p));
-		}
-		pa = new Triangle[lp.size()];
-		for (int i = 0; i < lp.size(); i++)
-		{
-			pa[i] = lp.get(i);
-		}
+	public void refine() {
+        pa = Arrays.stream(pa).map(Triangle::refine).flatMap(Arrays::stream).toArray(Triangle[]::new);
 	}
 
 

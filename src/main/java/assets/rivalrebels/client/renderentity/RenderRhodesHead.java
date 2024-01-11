@@ -12,48 +12,38 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesHead;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.renderer.entity.RenderManager;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @SideOnly(Side.CLIENT)
-public class RenderRhodesHead extends Render
+public class RenderRhodesHead extends Render<EntityRhodesHead>
 {
-	public RenderRhodesHead()
-	{
-	}
+    public RenderRhodesHead(RenderManager renderManager) {
+        super(renderManager);
+    }
 
-	public void renderRhodes(EntityRhodesHead rhodes, double x, double y, double z, float par8, float ptt)
+    @Override
+	public void doRender(EntityRhodesHead par1Entity, double par2, double par4, double par6, float par8, float par9)
 	{
-		GL11.glPushMatrix();
-		GL11.glTranslatef((float) x, (float) y, (float) z);
-		GL11.glScalef(rhodes.scale, rhodes.scale, rhodes.scale);
-		GL11.glColor3f(RenderRhodes.colors[rhodes.color*3], RenderRhodes.colors[rhodes.color*3+1], RenderRhodes.colors[rhodes.color*3+2]);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RenderRhodes.texture);
-		GL11.glDisable(GL11.GL_CULL_FACE);
-		GL11.glRotatef(rhodes.rotationYaw, 0, 1, 0);
-		GL11.glRotatef(rhodes.rotationPitch, 1, 0, 0);
-		RenderRhodes.head.renderAll();
-		GL11.glPopMatrix();
-	}
-
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderRhodes((EntityRhodesHead) par1Entity, par2, par4, par6, par8, par9);
-	}
+        GlStateManager.pushMatrix();
+        GlStateManager.translate((float) par2, (float) par4, (float) par6);
+        GlStateManager.scale(par1Entity.scale, par1Entity.scale, par1Entity.scale);
+        GlStateManager.color(RenderRhodes.colors[par1Entity.color*3], RenderRhodes.colors[par1Entity.color*3+1], RenderRhodes.colors[par1Entity.color*3+2]);
+        Minecraft.getMinecraft().renderEngine.bindTexture(RenderRhodes.texture);
+        GlStateManager.disableCull();
+        GlStateManager.rotate(par1Entity.rotationYaw, 0, 1, 0);
+        GlStateManager.rotate(par1Entity.rotationPitch, 1, 0, 0);
+        //RenderRhodes.head.renderAll();
+        GlStateManager.popMatrix();
+    }
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+	protected ResourceLocation getEntityTexture(EntityRhodesHead entity)
 	{
 		return null;
 	}

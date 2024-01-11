@@ -11,32 +11,33 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.effect.EntityWeatherEffect;
+import net.minecraft.init.SoundEvents;
 import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.world.World;
+
+import java.util.List;
 
 public class EntityLightningBolt2 extends EntityWeatherEffect
 {
 	/**
-	 * Declares which state the lightning bolt is in. Whether it's in the air, hit the ground, etc.
+	 * Declares which state the lightning bolt is in. Whether it's in the AIR, hit the GROUND, etc.
 	 */
 	private int	lightningState;
-	
+
 	/**
 	 * A random long that is used to change the vertex of the lightning rendered in RenderLightningBolt
 	 */
-	public long	boltVertex	= 0L;
-	
+	public long	boltVertex;
+
 	/**
 	 * Determines the time before the EntityLightningBolt2 is destroyed. It is a random integer decremented over time.
 	 */
 	private int	boltLivingTime;
-	
+
 	public EntityLightningBolt2(World par1World, double par2, double par4, double par6)
 	{
 		super(par1World);
@@ -45,7 +46,7 @@ public class EntityLightningBolt2 extends EntityWeatherEffect
 		this.boltVertex = this.rand.nextLong();
 		this.boltLivingTime = this.rand.nextInt(3) + 1;
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -53,15 +54,15 @@ public class EntityLightningBolt2 extends EntityWeatherEffect
 	public void onUpdate()
 	{
 		super.onUpdate();
-		
+
 		if (this.lightningState == 2)
 		{
-			this.worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "ambient.weather.thunder", 10000.0F, 0.8F + this.rand.nextFloat() * 0.2F);
-			this.worldObj.playSoundEffect(this.posX, this.posY, this.posZ, "random.explode", 2.0F, 0.5F + this.rand.nextFloat() * 0.2F);
+			this.world.playSound(this.posX, this.posY, this.posZ, SoundEvents.ENTITY_LIGHTNING_THUNDER, SoundCategory.WEATHER, 10000.0F, 0.8F + this.rand.nextFloat() * 0.2F, true);
+			this.world.playSound(this.posX, this.posY, this.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.WEATHER, 2.0F, 0.5F + this.rand.nextFloat() * 0.2F, true);
 		}
-		
+
 		--this.lightningState;
-		
+
 		if (this.lightningState < 0)
 		{
 			if (this.boltLivingTime == 0)
@@ -75,27 +76,25 @@ public class EntityLightningBolt2 extends EntityWeatherEffect
 				this.boltVertex = this.rand.nextLong();
 			}
 		}
-		
+
 		if (this.lightningState >= 0)
 		{
 			double var6 = 3.0D;
-			List var7 = this.worldObj.getEntitiesWithinAABBExcludingEntity(this, AxisAlignedBB.getBoundingBox(this.posX - var6, this.posY - var6, this.posZ - var6, this.posX + var6, this.posY + 6.0D + var6, this.posZ + var6));
-			Iterator var4 = var7.iterator();
-			
-			while (var4.hasNext())
-			{
-				Entity var5 = (Entity) var4.next();
-			}
-			
-			this.worldObj.lastLightningBolt = 2;
+			List<Entity> var7 = this.world.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(this.posX - var6, this.posY - var6, this.posZ - var6, this.posX + var6, this.posY + 6.0D + var6, this.posZ + var6));
+
+            for (Entity var5 : var7) {
+
+            }
+
+			this.world.setLastLightningBolt(2);
 		}
 	}
-	
+
 	@Override
 	protected void entityInit()
 	{
 	}
-	
+
 	/**
 	 * (abstract) Protected helper method to read subclass entity data from NBT.
 	 */
@@ -103,7 +102,7 @@ public class EntityLightningBolt2 extends EntityWeatherEffect
 	protected void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
 	}
-	
+
 	/**
 	 * (abstract) Protected helper method to write subclass entity data to NBT.
 	 */

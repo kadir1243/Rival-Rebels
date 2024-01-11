@@ -16,12 +16,12 @@ import assets.rivalrebels.RivalRebels;
 
 public class ItemCore extends Item
 {
-	public float	timemult	= 0;
-	
+	public float timemult = 0;
+
 	public ItemCore()
 	{
 		super();
-		maxStackSize = 1;
+		setMaxStackSize(1);
 		setCreativeTab(RivalRebels.rralltab);
 	}
 }

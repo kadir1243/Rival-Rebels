@@ -11,18 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels;
 
-import assets.rivalrebels.client.blockrenderer.SteelBlockRenderer;
 import assets.rivalrebels.client.gui.*;
 import assets.rivalrebels.client.renderentity.*;
 import assets.rivalrebels.client.tileentityrender.*;
 import assets.rivalrebels.common.entity.*;
 import assets.rivalrebels.common.tileentity.*;
-import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.client.registry.RenderingRegistry;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.World;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
+import net.minecraftforge.fml.client.registry.RenderingRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.lwjgl.input.Keyboard;
 
 public class ClientProxy extends CommonProxy
@@ -48,70 +47,64 @@ public class ClientProxy extends CommonProxy
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTheoreticalTsarBomba.class, new TileEntityTheoreticalTsarBombaRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityAntimatterBomb.class, new TileEntityAntimatterBombRenderer());
 		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTachyonBomb.class, new TileEntityTachyonBombRenderer());
-		RenderingRegistry.registerEntityRenderingHandler(EntityGasGrenade.class, new RenderGasGrenade());
-		RenderingRegistry.registerEntityRenderingHandler(EntityPropulsionFX.class, new RenderBullet("fire"));
-		RenderingRegistry.registerEntityRenderingHandler(EntityPassiveFire.class, new RenderBullet("fire"));
-		RenderingRegistry.registerEntityRenderingHandler(EntityCuchillo.class, new RenderCuchillo());
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall.class, new RenderFlame());
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall1.class, new RenderFlameRedBlue());
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall2.class, new RenderFlameBlue());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRocket.class, new RenderRocket());
-		RenderingRegistry.registerEntityRenderingHandler(EntityPlasmoid.class, new RenderPlasmoid());
-		RenderingRegistry.registerEntityRenderingHandler(EntityLightningLink.class, new RenderLightningLink());
-		RenderingRegistry.registerEntityRenderingHandler(EntityNuclearBlast.class, new RenderNuclearBlast());
-		RenderingRegistry.registerEntityRenderingHandler(EntityLightningBolt2.class, new RenderLightningBolt2());
-		RenderingRegistry.registerEntityRenderingHandler(EntityLaptop.class, new RenderLaptop());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskRegular.class, new RenderRoddiskRegular());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskRebel.class, new RenderRoddiskRebel());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskOfficer.class, new RenderRoddiskOfficer());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskLeader.class, new RenderRoddiskLeader());
-		RenderingRegistry.registerEntityRenderingHandler(EntityTsarBlast.class, new RenderTsarBlast());
-		RenderingRegistry.registerEntityRenderingHandler(EntityLaserLink.class, new RenderLaserLink());
-		RenderingRegistry.registerEntityRenderingHandler(EntityGore.class, new RenderGore());
-		RenderingRegistry.registerEntityRenderingHandler(EntityBlood.class, new RenderBlood());
-		RenderingRegistry.registerEntityRenderingHandler(EntityGoo.class, new RenderGoo());
-		RenderingRegistry.registerEntityRenderingHandler(EntityLaserBurst.class, new RenderLaserBurst());
-		RenderingRegistry.registerEntityRenderingHandler(EntityB83.class, new RenderB83());
-		RenderingRegistry.registerEntityRenderingHandler(EntityB2Spirit.class, new RenderB2Spirit());
-		RenderingRegistry.registerEntityRenderingHandler(EntityB2Frag.class, new RenderB2Frag());
-		RenderingRegistry.registerEntityRenderingHandler(EntityDebris.class, new RenderDebris());
-		RenderingRegistry.registerEntityRenderingHandler(EntityHackB83.class, new RenderHackB83());
-		RenderingRegistry.registerEntityRenderingHandler(EntitySeekB83.class, new RenderSeeker());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodes.class, new RenderRhodes());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesHead.class, new RenderRhodesHead());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesTorso.class, new RenderRhodesTorso());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperArm.class, new RenderRhodesLeftUpperArm());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperArm.class, new RenderRhodesRightUpperArm());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerArm.class, new RenderRhodesLeftLowerArm());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerArm.class, new RenderRhodesRightLowerArm());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperLeg.class, new RenderRhodesLeftUpperLeg());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperLeg.class, new RenderRhodesRightUpperLeg());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerLeg.class, new RenderRhodesLeftLowerLeg());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerLeg.class, new RenderRhodesRightLowerLeg());
-		RenderingRegistry.registerEntityRenderingHandler(EntityB83NoShroom.class, new RenderB83());
-		RenderingRegistry.registerEntityRenderingHandler(EntitySphereBlast.class, new RenderSphereBlast());
-		RenderingRegistry.registerEntityRenderingHandler(EntityNuke.class, new RenderNuke());
-		RenderingRegistry.registerEntityRenderingHandler(EntityTsar.class, new RenderTsar());
-		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskRep.class, new RenderRoddiskRep());
-		RenderingRegistry.registerEntityRenderingHandler(EntityHotPotato.class, new RenderHotPotato());
-		RenderingRegistry.registerEntityRenderingHandler(EntityBomb.class, new RenderBomb());
-		RenderingRegistry.registerEntityRenderingHandler(EntityTheoreticalTsar.class, new RenderTheoreticalTsar());
-		RenderingRegistry.registerEntityRenderingHandler(EntityTheoreticalTsarBlast.class, new RenderTheoreticalTsarBlast());
-		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBallGreen.class, new RenderFlameBallGreen());
-		RenderingRegistry.registerEntityRenderingHandler(EntityAntimatterBomb.class, new RenderAntimatterBomb());
-		RenderingRegistry.registerEntityRenderingHandler(EntityAntimatterBombBlast.class, new RenderAntimatterBombBlast());
-		RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBomb.class, new RenderTachyonBomb());
-		RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBombBlast.class, new RenderTachyonBombBlast());
-		RenderingRegistry.registerBlockHandler(new SteelBlockRenderer());
+		RenderingRegistry.registerEntityRenderingHandler(EntityGasGrenade.class, RenderGasGrenade::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityPropulsionFX.class, manager -> new RenderBullet(manager, "fire"));
+		RenderingRegistry.registerEntityRenderingHandler(EntityPassiveFire.class, manager -> new RenderBullet(manager, "fire"));
+		RenderingRegistry.registerEntityRenderingHandler(EntityCuchillo.class, RenderCuchillo::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall.class, RenderFlame::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall1.class, RenderFlameRedBlue::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBall2.class, RenderFlameBlue::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRocket.class, RenderRocket::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityPlasmoid.class, RenderPlasmoid::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityLightningLink.class, RenderLightningLink::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityNuclearBlast.class, RenderNuclearBlast::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityLightningBolt2.class, RenderLightningBolt2::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityLaptop.class, RenderLaptop::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskRegular.class, RenderRoddiskRegular::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskRebel.class, RenderRoddiskRebel::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskOfficer.class, RenderRoddiskOfficer::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskLeader.class, RenderRoddiskLeader::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityTsarBlast.class, RenderTsarBlast::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityLaserLink.class, RenderLaserLink::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityGore.class, RenderGore::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityBlood.class, RenderBlood::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityGoo.class, RenderGoo::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityLaserBurst.class, RenderLaserBurst::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityB83.class, RenderB83::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityB2Spirit.class, RenderB2Spirit::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityB2Frag.class, RenderB2Frag::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityDebris.class, RenderDebris::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityHackB83.class, RenderHackB83::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntitySeekB83.class, RenderSeeker::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodes.class, RenderRhodes::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesHead.class, RenderRhodesHead::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesTorso.class, RenderRhodesTorso::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperArm.class, RenderRhodesLeftUpperArm::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperArm.class, RenderRhodesRightUpperArm::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerArm.class, RenderRhodesLeftLowerArm::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerArm.class, RenderRhodesRightLowerArm::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftUpperLeg.class, RenderRhodesLeftUpperLeg::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightUpperLeg.class, RenderRhodesRightUpperLeg::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesLeftLowerLeg.class, RenderRhodesLeftLowerLeg::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRhodesRightLowerLeg.class, RenderRhodesRightLowerLeg::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityB83NoShroom.class, RenderB83::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntitySphereBlast.class, RenderSphereBlast::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityNuke.class, RenderNuke::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityTsar.class, RenderTsar::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityRoddiskRep.class, RenderRoddiskRep::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityHotPotato.class, RenderHotPotato::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityBomb.class, RenderBomb::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityTheoreticalTsar.class, RenderTheoreticalTsar::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityTheoreticalTsarBlast.class, RenderTheoreticalTsarBlast::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityFlameBallGreen.class, RenderFlameBallGreen::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityAntimatterBomb.class, RenderAntimatterBomb::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityAntimatterBombBlast.class, RenderAntimatterBombBlast::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBomb.class, RenderTachyonBomb::new);
+		RenderingRegistry.registerEntityRenderingHandler(EntityTachyonBombBlast.class, RenderTachyonBombBlast::new);
+		//RenderingRegistry.registerBlockHandler(new SteelBlockRenderer());
 	}
 
-	@Override
-	public int addArmor(String armor)
-	{
-		return RenderingRegistry.addNewArmourRendererPrefix(armor);
-	}
-
-	@Override
+    @Override
 	public void closeGui()
 	{
 		Minecraft.getMinecraft().displayGuiScreen(null);
@@ -132,13 +125,13 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void guiClass()
 	{
-		Minecraft.getMinecraft().displayGuiScreen(new GuiClass(RivalRebels.round.rrplayerlist.getForName(Minecraft.getMinecraft().thePlayer.getCommandSenderName()).rrclass));
+		Minecraft.getMinecraft().displayGuiScreen(new GuiClass(RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getMinecraft().player.getGameProfile()).rrclass));
 	}
 
 	@Override
 	public void guiSpawn()
 	{
-		Minecraft.getMinecraft().displayGuiScreen(new GuiSpawn(RivalRebels.round.rrplayerlist.getForName(Minecraft.getMinecraft().thePlayer.getCommandSenderName()).rrclass));
+		Minecraft.getMinecraft().displayGuiScreen(new GuiSpawn(RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getMinecraft().player.getGameProfile()).rrclass));
 	}
 
 	@Override
@@ -220,7 +213,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public void setOverlay(EntityRhodes rhodes)
 	{
-		if (rhodes.rider == Minecraft.getMinecraft().thePlayer)
+		if (rhodes.rider == Minecraft.getMinecraft().player)
 		{
 			RivalRebels.rrro.counter = 10;
 			RivalRebels.rrro.rhodes = rhodes;

@@ -18,7 +18,7 @@ import assets.rivalrebels.RivalRebels;
 public enum RivalRebelsClass
 {
 	NONE(0, 0xFFFFFF, "NONE", RivalRebels.guitrivalrebels, new ItemStack[0]),
-	
+
 	REBEL(1, 0xFF0000, "REBEL", RivalRebels.guitrebel,
 			new ItemStack[] {
 					new ItemStack(RivalRebels.rpg, 1),
@@ -43,7 +43,7 @@ public enum RivalRebelsClass
 					new ItemStack(RivalRebels.redrod, 1),
 					new ItemStack(RivalRebels.jump, 4),
 			}),
-	
+
 	NUKER(2, 0xFFFF00, "NUKER", RivalRebels.guitnuker,
 			new ItemStack[] {
 					new ItemStack(RivalRebels.flamethrower, 1),
@@ -66,7 +66,7 @@ public enum RivalRebelsClass
 					new ItemStack(RivalRebels.jump, 4),
 					//new ItemStack(RivalRebels.steel, 16),
 			}),
-	
+
 	INTEL(3, 0x00FFBB, "INTEL", RivalRebels.guitintel,
 			new ItemStack[] {
 					new ItemStack(RivalRebels.tesla, 1),
@@ -93,7 +93,7 @@ public enum RivalRebelsClass
 					new ItemStack(RivalRebels.steel, 16),
 					new ItemStack(RivalRebels.jump, 8),
 			}),
-	
+
 	HACKER(4, 0x00FF00, "HACKER", RivalRebels.guithacker,
 			new ItemStack[] {
 					new ItemStack(RivalRebels.plasmacannon, 1),
@@ -122,13 +122,13 @@ public enum RivalRebelsClass
 					new ItemStack(RivalRebels.steel, 32),
 					new ItemStack(RivalRebels.jump, 8),
 			});
-	
-	public ItemStack[]		inventory;
-	public ResourceLocation	resource;
-	public String			name;
-	public int				color;
-	public int				id;
-	
+
+	public final ItemStack[] inventory;
+	public final ResourceLocation resource;
+	public final String name;
+	public final int color;
+	public final int id;
+
 	RivalRebelsClass(int i, int c, String n, ResourceLocation r, ItemStack[] inv)
 	{
 		id = i;
@@ -137,20 +137,15 @@ public enum RivalRebelsClass
 		resource = r;
 		inventory = inv;
 	}
-	
+
 	public static RivalRebelsClass getForID(int i)
 	{
-		switch (i)
-		{
-			case 1:
-				return REBEL;
-			case 2:
-				return NUKER;
-			case 3:
-				return INTEL;
-			case 4:
-				return HACKER;
-		}
-		return NONE;
-	}
+        return switch (i) {
+            case 1 -> REBEL;
+            case 2 -> NUKER;
+            case 3 -> INTEL;
+            case 4 -> HACKER;
+            default -> NONE;
+        };
+    }
 }

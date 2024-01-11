@@ -14,105 +14,108 @@ package assets.rivalrebels.common.block;
 import assets.rivalrebels.common.entity.EntityBlood;
 import assets.rivalrebels.common.entity.EntityGoo;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-public class BlockGore extends BlockContainer
-{
+public class BlockGore extends BlockContainer {
+    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 5);
 	public BlockGore()
 	{
-		super(Material.cake);
-	}
+		super(Material.CAKE);
+        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
+    }
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(META);
+    }
 
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(META, meta);
+    }
+    @Override
+    public BlockStateContainer getBlockState() {
+        return new BlockStateContainer(this, META);
+    }
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 0;
 	}
 
-	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9)
-	{
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
 		if (player.capabilities.isCreativeMode)
 		{
-			int meta = world.getBlockMetadata(x, y, z) + 1;
+			int meta = state.getValue(META) + 1;
 			if (meta >= 6) meta = 0;
-			world.setBlockMetadataWithNotify(x, y, z, meta, 3);
+			world.setBlockState(pos, state.withProperty(META, meta));
 			return true;
 		}
 		return false;
 	}
 
-	@Override
-	public void randomDisplayTick(World world, int x, int y, int z, Random random)
-	{
-		if (world.getBlock(x, y - 1, z) == Blocks.air && world.getBlockMetadata(x, y, z) < 2) world.spawnEntityInWorld(new EntityBlood(world, x + Math.random(), y + 0.9f, z + Math.random()));
-		else if (world.getBlock(x, y - 1, z) == Blocks.air && world.getBlockMetadata(x, y, z) < 4) world.spawnEntityInWorld(new EntityGoo(world, x + Math.random(), y + 0.9f, z + Math.random()));
+    @Override
+    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+		if (world.isAirBlock(pos.down()) && state.getValue(META) < 2) world.spawnEntity(new EntityBlood(world, pos.getX() + rand.nextDouble(), pos.getY() + 0.9f, pos.getZ() + rand.nextDouble()));
+		else if (world.isAirBlock(pos.down()) && state.getValue(META) < 4) world.spawnEntity(new EntityGoo(world, pos.getX() + rand.nextDouble(), pos.getY() + 0.9f, pos.getZ() + rand.nextDouble()));
 	}
 
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
 
-	@Override
-	public int getRenderType()
-	{
-		return -1;
-	}
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+        return null;
+    }
 
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return false;
-	}
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+        return new AxisAlignedBB(BlockPos.ORIGIN, BlockPos.ORIGIN);
+    }
 
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return null;
-	}
-
-	@Override
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		return null;
-	}
-
-	@Override
-	public void updateTick(World world, int xx, int yy, int zz, Random par5Random)
-	{
-		if (world.isBlockNormalCubeDefault(xx, yy - 1, zz, false) || world.isBlockNormalCubeDefault(xx + 1, yy, zz, false) || world.isBlockNormalCubeDefault(xx - 1, yy, zz, false) || world.isBlockNormalCubeDefault(xx, yy, zz + 1, false) || world.isBlockNormalCubeDefault(xx, yy, zz - 1, false) || world.isBlockNormalCubeDefault(xx, yy + 1, zz, false))
-		{
-			world.setBlock(xx, yy, zz, Blocks.air);
+    @Override
+    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
+        if (world.isBlockNormalCube(pos.down(), false) ||
+            world.isBlockNormalCube(pos.east(), false) ||
+            world.isBlockNormalCube(pos.west(), false) ||
+            world.isBlockNormalCube(pos.south(), false) ||
+            world.isBlockNormalCube(pos.north(), false) ||
+            world.isBlockNormalCube(pos.up(), false)) {
+			world.setBlockToAir(pos);
 		}
 	}
 
     @Override
-	public boolean hasTileEntity(int metadata)
-	{
-		return true;
-	}
+    public boolean hasTileEntity(IBlockState state) {
+        return true;
+    }
 
-	@Override
+    @Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityGore();
 	}
 
-	@SideOnly(Side.CLIENT)
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -149,5 +152,5 @@ public class BlockGore extends BlockContainer
 		icon4 = iconregister.registerIcon("RivalRebels:bu");
 		icon5 = iconregister.registerIcon("RivalRebels:bv");
 		icon6 = iconregister.registerIcon("RivalRebels:bw");
-	}
+	}*/
 }

@@ -11,104 +11,109 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockContainer;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.World;
 
-public class BlockForceFieldNode extends BlockContainer
-{
+public class BlockForceFieldNode extends BlockContainer {
+    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
 	public BlockForceFieldNode()
 	{
-		super(Material.iron);
-	}
-	
+		super(Material.IRON);
+        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
+    }
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(META);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(META, meta);
+    }    @Override
+    public BlockStateContainer getBlockState() {
+        return new BlockStateContainer(this, META);
+    }
 	@Override
-	public boolean renderAsNormalBlock()
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
-	@Override
-	public boolean isOpaqueCube()
-	{
-		return false;
-	}
-	
-	@Override
-	public boolean onBlockActivated(World world, int x, int y, int z, EntityPlayer player, int par6, float par7, float par8, float par9)
-	{
-		TileEntity te = world.getTileEntity(x, y, z);
-		if (te instanceof TileEntityForceFieldNode && !world.isRemote)
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		TileEntity te = world.getTileEntity(pos);
+		if (te instanceof TileEntityForceFieldNode teffn && !world.isRemote)
 		{
-			TileEntityForceFieldNode teffn = (TileEntityForceFieldNode) te;
-			ItemStack is = player.inventory.getCurrentItem();
-			if (is != null && is.getItem() instanceof ItemChip && (teffn.username == null || teffn.username.equals("")) && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
+            ItemStack stack = player.getHeldItem(hand);
+			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.uuid == null && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
 			{
-				teffn.rrteam = RivalRebels.round.rrplayerlist.getForName(player.getCommandSenderName()).rrteam;
+				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
 				if (teffn.rrteam == RivalRebelsTeam.NONE || teffn.rrteam == null)
 				{
-					teffn.username = player.getCommandSenderName();
+					teffn.uuid = player.getGameProfile().getId();
 					teffn.rrteam = null;
 				}
-				RivalRebelsSoundPlayer.playSound(world, 10, 5, x, y, z);
+				RivalRebelsSoundPlayer.playSound(world, 10, 5, pos);
 			}
 		}
 		return false;
 	}
-	
-	@Override
-	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLiving, ItemStack par6ItemStack)
-	{
-		int l = MathHelper.floor_double((par5EntityLiving.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		
+
+    @Override
+    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
+		int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+
 		if (l == 0)
 		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
+			world.setBlockState(pos, state.withProperty(META, 2), 2);
 		}
-		
+
 		if (l == 1)
 		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
+            world.setBlockState(pos, state.withProperty(META, 5), 2);
 		}
-		
+
 		if (l == 2)
 		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
+            world.setBlockState(pos, state.withProperty(META, 3), 2);
 		}
-		
+
 		if (l == 3)
 		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
+            world.setBlockState(pos, state.withProperty(META, 4), 2);
 		}
 	}
-	
+
 	@Override
-	public boolean hasTileEntity(int metadata)
+	public boolean hasTileEntity(IBlockState state)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public TileEntity createNewTileEntity(World var1, int var)
 	{
 		return new TileEntityForceFieldNode();
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -120,7 +125,7 @@ public class BlockForceFieldNode extends BlockContainer
 	IIcon	icontop3;
 	@SideOnly(Side.CLIENT)
 	IIcon	icontop4;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -134,7 +139,7 @@ public class BlockForceFieldNode extends BlockContainer
 		if (side == meta) return icon2;
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
@@ -144,5 +149,5 @@ public class BlockForceFieldNode extends BlockContainer
 		icontop2 = iconregister.registerIcon("RivalRebels:ck");
 		icontop3 = iconregister.registerIcon("RivalRebels:cl");
 		icontop4 = iconregister.registerIcon("RivalRebels:cm");
-	}
+	}*/
 }

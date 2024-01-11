@@ -11,13 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.IIcon;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.init.Blocks;
+import net.minecraft.world.World;
 
 public class BlockAutoMarioTrap extends BlockAutoTemplate
 {
@@ -25,28 +21,28 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 	{
 		super();
 	}
-	
+
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
 		if (!world.isRemote)
 		{
-			placeBlockCarefully(world, x, y, z, Blocks.air);
+			placeBlockCarefully(world, x, y, z, Blocks.AIR);
 			int r = 2;
 			for (int z1 = -r; z1 <= r; z1++)
 			{
 				for (int x1 = -r; x1 <= r; x1++)
 				{
 					placeBlockCarefully(world, x + x1, y - 1, z + z1, RivalRebels.amario);
-					placeBlockCarefully(world, x + x1, y - 2, z + z1, Blocks.air);
-					placeBlockCarefully(world, x + x1, y - 3, z + z1, Blocks.air);
+					placeBlockCarefully(world, x + x1, y - 2, z + z1, Blocks.AIR);
+					placeBlockCarefully(world, x + x1, y - 3, z + z1, Blocks.AIR);
 				}
 			}
 		}
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon1;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon2;
@@ -58,7 +54,7 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 	IIcon	icon5;
 	@SideOnly(Side.CLIENT)
 	IIcon	icon6;
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
@@ -71,7 +67,7 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 		if (side == 5) return icon6;
 		return icon1;
 	}
-	
+
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
@@ -82,5 +78,5 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 		icon4 = iconregister.registerIcon("RivalRebels:de"); // SIDE S
 		icon5 = iconregister.registerIcon("RivalRebels:de"); // SIDE W
 		icon6 = iconregister.registerIcon("RivalRebels:de"); // SIDE E
-	}
+	}*/
 }

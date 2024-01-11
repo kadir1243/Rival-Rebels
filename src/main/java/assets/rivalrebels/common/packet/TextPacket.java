@@ -13,63 +13,55 @@ package assets.rivalrebels.common.packet;
 
 import io.netty.buffer.ByteBuf;
 import net.minecraft.client.Minecraft;
-import net.minecraft.util.ChatComponentText;
-import net.minecraft.util.StatCollector;
-import assets.rivalrebels.common.core.FileRW;
-import cpw.mods.fml.common.network.simpleimpl.IMessage;
-import cpw.mods.fml.common.network.simpleimpl.IMessageHandler;
-import cpw.mods.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraftforge.fml.common.network.ByteBufUtils;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
+import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
+import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 
 public class TextPacket implements IMessage
 {
-	String text;
-	
-	public TextPacket()
-	{
-		
+	private String text;
+
+	public TextPacket() {
 	}
-	
+
 	public TextPacket(String t)
 	{
 		text = t;
 	}
 
 	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		byte[] dst = new byte[buf.readInt()];
-		buf.readBytes(dst);
-		text = FileRW.getStringBytes(dst);
+	public void fromBytes(ByteBuf buf) {
+        text = ByteBufUtils.readUTF8String(buf);
 	}
 
 	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(text.length());
-		buf.writeBytes(FileRW.getBytesString(text));
+	public void toBytes(ByteBuf buf) {
+        ByteBufUtils.writeUTF8String(buf, text);
 	}
-	
+
 	public static class Handler implements IMessageHandler<TextPacket, IMessage>
 	{
 		@Override
 		public IMessage onMessage(TextPacket m, MessageContext ctx)
 		{
-			if (m.text.startsWith("-t"))
-			{
-				String[] str = m.text.substring(2, m.text.length()).split("\n");
-				for (int i = 0; i < str.length; i++) Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(str[i]));
-			}
-			else
-			{
-				String[] s = m.text.split(" ");
-				StringBuilder strb = new StringBuilder();
-				for (int i = 0; i < s.length; i++)
-				{
-					strb.append(StatCollector.translateToLocal(s[i]));
-					strb.append(" ");
-				}
-				Minecraft.getMinecraft().thePlayer.addChatMessage(new ChatComponentText(strb.toString()));
-			}
+            Minecraft.getMinecraft().addScheduledTask(() -> {
+                if (m.text.startsWith("-t")) {
+                    String[] str = m.text.substring(2).split("\n");
+                    for (String string : str)
+                        Minecraft.getMinecraft().player.sendMessage(new TextComponentString(string));
+                } else {
+                    String[] s = m.text.split(" ");
+                    StringBuilder strb = new StringBuilder();
+                    for (String string : s) {
+                        strb.append(I18n.format(string));
+                        strb.append(" ");
+                    }
+                    Minecraft.getMinecraft().player.sendMessage(new TextComponentString(strb.toString()));
+                }
+            });
 			return null;
 		}
 	}

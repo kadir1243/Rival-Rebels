@@ -11,177 +11,127 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.tileentity.TileEntityLoader;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.tileentity.TileEntityLoader;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
 
-public class BlockLoader extends BlockContainer
-{
-	private Random	random	= new Random();
-	public int		orientation;
-	
-	public BlockLoader()
-	{
-		super(Material.iron);
-		this.setCreativeTab(CreativeTabs.tabDecorations);
+import java.util.Random;
+
+public class BlockLoader extends BlockContainer {
+    public BlockLoader() {
+		super(Material.IRON);
+		this.setCreativeTab(CreativeTabs.DECORATIONS);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 0;
 	}
-	
-	@Override
-	/**
-	 * Called when the block is placed in the world.
-	 */
-	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase, ItemStack par6ItemStack)
-	{
-		int l = MathHelper.floor_double((par5EntityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		
-		if (l == 0)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
-		}
-		
-		if (l == 1)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
-		}
-		
-		if (l == 2)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
-		}
-		
-		if (l == 3)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
-		}
-	}
-	
-	/**
-	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
-	 * etc to this block.
-	 */
-	@Override
-	public boolean isOpaqueCube()
+
+    @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+        int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+
+        int metaS = meta;
+        if (l == 0) {
+            metaS = 2;
+        } else if (l == 1) {
+            metaS = 5;
+        } else if (l == 2) {
+            metaS = 3;
+        } else if (l == 3) {
+            metaS = 4;
+        }
+        return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, metaS, placer, hand);
+    }
+
+    @Override
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
-	/**
-	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
-	 */
-	@Override
-	public boolean renderAsNormalBlock()
-	{
-		return false;
-	}
-	
-	/**
-	 * The type of render function that is called for this block
-	 */
-	@Override
-	public int getRenderType()
-	{
-		return -1;
-	}
-	
-	/**
-	 * ejects contained items into the world, and notifies neighbours of an update, as appropriate
-	 */
-	@Override
-	public void breakBlock(World par1World, int par2, int par3, int par4, Block par5, int par6)
-	{
-		TileEntityLoader var7 = null;
-		try
-		{
-			var7 = (TileEntityLoader) par1World.getTileEntity(par2, par3, par4);
+
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        TileEntityLoader var7 = null;
+        try
+        {
+            var7 = (TileEntityLoader) world.getTileEntity(pos);
+        }
+        catch (Exception e)
+        {
+            // no error message ;]
+        }
+
+        int x = pos.getX();
+        int y= pos.getY();
+        int z =pos.getZ();
+        world.spawnEntity(new EntityItem(world, x, y, z, new ItemStack(RivalRebels.loader)));
+        if (var7 != null)
+        {
+            for (int var8 = 0; var8 < var7.getSizeInventory(); ++var8)
+            {
+                ItemStack var9 = var7.getStackInSlot(var8);
+
+                if (var9 != null)
+                {
+                    float var10 = world.rand.nextFloat() * 0.8F + 0.1F;
+                    float var11 = world.rand.nextFloat() * 0.8F + 0.1F;
+                    EntityItem var14;
+
+                    for (float var12 = world.rand.nextFloat() * 0.8F + 0.1F; var9.getCount() > 0; world.spawnEntity(var14))
+                    {
+                        int var13 = world.rand.nextInt(21) + 10;
+
+                        if (var13 > var9.getCount())
+                        {
+                            var13 = var9.getCount();
+                        }
+
+                        var9.shrink(var13);
+                        var14 = new EntityItem(world, (x + var10), (y + var11), (z + var12), new ItemStack(var9.getItem(), var13, var9.getItemDamage()));
+                        float var15 = 0.05F;
+                        var14.motionX = ((float) world.rand.nextGaussian() * var15);
+                        var14.motionY = ((float) world.rand.nextGaussian() * var15 + 0.2F);
+                        var14.motionZ = ((float) world.rand.nextGaussian() * var15);
+
+                        if (var9.hasTagCompound())
+                        {
+                            var14.getItem().setTagCompound(var9.getTagCompound().copy());
+                        }
+                    }
+                }
+            }
+            var7.invalidate();
+        }
+        super.breakBlock(world, pos, state);
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		if (!world.isRemote) {
+			player.openGui(RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
 		}
-		catch (Exception e)
-		{
-			// no error message ;]
-		}
-		
-		par1World.spawnEntityInWorld(new EntityItem(par1World, par2, par3, par4, new ItemStack(RivalRebels.loader, 1)));
-		if (var7 != null)
-		{
-			for (int var8 = 0; var8 < var7.getSizeInventory(); ++var8)
-			{
-				ItemStack var9 = var7.getStackInSlot(var8);
-				
-				if (var9 != null)
-				{
-					float var10 = this.random.nextFloat() * 0.8F + 0.1F;
-					float var11 = this.random.nextFloat() * 0.8F + 0.1F;
-					EntityItem var14;
-					
-					for (float var12 = this.random.nextFloat() * 0.8F + 0.1F; var9.stackSize > 0; par1World.spawnEntityInWorld(var14))
-					{
-						int var13 = this.random.nextInt(21) + 10;
-						
-						if (var13 > var9.stackSize)
-						{
-							var13 = var9.stackSize;
-						}
-						
-						var9.stackSize -= var13;
-						var14 = new EntityItem(par1World, (par2 + var10), (par3 + var11), (par4 + var12), new ItemStack(var9.getItem(), var13, var9.getItemDamage()));
-						float var15 = 0.05F;
-						var14.motionX = ((float) this.random.nextGaussian() * var15);
-						var14.motionY = ((float) this.random.nextGaussian() * var15 + 0.2F);
-						var14.motionZ = ((float) this.random.nextGaussian() * var15);
-						
-						if (var9.hasTagCompound())
-						{
-							var14.getEntityItem().setTagCompound((NBTTagCompound) var9.getTagCompound().copy());
-						}
-					}
-				}
-			}
-			var7.invalidate();
-		}
-		
-		super.breakBlock(par1World, par2, par3, par4, par5, par6);
-	}
-	
-	/**
-	 * Called upon block activation (right click on the block.)
-	 */
-	@Override
-	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
-	{
-		if (!par1World.isRemote)
-		{
-			FMLNetworkHandler.openGui(par5EntityPlayer, RivalRebels.instance, 0, par1World, par2, par3, par4);
-			// par5EntityPlayer.openGui(RivalRebels.instance, RivalRebels.rrchestGuiID, par1World, par2, par3, par4);
-		}
-		RivalRebelsSoundPlayer.playSound(par1World, 10, 3, par2, par3, par4);
-		
+		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
+
 		return true;
 	}
-	
+
 	/**
 	 * Returns a new instance of a block's tile entity class. Called on placing the block.
 	 */
@@ -190,19 +140,19 @@ public class BlockLoader extends BlockContainer
 	{
 		return new TileEntityLoader();
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
 		icon = iconregister.registerIcon("RivalRebels:av");
-	}
+	}*/
 }

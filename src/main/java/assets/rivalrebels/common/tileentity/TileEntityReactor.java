@@ -11,20 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.io.ByteArrayOutputStream;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.AxisAlignedBB;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -36,16 +22,28 @@ import assets.rivalrebels.common.item.ItemRodRedstone;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.ReactorUpdatePacket;
 import assets.rivalrebels.common.packet.TextPacket;
-import cpw.mods.fml.common.FMLCommonHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import net.minecraft.entity.item.EntityItem;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.util.ITickable;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
-public class TileEntityReactor extends TileEntity implements IInventory
-{
+import java.util.ArrayList;
+import java.util.List;
+
+public class TileEntityReactor extends TileEntity implements IInventory, ITickable {
 	public double			slide				= 90;
 	private double			test				= Math.PI;
-	public ItemStack		core;
-	public ItemStack		fuel;
+    public ItemStack		core = ItemStack.EMPTY;
+	public ItemStack		fuel = ItemStack.EMPTY;
 	public boolean			on					= false;
 	public boolean			prevOn				= false;
 	public boolean			melt				= false;
@@ -55,30 +53,26 @@ public class TileEntityReactor extends TileEntity implements IInventory
 	public double			lasttickconsumed	= 0;
 	public int				tickssincelastrod	= 0;
 	public boolean			lastrodwasredstone	= false;
-	public TileEntityList	machines			= new TileEntityList();
+	public List<TileEntity>	machines			= new ArrayList<>();
 	public int				tick				= 0;
 	public long				lastPacket			= System.currentTimeMillis();
-	
+
 	@Override
 	public void readFromNBT(NBTTagCompound par1NBTTagCompound)
 	{
 		super.readFromNBT(par1NBTTagCompound);
 		int c = par1NBTTagCompound.getInteger("core");
 		int f = par1NBTTagCompound.getInteger("fuel");
-		if (c != 0) core = new ItemStack(Item.getItemById(c));
-		if (f != 0) fuel = new ItemStack(Item.getItemById(f));
+		if (c != 0) core = Item.getItemById(c).getDefaultInstance();
+		if (f != 0) fuel = Item.getItemById(f).getDefaultInstance();
 		consumed = par1NBTTagCompound.getInteger("consumed");
 		on = par1NBTTagCompound.getBoolean("on");
 		int i = 0;
 		while (par1NBTTagCompound.hasKey("mx" + i))
 		{
-			int x = par1NBTTagCompound.getInteger("mx" + i);
-			int y = par1NBTTagCompound.getInteger("my" + i);
-			int z = par1NBTTagCompound.getInteger("mz" + i);
-			if (worldObj != null)
-			{
-				TileEntity te = worldObj.getTileEntity(x, y, z);
-				if (te != null && te instanceof TileEntityMachineBase)
+            if (hasWorld()) {
+				TileEntity te = world.getTileEntity(BlockPos.fromLong(par1NBTTagCompound.getLong("mpos" + i)));
+				if (te instanceof TileEntityMachineBase)
 				{
 					machines.add(te);
 				}
@@ -86,45 +80,36 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			i++;
 		}
 	}
-	
+
 	@Override
-	public void writeToNBT(NBTTagCompound par1NBTTagCompound)
+	public NBTTagCompound writeToNBT(NBTTagCompound par1NBTTagCompound)
 	{
 		super.writeToNBT(par1NBTTagCompound);
-		if (core != null) par1NBTTagCompound.setInteger("core", Item.getIdFromItem(core.getItem()));
-		if (fuel != null) par1NBTTagCompound.setInteger("fuel", Item.getIdFromItem(fuel.getItem()));
+		if (!core.isEmpty()) par1NBTTagCompound.setInteger("core", Item.getIdFromItem(core.getItem()));
+		if (!fuel.isEmpty()) par1NBTTagCompound.setInteger("fuel", Item.getIdFromItem(fuel.getItem()));
 		par1NBTTagCompound.setInteger("consumed", (int) consumed);
 		par1NBTTagCompound.setBoolean("on", on);
-		if (on) for (int i = 0; i < machines.getSize(); i++)
+		if (on) for (int i = 0; i < machines.size(); i++)
 		{
 			TileEntityMachineBase te = (TileEntityMachineBase) machines.get(i);
 			if (te == null || te instanceof TileEntityReactive) continue;
-			par1NBTTagCompound.setInteger("mx" + i, te.xCoord);
-			par1NBTTagCompound.setInteger("my" + i, te.yCoord);
-			par1NBTTagCompound.setInteger("mz" + i, te.zCoord);
+			par1NBTTagCompound.setLong("mpos" + i, te.getPos().toLong());
 		}
-	}
-	
+        return par1NBTTagCompound;
+    }
+
 	@Override
-	public void updateEntity()
-	{
-		super.updateEntity();
-		Side side = FMLCommonHandler.instance().getEffectiveSide();
-		if (side == Side.CLIENT)
+	public void update() {
+        if (world.isRemote)
 		{
 			slide = (Math.cos(test) + 1) * 45;
-			List players = worldObj.playerEntities;
-			Iterator iter = players.iterator();
-			boolean flag = false;
-			while (iter.hasNext())
-			{
-				EntityPlayer player = (EntityPlayer) iter.next();
-				if (player.getDistanceSq(xCoord + 0.5f, yCoord + 0.5f, zCoord + 0.5f) <= 9)
-				{
-					flag = true;
-					break;
-				}
-			}
+            boolean flag = false;
+            for (EntityPlayer player : world.playerEntities) {
+                if (player.getDistanceSq(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f) <= 9) {
+                    flag = true;
+                    break;
+                }
+            }
 			if (flag)
 			{
 				if (slide < 89.995) test += 0.05;
@@ -133,7 +118,7 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			{
 				if (slide > 0.004) test -= 0.05;
 			}
-			if (core == null)
+			if (core.isEmpty())
 			{
 				on = false;
 				consumed = 0;
@@ -141,26 +126,26 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				melt = false;
 				meltTick = 0;
 			}
-			
+
 			if (eject)
 			{
 				consumed = 0;
 				lasttickconsumed = 0;
-				fuel = null;
-				core = null;
+				fuel = ItemStack.EMPTY;
+				core = ItemStack.EMPTY;
 				melt = false;
 				meltTick = 0;
 				on = false;
 				eject = false;
 			}
-			
+
 			if (melt)
 			{
-				if (core != null)
+				if (!core.isEmpty())
 				{
 					for (int i = 0; i < 4; i++)
 					{
-						worldObj.spawnParticle("smoke", xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, Math.random() - 0.5, Math.random() / 2, Math.random() - 0.5);
+						world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5, world.rand.nextDouble() - 0.5, world.rand.nextDouble() / 2, world.rand.nextDouble() - 0.5);
 					}
 				}
 				else
@@ -172,28 +157,27 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			}
 			prevOn = on;
 		}
-		else if (side == Side.SERVER)
-		{
+		else {
 			if (eject)
 			{
-				if (core != null)
+				if (!core.isEmpty())
 				{
 					consumed = 0;
 					lasttickconsumed = 0;
-					worldObj.spawnEntityInWorld(new EntityItem(worldObj, xCoord + 0.5, yCoord + 1, zCoord + 0.5, core));
-					fuel = null;
-					core = null;
+					world.spawnEntity(new EntityItem(world, getPos().getX() + 0.5, getPos().getY() + 1, getPos().getZ() + 0.5, core));
+					fuel = ItemStack.EMPTY;
+					core = ItemStack.EMPTY;
 					melt = false;
 					meltTick = 0;
 					on = false;
 				}
 			}
-			
+
 			if (melt)
 			{
-				if (core != null)
+				if (!core.isEmpty())
 				{
-					if (meltTick % 20 == 0) RivalRebelsSoundPlayer.playSound(worldObj, 21, 1, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+					if (meltTick % 20 == 0) RivalRebelsSoundPlayer.playSound(world, 21, 1, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
 					on = true;
 					meltTick++;
 					if (meltTick == 300) meltDown(10);
@@ -206,8 +190,8 @@ public class TileEntityReactor extends TileEntity implements IInventory
 					on = false;
 				}
 			}
-			
-			if (fuel == null && tickssincelastrod != 0)
+
+			if (fuel.isEmpty() && tickssincelastrod != 0)
 			{
 				tickssincelastrod++;
 				if (tickssincelastrod >= 100)
@@ -217,20 +201,20 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				}
 				if (tickssincelastrod == 20 && !lastrodwasredstone)
 				{
-					//RivalRebelsServerPacketHandler.sendChatToAll("RivalRebels.WARNING RivalRebels.overheat", 0, worldObj);
+					//RivalRebelsServerPacketHandler.sendChatToAll("RivalRebels.WARNING RivalRebels.overheat", 0, world);
 				}
 			}
 			else
 			{
 				tickssincelastrod = 0;
 			}
-			
+
 			if (melt)
 			{
 				machines.clear();
 			}
-			
-			if (core == null)
+
+			if (core.isEmpty())
 			{
 				on = false;
 				consumed = 0;
@@ -238,85 +222,70 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				melt = false;
 				meltTick = 0;
 			}
-			
-			if (on && core != null && fuel != null && core.getItem() instanceof ItemCore && fuel.getItem() instanceof ItemRod)
+
+			if (on && !core.isEmpty() && !fuel.isEmpty() && core.getItem() instanceof ItemCore c && fuel.getItem() instanceof ItemRod r)
 			{
-				if (!prevOn && on) RivalRebelsSoundPlayer.playSound(worldObj, 21, 3, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5);
+				if (!prevOn && on) RivalRebelsSoundPlayer.playSound(world, 21, 3, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
 				else
 				{
 					tick++;
-					if (on && tick % 39 == 0) RivalRebelsSoundPlayer.playSound(worldObj, 21, 2, xCoord + 0.5, yCoord + 0.5, zCoord + 0.5, 0.9f, 0.77f);
+					if (on && tick % 39 == 0) RivalRebelsSoundPlayer.playSound(world, 21, 2, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5, 0.9f, 0.77f);
 				}
-				ItemCore c = (ItemCore) core.getItem();
-				ItemRod r = (ItemRod) fuel.getItem();
-				if (fuel.stackTagCompound == null) fuel.stackTagCompound = new NBTTagCompound();
-				float power = ((r.power * c.timemult) - fuel.stackTagCompound.getInteger("fuelLeft"));
+                if (!fuel.hasTagCompound()) fuel.setTagCompound(new NBTTagCompound());
+				float power = ((r.power * c.timemult) - fuel.getTagCompound().getInteger("fuelLeft"));
 				float temp = power;
-				Iterator iter = worldObj.loadedTileEntityList.iterator();
-				while (iter.hasNext())
-				{
-					TileEntity te = (TileEntity) iter.next();
-					if (te != null && te instanceof TileEntityMachineBase)
-					{
-						TileEntityMachineBase temb = (TileEntityMachineBase) te;
-						if (worldObj.getTileEntity(temb.x, temb.y, temb.z) == null)
-						{
-							double dist = temb.getDistanceFrom(xCoord, yCoord, zCoord);
-							if (dist < 1024)
-							{
-								temb.x = xCoord;
-								temb.y = yCoord;
-								temb.z = zCoord;
-								temb.edist = (float) Math.sqrt(dist);
-								machines.add(temb);
-							}
-						}
-						if (temb.x == xCoord && temb.y == yCoord && temb.z == zCoord)
-						{
-							machines.add(temb);
-							temb.powerGiven = power;
-							if (power > temb.pInM - temb.pInR)
-							{
-								power -= temb.pInM - temb.pInR;
-								temb.pInR = temb.pInM;
-							}
-							else
-							{
-								temb.pInR += power;
-								power = 0;
-							}
-							temb.powerGiven -= power;
-						}
-					}
-				}
+                for (TileEntity te : world.loadedTileEntityList) {
+                    if (te instanceof TileEntityMachineBase temb) {
+                        if (world.getTileEntity(temb.pos) == null) {
+                            double dist = temb.getDistanceSq(getPos().getX(), getPos().getY(), getPos().getZ());
+                            if (dist < 1024) {
+                                temb.pos = getPos();
+                                temb.edist = (float) Math.sqrt(dist);
+                                machines.add(temb);
+                            }
+                        }
+                        if (temb.pos.equals(getPos())) {
+                            machines.add(temb);
+                            temb.powerGiven = power;
+                            if (power > temb.pInM - temb.pInR) {
+                                power -= temb.pInM - temb.pInR;
+                                temb.pInR = temb.pInM;
+                            } else {
+                                temb.pInR += power;
+                                power = 0;
+                            }
+                            temb.powerGiven -= power;
+                        }
+                    }
+                }
 				lasttickconsumed = temp - power;
 				consumed += lasttickconsumed;
-				if (fuel.stackTagCompound.hasKey("fuelLeft"))
+				if (fuel.getTagCompound().hasKey("fuelLeft"))
 				{
-					fuel.stackTagCompound.setInteger("fuelLeft", (int) consumed);
-					
-					double fuelLeft = fuel.stackTagCompound.getInteger("fuelLeft");
+					fuel.getTagCompound().setInteger("fuelLeft", (int) consumed);
+
+					double fuelLeft = fuel.getTagCompound().getInteger("fuelLeft");
 					double fuelPercentage = (fuelLeft / temp);
-					
+
 					if (r instanceof ItemRodNuclear)
 					{
 						double f2 = fuelPercentage * fuelPercentage;
 						double f4 = f2 * f2;
 						double f8 = f4 * f4;
-						if (worldObj.rand.nextFloat() < f8)
+						if (world.rand.nextFloat() < f8)
 						{
 							melt = true;
 						}
 					}
 				}
-				else fuel.stackTagCompound.setInteger("fuelLeft", 0);
-				if (fuel.stackTagCompound.getInteger("fuelLeft") >= temp)
+				else fuel.getTagCompound().setInteger("fuelLeft", 0);
+				if (fuel.getTagCompound().getInteger("fuelLeft") >= temp)
 				{
 					lastrodwasredstone = r instanceof ItemRodRedstone; // meltdown if not redrod
 					consumed = 0;
 					lasttickconsumed = 0;
 					tickssincelastrod = 1;
-					fuel = null;
+					fuel = ItemStack.EMPTY;
 				}
 			}
 			else
@@ -328,11 +297,11 @@ public class TileEntityReactor extends TileEntity implements IInventory
 			if (System.currentTimeMillis() - lastPacket > 1000)
 			{
 				lastPacket = System.currentTimeMillis();
-				PacketDispatcher.packetsys.sendToAll(new ReactorUpdatePacket(xCoord, yCoord, zCoord, (float) consumed, (float) lasttickconsumed, melt, eject, on, machines));
+				PacketDispatcher.packetsys.sendToAll(new ReactorUpdatePacket(getPos(), (float) consumed, (float) lasttickconsumed, melt, eject, on, machines));
 			}
 		}
 	}
-	
+
 	public void meltDown(int radius)
 	{
 		/*for (int x = -radius; x < radius; x++)
@@ -342,92 +311,91 @@ public class TileEntityReactor extends TileEntity implements IInventory
 				double dist = Math.sqrt(x * x + z * z);
 				if (dist < radius - 1)
 				{
-					int rand = worldObj.rand.nextInt(4);
+					int rand = world.rand.nextInt(4);
 					if (rand == 0) for (int i = 0; i < 16; i++)
-						worldObj.setBlock(xCoord + x, yCoord - 1, zCoord + z, RivalRebels.petrifiedstone1, (int) (dist * 2f) + 1, 2);
+						world.setBlock(getPos().getX() + x, getPos().getY() - 1, getPos().getZ() + z, RivalRebels.petrifiedstone1, (int) (dist * 2f) + 1, 2);
 					if (rand == 1) for (int i = 0; i < 16; i++)
-						worldObj.setBlock(xCoord + x, yCoord - 1, zCoord + z, RivalRebels.petrifiedstone2, (int) (dist * 2f) + 1, 2);
+						world.setBlock(getPos().getX() + x, getPos().getY() - 1, getPos().getZ() + z, RivalRebels.petrifiedstone2, (int) (dist * 2f) + 1, 2);
 					if (rand == 2) for (int i = 0; i < 16; i++)
-						worldObj.setBlock(xCoord + x, yCoord - 1, zCoord + z, RivalRebels.petrifiedstone3, (int) (dist * 2f) + 1, 2);
+						world.setBlock(getPos().getX() + x, getPos().getY() - 1, getPos().getZ() + z, RivalRebels.petrifiedstone3, (int) (dist * 2f) + 1, 2);
 					if (rand == 3) for (int i = 0; i < 16; i++)
-						worldObj.setBlock(xCoord + x, yCoord - 1, zCoord + z, RivalRebels.petrifiedstone4, (int) (dist * 2f) + 1, 2);
-					
-					worldObj.setBlock(xCoord + x, yCoord - 2, zCoord + z, RivalRebels.radioactivedirt);
+						world.setBlock(getPos().getX() + x, getPos().getY() - 1, getPos().getZ() + z, RivalRebels.petrifiedstone4, (int) (dist * 2f) + 1, 2);
+
+					world.setBlock(getPos().getX() + x, getPos().getY() - 2, getPos().getZ() + z, RivalRebels.radioactivedirt);
 				}
 				else if (dist < radius)
 				{
-					worldObj.setBlock(xCoord + x, yCoord - 2, zCoord + z, RivalRebels.radioactivedirt);
+					world.setBlock(getPos().getX() + x, getPos().getY() - 2, getPos().getZ() + z, RivalRebels.radioactivedirt);
 				}
 			}
 		}*/
-		worldObj.setBlock(xCoord, yCoord, zCoord, RivalRebels.meltdown);
-		new Explosion(worldObj, xCoord, yCoord - 2, zCoord, 4, false, false, RivalRebelsDamageSource.rocket);
+		world.setBlockState(getPos(), RivalRebels.meltdown.getDefaultState());
+		new Explosion(world, getPos().getX(), getPos().getY() - 2, getPos().getZ(), 4, false, false, RivalRebelsDamageSource.rocket);
 	}
-	
+
 	@Override
 	public int getSizeInventory()
 	{
 		return 2;
 	}
-	
+
 	@Override
 	public ItemStack getStackInSlot(int i)
 	{
 		if (i == 0) return fuel;
 		else if (i == 1) return core;
-		else return null;
+		else return ItemStack.EMPTY;
 	}
-	
+
 	@Override
 	public ItemStack decrStackSize(int i, int j)
 	{
 		if (i == 0)
 		{
-			fuel.stackSize -= j;
+			fuel.shrink(j);
 			return fuel;
 		}
 		else if (i == 1)
 		{
-			core.stackSize -= j;
+			core.shrink(j);
 			return core;
 		}
-		else return null;
+		else return ItemStack.EMPTY;
 	}
-	
+
+    @Override
+    public ItemStack removeStackFromSlot(int index) {
+		if (index == 0) return fuel;
+		else if (index == 1) return core;
+		else return ItemStack.EMPTY;
+	}
+
 	@Override
-	public ItemStack getStackInSlotOnClosing(int i)
+	public void setInventorySlotContents(int index, ItemStack stack)
 	{
-		if (i == 0) return fuel;
-		else if (i == 1) return core;
-		else return null;
+		if (index == 0) fuel = stack;
+		else if (index == 1) core = stack;
 	}
-	
-	@Override
-	public void setInventorySlotContents(int i, ItemStack itemstack)
-	{
-		if (i == 0) fuel = itemstack;
-		else if (i == 1) core = itemstack;
-	}
-	
+
 	@Override
 	public int getInventoryStackLimit()
 	{
 		return 1;
 	}
-	
+
 	@Override
-	public boolean isUseableByPlayer(EntityPlayer entityplayer)
+	public boolean isUsableByPlayer(EntityPlayer player)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean isItemValidForSlot(int i, ItemStack itemstack)
 	{
-		if (itemstack == null || !(itemstack.getItem() instanceof ItemRod) || !(itemstack.getItem() instanceof ItemCore)) return false;
+		if (itemstack.isEmpty() || !(itemstack.getItem() instanceof ItemRod) || !(itemstack.getItem() instanceof ItemCore)) return false;
 		if (i == 0)
 		{
-			return fuel == null || !on;
+			return fuel.isEmpty() || !on;
 		}
 		if (i == 1)
 		{
@@ -435,54 +403,65 @@ public class TileEntityReactor extends TileEntity implements IInventory
 		}
 		return false;
 	}
-	
-	@Override
+
+    @Override
+    public int getField(int id) {
+        return 0;
+    }
+
+    @Override
+    public void setField(int id, int value) {
+
+    }
+
+    @Override
+    public int getFieldCount() {
+        return 0;
+    }
+
+    @Override
 	@SideOnly(Side.CLIENT)
 	public double getMaxRenderDistanceSquared()
 	{
 		return 16384.0D;
 	}
-	
+
 	@Override
 	public AxisAlignedBB getRenderBoundingBox()
 	{
-		return AxisAlignedBB.getBoundingBox(xCoord-100, yCoord-100, zCoord-100, xCoord+100, yCoord+100, zCoord+100);
+		return new AxisAlignedBB(getPos().add(-100, -100, -100), getPos().add(100, 100, 100));
 	}
-	
+
 	public float getPower()
 	{
-		if (core != null && fuel != null)
+		if (!core.isEmpty() && !fuel.isEmpty())
 		{
 			ItemCore c = (ItemCore) core.getItem();
 			ItemRod r = (ItemRod) fuel.getItem();
-			if (fuel.stackTagCompound == null) fuel.stackTagCompound = new NBTTagCompound();
-			return ((r.power * c.timemult) - fuel.stackTagCompound.getInteger("fuelLeft"));
+			if (!fuel.hasTagCompound()) fuel.setTagCompound(new NBTTagCompound());
+			return ((r.power * c.timemult) - fuel.getTagCompound().getInteger("fuelLeft"));
 		}
 		return 0;
 	}
-	
+
 	@Override
-	public String getInventoryName()
+	public String getName()
 	{
 		return "Tokamak";
 	}
-	
+
 	@Override
-	public boolean hasCustomInventoryName()
+	public boolean hasCustomName()
 	{
 		return false;
 	}
-	
+
 	@Override
-	public void openInventory()
-	{
-		
+	public void openInventory(EntityPlayer player) {
 	}
-	
+
 	@Override
-	public void closeInventory()
-	{
-		
+	public void closeInventory(EntityPlayer player) {
 	}
 
 	public void toggleOn()
@@ -494,4 +473,15 @@ public class TileEntityReactor extends TileEntity implements IInventory
 	{
 		eject = true;
 	}
+
+    @Override
+    public boolean isEmpty() {
+        return this.core.isEmpty() && this.fuel.isEmpty();
+    }
+
+    @Override
+    public void clear() {
+        this.core = ItemStack.EMPTY;
+        this.fuel = ItemStack.EMPTY;
+    }
 }

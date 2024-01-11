@@ -11,141 +11,88 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import java.util.Random;
-
-import net.minecraft.block.Block;
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
+import net.minecraft.block.state.IBlockState;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.IIcon;
-import net.minecraft.util.MathHelper;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import cpw.mods.fml.common.network.internal.FMLNetworkHandler;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+
+import java.util.Random;
 
 public class BlockLaptop extends BlockContainer
 {
-	public int	orientation;
-	
-	public BlockLaptop()
+
+    public BlockLaptop()
 	{
-		super(Material.iron);
-		this.setCreativeTab(CreativeTabs.tabDecorations);
+		super(Material.IRON);
+		this.setCreativeTab(CreativeTabs.DECORATIONS);
 	}
-	
+
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 0;
 	}
-	
-	@Override
-	/**
-	 * Called when the block is placed in the world.
-	 */
-	public void onBlockPlacedBy(World par1World, int par2, int par3, int par4, EntityLivingBase par5EntityLivingBase, ItemStack par6ItemStack)
-	{
-		int l = MathHelper.floor_double((par5EntityLivingBase.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		
-		if (l == 0)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 2, 2);
+
+    @Override
+    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
+		int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+
+        int metaS = meta;
+		if (l == 0) {
+			metaS = 2;
+		} else if (l == 1) {
+			metaS = 5;
+		} else if (l == 2) {
+			metaS = 3;
+		} else if (l == 3) {
+            metaS = 4;
 		}
-		
-		if (l == 1)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 5, 2);
-		}
-		
-		if (l == 2)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 3, 2);
-		}
-		
-		if (l == 3)
-		{
-			par1World.setBlockMetadataWithNotify(par2, par3, par4, 4, 2);
-		}
+        return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, metaS, placer, hand);
 	}
-	
-	/**
-	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
-	 * etc to this block.
-	 */
-	@Override
-	public boolean isOpaqueCube()
+
+    @Override
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
-	/**
-	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
-	 */
-	@Override
-	public boolean renderAsNormalBlock()
-	{
-		return false;
-	}
-	
-	/**
-	 * The type of render function that is called for this block
-	 */
-	@Override
-	public int getRenderType()
-	{
-		return -1;
-	}
-	
-	/**
-	 * ejects contained items into the world, and notifies neighbours of an update, as appropriate
-	 */
-	@Override
-	public void breakBlock(World par1World, int par2, int par3, int par4, Block par5, int par6)
-	{
-		TileEntityLaptop var7 = null;
-		try
-		{
-			var7 = (TileEntityLaptop) par1World.getTileEntity(par2, par3, par4);
+
+    @Override
+    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+        TileEntity entity = world.getTileEntity(pos);
+        if (!(entity instanceof TileEntityLaptop)) {
+            entity = null;
+        }
+
+        world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(RivalRebels.controller, 1)));
+
+        entity.invalidate();
+        super.breakBlock(world, pos, state);
+    }
+
+    @Override
+    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+		((TileEntityLaptop) world.getTileEntity(pos)).refreshTasks();
+		if (!world.isRemote) {
+			player.openGui(RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
 		}
-		catch (Exception e)
-		{
-			// no error message ;]
-		}
-		
-		par1World.spawnEntityInWorld(new EntityItem(par1World, par2, par3, par4, new ItemStack(RivalRebels.controller, 1)));
-		
-		var7.invalidate();
-		
-		super.breakBlock(par1World, par2, par3, par4, par5, par6);
-	}
-	
-	/**
-	 * Called upon block activation (right click on the block.)
-	 */
-	@Override
-	public boolean onBlockActivated(World par1World, int par2, int par3, int par4, EntityPlayer par5EntityPlayer, int par6, float par7, float par8, float par9)
-	{
-		((TileEntityLaptop) par1World.getTileEntity(par2, par3, par4)).refreshTasks();
-		if (!par1World.isRemote)
-		{
-			FMLNetworkHandler.openGui(par5EntityPlayer, RivalRebels.instance, 0, par1World, par2, par3, par4);
-			// par5EntityPlayer.openGui(RivalRebels.instance, RivalRebels.rrchestGuiID, par1World, par2, par3, par4);
-		}
-		RivalRebelsSoundPlayer.playSound(par1World, 10, 3, par2, par3, par4);
-		
+		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
+
 		return true;
 	}
-	
+
 	/**
 	 * Returns a new instance of a block's tile entity class. Called on placing the block.
 	 */
@@ -154,19 +101,19 @@ public class BlockLaptop extends BlockContainer
 	{
 		return new TileEntityLaptop();
 	}
-	
-	@SideOnly(Side.CLIENT)
+
+	/*@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
 		icon = iconregister.registerIcon("RivalRebels:dc");
-	}
+	}*/
 }

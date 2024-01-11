@@ -19,58 +19,64 @@ import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import assets.rivalrebels.RivalRebels;
 
+import java.util.function.Predicate;
+
 public class SlotRR extends Slot
 {
-	int				maxStack			= 64;
-	Class<?>		limit				= Item.class;
-	boolean			acceptsTrollFace	= false;
-	boolean			acceptsTimedBomb	= false;
-	public boolean	locked				= false;
-	
-	public SlotRR(IInventory inv, int id, int x, int y, int mstack, Class<?> only)
-	{
-		super(inv, id, x, y);
-		maxStack = mstack;
-		limit = only;
+	private int	maxStack;
+    private final Predicate<ItemStack> stackLock;
+    boolean acceptsTrollFace = false;
+	boolean acceptsTimedBomb = false;
+	public boolean locked = false;
+
+	public SlotRR(IInventory inv, int id, int x, int y, int mstack, Class<?> only) {
+		this(inv, id, x, y, mstack, stack -> only.isAssignableFrom(stack.getItem().getClass()) || (stack.getItem() instanceof ItemBlock itemBlock && only.isAssignableFrom(itemBlock.getBlock().getClass())));
 	}
-	
+
+    public SlotRR(IInventory inv, int id, int x, int y, int mstack, Item only) {
+        this(inv, id, x, y, mstack, stack -> stack.getItem() == only);
+    }
+
+    public SlotRR(IInventory inv, int id, int x, int y, int mstack, Predicate<ItemStack> stackLock) {
+        super(inv, id, x, y);
+        this.maxStack = mstack;
+        this.stackLock = stackLock;
+    }
+
 	@Override
-	public boolean canTakeStack(EntityPlayer par1EntityPlayer)
+	public boolean canTakeStack(EntityPlayer player)
 	{
 		return !locked;
 	}
-	
+
 	@Override
 	public boolean isItemValid(ItemStack item)
 	{
 		if (locked) return false;
-		if (item == null) return false;
+		if (item.isEmpty()) return false;
 		boolean isblock = item.getItem() instanceof ItemBlock;
 		boolean trollface = acceptsTrollFace && (item.getItem() == RivalRebels.trollmask);
 		boolean timedbomb = acceptsTimedBomb && (item.getItem() == Item.getItemFromBlock(RivalRebels.timedbomb));
-		boolean itemmatch = limit.isAssignableFrom(item.getItem().getClass());
-		boolean blockmatch = isblock && limit.isAssignableFrom(((ItemBlock) item.getItem()).field_150939_a.getClass());
-		if (itemmatch || blockmatch || trollface || timedbomb) return true;
-		return false;
-	}
-	
+        return stackLock.test(item) || trollface || timedbomb;
+    }
+
 	@Override
 	public int getSlotStackLimit()
 	{
 		return maxStack;
 	}
-	
+
 	public SlotRR setAcceptsTrollface(boolean t)
 	{
 		acceptsTrollFace = t;
-		
+
 		return this;
 	}
-	
+
 	public SlotRR setAcceptsTimedBomb(boolean t)
 	{
 		acceptsTimedBomb = t;
-		
+
 		return this;
 	}
 }

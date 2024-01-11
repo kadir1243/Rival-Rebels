@@ -11,23 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
+import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.block.Block;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.monster.EntityCaveSpider;
-import net.minecraft.entity.monster.EntityCreeper;
-import net.minecraft.entity.monster.EntityEnderman;
-import net.minecraft.entity.monster.EntityGhast;
-import net.minecraft.entity.monster.EntityMagmaCube;
-import net.minecraft.entity.monster.EntityPigZombie;
-import net.minecraft.entity.monster.EntitySkeleton;
-import net.minecraft.entity.monster.EntitySlime;
-import net.minecraft.entity.monster.EntitySpider;
-import net.minecraft.entity.monster.EntityZombie;
+import net.minecraft.entity.monster.*;
 import net.minecraft.entity.passive.EntityAnimal;
 import net.minecraft.entity.passive.EntityBat;
 import net.minecraft.entity.passive.EntitySquid;
@@ -35,26 +26,25 @@ import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.MathHelper;
-import net.minecraft.util.MovingObjectPosition;
-import net.minecraft.util.Vec3;
+import net.minecraft.util.NonNullList;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+
+import java.util.List;
 
 public class EntityLaserBurst extends EntityInanimate
 {
 	private EntityPlayer	shooter;
-	
+
 	public EntityLaserBurst(World par1World)
 	{
 		super(par1World);
 		setSize(0.5F, 0.5F);
 	}
-	
+
 	public EntityLaserBurst(World par1World, EntityPlayer player)
 	{
 		super(par1World);
@@ -65,13 +55,12 @@ public class EntityLaserBurst extends EntityInanimate
 		posY -= 0.12D;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
 		setAccurateHeading(motionX, motionY, motionZ, 4F, 0.075f);
 	}
-	
+
 	public EntityLaserBurst(World par1World, EntityPlayer player, boolean accurate)
 	{
 		super(par1World);
@@ -82,45 +71,42 @@ public class EntityLaserBurst extends EntityInanimate
 		posY -= 0.12D;
 		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
 		setPosition(posX, posY, posZ);
-		yOffset = 0.0F;
 		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
 		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		setAccurateHeading(motionX, motionY, motionZ, 4F * (float)Math.random() + 1.0F, accurate?0.001F:0.075F);
+		setAccurateHeading(motionX, motionY, motionZ, 4F * (float)rand.nextDouble() + 1.0F, accurate?0.001F:0.075F);
 	}
 	public EntityLaserBurst(World par1World, double x, double y,double z, double mx, double my, double mz)
 	{
 		super(par1World);
 		setSize(0.5F, 0.5F);
 		setPosition(x,y,z);
-		yOffset = 0.0F;
 		setAnglesMotion(mx, my, mz);
 	}
-	
+
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
 		motionX = mx;
 		motionY = my;
 		motionZ = mz;
 		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt_double(mx * mx + mz * mz)) * 180.0D / Math.PI);
+		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
 	}
-	
+
 	public EntityLaserBurst(World par1World, double x, double y, double z, double mx, double my, double mz, EntityPlayer player)
 	{
 		super(par1World);
 		shooter = player;
 		setSize(0.5F, 0.5F);
 		setPosition(x, y, z);
-		yOffset = 0.0F;
 		motionX = mx;
 		motionZ = mz;
 		motionY = my;
 	}
-	
+
 	public void setAccurateHeading(double par1, double par3, double par5, float par7, float par8)
 	{
-		float var9 = MathHelper.sqrt_double(par1 * par1 + par3 * par3 + par5 * par5);
+		float var9 = MathHelper.sqrt(par1 * par1 + par3 * par3 + par5 * par5);
 		par1 /= var9;
 		par3 /= var9;
 		par5 /= var9;
@@ -133,29 +119,29 @@ public class EntityLaserBurst extends EntityInanimate
 		motionX = par1;
 		motionY = par3;
 		motionZ = par5;
-		float var10 = MathHelper.sqrt_double(par1 * par1 + par5 * par5);
+		float var10 = MathHelper.sqrt(par1 * par1 + par5 * par5);
 		prevRotationYaw = rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
 		prevRotationPitch = rotationPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI);
 	}
-	
+
 	@Override
-	public int getBrightnessForRender(float par1)
+	public int getBrightnessForRender()
 	{
 		return 1000;
 	}
-	
+
 	@Override
-	public float getBrightness(float par1)
+	public float getBrightness()
 	{
 		return 1000F;
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -163,105 +149,95 @@ public class EntityLaserBurst extends EntityInanimate
 	public void onUpdate()
 	{
 		super.onUpdate();
-		
+
 		++ticksExisted;
 		if (ticksExisted > 60) setDead();
-		
-		Vec3 var15 = Vec3.createVectorHelper(posX, posY, posZ);
-		Vec3 var2 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-		MovingObjectPosition var3 = worldObj.rayTraceBlocks(var15, var2);
-		var15 = Vec3.createVectorHelper(posX, posY, posZ);
-		var2 = Vec3.createVectorHelper(posX + motionX, posY + motionY, posZ + motionZ);
-		
+
+		Vec3d var15 = new Vec3d(posX, posY, posZ);
+		Vec3d var2 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		RayTraceResult var3 = world.rayTraceBlocks(var15, var2);
+		var15 = new Vec3d(posX, posY, posZ);
+		var2 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+
 		if (var3 != null)
 		{
-			var2 = Vec3.createVectorHelper(var3.hitVec.xCoord, var3.hitVec.yCoord, var3.hitVec.zCoord);
+			var2 = var3.hitVec;
 		}
-		
-		if (!worldObj.isRemote)
+
+		if (!world.isRemote)
 		{
 			Entity var4 = null;
-			List var5 = worldObj.getEntitiesWithinAABBExcludingEntity(this, boundingBox.addCoord(motionX, motionY, motionZ).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
-			Iterator var8 = var5.iterator();
-			
-			while (var8.hasNext())
-			{
-				Entity var9 = (Entity) var8.next();
-				
-				if (var9.canBeCollidedWith() && var9 != shooter)
-				{
-					float var10 = 0.3F;
-					AxisAlignedBB var11 = var9.boundingBox.expand(var10, var10, var10);
-					MovingObjectPosition var12 = var11.calculateIntercept(var15, var2);
-					
-					if (var12 != null)
-					{
-						double var13 = var15.distanceTo(var12.hitVec);
-						
-						if (var13 < var6 || var6 == 0.0D)
-						{
-							var4 = var9;
-							var6 = var13;
-						}
-					}
-				}
-			}
-			
+
+            for (Entity var9 : var5) {
+                if (var9.canBeCollidedWith() && var9 != shooter) {
+                    float var10 = 0.3F;
+                    AxisAlignedBB var11 = var9.getEntityBoundingBox().grow(var10, var10, var10);
+                    RayTraceResult var12 = var11.calculateIntercept(var15, var2);
+
+                    if (var12 != null) {
+                        double var13 = var15.distanceTo(var12.hitVec);
+
+                        if (var13 < var6 || var6 == 0.0D) {
+                            var4 = var9;
+                            var6 = var13;
+                        }
+                    }
+                }
+            }
+
 			if (var4 != null)
 			{
-				var3 = new MovingObjectPosition(var4);
+				var3 = new RayTraceResult(var4);
 			}
 		}
-		
+
 		if (var3 != null)
 		{
 			if (var3.entityHit == null)
 			{
-				Block blockID = worldObj.getBlock(var3.blockX, var3.blockY, var3.blockZ);
-				if (blockID == Blocks.tnt)
+				Block blockID = world.getBlockState(var3.getBlockPos()).getBlock();
+				if (blockID == Blocks.TNT)
 				{
-					if (!worldObj.isRemote)
+					if (!world.isRemote)
 					{
-						EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(worldObj, (var3.blockX + 0.5F), (var3.blockY + 0.5F), (var3.blockZ + 0.5F), shooter);
-						entitytntprimed.fuse = worldObj.rand.nextInt(entitytntprimed.fuse / 4) + entitytntprimed.fuse / 8;
-						worldObj.spawnEntityInWorld(entitytntprimed);
-						worldObj.setBlockToAir(var3.blockX, var3.blockY, var3.blockZ);
+						EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, (var3.getBlockPos().getX() + 0.5F), (var3.getBlockPos().getY() + 0.5F), (var3.getBlockPos().getZ() + 0.5F), shooter);
+						entitytntprimed.setFuse(world.rand.nextInt(entitytntprimed.getFuse() / 4) + entitytntprimed.getFuse() / 8);
+						world.spawnEntity(entitytntprimed);
+						world.setBlockToAir(var3.getBlockPos());
 					}
 				}
 				if (blockID == RivalRebels.remotecharge)
 				{
-					RivalRebels.remotecharge.onBlockDestroyedByExplosion(worldObj, var3.blockX, var3.blockY, var3.blockZ, null);
+					RivalRebels.remotecharge.onBlockExploded(world, var3.getBlockPos(), null);
 				}
 				if (blockID == RivalRebels.timedbomb)
 				{
-					RivalRebels.timedbomb.onBlockDestroyedByExplosion(worldObj, var3.blockX, var3.blockY, var3.blockZ, null);
+					RivalRebels.timedbomb.onBlockExploded(world, var3.getBlockPos(), null);
 				}
 				setDead();
 			}
 			else
 			{
-				if (var3.entityHit instanceof EntityPlayer && shooter != var3.entityHit)
-				{
-					EntityPlayer player = (EntityPlayer) var3.entityHit;
-					
-					ItemStack armorSlots[] = player.inventory.armorInventory;
-					int i = worldObj.rand.nextInt(4);
-					if (armorSlots[i] != null && !worldObj.isRemote)
+				if (var3.entityHit instanceof EntityPlayer player && shooter != var3.entityHit) {
+                    NonNullList<ItemStack> armorSlots = player.inventory.armorInventory;
+					int i = world.rand.nextInt(4);
+					if (!armorSlots.get(i).isEmpty() && !world.isRemote)
 					{
-						armorSlots[i].damageItem(24, player);
+						armorSlots.get(i).damageItem(24, player);
 					}
 					player.attackEntityFrom(RivalRebelsDamageSource.laserburst, 16);
 					if (player.getHealth() < 3 && player.isEntityAlive())
 					{
 						player.attackEntityFrom(RivalRebelsDamageSource.laserburst, 2000000);
 						player.deathTime = 0;
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 0, 0));
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 1, 0));
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 2, 0));
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 2, 0));
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 3, 0));
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 3, 0));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 0, 0));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 1, 0));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 2, 0));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 2, 0));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 3, 0));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 3, 0));
 					}
 					setDead();
 				}
@@ -342,16 +318,16 @@ public class EntityLaserBurst extends EntityInanimate
 						}
 						else
 						{
-							legs = (int) (entity.boundingBox.getAverageEdgeLength() * 2);
-							arms = (int) (entity.boundingBox.getAverageEdgeLength() * 2);
+							legs = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
+							arms = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
 							mobs = 11;
 						}
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 0, mobs));
-						worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 1, mobs));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 0, mobs));
+						world.spawnEntity(new EntityGore(world, var3.entityHit, 1, mobs));
 						for (int i = 0; i < arms; i++)
-							worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 2, mobs));
+							world.spawnEntity(new EntityGore(world, var3.entityHit, 2, mobs));
 						for (int i = 0; i < legs; i++)
-							worldObj.spawnEntityInWorld(new EntityGore(worldObj, var3.entityHit, 3, mobs));
+							world.spawnEntity(new EntityGore(world, var3.entityHit, 3, mobs));
 					}
 					setDead();
 				}
@@ -370,57 +346,33 @@ public class EntityLaserBurst extends EntityInanimate
 				}
 			}
 		}
-		
+
 		posX += motionX;
 		posY += motionY;
 		posZ += motionZ;
-		float var16 = MathHelper.sqrt_double(motionX * motionX + motionZ * motionZ);
+		float var16 = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
 		rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
-		
+
 		for (rotationPitch = (float) (Math.atan2(motionY, var16) * 180.0D / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F)
 		{
-			;
-		}
+        }
 		while (rotationPitch - prevRotationPitch >= 180.0F)
 		{
 			prevRotationPitch += 360.0F;
 		}
-		
+
 		while (rotationYaw - prevRotationYaw < -180.0F)
 		{
 			prevRotationYaw -= 360.0F;
 		}
-		
+
 		while (rotationYaw - prevRotationYaw >= 180.0F)
 		{
 			prevRotationYaw += 360.0F;
 		}
-		
+
 		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2F;
 		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
 		setPosition(posX, posY, posZ);
-	}
-	
-	/**
-	 * (abstract) Protected helper method to write subclass entity data to NBT.
-	 */
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-	{
-		
-	}
-	
-	/**
-	 * (abstract) Protected helper method to read subclass entity data from NBT.
-	 */
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
-		
-	}
-	
-	@Override
-	protected void entityInit()
-	{
 	}
 }

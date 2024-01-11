@@ -11,17 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.core;
 
+import assets.rivalrebels.RivalRebels;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.client.event.sound.SoundLoadEvent;
-import cpw.mods.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
-/**
- * Raised by the SoundManager.loadSoundSettings, this would be a good place for adding your custom sounds to the SoundPool.
- */
-public class RivalRebelsSoundEventHandler
-{
+public class RivalRebelsSoundEventHandler {
 	@SubscribeEvent
-	public void onSoundLoad(SoundLoadEvent event)
-	{
+	public void onSoundLoad(RegistryEvent.Register<SoundEvent> event) {
 		String[] soundFiles = {
 				// artillery
 				"aa/a1.ogg",
@@ -201,9 +200,10 @@ public class RivalRebelsSoundEventHandler
 				"ba/r.ogg",
 				"ba/s.ogg",
 		};
-		for (int i = 0; i < soundFiles.length; i++)
-		{
-			 //manager.sndHandler.addSound("rivalrebels:" + soundFiles[i]);
-		}
+        for (String soundFile : soundFiles) {
+            SoundEvent soundEvent = new SoundEvent(new ResourceLocation(RivalRebels.MODID, soundFile));
+            soundEvent.setRegistryName(RivalRebels.MODID, soundFile);
+            event.getRegistry().register(soundEvent);
+        }
 	}
 }

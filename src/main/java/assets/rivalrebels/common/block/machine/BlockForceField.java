@@ -11,68 +11,72 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import java.util.Random;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.material.Material;
-import net.minecraft.client.renderer.texture.IIconRegister;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.IIcon;
+import net.minecraft.block.properties.PropertyInteger;
+import net.minecraft.block.state.BlockStateContainer;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.util.EnumBlockRenderType;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
-import assets.rivalrebels.RivalRebels;
-import cpw.mods.fml.relauncher.Side;
-import cpw.mods.fml.relauncher.SideOnly;
+import org.jetbrains.annotations.Nullable;
 
-public class BlockForceField extends Block
-{
-	public BlockForceField()
-	{
-		super(Material.glass);
-		setBlockBounds(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
+import java.util.Random;
+
+public class BlockForceField extends Block {
+    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 6);
+	public BlockForceField() {
+		super(Material.GLASS);
+        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
 	}
-	
+    @Override
+    public int getMetaFromState(IBlockState state) {
+        return state.getValue(META);
+    }
+
+    @Override
+    public IBlockState getStateFromMeta(int meta) {
+        return this.getDefaultState().withProperty(META, meta);
+    }    @Override
+    public BlockStateContainer getBlockState() {
+        return new BlockStateContainer(this, META);
+    }
 	@Override
 	public int quantityDropped(Random random)
 	{
 		return 0;
 	}
-	
-	public int idDropped(int i, Random random)
-	{
-		return 0;
-	}
-	
-	/**
-	 * Updates the blocks bounds based on its current state. Args: world, x, y, z
-	 */
-	@Override
-	public void setBlockBoundsBasedOnState(IBlockAccess par1IBlockAccess, int par2, int par3, int par4)
-	{
-		int var5 = par1IBlockAccess.getBlockMetadata(par2, par3, par4);
+
+    @Override
+    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+		int var5 = state.getValue(META);
 		float var6 = 0.4375f;
-		
+
 		if (var5 == 4)
 		{
-			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 5)
 		{
-			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 2)
 		{
-			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+			return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		if (var5 == 3)
 		{
-			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+			return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
+
+        return new AxisAlignedBB(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
 	}
-	
+
 	// @Override
 	// public void onBlockAdded(World world, int x, int y, int z)
 	// {
@@ -85,121 +89,86 @@ public class BlockForceField extends Block
 	// if (par1World.rand.nextInt(20) == 0) par1World.setBlock(x, y, z, 0);
 	// else par1World.scheduleBlockUpdate(x, y, z, blockID, par1World.rand.nextInt(10)+10);
 	// }
-	
-	/**
-	 * Sets the block's bounds for rendering it as an item
-	 */
-	@Override
-	public void setBlockBoundsForItemRender()
-	{
-		setBlockBounds(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
-	}
-	
-	/**
-	 * Returns a bounding box from the pool of bounding boxes (this means this box can change after the pool has been cleared to be reused)
-	 */
-	@Override
-	public AxisAlignedBB getCollisionBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		int var5 = par1World.getBlockMetadata(par2, par3, par4);
+
+    @Nullable
+    @Override
+    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+		int var5 = state.getValue(META);
 		float var6 = 0.4375f;
-		
+
 		if (var5 == 4)
 		{
-			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 5)
 		{
-			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 2)
 		{
-			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		if (var5 == 3)
 		{
-			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
-		return super.getCollisionBoundingBoxFromPool(par1World, par2, par3, par4);
+
+		return super.getCollisionBoundingBox(state, world, pos);
 	}
-	
-	@Override
-	@SideOnly(Side.CLIENT)
-	/**
-	 * Returns the bounding box of the wired rectangular prism to render.
-	 */
-	public AxisAlignedBB getSelectedBoundingBoxFromPool(World par1World, int par2, int par3, int par4)
-	{
-		int var5 = par1World.getBlockMetadata(par2, par3, par4);
+
+    @Override
+    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+		int var5 = state.getValue(META);
 		float var6 = 0.4375f;
-		
+
 		if (var5 == 4)
 		{
-			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 5)
 		{
-			setBlockBounds(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		}
-		
+
 		if (var5 == 2)
 		{
-			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
+
 		if (var5 == 3)
 		{
-			setBlockBounds(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
-		
-		return super.getSelectedBoundingBoxFromPool(par1World, par2, par3, par4);
+
+		return super.getSelectedBoundingBox(state, worldIn, pos);
 	}
-	
-	/**
-	 * Is this block (a) opaque and (b) a full 1m cube? This determines whether or not to render the shared face of two adjacent blocks and also whether the player can attach torches, redstone wire,
-	 * etc to this block.
-	 */
-	@Override
-	public boolean isOpaqueCube()
+
+    @Override
+	public boolean isOpaqueCube(IBlockState state)
 	{
 		return false;
 	}
-	
-	/**
-	 * If this block doesn't render as an ordinary block it will return False (examples: signs, buttons, stairs, etc)
-	 */
-	@Override
-	public boolean renderAsNormalBlock()
-	{
-		return false;
-	}
-	
-	/**
-	 * The type of render function that is called for this block
-	 */
-	@Override
-	public int getRenderType()
-	{
-		return RivalRebels.goodRender ? -1 : 0;
-	}
-	
-	@SideOnly(Side.CLIENT)
+
+    @Override
+    public EnumBlockRenderType getRenderType(IBlockState state) {
+        return EnumBlockRenderType.INVISIBLE;
+    }
+    /*@SideOnly(Side.CLIENT)
 	IIcon	icon;
-	
+
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
 		return icon;
 	}
-	
+
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
 		icon = iconregister.registerIcon("RivalRebels:di");
-	}
+	}*/
 }

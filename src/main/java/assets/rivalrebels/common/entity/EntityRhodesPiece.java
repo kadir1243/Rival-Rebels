@@ -11,25 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import java.util.Iterator;
-import java.util.List;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.AxisAlignedBB;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.MathHelper;
-import net.minecraft.world.World;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.RhodesPiecePacket;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.MoverType;
+import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.DamageSource;
+import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.world.World;
 
 public class EntityRhodesPiece extends Entity
 {
@@ -38,14 +31,14 @@ public class EntityRhodesPiece extends Entity
 	private float mpitch;
 	public float scale = 1.0f;
 	public int color = 0;
-	
+
 	public EntityRhodesPiece(World w)
 	{
 		super(w);
 		setSize(4F, 2F);
-		boundingBox.setBounds(-1.5, -1.5, -1.5, 1.5, 1.5, 1.5);
+		setEntityBoundingBox(new AxisAlignedBB(-1.5, -1.5, -1.5, 1.5, 1.5, 1.5));
 	}
-	
+
 	public EntityRhodesPiece(World w, double x, double y, double z, float s, int c)
 	{
 		this(w);
@@ -58,31 +51,25 @@ public class EntityRhodesPiece extends Entity
 		motionY = (float) Math.abs(rand.nextGaussian()*0.75);
 		motionZ = (float) (rand.nextGaussian()*0.75);
 	}
-	
+
 	@Override
 	public AxisAlignedBB getCollisionBox(Entity par1Entity)
 	{
-		return par1Entity.boundingBox;
+		return par1Entity.getEntityBoundingBox();
 	}
-	
-	@Override
-	public AxisAlignedBB getBoundingBox()
-	{
-		return this.boundingBox;
-	}
-	
+
 	@Override
 	public boolean canBeCollidedWith()
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean canBePushed()
 	{
 		return true;
 	}
-	
+
 	/**
 	 * Called to update the entity's position/logic.
 	 */
@@ -92,7 +79,7 @@ public class EntityRhodesPiece extends Entity
 		super.onUpdate();
 		if (ticksExisted == 1) PacketDispatcher.packetsys.sendToAll(new RhodesPiecePacket(this));
 		ticksExisted++;
-		if (worldObj.rand.nextInt(Math.max(getMaxAge()*(RivalRebels.rhodesPromode?1:30) - ticksExisted, RivalRebels.rhodesPromode?100:1))==0)
+		if (world.rand.nextInt(Math.max(getMaxAge()*(RivalRebels.rhodesPromode?1:30) - ticksExisted, RivalRebels.rhodesPromode?100:1))==0)
 		{
 			setDead();
 		}
@@ -106,7 +93,7 @@ public class EntityRhodesPiece extends Entity
 		mpitch *= 0.98f;
 		rotationYaw += myaw;
 		rotationPitch += mpitch;
-		if (isCollidedVertically)
+		if (collidedVertically)
 		{
 			rotationPitch = Math.round(rotationPitch / 90f)*90;
 			motionX *= 0.7f;
@@ -116,38 +103,38 @@ public class EntityRhodesPiece extends Entity
 		{
 			motionY -= 0.1;
 		}
-		moveEntity(motionX, motionY, motionZ);
+		move(MoverType.SELF, motionX, motionY, motionZ);
 	}
-	
+
 	public int getMaxAge()
 	{
 		return 100;
 	}
-	
+
 	@Override
 	public boolean isInRangeToRenderDist(double par1)
 	{
 		return true;
 	}
-	
+
 	@Override
 	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
 	{
 		super.attackEntityFrom(par1DamageSource, par2);
-		if (!isDead && !worldObj.isRemote)
+		if (!isDead && !world.isRemote)
 		{
 			health -= par2;
 			if (health <= 0)
 			{
 				setDead();
-				new Explosion(worldObj, posX, posY, posZ, 6, true, true, RivalRebelsDamageSource.rocket);
+				new Explosion(world, posX, posY, posZ, 6, true, true, RivalRebelsDamageSource.rocket);
 				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
 			}
 		}
-		
+
 		return true;
 	}
-	
+
 	@Override
 	protected void entityInit()
 	{

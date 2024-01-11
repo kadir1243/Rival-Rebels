@@ -11,14 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
+import assets.rivalrebels.RivalRebels;
 import net.minecraft.item.ItemTool;
-import net.minecraft.item.Item.ToolMaterial;
 
 import java.util.HashSet;
-
-import assets.rivalrebels.RivalRebels;
 
 public class ItemRod extends ItemTool
 {
@@ -26,16 +22,10 @@ public class ItemRod extends ItemTool
 
 	public ItemRod()
 	{
-		super(1, ToolMaterial.EMERALD, new HashSet<>());
-		maxStackSize = 1;
+		super(ToolMaterial.DIAMOND, new HashSet<>());
+		setMaxStackSize(1);
 		this.setMaxDamage(32);
 		setCreativeTab(RivalRebels.rralltab);
-	}
-
-	@Override
-	public boolean isItemTool(ItemStack is)
-	{
-		return true;
 	}
 
 	@Override
