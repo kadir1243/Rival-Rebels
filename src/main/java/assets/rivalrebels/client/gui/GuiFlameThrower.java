@@ -11,23 +11,24 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-
-import org.lwjgl.input.Keyboard;
-
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiFTKnob;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.common.packet.PacketDispatcher;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
 
-public class GuiFlameThrower extends GuiScreen
+public class GuiFlameThrower extends Screen
 {
 	private final int	xSizeOfTexture	= 256;
 	private final int	ySizeOfTexture	= 256;
@@ -36,50 +37,48 @@ public class GuiFlameThrower extends GuiScreen
 	private GuiFTKnob	knob;
 	private final int start;
 
-	public GuiFlameThrower(int start)
-	{
-		this.start = start;
+	public GuiFlameThrower(int start) {
+        super(Text.of(""));
+        this.start = start;
 	}
 
 	@Override
-	public void initGui()
-	{
+	public void init() {
 		posX = (width - xSizeOfTexture) / 2;
 		posY = (height - ySizeOfTexture) / 2;
-		buttonList.clear();
-		knob = new GuiFTKnob(0, posX + 108, posY + 176, -90, 90, start, true, "Knob");
-		buttonList.add(knob);
-	}
-
-	@Override
-	public boolean doesGuiPauseGame()
-	{
-		return false;
+		drawables.clear();
+		knob = new GuiFTKnob(posX + 108, posY + 176, -90, 90, start, true, "Knob");
+		addDrawable(knob);
 	}
 
     @Override
-	public void drawScreen(int x, int y, float d)
-	{
+    public boolean shouldPause() {
+        return false;
+    }
+
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		Tessellator tessellator = Tessellator.getInstance();
 		float f = 0.00390625F;
-		mc = Minecraft.getMinecraft();
-		mc.renderEngine.bindTexture(RivalRebels.guiflamethrower);
+		client = MinecraftClient.getInstance();
+		client.textureManager.bindTexture(RRIdentifiers.guiflamethrower);
         BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(posX, posY + ySizeOfTexture, zLevel).tex(0, ySizeOfTexture * f).endVertex();
-		buffer.pos(posX + xSizeOfTexture, posY + ySizeOfTexture, zLevel).tex(xSizeOfTexture * f, ySizeOfTexture * f).endVertex();
-		buffer.pos(posX + xSizeOfTexture, posY, zLevel).tex(xSizeOfTexture * f, 0).endVertex();
-		buffer.pos(posX, posY, zLevel).tex(0, 0).endVertex();
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		buffer.vertex(posX, posY + ySizeOfTexture, getZOffset()).texture(0, ySizeOfTexture * f).next();
+		buffer.vertex(posX + xSizeOfTexture, posY + ySizeOfTexture, getZOffset()).texture(xSizeOfTexture * f, ySizeOfTexture * f).next();
+		buffer.vertex(posX + xSizeOfTexture, posY, getZOffset()).texture(xSizeOfTexture * f, 0).next();
+		buffer.vertex(posX, posY, getZOffset()).texture(0, 0).next();
 		tessellator.draw();
-		super.drawScreen(x, y, d);
-		if (!(RivalRebels.altRkey?Keyboard.isKeyDown(Keyboard.KEY_F):Keyboard.isKeyDown(Keyboard.KEY_R)))
-		{
-			mc.displayGuiScreen(null);
-			mc.setIngameFocus();
-			ItemStack itemstack = mc.player.inventory.getStackInSlot(mc.player.inventory.currentItem);
-			if (!itemstack.hasTagCompound()) itemstack.setTagCompound(new NBTTagCompound());
-			itemstack.getTagCompound().setInteger("mode", knob.getDegree());
-			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(mc.player.inventory.currentItem, knob.getDegree()));
+        super.render(matrices, mouseX, mouseY, delta);
+		if (!(ClientProxy.USE_KEY.isPressed())) {
+			client.setScreen(null);
+			client.onWindowFocusChanged(true);
+			ItemStack itemstack = client.player.getStackInHand(Hand.MAIN_HAND);
+            if (itemstack.getItem() != RRItems.flamethrower) {
+                itemstack = client.player.getStackInHand(Hand.OFF_HAND);
+            }
+			itemstack.getOrCreateNbt().putInt("mode", knob.getDegree());
+			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
 		}
 	}
 }

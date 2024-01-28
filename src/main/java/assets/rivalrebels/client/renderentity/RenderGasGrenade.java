@@ -11,34 +11,28 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityGasGrenade;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 
-public class RenderGasGrenade extends Render<EntityGasGrenade>
+public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade>
 {
-    public RenderGasGrenade(RenderManager renderManager) {
+    public RenderGasGrenade(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void doRender(EntityGasGrenade entity, double x, double y, double z, float entityYaw, float partialTicks) {
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etgasgrenade);
-        GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x, (float) y, (float) z);
-		GlStateManager.rotate(entity.prevRotationYaw + (entity.rotationYaw - entity.prevRotationYaw) * partialTicks - 90.0F, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(entity.prevRotationPitch + (entity.rotationPitch - entity.prevRotationPitch) * partialTicks, 0.0F, 0.0F, 1.0F);
-		Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+    public void render(EntityGasGrenade entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		matrices.push();
+		matrices.multiply(new Quaternion(entity.prevYaw + (entity.getYaw() - entity.prevYaw) * tickDelta - 90.0F, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternion(entity.prevPitch + (entity.getPitch() - entity.prevPitch) * tickDelta, 0.0F, 0.0F, 1.0F));
         byte var11 = 0;
 		float var12 = 0.0F;
 		float var13 = 0.5F;
@@ -50,42 +44,32 @@ public class RenderGasGrenade extends Render<EntityGasGrenade>
 		float var19 = (10 + var11 * 10) / 32.0F;
 		float var20 = 0.05625F;
 
-		GlStateManager.rotate(45.0F, 1.0F, 0.0F, 0.0F);
-		GlStateManager.scale(var20, var20, var20);
-		GlStateManager.translate(-4.0F, 0.0F, 0.0F);
-		GlStateManager.glNormal3f(var20, 0.0F, 0.0F);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(-7.0D, -2.0D, -2.0D).tex(var16, var18).endVertex();
-		buffer.pos(-7.0D, -2.0D, 2.0D).tex(var17, var18).endVertex();
-		buffer.pos(-7.0D, 2.0D, 2.0D).tex(var17, var19).endVertex();
-		buffer.pos(-7.0D, 2.0D, -2.0D).tex(var16, var19).endVertex();
-		tessellator.draw();
-		GlStateManager.glNormal3f(-var20, 0.0F, 0.0F);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(-7.0D, 2.0D, -2.0D).tex(var16, var18).endVertex();
-		buffer.pos(-7.0D, 2.0D, 2.0D).tex(var17, var18).endVertex();
-		buffer.pos(-7.0D, -2.0D, 2.0D).tex(var17, var19).endVertex();
-		buffer.pos(-7.0D, -2.0D, -2.0D).tex(var16, var19).endVertex();
-		tessellator.draw();
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        matrices.multiply(new Quaternion(45.0F, 1.0F, 0.0F, 0.0F));
+		matrices.scale(var20, var20, var20);
+		matrices.translate(-4.0F, 0.0F, 0.0F);
+		buffer.vertex(-7.0D, -2.0D, -2.0D).normal(var20, 0.0F, 0.0F).texture(var16, var18).next();
+		buffer.vertex(-7.0D, -2.0D, 2.0D).normal(var20, 0.0F, 0.0F).texture(var17, var18).next();
+		buffer.vertex(-7.0D, 2.0D, 2.0D).normal(var20, 0.0F, 0.0F).texture(var17, var19).next();
+		buffer.vertex(-7.0D, 2.0D, -2.0D).normal(var20, 0.0F, 0.0F).texture(var16, var19).next();
+		buffer.vertex(-7.0D, 2.0D, -2.0D).normal(-var20, 0.0F, 0.0F).texture(var16, var18).next();
+		buffer.vertex(-7.0D, 2.0D, 2.0D).normal(-var20, 0.0F, 0.0F).texture(var17, var18).next();
+		buffer.vertex(-7.0D, -2.0D, 2.0D).normal(-var20, 0.0F, 0.0F).texture(var17, var19).next();
+		buffer.vertex(-7.0D, -2.0D, -2.0D).normal(-var20, 0.0F, 0.0F).texture(var16, var19).next();
 
-		for (int var23 = 0; var23 < 4; ++var23)
-		{
-			GlStateManager.rotate(90.0F, 1.0F, 0.0F, 0.0F);
-			GlStateManager.glNormal3f(0.0F, 0.0F, var20);
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(-8.0D, -2.0D, 0.0D).tex(var12, var14).endVertex();
-			buffer.pos(8.0D, -2.0D, 0.0D).tex(var13, var14).endVertex();
-			buffer.pos(8.0D, 2.0D, 0.0D).tex(var13, var15).endVertex();
-			buffer.pos(-8.0D, 2.0D, 0.0D).tex(var12, var15).endVertex();
-			tessellator.draw();
+		for (int var23 = 0; var23 < 4; ++var23) {
+			matrices.multiply(new Quaternion(90.0F, 1.0F, 0.0F, 0.0F));
+			buffer.vertex(-8.0D, -2.0D, 0.0D).normal(0.0F, 0.0F, var20).texture(var12, var14).next();
+			buffer.vertex(8.0D, -2.0D, 0.0D).normal(0.0F, 0.0F, var20).texture(var13, var14).next();
+			buffer.vertex(8.0D, 2.0D, 0.0D).normal(0.0F, 0.0F, var20).texture(var13, var15).next();
+			buffer.vertex(-8.0D, 2.0D, 0.0D).normal(0.0F, 0.0F, var20).texture(var12, var15).next();
 		}
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 
-	@Override
-	protected ResourceLocation getEntityTexture(EntityGasGrenade entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityGasGrenade entity) {
+        return RRIdentifiers.etgasgrenade;
+    }
 }

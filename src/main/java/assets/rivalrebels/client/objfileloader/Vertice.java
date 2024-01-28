@@ -11,13 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
-import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class Vertice
 {
 	public Vec3d p;
@@ -42,14 +42,9 @@ public class Vertice
         n = n.normalize();
 	}
 
-	public void render(BufferBuilder buffer)
+	public void render(VertexConsumer buffer)
 	{
-        buffer.pos(p.x, p.y, p.z).tex(t.x, t.y).normal((float) n.x, (float) n.y, (float) n.z).endVertex();
-	}
-
-	public void renderWireframe(BufferBuilder buffer)
-	{
-		buffer.pos(p.x, p.y, p.z).endVertex();
+        buffer.vertex(p.x, p.y, p.z).texture(t.x, t.y).normal((float) n.x, (float) n.y, (float) n.z).next();
 	}
 
     public Vertice copy() {

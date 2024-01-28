@@ -13,51 +13,39 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.entity.EntityTsar;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderTsar extends Render
+@OnlyIn(Dist.CLIENT)
+public class RenderTsar extends EntityRenderer<EntityTsar>
 {
-	private ModelTsarBomba	model;
+	private final ModelTsarBomba model;
 
-	public RenderTsar(RenderManager manager)
+	public RenderTsar(EntityRendererFactory.Context manager)
 	{
         super(manager);
 		model = new ModelTsarBomba();
 	}
 
-	public void renderB83(EntityTsar b83, double x, double y, double z, float par8, float par9)
-	{
-		GlStateManager.disableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x, (float) y, (float) z);
-		GlStateManager.rotate(b83.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-		//GlStateManager.rotate(90.0f, 1.0F, 0.0F, 0.0F);
-		GlStateManager.rotate(b83.rotationPitch - 90.0f, 0.0F, 0.0F, 1.0F);
-		model.render();
-		GlStateManager.popMatrix();
+    @Override
+    public void render(EntityTsar entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		matrices.push();
+		matrices.multiply(new Quaternion(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+		//GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
+		matrices.multiply(new Quaternion(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
+		model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()));
+		matrices.pop();
 	}
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity p_76986_1_, double p_76986_2_, double p_76986_4_, double p_76986_6_, float p_76986_8_, float p_76986_9_)
-	{
-		renderB83((EntityTsar) p_76986_1_, p_76986_2_, p_76986_4_, p_76986_6_, p_76986_8_, p_76986_9_);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityTsar entity) {
+        return null;
+    }
 }

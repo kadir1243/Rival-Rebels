@@ -11,22 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.init.Blocks;
+import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
 public class BlockAutoForceField extends BlockAutoTemplate
 {
-	public BlockAutoForceField()
+	public BlockAutoForceField(Settings settings)
 	{
-		super();
+		super(settings);
 	}
 
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			int r = 2;
 			int h = 6;
@@ -39,51 +39,51 @@ public class BlockAutoForceField extends BlockAutoTemplate
 					{
 						if (((Math.abs(x1) == r || Math.abs(z1) == r) && (y1 != 3 || (Math.abs(x1) != 0 && Math.abs(z1) != 0))) || y1 == 0 || y1 == h)
 						{
-							placeBlockCarefully(world, x + x1, y + y1, z + z1, RivalRebels.reactive);
+							placeBlockCarefully(world, x + x1, y + y1, z + z1, RRBlocks.reactive);
 						}
 						else
 						{
-							placeBlockCarefully(world, x + x1, y + y1, z + z1, Blocks.AIR, 0, 2);
+							placeBlockCarefully(world, x + x1, y + y1, z + z1, Blocks.AIR);
 						}
 					}
 				}
 				if (y1 != 3)
 				{
-					placeBlockCarefully(world, x + r + 1, y + y1, z, RivalRebels.reactive);
-					placeBlockCarefully(world, x - r - 1, y + y1, z, RivalRebels.reactive);
-					placeBlockCarefully(world, x, y + y1, z + r + 1, RivalRebels.reactive);
-					placeBlockCarefully(world, x, y + y1, z - r - 1, RivalRebels.reactive);
+					placeBlockCarefully(world, x + r + 1, y + y1, z, RRBlocks.reactive);
+					placeBlockCarefully(world, x - r - 1, y + y1, z, RRBlocks.reactive);
+					placeBlockCarefully(world, x, y + y1, z + r + 1, RRBlocks.reactive);
+					placeBlockCarefully(world, x, y + y1, z - r - 1, RRBlocks.reactive);
 				}
 				else
 				{
 					for (int z1 = -r; z1 <= r; z1++)
 					{
-						placeBlockCarefully(world, x, y + y1, z + z1, RivalRebels.conduit);
+						placeBlockCarefully(world, x, y + y1, z + z1, RRBlocks.conduit);
 					}
 
 					for (int x1 = -r; x1 <= r; x1++)
 					{
-						placeBlockCarefully(world, x + x1, y + y1, z, RivalRebels.conduit);
+						placeBlockCarefully(world, x + x1, y + y1, z, RRBlocks.conduit);
 					}
 				}
 			}
 		}
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -96,7 +96,7 @@ public class BlockAutoForceField extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

@@ -11,70 +11,65 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class BlockSigmaArmor extends Block
 {
-	public BlockSigmaArmor()
+	public BlockSigmaArmor(Settings settings)
 	{
-		super(Material.WOOD);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+		super(settings);
 	}
 
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-        blockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player);
-    }
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
 
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
-	{
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			player.sendMessage(new TextComponentString("§7[§2Inventory§7]"));
-			player.sendMessage(new TextComponentString("§aArmor. §9(Sigma's color armor.)"));
-			player.sendMessage(new TextComponentString("§7[§4Orders§7] §cEquipt your set of armor."));
-			EntityItem ei7 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camohat2));
-			EntityItem ei8 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camoshirt2));
-			EntityItem ei9 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camopants2));
-			EntityItem ei10 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.camoshoes2));
+			player.sendMessage(Text.of("§7[§2Inventory§7]"), false);
+			player.sendMessage(Text.of("§aArmor. §9(Sigma's color armor.)"), false);
+			player.sendMessage(Text.of("§7[§4Orders§7] §cEquipt your set of armor."), false);
+			ItemEntity ei7 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camohat2));
+			ItemEntity ei8 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshirt2));
+			ItemEntity ei9 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camopants2));
+			ItemEntity ei10 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshoes2));
 			world.spawnEntity(ei7);
 			world.spawnEntity(ei8);
 			world.spawnEntity(ei9);
 			world.spawnEntity(ei10);
-            world.setBlockToAir(new BlockPos(x, y, z));
+            world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		}
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -87,7 +82,7 @@ public class BlockSigmaArmor extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

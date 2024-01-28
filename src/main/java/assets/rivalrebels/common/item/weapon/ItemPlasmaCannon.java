@@ -12,99 +12,102 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.PlasmaCannonRenderer;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.item.ToolItem;
+import net.minecraft.item.ToolMaterials;
+import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderProperties;
 
-import java.util.HashSet;
+import java.util.function.Consumer;
 
-public class ItemPlasmaCannon extends ItemTool
+public class ItemPlasmaCannon extends ToolItem
 {
-	public ItemPlasmaCannon()
-	{
-		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+	public ItemPlasmaCannon() {
+		super(ToolMaterials.DIAMOND, new Settings().maxCount(1).group(RRItems.rralltab));
 	}
-
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new PlasmaCannonRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 	@Override
-	public int getItemEnchantability()
+	public int getEnchantability()
 	{
 		return 100;
 	}
 
 	@Override
-	public boolean isFull3D()
+	public UseAction getUseAction(ItemStack stack)
 	{
-		return true;
+		return UseAction.BOW;
 	}
 
 	@Override
-	public EnumAction getItemUseAction(ItemStack stack)
-	{
-		return EnumAction.BOW;
-	}
-
-	@Override
-	public int getMaxItemUseDuration(ItemStack stack)
+	public int getMaxUseTime(ItemStack stack)
 	{
 		return 64;
 	}
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        ItemStack hydrodStack = ItemUtil.getItemStack(player, RivalRebels.hydrod);
-        if (player.capabilities.isCreativeMode || !hydrodStack.isEmpty() || RivalRebels.infiniteAmmo) {
-			player.setActiveHand(hand);
-			if (!player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo) {
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack stack = user.getStackInHand(hand);
+        ItemStack hydrodStack = ItemUtil.getItemStack(user, RRItems.hydrod);
+        if (user.getAbilities().invulnerable || !hydrodStack.isEmpty() || RivalRebels.infiniteAmmo) {
+			user.setCurrentHand(hand);
+			if (!user.getAbilities().invulnerable && !RivalRebels.infiniteAmmo) {
 				if (!hydrodStack.isEmpty())
 				{
-					hydrodStack.damageItem(1, player);
-					if (hydrodStack.getItemDamage() == hydrodStack.getMaxDamage())
+					hydrodStack.damage(1, user, player -> player.sendToolBreakStatus(hand));
+					if (hydrodStack.getDamage() == hydrodStack.getMaxDamage())
 					{
-						hydrodStack.shrink(1);
+						hydrodStack.decrement(1);
                         if (hydrodStack.isEmpty())
-                            player.inventory.deleteStack(hydrodStack);
-						player.inventory.addItemStackToInventory(RivalRebels.emptyrod.getDefaultInstance());
+                            user.getInventory().removeOne(hydrodStack);
+						user.getInventory().insertStack(RRItems.emptyrod.getDefaultStack());
 					}
-					player.setActiveHand(hand);
+					user.setCurrentHand(hand);
 				}
 				else
 				{
-					return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+					return TypedActionResult.success(stack, world.isClient);
 				}
 			}
-			RivalRebelsSoundPlayer.playSound(player, 16, 1, 0.25f);
+			RivalRebelsSoundPlayer.playSound(user, 16, 1, 0.25f);
 		}
-		else if (!world.isRemote)
+		else if (!world.isClient)
 		{
-			player.sendMessage(new TextComponentString("§cOut of Hydrogen"));
+			user.sendMessage(Text.of("§cOut of Hydrogen"), true);
 		}
-		return ActionResult.newResult(EnumActionResult.PASS, stack);
+		return TypedActionResult.success(stack, world.isClient);
 	}
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entityLiving, int timeLeft) {
-		if (!world.isRemote)
-		{
-			float f = (getMaxItemUseDuration(stack) - timeLeft) / 20.0F;
+    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+		if (!world.isClient) {
+            float f = (getMaxUseTime(stack) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
 			f+=0.2f;
-			RivalRebelsSoundPlayer.playSound(entityLiving, 16, 2);
-			Entity entity = new EntityPlasmoid(world, entityLiving, f+0.5f, stack.isItemEnchanted());
+			RivalRebelsSoundPlayer.playSound(user, 16, 2);
+			Entity entity = new EntityPlasmoid(world, user, f+0.5f, stack.hasEnchantments());
 			world.spawnEntity(entity);
 		}
 	}

@@ -11,27 +11,34 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.block.trap.BlockTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer<TileEntityTachyonBomb> {
+@OnlyIn(Dist.CLIENT)
+public class TileEntityTachyonBombRenderer implements BlockEntityRenderer<TileEntityTachyonBomb> {
+    public TileEntityTachyonBombRenderer(BlockEntityRendererFactory.Context context) {
+    }
+
     @Override
-    public void render(TileEntityTachyonBomb te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		GlStateManager.disableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 1.0F, (float) z + 0.5F);
-		GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-		int metadata = te.getBlockMetadata();
+    public void render(TileEntityTachyonBomb entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 1F, (float) entity.getPos().getZ() + 0.5F);
+		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
+		int metadata = entity.getCachedState().get(BlockTachyonBomb.META);
 
 		if (metadata == 2)
 		{
-			GlStateManager.rotate(180, 0, 1, 0);
+			matrices.multiply(new Quaternion(180, 0, 1, 0));
 		}
 
 		if (metadata == 3)
@@ -40,15 +47,22 @@ public class TileEntityTachyonBombRenderer extends TileEntitySpecialRenderer<Til
 
 		if (metadata == 4)
 		{
-			GlStateManager.rotate(-90, 0, 1, 0);
+			matrices.multiply(new Quaternion(-90, 0, 1, 0));
 		}
 
 		if (metadata == 5)
 		{
-			GlStateManager.rotate(90, 0, 1, 0);
+			matrices.multiply(new Quaternion(90, 0, 1, 0));
 		}
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettachyonbomb);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.ettachyonbomb);
 		//RenderTachyonBomb.bomb.renderAll();
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
+
+    @Override
+    public int getRenderDistance()
+    {
+        return 16384;
+    }
+
 }

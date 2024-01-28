@@ -11,7 +11,20 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import net.minecraft.tileentity.TileEntity;
+import assets.rivalrebels.common.entity.EntityRhodes;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.math.BlockPos;
 
-public class TileEntityNukeCrate extends TileEntity {
+public class TileEntityNukeCrate extends BlockEntity {
+    public TileEntityNukeCrate(BlockPos pos, BlockState state) {
+        super(RRTileEntities.NUKE_CRATE, pos, state);
+        EntityRhodes.BLOCK_ENTITIES.put(pos, this);
+    }
+
+    @Override
+    public void markRemoved() {
+        super.markRemoved();
+        EntityRhodes.BLOCK_ENTITIES.remove(getPos());
+    }
 }

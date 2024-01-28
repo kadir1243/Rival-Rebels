@@ -11,110 +11,111 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
+import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.TeslaRenderer;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRaytrace;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.client.Minecraft;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
+import net.minecraft.item.ToolItem;
+import net.minecraft.item.ToolMaterials;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
-import org.lwjgl.input.Keyboard;
+import net.minecraftforge.client.IItemRenderProperties;
 
-import java.util.HashSet;
+import java.util.function.Consumer;
 
-public class ItemTesla extends ItemTool
-{
-	public ItemTesla()
-	{
-		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+public class ItemTesla extends ToolItem {
+	public ItemTesla() {
+		super(ToolMaterials.DIAMOND, new Settings().maxCount(1).group(RRItems.rralltab));
 	}
-
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new TeslaRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 	@Override
-	public int getItemEnchantability()
+	public int getEnchantability()
 	{
 		return 100;
 	}
 
 	@Override
-	public boolean isFull3D()
+	public UseAction getUseAction(ItemStack stack)
 	{
-		return true;
+		return UseAction.BOW;
 	}
 
 	@Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
-	{
-		return EnumAction.BOW;
-	}
-
-	@Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
+	public int getMaxUseTime(ItemStack stack)
 	{
 		return 20;
 	}
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-		ItemStack stack = player.getHeldItem(hand);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+		ItemStack stack = player.getStackInHand(hand);
         int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
-        ItemStack battery = ItemUtil.getItemStack(player, RivalRebels.battery);
-        if (player.capabilities.isCreativeMode || !battery.isEmpty() || RivalRebels.infiniteAmmo)
+        ItemStack battery = ItemUtil.getItemStack(player, RRItems.battery);
+        if (player.getAbilities().invulnerable || !battery.isEmpty() || RivalRebels.infiniteAmmo)
 		{
-			if (!player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
+			if (!player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
 			{
-                battery.shrink(1);
-				if (chance > 0.33333) battery.shrink(1);
-				if (chance > 0.66666) battery.shrink(1);
+                battery.decrement(1);
+				if (chance > 0.33333) battery.decrement(1);
+				if (chance > 0.66666) battery.decrement(1);
                 if (battery.isEmpty()) {
-                    player.inventory.deleteStack(battery);
+                    player.getInventory().removeOne(battery);
                 }
             }
-			player.setActiveHand(hand);
+			player.setCurrentHand(hand);
 		}
-		else if (!world.isRemote)
+		else if (!world.isClient)
 		{
-			player.sendMessage(new TextComponentString("§cOut of batteries"));
+			player.sendMessage(Text.of("§cOut of batteries"), false);
 		}
-		if (message && world.isRemote)
+		if (message && world.isClient)
 		{
-			player.sendMessage(new TextComponentTranslation("RivalRebels.Orders").appendText(" ").appendSibling(new TextComponentTranslation("RivalRebels.message.use")).appendText(" [R]."));
+			player.sendMessage(new TranslatableText("RivalRebels.Orders").append(" ").append(new TranslatableText("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
-		return ActionResult.newResult(EnumActionResult.PASS, stack);
+		return TypedActionResult.success(stack, world.isClient);
 	}
 	boolean message = true;
 
     @Override
-    public void onUpdate(ItemStack stack, World world, Entity entity, int itemSlot, boolean isSelected) {
-        if (world.isRemote) {
-            if ((RivalRebels.altRkey ? Keyboard.isKeyDown(Keyboard.KEY_F) : Keyboard.isKeyDown(Keyboard.KEY_R)) && isSelected && Minecraft.getMinecraft().currentScreen == null) {
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+        if (world.isClient) {
+            if (ClientProxy.USE_KEY.isPressed() && selected && MinecraftClient.getInstance().currentScreen == null) {
                 RivalRebels.proxy.teslaGui(getDegree(stack));
             }
         }
     }
 
     @Override
-    public void onUsingTick(ItemStack stack, EntityLivingBase player, int count) {
-		if (player.isWet() && !player.isEntityInvulnerable(RivalRebelsDamageSource.electricity))
-		{
-			player.attackEntityFrom(RivalRebelsDamageSource.electricity, 2);
+    public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
+		if (player.isWet() && !player.isInvulnerableTo(RivalRebelsDamageSource.electricity)) {
+			player.damage(RivalRebelsDamageSource.electricity, 2);
 		}
 		World world = player.world;
-		if (player.world.rand.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(player, 25, 1);
+		if (player.world.random.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(player, 25, 1);
 
 		int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
@@ -126,14 +127,14 @@ public class ItemTesla extends ItemTool
 
 		int num = (degree / 25) + 1;
 
-		if (!world.isRemote) for (int i = 0; i < num; i++)
-			world.spawnEntity(new EntityRaytrace(world, player, dist, randomness, chance, !stack.isItemEnchanted()));
+		if (!world.isClient) for (int i = 0; i < num; i++)
+			world.spawnEntity(new EntityRaytrace(world, player, dist, randomness, chance, !stack.hasEnchantments()));
 	}
 
 	public int getDegree(ItemStack item)
 	{
-		if (!item.hasTagCompound()) return 0;
-		else return item.getTagCompound().getInteger("dial") + 90;
+		if (!item.hasNbt()) return 0;
+		else return item.getNbt().getInt("dial") + 90;
 	}
 
 	/*@Override

@@ -11,75 +11,58 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.entity.EntityB2Spirit;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderB2Spirit extends Render
+@OnlyIn(Dist.CLIENT)
+public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit>
 {
-	ModelFromObj	b2;
-	public static ModelFromObj	shuttle;
-	public static ModelFromObj	tupolev;
+	private final ModelFromObj	b2;
+	public static ModelFromObj	shuttle = ModelFromObj.readObjFile("shuttle.obj");
+	public static ModelFromObj	tupolev = ModelFromObj.readObjFile("tupolev.obj");
 
-	public RenderB2Spirit(RenderManager manager)
+	public RenderB2Spirit(EntityRendererFactory.Context manager)
 	{
         super(manager);
         b2 = ModelFromObj.readObjFile("d.obj");
 		b2.scale(3, 3, 3);
-		tupolev = ModelFromObj.readObjFile("tupolev.obj");
-		shuttle = ModelFromObj.readObjFile("shuttle.obj");
 	}
 
-	public void renderB2Spirit(EntityB2Spirit b2spirit, double x, double y, double z, float par8, float par9)
-	{
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x, (float) y, (float) z);
-		GlStateManager.rotate(b2spirit.rotationYaw, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(b2spirit.rotationPitch, 1.0F, 0.0F, 0.0F);
-		GlStateManager.disableCull();
-		if (RivalRebels.bombertype.equals("sh"))
-		{
-			GlStateManager.scale(3.0f, 3.0f, 3.0f);
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etb2spirit);
-			shuttle.render();
+    @Override
+    public void render(EntityB2Spirit entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		matrices.push();
+		matrices.multiply(new Quaternion(entity.getYaw(), 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternion(entity.getPitch(), 1.0F, 0.0F, 0.0F));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        if (RRConfig.CLIENT.getBomberType().equals("sh")) {
+			matrices.scale(3.0f, 3.0f, 3.0f);
+			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etb2spirit);
+			shuttle.render(buffer);
+		} else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
+			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ettupolev);
+			tupolev.render(buffer);
+		} else {
+			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etb2spirit);
+			b2.render(buffer);
 		}
-		else if (RivalRebels.bombertype.equals("tu"))
-		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettupolev);
-			tupolev.render();
-		}
-		else
-		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etb2spirit);
-			b2.render();
-		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderB2Spirit((EntityB2Spirit) par1Entity, par2, par4, par6, par8, par9);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityB2Spirit entity) {
+        return null;
+    }
 }

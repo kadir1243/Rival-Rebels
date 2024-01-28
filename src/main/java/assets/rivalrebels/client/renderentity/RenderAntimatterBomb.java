@@ -11,51 +11,45 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityAntimatterBomb;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.obj.OBJModel;
 
-@SideOnly(Side.CLIENT)
-public class RenderAntimatterBomb extends Render<EntityAntimatterBomb>
-{
-    public static IModel bomb;
+@OnlyIn(Dist.CLIENT)
+public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb> {
+    public static OBJModel bomb;
 
-	public RenderAntimatterBomb(RenderManager manager)
-	{
+    public RenderAntimatterBomb(EntityRendererFactory.Context manager) {
         super(manager);
-        try {
-            bomb = OBJLoader.INSTANCE.loadModel(new ResourceLocation(RivalRebels.MODID, "models/t.obj"));
-        } catch (Exception e) {
-            RivalRebels.LOGGER.error(e);
-        }
+
+        bomb = RenderHelper.getModel("t");
     }
 
-	@Override
-	public void doRender(EntityAntimatterBomb entity, double x, double y, double z, float entityYaw, float partialTicks)
-	{
-        GlStateManager.disableLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x, (float) y, (float) z);
-        GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-        GlStateManager.rotate(entity.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-        // GlStateManager.rotate(90.0f, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(entity.rotationPitch, 0.0F, 0.0F, 1.0F);
-        Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etantimatterbomb);
+    @Override
+    public void render(EntityAntimatterBomb entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
+        matrices.multiply(new Quaternion(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+        // matrices.multiply(new Quaternion(90.0f, 1.0F, 0.0F, 0.0F));
+        matrices.multiply(new Quaternion(entity.getPitch(), 0.0F, 0.0F, 1.0F));
+        MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etantimatterbomb);
         //bomb.renderAll();
-        GlStateManager.popMatrix();
+        matrices.pop();
     }
 
-	@Override
-	protected ResourceLocation getEntityTexture(EntityAntimatterBomb entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityAntimatterBomb entity) {
+        return RRIdentifiers.etantimatterbomb;
+    }
 }

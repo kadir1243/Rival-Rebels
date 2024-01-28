@@ -13,19 +13,29 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
-import net.minecraft.block.material.Material;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.projectile.thrown.ThrownEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.FluidTags;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 
 import java.util.List;
+import java.util.Optional;
 
-public class EntityHackB83 extends EntityThrowable
+public class EntityHackB83 extends ThrownEntity
 {
 	public int	ticksInAir	= 0;
 	double mmx = 0;
@@ -33,26 +43,27 @@ public class EntityHackB83 extends EntityThrowable
 	double mmz = 0;
 	boolean straight;
 
+    public EntityHackB83(EntityType<? extends EntityHackB83> entityType, World world) {
+        super(entityType, world);
+    }
+
 	public EntityHackB83(World par1World)
 	{
-		super(par1World);
-		this.setSize(0.5F, 0.5F);
+		this(RREntities.HACK_B83, par1World);
 	}
 
 	public EntityHackB83(World par1World, double x, double y, double z, float yaw, float pitch, boolean flystraight)
 	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+		this(par1World);
 		straight = flystraight;
-		setLocationAndAngles(x, y, z, yaw, pitch);
-		motionX = -(-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-	}
+		refreshPositionAndAngles(x, y, z, yaw, pitch);
+        setVelocity(-(-MathHelper.sin(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(pitch / 180.0F * (float) Math.PI)));
+    }
 	public EntityHackB83(World par1World, double x, double y,double z, double mx, double my, double mz, boolean flystraight)
 	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+		this(par1World);
 		setPosition(x,y,z);
 		setAnglesMotion(mx, my, mz);
 		straight = flystraight;
@@ -60,81 +71,76 @@ public class EntityHackB83 extends EntityThrowable
 
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
+        setVelocity(mx, my, mz);
+		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
-	@Override
-	public void onUpdate()
+    @Override
+    protected void initDataTracker() {
+    }
+
+    @Override
+	public void tick()
 	{
-		this.lastTickPosX = this.posX;
-		this.lastTickPosY = this.posY;
-		this.lastTickPosZ = this.posZ;
-		if (ticksInAir == - 100 || posY < 0 || posY > 256) explode();
+		if (ticksInAir == - 100 || getY() < 0 || getY() > 256) explode();
 		++this.ticksInAir;
-		if (!straight && !world.isRemote)
+		if (!straight && !world.isClient)
 		{
-			mmx += world.rand.nextGaussian()*0.4;
-			mmy += world.rand.nextGaussian()*0.4;
-			mmz += world.rand.nextGaussian()*0.4;
+			mmx += world.random.nextGaussian()*0.4;
+			mmy += world.random.nextGaussian()*0.4;
+			mmz += world.random.nextGaussian()*0.4;
 			double dist = 1/Math.sqrt(mmx*mmx + mmy*mmy + mmz*mmz);
 			mmx *= dist;
 			mmy *= dist;
 			mmz *= dist;
-			if (ticksInAir > 35)
-			{
-				motionX += mmx*0.2f;
-				motionY += mmy*0.2f;
-				motionZ += mmz*0.2f;
-			}
-			else
-			{
-				motionX += mmx*0.2f;
-				motionY += Math.abs(mmy)*0.2f;
-				motionZ += mmz*0.2f;
+			if (ticksInAir > 35) {
+				setVelocity(getVelocity().add(mmx * 0.2f,
+                    mmy * 0.2f,
+                    mmz * 0.2f));
+			} else {
+                setVelocity(getVelocity().add(
+                    mmx*0.2f,
+                    Math.abs(mmy)*0.2f,
+                    mmz*0.2f
+                ));
 			}
 		}
 
-		if (world.isRemote && !inWater)
+		if (world.isClient && !isInsideWaterOrBubbleColumn())
 		{
-			world.spawnEntity(new EntityPropulsionFX(world, posX, posY, posZ, -motionX, -motionY, -motionZ));
-			world.spawnEntity(new EntityPropulsionFX(world, posX, posY, posZ, -motionX*0.8f, -motionY*0.8f, -motionZ*0.8f));
-			world.spawnEntity(new EntityPropulsionFX(world, posX, posY, posZ, -motionX*0.6f, -motionY*0.6f, -motionZ*0.6f));
-			world.spawnEntity(new EntityPropulsionFX(world, posX, posY, posZ, -motionX*0.4f, -motionY*0.4f, -motionZ*0.4f));
-			world.spawnEntity(new EntityPropulsionFX(world, posX, posY, posZ, -motionX*0.2f, -motionY*0.2f, -motionZ*0.2f));
+			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX(), -getVelocity().getY(), -getVelocity().getZ()));
+			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.8f, -getVelocity().getY()*0.8f, -getVelocity().getZ()*0.8f));
+			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.6f, -getVelocity().getY()*0.6f, -getVelocity().getZ()*0.6f));
+			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.4f, -getVelocity().getY()*0.4f, -getVelocity().getZ()*0.4f));
+			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.2f, -getVelocity().getY()*0.2f, -getVelocity().getZ()*0.2f));
 		}
 
-		Vec3d var15 = new Vec3d(this.posX, this.posY, this.posZ);
-		Vec3d var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-		RayTraceResult var3 = this.world.rayTraceBlocks(var15, var2);
-		var15 = new Vec3d(this.posX, this.posY, this.posZ);
-		var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+		Vec3d var15 = getPos();
+		Vec3d var2 = getPos().add(getVelocity());
+		HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		var15 = getPos();
+		var2 = getPos().add(getVelocity());
 
 		if (var3 != null)
 		{
-			var2 = var3.hitVec;
+			var2 = var3.getPos();
 		}
 
-		if (!this.world.isRemote && this.ticksInAir > 3)
+		if (!this.world.isClient && this.ticksInAir > 3)
 		{
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.canBeCollidedWith()) {
+                if (var9.collides()) {
                     float var10 = 0.3F;
-                    AxisAlignedBB var11 = var9.getEntityBoundingBox().grow(var10, var10, var10);
-                    RayTraceResult var12 = var11.calculateIntercept(var15, var2);
+                    Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
+                    Optional<Vec3d> var12 = var11.raycast(var15, var2);
 
-                    if (var12 != null) {
-                        double var13 = var15.distanceTo(var12.hitVec);
+                    if (var12.isPresent()) {
+                        double var13 = var15.distanceTo(var12.get());
 
                         if (var13 < var6 || var6 == 0.0D) {
                             var4 = var9;
@@ -146,90 +152,82 @@ public class EntityHackB83 extends EntityThrowable
 
 			if (var4 != null)
 			{
-				var3 = new RayTraceResult(var4);
+				var3 = new EntityHitResult(var4);
 			}
 		}
 
 		if (var3 != null)
 		{
-			this.onImpact(var3);
+			this.onCollision(var3);
 		}
 
-		this.posX += this.motionX;
-		this.posY += this.motionY;
-		this.posZ += this.motionZ;
-		float var16 = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-		this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+		float var16 = MathHelper.sqrt((float) (this.getVelocity().getX() * this.getVelocity().getX() + this.getVelocity().getZ() * this.getVelocity().getZ()));
+		this.setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
 
-		for (this.rotationPitch = (float) (Math.atan2(this.motionY, var16) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+		for (this.setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); this.getPitch() - this.prevPitch < -180.0F; this.prevPitch -= 360.0F)
 		{
-			;
-		}
+        }
 
-		while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+		while (this.getPitch() - this.prevPitch >= 180.0F)
 		{
-			this.prevRotationPitch += 360.0F;
+			this.prevPitch += 360.0F;
 		}
 
-		while (this.rotationYaw - this.prevRotationYaw < -180.0F)
+		while (this.getYaw() - this.prevYaw < -180.0F)
 		{
-			this.prevRotationYaw -= 360.0F;
+			this.prevYaw -= 360.0F;
 		}
 
-		while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
+		while (this.getYaw() - this.prevYaw >= 180.0F)
 		{
-			this.prevRotationYaw += 360.0F;
+			this.prevYaw += 360.0F;
 		}
 
-		this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
-		this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
+		this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.2F);
+		this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.2F);
 		float var17 = 0.9f;
-		if (!straight && !world.isRemote)
+		if (!straight && !world.isClient)
 		{
-			this.motionX *= var17;
-			this.motionY *= var17;
-			this.motionZ *= var17;
+            setVelocity(getVelocity().multiply(var17));
 		}
-		this.setPosition(this.posX, this.posY, this.posZ);
+		this.setPosition(this.getX(), this.getY(), this.getZ());
 	}
 
 	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
+	public void writeCustomDataToNbt(NbtCompound par1NBTTagCompound)
 	{
 
 	}
 
 	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
+	public void readCustomDataFromNbt(NbtCompound par1NBTTagCompound)
 	{
 
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
-	@Override
-	protected void onImpact(RayTraceResult var1)
-	{
-		if (var1.entityHit == null)
-		{
-			Material m = world.getBlockState(var1.getBlockPos()).getMaterial();
-			if (m == Material.LEAVES || m == Material.CLAY || m == Material.GROUND || m == Material.PLANTS || m == Material.CAKE || m == Material.CIRCUITS || m == Material.CACTUS || m == Material.CLOTH || m == Material.CRAFTED_SNOW || m == Material.GLASS || m == Material.GRASS || m == Material.SAND || m == Material.SNOW || m == Material.WOOD || m == Material.VINE || m == Material.WATER || m == Material.SPONGE || m == Material.ICE)
-			{
-				world.setBlockToAir(var1.getBlockPos());
-				return;
-			}
-		}
-		explode();
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        BlockState state = world.getBlockState(blockHitResult.getBlockPos());
+        Material m = state.getMaterial();
+        if (state.isIn(BlockTags.LEAVES) || m == Material.ORGANIC_PRODUCT || m == Material.SOIL || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || m == Material.CAKE || m == Material.DECORATION || state.isIn(BlockTags.WOOL) || m == Material.SNOW_BLOCK || state.isIn(Tags.Blocks.GLASS) || m == Material.SOLID_ORGANIC || state.isIn(Tags.Blocks.SAND) || m == Material.SNOW_LAYER || m == Material.WOOD || m == Material.REPLACEABLE_PLANT || state.getFluidState().isIn(FluidTags.WATER) || m == Material.SPONGE || state.isIn(BlockTags.ICE))
+        {
+            world.setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
+            return;
+        }
+        explode();
 	}
 
 	public void explode()
 	{
-		new NuclearExplosion(world, (int) posX, (int) posY, (int) posZ, RivalRebels.b83Strength, false);
-		world.spawnEntity(new EntityTsarBlast(world, posX, posY, posZ, RivalRebels.b83Strength * 1.333333333f).setTime());
-		this.setDead();
+		new NuclearExplosion(world, (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength, false);
+		world.spawnEntity(new EntityTsarBlast(world, getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f).setTime());
+		this.kill();
 	}
 }

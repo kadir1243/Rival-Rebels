@@ -11,27 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
+import net.minecraft.item.ToolItem;
+import net.minecraft.item.ToolMaterials;
+import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.ToolActions;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ItemArmyShovel extends ItemTool
+public class ItemArmyShovel extends ToolItem
 {
 	private static final Set<Block> blocksEffectiveAgainst;
 
-	public ItemArmyShovel()
-	{
-		super(1, 1, ToolMaterial.IRON, blocksEffectiveAgainst);
-		setCreativeTab(RivalRebels.rralltab);
-        setHarvestLevel("shovel", 3);
-        setHarvestLevel("pickaxe", 3);
-        setHarvestLevel("axe", 3);
-	}
+	public ItemArmyShovel() {
+		super(ToolMaterials.DIAMOND, new Settings().group(RRItems.rralltab));
+    }
 
 	@Override
 	public boolean isDamageable()
@@ -40,38 +39,43 @@ public class ItemArmyShovel extends ItemTool
 	}
 
     @Override
-    public boolean canHarvestBlock(IBlockState state, ItemStack stack) {
-        return blocksEffectiveAgainst.contains(state.getBlock());
+    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
+        return super.isCorrectToolForDrops(stack, state) || blocksEffectiveAgainst.contains(state.getBlock());
+    }
+
+    @Override
+    public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
+        return toolAction == ToolActions.AXE_DIG || toolAction == ToolActions.SHOVEL_DIG || toolAction == ToolActions.PICKAXE_DIG;
     }
 
     static
 	{
 		blocksEffectiveAgainst = new HashSet<>();
-		blocksEffectiveAgainst.add(RivalRebels.barricade);
-		blocksEffectiveAgainst.add(RivalRebels.reactive);
-		blocksEffectiveAgainst.add(RivalRebels.conduit);
-		blocksEffectiveAgainst.add(RivalRebels.tower);
-		blocksEffectiveAgainst.add(RivalRebels.steel);
-		blocksEffectiveAgainst.add(RivalRebels.rhodesactivator);
-		blocksEffectiveAgainst.add(RivalRebels.camo1);
-		blocksEffectiveAgainst.add(RivalRebels.camo2);
-		blocksEffectiveAgainst.add(RivalRebels.camo3);
-		blocksEffectiveAgainst.add(RivalRebels.jump);
-		blocksEffectiveAgainst.add(RivalRebels.landmine);
-		blocksEffectiveAgainst.add(RivalRebels.alandmine);
-		blocksEffectiveAgainst.add(RivalRebels.quicksand);
-		blocksEffectiveAgainst.add(RivalRebels.aquicksand);
-		blocksEffectiveAgainst.add(RivalRebels.mario);
-		blocksEffectiveAgainst.add(RivalRebels.amario);
-		blocksEffectiveAgainst.add(RivalRebels.loader);
-		blocksEffectiveAgainst.add(RivalRebels.reactor);
-		blocksEffectiveAgainst.add(RivalRebels.radioactivedirt);
-		blocksEffectiveAgainst.add(RivalRebels.radioactivesand);
-		blocksEffectiveAgainst.add(RivalRebels.petrifiedstone1);
-		blocksEffectiveAgainst.add(RivalRebels.petrifiedstone2);
-		blocksEffectiveAgainst.add(RivalRebels.petrifiedstone3);
-		blocksEffectiveAgainst.add(RivalRebels.petrifiedstone4);
-		blocksEffectiveAgainst.add(RivalRebels.petrifiedwood);
+		blocksEffectiveAgainst.add(RRBlocks.barricade);
+		blocksEffectiveAgainst.add(RRBlocks.reactive);
+		blocksEffectiveAgainst.add(RRBlocks.conduit);
+		blocksEffectiveAgainst.add(RRBlocks.tower);
+		blocksEffectiveAgainst.add(RRBlocks.steel);
+		blocksEffectiveAgainst.add(RRBlocks.rhodesactivator);
+		blocksEffectiveAgainst.add(RRBlocks.camo1);
+		blocksEffectiveAgainst.add(RRBlocks.camo2);
+		blocksEffectiveAgainst.add(RRBlocks.camo3);
+		blocksEffectiveAgainst.add(RRBlocks.jump);
+		blocksEffectiveAgainst.add(RRBlocks.landmine);
+		blocksEffectiveAgainst.add(RRBlocks.alandmine);
+		blocksEffectiveAgainst.add(RRBlocks.quicksand);
+		blocksEffectiveAgainst.add(RRBlocks.aquicksand);
+		blocksEffectiveAgainst.add(RRBlocks.mario);
+		blocksEffectiveAgainst.add(RRBlocks.amario);
+		blocksEffectiveAgainst.add(RRBlocks.loader);
+		blocksEffectiveAgainst.add(RRBlocks.reactor);
+		blocksEffectiveAgainst.add(RRBlocks.radioactivedirt);
+		blocksEffectiveAgainst.add(RRBlocks.radioactivesand);
+		blocksEffectiveAgainst.add(RRBlocks.petrifiedstone1);
+		blocksEffectiveAgainst.add(RRBlocks.petrifiedstone2);
+		blocksEffectiveAgainst.add(RRBlocks.petrifiedstone3);
+		blocksEffectiveAgainst.add(RRBlocks.petrifiedstone4);
+		blocksEffectiveAgainst.add(RRBlocks.petrifiedwood);
 	}
 
 	/*@Override

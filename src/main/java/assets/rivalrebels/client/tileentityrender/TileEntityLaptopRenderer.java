@@ -11,52 +11,46 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
+import assets.rivalrebels.client.renderhelper.RenderHelper;
+import assets.rivalrebels.common.block.machine.BlockLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityLaptopRenderer extends TileEntitySpecialRenderer<TileEntityLaptop> {
+@OnlyIn(Dist.CLIENT)
+public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityLaptop> {
 	private final ModelLaptop model;
 
-	public TileEntityLaptopRenderer()
-	{
+	public TileEntityLaptopRenderer(BlockEntityRendererFactory.Context context) {
 		model = new ModelLaptop();
 	}
 
     @Override
-    public void render(TileEntityLaptop te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		GlStateManager.disableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y, (float) z + 0.5F);
-		int var9 = te.getBlockMetadata();
-		short var11 = 0;
-		if (var9 == 2)
-		{
-			var11 = 180;
-		}
-		if (var9 == 3)
-		{
-			var11 = 0;
-		}
-		if (var9 == 4)
-		{
-			var11 = -90;
-		}
-		if (var9 == 5)
-		{
-			var11 = 90;
-		}
-		GlStateManager.rotate(var11, 0.0F, 1.0F, 0.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
-		model.renderModel((float) -te.slide);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etubuntu);
-		model.renderScreen((float) -te.slide);
-		GlStateManager.popMatrix();
+    public void render(TileEntityLaptop entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY(), (float) entity.getPos().getZ() + 0.5F);
+        short var11 = switch (entity.getCachedState().get(BlockLaptop.META)) {
+            case 2 -> 180;
+            case 3 -> 0;
+            case 4 -> -90;
+            case 5 -> 90;
+            default -> 0;
+        };
+        matrices.multiply(new Quaternion(var11, 0.0F, 1.0F, 0.0F));
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etlaptop);
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderHelper.TRINGLES_POS_TEX);
+        model.renderModel(vertexConsumer, matrices, (float) -entity.slide);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etubuntu);
+		model.renderScreen(vertexConsumer, matrices, (float) -entity.slide);
+		matrices.pop();
 	}
 }

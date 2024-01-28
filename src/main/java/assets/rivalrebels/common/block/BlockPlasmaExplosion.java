@@ -11,61 +11,33 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockPlasmaExplosion extends BlockContainer
+public class BlockPlasmaExplosion extends BlockWithEntity
 {
-	public BlockPlasmaExplosion()
+	public BlockPlasmaExplosion(Settings settings)
 	{
-		super(Material.PORTAL);
+		super(settings);
 	}
 
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return null;
-    }
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityPlasmaExplosion(pos, state);
+	}
 
+    @Nullable
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
-
-    @Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(World var1, int var)
-	{
-		return new TileEntityPlasmaExplosion();
-	}
-
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
-	}*/
 }

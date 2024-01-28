@@ -13,54 +13,57 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.entity.EntitySphereBlast;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3f;
 
-public class RenderSphereBlast extends Render<EntitySphereBlast>
+public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast>
 {
-	private ModelBlastSphere	modelsphere;
+	private final ModelBlastSphere modelsphere;
 
-	public RenderSphereBlast(RenderManager manager) {
+	public RenderSphereBlast(EntityRendererFactory.Context manager) {
         super(manager);
 		modelsphere = new ModelBlastSphere();
 	}
 
-	@Override
-	public void doRender(EntitySphereBlast tsar, double x, double y, double z, float var8, float var9) {
-		tsar.time++;
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		double elev = ((MathHelper.sin(tsar.time/40f)+1.5f)*10);
-		GlStateManager.translate(x, y + elev, z);
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate((float) (elev * 2), 0, 1, 0);
-		GlStateManager.rotate((float) (elev * 3), 1, 0, 0);
-		modelsphere.renderModel((float) elev, 1, 0.25f, 0, 1f);
-		GlStateManager.popMatrix();
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate((float) (elev * -2), 0, 1, 0);
-		GlStateManager.rotate((float) (elev * 4), 0, 0, 1);
-		modelsphere.renderModel((float) (elev - 0.2f), 1, 0.5f, 0, 1f);
-		GlStateManager.popMatrix();
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate((float) (elev * -3), 1, 0, 0);
-		GlStateManager.rotate((float) (elev * 2), 0, 0, 1);
-		modelsphere.renderModel((float) (elev - 0.4f), 1, 0, 0, 1f);
-		GlStateManager.popMatrix();
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate((float) (elev * -1), 0, 1, 0);
-		GlStateManager.rotate((float) (elev * 3), 0, 0, 1);
-		modelsphere.renderModel((float) (elev - 0.6f), 1, 1, 0, 1);
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
-	}
+    @Override
+    public void render(EntitySphereBlast entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        entity.time++;
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
+        matrices.push();
+        double elev = ((MathHelper.sin(entity.time / 40f) + 1.5f) * 10);
+        matrices.translate(entity.getX(), entity.getY() + elev, entity.getZ());
+        matrices.push();
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion((float) (elev * 2)));
+        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion((float) (elev * 3)));
+        modelsphere.renderModel(matrices, buffer, (float) elev, 1, 0.25f, 0, 1f);
+        matrices.pop();
+        matrices.push();
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion((float) (elev * -2)));
+        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion((float) (elev * 4)));
+        modelsphere.renderModel(matrices, buffer, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
+        matrices.pop();
+        matrices.push();
+        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion((float) (elev * -3)));
+        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion((float) (elev * 2)));
+        modelsphere.renderModel(matrices, buffer, (float) (elev - 0.4f), 1, 0, 0, 1f);
+        matrices.pop();
+        matrices.push();
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion((float) (elev * -1)));
+        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion((float) (elev * 3)));
+        modelsphere.renderModel(matrices, buffer, (float) (elev - 0.6f), 1, 1, 0, 1);
+        matrices.pop();
+        matrices.pop();
+    }
 
-	@Override
-	protected ResourceLocation getEntityTexture(EntitySphereBlast entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntitySphereBlast entity) {
+        return null;
+    }
 }

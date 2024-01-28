@@ -11,49 +11,43 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.entity.EntityB83;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderB83 extends Render<EntityB83>
+@OnlyIn(Dist.CLIENT)
+public class RenderB83 extends EntityRenderer<EntityB83>
 {
 	public static ModelFromObj	md;
 
-	public RenderB83(RenderManager manager) {
+	public RenderB83(EntityRendererFactory.Context manager) {
         super(manager);
         md = ModelFromObj.readObjFile("c.obj");
 	}
 
-    /**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(EntityB83 par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-        GlStateManager.enableLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) par2, (float) par4, (float) par6);
-        GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-        GlStateManager.rotate(par1Entity.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(par1Entity.rotationPitch - 180.0f, 0.0F, 0.0F, 1.0F);
-        Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etb83);
-        md.render();
-        GlStateManager.popMatrix();
+    @Override
+    public void render(EntityB83 entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
+        matrices.multiply(new Quaternion(yaw - 90.0f, 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternion(entity.getPitch() - 180.0f, 0.0F, 0.0F, 1.0F));
+        md.render(vertexConsumers.getBuffer(RenderLayer.getEntitySolid(getTexture(entity))));
+        matrices.pop();
     }
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityB83 entity)
+    public Identifier getTexture(EntityB83 entity)
 	{
-		return null;
+		return RRIdentifiers.etb83;
 	}
 }

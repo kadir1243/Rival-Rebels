@@ -11,22 +11,32 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRod;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Quaternion;
 
-public class PlasmaCannonRenderer extends TileEntityItemStackRenderer {
+public class PlasmaCannonRenderer extends BuiltinModelItemRenderer {
 	private final ModelRod md2;
 	private final ModelRod md3;
 	private final ModelFromObj model;
 
-	public PlasmaCannonRenderer()
-	{
+	public PlasmaCannonRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		md2 = new ModelRod();
 		md2.rendersecondcap = false;
 		md3 = new ModelRod();
@@ -34,75 +44,68 @@ public class PlasmaCannonRenderer extends TileEntityItemStackRenderer {
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(-0.1f, 0f, 0f);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etplasmacannon);
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.5f, 0.2f, -0.03f);
-		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
-		GlStateManager.scale(0.03125f, 0.03125f, 0.03125f);
-		GlStateManager.pushMatrix();
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		matrices.translate(-0.1f, 0f, 0f);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etplasmacannon);
+		matrices.push();
+		matrices.translate(0.5f, 0.2f, -0.03f);
+		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.scale(0.03125f, 0.03125f, 0.03125f);
+		matrices.push();
 
-		model.render();
-		if (stack.isItemEnchanted())
-		{
-			GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-			GlStateManager.disableLighting();
-			model.render();
-			GlStateManager.disableBlend();
-			GlStateManager.enableLighting();
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        model.render(buffer);
+		if (stack.hasEnchantments()) {
+			RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			RenderSystem.enableBlend();
+            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+			model.render(buffer);
+			RenderSystem.disableBlend();
 		}
 
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
+		matrices.pop();
+		matrices.pop();
 
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ethydrod);
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.5f, 0.2f, -0.03f);
-		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate(225, 0.0F, 0.0F, 1.0F);
-		GlStateManager.translate(-0.5f, 0.5f, 0.0f);
-		GlStateManager.scale(0.25f, 0.5f, 0.25f);
-		md2.render();
-		if (stack.isItemEnchanted())
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ethydrod);
+		matrices.push();
+		matrices.translate(0.5f, 0.2f, -0.03f);
+		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.push();
+		matrices.multiply(new Quaternion(225, 0.0F, 0.0F, 1.0F));
+		matrices.translate(-0.5f, 0.5f, 0.0f);
+		matrices.scale(0.25f, 0.5f, 0.25f);
+		md2.render(matrices, buffer);
+		if (stack.hasEnchantments())
 		{
-            GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-			GlStateManager.disableLighting();
-			md2.render();
-			GlStateManager.disableBlend();
-			GlStateManager.enableLighting();
+            RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			RenderSystem.enableBlend();
+            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+			md2.render(matrices, buffer);
+			RenderSystem.disableBlend();
 		}
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
+		matrices.pop();
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.5f, 0.2f, -0.03f);
-		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate(247.5f, 0.0F, 0.0F, 1.0F);
-		GlStateManager.translate(-0.175f, 0.1f, 0.0f);
-		GlStateManager.scale(0.25f, 0.5f, 0.25f);
-		md3.render();
-		if (stack.isItemEnchanted())
+		matrices.push();
+		matrices.translate(0.5f, 0.2f, -0.03f);
+		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.push();
+		matrices.multiply(new Quaternion(247.5f, 0.0F, 0.0F, 1.0F));
+		matrices.translate(-0.175f, 0.1f, 0.0f);
+		matrices.scale(0.25f, 0.5f, 0.25f);
+		md3.render(matrices, buffer);
+		if (stack.hasEnchantments())
 		{
-			GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-			GlStateManager.disableLighting();
-			md3.render();
-			GlStateManager.disableBlend();
-			GlStateManager.enableLighting();
+			RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			RenderSystem.enableBlend();
+			RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+			md3.render(matrices, buffer);
+			RenderSystem.disableBlend();
 		}
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
+		matrices.pop();
+		matrices.pop();
+		matrices.pop();
 	}
 }
 

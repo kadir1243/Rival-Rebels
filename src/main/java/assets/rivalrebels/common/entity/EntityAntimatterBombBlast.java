@@ -16,12 +16,14 @@ import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.AntimatterBomb;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.common.extensions.IForgeBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,58 +34,62 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	public double		radius;
 	public int			time		= 0;
 
-	public EntityAntimatterBombBlast(World par1World)
-	{
-		super(par1World);
-		ignoreFrustumCheck = true;
+	public EntityAntimatterBombBlast(EntityType<? extends EntityAntimatterBombBlast> entityType, World par1World) {
+		super(entityType, par1World);
+		ignoreCameraFrustum = true;
 	}
+
+    public EntityAntimatterBombBlast(World par1World) {
+        super(RREntities.ANTIMATTER_BOMB_BLAST, par1World);
+        ignoreCameraFrustum = true;
+    }
 
 	public EntityAntimatterBombBlast(World par1World, float x, float y, float z, AntimatterBomb tsarBomba, int rad)
 	{
-		super(par1World);
-		ignoreFrustumCheck = true;
+		this(par1World);
+		ignoreCameraFrustum = true;
 		tsar = tsarBomba;
 		radius = rad;
-		motionX = Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10;
+		setVelocity(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
 		setPosition(x, y, z);
 	}
 
 	public EntityAntimatterBombBlast(World par1World, double x, double y, double z, float rad)
 	{
-		super(par1World);
-		ignoreFrustumCheck = true;
+		this(par1World);
+		ignoreCameraFrustum = true;
 		radius = rad;
-		motionX = Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10;
+		setVelocity(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
 		setPosition(x, y, z);
 	}
 
 	@Override
-	public void onUpdate()
+	public void tick()
 	{
-		super.onUpdate();
+		super.tick();
 
-		if (world.rand.nextInt(30) == 0)
+		if (world.random.nextInt(30) == 0)
 		{
-			world.playSound(this.posX, this.posY, this.posZ, SoundEvents.ENTITY_LIGHTNING_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.5F, false);
+			world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.5F, false);
 		}
 		else
 		{
-			if (world.rand.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
+			if (world.random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
 		}
 
-		ticksExisted++;
+		age++;
 
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			if (tsar == null && ticksExisted > 1200) setDead();
-			if (ticksExisted % 20 == 0) updateEntityList();
-			if (ticksExisted < 1200 && ticksExisted % 5 == 0) pushAndHurtEntities();
+			if (tsar == null && age > 1200) kill();
+			if (age % 20 == 0) updateEntityList();
+			if (age < 1200 && age % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RivalRebels.tsarBombaSpeed * 2; i++)
 			{
 				if (tsar != null)
 				{
-					tsar.update(this);
-					/*if (tsar.update())
+					tsar.tick(this);
+					/*if (tsar.tick())
 					{
 						tsar = null;
 					}*/
@@ -102,16 +108,13 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	{
 		entitylist.clear();
 		double ldist = radius*radius;
-		for (int i = 0; i < world.loadedEntityList.size(); i++)
-		{
-			Entity e = world.loadedEntityList.get(i);
-			double dist = e.getDistanceSq(posX,posY,posZ);
-			if (dist < ldist)
-			{
-				if ((e instanceof EntityPlayer && ((EntityPlayer) e).capabilities.isCreativeMode) || e instanceof EntityNuclearBlast || e instanceof EntityAntimatterBombBlast || e == this) continue;
-				entitylist.add(e);
-			}
-		}
+        List<Entity> otherEntities = world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB, e -> !((e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityAntimatterBombBlast));
+        for (Entity e : otherEntities) {
+            double dist = e.squaredDistanceTo(getX(), getY(), getZ());
+            if (dist < ldist) {
+                entitylist.add(e);
+            }
+        }
 	}
 
 	public void pushAndHurtEntities()
@@ -120,14 +123,14 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 		float invrad = 1.0f / (float) radius;
 		for (Entity e : entitylist)
 		{
-			if (e.isDead || e.getIsInvulnerable())
+			if (!e.isAlive() || e.isInvulnerable())
 			{
 				remove.add(e);
 				continue;
 			}
-			float dx = (float) (e.posX - posX);
-			float dy = (float) (e.posY - posY);
-			float dz = (float) (e.posZ - posZ);
+			float dx = (float) (e.getX() - getX());
+			float dy = (float) (e.getY() - getY());
+			float dz = (float) (e.getZ() - getZ());
 			float dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
 			float rsqrt = 1.0f / (dist + 0.0001f);
 			dx *= rsqrt;
@@ -136,14 +139,16 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
-				e.attackEntityFrom(RivalRebelsDamageSource.nuclearblast, (int) (radius*f*0.025f));
+				e.damage(RivalRebelsDamageSource.nuclearblast, (int) (radius*f*0.025f));
 			}
 			else
 			{
-				e.attackEntityFrom(RivalRebelsDamageSource.nuclearblast, (int) (f * f * 2.0f * radius + 20.0f));
-				e.motionX -= dx * f;
-				e.motionY -= dy * f;
-				e.motionZ -= dz * f;
+				e.damage(RivalRebelsDamageSource.nuclearblast, (int) (f * f * 2.0f * radius + 20.0f));
+                e.setVelocity(e.getVelocity().subtract(
+                    dx * f,
+                    dy * f,
+                    dz * f
+                ));
 			}
 		}
 		for (Entity e : remove)
@@ -153,38 +158,30 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	}
 
 	@Override
-	public void readEntityFromNBT(NBTTagCompound nbt)
-	{
-		motionX = nbt.getFloat("size");
+	public void readCustomDataFromNbt(NbtCompound nbt) {
 		radius = nbt.getFloat("radius");
 	}
 
 	@Override
-	public void writeEntityToNBT(NBTTagCompound nbt)
+	public void writeCustomDataToNbt(NbtCompound nbt)
 	{
-		nbt.setFloat("size", (float) motionX);
-		nbt.setFloat("radius", (float) radius);
+		nbt.putFloat("radius", (float) radius);
 	}
 
     @Override
-    public float getBrightness() {
+    public float getBrightnessAtEyes() {
         return 1000F;
     }
 
-    @Override
-    public int getBrightnessForRender() {
-        return 1000;
-    }
-
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
     public EntityAntimatterBombBlast setTime()
 	{
-		ticksExisted = 920;
+		age = 920;
 		return this;
 	}
 }

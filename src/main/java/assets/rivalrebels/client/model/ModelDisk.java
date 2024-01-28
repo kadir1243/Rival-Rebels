@@ -14,7 +14,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
 
 public class ModelDisk
 {
@@ -46,28 +48,28 @@ public class ModelDisk
 	Vertice			v9			= new Vertice(1.00f * cosdeg, 0f, 1.00f * sindeg);
 	Vertice			v10			= new Vertice(0.65f * cosdeg, -0.0625f, 0.65f * sindeg);
 
-	public void render()
+	public void render(MatrixStack matrices, VertexConsumer buffer)
 	{
 		for (float i = 0; i < 360; i += 360 / numOfSegs)
 		{
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate(i, 0, 1, 0);
-			RenderHelper.addFace(v2, v1, v6, v7, t4, t9, t10, t5);
+			matrices.push();
+			matrices.multiply(new Quaternion(i, 0, 1, 0));
+			RenderHelper.addFace(buffer, v2, v1, v6, v7, t4, t9, t10, t5);
 			if (i == 0 || i == 16)
 			{
-				RenderHelper.addFace(v3, v2, v7, v8, t2, t7, t8, t3);
-				RenderHelper.addFace(v4, v3, v8, v9, t2, t7, t8, t3);
-				RenderHelper.addFace(v5, v4, v9, v10, t2, t7, t8, t3);
-				RenderHelper.addFace(v1, v5, v10, v6, t2, t7, t8, t3);
+				RenderHelper.addFace(buffer, v3, v2, v7, v8, t2, t7, t8, t3);
+				RenderHelper.addFace(buffer, v4, v3, v8, v9, t2, t7, t8, t3);
+				RenderHelper.addFace(buffer, v5, v4, v9, v10, t2, t7, t8, t3);
+				RenderHelper.addFace(buffer, v1, v5, v10, v6, t2, t7, t8, t3);
 			}
 			else
 			{
-				RenderHelper.addFace(v3, v2, v7, v8, t6, t1, t2, t7);
-				RenderHelper.addFace(v4, v3, v8, v9, t6, t1, t2, t7);
-				RenderHelper.addFace(v5, v4, v9, v10, t1, t6, t7, t2);
-				RenderHelper.addFace(v1, v5, v10, v6, t1, t6, t7, t2);
+				RenderHelper.addFace(buffer, v3, v2, v7, v8, t6, t1, t2, t7);
+				RenderHelper.addFace(buffer, v4, v3, v8, v9, t6, t1, t2, t7);
+				RenderHelper.addFace(buffer, v5, v4, v9, v10, t1, t6, t7, t2);
+				RenderHelper.addFace(buffer, v1, v5, v10, v6, t1, t6, t7, t2);
 			}
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
 	}
 }

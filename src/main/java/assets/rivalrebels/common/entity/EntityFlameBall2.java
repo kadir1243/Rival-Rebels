@@ -11,23 +11,32 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.FluidTags;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
+import net.minecraftforge.common.Tags;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 public class EntityFlameBall2 extends EntityInanimate
 {
@@ -36,145 +45,93 @@ public class EntityFlameBall2 extends EntityInanimate
 	public float	motionr;
 	public boolean	gonnadie;
 
-	public EntityFlameBall2(World par1World)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
-		rotation = (float) (rand.nextDouble() * 360);
-		motionr = (float) (rand.nextDouble() - 0.5f) * 5;
+    public EntityFlameBall2(EntityType<? extends EntityFlameBall2> type, World world) {
+        super(type, world);
+    }
+
+	public EntityFlameBall2(World par1World) {
+		this(RREntities.FLAME_BALL2, par1World);
+		rotation = (float) (random.nextDouble() * 360);
+		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
 
-	public EntityFlameBall2(World par1World, double par2, double par4, double par6)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+	public EntityFlameBall2(World par1World, double par2, double par4, double par6) {
+		this(par1World);
 		setPosition(par2, par4, par6);
-		rotation = (float) (rand.nextDouble() * 360);
-		motionr = (float) (rand.nextDouble() - 0.5f) * 5;
 	}
 
 	public EntityFlameBall2(World par1World, Entity player, float par3)
 	{
-		super(par1World);
+		this(par1World);
 		// par3/=3f;
-		setSize(0.5F, 0.5F);
-		setPosition(player.posX, player.posY + player.getEyeHeight(), player.posZ);
-		motionX = (-MathHelper.sin(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(player.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(player.rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(player.rotationPitch / 180.0F * (float) Math.PI));
-		posX -= (MathHelper.cos(player.rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		posY -= 0.13;
-		posZ -= (MathHelper.sin(player.rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		motionX *= par3;
-		motionY *= par3;
-		motionZ *= par3;
-		rotation = (float) (rand.nextDouble() * 360);
-		motionr = (float) (rand.nextDouble() - 0.5f) * 5;
-		// Side side = FMLCommonHandler.instance().getEffectiveSide();
-		// if (side == Side.SERVER)
-		// {
-		// ByteArrayOutputStream bos = new ByteArrayOutputStream(9);
-		// DataOutputStream outputStream = new DataOutputStream(bos);
-		// try
-		// {
-		// outputStream.writeInt(24);
-		// outputStream.writeInt(entityId);
-		// outputStream.writeByte((byte)mode);
-		// }
-		// catch (Exception ex)
-		// {
-		// ex.printStackTrace();
-		// }
-		// finally
-		// {
-		// try
-		// {
-		// if (outputStream != null) outputStream.close();
-		// }
-		// catch (IOException error)
-		// {
-		//
-		// }
-		// }
-		// Packet250CustomPayload packet = new Packet250CustomPayload();
-		// packet.channel = "RodolRivalRebels";
-		// packet.data = bos.toByteArray();
-		// packet.length = bos.size();
-		// PacketDispatcher.sendPacketToAllPlayers(packet);
-		// }
+		setPosition(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+		setVelocity((-MathHelper.sin(player.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(player.getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(player.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(player.getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(player.getPitch() / 180.0F * (float) Math.PI)));
+        setPos(
+            getX() - (MathHelper.cos(player.getYaw() / 180.0F * (float) Math.PI) * 0.2F),
+            getY() - 0.13,
+            getZ() - (MathHelper.sin(player.getYaw() / 180.0F * (float) Math.PI) * 0.2F)
+        );
+        setVelocity(getVelocity().multiply(par3));
 	}
 
 	public EntityFlameBall2(World par1World, TileEntityReciever ter, float f)
 	{
-		super(par1World);
-		rotationYaw = (float) (180 - ter.yaw);
-		rotationPitch = (float) (-ter.pitch);
-		setSize(0.5F, 0.5F);
+		this(par1World);
+		setYaw((float) (180 - ter.yaw));
+		setPitch((float) (-ter.pitch));
 		setPosition(ter.getPos().getX() + ter.xO + 0.5, ter.getPos().getY() + 0.5, ter.getPos().getZ() + ter.zO + 0.5);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		motionX *= f;
-		motionY *= f;
-		motionZ *= f;
-		rotation = (float) (rand.nextDouble() * 360);
-		motionr = (float) (rand.nextDouble() - 0.5f) * 5;
+        setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+
+        setVelocity(getVelocity().multiply(f));
 	}
 
 	public EntityFlameBall2(World world, double x, double y, double z, double mx, double my, double mz)
 	{
-		super(world);
-		setSize(0.5F, 0.5F);
+		this(world);
 		setPosition(x, y, z);
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
-		rotation = (float) (rand.nextDouble() * 360);
-		motionr = (float) (rand.nextDouble() - 0.5f) * 5;
+        setVelocity(mx, my, mz);
 	}
 
 	@Override
-	public void onUpdate()
-	{
-		lastTickPosX = posX;
-		lastTickPosY = posY;
-		lastTickPosZ = posZ;
-		super.onUpdate();
-		ticksExisted++;
+	public void tick() {
+		super.tick();
+		age++;
 		sequence++;
-		if (sequence > 15/* > RivalRebels.flamethrowerDecay */) setDead();
-		if (ticksExisted > 5 && rand.nextDouble() > 0.5) gonnadie = true;
+		if (sequence > 15/* > RivalRebels.flamethrowerDecay */) kill();
+		if (age > 5 && random.nextDouble() > 0.5) gonnadie = true;
 
 		if (gonnadie && sequence < 15) sequence++;
 
-		Vec3d start = new Vec3d(posX, posY, posZ);
-		Vec3d end = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult mop = world.rayTraceBlocks(start, end);
-		start = new Vec3d(posX, posY, posZ);
-		end = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3d start = getPos();
+		Vec3d end = getPos().add(getVelocity());
+		HitResult mop = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
-		if (mop != null) end = mop.hitVec;
+		if (mop != null) end = mop.getPos();
 
 		Entity e = null;
-		List<Entity> var5 = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
+		List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 		double var6 = 0.0D;
 		Iterator<Entity> var8 = var5.iterator();
 
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			while (var8.hasNext())
 			{
 				Entity var9 = var8.next();
 
-				if (var9.canBeCollidedWith())
+				if (var9.collides())
 				{
 					float var10 = 0.3F;
-					AxisAlignedBB var11 = var9.getEntityBoundingBox().grow(var10, var10, var10);
-					RayTraceResult var12 = var11.calculateIntercept(start, end);
+					Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
+					Optional<Vec3d> var12 = var11.raycast(start, end);
 
-					if (var12 != null)
+					if (var12.isPresent())
 					{
-						double var13 = start.distanceTo(var12.hitVec);
+						double var13 = start.distanceTo(var12.get());
 
 						if (var13 < var6 || var6 == 0.0D)
 						{
@@ -188,139 +145,113 @@ public class EntityFlameBall2 extends EntityInanimate
 
 		if (e != null)
 		{
-			mop = new RayTraceResult(e);
+			mop = new EntityHitResult(e);
 		}
 
-		if (mop != null && ticksExisted >= 6)
-		{
-			posX -= 0.5f;
-			posY -= 0.5f;
-			posZ -= 0.5f;
+		if (mop != null && age >= 6) {
+            setPos(getX() - 0.5F, getY() - 0.5, getZ() - 0.5);
 			fire();
-			posX++;
+            setPos(getX() + 1, getY(), getZ());
 			fire();
-			posX--;
-			posX--;
+            setPos(getX() - 2, getY(), getZ());
 			fire();
-			posX++;
-			posY++;
+            setPos(getX() + 1, getY() + 1, getZ());
 			fire();
-			posY--;
-			posY--;
+            setPos(getX(), getY() - 2, getZ());
 			fire();
-			posY++;
-			posZ++;
+            setPos(getX(), getY() + 1, getZ() + 1);
 			fire();
-			posZ--;
-			posZ--;
+            setPos(getX(), getY(), getZ() - 2);
 			fire();
-			posZ++;
-			posX += 0.5f;
-			posY += 0.5f;
-			posZ += 0.5f;
-			setDead();
-			if (mop.entityHit != null)
+            setPos(getX(), getY(), getZ() + 1);
+            setPos(getX() + 0.5, getY() + 0.5, getZ() + 0.5);
+			kill();
+			if (mop.getType() == HitResult.Type.ENTITY)
 			{
-				mop.entityHit.setFire(3);
-				mop.entityHit.attackEntityFrom(RivalRebelsDamageSource.cooked, 12);
-				if (mop.entityHit instanceof EntityPlayer player)
+                Entity entityHit = ((EntityHitResult) mop).getEntity();
+                entityHit.setOnFireFor(3);
+				entityHit.damage(RivalRebelsDamageSource.cooked, 12);
+				if (entityHit instanceof PlayerEntity player)
 				{
-                    NonNullList<ItemStack> armorSlots = player.inventory.armorInventory;
-					int i = world.rand.nextInt(4);
-					if (!armorSlots.get(i).isEmpty() && !world.isRemote)
+					EquipmentSlot equipmentSlot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, world.random.nextInt(4));
+                    ItemStack equippedStack = player.getEquippedStack(equipmentSlot);
+                    if (!equippedStack.isEmpty() && !world.isClient)
 					{
-						armorSlots.get(i).damageItem(8, player);
+						equippedStack.damage(8, player, player1 -> player1.sendEquipmentBreakStatus(equipmentSlot));
 					}
 				}
 			}
 		}
 
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
 
 		rotation += motionr;
 		motionr *= 1.06f;
 
-		if (isInWater()) setDead();
+		if (isInsideWaterOrBubbleColumn()) kill();
 		float airFriction = 0.9F;
-		if (gonnadie)
-		{
-			motionY += 0.05;
+		if (gonnadie) {
+            setVelocity(getVelocity().add(0, 0.05, 0));
 			airFriction = 0.7f;
 		}
-		motionX *= airFriction;
-		motionY *= airFriction;
-		motionZ *= airFriction;
-		setPosition(posX, posY, posZ);
+        setVelocity(getVelocity().multiply(airFriction));
+		setPosition(getX(), getY(), getZ());
 	}
 
 	@Override
-	public int getBrightnessForRender()
+	public float getBrightnessAtEyes()
 	{
 		return 1000;
 	}
 
 	@Override
-	public float getBrightness()
-	{
-		return 1000;
-	}
-
-	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean canBeAttackedWithItem()
+	public boolean isAttackable()
 	{
 		return false;
 	}
 
-	@Override
-	public boolean shouldRenderInPass(int pass)
-	{
-		return true;
-	}
-
 	private void fire()
 	{
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			Block id = world.getBlockState(getPosition()).getBlock();
-			if (id == Blocks.AIR || id == Blocks.SNOW || id == Blocks.ICE) world.setBlockState(getPosition(), Blocks.FIRE.getDefaultState());
-			else if (id == Blocks.SAND && world.rand.nextInt(60) == 0) world.setBlockState(getPosition(), Blocks.GLASS.getDefaultState());
-			else if (id == Blocks.GLASS && world.rand.nextInt(120) == 0) world.setBlockState(getPosition(), Blocks.OBSIDIAN.getDefaultState());
-			else if (id == Blocks.OBSIDIAN && world.rand.nextInt(90) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if ((id == Blocks.STONE || id == Blocks.COBBLESTONE) && world.rand.nextInt(30) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.IRON_ORE && world.rand.nextInt(30) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.COAL_ORE && world.rand.nextInt(30) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.GOLD_ORE && world.rand.nextInt(30) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.LAPIS_ORE && world.rand.nextInt(30) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.GRAVEL && world.rand.nextInt(30) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.SANDSTONE && world.rand.nextInt(30) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.IRON_BLOCK && world.rand.nextInt(50) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.BEDROCK && world.rand.nextInt(500) == 0) world.setBlockState(getPosition(), Blocks.OBSIDIAN.getDefaultState());
-			else if (id == Blocks.LAVA) world.setBlockToAir(getPosition());
-			else if (id == Blocks.LEAVES || id == Blocks.LEAVES2) world.setBlockState(getPosition(), Blocks.FIRE.getDefaultState());
-			else if (id == Blocks.GRASS) world.setBlockState(getPosition(), Blocks.DIRT.getDefaultState());
-			else if (id == Blocks.DIRT) world.setBlockState(getPosition(), Blocks.FIRE.getDefaultState());
-			else if (id == RivalRebels.flare) RivalRebels.flare.onPlayerDestroy(world, getPosition(), RivalRebels.flare.getDefaultState());
-			else if (id == RivalRebels.timedbomb) RivalRebels.timedbomb.onPlayerDestroy(world, getPosition(), RivalRebels.timedbomb.getDefaultState());
-			else if (id == RivalRebels.remotecharge) RivalRebels.remotecharge.onPlayerDestroy(world, getPosition(), RivalRebels.remotecharge.getDefaultState());
-			else if (id == RivalRebels.landmine) RivalRebels.remotecharge.onPlayerDestroy(world, getPosition(), RivalRebels.landmine.getDefaultState());
-			else if (id == RivalRebels.alandmine) RivalRebels.remotecharge.onPlayerDestroy(world, getPosition(), RivalRebels.alandmine.getDefaultState());
+            BlockState state = world.getBlockState(getBlockPos());
+            Block id = state.getBlock();
+			if (state.isAir() || id == Blocks.SNOW || state.isIn(BlockTags.ICE)) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (state.isIn(BlockTags.SAND) && world.random.nextInt(60) == 0) world.setBlockState(getBlockPos(), Blocks.GLASS.getDefaultState());
+			else if (state.isIn(Tags.Blocks.GLASS) && world.random.nextInt(120) == 0) world.setBlockState(getBlockPos(), Blocks.OBSIDIAN.getDefaultState());
+			else if (state.isIn(Tags.Blocks.OBSIDIAN) && world.random.nextInt(90) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if ((state.isIn(BlockTags.BASE_STONE_OVERWORLD) || state.isIn(Tags.Blocks.COBBLESTONE)) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(Tags.Blocks.ORES_IRON) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(Tags.Blocks.ORES_COAL) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(Tags.Blocks.ORES_GOLD) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(Tags.Blocks.ORES_LAPIS) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(Tags.Blocks.GRAVEL) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(Tags.Blocks.SANDSTONE) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(Tags.Blocks.STORAGE_BLOCKS_IRON) && world.random.nextInt(50) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (id == Blocks.BEDROCK && world.random.nextInt(500) == 0) world.setBlockState(getBlockPos(), Blocks.OBSIDIAN.getDefaultState());
+			else if (state.getFluidState().isIn(FluidTags.LAVA)) world.setBlockState(getBlockPos(), Blocks.AIR.getDefaultState());
+			else if (state.isIn(BlockTags.LEAVES)) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (state.isIn(BlockTags.DIRT)) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (id == RRBlocks.flare) id.onBroken(world, getBlockPos(), state);
+			else if (id == RRBlocks.timedbomb) id.onBroken(world, getBlockPos(), state);
+			else if (id == RRBlocks.remotecharge) id.onBroken(world, getBlockPos(), state);
+			else if (id == RRBlocks.landmine) id.onBroken(world, getBlockPos(), state);
+			else if (id == RRBlocks.alandmine) id.onBroken(world, getBlockPos(), state);
 			else if (id == Blocks.TNT)
 			{
-				world.setBlockToAir(getPosition());
-				world.createExplosion(null, posX, posY, posZ, 4, false);
+				world.setBlockState(getBlockPos(), Blocks.AIR.getDefaultState());
+				world.createExplosion(null, getX(), getY(), getZ(), 4, Explosion.DestructionType.NONE);
 			}
-			else if (id == RivalRebels.conduit) world.setBlockState(getPosition(), Blocks.FIRE.getDefaultState());
-			else if (id == RivalRebels.reactive && world.rand.nextInt(20) == 0) world.setBlockState(getPosition(), Blocks.LAVA.getDefaultState());
-			else if ((id == RivalRebels.camo1 || id == RivalRebels.camo2 || id == RivalRebels.camo3) && world.rand.nextInt(40) == 0) world.setBlockState(getPosition(), RivalRebels.steel.getDefaultState());
-			else if (id == RivalRebels.steel && world.rand.nextInt(40) == 0) world.setBlockState(getPosition(), Blocks.FIRE.getDefaultState());
+			else if (id == RRBlocks.conduit) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (id == RRBlocks.reactive && world.random.nextInt(20) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if ((id == RRBlocks.camo1 || id == RRBlocks.camo2 || id == RRBlocks.camo3) && world.random.nextInt(40) == 0) world.setBlockState(getBlockPos(), RRBlocks.steel.getDefaultState());
+			else if (id == RRBlocks.steel && world.random.nextInt(40) == 0) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
 		}
 	}
 }

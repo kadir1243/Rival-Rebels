@@ -14,28 +14,36 @@ package assets.rivalrebels.common.block.autobuilds;
 import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.block.Block;
-import net.minecraft.block.BlockFalling;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.FallingBlock;
+import net.minecraft.block.Material;
+import net.minecraft.entity.FallingBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
-public class BlockAutoTemplate extends BlockFalling
-{
+public class BlockAutoTemplate extends FallingBlock {
 	public int		time	= 15;
 	public String	name	= "building";
 
-	public BlockAutoTemplate()
-	{
-		super();
+	public BlockAutoTemplate() {
+		super(Settings.of(Material.WOOD));
 	}
 
+    public BlockAutoTemplate(Settings settings) {
+        super(settings);
+    }
+
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-		if (!world.isRemote) {
-			player.sendMessage(new TextComponentString("§4[§cWarning§4]§c Use pliers to build."));
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		if (!world.isClient) {
+			player.sendMessage(Text.of("§4[§cWarning§4]§c Use pliers to build."), true);
 		}
+        return ActionResult.success(world.isClient);
 	}
 
 	public void build(World world, int x, int y, int z)
@@ -43,33 +51,21 @@ public class BlockAutoTemplate extends BlockFalling
 		RivalRebelsSoundPlayer.playSound(world, 1, 0, x, y, z, 10, 1);
 	}
 
-	public void placeBlockCarefully(World world, int i, int j, int z, Block block)
-	{
-		if (!BlackList.autobuild(world.getBlockState(new BlockPos(i, j, z)).getBlock()))
-		{
-			world.setBlockState(new BlockPos(i, j, z), block.getDefaultState());
+	public void placeBlockCarefully(World world, int x, int y, int z, Block block) {
+		if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
+			world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
 		}
 	}
 
-	public void placeBlockCarefully(World world, int i, int j, int z, Block block, int m, int f)
-	{
-        if (!BlackList.autobuild(world.getBlockState(new BlockPos(i, j, z)).getBlock()))
-		{
-            world.setBlockState(new BlockPos(i, j, z), block.getStateFromMeta(m), f);
-		}
-	}
-
-    public void placeBlockCarefully(World world, int i, int j, int z, Block block, int m)
-    {
-        if (!BlackList.autobuild(world.getBlockState(new BlockPos(i, j, z)).getBlock()))
-        {
-            world.setBlockState(new BlockPos(i, j, z), block.getStateFromMeta(m));
+    public void placeBlockCarefully(World world, int x, int y, int z, BlockState state) {
+        if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
+            world.setBlockState(new BlockPos(x, y, z), state);
         }
     }
 
     @Override
-    public void onEndFalling(World world, BlockPos pos, IBlockState fallingState, IBlockState hitState) {
-		if (!world.isRemote) build(world, pos.getX(), pos.getY(), pos.getZ());
+    public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
+		if (!world.isClient) build(world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
 }

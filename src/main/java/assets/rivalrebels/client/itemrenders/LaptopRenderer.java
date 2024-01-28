@@ -11,33 +11,40 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Quaternion;
 
-public class LaptopRenderer extends TileEntityItemStackRenderer
+public class LaptopRenderer extends BuiltinModelItemRenderer
 {
 	ModelLaptop	ml;
 
-	public LaptopRenderer()
-	{
+	public LaptopRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		ml = new ModelLaptop();
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) 0.3, (float) 0.3, 0);
-		GlStateManager.rotate(180, 0, 1, 0);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
-		ml.renderModel(-90);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etubuntu);
-		ml.renderScreen(-90);
-		GlStateManager.popMatrix();
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		matrices.translate((float) 0.3, (float) 0.3, 0);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true));
+        matrices.multiply(new Quaternion(180, 0, 1, 0));
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etlaptop);
+		ml.renderModel(buffer, matrices, -90);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etubuntu);
+		ml.renderScreen(buffer, matrices, -90);
+		matrices.pop();
 	}
 }
 

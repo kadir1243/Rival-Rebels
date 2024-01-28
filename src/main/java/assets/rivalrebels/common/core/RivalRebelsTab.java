@@ -11,11 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.core;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.creativetab.CreativeTabs;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 
-public class RivalRebelsTab extends CreativeTabs
+public class RivalRebelsTab extends ItemGroup
 {
 	private final String name;
 	private final int icon;
@@ -29,18 +29,12 @@ public class RivalRebelsTab extends CreativeTabs
 
     @Override
     public ItemStack createIcon() {
-        if (icon == 0) return RivalRebels.nuclearelement.getDefaultInstance();
-        else return RivalRebels.hydrod.getDefaultInstance();
+        if (icon == 0) return RRItems.nuclearelement.getDefaultStack();
+        else return RRItems.hydrod.getDefaultStack();
     }
 
     @Override
-    public String getTranslationKey() {
-        return this.name;
+    public String getName() {
+        return name;
     }
-
-    @Override
-	public String getTabLabel()
-	{
-		return this.name;
-	}
 }

@@ -11,37 +11,41 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.client.model.ModelReactor;
 import assets.rivalrebels.client.model.RenderLibrary;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.common.block.machine.BlockReactor;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityReactorRenderer extends TileEntitySpecialRenderer<TileEntityReactor>
+@OnlyIn(Dist.CLIENT)
+public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntityReactor>
 {
-	private ModelReactor	mr;
-	private ModelLaptop		ml;
-	private ModelFromObj	mo;
+	private final ModelReactor mr;
+	private final ModelLaptop ml;
+	private final ModelFromObj mo;
 
-	public TileEntityReactorRenderer()
-	{
+	public TileEntityReactorRenderer(BlockEntityRendererFactory.Context context) {
 		mr = new ModelReactor();
 		ml = new ModelLaptop();
         mo = ModelFromObj.readObjFile("a.obj");
 	}
 
     @Override
-    public void render(TileEntityReactor te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		GlStateManager.enableLighting();
-		int var9 = te.getBlockMetadata();
+    public void render(TileEntityReactor entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		int var9 = entity.getCachedState().get(BlockReactor.META);
 		short var11 = 0;
 		if (var9 == 2)
 		{
@@ -62,27 +66,27 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer<TileEnt
 		{
 			var11 = 90;
 		}
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 1.1875F, (float) z + 0.5F);
-		GlStateManager.rotate(var11, 0.0F, 1.0F, 0.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
-		ml.renderModel((float) -te.slide);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etscreen);
-		ml.renderScreen((float) -te.slide);
-		GlStateManager.popMatrix();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		GlStateManager.rotate(var11, 0.0F, 1.0F, 0.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreactor);
-		mr.renderModel();
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etelectrode);
-		GlStateManager.translate(0, 2, -0.125f);
-		GlStateManager.scale(0.2f, 0.2f, 0.2f);
-		mo.render();
-		GlStateManager.popMatrix();
-		for (int i = 0; i < te.machines.size(); i++)
-		{
-			TileEntityMachineBase temb = (TileEntityMachineBase) te.machines.get(i);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 1.1875F, (float) entity.getPos().getZ() + 0.5F);
+		matrices.multiply(new Quaternion(var11, 0.0F, 1.0F, 0.0F));
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etlaptop);
+		ml.renderModel(buffer, matrices, (float) -entity.slide);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etscreen);
+		ml.renderScreen(buffer, matrices, (float) -entity.slide);
+		matrices.pop();
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+		matrices.multiply(new Quaternion(var11, 0.0F, 1.0F, 0.0F));
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etreactor);
+		mr.renderModel(matrices, buffer);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etelectrode);
+		matrices.translate(0, 2, -0.125f);
+		matrices.scale(0.2f, 0.2f, 0.2f);
+		mo.render(buffer);
+		matrices.pop();
+		for (int i = 0; i < entity.machines.size(); i++) {
+			TileEntityMachineBase temb = entity.machines.get(i);
 			if (temb.powerGiven > 0)
 			{
 				float radius = (temb.powerGiven * temb.powerGiven) / 40000;
@@ -92,9 +96,16 @@ public class TileEntityReactorRenderer extends TileEntitySpecialRenderer<TileEnt
 				if (radius > 0.10) steps++;
 				if (radius > 0.15) steps++;
 				if (radius > 0.25) radius = 0.25f;
-				// if (steps == 2 && temb.world.rand.nextInt(5) != 0) return;
-				RenderLibrary.instance.renderModel((float) x + 0.5f, (float) y + 2.5f, (float) z + 0.5f, temb.getPos().getX() - te.getPos().getX(), temb.getPos().getY() - te.getPos().getY() - 2.5f, temb.getPos().getZ() - te.getPos().getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
+				// if (steps == 2 && temb.world.random.nextInt(5) != 0) return;
+				RenderLibrary.renderModel(matrices, buffer, (float) entity.getPos().getX() + 0.5f, (float) entity.getPos().getY() + 2.5f, (float) entity.getPos().getZ() + 0.5f, temb.getPos().getX() - entity.getPos().getX(), temb.getPos().getY() - entity.getPos().getY() - 2.5f, temb.getPos().getZ() - entity.getPos().getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
 			}
 		}
 	}
+
+    @Override
+    public int getRenderDistance()
+    {
+        return 16384;
+    }
+
 }

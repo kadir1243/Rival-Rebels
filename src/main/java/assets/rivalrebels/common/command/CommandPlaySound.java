@@ -12,57 +12,32 @@
 package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.command.CommandBase;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.FloatArgumentType;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.text.TextComponentString;
 
-public class CommandPlaySound extends CommandBase
-{
-	@Override
-	public String getName()
-	{
-		return "rrsoundsystem";
-	}
-
-	@Override
-	public String getUsage(ICommandSender par1ICommandSender)
-	{
-		return "/" + getName();
-	}
-
-    @Override
-    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-        return true;
+public class CommandPlaySound {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(CommandManager.literal("rrsoundsystem")
+            .then(CommandManager.argument("dir", IntegerArgumentType.integer())
+                .then(CommandManager.argument("num", IntegerArgumentType.integer())
+                    .then(CommandManager.argument("volume", FloatArgumentType.floatArg())
+                        .then(CommandManager.argument("pitch", FloatArgumentType.floatArg())
+                            .executes(context -> execute(context.getSource(), IntegerArgumentType.getInteger(context, "dir"), IntegerArgumentType.getInteger(context, "num"), FloatArgumentType.getFloat(context, "volume"), FloatArgumentType.getFloat(context, "pitch")))
+                        )
+                    )
+                )
+            )
+        );
     }
 
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (args.length == 4)
-		{
-			int dir = 0;
-			int num = 0;
-			float vol = 0f;
-			float pit = 0f;
-			try
-			{
-				dir = Integer.parseInt(args[0].trim());
-				num = Integer.parseInt(args[1].trim());
-				vol = Float.parseFloat(args[2].trim());
-				pit = Float.parseFloat(args[3].trim());
-			}
-			catch (Exception E)
-			{
-				sender.sendMessage(new TextComponentString("No!"));
-			}
-			Vec3d cc = sender.getPositionVector();
-			RivalRebelsSoundPlayer.playSound(sender.getEntityWorld(), dir, num, cc.x, cc.y, cc.z, vol, pit);
-		}
-		else
-		{
-			sender.sendMessage(new TextComponentString("No!"));
-		}
+    private static int execute(ServerCommandSource source, int dir, int num, float volume, float pitch) throws CommandException {
+        Vec3d cc = source.getPosition();
+        RivalRebelsSoundPlayer.playSound(source.getWorld(), dir, num, cc.x, cc.y, cc.z, volume, pitch);
+		return 0;
 	}
 }

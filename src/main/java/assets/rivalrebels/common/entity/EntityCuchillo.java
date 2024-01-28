@@ -11,26 +11,31 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.SoundCategory;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EntityCuchillo extends EntityInanimate
 {
@@ -38,66 +43,63 @@ public class EntityCuchillo extends EntityInanimate
 	private boolean	inGround;
 	private int		ticksInGround;
 
-	public EntityCuchillo(World par1World)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+    public EntityCuchillo(EntityType<? extends EntityCuchillo> type, World par1World) {
+        super(type, par1World);
+    }
+
+	public EntityCuchillo(World par1World) {
+		this(RREntities.CUCHILLO, par1World);
 	}
 
-	public EntityCuchillo(World par1World, EntityPlayer player, float par3)
+	public EntityCuchillo(World par1World, PlayerEntity player, float par3)
 	{
-		super(par1World);
+		this(par1World);
 		shootingEntity = player;
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(player.posX, player.posY + player.getEyeHeight(), player.posZ, player.rotationYaw, player.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		posY -= 0.1f;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		setPosition(posX, posY, posZ);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI)) * par3;
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI)) * par3;
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI)) * par3;
+		refreshPositionAndAngles(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYaw(), player.getPitch());
+        setPos(getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.16F),
+            getY() - 0.1f,
+            getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.16F));
+		setPosition(getX(), getY(), getZ());
+		setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)) * par3,
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)) * par3,
+            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)) * par3);
 	}
 	public EntityCuchillo(World par1World, double x, double y,double z, double mx, double my, double mz)
 	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+		this(par1World);
 		setPosition(x,y,z);
 		setAnglesMotion(mx, my, mz);
 	}
 
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
+	public void setAnglesMotion(double mx, double my, double mz) {
+        setVelocity(mx, my, mz);
+		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
     @Override
-	public void onUpdate()
+	public void tick()
 	{
-		super.onUpdate();
-		ticksExisted++;
+		super.tick();
+		age++;
 		if (!inGround)
 		{
-			Vec3d vec31 = new Vec3d(posX, posY, posZ);
-			Vec3d vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-			RayTraceResult mop = world.rayTraceBlocks(vec31, vec3, false, true, false);
-			vec31 = new Vec3d(posX, posY, posZ);
-			if (mop != null) vec3 = mop.hitVec;
-			else vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+			Vec3d vec31 = getPos();
+			Vec3d vec3 = getPos().add(getVelocity());
+			HitResult mop = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+			vec31 = getPos();
+			if (mop != null) vec3 = mop.getPos();
+			else vec3 = getPos().add(getVelocity());
 
-			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
             for (Entity entity : list) {
-                if (entity.canBeCollidedWith() && (ticksExisted >= 10 || entity != shootingEntity)) {
-                    RayTraceResult mop1 = entity.getEntityBoundingBox().grow(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
-                    if (mop1 != null) {
-                        double d1 = vec31.squareDistanceTo(mop1.hitVec);
+                if (entity.collides() && (age >= 10 || entity != shootingEntity)) {
+                    Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
+                    if (mop1.isPresent()) {
+                        double d1 = vec31.squaredDistanceTo(mop1.get());
                         if (d1 < d0) {
-                            mop = new RayTraceResult(entity, mop1.hitVec);
+                            mop = new EntityHitResult(entity, mop1.get());
                             d0 = d1;
                         }
                     }
@@ -106,28 +108,26 @@ public class EntityCuchillo extends EntityInanimate
 
 			if (mop != null)
 			{
-				if (!world.isRemote)
+				if (!world.isClient)
 				{
-					if (mop.entityHit != null)
+					if (mop.getType() == HitResult.Type.ENTITY)
 					{
-						mop.entityHit.attackEntityFrom(RivalRebelsDamageSource.cuchillo, 7);
-						setDead();
+                        ((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cuchillo, 7);
+						kill();
 					}
 					else
 					{
-                        IBlockState state = world.getBlockState(mop.getBlockPos());
-                        Block block = state.getBlock();
-						Material hit = state.getMaterial();
-						if (block == Blocks.GLASS || block == Blocks.GLASS_PANE || block == Blocks.STAINED_GLASS || block == Blocks.STAINED_GLASS_PANE)
-						{
-							world.setBlockToAir(mop.getBlockPos());
+                        BlockPos pos = ((BlockHitResult) mop).getBlockPos();
+                        BlockState state = world.getBlockState(pos);
+                        Material hit = state.getMaterial();
+						if (state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS_PANES) || state.isIn(Tags.Blocks.STAINED_GLASS) || state.isIn(Tags.Blocks.STAINED_GLASS_PANES)) {
+							world.setBlockState(pos, Blocks.AIR.getDefaultState());
 							RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
-							return;
-						}
-						else if (hit == Material.ROCK)
+                        }
+						else if (hit == Material.STONE)
 						{
-							world.spawnEntity(new EntityItem(world, posX, posY, posZ, new ItemStack(RivalRebels.knife, 1)));
-							setDead();
+							world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
+							kill();
 						}
 						else
 						{
@@ -138,59 +138,51 @@ public class EntityCuchillo extends EntityInanimate
 			}
 			else
 			{
-				posX += motionX;
-				posY += motionY;
-				posZ += motionZ;
-				rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
-				while (rotationYaw - prevRotationYaw < -180.0F)
-					prevRotationYaw -= 360.0F;
-				while (rotationYaw - prevRotationYaw >= 180.0F)
-					prevRotationYaw += 360.0F;
-				rotationPitch -= 30;
-				rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
+                setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+				setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
+				while (getYaw() - prevYaw < -180.0F)
+					prevYaw -= 360.0F;
+				while (getYaw() - prevYaw >= 180.0F)
+					prevYaw += 360.0F;
+                setPitch(getPitch() - 30);
+				setYaw(prevYaw + (getYaw() - prevYaw) * 0.2F);
 
 				float friction = 0.98f;
 
-				if (isInWater())
+				if (isInsideWaterOrBubbleColumn())
 				{
 					for (int var26 = 0; var26 < 4; ++var26)
-						world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * 0.25F, posY - motionY * 0.25F, posZ - motionZ * 0.25F, motionX, motionY, motionZ);
+						world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
 					friction = 0.8F;
 				}
-				motionX *= friction;
-				motionY *= friction;
-				motionZ *= friction;
-				motionY -= 0.026F;
-				setPosition(posX, posY, posZ);
+                setVelocity(getVelocity().multiply(friction));
+                setVelocity(getVelocity().subtract(0, 0.026F, 0));
+				setPosition(getX(), getY(), getZ());
 			}
 		}
 		else
 		{
-			motionX *= 0.2f;
-			motionY *= 0.2f;
-			motionZ *= 0.2f;
+            setVelocity(getVelocity().multiply(0.2));
 			ticksInGround++;
 			if (ticksInGround == 60)
 			{
-				world.spawnEntity(new EntityItem(world, posX, posY, posZ, new ItemStack(RivalRebels.knife, 1)));
-				setDead();
+				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
+				kill();
 			}
 		}
 	}
 
 	@Override
-	public void onCollideWithPlayer(EntityPlayer par1EntityPlayer)
-	{
-		if (!world.isRemote && inGround)
-		{
-			if (!par1EntityPlayer.capabilities.isCreativeMode) par1EntityPlayer.inventory.addItemStackToInventory(new ItemStack(RivalRebels.knife, 1));
-			world.playSound(this.posX, this.posY, this.posZ, SoundEvents.BLOCK_LAVA_POP, SoundCategory.NEUTRAL, 0.2F, ((rand.nextFloat() - rand.nextFloat()) * 0.7F + 1.0F) * 2.0F, true);
-			setDead();
+	public void onPlayerCollision(PlayerEntity player) {
+		if (!world.isClient && inGround) {
+			if (!player.getAbilities().invulnerable) player.getInventory().insertStack(RRItems.knife.getDefaultStack());
+			world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.NEUTRAL, 0.2F, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F, true);
+			kill();
 		}
 	}
 
 	@Override
-	public boolean canBeAttackedWithItem()
+	public boolean isAttackable()
 	{
 		return false;
 	}

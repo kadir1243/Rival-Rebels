@@ -11,58 +11,68 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.common.block.machine.BlockReciever;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityRecieverRenderer extends TileEntitySpecialRenderer<TileEntityReciever>
-{
-	public static ModelFromObj	base;
-	public static ModelFromObj	arm;
-	public static ModelFromObj	adsdragon;
+@OnlyIn(Dist.CLIENT)
+public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever> {
+	public static ModelFromObj base;
+	public static ModelFromObj arm;
+	public static ModelFromObj adsdragon;
 
-	public TileEntityRecieverRenderer()
-	{
+	public TileEntityRecieverRenderer(BlockEntityRendererFactory.Context context) {
         base = ModelFromObj.readObjFile("p.obj");
         arm = ModelFromObj.readObjFile("q.obj");
         adsdragon = ModelFromObj.readObjFile("r.obj");
 	}
 
     @Override
-    public void render(TileEntityReciever te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreciever);
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(x + 0.5, y, z + 0.5);
-		GlStateManager.enableTexture2D();
-		GlStateManager.enableLighting();
-		int m = te.getBlockMetadata();
-		short r = 0;
+    public void render(TileEntityReciever entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etreciever);
+		matrices.push();
+		matrices.translate(entity.getPos().getX() + 0.5, entity.getPos().getY(), entity.getPos().getZ() + 0.5);
+		int m = entity.getCachedState().get(BlockReciever.META);
+		int r = 0;
 
 		if (m == 2) r = 0;
 		if (m == 3) r = 180;
 		if (m == 4) r = 90;
 		if (m == 5) r = -90;
 
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate(r, 0, 1, 0);
-        GlStateManager.translate(0, 0, 0.5);
-		base.render();
-		if (te.hasWeapon)
+		matrices.push();
+		matrices.multiply(new Quaternion(r, 0, 1, 0));
+        matrices.translate(0, 0, 0.5);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        base.render(buffer);
+		if (entity.hasWeapon)
 		{
-            GlStateManager.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			GlStateManager.rotate((float) (te.yaw - r), 0, 1, 0);
-			arm.render();
-            GlStateManager.rotate((float) te.pitch, 1, 0, 0);
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etadsdragon);
-			adsdragon.render();
+            matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
+			matrices.multiply(new Quaternion((float) (entity.yaw - r), 0, 1, 0));
+			arm.render(buffer);
+            matrices.multiply(new Quaternion((float) entity.pitch, 1, 0, 0));
+			MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etadsdragon);
+			adsdragon.render(buffer);
 		}
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
+		matrices.pop();
+		matrices.pop();
 	}
+
+    @Override
+    public int getRenderDistance()
+    {
+        return 16384;
+    }
+
 }

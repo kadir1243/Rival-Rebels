@@ -11,11 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiButton;
-import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.input.Mouse;
+import assets.rivalrebels.RRIdentifiers;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.LiteralText;
+import net.minecraftforge.client.gui.GuiUtils;
 
 public class GuiScroll extends GuiButton
 {
@@ -28,53 +29,42 @@ public class GuiScroll extends GuiButton
 	/** Keeps if the scroll is active */
 	public boolean	pressed;
 
-	public GuiScroll(int par1, int par2, int par3, int par4)
+	public GuiScroll(int par2, int par3, int par4)
 	{
-		super(par1, par2, par3, 5, 11, "");
+		super(par2, par3, 5, 11, LiteralText.EMPTY);
 		this.limit = par4;
 		pressed = false;
 	}
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-		this.mouseDragged(mc, mouseX, mouseY);
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 		if (scroll > limit) scroll = limit;
 		if (scroll < 0) scroll = 0;
-		mc.renderEngine.bindTexture(RivalRebels.guitbutton);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.guitbutton);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
-		if (pressed || mousePressed(mc, mouseX, mouseY)) state = 11;
-		this.drawTexturedModalRect(this.x, this.y + scroll, 0, state, this.width, this.height);
+		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 11;
+		GuiUtils.drawTexturedModalRect(matrices, this.x, this.y + scroll, 0, state, this.width, this.height, getZOffset());
 	}
 
-	@Override
-	protected void mouseDragged(Minecraft mc, int par2, int par3)
-	{
-		if (Mouse.isButtonDown(0))
-		{
-			if (mousePressed(mc, par2, par3)) pressed = true;
-			if (pressed) scroll = par3 - y - 5;
-		}
-		else
-		{
+    @Override
+    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
+		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
+			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
+			if (pressed) scroll = (int) (mouseY - y - 5);
+		} else {
 			pressed = false;
 		}
 	}
 
-	@Override
-	public void mouseReleased(int par2, int par3)
-	{
+    @Override
+    public void onRelease(double mouseX, double mouseY) {
 		pressed = false;
 	}
 
 	public int getScroll()
 	{
 		return scroll;
-	}
-
-	@Override
-	public boolean mousePressed(Minecraft mc, int par2, int par3)
-	{
-		return this.enabled && this.visible && par2 >= this.x && par3 >= this.y && par2 < this.x + this.width && par3 < this.y + limit + this.height;
 	}
 }

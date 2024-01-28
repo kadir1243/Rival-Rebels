@@ -12,183 +12,139 @@
 package assets.rivalrebels.common.entity;
 
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
-public class EntityPassiveFire extends EntityInanimate
-{
+public class EntityPassiveFire extends EntityInanimate {
     private boolean	inGround;
 
 	public Entity	shootingEntity;
 	private int		ticksInAir;
 	private double	damage;
 
-	public EntityPassiveFire(World par1World)
-	{
-		super(par1World);
+    public EntityPassiveFire(EntityType<? extends EntityPassiveFire> type, World world) {
+        super(type, world);
+    }
+
+	public EntityPassiveFire(World par1World) {
+		this(RREntities.PASSIVE_FIRE, par1World);
         inGround = false;
 		ticksInAir = 0;
 		damage = 2D;
-		setSize(0.1F, 0.1F);
 	}
 
-	public EntityPassiveFire(World par1World, double par2, double par4, double par6)
-	{
-		super(par1World);
-        inGround = false;
-		ticksInAir = 0;
-		damage = 2D;
-		setSize(0.1F, 0.1F);
+	public EntityPassiveFire(World par1World, double par2, double par4, double par6) {
+		this(par1World);
 		setPosition(par2, par4, par6);
 	}
 
-	public EntityPassiveFire(World par1World, EntityLiving par2EntityLiving, EntityLiving par3EntityLiving, float par4, float par5)
-	{
-		super(par1World);
-        inGround = false;
-		ticksInAir = 0;
-		damage = 2D;
-		shootingEntity = par2EntityLiving;
-		posY = (par2EntityLiving.posY + par2EntityLiving.getEyeHeight()) - 0.1D;
-		double d = par3EntityLiving.posX - par2EntityLiving.posX;
-		double d1 = (par3EntityLiving.posY + par3EntityLiving.getEyeHeight()) - 0.7D - posY;
-		double d2 = par3EntityLiving.posZ - par2EntityLiving.posZ;
-		double d3 = MathHelper.sqrt(d * d + d2 * d2);
+	public EntityPassiveFire(World par1World, MobEntity shootingEntity, MobEntity par3EntityLiving, float par4, float par5) {
+		this(par1World);
+		this.shootingEntity = shootingEntity;
+        setPos(getX(), (shootingEntity.getY() + shootingEntity.getEyeHeight(shootingEntity.getPose())) - 0.1D, getZ());
+		double d = par3EntityLiving.getX() - shootingEntity.getX();
+		double d1 = (par3EntityLiving.getY() + par3EntityLiving.getEyeHeight(par3EntityLiving.getPose())) - 0.7D - getY();
+		double d2 = par3EntityLiving.getZ() - shootingEntity.getZ();
+		double d3 = Math.sqrt(d * d + d2 * d2);
 
-		if (d3 < 9.9999999999999995E-008D)
-		{
-        }
-		else
-		{
+		if (d3 < 9.9999999999999995E-008D) {
+        } else {
 			float f = (float) ((Math.atan2(d2, d) * 180D) / Math.PI) - 90F;
 			float f1 = (float) (-((Math.atan2(d1, d3) * 180D) / Math.PI));
 			double d4 = d / d3;
 			double d5 = d2 / d3;
-			setLocationAndAngles(par2EntityLiving.posX + d4, posY, par2EntityLiving.posZ + d5, f, f1);
+			refreshPositionAndAngles(shootingEntity.getX() + d4, getY(), shootingEntity.getZ() + d5, f, f1);
 			float f2 = (float) d3 * 0.2F;
 			setVelocity(d, d1 + f2, d2);
         }
 	}
 
-	public EntityPassiveFire(World par1World, Entity entity, float par3)
-	{
-		super(par1World);
-        inGround = false;
-		ticksInAir = 0;
-		damage = 2D;
+	public EntityPassiveFire(World par1World, Entity entity, float par3) {
+		this(par1World);
 		shootingEntity = entity;
-		setSize(0.1f, 0.1f);
-		setLocationAndAngles(entity.posX, entity.posY + entity.getEyeHeight(), entity.posZ, entity.rotationYaw, entity.rotationPitch);
-		rotationYaw = (rotationYaw + 25) % 360;
-		posX -= MathHelper.cos((rotationYaw / 180F) * (float) Math.PI) * 0.16F;
-		posY -= 0.2D;
-		posZ -= MathHelper.sin((rotationYaw / 180F) * (float) Math.PI) * 0.16F;
-		setPosition(posX, posY, posZ);
-		motionX = -MathHelper.sin((rotationYaw / 180F) * (float) Math.PI) * MathHelper.cos((rotationPitch / 180F) * (float) Math.PI);
-		motionZ = MathHelper.cos((rotationYaw / 180F) * (float) Math.PI) * MathHelper.cos((rotationPitch / 180F) * (float) Math.PI);
-		motionY = -MathHelper.sin((rotationPitch / 180F) * (float) Math.PI);
-		setVelocity(motionX, motionY, motionZ);
+		refreshPositionAndAngles(entity.getX(), entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ(), entity.getYaw(), entity.getPitch());
+		setYaw((getYaw() + 25) % 360);
+        setPos(
+            getX() - MathHelper.cos((getYaw() / 180F) * (float) Math.PI) * 0.16F,
+            getY() - 0.2D,
+            getZ() - MathHelper.sin((getYaw() / 180F) * (float) Math.PI) * 0.16F
+        );
+		setPosition(getX(), getY(), getZ());
+        super.setVelocity(-MathHelper.sin((getYaw() / 180F) * (float) Math.PI) * MathHelper.cos((getPitch() / 180F) * (float) Math.PI),
+		 MathHelper.cos((getYaw() / 180F) * (float) Math.PI) * MathHelper.cos((getPitch() / 180F) * (float) Math.PI),
+		 -MathHelper.sin((getPitch() / 180F) * (float) Math.PI));
 	}
 
 	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000;
-	}
-
-	@Override
-	public float getBrightness()
+	public float getBrightnessAtEyes()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
-		return (par1 <= 16);
+		return (distance <= 16);
 	}
 
 	public EntityPassiveFire(World world, int x, int y, int z, int mx, int my, int mz)
 	{
-		super(world);
-        inGround = false;
-		ticksInAir = 0;
-		damage = 2D;
-		setSize(0.3F, 0.3F);
+		this(world);
 		setPosition(x, y, z);
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
+        super.setVelocity(mx, my, mz);
 	}
 
-    /**
-	 * Sets the velocity to the args. Args: x, y, z
-	 */
-	@Override
-	public void setVelocity(double par1, double par3, double par5)
-	{
-		motionX = par1 + (world.rand.nextFloat() - 0.5) / 50;
-		motionY = par3 + (world.rand.nextFloat() - 0.5) / 50;
-		motionZ = par5 + (world.rand.nextFloat() - 0.5) / 50;
+    @Override
+	public void setVelocity(double x, double y, double z) {
+        super.setVelocity(
+            x + (world.random.nextFloat() - 0.5) / 50,
+            y + (world.random.nextFloat() - 0.5) / 50,
+            z + (world.random.nextFloat() - 0.5) / 50);
 	}
 
 	@Override
-	public void onUpdate()
-	{
-		this.lastTickPosX = this.posX;
-		this.lastTickPosY = this.posY;
-		this.lastTickPosZ = this.posZ;
-		super.onUpdate();
+	public void tick() {
+		super.tick();
 
 		if (ticksInAir > 7)
 		{
-			this.setDead();
+			this.kill();
 		}
 
-		this.posX += this.motionX;
-		this.posY += this.motionY;
-		this.posZ += this.motionZ;
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
 		float var17 = 0.4F;
 		float var18 = -0.02F;
 
-		if (this.isInWater())
+		if (this.isInsideWaterOrBubbleColumn())
 		{
-			setDead();
+			kill();
 		}
 
-		this.motionX *= var17;
-		this.motionY *= var17;
-		this.motionZ *= var17;
-		this.motionY -= var18;
-		this.setPosition(this.posX, this.posY, this.posZ);
+        setVelocity(getVelocity().multiply(var17));
+        setVelocity(getVelocity().subtract(0, var18, 0));
+		this.setPosition(this.getX(), this.getY(), this.getZ());
 		ticksInAir++;
 	}
 
     @Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
+	public void writeCustomDataToNbt(NbtCompound nbt)
 	{
-		par1NBTTagCompound.setByte("inGround", (byte) (inGround ? 1 : 0));
-		par1NBTTagCompound.setDouble("damage", damage);
+		nbt.putBoolean("inGround", inGround);
+		nbt.putDouble("damage", damage);
 	}
 
     @Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
+	public void readCustomDataFromNbt(NbtCompound nbt)
 	{
-		inGround = par1NBTTagCompound.getByte("inGround") == 1;
-
-		if (par1NBTTagCompound.hasKey("damage"))
-		{
-			damage = par1NBTTagCompound.getDouble("damage");
-		}
+		inGround = nbt.getBoolean("inGround");
+        damage = nbt.getDouble("damage");
 	}
 
-	/**
-	 * If returns false, the item will not inflict any damage against entities.
-	 */
 	@Override
-	public boolean canBeAttackedWithItem()
+	public boolean isAttackable()
 	{
 		return false;
 	}

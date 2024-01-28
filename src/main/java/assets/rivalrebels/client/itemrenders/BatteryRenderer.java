@@ -11,33 +11,39 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Quaternion;
 
-public class BatteryRenderer extends TileEntityItemStackRenderer {
+public class BatteryRenderer extends BuiltinModelItemRenderer {
 	private final ModelFromObj battery;
 
-	public BatteryRenderer() {
+	public BatteryRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		battery = ModelFromObj.readObjFile("k.obj");
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etbattery);
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.8f, 0.3f, -0.03f);
-		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(90, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.3f, 0.3f, 0.3f);
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etbattery);
+		matrices.push();
+		matrices.translate(0.8f, 0.3f, -0.03f);
+		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternion(90, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.3f, 0.3f, 0.3f);
 
-		battery.render();
+		battery.render(vertexConsumers.getBuffer(RenderLayer.getSolid()));
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }
 

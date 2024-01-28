@@ -11,15 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelReactor
 {
@@ -87,66 +82,59 @@ public class ModelReactor
 	Vertice			v15		= new Vertice(-0.5f, 0.8125f, -0.5f);
 	Vertice			v16		= new Vertice(-0.5f, 0.8125f, 0.5f);
 
-	public void renderModel()
+	public void renderModel(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		addFace(v13, v14, v15, v16, t14, t2, t3, t17);
-		addFace(v9, v5, v6, v10, t7, t4, t18, t12);
-		addFace(v10, v6, v7, v11, t15, t19, t22, t16);
-		addFace(v11, v7, v8, v12, t7, t4, t18, t12);
-		addFace(v12, v8, v5, v9, t21, t24, t23, t20);
+		matrices.push();
+		addFace(buffer, v13, v14, v15, v16, t14, t2, t3, t17);
+		addFace(buffer, v9, v5, v6, v10, t7, t4, t18, t12);
+		addFace(buffer, v10, v6, v7, v11, t15, t19, t22, t16);
+		addFace(buffer, v11, v7, v8, v12, t7, t4, t18, t12);
+		addFace(buffer, v12, v8, v5, v9, t21, t24, t23, t20);
 
-		addFace(v5, v1, v2, v6, t2, t14, t13, t1);
-		addFace(v6, v2, v3, v7, t2, t14, t13, t1);
-		addFace(v7, v3, v4, v8, t2, t14, t13, t1);
-		addFace(v8, v4, v1, v5, t2, t14, t13, t1);
-		addFace(v2, v1, v4, v3, t1v, t2v, t3v, t4v);
+		addFace(buffer, v5, v1, v2, v6, t2, t14, t13, t1);
+		addFace(buffer, v6, v2, v3, v7, t2, t14, t13, t1);
+		addFace(buffer, v7, v3, v4, v8, t2, t14, t13, t1);
+		addFace(buffer, v8, v4, v1, v5, t2, t14, t13, t1);
+		addFace(buffer, v2, v1, v4, v3, t1v, t2v, t3v, t4v);
 		xoff = 0.9375f;
-		addFace(v5, v1, v2, v6, t1v, t2v, t3v, t4v);
+		addFace(buffer, v5, v1, v2, v6, t1v, t2v, t3v, t4v);
 		xoff = 1f;
 		zoff = 0.9375f;
-		addFace(v6, v2, v3, v7, t1v, t2v, t3v, t4v);
+		addFace(buffer, v6, v2, v3, v7, t1v, t2v, t3v, t4v);
 		xoff = 0.9375f;
 		zoff = 1f;
-		addFace(v7, v3, v4, v8, t1v, t2v, t3v, t4v);
+		addFace(buffer, v7, v3, v4, v8, t1v, t2v, t3v, t4v);
 		xoff = 1f;
 		zoff = 0.9375f;
-		addFace(v8, v4, v1, v5, t1v, t2v, t3v, t4v);
-		zoff = 1f;
+		addFace(buffer, v8, v4, v1, v5, t1v, t2v, t3v, t4v);
 
-		xoff = yoff = zoff = 0.6875F;
-		addFace(v2, v1, v4, v3, t5v, t6v, t8v, t7v);
-		addFace(v5, v1, v2, v6, t5v, t6v, t8v, t7v);
-		addFace(v6, v2, v3, v7, t5v, t6v, t8v, t7v);
-		addFace(v7, v3, v4, v8, t5v, t6v, t8v, t7v);
-		addFace(v8, v4, v1, v5, t5v, t6v, t8v, t7v);
-		addFace(v5, v6, v7, v8, t5v, t6v, t8v, t7v);
+        xoff = yoff = zoff = 0.6875F;
+		addFace(buffer, v2, v1, v4, v3, t5v, t6v, t8v, t7v);
+		addFace(buffer, v5, v1, v2, v6, t5v, t6v, t8v, t7v);
+		addFace(buffer, v6, v2, v3, v7, t5v, t6v, t8v, t7v);
+		addFace(buffer, v7, v3, v4, v8, t5v, t6v, t8v, t7v);
+		addFace(buffer, v8, v4, v1, v5, t5v, t6v, t8v, t7v);
+		addFace(buffer, v5, v6, v7, v8, t5v, t6v, t8v, t7v);
 
 		xoff = yoff = zoff = 0.8125F;
-		addFace(v2, v1, v4, v3, t9v, t10v, t12v, t11v);
-		addFace(v5, v1, v2, v6, t9v, t10v, t12v, t11v);
-		addFace(v6, v2, v3, v7, t9v, t10v, t12v, t11v);
-		addFace(v7, v3, v4, v8, t9v, t10v, t12v, t11v);
-		addFace(v8, v4, v1, v5, t9v, t10v, t12v, t11v);
-		addFace(v5, v6, v7, v8, t9v, t10v, t12v, t11v);
+		addFace(buffer, v2, v1, v4, v3, t9v, t10v, t12v, t11v);
+		addFace(buffer, v5, v1, v2, v6, t9v, t10v, t12v, t11v);
+		addFace(buffer, v6, v2, v3, v7, t9v, t10v, t12v, t11v);
+		addFace(buffer, v7, v3, v4, v8, t9v, t10v, t12v, t11v);
+		addFace(buffer, v8, v4, v1, v5, t9v, t10v, t12v, t11v);
+		addFace(buffer, v5, v6, v7, v8, t9v, t10v, t12v, t11v);
 		xoff = yoff = zoff = 1F;
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 
-	private void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4)
-	{
-		Tessellator t = Tessellator.getInstance();
-        BufferBuilder buffer = t.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	private void addFace(VertexConsumer buffer, Vertice v1, Vertice v2, Vertice v3, Vertice v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4) {
 		addVertice(buffer, v1, t1);
 		addVertice(buffer, v2, t2);
 		addVertice(buffer, v3, t3);
 		addVertice(buffer, v4, t4);
-		t.draw();
 	}
 
-	private void addVertice(BufferBuilder buffer, Vertice v, TextureVertice t) {
-		buffer.pos(v.x * xoff, v.y * yoff, v.z * zoff).tex(t.x, t.y).endVertex();
+	private void addVertice(VertexConsumer buffer, Vertice v, TextureVertice t) {
+		buffer.vertex(v.x * xoff, v.y * yoff, v.z * zoff).texture(t.x, t.y).next();
 	}
 }

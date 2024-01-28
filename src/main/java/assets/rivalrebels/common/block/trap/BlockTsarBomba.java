@@ -11,84 +11,69 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockTsarBomba extends BlockContainer
-{
-	public BlockTsarBomba()
+public class BlockTsarBomba extends BlockWithEntity {
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+	public BlockTsarBomba(Settings settings)
 	{
-		super(Material.IRON);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
-	}
-
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-	/*public void onBlockPlacedBy(World world, int x, int y, int z, EntityLivingBase entity, ItemStack i) {
-		int var7 = MathHelper.floor((entity.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		world.setBlockMetadataWithNotify(x, y, z, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))), 0);
-	}*/
+		super(settings);
+        setDefaultState(getStateManager().getDefaultState().with(META, 0));
+    }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (!stack.isEmpty() && stack.getItem() == RivalRebels.pliers) {
-			player.openGui(RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
-		} else if (!world.isRemote) {
-			player.sendMessage(new TextComponentString("§7[§4Orders§7] §cUse pliers to open."));
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
+    }
+
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+		int var7 = MathHelper.floor((ctx.getPlayerYaw() * 4.0F / 360.0F) + 0.5D) & 3;
+		return super.getPlacementState(ctx).with(META, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))));
+	}
+
+    @Override
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        ItemStack stack = player.getStackInHand(hand);
+        if (!stack.isEmpty() && stack.getItem() == RRItems.pliers) {
+			player.openHandledScreen((NamedScreenHandlerFactory) world.getBlockEntity(pos));
+		} else if (!world.isClient) {
+			player.sendMessage(Text.of("§7[§4Orders§7] §cUse pliers to open."), true);
 		}
-		return false;
+		return ActionResult.PASS;
 	}
 
-	@Override
-	public boolean hasTileEntity(IBlockState state)
-	{
-		return true;
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityTsarBomba(pos, state);
 	}
-
-	/**
-	 * each class overrides this to return a new <className>
-	 */
-	@Override
-	public TileEntity createNewTileEntity(World world, int meta)
-	{
-		return new TileEntityTsarBomba();
-	}
-
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
-	}*/
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
 }

@@ -11,37 +11,42 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.*;
 import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.util.math.Quaternion;
 
 import java.util.Random;
 
-public class AstroBlasterRenderer extends TileEntityItemStackRenderer
+public class AstroBlasterRenderer extends BuiltinModelItemRenderer
 {
-	ModelAstroBlasterBarrel	md1;
-	ModelAstroBlasterHandle	md2;
-	ModelAstroBlasterBody	md3;
-	ModelAstroBlasterBack	md4;
-	ModelRod				md5;
-	float					pullback		= 0;
-	float					rotation		= 0;
-	boolean					isreloading		= false;
-	int						stage			= 0;
-	int						spin			= 0;
-	int						time			= 1;
-	int						reloadcooldown	= 0;
+	private final ModelAstroBlasterBarrel	md1;
+	private final ModelAstroBlasterHandle	md2;
+	private final ModelAstroBlasterBody	md3;
+	private final ModelAstroBlasterBack	md4;
+	private final ModelRod				md5;
+	private float					pullback		= 0;
+	private float					rotation		= 0;
+	private boolean					isreloading		= false;
+	private int						stage			= 0;
+	private int						spin			= 0;
+    private int						reloadcooldown	= 0;
 
-	public AstroBlasterRenderer()
-	{
+	public AstroBlasterRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		md1 = new ModelAstroBlasterBarrel();
 		md2 = new ModelAstroBlasterHandle();
 		md3 = new ModelAstroBlasterBody();
@@ -50,15 +55,15 @@ public class AstroBlasterRenderer extends TileEntityItemStackRenderer
 	}
 
     @Override
-    public void renderByItem(ItemStack item) {
-		spin++;
-		if (item.getRepairCost() >= 1)
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        spin++;
+		if (stack.getRepairCost() >= 1)
 		{
-			spin += item.getRepairCost() / 2.2;
+			spin += stack.getRepairCost() / 2.2;
 		}
 		spin %= 628;
 		if (reloadcooldown > 0) reloadcooldown--;
-		if (item.getRepairCost() > 20 && reloadcooldown == 0) isreloading = true;
+		if (stack.getRepairCost() > 20 && reloadcooldown == 0) isreloading = true;
 		if (isreloading)
 		{
 			if (stage == 0) if (pullback < 0.3) pullback += 0.03;
@@ -75,115 +80,104 @@ public class AstroBlasterRenderer extends TileEntityItemStackRenderer
 			}
 
 		}
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		GlStateManager.translate(0.4f, 0.35f, -0.03f);
-		GlStateManager.rotate(-55, 0.0F, 0.0F, 1.0F);
-		GlStateManager.translate(0f, -0.05f, 0.05f);
+		matrices.push();
+		matrices.translate(0.4f, 0.35f, -0.03f);
+		matrices.multiply(new Quaternion(-55, 0.0F, 0.0F, 1.0F));
+		matrices.translate(0f, -0.05f, 0.05f);
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0f, 0.9f, 0f);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.eteinstenbarrel);
-		md1.render();
-		if (item.isItemEnchanted())
+		matrices.push();
+		matrices.translate(0f, 0.9f, 0f);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.eteinstenbarrel);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
+        md1.render(matrices, buffer);
+		if (stack.hasEnchantments())
 		{
-			GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-			GlStateManager.disableLighting();
-			md1.render();
-			GlStateManager.disableBlend();
-			GlStateManager.enableLighting();
+			RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+			md1.render(matrices, buffer);
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.22f, -0.025f, 0f);
-		GlStateManager.rotate(90, 0.0F, 0.0F, 1.0F);
-		GlStateManager.scale(0.03125f, 0.03125f, 0.03125f);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.eteinstenhandle);
-		md2.render();
-		if (item.isItemEnchanted()) {
-			GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GlStateManager.enableBlend();
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-			GlStateManager.disableLighting();
-			md2.render();
-			GlStateManager.disableBlend();
-			GlStateManager.enableLighting();
+		matrices.push();
+		matrices.translate(0.22f, -0.025f, 0f);
+		matrices.multiply(new Quaternion(90, 0.0F, 0.0F, 1.0F));
+		matrices.scale(0.03125f, 0.03125f, 0.03125f);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.eteinstenhandle);
+		md2.render(matrices, buffer, light, overlay, 0, 0, 0, 0);
+		if (stack.hasEnchantments()) {
+			RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			RenderSystem.enableBlend();
+            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+			md2.render(matrices, buffer, light, overlay, 0, 0, 0, 0);
+			RenderSystem.disableBlend();
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 
-		// GlStateManager.pushMatrix();
-		// GlStateManager.translate(0f, 0.8f, 0f);
-		// GlStateManager.rotate(180, 0.0F, 0.0F, 1.0F);
-		// GlStateManager.scale(0.9, 4.5, 0.9);
+		// matrices.push();
+		// matrices.translate(0f, 0.8f, 0f);
+		// RenderSystem.rotate(180, 0.0F, 0.0F, 1.0F);
+		// matrices.scale(0.9F, 4.5F, 0.9F);
 		// md3.render(0.2f, 0.3f, 0.3f, 0.3f, 1f);
-		// GlStateManager.popMatrix();
+		// matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0f, 0.2f, 0f);
-		GlStateManager.scale(0.85, 0.85, 0.85);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.eteinstenback);
-		md4.render();
-		if (item.isItemEnchanted()) {
-			GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GlStateManager.enableBlend();
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-			GlStateManager.disableLighting();
-			md4.render();
-            GlStateManager.disableBlend();
-			GlStateManager.enableLighting();
+		matrices.push();
+		matrices.translate(0f, 0.2f, 0f);
+		matrices.scale(0.85F, 0.85F, 0.85F);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.eteinstenback);
+        md4.render(matrices, buffer);
+		if (stack.hasEnchantments()) {
+			RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			RenderSystem.enableBlend();
+            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+			md4.render(matrices, buffer);
+            RenderSystem.disableBlend();
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0f, -pullback, 0f);
-		GlStateManager.rotate(rotation, 0.0F, 1.0F, 0.0F);
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.12f, 0.1f, 0.12f);
-		GlStateManager.rotate(pullback * 270, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.3f, 0.7f, 0.3f);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etredrod);
-		md5.render();
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(0f, -pullback, 0f);
+		matrices.multiply(new Quaternion(rotation, 0.0F, 1.0F, 0.0F));
+		matrices.push();
+		matrices.translate(0.12f, 0.1f, 0.12f);
+		matrices.multiply(new Quaternion(pullback * 270, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.3f, 0.7f, 0.3f);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etredrod);
+		md5.render(matrices, buffer);
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(-0.12f, 0.1f, 0.12f);
-		GlStateManager.rotate(pullback * 270, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.3f, 0.7f, 0.3f);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etredrod);
-		md5.render();
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(-0.12f, 0.1f, 0.12f);
+		matrices.multiply(new Quaternion(pullback * 270, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.3f, 0.7f, 0.3f);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etredrod);
+		md5.render(matrices, buffer);
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(-0.12f, 0.1f, -0.12f);
-		GlStateManager.rotate(pullback * 270, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.3f, 0.7f, 0.3f);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etredrod);
-		md5.render();
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(-0.12f, 0.1f, -0.12f);
+		matrices.multiply(new Quaternion(pullback * 270, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.3f, 0.7f, 0.3f);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etredrod);
+		md5.render(matrices, buffer);
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.12f, 0.1f, -0.12f);
-		GlStateManager.rotate(pullback * 270, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.3f, 0.7f, 0.3f);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etredrod);
-		md5.render();
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(0.12f, 0.1f, -0.12f);
+		matrices.multiply(new Quaternion(pullback * 270, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.3f, 0.7f, 0.3f);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etredrod);
+		md5.render(matrices, buffer);
+		matrices.pop();
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.disableTexture2D();
-        GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-		GlStateManager.translate(0, 0.25f, 0);
+		matrices.push();
+        RenderSystem.enableBlend();
+        RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+		matrices.translate(0, 0.25f, 0);
 		float segmentDistance = 0.1f;
 		float distance = 0.5f;
 		float radius = 0.01F;
-		Random rand = new Random();
-		Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+		Random random = new Random();
 
         double AddedX = 0;
 		double AddedZ = 0;
@@ -194,8 +188,8 @@ public class AstroBlasterRenderer extends TileEntityItemStackRenderer
 		{
 			prevAddedX = AddedX;
 			prevAddedZ = AddedZ;
-			AddedX = (rand.nextFloat() - 0.5) * 0.1f;
-			AddedZ = (rand.nextFloat() - 0.5) * 0.1f;
+			AddedX = (random.nextFloat() - 0.5) * 0.1f;
+			AddedZ = (random.nextFloat() - 0.5) * 0.1f;
 			double dist = Math.sqrt(AddedX * AddedX + AddedZ * AddedZ);
 			if (dist != 0)
 			{
@@ -218,28 +212,26 @@ public class AstroBlasterRenderer extends TileEntityItemStackRenderer
 
 			for (float o = 0; o <= radius; o += radius / 2f)
 			{
-				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-				buffer.pos(AddedX + o, AddedY, AddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(AddedX + o, AddedY, AddedZ + o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(AddedX - o, AddedY, AddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(AddedX + o, AddedY, AddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(AddedX - o, AddedY, AddedZ + o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(AddedX - o, AddedY, AddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(AddedX + o, AddedY, AddedZ + o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(AddedX - o, AddedY, AddedZ + o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).endVertex();
-				buffer.pos(prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).endVertex();
-				tessellator.draw();
+				buffer.vertex(AddedX + o, AddedY, AddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(AddedX + o, AddedY, AddedZ + o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(AddedX - o, AddedY, AddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(AddedX + o, AddedY, AddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(AddedX - o, AddedY, AddedZ + o).color(1, 0, 0, 1).next();
+				buffer.vertex(AddedX - o, AddedY, AddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).next();
+				buffer.vertex(AddedX + o, AddedY, AddedZ + o).color(1, 0, 0, 1).next();
+				buffer.vertex(AddedX - o, AddedY, AddedZ + o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).next();
+				buffer.vertex(prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).color(1, 0, 0, 1).next();
 			}
-			// GlStateManager.pushMatrix();
-			// GlStateManager.rotate(90f, 0.0F, 0.0F, 1.0F);
-			// GlStateManager.rotate((float) angle, 0.0F, 1.0F, 0.0F);
+			// matrices.push();
+			// RenderSystem.rotate(90f, 0.0F, 0.0F, 1.0F);
+			// RenderSystem.rotate((float) angle, 0.0F, 1.0F, 0.0F);
 			// float o = 0.075f;
 			// float s = 0.1f;
 			// tessellator.startDrawingQuads();
@@ -270,29 +262,28 @@ public class AstroBlasterRenderer extends TileEntityItemStackRenderer
 			// tessellator.addVertex( - o, AddedY + s, + o);
 			// tessellator.addVertex( + o, AddedY + s, + o);
 			// tessellator.draw();
-			// GlStateManager.popMatrix();
+			// matrices.pop();
 		}
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0f, 0.8f, 0f);
-		GlStateManager.rotate(180, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(spin, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.9, 4.1, 0.9);
-		md3.render((float) (0.22f + (Math.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(0f, 0.8f, 0f);
+		matrices.multiply(new Quaternion(180, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternion(spin, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.9F, 4.1F, 0.9F);
+		md3.render(matrices, buffer, (float) (0.22f + (Math.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0f, 0.8f, 0f);
-		GlStateManager.rotate(180, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(-spin, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.9, 4.1, 0.9);
-		md3.render((float) (0.22f + (Math.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
-		GlStateManager.disableBlend();
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(0f, 0.8f, 0f);
+		matrices.multiply(new Quaternion(180, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternion(-spin, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.9F, 4.1F, 0.9F);
+		md3.render(matrices, buffer, (float) (0.22f + (Math.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
+		matrices.pop();
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }
 

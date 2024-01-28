@@ -11,33 +11,37 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocket;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
-public class RocketRenderer extends TileEntityItemStackRenderer
+public class RocketRenderer extends BuiltinModelItemRenderer
 {
-	ModelRocket	rock;
+	private final ModelRocket rock;
 
-	public RocketRenderer()
-	{
+	public RocketRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		rock = new ModelRocket();
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-		GlStateManager.enableLighting();
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etrocket);
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.8f, 0.3f, -0.03f);
-		GlStateManager.scale(2, 2, 2);
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etrocket);
+		matrices.push();
+		matrices.translate(0.8f, 0.3f, -0.03f);
+		matrices.scale(2, 2, 2);
 
-		rock.render(true);
+		rock.render(matrices, vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true)), true);
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }
 

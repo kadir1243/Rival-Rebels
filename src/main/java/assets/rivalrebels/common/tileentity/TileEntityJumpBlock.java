@@ -11,7 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.math.BlockPos;
 
-public class TileEntityJumpBlock extends TileEntity {
+public class TileEntityJumpBlock extends BlockEntity {
+    public TileEntityJumpBlock(BlockPos pos, BlockState state) {
+        super(RRTileEntities.JUMP_BLOCK, pos, state);
+    }
 }

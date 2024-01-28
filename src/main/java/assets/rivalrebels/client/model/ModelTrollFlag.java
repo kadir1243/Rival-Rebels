@@ -11,85 +11,36 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelTrollFlag
 {
-	public void renderModel(World world, double x, double y, double z, int metadata)
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+	public void renderModel(VertexConsumer buffer, int metadata) {
         double var18 = 0.05;
 
-		if (metadata == 5)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(var18, 1, 1).tex(0, 0).endVertex();
-			buffer.pos(var18, 0, 1).tex(0, 1).endVertex();
-			buffer.pos(var18, 0, 0).tex(1, 1).endVertex();
-			buffer.pos(var18, 1, 0).tex(1, 0).endVertex();
-			tessellator.draw();
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(var18, 1, 0).tex(1, 0).endVertex();
-			buffer.pos(var18, 0, 0).tex(1, 1).endVertex();
-			buffer.pos(var18, 0, 1).tex(0, 1).endVertex();
-			buffer.pos(var18, 1, 1).tex(0, 0).endVertex();
-			tessellator.draw();
-		}
-
-		if (metadata == 4)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(1 - var18, 0, 1).tex(1, 1).endVertex();
-			buffer.pos(1 - var18, 1, 1).tex(1, 0).endVertex();
-			buffer.pos(1 - var18, 1, 0).tex(0, 0).endVertex();
-			buffer.pos(1 - var18, 0, 0).tex(0, 1).endVertex();
-			tessellator.draw();
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(1 - var18, 0, 0).tex(0, 1).endVertex();
-			buffer.pos(1 - var18, 1, 0).tex(0, 0).endVertex();
-			buffer.pos(1 - var18, 1, 1).tex(1, 0).endVertex();
-			buffer.pos(1 - var18, 0, 1).tex(1, 1).endVertex();
-			tessellator.draw();
-		}
-
-		if (metadata == 3)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(1, 0, var18).tex(1, 1).endVertex();
-			buffer.pos(1, 1, var18).tex(1, 0).endVertex();
-			buffer.pos(0, 1, var18).tex(0, 0).endVertex();
-			buffer.pos(0, 0, var18).tex(0, 1).endVertex();
-			tessellator.draw();
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(0, 0, var18).tex(0, 1).endVertex();
-			buffer.pos(0, 1, var18).tex(0, 0).endVertex();
-			buffer.pos(1, 1, var18).tex(1, 0).endVertex();
-			buffer.pos(1, 0, var18).tex(1, 1).endVertex();
-			tessellator.draw();
-		}
-
-		if (metadata == 2)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(1, 1, 1 - var18).tex(0, 0).endVertex();
-			buffer.pos(1, 0, 1 - var18).tex(0, 1).endVertex();
-			buffer.pos(0, 0, 1 - var18).tex(1, 1).endVertex();
-			buffer.pos(0, 1, 1 - var18).tex(1, 0).endVertex();
-			tessellator.draw();
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(0, 1, 1 - var18).tex(1, 0).endVertex();
-			buffer.pos(0, 0, 1 - var18).tex(1, 1).endVertex();
-			buffer.pos(1, 0, 1 - var18).tex(0, 1).endVertex();
-			buffer.pos(1, 1, 1 - var18).tex(0, 0).endVertex();
-			tessellator.draw();
+		if (metadata == 5) {
+			buffer.vertex(var18, 1, 1).texture(0, 0).next();
+			buffer.vertex(var18, 0, 1).texture(0, 1).next();
+			buffer.vertex(var18, 0, 0).texture(1, 1).next();
+			buffer.vertex(var18, 1, 0).texture(1, 0).next();
+		} else if (metadata == 4) {
+			buffer.vertex(1 - var18, 0, 1).texture(1, 1).next();
+			buffer.vertex(1 - var18, 1, 1).texture(1, 0).next();
+			buffer.vertex(1 - var18, 1, 0).texture(0, 0).next();
+			buffer.vertex(1 - var18, 0, 0).texture(0, 1).next();
+		} else if (metadata == 3) {
+			buffer.vertex(1, 0, var18).texture(1, 1).next();
+			buffer.vertex(1, 1, var18).texture(1, 0).next();
+			buffer.vertex(0, 1, var18).texture(0, 0).next();
+			buffer.vertex(0, 0, var18).texture(0, 1).next();
+		} else if (metadata == 2) {
+			buffer.vertex(1, 1, 1 - var18).texture(0, 0).next();
+			buffer.vertex(1, 0, 1 - var18).texture(0, 1).next();
+			buffer.vertex(0, 0, 1 - var18).texture(1, 1).next();
+			buffer.vertex(0, 1, 1 - var18).texture(1, 0).next();
 		}
 	}
 }

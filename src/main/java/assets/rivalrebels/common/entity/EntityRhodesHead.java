@@ -11,23 +11,25 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.entity.item.EntityItem;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.DamageSource;
 import net.minecraft.world.World;
 
 public class EntityRhodesHead extends EntityRhodesPiece
 {
-	public EntityRhodesHead(World w)
+	public EntityRhodesHead(EntityType<? extends EntityRhodesHead> type, World w)
 	{
-		super(w);
+		super(type, w);
 	}
 
 	public EntityRhodesHead(World w, double x, double y, double z, float scale, int color)
 	{
-		super(w, x, y, z, scale, color);
+		super(RREntities.RHODES_HEAD, w, x, y, z, scale, color);
 		health = 700;
 	}
 
@@ -38,19 +40,18 @@ public class EntityRhodesHead extends EntityRhodesPiece
 	}
 
 	@Override
-	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2) {
-		if (!isDead && !world.isRemote)
-		{
+	public boolean damage(DamageSource par1DamageSource, float par2) {
+		if (isAlive() && !world.isClient) {
 			health -= par2;
 			if (health <= 0)
 			{
-				setDead();
-				world.spawnEntity(new EntityItem(world, posX, posY, posZ, new ItemStack(RivalRebels.nuclearelement, 4)));
-				world.spawnEntity(new EntityItem(world, posX, posY, posZ, new ItemStack(RivalRebels.core3, 1)));
-				world.spawnEntity(new EntityItem(world, posX, posY, posZ, new ItemStack(RivalRebels.einsten, 1)));
-				if (rand.nextBoolean())
+				kill();
+				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), new ItemStack(RRItems.nuclearelement, 4)));
+				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.core3.getDefaultStack()));
+				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.einsten.getDefaultStack()));
+				if (random.nextBoolean())
 				{
-					world.spawnEntity(new EntityItem(world, posX, posY, posZ, new ItemStack(RivalRebels.buildrhodes, 1)));
+					world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRBlocks.buildrhodes.asItem().getDefaultStack()));
 				}
 				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
 			}

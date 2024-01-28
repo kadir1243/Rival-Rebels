@@ -11,12 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.NuclearRodRenderer;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderProperties;
+
+import java.util.function.Consumer;
 
 public class ItemRodNuclear extends ItemRod
 {
@@ -24,22 +29,24 @@ public class ItemRodNuclear extends ItemRod
 	{
 		super();
 		power = 3000000;
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
 	}
 
-	@Override
-	public void onUpdate(ItemStack stack, World world, Entity entity, int par4, boolean par5) {
-		if (entity instanceof EntityPlayer player) {
-            if (stack.getItem() == RivalRebels.nuclearelement && world.rand.nextInt(16) == 0 && !player.capabilities.isCreativeMode) {
-                player.attackEntityFrom(RivalRebelsDamageSource.radioactivepoisoning, world.rand.nextInt(4));
+    @Override
+    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+		if (entity instanceof PlayerEntity player) {
+            if (world.random.nextInt(16) == 0 && !player.getAbilities().invulnerable) {
+                player.damage(RivalRebelsDamageSource.radioactivepoisoning, world.random.nextInt(4));
             }
         }
 	}
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:av");
-	}*/
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new NuclearRodRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 }

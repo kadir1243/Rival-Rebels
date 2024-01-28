@@ -11,105 +11,71 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockTachyonBomb extends BlockContainer
+public class BlockTachyonBomb extends BlockWithEntity
 {
-	public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
+	public static final IntProperty META = IntProperty.of("meta", 0, 15);
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(META);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
+    }
+	public BlockTachyonBomb(Settings settings)
+	{
+		super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
 
+    @Nullable
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(META, meta);
-    }    @Override
-public BlockStateContainer getBlockState() {
-    return new BlockStateContainer(this, META);
-}
-	public BlockTachyonBomb()
-	{
-		super(Material.IRON);
-        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
-    }
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
-	}
-
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+		int var7 = MathHelper.floor((ctx.getPlayerYaw() * 4.0F / 360.0F) + 0.5D) & 3;
+		return super.getPlacementState(ctx).with(META, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))));
 	}
 
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-		int var7 = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
-		world.setBlockState(pos, state.withProperty(META, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0)))), 0);
-	}
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        ItemStack stack = player.getHeldItem(hand);
-        if (!stack.isEmpty() && stack.getItem() == RivalRebels.pliers) {
-			player.openGui(RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        ItemStack stack = player.getStackInHand(hand);
+        if (!stack.isEmpty() && stack.getItem() == RRItems.pliers) {
+            player.openHandledScreen((NamedScreenHandlerFactory) world.getBlockEntity(pos));
 		}
-		else if (!world.isRemote)
+		else if (!world.isClient)
 		{
-			player.sendMessage(new TextComponentString("§7[§4Orders§7] §cUse pliers to open."));
+			player.sendMessage(Text.of("§7[§4Orders§7] §cUse pliers to open."), true);
 		}
-		return false;
+		return ActionResult.PASS;
 	}
 
-	@Override
-	public boolean hasTileEntity(IBlockState state)
-	{
-		return true;
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityTachyonBomb(pos, state);
 	}
-
-	/**
-	 * each class overrides this to return a new <className>
-	 */
-	@Override
-	public TileEntity createNewTileEntity(World world, int meta)
-	{
-		return new TileEntityTachyonBomb();
-	}
-
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
-	}*/
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
 }

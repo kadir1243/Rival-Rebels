@@ -11,49 +11,38 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
 import net.minecraft.entity.Entity;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemArmor;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterial;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-public class ItemArmorCamo extends ItemArmor
+public class ItemArmorCamo extends ArmorItem {
+	public int team;
 
-{
-	private static final int	maxDamageArray[]	= { 11, 16, 15, 13 };
-	public int					team;
-
-	public ItemArmorCamo(ArmorMaterial par2EnumArmorMaterial, EntityEquipmentSlot par4, int team)
-	{
-		super(par2EnumArmorMaterial, 0, par4);
-		setCreativeTab(RivalRebels.rrarmortab);
-		setMaxDamage(par2EnumArmorMaterial.getDurability(par4) * 2);
-		setMaxStackSize(1);
+	public ItemArmorCamo(ArmorMaterial material, EquipmentSlot par4, int team) {
+		super(material, par4, new Item.Settings().group(RRItems.rrarmortab).maxDamage(material.getDurability(par4) * 2));
 		this.team = team;
-	}
-
-	static int[] getMaxDamageArray()
-	{
-		return maxDamageArray;
 	}
 
     @Nullable
     @Override
-    public String getArmorTexture(ItemStack stack, Entity entity, EntityEquipmentSlot slot, String type) {
-		if (stack.getItem() == RivalRebels.camohat || stack.getItem() == RivalRebels.camoshirt || stack.getItem() == RivalRebels.camoshoes)
+    public String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
+		if (stack.getItem() == RRItems.camohat || stack.getItem() == RRItems.camoshirt || stack.getItem() == RRItems.camoshoes)
 		{
 			return "rivalrebels:textures/armors/c.png";
 		}
-		if (stack.getItem() == RivalRebels.camopants)
+		if (stack.getItem() == RRItems.camopants)
 		{
 			return "rivalrebels:textures/armors/d.png";
 		}
-		if (stack.getItem() == RivalRebels.camohat2 || stack.getItem() == RivalRebels.camoshirt2 || stack.getItem() == RivalRebels.camoshoes2)
+		if (stack.getItem() == RRItems.camohat2 || stack.getItem() == RRItems.camoshirt2 || stack.getItem() == RRItems.camoshoes2)
 		{
 			return "rivalrebels:textures/armors/a.png";
 		}
-		if (stack.getItem() == RivalRebels.camopants2)
+		if (stack.getItem() == RRItems.camopants2)
 		{
 			return "rivalrebels:textures/armors/b.png";
 		}

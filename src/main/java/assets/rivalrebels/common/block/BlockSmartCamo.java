@@ -11,91 +11,70 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 
 public class BlockSmartCamo extends Block
 {
-	public BlockSmartCamo()
+	public BlockSmartCamo(Settings settings)
 	{
-		super(Material.IRON);
+		super(settings);
 	}
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (getBlock(world, x + 1, y, z) == Blocks.SNOW_LAYER || getBlock(world, x - 1, y, z) == Blocks.SNOW_LAYER || getBlock(world, x, y, z - 1) == Blocks.SNOW_LAYER || getBlock(world, x, y, z + 1) == Blocks.SNOW_LAYER)
-        {
-            setBlock(world, x, y, z, RivalRebels.camo3);
-        }
-        else
-        {
-            if (getBlock(world, x, y - 1, z) == Blocks.GRASS || getBlock(world, x, y - 1, z) == Blocks.DIRT)
-            {
-                setBlock(world, x, y, z, RivalRebels.camo1);
-            }
-            else
-            {
-                if (getBlock(world, x, y - 1, z) == Blocks.SAND || getBlock(world, x, y - 1, z) == Blocks.SANDSTONE)
-                {
-                    setBlock(world, x, y, z, RivalRebels.camo2);
-                }
-                else
-                {
-                    if (getBlock(world, x, y - 1, z) == Blocks.STONE || getBlock(world, x, y - 1, z) == Blocks.GRAVEL || getBlock(world, x, y - 1, z) == Blocks.BEDROCK || getBlock(world, x, y - 1, z) == Blocks.COBBLESTONE)
-                    {
-                        setBlock(world, x, y, z, RivalRebels.camo3);
-                    }
-                    else
-                    {
-                        if (getBlock(world, x, y - 1, z) == RivalRebels.camo2 || getBlock(world, x + 1, y, z) == RivalRebels.camo2 || getBlock(world, x - 1, y, z) == RivalRebels.camo2 || getBlock(world, x, y, z + 1) == RivalRebels.camo2 || getBlock(world, x, y, z - 1) == RivalRebels.camo2 || getBlock(world, x, y + 1, z) == RivalRebels.camo2)
-                        {
-                            setBlock(world, x, y, z, RivalRebels.camo2);
-                        }
-                        else
-                        {
-                            if (getBlock(world, x, y - 1, z) == RivalRebels.camo3 || getBlock(world, x + 1, y, z) == RivalRebels.camo3 || getBlock(world, x - 1, y, z) == RivalRebels.camo3 || getBlock(world, x, y, z + 1) == RivalRebels.camo3 || getBlock(world, x, y, z - 1) == RivalRebels.camo3 || getBlock(world, x, y + 1, z) == RivalRebels.camo3)
-                            {
-                                setBlock(world, x, y, z, RivalRebels.camo3);
-                            }
-                            else
-                            {
-                                setBlock(world, x, y, z, RivalRebels.camo1);
+        if (getBlock(world, x + 1, y, z) == Blocks.SNOW || getBlock(world, x - 1, y, z) == Blocks.SNOW || getBlock(world, x, y, z - 1) == Blocks.SNOW || getBlock(world, x, y, z + 1) == Blocks.SNOW) {
+            setBlock(world, pos, RRBlocks.camo3);
+        } else {
+            if (getBlockState(world, pos.down()).isIn(BlockTags.DIRT)) {
+                setBlock(world, pos, RRBlocks.camo1);
+            } else {
+                if (getBlockState(world, pos.down()).isIn(Tags.Blocks.SAND) || getBlockState(world, pos.down()).isIn(Tags.Blocks.SANDSTONE)) {
+                    setBlock(world, pos, RRBlocks.camo2);
+                } else {
+                    if (getBlockState(world, pos.down()).isIn(BlockTags.BASE_STONE_OVERWORLD) || getBlockState(world, pos.down()).isIn(Tags.Blocks.GRAVEL) || getBlock(world, pos.down()) == Blocks.BEDROCK || getBlockState(world, pos.down()).isIn(Tags.Blocks.COBBLESTONE)) {
+                        setBlock(world, pos, RRBlocks.camo3);
+                    } else {
+                        if (getBlock(world, pos.down()) == RRBlocks.camo2 || getBlock(world, x + 1, y, z) == RRBlocks.camo2 || getBlock(world, x - 1, y, z) == RRBlocks.camo2 || getBlock(world, x, y, z + 1) == RRBlocks.camo2 || getBlock(world, x, y, z - 1) == RRBlocks.camo2 || getBlock(world, x, y + 1, z) == RRBlocks.camo2) {
+                            setBlock(world, pos, RRBlocks.camo2);
+                        } else {
+                            if (getBlock(world, pos.down()) == RRBlocks.camo3 || getBlock(world, x + 1, y, z) == RRBlocks.camo3 || getBlock(world, x - 1, y, z) == RRBlocks.camo3 || getBlock(world, x, y, z + 1) == RRBlocks.camo3 || getBlock(world, x, y, z - 1) == RRBlocks.camo3 || getBlock(world, x, y + 1, z) == RRBlocks.camo3) {
+                                setBlock(world, pos, RRBlocks.camo3);
+                            } else {
+                                setBlock(world, pos, RRBlocks.camo1);
                             }
                         }
                     }
                 }
             }
         }
-    }
-
-    private static void setBlock(World world, int x, int y, int z, Block block) {
-        world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
     }
 
     private static Block getBlock(World world, int x, int y, int z) {
-        return world.getBlockState(new BlockPos(x, y, z)).getBlock();
+        return getBlockState(world, x, y, z).getBlock();
     }
 
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
+    private static BlockState getBlockState(World world, int x, int y, int z) {
+        return world.getBlockState(new BlockPos(x, y, z));
+    }
 
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
+    private static void setBlock(World world, BlockPos pos, Block block) {
+        world.setBlockState(pos, block.getDefaultState());
+    }
 
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:bq");
-	}*/
+    private static Block getBlock(World world, BlockPos pos) {
+        return getBlockState(world, pos).getBlock();
+    }
+
+    private static BlockState getBlockState(World world, BlockPos pos) {
+        return world.getBlockState(pos);
+    }
 }

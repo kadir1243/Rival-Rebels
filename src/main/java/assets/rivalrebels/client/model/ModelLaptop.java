@@ -14,7 +14,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
 
 public class ModelLaptop
 {
@@ -63,27 +65,27 @@ public class ModelLaptop
 	Vertice			v11		= new Vertice(-0.4375f, 0.125f, 0);
 	Vertice			v12		= new Vertice(-0.4375f, 0.125f, 0.5625f);
 
-	public void renderModel(float turn)
+	public void renderModel(VertexConsumer buffer, MatrixStack matrices, float turn)
 	{
-		GlStateManager.pushMatrix();
-		RenderHelper.addFace(v11, v12, v9, v10, t4t, t9t, t10t, t5t);
-		RenderHelper.addFace(v12, v4, v1, v9, t9t, t13t, t14t, t10t);
-		RenderHelper.addFace(v11, v3, v4, v12, t4t, t3t, t8t, t9t);
-		RenderHelper.addFace(v10, v2, v3, v11, t5t, t2t, t1t, t4t);
-		RenderHelper.addFace(v9, v1, v2, v10, t10t, t11t, t6t, t5t);
-		RenderHelper.addFace(v2, v1, v4, v3, t6t, t11t, t12t, t7t);
-		GlStateManager.popMatrix();
+		matrices.push();
+		RenderHelper.addFace(buffer, v11, v12, v9, v10, t4t, t9t, t10t, t5t);
+		RenderHelper.addFace(buffer, v12, v4, v1, v9, t9t, t13t, t14t, t10t);
+		RenderHelper.addFace(buffer, v11, v3, v4, v12, t4t, t3t, t8t, t9t);
+		RenderHelper.addFace(buffer, v10, v2, v3, v11, t5t, t2t, t1t, t4t);
+		RenderHelper.addFace(buffer, v9, v1, v2, v10, t10t, t11t, t6t, t5t);
+		RenderHelper.addFace(buffer, v2, v1, v4, v3, t6t, t11t, t12t, t7t);
+		matrices.pop();
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, 0.125f, 0);
-		GlStateManager.rotate(turn, 0.1875f, 0, 0);
-		RenderHelper.addFace(v5, v6, v7, v8, t4, t9, t10, t5);
-		RenderHelper.addFace(v8, v4, v1, v5, t9, t13, t14, t10);
-		RenderHelper.addFace(v7, v3, v4, v8, t4, t3, t8, t9);
-		RenderHelper.addFace(v6, v2, v3, v7, t5, t2, t1, t4);
-		RenderHelper.addFace(v5, v1, v2, v6, t10, t11, t6, t5);
-		RenderHelper.addFace(v2, v1, v4, v3, t6, t11, t12, t7);
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(0, 0.125f, 0);
+		matrices.multiply(new Quaternion(turn, 0.1875f, 0, 0));
+		RenderHelper.addFace(buffer, v5, v6, v7, v8, t4, t9, t10, t5);
+		RenderHelper.addFace(buffer, v8, v4, v1, v5, t9, t13, t14, t10);
+		RenderHelper.addFace(buffer, v7, v3, v4, v8, t4, t3, t8, t9);
+		RenderHelper.addFace(buffer, v6, v2, v3, v7, t5, t2, t1, t4);
+		RenderHelper.addFace(buffer, v5, v1, v2, v6, t10, t11, t6, t5);
+		RenderHelper.addFace(buffer, v2, v1, v4, v3, t6, t11, t12, t7);
+		matrices.pop();
 	}
 
 	TextureVertice	t111	= new TextureVertice(0, 0);
@@ -95,12 +97,12 @@ public class ModelLaptop
 	Vertice			v3v		= new Vertice(-0.375f, 0f, 0.0625f);
 	Vertice			v4v		= new Vertice(-0.375f, 0f, 0.5f);
 
-	public void renderScreen(float turn)
+	public void renderScreen(VertexConsumer buffer, MatrixStack matrices, float turn)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0, 0.125f, 0);
-		GlStateManager.rotate(turn, 0.1875f, 0, 0);
-		RenderHelper.addFace(v2v, v1v, v4v, v3v, t333, t222, t111, t444);
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(0, 0.125f, 0);
+		matrices.multiply(new Quaternion(turn, 0.1875f, 0, 0));
+		RenderHelper.addFace(buffer, v2v, v1v, v4v, v3v, t333, t222, t111, t444);
+		matrices.pop();
 	}
 }

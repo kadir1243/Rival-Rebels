@@ -12,75 +12,79 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.RocketLauncherRenderer;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityBomb;
 import assets.rivalrebels.common.entity.EntityRocket;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.item.ToolItem;
+import net.minecraft.item.ToolMaterials;
+import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderProperties;
 
-import java.util.HashSet;
+import java.util.function.Consumer;
 
-public class ItemRPG extends ItemTool
+public class ItemRPG extends ToolItem
 {
-	public ItemRPG()
+	public ItemRPG() {
+		super(ToolMaterials.DIAMOND, new Settings().maxCount(1).group(RRItems.rralltab));
+	}
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new RocketLauncherRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
+	@Override
+	public UseAction getUseAction(ItemStack stack)
 	{
-		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+		return UseAction.BOW;
 	}
 
 	@Override
-	public boolean isFull3D()
-	{
-		return true;
-	}
-
-	@Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
-	{
-		return EnumAction.BOW;
-	}
-
-	@Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
+	public int getMaxUseTime(ItemStack stack)
 	{
 		return 144;
 	}
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-        ItemStack itemStack = ItemUtil.getItemStack(player, RivalRebels.rocket);
-        if (player.capabilities.isCreativeMode || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
+        ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.rocket);
+        if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
 		{
-			player.setActiveHand(hand);
-			if (!world.isRemote && !player.capabilities.isCreativeMode && !RivalRebels.infiniteAmmo)
+			player.setCurrentHand(hand);
+			if (!world.isClient && !player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
 			{
-                itemStack.shrink(1);
+                itemStack.decrement(1);
                 if (itemStack.isEmpty())
-                    player.inventory.deleteStack(itemStack);
+                    player.getInventory().removeOne(itemStack);
 			}
-			if (!stack.isItemEnchanted()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
+			if (!stack.hasEnchantments()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
 			else RivalRebelsSoundPlayer.playSound(player, 10, 4, 1.0f);
-			if (!world.isRemote)
+			if (!world.isClient)
 			{
-				if (!stack.isItemEnchanted()) world.spawnEntity(new EntityRocket(world, player, 0.1F));
+				if (!stack.hasEnchantments()) world.spawnEntity(new EntityRocket(world, player, 0.1F));
 				else world.spawnEntity(new EntityBomb(world, player, 0.1F));
 			}
 		}
-		else if (!world.isRemote)
+		else if (!world.isClient)
 		{
-			player.sendMessage(new TextComponentString("§cOut of ammunition"));
+			player.sendMessage(Text.of("§cOut of ammunition"), false);
 		}
-		return ActionResult.newResult(EnumActionResult.PASS, stack);
+		return TypedActionResult.success(stack, world.isClient);
 	}
 
 	/*@Override

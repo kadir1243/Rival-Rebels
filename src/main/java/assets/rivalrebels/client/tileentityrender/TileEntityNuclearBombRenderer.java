@@ -11,59 +11,47 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.block.trap.BlockNuclearBomb;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityNuclearBombRenderer extends TileEntitySpecialRenderer<TileEntityNuclearBomb>
-{
-	public TileEntityNuclearBombRenderer()
-	{
+@OnlyIn(Dist.CLIENT)
+public class TileEntityNuclearBombRenderer implements BlockEntityRenderer<TileEntityNuclearBomb> {
+    public TileEntityNuclearBombRenderer(BlockEntityRendererFactory.Context context) {
+    }
+
+    @Override
+    public void render(TileEntityNuclearBomb entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
+		int metadata = entity.getCachedState().get(BlockNuclearBomb.META);
+        switch (metadata) {
+            case 0 -> matrices.multiply(new Quaternion(90, 1, 0, 0));
+            case 1 -> matrices.multiply(new Quaternion(-90, 1, 0, 0));
+            case 2 -> matrices.multiply(new Quaternion(180, 0, 1, 0));
+            case 3 -> matrices.multiply(new Quaternion(0, 0, 1, 0));
+            case 4 -> matrices.multiply(new Quaternion(-90, 0, 1, 0));
+            case 5 -> matrices.multiply(new Quaternion(90, 0, 1, 0));
+        }
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etwacknuke);
+		//RenderNuke.model.renderAll();
+		matrices.pop();
 	}
 
     @Override
-    public void render(TileEntityNuclearBomb te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-		int metadata = te.getBlockMetadata();
-		if (metadata == 0)
-		{
-			GlStateManager.rotate(90, 1, 0, 0);
-		}
+    public int getRenderDistance()
+    {
+        return 65536;
+    }
 
-		if (metadata == 1)
-		{
-			GlStateManager.rotate(-90, 1, 0, 0);
-		}
-
-		if (metadata == 2)
-		{
-			GlStateManager.rotate(180, 0, 1, 0);
-		}
-
-		if (metadata == 3)
-		{
-			GlStateManager.rotate(0, 0, 1, 0);
-		}
-
-		if (metadata == 4)
-		{
-			GlStateManager.rotate(-90, 0, 1, 0);
-		}
-
-		if (metadata == 5)
-		{
-			GlStateManager.rotate(90, 0, 1, 0);
-		}
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etwacknuke);
-		//RenderNuke.model.renderAll();
-		GlStateManager.popMatrix();
-	}
 }

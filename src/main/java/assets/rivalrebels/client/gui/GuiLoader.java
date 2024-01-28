@@ -11,51 +11,45 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerLoader;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.inventory.IInventory;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.Sys;
-import org.lwjgl.input.Mouse;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.Text;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.GuiUtils;
 
-@SideOnly(Side.CLIENT)
-public class GuiLoader extends GuiContainer
-{
-
+@OnlyIn(Dist.CLIENT)
+public class GuiLoader extends HandledScreen<ContainerLoader> {
     /**
 	 * window height is calculated with this values, the more rows, the heigher
 	 */
-	private int			inventoryRows	= 0;
+	private final int inventoryRows;
 
-	public GuiLoader(IInventory par1IInventory, IInventory par2IInventory)
+	public GuiLoader(ContainerLoader containerLoader, PlayerInventory playerInv, Text title)
 	{
-		super(new ContainerLoader(par1IInventory, par2IInventory));
-        this.allowUserInput = false;
-		short var3 = 222;
-		int var4 = var3 - 108;
-		this.inventoryRows = par2IInventory.getSizeInventory() / 9;
-		this.ySize = var4 + this.inventoryRows * 18;
-		this.xSize = 256;
+		super(containerLoader, playerInv, title);
+        int var4 = 114;
+		this.inventoryRows = containerLoader.size() / 9;
+		this.backgroundHeight = var4 + this.inventoryRows * 18;
+		this.backgroundWidth = 256;
 	}
 
-	/**
-	 * Draw the foreground layer for the GuiContainer (everything in front of the items)
-	 */
-	@Override
-	protected void drawGuiContainerForegroundLayer(int par1, int par2)
-	{
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate(-13, 0, 0, 1);
-		fontRenderer.drawString("Loader", 165, 237, 0x444444);
-		GlStateManager.popMatrix();
-		int mousex = par1;
-		int mousey = par2;
-		int posx = (width - xSize) / 2;
-		int posy = (height - ySize) / 2;
+    @Override
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+		matrices.push();
+		matrices.multiply(new Quaternion(-13, 0, 0, 1));
+		textRenderer.draw(matrices, "Loader", 165, 237, 0x444444);
+		matrices.pop();
+		int mousex = mouseX;
+		int mousey = mouseY;
+		int posx = (width - getXSize()) / 2;
+		int posy = (height - getYSize()) / 2;
 		int coordx = posx + 92;
 		int coordy = posy + 202;
 		int widthx = 72;
@@ -64,26 +58,22 @@ public class GuiLoader extends GuiContainer
 		{
 			mousex -= posx;
 			mousey -= posy;
-			drawGradientRect(mousex, mousey, mousex + fontRenderer.getStringWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			fontRenderer.drawString("rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
-			if (!buttondown && Mouse.isButtonDown(0))
+			GuiUtils.drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			if (!buttondown && client.mouse.wasLeftButtonClicked())
 			{
-                Sys.openURL("http://rivalrebels.com");
+                Util.getOperatingSystem().open("http://rivalrebels.com");
             }
 		}
-		buttondown = Mouse.isButtonDown(0);
+		buttondown = client.mouse.wasLeftButtonClicked();
 	}
 
 	boolean	buttondown;
 
-	/**
-	 * Draw the background layer for the GuiContainer (everything behind the items)
-	 */
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
-	{
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guitloader);
-		this.drawTexturedModalRect(width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
+    @Override
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, RRIdentifiers.guitloader);
+		GuiUtils.drawTexturedModalRect(matrices, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210, getZOffset());
 	}
 }

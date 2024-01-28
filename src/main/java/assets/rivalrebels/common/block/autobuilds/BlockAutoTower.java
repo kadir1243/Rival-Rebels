@@ -11,15 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.init.Blocks;
+import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
 public class BlockAutoTower extends BlockAutoTemplate
 {
-	public BlockAutoTower()
+	public BlockAutoTower(Settings settings)
 	{
-		super();
+		super(settings);
 	}
 
 	@Override
@@ -28,14 +28,14 @@ public class BlockAutoTower extends BlockAutoTemplate
 		super.build(world, x, y, z);
 		for (int y1 = 0; y1 <= 16; y1++)
 		{
-			placeBlockCarefully(world, x + 1, y + y1, z, RivalRebels.steel);
-			placeBlockCarefully(world, x - 1, y + y1, z, RivalRebels.steel);
-			placeBlockCarefully(world, x, y + y1, z + 1, RivalRebels.steel);
-			placeBlockCarefully(world, x, y + y1, z - 1, RivalRebels.steel);
-			placeBlockCarefully(world, x - 1, y + y1, z + 1, RivalRebels.steel);
-			placeBlockCarefully(world, x + 1, y + y1, z - 1, RivalRebels.steel);
-			placeBlockCarefully(world, x + 1, y + y1, z + 1, RivalRebels.steel);
-			placeBlockCarefully(world, x - 1, y + y1, z - 1, RivalRebels.steel);
+			placeBlockCarefully(world, x + 1, y + y1, z, RRBlocks.steel);
+			placeBlockCarefully(world, x - 1, y + y1, z, RRBlocks.steel);
+			placeBlockCarefully(world, x, y + y1, z + 1, RRBlocks.steel);
+			placeBlockCarefully(world, x, y + y1, z - 1, RRBlocks.steel);
+			placeBlockCarefully(world, x - 1, y + y1, z + 1, RRBlocks.steel);
+			placeBlockCarefully(world, x + 1, y + y1, z - 1, RRBlocks.steel);
+			placeBlockCarefully(world, x + 1, y + y1, z + 1, RRBlocks.steel);
+			placeBlockCarefully(world, x - 1, y + y1, z - 1, RRBlocks.steel);
 			placeBlockCarefully(world, x, y + y1, z, Blocks.AIR);
 
 			if (y1 <= 1)
@@ -82,30 +82,30 @@ public class BlockAutoTower extends BlockAutoTemplate
 			}
 			else if (y1 == 16)
 			{
-				placeBlockCarefully(world, x - 1, y + y1, z + 1, Blocks.LOG);
+				placeBlockCarefully(world, x - 1, y + y1, z + 1, Blocks.OAK_LOG);
 				placeBlockCarefully(world, x - 1, y + y1 + 1, z + 1, Blocks.REDSTONE_TORCH);
 				placeBlockCarefully(world, x + 1, y + y1 + 1, z - 1, Blocks.REDSTONE_TORCH);
 				placeBlockCarefully(world, x + 1, y + y1 + 1, z + 1, Blocks.REDSTONE_TORCH);
 				placeBlockCarefully(world, x - 1, y + y1 + 1, z - 1, Blocks.REDSTONE_TORCH);
 			}
 		}
-		placeBlockCarefully(world, x, y - 1, z, RivalRebels.jump);
+		placeBlockCarefully(world, x, y - 1, z, RRBlocks.jump);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -118,7 +118,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

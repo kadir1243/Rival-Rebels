@@ -11,16 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelJump
 {
 	float	s	= 0.501F;
@@ -36,12 +33,7 @@ public class ModelJump
 	Vertice	v7	= new Vertice(-s, -t, -s);
 	Vertice	v8	= new Vertice(-s, -t, s);
 
-	public void renderModel()
-	{
-		Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	public void renderModel(VertexConsumer buffer) {
 		RenderHelper.addVertice(buffer, v2, 0, 0);
 		RenderHelper.addVertice(buffer, v1, 1, 0);
 		RenderHelper.addVertice(buffer, v4, 1, 1);
@@ -50,6 +42,5 @@ public class ModelJump
 		RenderHelper.addVertice(buffer, v6, 1, 0);
 		RenderHelper.addVertice(buffer, v7, 1, 1);
 		RenderHelper.addVertice(buffer, v8, 0, 1);
-		tessellator.draw();
 	}
 }

@@ -11,77 +11,79 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.container.ContainerLoader;
 import assets.rivalrebels.common.item.ItemRod;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.Text;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityLoader extends TileEntity implements IInventory, ITickable
+public class TileEntityLoader extends BlockEntity implements Inventory, Tickable, NamedScreenHandlerFactory
 {
-	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(64, ItemStack.EMPTY);
+	private final DefaultedList<ItemStack> chestContents	= DefaultedList.ofSize(64, ItemStack.EMPTY);
 
 	public double			slide			= 0;
 	double					test			= Math.PI;
 	int						counter;
 
-	public List<TileEntity> machines		= new ArrayList<>();
+	public List<BlockEntity> machines		= new ArrayList<>();
 
-	@Override
-	public int getSizeInventory()
+    public TileEntityLoader(BlockPos pos, BlockState state) {
+        super(RRTileEntities.LOADER, pos, state);
+    }
+
+    @Override
+	public int size()
 	{
 		return 60;
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public double getMaxRenderDistanceSquared()
+	public Box getRenderBoundingBox()
 	{
-		return 16384.0D;
+		return new Box(getPos().add(-5, -1, -5), getPos().add(6, 2, 6));
 	}
 
 	@Override
-	public AxisAlignedBB getRenderBoundingBox()
+	public ItemStack getStack(int slot)
 	{
-		return new AxisAlignedBB(getPos().add(-5, -1, -5), getPos().add(6, 2, 6));
+		return this.chestContents.get(slot);
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int par1)
+	public ItemStack removeStack(int slot, int amount)
 	{
-		return this.chestContents.get(par1);
-	}
-
-	@Override
-	public ItemStack decrStackSize(int par1, int par2)
-	{
-		if (!this.chestContents.get(par1).isEmpty())
+		if (!this.chestContents.get(slot).isEmpty())
 		{
 			ItemStack var3;
 
-			if (this.chestContents.get(par1).getCount() <= par2)
+			if (this.chestContents.get(slot).getCount() <= amount)
 			{
-				var3 = this.chestContents.get(par1);
-				this.chestContents.set(par1, ItemStack.EMPTY);
+				var3 = this.chestContents.get(slot);
+				this.chestContents.set(slot, ItemStack.EMPTY);
             }
 			else
 			{
-				var3 = this.chestContents.get(par1).splitStack(par2);
+				var3 = this.chestContents.get(slot).split(amount);
 
-				if (this.chestContents.get(par1).isEmpty())
+				if (this.chestContents.get(slot).isEmpty())
 				{
-					this.chestContents.set(par1, ItemStack.EMPTY);
+					this.chestContents.set(slot, ItemStack.EMPTY);
 				}
 
             }
@@ -91,7 +93,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 	}
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
+    public ItemStack removeStack(int index) {
 		if (!this.chestContents.get(index).isEmpty())
 		{
 			ItemStack var2 = this.chestContents.get(index);
@@ -102,60 +104,42 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 	}
 
 	@Override
-	public void setInventorySlotContents(int index, ItemStack stack)
+	public void setStack(int index, ItemStack stack)
 	{
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getInventoryStackLimit())
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack())
 		{
-			stack.setCount(this.getInventoryStackLimit());
+			stack.setCount(this.getMaxCountPerStack());
 		}
 	}
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		super.readFromNBT(nbt);
-        ItemStackHelper.loadAllItems(nbt, this.chestContents);
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
+        Inventories.readNbt(nbt, this.chestContents);
 	}
 
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-	{
-		super.writeToNBT(nbt);
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
 
-        ItemStackHelper.saveAllItems(nbt, this.chestContents);
-        return nbt;
+        Inventories.writeNbt(nbt, this.chestContents);
     }
 
-	@Override
-	public int getInventoryStackLimit()
+    @Override
+	public boolean canPlayerUse(PlayerEntity player)
 	{
-		return 64;
+		return this.world.getBlockEntity(this.getPos()) == this && player.squaredDistanceTo(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
 
 	@Override
-	public boolean isUsableByPlayer(EntityPlayer player)
-	{
-		return this.world.getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
-	}
-
-	@Override
-	public void update() {
+	public void tick() {
 		slide = (Math.cos(test) + 1) / 32 * 14;
 
-        boolean i = false;
-        for (EntityPlayer player : world.playerEntities) {
-            if (player.getDistanceSq(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f) <= 9) {
-                i = true;
-            }
-        }
-		if (i)
-		{
+        if (world.isPlayerInRange(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f, 9)) {
 			if (slide < 0.871) test += 0.05;
-		}
-		else
-		{
+		} else {
 			if (slide > 0.004) test -= 0.05;
 		}
 		counter++;
@@ -163,22 +147,22 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 		{
 			for (int x = 1; x < 7; x++)
 			{
-				TileEntity te = world.getTileEntity(getPos().east(x));
+				BlockEntity te = world.getBlockEntity(getPos().east(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
 					machines.add(te);
 				}
-				te = world.getTileEntity(getPos().west(x));
+				te = world.getBlockEntity(getPos().west(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
 					machines.add(te);
 				}
-				te = world.getTileEntity(getPos().south(x));
+				te = world.getBlockEntity(getPos().south(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
 					machines.add(te);
 				}
-				te = world.getTileEntity(getPos().north(x));
+				te = world.getBlockEntity(getPos().north(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
 					machines.add(te);
@@ -186,8 +170,8 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 			}
 			for (int index = 0; index < machines.size(); index++)
 			{
-				TileEntity te = machines.get(index);
-				if (te != null && !te.isInvalid())
+				BlockEntity te = machines.get(index);
+				if (te != null && !te.isRemoved())
 				{
 					if (te instanceof TileEntityReactor ter)
 					{
@@ -197,10 +181,10 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 							{
 								if (ter.fuel.isEmpty())
 								{
-									if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() instanceof ItemRod && chestContents.get(q).getItem() != RivalRebels.emptyrod)
+									if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() instanceof ItemRod && chestContents.get(q).getItem() != RRItems.emptyrod)
 									{
 										ter.fuel = chestContents.get(q);
-										chestContents.set(q, new ItemStack(RivalRebels.emptyrod, 1));
+										chestContents.set(q, RRItems.emptyrod.getDefaultStack());
 									}
 								}
 								else
@@ -214,7 +198,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 					{
                         for (int q = 0; q < chestContents.size(); q++)
 						{
-							if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() == RivalRebels.fuel)
+							if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() == RRItems.fuel)
 							{
 								int amount = chestContents.get(q).getCount();
 								if (ter.chestContents.get(0).isEmpty() || ter.chestContents.get(0).getCount() < 64)
@@ -224,7 +208,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 										ter.chestContents.set(0, chestContents.get(q).copy());
 										ter.chestContents.get(0).setCount(amount);
 									}
-									else ter.chestContents.get(0).grow(amount);
+									else ter.chestContents.get(0).increment(amount);
 									amount = 0;
 									if (ter.chestContents.get(0).getCount() > 64)
 									{
@@ -239,7 +223,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 										ter.chestContents.set(1, chestContents.get(q).copy());
 										ter.chestContents.get(1).setCount(amount);
 									}
-									else ter.chestContents.get(1).grow(amount);
+									else ter.chestContents.get(1).increment(amount);
 									amount = 0;
 									if (ter.chestContents.get(1).getCount() > 64)
 									{
@@ -254,7 +238,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 										ter.chestContents.set(2, chestContents.get(q).copy());
 										ter.chestContents.get(2).setCount(amount);
 									}
-									else ter.chestContents.get(2).grow(amount);
+									else ter.chestContents.get(2).increment(amount);
 									amount = 0;
 									if (ter.chestContents.get(2).getCount() > 64)
 									{
@@ -265,7 +249,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 								chestContents.get(q).setCount(amount);
 								if (chestContents.get(q).isEmpty()) chestContents.set(q, ItemStack.EMPTY);
 							}
-							if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() == RivalRebels.battery)
+							if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() == RRItems.battery)
 							{
 								int amount = chestContents.get(q).getCount();
 								if (ter.chestContents.get(3).isEmpty() || ter.chestContents.get(3).getCount() < 16)
@@ -275,7 +259,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 										ter.chestContents.set(3, chestContents.get(q).copy());
 										ter.chestContents.get(3).setCount(amount);
 									}
-									else ter.chestContents.get(3).grow(amount);
+									else ter.chestContents.get(3).increment(amount);
 									amount = 0;
 									if (ter.chestContents.get(3).getCount() > 16)
 									{
@@ -290,7 +274,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 										ter.chestContents.set(4, chestContents.get(q).copy());
 										ter.chestContents.get(4).setCount(amount);
 									}
-									else ter.chestContents.get(4).grow(amount);
+									else ter.chestContents.get(4).increment(amount);
 									amount = 0;
 									if (ter.chestContents.get(4).getCount() > 16)
 									{
@@ -305,7 +289,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 										ter.chestContents.set(5, chestContents.get(q).copy());
 										ter.chestContents.get(5).setCount(amount);
 									}
-									else ter.chestContents.get(5).grow(amount);
+									else ter.chestContents.get(5).increment(amount);
 									amount = 0;
 									if (ter.chestContents.get(5).getCount() > 16)
 									{
@@ -324,7 +308,7 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 					machines.remove((int) index);
 				}
 			}
-			TileEntity te = world.getTileEntity(getPos().down());
+			BlockEntity te = world.getBlockEntity(getPos().down());
 			if (te instanceof TileEntityLoader tel)
 			{
                 for (int q = 0; q < chestContents.size(); q++)
@@ -346,53 +330,10 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
 		}
 	}
 
-	@Override
-	public void invalidate()
-	{
-		super.invalidate();
-		this.updateContainingBlockInfo();
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack)
-	{
-		return true;
-	}
-
     @Override
-    public int getField(int id) {
-        return 0;
+    public Text getDisplayName() {
+        return Text.of("Loader");
     }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-	public String getName()
-	{
-		return "Loader";
-	}
-
-	@Override
-	public boolean hasCustomName()
-	{
-		return false;
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {
-	}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-	}
 
     @Override
     public boolean isEmpty() {
@@ -407,5 +348,11 @@ public class TileEntityLoader extends TileEntity implements IInventory, ITickabl
     @Override
     public void clear() {
         this.chestContents.clear();
+    }
+
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+        return new ContainerLoader(syncId, inv, this);
     }
 }

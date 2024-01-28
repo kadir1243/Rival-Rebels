@@ -12,77 +12,83 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
+import net.minecraftforge.common.Tags;
+
+import java.util.HashSet;
+import java.util.Set;
+
+import static assets.rivalrebels.RivalRebels.getBlocks;
 
 public class BlackList {
-    public static Block[] tesla =
-        {
-            RivalRebels.omegaobj,
-            RivalRebels.sigmaobj,
-            RivalRebels.fshield,
-            Blocks.BEDROCK,
-            Blocks.WATER,
-            Blocks.FLOWING_WATER,
-            Blocks.LAVA,
-            Blocks.FLOWING_LAVA,
-            Blocks.GLASS,
-            Blocks.OBSIDIAN,
-            Blocks.GLASS_PANE,
-            Blocks.STAINED_GLASS,
-            Blocks.STAINED_GLASS_PANE,
-            RivalRebels.nuclearBomb,
-            RivalRebels.tsarbombablock,
-            RivalRebels.loader,
-            RivalRebels.reactor,
-            RivalRebels.forcefieldnode,
-            RivalRebels.conduit,
-            RivalRebels.forcefield,
-            RivalRebels.meltdown,
-            RivalRebels.ffreciever,
-        };
+    public static Set<Block> tesla = new HashSet<>();
+
+    static {
+        tesla.add(RRBlocks.omegaobj);
+        tesla.add(RRBlocks.sigmaobj);
+        tesla.add(RRBlocks.fshield);
+        tesla.add(Blocks.BEDROCK);
+        tesla.add(Blocks.WATER);
+        tesla.add(Blocks.LAVA);
+        tesla.addAll(getBlocks(Tags.Blocks.GLASS));
+        tesla.add(Blocks.OBSIDIAN);
+        tesla.addAll(getBlocks(Tags.Blocks.GLASS_PANES));
+        tesla.addAll(getBlocks(Tags.Blocks.STAINED_GLASS));
+        tesla.addAll(getBlocks(Tags.Blocks.STAINED_GLASS_PANES));
+        tesla.add(RRBlocks.nuclearBomb);
+        tesla.add(RRBlocks.tsarbombablock);
+        tesla.add(RRBlocks.loader);
+        tesla.add(RRBlocks.reactor);
+        tesla.add(RRBlocks.forcefieldnode);
+        tesla.add(RRBlocks.conduit);
+        tesla.add(RRBlocks.forcefield);
+        tesla.add(RRBlocks.meltdown);
+        tesla.add(RRBlocks.ffreciever);
+    }
     public static Block[] explosion =
         {
-            RivalRebels.fshield,
-            RivalRebels.nuclearBomb,
-            RivalRebels.tsarbombablock,
-            RivalRebels.omegaobj,
-            RivalRebels.sigmaobj,
-            RivalRebels.forcefieldnode,
-            RivalRebels.reactor,
-            RivalRebels.loader,
-            RivalRebels.meltdown,
-            RivalRebels.forcefield,
-            RivalRebels.ffreciever,
+            RRBlocks.fshield,
+            RRBlocks.nuclearBomb,
+            RRBlocks.tsarbombablock,
+            RRBlocks.omegaobj,
+            RRBlocks.sigmaobj,
+            RRBlocks.forcefieldnode,
+            RRBlocks.reactor,
+            RRBlocks.loader,
+            RRBlocks.meltdown,
+            RRBlocks.forcefield,
+            RRBlocks.ffreciever,
         };
     public static Block[] plasmaExplosion =
         {
-            RivalRebels.omegaobj,
-            RivalRebels.sigmaobj,
-            RivalRebels.tsarbombablock,
-            RivalRebels.nuclearBomb,
-            RivalRebels.reactor,
-            RivalRebels.loader,
-            RivalRebels.controller,
-            RivalRebels.meltdown,
-            RivalRebels.forcefield,
-            RivalRebels.ffreciever,
+            RRBlocks.omegaobj,
+            RRBlocks.sigmaobj,
+            RRBlocks.tsarbombablock,
+            RRBlocks.nuclearBomb,
+            RRBlocks.reactor,
+            RRBlocks.loader,
+            RRBlocks.controller,
+            RRBlocks.meltdown,
+            RRBlocks.forcefield,
+            RRBlocks.ffreciever,
         };
     public static Block[] autobuild =
         {
-            RivalRebels.fshield,
-            RivalRebels.nuclearBomb,
-            RivalRebels.tsarbombablock,
-            RivalRebels.omegaobj,
-            RivalRebels.sigmaobj,
-            RivalRebels.forcefieldnode,
-            RivalRebels.reactive,
-            RivalRebels.conduit,
-            RivalRebels.reactor,
-            RivalRebels.loader,
-            RivalRebels.meltdown,
-            RivalRebels.forcefield,
-            RivalRebels.ffreciever,
+            RRBlocks.fshield,
+            RRBlocks.nuclearBomb,
+            RRBlocks.tsarbombablock,
+            RRBlocks.omegaobj,
+            RRBlocks.sigmaobj,
+            RRBlocks.forcefieldnode,
+            RRBlocks.reactive,
+            RRBlocks.conduit,
+            RRBlocks.reactor,
+            RRBlocks.loader,
+            RRBlocks.meltdown,
+            RRBlocks.forcefield,
+            RRBlocks.ffreciever,
             Blocks.BEDROCK,
         };
 

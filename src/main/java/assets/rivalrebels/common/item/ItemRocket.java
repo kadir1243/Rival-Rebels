@@ -11,21 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.RocketRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.IItemRenderProperties;
 
-public class ItemRocket extends Item
-{
-	public ItemRocket()
-	{
-		super();
-        setMaxStackSize(32);
-		setCreativeTab(RivalRebels.rralltab);
+import java.util.function.Consumer;
+
+public class ItemRocket extends Item {
+	public ItemRocket() {
+        super(new Settings().maxCount(32).group(RRItems.rralltab));
 	}
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ar");
-	}*/
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new RocketRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 }

@@ -11,60 +11,86 @@
  *******************************************************************************/
 package assets.rivalrebels.common.container;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
-import net.minecraft.item.ItemStack;
 import assets.rivalrebels.common.block.trap.BlockTimedBomb;
+import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.item.ItemFuse;
 import assets.rivalrebels.common.item.ItemRodNuclear;
-import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 
-public class ContainerNuclearBomb extends Container
+public class ContainerNuclearBomb extends ScreenHandler
 {
-	protected TileEntityNuclearBomb	tileEntity;
+	protected Inventory nuclearBomb;
+    private final PropertyDelegate propertyDelegate;
 
-	public ContainerNuclearBomb(InventoryPlayer inventoryPlayer, TileEntityNuclearBomb te)
-	{
-		tileEntity = te;
-		addSlotToContainer(new SlotRR(tileEntity, 0, 16, 34, 1, ItemFuse.class));
+    public ContainerNuclearBomb(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, new SimpleInventory(36), new ArrayPropertyDelegate(4));
+    }
+
+    public ContainerNuclearBomb(int syncId, PlayerInventory inventoryPlayer, Inventory nuclearBomb, PropertyDelegate propertyDelegate) {
+        super(RivalRebelsGuiHandler.NUCLEAR_BOMB_SCREEN_HANDLER_TYPE, syncId);
+		this.nuclearBomb = nuclearBomb;
+        this.propertyDelegate = propertyDelegate;
+        addSlot(new SlotRR(nuclearBomb, 0, 16, 34, 1, ItemFuse.class));
 		for (int i = 0; i <= 4; i++)
 		{
-			addSlotToContainer(new SlotRR(tileEntity, i + 1, 38 + i * 18, 25, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlotToContainer(new SlotRR(tileEntity, i + 6, 38 + i * 18, 43, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(nuclearBomb, i + 1, 38 + i * 18, 25, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(nuclearBomb, i + 6, 38 + i * 18, 43, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
 		}
-		addSlotToContainer(new SlotRR(tileEntity, 11, 133, 34, 1, BlockTimedBomb.class));
-		addSlotToContainer(new SlotRR(tileEntity, 12, 152, 34, 1, ItemChip.class));
+		addSlot(new SlotRR(nuclearBomb, 11, 133, 34, 1, BlockTimedBomb.class));
+		addSlot(new SlotRR(nuclearBomb, 12, 152, 34, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer player)
+	public boolean canUse(PlayerEntity player)
 	{
-		return tileEntity.isUsableByPlayer(player);
+		return nuclearBomb.canPlayerUse(player);
 	}
 
-	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
+	protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
+				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 84 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; i++)
 		{
-			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 139));
+			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 139));
 		}
 	}
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int index)
+	public ItemStack transferSlot(PlayerEntity player, int index)
 	{
 		return ItemStack.EMPTY;
 	}
+
+    public int getCountDown() {
+        return propertyDelegate.get(0);
+    }
+
+    public int getAmountOfCharges() {
+        return propertyDelegate.get(1);
+    }
+
+    public boolean hasTrollFace() {
+        return propertyDelegate.get(2) == 1;
+    }
+
+    public boolean isArmed() {
+        return propertyDelegate.get(3) == 1;
+    }
 }

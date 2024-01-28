@@ -11,76 +11,67 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.ResourceLocation;
-
-import org.lwjgl.opengl.GL11;
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.entity.EntityFlameBall1;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 import org.lwjgl.opengl.GL14;
 
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.entity.EntityFlameBall1;
-
-public class RenderFlameRedBlue extends Render<EntityFlameBall1>
+public class RenderFlameRedBlue extends EntityRenderer<EntityFlameBall1>
 {
-    public RenderFlameRedBlue(RenderManager renderManager) {
+    public RenderFlameRedBlue(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-	public void doRender(EntityFlameBall1 entity, double x, double y, double z, float entityYaw, float partialTicks)
-	{
-        if (entity.ticksExisted < 3) return;
-        GlStateManager.pushMatrix();
-        GlStateManager.depthMask(false);
-        GlStateManager.enableTexture2D();
-        GlStateManager.disableCull();
-        GlStateManager.disableLighting();
-        GlStateManager.enableBlend();
-        GlStateManager.tryBlendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ZERO);
-        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-        GlStateManager.glBlendEquation(GL14.GL_FUNC_ADD);
-        GlStateManager.color(1f, 1f, 1f, 1f);
-        Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etflamebluered);
+    public void render(EntityFlameBall1 entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        if (entity.age < 3) return;
+        matrices.push();
+        RenderSystem.depthMask(false);
+        RenderSystem.disableCull();
+        RenderSystem.enableBlend();
+        RenderSystem.defaultBlendFunc();
+        RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+        RenderSystem.blendEquation(GL14.GL_FUNC_ADD);
+        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
-        GlStateManager.pushMatrix();
+        matrices.push();
         float X = (entity.sequence % 4) / 4f;
         float Y = (entity.sequence - (entity.sequence % 4)) / 16f;
-        float size = 0.0550f * entity.ticksExisted;
+        float size = 0.0550f * entity.age;
         size *= size;
         // if (size >= 0.5) size = 0.5f;
         size += 0.05;
-        Tessellator t = Tessellator.getInstance();
-        BufferBuilder buffer = t.getBuffer();
-        GlStateManager.translate(x, y, z);
-        GlStateManager.rotate(180 - Minecraft.getMinecraft().player.rotationYaw, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(90 - Minecraft.getMinecraft().player.rotationPitch, 1.0F, 0.0F, 0.0F);
-        GlStateManager.pushMatrix();
-        GlStateManager.rotate(entity.rotation, 0.0F, 1.0F, 0.0F);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-        buffer.pos(-size, 0, -size).tex(X, Y).normal(0, 1, 0).endVertex();
-        buffer.pos(size, 0, -size).tex(X + 0.25f, Y).normal(0, 1, 0).endVertex();
-        buffer.pos(size, 0, size).tex(X + 0.25f, Y + 0.25f).normal(0, 1, 0).endVertex();
-        buffer.pos(-size, 0, size).tex(X, Y + 0.25f).normal(0, 1, 0).endVertex();
-        t.draw();
-        GlStateManager.popMatrix();
-        GlStateManager.popMatrix();
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        matrices.multiply(new Quaternion(180 - MinecraftClient.getInstance().player.getYaw(), 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternion(90 - MinecraftClient.getInstance().player.getPitch(), 1.0F, 0.0F, 0.0F));
+        matrices.push();
+        matrices.multiply(new Quaternion(entity.rotation, 0.0F, 1.0F, 0.0F));
+        buffer.vertex(-size, 0, -size).texture(X, Y).normal(0, 1, 0).next();
+        buffer.vertex(size, 0, -size).texture(X + 0.25f, Y).normal(0, 1, 0).next();
+        buffer.vertex(size, 0, size).texture(X + 0.25f, Y + 0.25f).normal(0, 1, 0).next();
+        buffer.vertex(-size, 0, size).texture(X, Y + 0.25f).normal(0, 1, 0).next();
+        matrices.pop();
+        matrices.pop();
 
-        GlStateManager.enableLighting();
-        GlStateManager.enableCull();
-        GlStateManager.disableBlend();
-        GlStateManager.depthMask(true);
-        GlStateManager.popMatrix();
+        RenderSystem.enableCull();
+        RenderSystem.disableBlend();
+        RenderSystem.depthMask(true);
+        matrices.pop();
     }
 
-	@Override
-	protected ResourceLocation getEntityTexture(EntityFlameBall1 entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityFlameBall1 entity) {
+        return RRIdentifiers.etflamebluered;
+    }
 }

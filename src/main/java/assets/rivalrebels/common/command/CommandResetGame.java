@@ -12,68 +12,39 @@
 package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import net.minecraft.command.CommandBase;
+import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.command.argument.EntityArgumentType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 
-import java.util.Collections;
-import java.util.List;
+public class CommandResetGame {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(CommandManager.literal("rrreset")
+            .requires(arg -> arg.hasPermissionLevel(3))
+            .then(CommandManager.literal("all")
+                    .executes(context -> execute(context.getSource(), null))
+            )
+            .then(CommandManager.argument("player", EntityArgumentType.player())
+                    .executes(context -> execute(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+            )
+        );
+    }
 
-public class CommandResetGame extends CommandBase
-{
-	@Override
-	public String getName()
-	{
-		return "rrreset";
-	}
-
-	@Override
-	public String getUsage(ICommandSender par1ICommandSender)
-	{
-		return "/" + getName() + " <player>";
-	}
-
-	/**
-	 * Return the required permission level for this command.
-	 */
-	@Override
-	public int getRequiredPermissionLevel()
-	{
-		return 3;
-	}
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		EntityPlayer player = getCommandSenderAsPlayer(sender);
-		if (args.length == 1 && !args[0].isEmpty())
-		{
-			if (args[0].equals("all"))
-			{
-				RivalRebels.round.rrplayerlist.clearTeam();
-				PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
-				player.sendMessage(new TextComponentString("§7All players have been reset."));
-			}
-			else if (RivalRebels.round.rrplayerlist.contains(server.getPlayerList().getPlayerByUsername(args[0]).getGameProfile()))
-			{
-				RivalRebels.round.rrplayerlist.getForGameProfile(server.getPlayerList().getPlayerByUsername(args[0]).getGameProfile()).clearTeam();
-				PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
-				player.sendMessage(new TextComponentString("§7Player successfully reset."));
-			}
-			else
-			{
-				player.sendMessage(new TextComponentString("§7No player by that name."));
-			}
+    private static int execute(ServerCommandSource source, PlayerEntity player) throws CommandException {
+		if (player == null) {
+			RivalRebels.round.rrplayerlist.clearTeam();
+			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
+			source.sendFeedback(Text.of("§7All players have been reset."), true);
+		} else if (RivalRebels.round.rrplayerlist.contains(player.getGameProfile())) {
+			RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).clearTeam();
+			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
+			source.sendFeedback(Text.of("§7Player successfully reset."), true);
+		} else {
+			source.sendError(Text.of("§7No player by that name."));
 		}
-	}
-
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
-		return args.length >= 1 ? getListOfStringsMatchingLastWord(args, server.getOnlinePlayerNames()) : Collections.emptyList();
+        return 0;
 	}
 }

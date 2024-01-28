@@ -11,24 +11,28 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ModelNuclearBomb;
 import assets.rivalrebels.common.entity.EntityBomb;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderBomb extends Render<EntityBomb>
+@OnlyIn(Dist.CLIENT)
+public class RenderBomb extends EntityRenderer<EntityBomb>
 {
 	private ModelNuclearBomb	model;
 	private ModelBlastSphere	modelsphere;
-	public RenderBomb(RenderManager manager)
+	public RenderBomb(EntityRendererFactory.Context manager)
 	{
         super(manager);
 		modelsphere = new ModelBlastSphere();
@@ -36,36 +40,34 @@ public class RenderBomb extends Render<EntityBomb>
 	}
 
     @Override
-	public void doRender(EntityBomb entity, double x, double y, double z, float entityYaw, float partialTicks)
-	{
-        GlStateManager.enableLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x, (float) y, (float) z);
-        GlStateManager.rotate(entity.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-        GlStateManager.rotate(entity.rotationPitch - 90.0f, 0.0F, 0.0F, 1.0F);
-        if (entity.motionX==0&& entity.motionZ==0)
+    public void render(EntityBomb entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.multiply(new Quaternion(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternion(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        if (entity.getVelocity().getX()==0&& entity.getVelocity().getZ()==0)
         {
-            if (entity.motionY == 1)
+            VertexConsumer lightningBuffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
+            if (entity.getVelocity().getY() == 1)
             {
-                modelsphere.renderModel(entity.ticksExisted * 0.2f, 0.25f, 0.25f, 1.0f, 0.75f);
+                modelsphere.renderModel(matrices, lightningBuffer, entity.age * 0.2f, 0.25f, 0.25f, 1.0f, 0.75f);
             }
-            else if (entity.motionY == 0)
+            else if (entity.getVelocity().getY() == 0)
             {
-                modelsphere.renderModel(entity.ticksExisted * 0.2f, 0.8f, 0.8f, 1f, 0.75f);
+                modelsphere.renderModel(matrices, lightningBuffer, entity.age * 0.2f, 0.8f, 0.8f, 1f, 0.75f);
             }
         }
         else
         {
-            Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etnuke);
-            GlStateManager.scale(0.25f, 0.5f, 0.25f);
-            model.renderModel(true);
+            MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etnuke);
+            matrices.scale(0.25f, 0.5f, 0.25f);
+            model.renderModel(matrices, buffer, true);
         }
-        GlStateManager.popMatrix();
+        matrices.pop();
     }
 
-	@Override
-	protected ResourceLocation getEntityTexture(EntityBomb entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityBomb entity) {
+        return null;
+    }
 }

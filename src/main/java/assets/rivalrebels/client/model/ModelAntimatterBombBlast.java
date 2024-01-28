@@ -15,7 +15,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
 
 import java.util.Random;
 
@@ -41,21 +43,21 @@ public class ModelAntimatterBombBlast
 
 	public ModelAntimatterBombBlast()
 	{
-		Random rand = new Random();
+		Random random = new Random();
 		for (int f = 0; f < tsarx.length; f++)
 		{
 			for (int i = 0; i < tsarx[f].length; i++)
 			{
-				tsarx[f][i] += (rand.nextFloat() - 0.5f) * 1f;
+				tsarx[f][i] += (random.nextFloat() - 0.5f) * 1f;
 			}
 			for (int i = 0; i < tsary[f].length; i++)
 			{
-				tsary[f][i] += (rand.nextFloat() - 0.5f) * 1f;
+				tsary[f][i] += (random.nextFloat() - 0.5f) * 1f;
 			}
 		}
 	}
 
-	public void render()
+	public void render(MatrixStack matrices, VertexConsumer buffer)
 	{
 		if (timer == 0)
 		{
@@ -65,12 +67,10 @@ public class ModelAntimatterBombBlast
 		index %= time.length;
 		if (timer > 0) timer--;
 		texanim += texadd;
-		GlStateManager.pushMatrix();
-		GlStateManager.disableCull();
-		for (float i = 0; i < segments; i++)
-		{
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate(add * i, 0, 1, 0);
+		matrices.push();
+		for (float i = 0; i < segments; i++) {
+			matrices.push();
+			matrices.multiply(new Quaternion(add * i, 0, 1, 0));
 			for (int f = 1; f < tsart; f++)
 			{
 				int ind0 = (time.length + index - 1) % time.length;
@@ -82,13 +82,13 @@ public class ModelAntimatterBombBlast
 				TextureVertice t2 = new TextureVertice((1f / segments) * (i - 1), ((1f / tsart) * (f - 1)) + texanim);
 				TextureVertice t3 = new TextureVertice((1f / segments) * i, ((1f / tsart) * (f - 1)) + texanim);
 				TextureVertice t4 = new TextureVertice((1f / segments) * i, ((1f / tsart) * f) + texanim);
-				RenderHelper.addFace(new Vertice(0f, y1, x1),
+				RenderHelper.addFace(buffer, new Vertice(0f, y1, x1),
 						new Vertice(0f, y0, x0),
 						new Vertice(x0 * sin, y0, x0 * cos),
 						new Vertice(x1 * sin, y1, x1 * cos), t1, t2, t3, t4);
 			}
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }

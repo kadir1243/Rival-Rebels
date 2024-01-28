@@ -11,95 +11,72 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class EntityBlood extends EntityInanimate
 {
 	private boolean	isGore	= true;
 
-	public EntityBlood(World par1World)
-	{
-		super(par1World);
-		setSize(0.25F, 0.25F);
+	public EntityBlood(EntityType<? extends EntityBlood> type, World par1World) {
+		super(type, par1World);
 	}
 
-	public EntityBlood(World par1World, EntityGore bloodEmitter)
-	{
-		super(par1World);
-		setSize(0.25F, 0.25F);
-		setLocationAndAngles(bloodEmitter.posX, bloodEmitter.posY, bloodEmitter.posZ, 0, 0);
-		setPosition(posX, posY, posZ);
+    public EntityBlood(World world) {
+        this(RREntities.BLOOD, world);
+    }
+
+	public EntityBlood(World par1World, EntityGore bloodEmitter) {
+		this(par1World);
+		refreshPositionAndAngles(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
+		setPosition(getX(), getY(), getZ());
 		shoot(0.1f);
 		isGore = true;
 	}
 
 	public EntityBlood(World par1World, double x, double y, double z)
 	{
-		super(par1World);
-		setSize(0.25F, 0.25F);
-		setLocationAndAngles(x, y, z, 0, 0);
-		setPosition(posX, posY, posZ);
+		this(par1World);
+		refreshPositionAndAngles(x, y, z, 0, 0);
+		setPosition(getX(), getY(), getZ());
 		shoot(0f);
 		isGore = false;
 	}
 
 	public void shoot(float force)
 	{
-		motionX = rand.nextGaussian() * force;
-		motionY = rand.nextGaussian() * force;
-		motionZ = rand.nextGaussian() * force;
+		setVelocity(
+            random.nextGaussian() * force,
+            random.nextGaussian() * force,
+            random.nextGaussian() * force);
 	}
 
 	@Override
-	public void onUpdate()
+	public void tick()
 	{
-		super.onUpdate();
+		super.tick();
 
-		++ticksExisted;
+		++age;
 
-		Vec3d vec3 = new Vec3d(posX, posY, posZ);
-		Vec3d vec31 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult movingobjectposition = world.rayTraceBlocks(vec3, vec31);
-		vec3 = new Vec3d(posX, posY, posZ);
-		vec31 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		if (isInsideWaterOrBubbleColumn() || (age == 20 && isGore)) kill();
 
-		if (movingobjectposition != null || isInWater() || (ticksExisted == 20 && isGore)) setDead();
+        Vec3d vec3d = getPos().add(getVelocity());
+        setVelocity(vec3d.getX(), vec3d.getY(), vec3d.getZ());
 
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
-
-		motionX *= 0.99F;
-		motionY *= 0.99F;
-		motionZ *= 0.99F;
-		motionY -= 0.03F;
-		setPosition(posX, posY, posZ);
+        setVelocity(getVelocity().multiply(0.99F));
+        addVelocity(0, -0.03F, 0);
+		setPosition(getX(), getY(), getZ());
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean isInRangeToRenderDist(double par1)
+	@OnlyIn(Dist.CLIENT)
+	public boolean shouldRender(double distance)
 	{
-		return par1 < 256;
+		return distance < 256;
 	}
 
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-	{
-	}
 
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
-	}
-
-	@Override
-	public void entityInit()
-	{
-	}
 }

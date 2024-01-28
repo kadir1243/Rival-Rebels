@@ -12,21 +12,22 @@
 package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.RivalRebels;
-import net.minecraft.init.Blocks;
+import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
 public class BlockAutoBunker extends BlockAutoTemplate
 {
-	public BlockAutoBunker()
+	public BlockAutoBunker(Settings settings)
 	{
-		super();
+		super(settings);
 	}
 
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			int r = RivalRebels.bunkerradius;
 
@@ -45,10 +46,10 @@ public class BlockAutoBunker extends BlockAutoTemplate
 			{
 				for (int c = -r; c <= r; c++)
 				{
-					placeBlockCarefully(world, x + a, y - 1, z + c, RivalRebels.smartcamo);
+					placeBlockCarefully(world, x + a, y - 1, z + c, RRBlocks.smartcamo);
 					if (a < -(r - 1) || c < -(r - 1) || a > (r - 1) || c > (r - 1))
 					{
-						placeBlockCarefully(world, x + a, y, z + c, RivalRebels.smartcamo);
+						placeBlockCarefully(world, x + a, y, z + c, RRBlocks.smartcamo);
 					}
 				}
 			}
@@ -60,15 +61,15 @@ public class BlockAutoBunker extends BlockAutoTemplate
 				{
 					if ((a == -(r - 1) && c == -(r - 1)) || (a == -(r - 1) && c == +(r - 1)) || (a == +(r - 1) && c == -(r - 1)) || (a == +(r - 1) && c == +(r - 1)))
 					{
-						placeBlockCarefully(world, x + a, y - 3, z + c, RivalRebels.smartcamo);
-						placeBlockCarefully(world, x + a, y - 2, z + c, RivalRebels.smartcamo);
-						placeBlockCarefully(world, x + a, y - 1, z + c, RivalRebels.smartcamo);
+						placeBlockCarefully(world, x + a, y - 3, z + c, RRBlocks.smartcamo);
+						placeBlockCarefully(world, x + a, y - 2, z + c, RRBlocks.smartcamo);
+						placeBlockCarefully(world, x + a, y - 1, z + c, RRBlocks.smartcamo);
 					}
 					if (a < -(r - 2) || c < -(r - 2) || a > (r - 2) || c > (r - 2))
 					{
-						placeBlockCarefully(world, x + a, y - 3, z + c, RivalRebels.smartcamo);
-						placeBlockCarefully(world, x + a, y, z + c, RivalRebels.smartcamo);
-						placeBlockCarefully(world, x + a, y + 1, z + c, RivalRebels.smartcamo);
+						placeBlockCarefully(world, x + a, y - 3, z + c, RRBlocks.smartcamo);
+						placeBlockCarefully(world, x + a, y, z + c, RRBlocks.smartcamo);
+						placeBlockCarefully(world, x + a, y + 1, z + c, RRBlocks.smartcamo);
 					}
 
 				}
@@ -79,8 +80,8 @@ public class BlockAutoBunker extends BlockAutoTemplate
 				{
 					if (a < -(r - 1) || c < -(r - 1) || a > (r - 1) || c > (r - 1))
 					{
-						placeBlockCarefully(world, x + a, y, z + c, RivalRebels.smartcamo);
-						placeBlockCarefully(world, x + a, y - 3, z + c, RivalRebels.smartcamo);
+						placeBlockCarefully(world, x + a, y, z + c, RRBlocks.smartcamo);
+						placeBlockCarefully(world, x + a, y - 3, z + c, RRBlocks.smartcamo);
 					}
 				}
 			}
@@ -90,8 +91,8 @@ public class BlockAutoBunker extends BlockAutoTemplate
 			{
 				for (int c = -r; c <= r; c++)
 				{
-					placeBlockCarefully(world, x + a, y + 1, z + c, RivalRebels.smartcamo);
-					placeBlockCarefully(world, x + a, y + 2, z + c, RivalRebels.smartcamo);
+					placeBlockCarefully(world, x + a, y + 1, z + c, RRBlocks.smartcamo);
+					placeBlockCarefully(world, x + a, y + 2, z + c, RRBlocks.smartcamo);
 				}
 			}
 			y = y - 3;
@@ -102,32 +103,32 @@ public class BlockAutoBunker extends BlockAutoTemplate
 				{
 					if (a < -(r - 2) || c < -(r - 2) || a > (r - 2) || c > (r - 2))
 					{
-						placeBlockCarefully(world, x + a, y, z + c, RivalRebels.smartcamo);
-						placeBlockCarefully(world, x + a, y + 1, z + c, RivalRebels.smartcamo);
+						placeBlockCarefully(world, x + a, y, z + c, RRBlocks.smartcamo);
+						placeBlockCarefully(world, x + a, y + 1, z + c, RRBlocks.smartcamo);
 					}
 				}
 			}
-			placeBlockCarefully(world, x - r + 5, y + 3, z, RivalRebels.light2);
-			placeBlockCarefully(world, x + r - 5, y + 3, z, RivalRebels.light2);
-			placeBlockCarefully(world, x, y + 3, z + r - 5, RivalRebels.light2);
-			placeBlockCarefully(world, x, y + 3, z - r + 5, RivalRebels.light2);
+			placeBlockCarefully(world, x - r + 5, y + 3, z, RRBlocks.light2);
+			placeBlockCarefully(world, x + r - 5, y + 3, z, RRBlocks.light2);
+			placeBlockCarefully(world, x, y + 3, z + r - 5, RRBlocks.light2);
+			placeBlockCarefully(world, x, y + 3, z - r + 5, RRBlocks.light2);
 		}
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -140,7 +141,7 @@ public class BlockAutoBunker extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

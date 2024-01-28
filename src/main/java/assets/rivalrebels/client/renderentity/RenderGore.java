@@ -11,170 +11,177 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityGore;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.GlStateManager.DestFactor;
-import net.minecraft.client.renderer.GlStateManager.SourceFactor;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 
-public class RenderGore extends Render<EntityGore>
+import java.util.Objects;
+
+public class RenderGore extends EntityRenderer<EntityGore>
 {
-	private static final ResourceLocation	player			= new ResourceLocation("textures/entity/steve.png");
-	private static final ResourceLocation	creeper			= new ResourceLocation("textures/entity/creeper/creeper.png");
-	private static final ResourceLocation	enderman		= new ResourceLocation("textures/entity/enderman/enderman.png");
-	private static final ResourceLocation	ghast			= new ResourceLocation("textures/entity/ghast/ghast.png");
-	private static final ResourceLocation	skeleton		= new ResourceLocation("textures/entity/skeleton/skeleton.png");
-	private static final ResourceLocation	slime			= new ResourceLocation("textures/entity/slime/slime.png");
-	private static final ResourceLocation	magmacube		= new ResourceLocation("textures/entity/slime/magmacube.png");
-	private static final ResourceLocation	spider			= new ResourceLocation("textures/entity/spider/spider.png");
-	private static final ResourceLocation	cavespider		= new ResourceLocation("textures/entity/spider/cave_spider.png");
-	private static final ResourceLocation	zombiepigman	= new ResourceLocation("textures/entity/zombie_pigman.png");
-	private static final ResourceLocation	zombie			= new ResourceLocation("textures/entity/zombie/zombie.png");
+	private static final Identifier	player			= new Identifier("textures/entity/steve.png");
+	private static final Identifier	creeper			= new Identifier("textures/entity/creeper/creeper.png");
+	private static final Identifier	enderman		= new Identifier("textures/entity/enderman/enderman.png");
+	private static final Identifier	ghast			= new Identifier("textures/entity/ghast/ghast.png");
+	private static final Identifier	skeleton		= new Identifier("textures/entity/skeleton/skeleton.png");
+	private static final Identifier	slime			= new Identifier("textures/entity/slime/slime.png");
+	private static final Identifier	magmacube		= new Identifier("textures/entity/slime/magmacube.png");
+	private static final Identifier	spider			= new Identifier("textures/entity/spider/spider.png");
+	private static final Identifier	cavespider		= new Identifier("textures/entity/spider/cave_spider.png");
+	private static final Identifier	zombiepigman	= new Identifier("textures/entity/zombie_pigman.png");
+	private static final Identifier	zombie			= new Identifier("textures/entity/zombie/zombie.png");
 
-    public RenderGore(RenderManager renderManager) {
+    public RenderGore(EntityRendererFactory.Context renderManager) {
         super(renderManager);
-        this.shadowSize = 0F;
+        this.shadowRadius = 0F;
     }
 
     @Override
-	public void doRender(EntityGore entity, double x, double y, double z, float f, float f1)
-	{
-		GlStateManager.pushMatrix();
-		GlStateManager.enableLighting();
-		GlStateManager.translate(x, y, z);
-		GlStateManager.rotate(-entity.rotationYaw + 180, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(entity.rotationPitch, 1.0F, 0.0F, 0.0F);
-        int mob = entity.mob;
-		int type = entity.type;
-		double size = entity.size;
+    public void render(EntityGore entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
 
-		if (mob == 0)
-		{
-			if (entity.playerSkin != null) Minecraft.getMinecraft().renderEngine.bindTexture(entity.playerSkin);
-			else Minecraft.getMinecraft().renderEngine.bindTexture(player);
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 16, 16, 64, 32, 16);
-			else if (type == 2) RenderHelper.renderBox(4, 12, 4, 40, 16, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(4, 12, 4, 0, 16, 64, 32, 16);
+		matrices.push();
+		matrices.translate(x, y, z);
+		matrices.multiply(new Quaternion(-entity.getYaw() + 180, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternion(entity.getPitch(), 1.0F, 0.0F, 0.0F));
+        int mob = entity.getMob();
+		int type = entity.getTypeOfGore();
+		float size = entity.getSize();
+
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getItemEntityTranslucentCull(getTexture(entity)));
+        if (mob == 0) {
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 32, 16);
 		}
 		else if (mob == 1)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(zombie);
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 64, 16);
-			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 16, 16, 64, 64, 16);
-			else if (type == 2) RenderHelper.renderBox(4, 12, 4, 40, 16, 64, 64, 16);
-			else if (type == 3) RenderHelper.renderBox(4, 12, 4, 0, 16, 64, 64, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16);
 		}
 		else if (mob == 2)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(zombiepigman);
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 64, 16);
-			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 16, 16, 64, 64, 16);
-			else if (type == 2) RenderHelper.renderBox(4, 12, 4, 40, 16, 64, 64, 16);
-			else if (type == 3) RenderHelper.renderBox(4, 12, 4, 0, 16, 64, 64, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16);
 		}
 		else if (mob == 3)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(skeleton);
-			GlStateManager.disableCull();
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 16, 16, 64, 32, 16);
-			else if (type == 2) RenderHelper.renderBox(2, 10, 2, 40, 16, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(2, 10, 2, 0, 16, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 40, 16, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 0, 16, 64, 32, 16);
 		}
 		else if (mob == 4)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(enderman);
 			if (type == 0)
 			{
-				RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
-				GlStateManager.translate(0, -0.125, 0);
-				GlStateManager.scale(0.875, 0.875, 0.875);
-				RenderHelper.renderBox(8, 8, 8, 0, 16, 64, 32, 16);
+				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
+				matrices.translate(0, -0.125, 0);
+				matrices.scale(0.875F, 0.875F, 0.875F);
+				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 16, 64, 32, 16);
 			}
-			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 32, 16, 64, 32, 16);
-			else if (type == 2) RenderHelper.renderBox(2, 30, 2, 56, 0, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(2, 30, 2, 56, 0, 64, 32, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 32, 16, 64, 32, 16);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16);
 		}
 		else if (mob == 5)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(creeper);
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(4, 12, 8, 16, 16, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(4, 6, 4, 0, 16, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 6, 4, 0, 16, 64, 32, 16);
 		}
 		else if (mob == 6)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(slime);
 			if (type == 0)
 			{
-                GlStateManager.enableBlend();
-                GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-				RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
+                RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE_MINUS_SRC_ALPHA);
+				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
 			}
 			else if (type == 1)
 			{
-				GlStateManager.enableBlend();
-				GlStateManager.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE_MINUS_SRC_ALPHA);
-				RenderHelper.renderBox(6, 6, 6, 0, 16, 64, 32, 16);
+				RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE_MINUS_SRC_ALPHA);
+				RenderHelper.renderBox(matrices, buffer, 6, 6, 6, 0, 16, 64, 32, 16);
 			}
 		}
 		else if (mob == 7)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(magmacube);
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(6, 6, 6, 0, 16, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 6, 6, 6, 0, 16, 64, 32, 16);
 		}
 		else if (mob == 8)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(spider);
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 32, 4, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16);
 			else if (type == 1)
 			{
-                GlStateManager.rotate(90, 0, 1, 0);
-				RenderHelper.renderBox(8, 12, 10, 4, 12, 64, 32, 16);
+                matrices.multiply(new Quaternion(90, 0, 1, 0));
+				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16);
 			}
-			else if (type == 3) RenderHelper.renderBox(2, 2, 16, 18, 0, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16);
 		}
 		else if (mob == 9)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(cavespider);
-			GlStateManager.scale(0.666f, 0.666f, 0.666f);
-			if (type == 0) RenderHelper.renderBox(8, 8, 8, 32, 4, 64, 32, 16);
+			matrices.scale(0.666f, 0.666f, 0.666f);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16);
 			else if (type == 1)
 			{
-                GlStateManager.rotate(90, 0, 1, 0);
-				RenderHelper.renderBox(8, 12, 10, 4, 12, 64, 32, 16);
+                matrices.multiply(new Quaternion(90, 0, 1, 0));
+				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16);
 			}
-			else if (type == 3) RenderHelper.renderBox(2, 2, 16, 18, 0, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16);
 		}
 		else if (mob == 10)
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(ghast);
-			if (type == 0) RenderHelper.renderBox(16, 16, 16, 0, 0, 64, 32, 4);
-			else if (type == 3) RenderHelper.renderBox(2, 14, 2, 0, 0, 64, 32, 4);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 16, 16, 16, 0, 0, 64, 32, 4);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 14, 2, 0, 0, 64, 32, 4);
 		}
 		else if (mob == 11)
 		{
-			if (size < 1) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash5);
-			else if (size < 2) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash1);
-			else Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash3);
-			if (type == 0) RenderHelper.renderBox((int) (8 * size), (int) (8 * size), (int) (8 * size), 0, 0, 64, 64, 16);
-			else if (type == 1) RenderHelper.renderBox((int) (4 * size), (int) (12 * size), (int) (8 * size), 0, 0, 64, 64, 16);
-			else if (type == 2) RenderHelper.renderBox((int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
-			else if (type == 3) RenderHelper.renderBox((int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, (int) (8 * size), (int) (8 * size), (int) (8 * size), 0, 0, 64, 64, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (8 * size), 0, 0, 64, 64, 16);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityGore entity)
-	{
-		return null;
+    public Identifier getTexture(EntityGore entity) {
+        return switch (entity.getMob()) {
+            case 0 -> Objects.requireNonNullElse(entity.playerSkin, player);
+            case 1 -> zombie;
+            case 2 -> zombiepigman;
+            case 3 -> skeleton;
+            case 4 -> enderman;
+            case 5 -> creeper;
+            case 6 -> slime;
+            case 7 -> magmacube;
+            case 8 -> spider;
+            case 9 -> cavespider;
+            case 10 -> ghast;
+            case 11 -> {
+                if (entity.getSize() < 1) yield RRIdentifiers.btsplash5;
+                else if (entity.getSize() < 2) yield RRIdentifiers.btsplash1;
+                yield RRIdentifiers.btsplash3;
+            }
+            default -> null;
+        };
 	}
 }

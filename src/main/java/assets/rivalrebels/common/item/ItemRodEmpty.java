@@ -11,20 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.EmptyRodRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.IItemRenderProperties;
 
-public class ItemRodEmpty extends Item
-{
-	public ItemRodEmpty()
-	{
-		super();
-		setCreativeTab(RivalRebels.rralltab);
+import java.util.function.Consumer;
+
+public class ItemRodEmpty extends Item {
+	public ItemRodEmpty() {
+        super(new Settings().group(RRItems.rralltab));
 	}
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:at");
-	}*/
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new EmptyRodRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 }

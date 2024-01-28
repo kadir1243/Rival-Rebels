@@ -20,10 +20,4 @@ public class Vector
 		x = X;
 		y = Y;
 	}
-
-	public boolean isInsideRectangle(Rectangle rec)
-	{
-		if (x >= rec.xMin && x <= rec.xMax && y >= rec.yMin && y <= rec.yMax) return true;
-		return false;
-	}
 }

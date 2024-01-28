@@ -11,21 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
-
 public class ItemCoreTitanium extends ItemCore
 {
 	public ItemCoreTitanium()
 	{
-		super();
-		setMaxStackSize(1);
+		super(new Settings());
 		timemult = 1.0f;
-		setCreativeTab(RivalRebels.rralltab);
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ba");
-	}*/
 }

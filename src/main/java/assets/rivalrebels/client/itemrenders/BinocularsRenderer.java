@@ -11,39 +11,44 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Quaternion;
 
-public class BinocularsRenderer extends TileEntityItemStackRenderer {
+public class BinocularsRenderer extends BuiltinModelItemRenderer {
 	private final ModelFromObj model;
 
-	public BinocularsRenderer() {
+	public BinocularsRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
         model = ModelFromObj.readObjFile("b.obj");
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etbinoculars);
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.5f, 0.5f, -0.03f);
-		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(90, 0.0F, 1.0F, 0.0F);
-		GlStateManager.scale(0.35f, 0.35f, 0.35f);
-		/*if (type == ItemRenderType.EQUIPPED_FIRST_PERSON && (Mouse.isButtonDown(1)))
-		{
-			GlStateManager.popMatrix();
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etbinoculars);
+		matrices.push();
+		matrices.translate(0.5f, 0.5f, -0.03f);
+		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternion(90, 0.0F, 1.0F, 0.0F));
+		matrices.scale(0.35f, 0.35f, 0.35f);
+		if (mode == ModelTransformation.Mode.HEAD && (MinecraftClient.getInstance().mouse.wasRightButtonClicked())) {
+			matrices.pop();
 			return;
-		}*/
-		GlStateManager.translate(0.6f, 0.05f, 0.3f);
+		}
+		matrices.translate(0.6f, 0.05f, 0.3f);
 
-		model.render();
+		model.render(vertexConsumers.getBuffer(RenderLayer.getSolid()));
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }
 

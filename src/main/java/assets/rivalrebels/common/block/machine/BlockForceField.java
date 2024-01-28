@@ -11,153 +11,78 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.block.*;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 
 public class BlockForceField extends Block {
-    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 6);
-	public BlockForceField() {
-		super(Material.GLASS);
-        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
+    public static final IntProperty META = IntProperty.of("meta", 0, 6);
+
+    public BlockForceField(Settings settings) {
+		super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
 	}
+
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(META);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
+    }
+
+    //@Override
+    public Box getBoundingBox(BlockState state, BlockView source, BlockPos pos) {
+		int var5 = state.get(META);
+		float var6 = 0.4375f;
+
+		if (var5 == 4) {
+			return new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+		} else if (var5 == 5) {
+			return new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+		} else if (var5 == 2) {
+			return new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+		} else if (var5 == 3) {
+			return new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+		}
+
+        return new Box(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
+	}
+
+    @Override
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        float var6 = 0.4375f;
+
+        return switch (state.get(META)) {
+            case 4 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 5 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 2 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            case 3 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            default -> super.getCollisionShape(state, world, pos, context);
+        };
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(META, meta);
-    }    @Override
-    public BlockStateContainer getBlockState() {
-        return new BlockStateContainer(this, META);
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+		int var5 = state.get(META);
+		float var6 = 0.4375f;
+
+        return switch (var5) {
+            case 4 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 5 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 2 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            case 3 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            default -> super.getOutlineShape(state, world, pos, context);
+        };
     }
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
-	}
 
     @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		int var5 = state.getValue(META);
-		float var6 = 0.4375f;
-
-		if (var5 == 4)
-		{
-			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		}
-
-		if (var5 == 5)
-		{
-			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		}
-
-		if (var5 == 2)
-		{
-			return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		}
-
-		if (var5 == 3)
-		{
-			return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		}
-
-        return new AxisAlignedBB(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
-	}
-
-	// @Override
-	// public void onBlockAdded(World world, int x, int y, int z)
-	// {
-	// world.scheduleBlockUpdate(x, y, z, blockID, world.rand.nextInt(10)+10);
-	// }
-	//
-	// @Override
-	// public void updateTick(World par1World, int x, int y, int z, Random par5Random)
-	// {
-	// if (par1World.rand.nextInt(20) == 0) par1World.setBlock(x, y, z, 0);
-	// else par1World.scheduleBlockUpdate(x, y, z, blockID, par1World.rand.nextInt(10)+10);
-	// }
-
-    @Nullable
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
-		int var5 = state.getValue(META);
-		float var6 = 0.4375f;
-
-		if (var5 == 4)
-		{
-			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		}
-
-		if (var5 == 5)
-		{
-			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		}
-
-		if (var5 == 2)
-		{
-            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		}
-
-		if (var5 == 3)
-		{
-            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		}
-
-		return super.getCollisionBoundingBox(state, world, pos);
-	}
-
-    @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-		int var5 = state.getValue(META);
-		float var6 = 0.4375f;
-
-		if (var5 == 4)
-		{
-			return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		}
-
-		if (var5 == 5)
-		{
-            return new AxisAlignedBB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		}
-
-		if (var5 == 2)
-		{
-            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		}
-
-		if (var5 == 3)
-		{
-            return new AxisAlignedBB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		}
-
-		return super.getSelectedBoundingBox(state, worldIn, pos);
-	}
-
-    @Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.INVISIBLE;
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.INVISIBLE;
     }
-    /*@SideOnly(Side.CLIENT)
+    /*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
 
 	@Override

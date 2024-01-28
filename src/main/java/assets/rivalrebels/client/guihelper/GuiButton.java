@@ -11,41 +11,44 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import assets.rivalrebels.RRIdentifiers;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class GuiButton extends net.minecraft.client.gui.GuiButton
-{
-	public GuiButton(int par1, int par2, int par3, String par4Str)
-	{
-		this(par1, par2, par3, 60, 11, par4Str);
+@OnlyIn(Dist.CLIENT)
+public class GuiButton extends ButtonWidget {
+    public GuiButton(int x, int y, int width, int height, String message) {
+		this(x, y, width, height, Text.of(message), button -> {});
 	}
 
-	public GuiButton(int par1, int par2, int par3, int par4, int par5, String par6Str)
-	{
-		super(par1, par2, par3, par4, par5, par6Str);
-	}
+    public GuiButton(int x, int y, int width, int height, Text message) {
+        this(x, y, width, height, message, button -> {});
+    }
+
+    public GuiButton(int x, int y, int width, int height, Text message, PressAction onPress) {
+        super(x, y, width, height, message, onPress);
+    }
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-		if (this.visible)
-		{
-			FontRenderer fontrenderer = mc.fontRenderer;
-			mc.renderEngine.bindTexture(RivalRebels.guitbutton);
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		if (this.visible) {
+            MinecraftClient client = MinecraftClient.getInstance();
+			TextRenderer fontrenderer = client.textRenderer;
+			client.textureManager.bindTexture(RRIdentifiers.guitbutton);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 			this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
-			int k = this.getHoverState(this.hovered);
-			this.drawTexturedModalRect(this.x, this.y, 5, k * 11, this.width, this.height);
-			this.mouseDragged(mc, mouseX, mouseY);
+			int k = this.getYImage(this.hovered);
+			this.drawTexture(matrices, this.x, this.y, 5, k * 11, this.width, this.height);
+			this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 			int l = 0xffffff;
 
-			if (!this.enabled)
+			if (!this.active)
 			{
 				l = 0xcccccc;
 			}
@@ -54,7 +57,7 @@ public class GuiButton extends net.minecraft.client.gui.GuiButton
 				l = 0x88e8ff;
 			}
 
-			this.drawCenteredString(fontrenderer, I18n.format(this.displayString), this.x + this.width / 2, this.y + (this.height - 7) / 2, l);
+			drawCenteredText(matrices, fontrenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 7) / 2, l);
 		}
 	}
 }

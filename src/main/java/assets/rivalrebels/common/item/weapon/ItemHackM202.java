@@ -11,53 +11,57 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.HackRocketLauncherRenderer;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityHackB83;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.minecraft.entity.player.EntityPlayer;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ToolItem;
+import net.minecraft.item.ToolMaterials;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderProperties;
 
-import java.util.HashSet;
+import java.util.function.Consumer;
 
-public class ItemHackM202 extends ItemTool
+public class ItemHackM202 extends ToolItem
 {
 	public ItemHackM202()
 	{
-		super(1, 1, ToolMaterial.DIAMOND, new HashSet<>());
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+		super(ToolMaterials.DIAMOND, new Settings().maxCount(1).group(RRItems.rralltab));
 	}
-
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new HackRocketLauncherRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 	@Override
-	public int getItemEnchantability()
+	public int getEnchantability()
 	{
 		return 100;
 	}
 
-	@Override
-	public boolean isFull3D()
-	{
-		return true;
-	}
-
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
-		player.setHeldItem(hand, ItemStack.EMPTY);
-		if (!world.isRemote)
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack stack = user.getStackInHand(hand);
+		user.setStackInHand(hand, ItemStack.EMPTY);
+		if (!world.isClient)
 		{
-			world.spawnEntity(new EntityHackB83(world, player.posX, player.posY, player.posZ, -player.rotationYawHead, player.rotationPitch, stack.isItemEnchanted()));
+			world.spawnEntity(new EntityHackB83(world, user.getX(), user.getY(), user.getZ(), -user.headYaw, user.getPitch(), stack.hasEnchantments()));
 		}
-		RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
-		new Explosion(world, player.posX, player.posY, player.posZ, 2, true, false, RivalRebelsDamageSource.flare);
-		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+		RivalRebelsSoundPlayer.playSound(user, 23, 2, 0.4f);
+		new Explosion(world, user.getX(), user.getY(), user.getZ(), 2, true, false, RivalRebelsDamageSource.flare);
+		return TypedActionResult.success(stack, world.isClient);
 	}
 
 	/*@Override

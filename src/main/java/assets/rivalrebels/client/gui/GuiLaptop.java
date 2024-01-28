@@ -12,68 +12,57 @@
 
 package assets.rivalrebels.client.gui;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.common.container.ContainerLaptop;
-import assets.rivalrebels.common.packet.LaptopButtonPacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.Sys;
-import org.lwjgl.input.Mouse;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Util;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.GuiUtils;
 
-@SideOnly(Side.CLIENT)
-public class GuiLaptop extends GuiContainer
-{
-	ContainerLaptop		container;
-	TileEntityLaptop	lt;
-	GuiButton			button;
-	boolean				prevButtonDown;
+@OnlyIn(Dist.CLIENT)
+public class GuiLaptop extends HandledScreen<ContainerLaptop> {
+    GuiButton button;
+	boolean prevButtonDown;
 
-	public GuiLaptop(Container container)
+	public GuiLaptop(ContainerLaptop containerLaptop, PlayerInventory playerInventory, Text title)
 	{
-		super(container);
-		this.container = (ContainerLaptop) container;
+		super(containerLaptop, playerInventory, title);
+		backgroundHeight = 206;
 	}
 
-	public GuiLaptop(InventoryPlayer inventoryPlayer, TileEntityLaptop tileEntity)
-	{
-		super(new ContainerLaptop(inventoryPlayer, tileEntity));
-		ySize = 206;
-		lt = tileEntity;
+    @Override
+    protected void init() {
+        super.init();
+
+		int x = (width - getXSize()) / 2;
+		int y = (height - getYSize()) / 2;
+		drawables.clear();
+		button = new GuiButton(x + 131, y + 89, 16, 16, LiteralText.EMPTY);
+		addDrawable(button);
 	}
 
-	@Override
-	public void initGui()
-	{
-		super.initGui();
-		int x = (width - xSize) / 2;
-		int y = (height - ySize) / 2;
-		buttonList.clear();
-		button = new GuiButton(0, x + 131, y + 89, 16, 16, "");
-		buttonList.add(button);
-	}
+    @Override
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+        super.drawForeground(matrices, mouseX, mouseY);
 
-	@Override
-	protected void drawGuiContainerForegroundLayer(int par1, int par2)
-	{
-		super.drawGuiContainerForegroundLayer(par1, par2);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guilaptopnuke);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.guilaptopnuke);
 
-		if (lt.isReady()) this.drawTexturedModalRect(131, 89, 239, 9, 16, 16);
-		else this.drawTexturedModalRect(131, 89, 131, 89, 16, 16);
+		if (handler.isReady()) GuiUtils.drawTexturedModalRect(matrices, 131, 89, 239, 9, 16, 16, getZOffset());
+		else GuiUtils.drawTexturedModalRect(matrices, 131, 89, 131, 89, 16, 16, getZOffset());
 
-		int mousex = par1;
-		int mousey = par2;
-		int posx = (width - xSize) / 2;
-		int posy = (height - ySize) / 2;
+		int mousex = mouseX;
+		int mousey = mouseY;
+		int posx = (width - getXSize()) / 2;
+		int posy = (height - getYSize()) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 194;
 		int widthx = 72;
@@ -82,34 +71,32 @@ public class GuiLaptop extends GuiContainer
 		{
 			mousex -= posx;
 			mousey -= posy;
-			drawGradientRect(mousex, mousey, mousex + fontRenderer.getStringWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			fontRenderer.drawString("rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
-			if (!buttondown && Mouse.isButtonDown(0)) {
-                Sys.openURL("http://rivalrebels.com");
+			GuiUtils.drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			if (!buttondown && client.mouse.wasLeftButtonClicked()) {
+                Util.getOperatingSystem().open("http://rivalrebels.com");
 			}
 		}
-		buttondown = Mouse.isButtonDown(0);
+		buttondown = client.mouse.wasLeftButtonClicked();
 	}
 
 	boolean	buttondown;
 
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
-	{
-		GlStateManager.color(1, 1, 1);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guilaptopnuke);
-		int x = (width - xSize) / 2;
-		int y = (height - ySize) / 2;
-		this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
-		if (lt.hasChips()) this.drawTexturedModalRect(x + 135, y + 79, 248, 0, 8, 8);
-		fontRenderer.drawString(I18n.format("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff);
-		fontRenderer.drawString(I18n.format("RivalRebels.controller.b2spirit"), x + 25, y + 11, 0xffffff);
-		fontRenderer.drawString(I18n.format("x" + lt.b2spirit), x + 154, y + 96, 0xffffff);
-		fontRenderer.drawString(I18n.format("x" + lt.b2carpet), x + 154, y + 85, 0xffffff);
-		if (button.mousePressed(mc, par2, par3) && Mouse.isButtonDown(0) && !prevButtonDown)
-		{
-			PacketDispatcher.packetsys.sendToServer(new LaptopButtonPacket(lt.getPos()));
+    @Override
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.setShaderTexture(0, RRIdentifiers.guilaptopnuke);
+		int x = (width - getXSize()) / 2;
+		int y = (height - getYSize()) / 2;
+		GuiUtils.drawTexturedModalRect(matrices, x, y, 0, 0, getXSize(), getYSize(), getZOffset());
+		if (handler.hasChips()) GuiUtils.drawTexturedModalRect(matrices, x + 135, y + 79, 248, 0, 8, 8, getZOffset());
+		textRenderer.draw(matrices, new TranslatableText("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff);
+		textRenderer.draw(matrices, new TranslatableText("RivalRebels.controller.b2spirit"), x + 25, y + 11, 0xffffff);
+		textRenderer.draw(matrices, new TranslatableText("x" + handler.getB2spirit()), x + 154, y + 96, 0xffffff);
+		textRenderer.draw(matrices, new TranslatableText("x" + handler.getB2carpet()), x + 154, y + 85, 0xffffff);
+		if (button.mouseClicked(mouseX, mouseY, 0) && client.mouse.wasLeftButtonClicked() && !prevButtonDown) {
+            handler.onGoButtonPressed();
 		}
-		prevButtonDown = Mouse.isButtonDown(0);
+		prevButtonDown = client.mouse.wasLeftButtonClicked();
 	}
 }

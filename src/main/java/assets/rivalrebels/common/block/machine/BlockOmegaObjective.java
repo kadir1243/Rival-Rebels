@@ -12,83 +12,71 @@
 package assets.rivalrebels.common.block.machine;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityOmegaObjective;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockOmegaObjective extends BlockContainer
-{
-	public BlockOmegaObjective()
-	{
-		super(Material.IRON);
-		this.setCreativeTab(CreativeTabs.DECORATIONS);
-	}
-
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
+public class BlockOmegaObjective extends BlockWithEntity {
+	public BlockOmegaObjective(Settings settings) {
+		super(settings);
 	}
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		if (!pos.equals(RivalRebels.round.omegaObjPos))
-		{
-			world.setBlockState(RivalRebels.round.omegaObjPos, RivalRebels.plasmaexplosion.getDefaultState());
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+		if (!pos.equals(RivalRebels.round.omegaObjPos)) {
+			world.setBlockState(RivalRebels.round.omegaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
 			RivalRebels.round.omegaObjPos = pos;
-			if (world.getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RivalRebels.sigmaobj)
+			if (world.getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RRBlocks.sigmaobj)
 				RivalRebels.round.roundManualStart();
 		}
 	}
 
     @Override
-    public void breakBlock(World worldIn, BlockPos pos, IBlockState state) {
-        super.breakBlock(worldIn, pos, state);
-        if (worldIn.getBlockState(pos).getBlock() != RivalRebels.plasmaexplosion) {
-            worldIn.setBlockState(pos, state);
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        super.onBreak(world, pos, state, player);
+
+        if (state.getBlock() != RRBlocks.plasmaexplosion) {
+            world.setBlockState(pos, state);
         }
     }
 
     @Override
-    public boolean canHarvestBlock(IBlockAccess world, BlockPos pos, EntityPlayer player) {
-        return player.capabilities.isCreativeMode || super.canHarvestBlock(world, pos, player);
+    public boolean canHarvestBlock(BlockState state, BlockView world, BlockPos pos, PlayerEntity player) {
+        return player.getAbilities().creativeMode || super.canHarvestBlock(state, world, pos, player);
     }
 
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
 
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
-	/**
-	 * Returns a new instance of a block's tile entity class. Called on placing the block.
-	 */
-	@Override
-	public TileEntity createNewTileEntity(World par1World, int var)
-	{
-		return new TileEntityOmegaObjective();
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityOmegaObjective(pos, state);
 	}
-
-	/*@SideOnly(Side.CLIENT)
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
 
 	@Override

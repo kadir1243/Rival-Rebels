@@ -214,3 +214,16 @@ item.rivalrebelsitem4.name=Fuel
 item.rivalrebelsarmor15.name=Hacker Boots O
 item.rivalrebelsitem15.name=Hydrogen Rod
 tile.rivalrebels.blocks.11.name=Quake
+
+rivalrebels.warning_bomb_will_explode_line_1=§4[§cWARNING§4]§c Radiological Alarm.
+rivalrebels.warning_bomb_will_explode_line_2=§4[§cWARNING§4]§c Nuclear weapon armed.
+rivalrebels.warning_bomb_will_explode_line_3=§4[§cWARNING§4]§c 10 seconds left.
+rivalrebels.warning_meltdown=§4[§cWARNING§4]§c Meltdown
+rivalrebels.defuse=§7[§6Defuse§7]§e %s §7'/.
+rivalrebels.building.tokamak=§7[§6Status§7]§e Constructing ToKaMaK %s §7'/.
+rivalrebels.building=§7[§6Status§7]§e Constructing %s §7'/.
+rivalrebels.warning_to_specific_player=§4[§cWARNING§4]§c %s
+rivalrebels.use_pliars=§7[§4Orders§7]§c Use %s
+rivalrebels.warning_tsar_is_armed=§4[§cWARNING§4]§c %s Armed
+rivalrebels.tsar_bomb_defuse=§7[§6Status§7]§e %s §7[§6Defuse§7]§e Tsar Bomba
+rivalrebels.nuke_bomb_defuse=§7[§6Status§7]§e %s §7[§6Defuse§7]§e Nuclear Bomb

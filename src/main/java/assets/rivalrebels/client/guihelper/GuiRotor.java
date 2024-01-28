@@ -11,44 +11,45 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
+import assets.rivalrebels.RRIdentifiers;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.GuiUtils;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class GuiRotor extends GuiButton
 {
 	protected int		degree;
 	protected boolean	pressed;
 
-	public GuiRotor(int id, int x, int y, int yawLimit, String par6Str)
+	public GuiRotor(int x, int y, int yawLimit, String par6Str)
 	{
-		super(id, x, y, 32, 32, par6Str);
+		super(x, y, 32, 32, par6Str);
 		degree = yawLimit / 2;
 	}
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-		this.mouseDragged(mc, mouseX, mouseY);
-		mc.renderEngine.bindTexture(RivalRebels.guitray);
-		GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-		GlStateManager.pushMatrix();
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.guitray);
+		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		matrices.push();
 		int deg = (degree % 180);
 		if (degree >= 180) deg = 180 - deg;
 		if (deg < 22) deg = 22;
 		degree = deg;
-		this.drawTexturedModalRect(this.x, this.y, 224, 66, this.width, this.height * deg / (180));
-		this.drawCenteredString(mc.fontRenderer, (deg * 2) + "°", x + width / 2, y + height / 2 - 4, 0xffffff);
-		GlStateManager.popMatrix();
+		GuiUtils.drawTexturedModalRect(matrices, this.x, this.y, 224, 66, this.width, this.height * deg / (180), getZOffset());
+		drawCenteredText(matrices, MinecraftClient.getInstance().textRenderer, (deg * 2) + "°", x + width / 2, y + height / 2 - 4, 0xffffff);
+		matrices.pop();
 	}
 
-	@Override
-	protected void mouseDragged(Minecraft mc, int mouseX, int mouseY) {
-		if (Mouse.isButtonDown(0)) {
-			if (mousePressed(mc, mouseX, mouseY)) pressed = true;
+    @Override
+    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
+		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
+			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
 			if (pressed) degree = ((int) (Math.atan2(y - mouseY + (height / 2), x - mouseX + (width / 2)) * 180 / Math.PI) + 270) % 360;
 		} else {
 			pressed = false;
@@ -59,9 +60,8 @@ public class GuiRotor extends GuiButton
 		}
 	}
 
-	@Override
-	public void mouseReleased(int par2, int par3)
-	{
+    @Override
+    public void onRelease(double mouseX, double mouseY) {
 		pressed = false;
 	}
 
@@ -71,8 +71,7 @@ public class GuiRotor extends GuiButton
 	}
 
     @Override
-	public boolean mousePressed(Minecraft mc, int mouseX, int mouseY)
-	{
-		return this.enabled && this.visible && Math.sqrt(((x - mouseX + (width / 2f)) * (x - mouseX + (width / 2f))) + ((y - mouseY + (height / 2f)) * (y - mouseY + (height / 2f)))) <= (width / 2f);
+    public boolean mouseClicked(double mouseX, double mouseY, int button) {
+		return this.active && this.visible && Math.sqrt(((x - mouseX + (width / 2f)) * (x - mouseX + (width / 2f))) + ((y - mouseY + (height / 2f)) * (y - mouseY + (height / 2f)))) <= (width / 2f);
 	}
 }

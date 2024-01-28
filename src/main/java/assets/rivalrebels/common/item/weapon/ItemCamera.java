@@ -11,24 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.EntityEquipmentSlot;
-import net.minecraft.item.ItemArmor;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ArmorItem;
+import net.minecraft.item.ArmorMaterials;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 
-public class ItemCamera extends ItemArmor
+import static org.lwjgl.glfw.GLFW.*;
+
+public class ItemCamera extends ArmorItem
 {
-	public ItemCamera()
-	{
-		super(ArmorMaterial.CHAIN, 0, EntityEquipmentSlot.HEAD);
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+	public ItemCamera() {
+		super(ArmorMaterials.CHAIN, EquipmentSlot.HEAD, new Settings().maxCount(1).group(RRItems.rralltab));
 	}
 
 	float	zoom		= 30f;
@@ -37,39 +35,37 @@ public class ItemCamera extends ItemArmor
 	boolean prevheld = false;
 	boolean bkey = false;
 	public static boolean zoomed = false;
-	@Override
-	public void onArmorTick(World world, EntityPlayer entity, ItemStack itemStack)
-	{
-		if (world.isRemote)
-		{
-			if (entity == Minecraft.getMinecraft().player)
-			{
-				boolean key = Keyboard.isKeyDown(Keyboard.KEY_B) && Minecraft.getMinecraft().currentScreen == null;
+
+    @Override
+    public void onArmorTick(ItemStack stack, World world, PlayerEntity player) {
+		if (world.isClient) {
+            MinecraftClient client = MinecraftClient.getInstance();
+            if (player == client.player) {
+				boolean key = glfwGetKey(client.getWindow().getHandle(), GLFW_KEY_B) == GLFW_PRESS && client.currentScreen == null;
 				if (key != bkey && key) zoomed = !zoomed;
 				bkey = key;
-				if (zoomed)
-				{
+				if (zoomed) {
 					if (!prevheld)
 					{
-						fovset = Minecraft.getMinecraft().gameSettings.fovSetting;
-						senset = Minecraft.getMinecraft().gameSettings.mouseSensitivity;
-						//Minecraft.getMinecraft().gameSettings.smoothCamera = true;
+						fovset = (float) client.options.fov;
+						senset = (float) client.options.mouseSensitivity;
+						client.options.smoothCameraEnabled = true;
 					}
-					zoom += (Mouse.getEventDWheel() * 0.01f);
+					zoom += (client.mouse.getYVelocity() * 0.01f);
 					if (zoom < 10) zoom = 10;
 					if (zoom > 67) zoom = 67;
-					Minecraft.getMinecraft().gameSettings.hideGUI = true;
-					Minecraft.getMinecraft().gameSettings.fovSetting = zoom + (Minecraft.getMinecraft().gameSettings.fovSetting - zoom) * 0.85f;
-					Minecraft.getMinecraft().gameSettings.mouseSensitivity = senset * MathHelper.sqrt(zoom) * 0.1f;
+					client.options.hudHidden = true;
+					client.options.fov = zoom + (client.options.fov - zoom) * 0.85f;
+					client.options.mouseSensitivity = senset * MathHelper.sqrt(zoom) * 0.1f;
 				}
 				else
 				{
 					if (prevheld)
 					{
-						Minecraft.getMinecraft().gameSettings.fovSetting = fovset;
-						Minecraft.getMinecraft().gameSettings.mouseSensitivity = senset;
-						Minecraft.getMinecraft().gameSettings.hideGUI = false;
-						//Minecraft.getMinecraft().gameSettings.smoothCamera = false;
+						client.options.fov = fovset;
+						client.options.mouseSensitivity = senset;
+						client.options.hudHidden = false;
+						client.options.smoothCameraEnabled = false;
 					}
 				}
 				prevheld = zoomed;

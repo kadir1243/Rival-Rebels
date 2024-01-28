@@ -12,64 +12,64 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityDebris;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockRendererDispatcher;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.texture.TextureMap;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.block.BlockRenderType;
+import net.minecraft.block.BlockState;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.BlockRenderManager;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import org.lwjgl.opengl.GL11;
 
-public class RenderDebris extends Render<EntityDebris> {
-	public RenderDebris(RenderManager manager)
+import java.util.Random;
+
+public class RenderDebris extends EntityRenderer<EntityDebris> {
+	public RenderDebris(EntityRendererFactory.Context manager)
 	{
         super(manager);
-        this.shadowSize = 0.5F;
+        this.shadowRadius = 0.5F;
 	}
 
-	@Override
-	public void doRender(EntityDebris debris, double x, double y, double z, float pitch, float yaw) {
-		if (debris.isDead) return;
-        IBlockState state = debris.state;
-        if (state == null || state.getRenderType() == EnumBlockRenderType.INVISIBLE) return; // Why ???
-        GlStateManager.pushMatrix();
-        bindEntityTexture(debris);
-        GlStateManager.disableLighting();
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+    @Override
+    public void render(EntityDebris entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		if (!entity.isAlive()) return;
+        BlockState state = entity.getState();
+        if (state == null || state.getRenderType() != BlockRenderType.MODEL) return; // Why ???
+        matrices.push();
 
-        if (this.renderOutlines) {
-            GlStateManager.enableColorMaterial();
-            GlStateManager.enableOutlineMode(this.getTeamColor(debris));
+        BlockPos blockpos = new BlockPos(entity.getX(), entity.getBoundingBox().maxY, entity.getZ());
+        BlockRenderManager blockrendererdispatcher = MinecraftClient.getInstance().getBlockRenderManager();
+
+        for(RenderLayer type : RenderLayer.getBlockLayers()) {
+            if (RenderLayers.canRenderInLayer(state, type)) {
+                blockrendererdispatcher.getModelRenderer()
+                    .render(
+                        entity.world,
+                        blockrendererdispatcher.getModel(state),
+                        state,
+                        blockpos,
+                        matrices,
+                        vertexConsumers.getBuffer(type),
+                        false,
+                        new Random(),
+                        state.getRenderingSeed(entity.getBlockPos()),
+                        OverlayTexture.DEFAULT_UV
+                    );
+            }
         }
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.BLOCK);
-        BlockPos blockpos = new BlockPos(debris.posX, debris.getEntityBoundingBox().maxY, debris.posZ);
-        GlStateManager.translate((float)(x - (double)blockpos.getX() - 0.5D), (float)(y - (double)blockpos.getY()), (float)(z - (double)blockpos.getZ() - 0.5D));
-        BlockRendererDispatcher dispatcher = Minecraft.getMinecraft().getBlockRendererDispatcher();
-        dispatcher.getBlockModelRenderer().renderModel(debris.world, dispatcher.getModelForState(state), state, blockpos, buffer, false, MathHelper.getPositionRandom(debris.getPosition()));
-        tessellator.draw();
-
-        if (this.renderOutlines) {
-            GlStateManager.disableOutlineMode();
-            GlStateManager.disableColorMaterial();
-        }
-
-        GlStateManager.enableLighting();
-        GlStateManager.popMatrix();
+        matrices.pop();
     }
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityDebris r)
+	public Identifier getTexture(EntityDebris entity)
 	{
-		return TextureMap.LOCATION_BLOCKS_TEXTURE;
+		return SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
 	}
 }

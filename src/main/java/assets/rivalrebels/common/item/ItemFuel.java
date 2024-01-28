@@ -11,26 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.GasRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.IItemRenderProperties;
 
-public class ItemFuel extends Item
-{
-	public ItemFuel()
-	{
-		super();
-		setCreativeTab(RivalRebels.rralltab);
+import java.util.function.Consumer;
+
+public class ItemFuel extends Item {
+	public ItemFuel() {
+		super(new Settings().group(RRItems.rralltab));
 	}
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:af");
-	}*/
-
-	@Override
-	public boolean isFull3D()
-	{
-		return true;
-	}
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new GasRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 }

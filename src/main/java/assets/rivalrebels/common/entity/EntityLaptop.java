@@ -11,12 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
+import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
 public class EntityLaptop extends EntityInanimate
@@ -24,75 +24,55 @@ public class EntityLaptop extends EntityInanimate
 	public double	slide	= 0;
 	double			test	= Math.PI;
 
-	public EntityLaptop(World par1World)
-	{
-		super(par1World);
-		this.setSize(1F, 0.6F);
-		setEntityBoundingBox(new AxisAlignedBB(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
+    public EntityLaptop(EntityType<? extends EntityLaptop> type, World world) {
+        super(type, world);
+    }
+
+	public EntityLaptop(World par1World) {
+		this(RREntities.LAPTOP, par1World);
+		setBoundingBox(new Box(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
 	}
 
-	@Override
-	public AxisAlignedBB getCollisionBox(Entity par1Entity)
-	{
-		return par1Entity.getEntityBoundingBox();
-	}
+    @Override
+    public boolean collides() {
+        return this.isAlive();
+    }
 
-	@Override
-	public boolean canBeCollidedWith()
-	{
-		return !this.isDead;
-	}
+    @Override
+    public boolean isPushable() {
+        return true;
+    }
 
-	/**
-	 * Returns true if this entity should push and be pushed by other entities when colliding.
-	 */
-	@Override
-	public boolean canBePushed()
-	{
-		return true;
-	}
-
-	public EntityLaptop(World par1World, float x, float y, float z, float yaw)
-	{
-		super(par1World);
+    public EntityLaptop(World par1World, float x, float y, float z, float yaw) {
+		this(par1World);
 		setPosition(x, y, z);
-		rotationYaw = yaw;
-		setEntityBoundingBox(new AxisAlignedBB(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
+        this.setYaw(yaw);
 	}
 
 	@Override
-	public void onUpdate()
+	public void tick()
 	{
-		super.onUpdate();
+		super.tick();
 		slide = (Math.cos(test) + 1) * 45;
 
-        boolean i = false;
-        for (EntityPlayer player : world.playerEntities) {
-            if (player.getDistanceSq(posX + 0.5f, posY + 0.5f, posZ + 0.5f) <= 9) {
-                i = true;
-            }
-        }
-		if (i)
-		{
+        if (world.isPlayerInRange(getX() + 0.5F, getY() + 0.5F, getZ() + 0.5F, 9)) {
 			if (slide < 89.995) test += 0.05;
-		}
-		else
-		{
+		} else {
 			if (slide > 0.004) test -= 0.05;
 		}
 	}
 
     @Override
-    public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
-		if (player.isSneaking() && !player.world.isRemote) {
-			player.openGui(RivalRebels.instance, 0, player.world, 0, 0, 0);
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+		if (player.isSneaking() && !player.world.isClient) {
+			player.openHandledScreen(null);
 		}
-		if (!player.isSneaking() && player.inventory.addItemStackToInventory(new ItemStack(RivalRebels.controller)))
+		if (!player.isSneaking() && player.getInventory().insertStack(RRBlocks.controller.asItem().getDefaultStack()))
 		{
-			player.swingArm(hand);
-			setDead();
+			player.swingHand(hand);
+			kill();
 		}
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
 }

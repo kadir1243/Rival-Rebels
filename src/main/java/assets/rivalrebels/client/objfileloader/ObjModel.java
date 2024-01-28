@@ -11,13 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
+import assets.rivalrebels.RivalRebels;
+
 import java.io.InputStream;
 import java.nio.ByteBuffer;
-
-import net.minecraft.client.renderer.GlStateManager;
-import org.lwjgl.opengl.GL11;
-
-import assets.rivalrebels.RivalRebels;
 
 public class ObjModel
 {
@@ -56,16 +53,7 @@ public class ObjModel
 		}
 	}
 
-	public void render()
-	{
-		GlStateManager.glBegin(GL11.GL_TRIANGLES);
-		for (int i = 0; i < tris.length; i++)
-		{
-			//GL11.
-		}
-	}
-
-	private class Vector3
+    private class Vector3
 	{
 		public float x,y,z;//pos
 		public float i,j,k;//norm

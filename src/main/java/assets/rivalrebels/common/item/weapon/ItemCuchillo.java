@@ -11,69 +11,60 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityCuchillo;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemTool;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ToolItem;
+import net.minecraft.item.ToolMaterials;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 
-import java.util.HashSet;
-
-public class ItemCuchillo extends ItemTool
+public class ItemCuchillo extends ToolItem
 {
 	public ItemCuchillo()
 	{
-		super(1, 1, ToolMaterial.IRON, new HashSet<>());
-		setMaxStackSize(5);
-		setCreativeTab(RivalRebels.rralltab);
+		super(ToolMaterials.IRON, new Settings().maxCount(5).group(RRItems.rralltab));
 	}
 
     @Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
+	public UseAction getUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.BOW;
-	}
-
-	@Override
-	public boolean isFull3D()
-	{
-		return false;
+		return UseAction.BOW;
 	}
 
     @Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
+	public int getMaxUseTime(ItemStack par1ItemStack)
 	{
 		return 72000;
 	}
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entityLiving, int timeLeft) {
-        if (!(entityLiving instanceof EntityPlayer player)) return;
+    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+        if (!(user instanceof PlayerEntity player)) return;
 
-        ItemStack itemStack = ItemUtil.getItemStack(player, RivalRebels.knife);
-        if (player.capabilities.isCreativeMode || !itemStack.isEmpty())
+        ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.knife);
+        if (player.getAbilities().invulnerable || !itemStack.isEmpty())
 		{
-			float f = (getMaxItemUseDuration(stack) - timeLeft) / 20.0F;
+			float f = (getMaxUseTime(stack) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f < 0.1D) return;
 			if (f > 1.0F) f = 1.0F;
-			if (!player.capabilities.isCreativeMode) stack.shrink(1);
+			if (!player.getAbilities().invulnerable) stack.decrement(1);
 			RivalRebelsSoundPlayer.playSound(player, 4, 3);
-			if (!world.isRemote) world.spawnEntity(new EntityCuchillo(world, player, 0.5f + f));
+			if (!world.isClient) world.spawnEntity(new EntityCuchillo(world, player, 0.5f + f));
 		}
 	}
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        player.setActiveHand(hand);
-        return super.onItemRightClick(world, player, hand);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        user.setCurrentHand(hand);
+        return super.use(world, user, hand);
     }
 
 	/*@Override

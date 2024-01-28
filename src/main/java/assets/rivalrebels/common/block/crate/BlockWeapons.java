@@ -11,66 +11,62 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class BlockWeapons extends Block
 {
-	public BlockWeapons()
+	public BlockWeapons(Settings settings)
 	{
-		super(Material.WOOD);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+		super(settings);
 	}
 
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (world.isRemote) {
-            player.sendMessage(new TextComponentTranslation("RivalRebels.Inventory"));
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.rpg.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.consume") + " " + I18n.translateToLocal(RivalRebels.rocket.getTranslationKey() + ".name") + ")"));
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.tesla.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.consume") + " " + I18n.translateToLocal(RivalRebels.hydrod.getTranslationKey() + ".name") + ")"));
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.flamethrower.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.consume") + " " + I18n.translateToLocal(RivalRebels.fuel.getTranslationKey() + ".name") + ")"));
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.plasmacannon.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.consume") + " " + I18n.translateToLocal(RivalRebels.battery.getTranslationKey() + ".name") + ")"));
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.einsten.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.consume") + " " + I18n.translateToLocal(RivalRebels.redrod.getTranslationKey() + ".name") + ")"));
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.roddisk.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.message.use") + " /rr)"));
-            // player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.bastion.getTranslationKey() + ".name") + ". §9(" +
-            // I18n.translateToLocal("RivalRebels.build") + " " + I18n.translateToLocal(RivalRebels.barricade.getTranslationKey() + ".name") + ")");
-            // player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.tower.getTranslationKey() + ".name") + ". §9(" +
-            // I18n.translateToLocal("RivalRebels.build") + " " + I18n.translateToLocal(RivalRebels.tower.getTranslationKey() + ".name") + ")");
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.knife.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.opknife") + ")"));
-            player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.gasgrenade.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.chemicalweapon") + ")"));
-            player.sendMessage(new TextComponentString(I18n.translateToLocal("RivalRebels.Orders") + " " + I18n.translateToLocal("RivalRebels.equipweapons")));
+        if (world.isClient) {
+            player.sendMessage(new TranslatableText("RivalRebels.Inventory"), false);
+            player.sendMessage(new LiteralText("§a" + RRItems.rpg.getName() + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.rocket.getName()) + ")"), false);
+            player.sendMessage(new LiteralText("§a" + RRItems.tesla.getName() + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.hydrod.getName()) + ")"), false);
+            player.sendMessage(new LiteralText("§a" + (RRItems.flamethrower.getName()) + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.fuel.getName()) + ")"), false);
+            player.sendMessage(new LiteralText("§a" + (RRItems.plasmacannon.getName()) + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.battery.getName()) + ")"), false);
+            player.sendMessage(new LiteralText("§a" + (RRItems.einsten.getName()) + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.redrod.getName()) + ")"), false);
+            player.sendMessage(new LiteralText("§a" + (RRItems.roddisk.getName()) + ". §9(" + I18n.translate("RivalRebels.message.use") + " /rr)"), false);
+            // player.sendMessage(new LiteralText("§a" + I18n.translate(RivalRebels.bastion.getTranslationKey() + ".name") + ". §9(" +
+            // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.barricade.getTranslationKey() + ".name") + ")");
+            // player.sendMessage(new LiteralText("§a" + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ". §9(" +
+            // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ")");
+            player.sendMessage(new LiteralText("§a" + (RRItems.knife.getName()) + ". §9(" + I18n.translate("RivalRebels.opknife") + ")"), false);
+            player.sendMessage(new LiteralText("§a" + (RRItems.gasgrenade.getName()) + ". §9(" + I18n.translate("RivalRebels.chemicalweapon") + ")"), false);
+            player.sendMessage(new LiteralText(I18n.translate("RivalRebels.Orders") + " " + I18n.translate("RivalRebels.equipweapons")), false);
         }
-        if (!world.isRemote)
+        if (!world.isClient)
         {
-            EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.rpg));
-            EntityItem ei1 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.tesla));
-            EntityItem ei2 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.plasmacannon));
-            EntityItem ei3 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.flamethrower));
-            EntityItem ei4 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.roddisk));
-            // EntityItem ei5 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.barricade, 6));
-            // EntityItem ei6 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.tower, 3));
-            EntityItem ei7 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.knife, 10));
-            EntityItem ei8 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.gasgrenade, 6));
-            EntityItem ei9 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.einsten));
+            ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.rpg.getDefaultStack());
+            ItemEntity ei1 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.tesla.getDefaultStack());
+            ItemEntity ei2 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.plasmacannon.getDefaultStack());
+            ItemEntity ei3 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.flamethrower.getDefaultStack());
+            ItemEntity ei4 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.roddisk.getDefaultStack());
+            // ItemEntity ei5 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.barricade, 6));
+            // ItemEntity ei6 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.tower, 3));
+            ItemEntity ei7 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.knife, 10));
+            ItemEntity ei8 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.gasgrenade, 6));
+            ItemEntity ei9 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.einsten.getDefaultStack());
             world.spawnEntity(ei);
             world.spawnEntity(ei1);
             world.spawnEntity(ei2);
@@ -81,25 +77,25 @@ public class BlockWeapons extends Block
             world.spawnEntity(ei7);
             world.spawnEntity(ei8);
             world.spawnEntity(ei9);
-            world.setBlockToAir(pos);
+            world.setBlockState(pos, Blocks.AIR.getDefaultState());
         }
-
+        return ActionResult.PASS;
     }
 
-    /*@SideOnly(Side.CLIENT)
+    /*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -112,7 +108,7 @@ public class BlockWeapons extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

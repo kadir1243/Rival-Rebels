@@ -13,41 +13,36 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
+import net.minecraft.entity.EntityType;
 import net.minecraft.world.World;
 
 public class EntityB83NoShroom extends EntityB83
 {
 	public int	ticksInAir	= 0;
 
-	public EntityB83NoShroom(World par1World)
+	public EntityB83NoShroom(EntityType<? extends EntityB83NoShroom> entityType, World par1World)
 	{
-		super(par1World);
-		this.setSize(0.5F, 0.5F);
+		super(entityType, par1World);
 	}
 
-	public EntityB83NoShroom(World par1World, double x, double y, double z, double mx, double my, double mz)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+	public EntityB83NoShroom(World par1World, double x, double y, double z, double mx, double my, double mz) {
+		this(RREntities.B83_NO_SHROOM, par1World);
 		setPosition(x, y, z);
-		shoot(mx, my, mz, 5, 1);
+        setVelocity(mx, my, mz, 5, 1);
 	}
 
 	@Override
-	public void onUpdate()
-	{
-		motionX *= 0.99f/0.9f;
-		motionY *= 0.99f/0.9f;
-		motionZ *= 0.99f/0.9f;
-		super.onUpdate();
+	public void tick() {
+        setVelocity(getVelocity().multiply(0.99f/0.9f));
+		super.tick();
 	}
 
 	public void explode()
 	{
-		new NuclearExplosion(world, (int) posX, (int) posY, (int) posZ, RivalRebels.b83Strength/2);
-		EntitySphereBlast etb = new EntitySphereBlast(world, posX, posY, posZ, RivalRebels.b83Strength * 1.333333333f);
+		new NuclearExplosion(world, (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength/2);
+		EntitySphereBlast etb = new EntitySphereBlast(world, getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f);
 		etb.time = -920;
 		world.spawnEntity(etb);
-		this.setDead();
+		this.kill();
 	}
 }

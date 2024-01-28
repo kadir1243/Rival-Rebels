@@ -11,27 +11,31 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class GuiCustomButton extends net.minecraft.client.gui.GuiButton
+import static net.minecraftforge.client.gui.GuiUtils.drawTexturedModalRect;
+
+@OnlyIn(Dist.CLIENT)
+public class GuiCustomButton extends ButtonWidget
 {
 	Rectangle			bbox;
 	Vector				tbox;
-	ResourceLocation	resloc;
+	Identifier	resloc;
 	boolean				toggleable;
 	public boolean		isPressed	= false;
 	public boolean		wasPressed	= false;
 	public boolean		mouseDown	= false;
 
-	public GuiCustomButton(int id, Rectangle rec, ResourceLocation rl, Vector uv, boolean isToggle)
+	public GuiCustomButton(Rectangle rec, Identifier rl, Vector uv, boolean isToggle)
 	{
-		super(id, rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, "");
+		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Text.of(""), button -> {});
 		bbox = rec;
 		tbox = uv;
 		resloc = rl;
@@ -39,8 +43,8 @@ public class GuiCustomButton extends net.minecraft.client.gui.GuiButton
 	}
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
-		boolean current = Mouse.isButtonDown(0) && bbox.isVecInside(new Vector(mouseX, mouseY));
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		boolean current = MinecraftClient.getInstance().mouse.wasLeftButtonClicked() && bbox.isVecInside(new Vector(mouseX, mouseY));
 		wasPressed = false;
 		if (toggleable && current && !mouseDown)
 		{
@@ -63,9 +67,9 @@ public class GuiCustomButton extends net.minecraft.client.gui.GuiButton
 
 		if (isPressed)
 		{
-			mc.renderEngine.bindTexture(resloc);
-			GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTexturedModalRect(bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin);
+			MinecraftClient.getInstance().getTextureManager().bindTexture(resloc);
+			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			drawTexturedModalRect(matrices, bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin, getZOffset());
 		}
 	}
 }

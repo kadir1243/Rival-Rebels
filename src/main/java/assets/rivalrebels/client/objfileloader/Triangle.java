@@ -11,22 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import static org.lwjgl.opengl.GL11.GL_LINE_LOOP;
-import static org.lwjgl.opengl.GL11.GL_TRIANGLES;
-
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class Triangle
 {
 	public Vertice[]	pa;
-	private final Tessellator tes	= Tessellator.getInstance();
 
 	public Triangle(Vertice[] PA)
 	{
@@ -34,28 +27,13 @@ public class Triangle
 		pa = PA;
 	}
 
-	public void render()
-	{
-        BufferBuilder buffer = tes.getBuffer();
-        buffer.begin(GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX_COLOR);
+	public void render(VertexConsumer buffer) {
         for (Vertice vertice : pa) {
             vertice.render(buffer);
         }
-		tes.draw();
 	}
 
-	public void renderWireframe()
-	{
-        GlStateManager.glLineWidth(2);
-        BufferBuilder buffer = tes.getBuffer();
-        buffer.begin(GL_LINE_LOOP, DefaultVertexFormats.POSITION);
-        for (Vertice vertice : pa) {
-            vertice.renderWireframe(buffer);
-        }
-		tes.draw();
-	}
-
-	public void normalize()
+    public void normalize()
 	{
         for (Vertice vertice : pa) {
             vertice.normalize();

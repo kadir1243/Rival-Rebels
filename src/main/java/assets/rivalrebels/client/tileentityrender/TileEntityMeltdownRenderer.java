@@ -13,40 +13,51 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.tileentity.TileEntityMeltDown;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityMeltdownRenderer extends TileEntitySpecialRenderer<TileEntityMeltDown>
-{
-	ModelBlastSphere	model;
+@OnlyIn(Dist.CLIENT)
+public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntityMeltDown> {
+	private final ModelBlastSphere model;
 
-	public TileEntityMeltdownRenderer()
-	{
+	public TileEntityMeltdownRenderer(BlockEntityRendererFactory.Context context) {
 		model = new ModelBlastSphere();
 	}
 
     @Override
-    public void render(TileEntityMeltDown te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		float fsize = (float) Math.sin(te.size);
+    public void render(TileEntityMeltDown entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        float fsize = (float) Math.sin(entity.size);
 		if (fsize <= 0) return;
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate(te.size * 50, 0f, 1, 0f);
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+		matrices.push();
+		matrices.multiply(new Quaternion(entity.size * 50, 0f, 1, 0f));
 
-		model.renderModel(fsize * 5.5f, 1, 1, 1, 0.4f);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        model.renderModel(matrices, buffer, fsize * 5.5f, 1, 1, 1, 0.4f);
 
-		GlStateManager.rotate(te.size * 50, 0f, 1, 0f);
+		matrices.multiply(new Quaternion(entity.size * 50, 0f, 1, 0f));
 
-		model.renderModel(fsize * 5.6f, 1, 1, 1, 0.4f);
+		model.renderModel(matrices, buffer, fsize * 5.6f, 1, 1, 1, 0.4f);
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 
-		model.renderModel(fsize * 5.9f, 1, 1, 1, 0.4f);
+		model.renderModel(matrices, buffer, fsize * 5.9f, 1, 1, 1, 0.4f);
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
+
+    @Override
+    public int getRenderDistance()
+    {
+        return 16384;
+    }
+
 }

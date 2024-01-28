@@ -11,16 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelObjective
 {
@@ -132,35 +127,34 @@ public class ModelObjective
 	TextureVertice	rs11		= new TextureVertice(u + q, k + q * 2);
 	TextureVertice	rs12		= new TextureVertice(u + r, k + p * 2);
 
-	public void renderA()
+	public void renderA(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		RenderHelper.addFace(lloader1, lloader12, rloader12, rloader1, l1f, l12s, r12s, r1f);
-		RenderHelper.addFace(lloader2, lloader1, rloader1, rloader2, l2, l1s, r1s, r2);
-		RenderHelper.addFace(lloader3, lloader2, rloader2, rloader3, l3f, l2, r2, r3f);
-		RenderHelper.addFace(lloader4, lloader3, rloader3, rloader4, l4, l3s, r3s, r4);
-		RenderHelper.addFace(lloader5, lloader4, rloader4, rloader5, l5, l4, r4, r5);
-		RenderHelper.addFace(lloader6, lloader5, rloader5, rloader6, l6f, l5, r5, r6f);
-		RenderHelper.addFace(lloader7, lloader6, rloader6, rloader7, l7, l6s, r6s, r7);
-		RenderHelper.addFace(lloader8, lloader7, rloader7, rloader8, l8, l7, r7, r8);
-		RenderHelper.addFace(lloader9, lloader8, rloader8, rloader9, l9, l8, r8, r9);
-		RenderHelper.addFace(lloader10, lloader9, rloader9, rloader10, l10, l9, r9, r10);
-		RenderHelper.addFace(lloader11, lloader10, rloader10, rloader11, l11, l10, r10, r11);
-		RenderHelper.addFace(lloader12, lloader11, rloader11, rloader12, l12f, l11, r11, r12f);
+		matrices.push();
+		RenderHelper.addFace(buffer, lloader1, lloader12, rloader12, rloader1, l1f, l12s, r12s, r1f);
+		RenderHelper.addFace(buffer, lloader2, lloader1, rloader1, rloader2, l2, l1s, r1s, r2);
+		RenderHelper.addFace(buffer, lloader3, lloader2, rloader2, rloader3, l3f, l2, r2, r3f);
+		RenderHelper.addFace(buffer, lloader4, lloader3, rloader3, rloader4, l4, l3s, r3s, r4);
+		RenderHelper.addFace(buffer, lloader5, lloader4, rloader4, rloader5, l5, l4, r4, r5);
+		RenderHelper.addFace(buffer, lloader6, lloader5, rloader5, rloader6, l6f, l5, r5, r6f);
+		RenderHelper.addFace(buffer, lloader7, lloader6, rloader6, rloader7, l7, l6s, r6s, r7);
+		RenderHelper.addFace(buffer, lloader8, lloader7, rloader7, rloader8, l8, l7, r7, r8);
+		RenderHelper.addFace(buffer, lloader9, lloader8, rloader8, rloader9, l9, l8, r8, r9);
+		RenderHelper.addFace(buffer, lloader10, lloader9, rloader9, rloader10, l10, l9, r9, r10);
+		RenderHelper.addFace(buffer, lloader11, lloader10, rloader10, rloader11, l11, l10, r10, r11);
+		RenderHelper.addFace(buffer, lloader12, lloader11, rloader11, rloader12, l12f, l11, r11, r12f);
 
-		RenderHelper.addFace(lloader1, lloader2, lloader11, lloader12, ls6, ls5, ls8, ls7);
-		RenderHelper.addFace(lloader2, lloader3, lloader10, lloader11, ls5, ls4, ls9, ls8);
-		RenderHelper.addFace(lloader3, lloader4, lloader9, lloader10, ls4, ls3, ls10, ls9);
-		RenderHelper.addFace(lloader4, lloader5, lloader8, lloader9, ls3, ls2, ls11, ls10);
-		RenderHelper.addFace(lloader5, lloader6, lloader7, lloader8, ls2, ls1, ls12, ls11);
+		RenderHelper.addFace(buffer, lloader1, lloader2, lloader11, lloader12, ls6, ls5, ls8, ls7);
+		RenderHelper.addFace(buffer, lloader2, lloader3, lloader10, lloader11, ls5, ls4, ls9, ls8);
+		RenderHelper.addFace(buffer, lloader3, lloader4, lloader9, lloader10, ls4, ls3, ls10, ls9);
+		RenderHelper.addFace(buffer, lloader4, lloader5, lloader8, lloader9, ls3, ls2, ls11, ls10);
+		RenderHelper.addFace(buffer, lloader5, lloader6, lloader7, lloader8, ls2, ls1, ls12, ls11);
 
-		RenderHelper.addFace(rloader2, rloader1, rloader12, rloader11, rs8, rs7, rs6, rs5);
-		RenderHelper.addFace(rloader3, rloader2, rloader11, rloader10, rs9, rs8, rs5, rs4);
-		RenderHelper.addFace(rloader4, rloader3, rloader10, rloader9, rs10, rs9, rs4, rs3);
-		RenderHelper.addFace(rloader5, rloader4, rloader9, rloader8, rs11, rs10, rs3, rs2);
-		RenderHelper.addFace(rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1);
-		GlStateManager.popMatrix();
+		RenderHelper.addFace(buffer, rloader2, rloader1, rloader12, rloader11, rs8, rs7, rs6, rs5);
+		RenderHelper.addFace(buffer, rloader3, rloader2, rloader11, rloader10, rs9, rs8, rs5, rs4);
+		RenderHelper.addFace(buffer, rloader4, rloader3, rloader10, rloader9, rs10, rs9, rs4, rs3);
+		RenderHelper.addFace(buffer, rloader5, rloader4, rloader9, rloader8, rs11, rs10, rs3, rs2);
+		RenderHelper.addFace(buffer, rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1);
+		matrices.pop();
 	}
 
 	Vertice	vfront1	= new Vertice(0.5f, 0.3125f, 0.3125f);
@@ -173,28 +167,22 @@ public class ModelObjective
 	Vertice	vcside4	= new Vertice(-0.125f, -0.3125f, -0.3125f);
 	Vertice	vcside5	= new Vertice(-0.125f, 0.3125f, -0.3125f);
 
-	public void renderB(float slide, float x, float y, float X, float Y)
+	public void renderB(MatrixStack matrices, VertexConsumer buffer, float slide, float x, float y, float X, float Y)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		GlStateManager.translate(slide, 0, 0);
-		addFace(vfront3, vfront4, vfront1, vfront2, x, y);
-		addFace(vcside3, vfront2, vfront1, vcside2, X, Y);
-		addFace(vcside5, vfront4, vfront3, vcside4, X, Y);
-		addFace(vcside2, vfront1, vfront4, vcside5, X, Y);
-		addFace(vcside4, vfront3, vfront2, vcside3, X, Y);
-		GlStateManager.popMatrix();
+		matrices.push();
+		matrices.translate(slide, 0, 0);
+		addFace(buffer, vfront3, vfront4, vfront1, vfront2, x, y);
+		addFace(buffer, vcside3, vfront2, vfront1, vcside2, X, Y);
+		addFace(buffer, vcside5, vfront4, vfront3, vcside4, X, Y);
+		addFace(buffer, vcside2, vfront1, vfront4, vcside5, X, Y);
+		addFace(buffer, vcside4, vfront3, vfront2, vcside3, X, Y);
+		matrices.pop();
 	}
 
-	private void addFace(Vertice v1, Vertice v2, Vertice v3, Vertice v4, float x, float y)
-	{
-		Tessellator t = Tessellator.getInstance();
-        BufferBuilder buffer = t.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+	private void addFace(VertexConsumer buffer, Vertice v1, Vertice v2, Vertice v3, Vertice v4, float x, float y) {
 		RenderHelper.addVertice(buffer, v1, new TextureVertice(x + 0.078125f, y + 0.15625f));
 		RenderHelper.addVertice(buffer, v2, new TextureVertice(x + 0.078125f, y - 0.15625f));
 		RenderHelper.addVertice(buffer, v3, new TextureVertice(x - 0.078125f, y - 0.15625f));
 		RenderHelper.addVertice(buffer, v4, new TextureVertice(x - 0.078125f, y + 0.15625f));
-		t.draw();
 	}
 }

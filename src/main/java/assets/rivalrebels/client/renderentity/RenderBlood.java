@@ -11,59 +11,42 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.entity.EntityBlood;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 
-public class RenderBlood extends Render
+public class RenderBlood extends EntityRenderer<EntityBlood>
 {
-    public RenderBlood(RenderManager renderManager) {
+    public RenderBlood(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-	public void doRender(Entity entity, double x, double y, double z, float f, float f1)
-	{
-		GlStateManager.enableLighting();
-		if (entity.ticksExisted > 1)
-		{
-			GlStateManager.pushMatrix();
-			GlStateManager.translate((float) x, (float) y, (float) z);
-			GlStateManager.scale(0.25F, 0.25F, 0.25F);
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etblood);
-			renderFaceMe();
-			GlStateManager.popMatrix();
-		}
+    public void render(EntityBlood entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		matrices.push();
+		matrices.scale(0.25F, 0.25F, 0.25F);
+        float var7 = 1.0F;
+        float var8 = 0.5F;
+        float var9 = 0.25F;
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntitySolid(getTexture(entity)));
+        matrices.multiply(new Quaternion((float) (180.0F - this.dispatcher.camera.getPos().getY()), 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternion((float) -this.dispatcher.camera.getPos().getX(), 1.0F, 0.0F, 0.0F));
+        buffer.vertex((0.0F - var8), (0.0F - var9), 0.0D).texture(0, 0).normal(0, 1, 0).next();
+        buffer.vertex((var7 - var8), (0.0F - var9), 0.0D).texture(1, 0).normal(0, 1, 0).next();
+        buffer.vertex((var7 - var8), (var7 - var9), 0.0D).texture(1, 1).normal(0, 1, 0).next();
+        buffer.vertex((0.0F - var8), (var7 - var9), 0.0D).texture(0, 1).normal(0, 1, 0).next();
+        matrices.pop();
 	}
 
-	private void renderFaceMe()
-	{
-		float var7 = 1.0F;
-		float var8 = 0.5F;
-		float var9 = 0.25F;
-		Tessellator t = Tessellator.getInstance();
-        BufferBuilder buffer = t.getBuffer();
-        GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(-this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-		buffer.pos((0.0F - var8), (0.0F - var9), 0.0D).tex(0, 0).normal(0, 1, 0).endVertex();
-		buffer.pos((var7 - var8), (0.0F - var9), 0.0D).tex(1, 0).normal(0, 1, 0).endVertex();
-		buffer.pos((var7 - var8), (var7 - var9), 0.0D).tex(1, 1).normal(0, 1, 0).endVertex();
-		buffer.pos((0.0F - var8), (var7 - var9), 0.0D).tex(0, 1).normal(0, 1, 0).endVertex();
-		t.draw();
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
+    @Override
+    public Identifier getTexture(EntityBlood entity) {
+		return RRIdentifiers.etblood;
 	}
 }

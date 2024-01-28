@@ -11,49 +11,45 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityTachyonBomb;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderTachyonBomb extends Render<EntityTachyonBomb> {
-    public static IModel bomb;
+@OnlyIn(Dist.CLIENT)
+public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
+    //public static IModel bomb;
 
-	public RenderTachyonBomb(RenderManager manager) {
+	public RenderTachyonBomb(EntityRendererFactory.Context manager) {
         super(manager);
         try {
-            bomb = OBJLoader.INSTANCE.loadModel(new ResourceLocation(RivalRebels.MODID, "models/t.obj"));
+            //bomb = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/t.obj"));
         } catch (Exception e) {
-            RivalRebels.LOGGER.error(e);
+            RivalRebels.LOGGER.error("Error loading model for tachyon bomb", e);
         }
     }
 
-	@Override
-	public void doRender(EntityTachyonBomb entity, double x, double y, double z, float par8, float par9)
-	{
-        GlStateManager.disableLighting();
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) x, (float) y, (float) z);
-        GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-        GlStateManager.rotate(entity.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-        // GlStateManager.rotate(90.0f, 1.0F, 0.0F, 0.0F);
-        GlStateManager.rotate(entity.rotationPitch, 0.0F, 0.0F, 1.0F);
-        Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettachyonbomb);
+    @Override
+    public void render(EntityTachyonBomb entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
+        matrices.multiply(new Quaternion(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+        // GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
+        matrices.multiply(new Quaternion(entity.getPitch(), 0.0F, 0.0F, 1.0F));
         //bomb.renderAll();
-        GlStateManager.popMatrix();
+        matrices.pop();
     }
 
-	@Override
-	protected ResourceLocation getEntityTexture(EntityTachyonBomb entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityTachyonBomb entity) {
+        return RRIdentifiers.ettachyonbomb;
+    }
 }

@@ -11,56 +11,57 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.particle.Particle;
-import net.minecraft.client.renderer.BufferBuilder;
+import assets.rivalrebels.RRIdentifiers;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.particle.ParticleTextureSheet;
+import net.minecraft.client.particle.SpriteBillboardParticle;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class EntityBloodFX extends Particle
-{
+@OnlyIn(Dist.CLIENT)
+public class EntityBloodFX extends SpriteBillboardParticle {
 	boolean	isBlood;
 
-	public EntityBloodFX(World w, double x, double y, double z, boolean b)
+	public EntityBloodFX(ClientWorld w, double x, double y, double z, boolean b)
 	{
-		this(w, x, y, z, w.rand.nextGaussian() * 0.1, w.rand.nextGaussian() * 0.1, w.rand.nextGaussian() * 0.1, b);
+		this(w, x, y, z, w.random.nextGaussian() * 0.1, w.random.nextGaussian() * 0.1, w.random.nextGaussian() * 0.1, b);
 	}
 
-	public EntityBloodFX(World w, double x, double y, double z, double r, double g, double b, boolean bl)
-	{
+	public EntityBloodFX(ClientWorld w, double x, double y, double z, double r, double g, double b, boolean bl) {
 		super(w, x, y, z, r, g, b);
 
-		posX = x;
-		posY = y;
-		posZ = z;
-		motionX = r;
-		motionY = g;
-		motionZ = b;
-		particleGravity = 0.75F;
-		particleMaxAge = 20;
+		velocityX = r;
+		velocityY = g;
+		velocityZ = b;
+		gravityStrength = 0.75F;
+		maxAge = 20;
 		isBlood = bl;
+        setSprite(MinecraftClient.getInstance().getSpriteAtlas(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE).apply(isBlood ? RRIdentifiers.etblood : RRIdentifiers.etgoo));
 	}
 
-	public EntityBloodFX(World w, EntityGore g, boolean b)
+	public EntityBloodFX(ClientWorld w, EntityGore g, boolean b)
 	{
-		this(w, g.posX, g.posY, g.posZ, b);
+		this(w, g.getX(), g.getY(), g.getZ(), b);
 	}
 
     @Override
-    public void renderParticle(BufferBuilder buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-		Minecraft.getMinecraft().renderEngine.bindTexture(isBlood ? RivalRebels.etblood : RivalRebels.etgoo);
-		float f10 = 0.1F * this.particleScale;
+    public ParticleTextureSheet getType() {
+        return ParticleTextureSheet.PARTICLE_SHEET_OPAQUE;
+    }
 
-		float f11 = (float) (prevPosX + (posX - prevPosX) * partialTicks - interpPosX);
-		float f12 = (float) (prevPosY + (posY - prevPosY) * partialTicks - interpPosY);
-		float f13 = (float) (prevPosZ + (posZ - prevPosZ) * partialTicks - interpPosZ);
-		buffer.pos(f11 - rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 - rotationYZ * f10 - rotationXZ * f10).tex(1, 1).color(1, 1, 1, 1).endVertex();
-		buffer.pos(f11 - rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 - rotationYZ * f10 + rotationXZ * f10).tex(1, 0).color(1, 1, 1, 1).endVertex();
-		buffer.pos(f11 + rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 + rotationYZ * f10 + rotationXZ * f10).tex(0, 0).color(1, 1, 1, 1).endVertex();
-		buffer.pos(f11 + rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 + rotationYZ * f10 - rotationXZ * f10).tex(0, 1).color(1, 1, 1, 1).endVertex();
+    public void renderParticle(VertexConsumer buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
+		float f10 = 0.1F * this.scale;
+
+		float f11 = (float) (prevPosX + (x - prevPosX) * partialTicks /*- interpPosX*/);
+		float f12 = (float) (prevPosY + (y - prevPosY) * partialTicks /*- interpPosY*/);
+		float f13 = (float) (prevPosZ + (z - prevPosZ) * partialTicks /*- interpPosZ*/);
+		buffer.vertex(f11 - rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 - rotationYZ * f10 - rotationXZ * f10).texture(1, 1).color(1, 1, 1, 1).next();
+		buffer.vertex(f11 - rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 - rotationYZ * f10 + rotationXZ * f10).texture(1, 0).color(1, 1, 1, 1).next();
+		buffer.vertex(f11 + rotationX * f10 + rotationXY * f10, f12 + rotationZ * f10, f13 + rotationYZ * f10 + rotationXZ * f10).texture(0, 0).color(1, 1, 1, 1).next();
+		buffer.vertex(f11 + rotationX * f10 - rotationXY * f10, f12 - rotationZ * f10, f13 + rotationYZ * f10 - rotationXZ * f10).texture(0, 1).color(1, 1, 1, 1).next();
 	}
 }

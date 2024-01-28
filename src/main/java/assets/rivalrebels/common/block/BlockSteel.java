@@ -12,89 +12,55 @@
 package assets.rivalrebels.common.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
-public class BlockSteel extends Block
-{
-	public BlockSteel()
+public class BlockSteel extends Block {
+	public BlockSteel(Settings settings)
 	{
-		super(Material.IRON);
+		super(settings);
 	}
 
-	/*@Override
-	public int getRenderType()
-	{
-		return 485;
-	}*/
-
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
         float f = 0.0625F;
-        return new AxisAlignedBB(x + f, y + f, z + f, (x + 1) - f, (float) y + 1, (z + 1) - f);
+        return VoxelShapes.cuboid(new Box(x + f, y + f, z + f, (x + 1) - f, (float) y + 1, (z + 1) - f));
     }
 
     @Override
-    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if (entity.isSneaking() && !entity.collidedHorizontally)
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+		if (entity.isSneaking() && !entity.horizontalCollision)
 		{
-			entity.motionY = 0.08;
+            entity.setVelocity(entity.getVelocity().getX(), 0.08, entity.getVelocity().getZ());
 			entity.fallDistance = 0;
 		}
-		else if (entity.collidedHorizontally)
+		else if (entity.horizontalCollision)
 		{
-			entity.motionY = 0.25;
+            entity.setVelocity(entity.getVelocity().getX(), 0.25, entity.getVelocity().getZ());
 			entity.fallDistance = 0;
 		}
-		else if (entity.onGround)
+		else if (entity.isOnGround())
 		{
 		}
-		else if (entity.collidedVertically)
+		else if (entity.verticalCollision)
 		{
-			entity.motionY = 0.08;
+			entity.setVelocity(entity.getVelocity().getX(), 0.08, entity.getVelocity().getZ());
 			entity.fallDistance = 0;
 		}
 		else
 		{
-			entity.motionY = -0.1;
+            entity.setVelocity(entity.getVelocity().getX(), -0.1, entity.getVelocity().getZ());
 			entity.fallDistance = 0;
 		}
 	}
-
-	@Override
-	public boolean hasTileEntity(IBlockState state)
-	{
-		return true;
-	}
-
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:bx");
-	}*/
 }

@@ -11,31 +11,39 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.packet.EntityGorePacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class EntityGore extends EntityInanimate
-{
-	protected boolean		inGround;
+import javax.annotation.Nullable;
+import java.util.Optional;
+import java.util.UUID;
+
+public class EntityGore extends EntityInanimate {
+    public static final TrackedData<Integer> MOB = DataTracker.registerData(EntityGore.class, TrackedDataHandlerRegistry.INTEGER);
+    public static final TrackedData<Integer> TYPE_OF_GORE = DataTracker.registerData(EntityGore.class, TrackedDataHandlerRegistry.INTEGER);
+    public static final TrackedData<Float> SIZE = DataTracker.registerData(EntityGore.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Boolean> IS_GREEN = DataTracker.registerData(EntityGore.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public static final TrackedData<Optional<UUID>> OWNER = DataTracker.registerData(EntityGore.class, TrackedDataHandlerRegistry.OPTIONAL_UUID);
+    protected boolean		inGround;
 	public Entity			origin;
-	public String			username	= "Steve";
-	private int				ticksExisted;
-	private boolean			isSliding	= false;
-	public int				type		= 0;
-	public int				mob			= -1;
-	private int				slideCount	= 0;
+    private boolean			isSliding	= false;
+    private int				slideCount	= 0;
 	float					x			= 0;
 	float					y			= 0;
 	float					z			= 0;
@@ -45,187 +53,193 @@ public class EntityGore extends EntityInanimate
 	float					motionpitch	= 0;
 	int						pitchLock	= 0;
 	float					offset		= 0;
-	public double			size		= 0;
-	public boolean			greenblood	= false;
-	// @SideOnly(Side.CLIENT)
-	public ResourceLocation	playerSkin	= null;
+    // @OnlyIn(Dist.CLIENT)
+	public Identifier	playerSkin	= null;
 	private int				bounces		= -1;
+
+    public EntityGore(EntityType<? extends EntityGore> type, World world) {
+        super(type, world);
+    }
 
 	public EntityGore(World par1World)
 	{
-		super(par1World);
-		setSize(0.25F, 0.25F);
+		this(RREntities.GORE, par1World);
 	}
 	public EntityGore(World par1World, double x, double y,double z, double mx, double my, double mz, int Type, int Mob)
 	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+		this(par1World);
 		setPosition(x,y,z);
 		setAnglesMotion(mx, my, mz);
-		type = Type;
-		mob = Mob;
+		setTypeOfGore(Type);
+		setMob(Mob);
 	}
 
-	public void setAnglesMotion(double mx, double my, double mz)
+    public void setMob(int mob) {
+        dataTracker.set(MOB, mob);
+    }
+
+    public int getMob() {
+        return dataTracker.get(MOB);
+    }
+
+    public boolean isGreen() {
+        return dataTracker.get(IS_GREEN);
+    }
+
+    public void setGreen(boolean green) {
+        dataTracker.set(IS_GREEN, green);
+    }
+
+    public void setAnglesMotion(double mx, double my, double mz)
 	{
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
+        setVelocity(mx, my, mz);
+		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
-	public EntityGore(World par1World, Entity toBeGibbed, int Type, int Mob)
+	public EntityGore(World par1World, Entity toBeGibbed, int Type, int mob)
 	{
-		super(par1World);
-		setSize(0.25F, 0.25F);
+		this(par1World);
 		origin = toBeGibbed;
 		isSliding = false;
 		slideCount = 0;
 		bounces = -1;
 		pitchLock = 0;
-		type = Type;
-		greenblood = false;
-		mob = Mob;
-		if (Mob == 0)
+		setTypeOfGore(Type);
+		setGreen(false);
+		setMob(mob);
+		if (mob == 0)
 		{
-			username = origin.getName();
+            setOwner(origin instanceof PlayerEntity player ? player.getGameProfile().getId() : null);
 			setBiped(0);
 		}
-		else if (Mob == 1)
-		{
-			setBiped(0);
-		}
-		else if (Mob == 2)
+		else if (mob == 1)
 		{
 			setBiped(0);
 		}
-		else if (Mob == 3)
+		else if (mob == 2)
+		{
+			setBiped(0);
+		}
+		else if (mob == 3)
 		{
 			setBiped(1);
-			greenblood = true;
+			setGreen(true);
 		}
-		else if (Mob == 4)
+		else if (mob == 4)
 		{
 			setBiped(2);
 		}
-		else if (Mob == 5)
+		else if (mob == 5)
 		{
 			setQuadruped();
-			greenblood = true;
+			setGreen(true);
 		}
-		else if (Mob == 6)
+		else if (mob == 6)
 		{
 			setNoped();
-			greenblood = true;
+			setGreen(true);
 		}
-		else if (Mob == 7)
+		else if (mob == 7)
 		{
 			setNoped();
 		}
-		else if (Mob == 8)
+		else if (mob == 8)
 		{
 			setOctoped(0);
 		}
-		else if (Mob == 9)
+		else if (mob == 9)
 		{
 			setOctoped(1);
-			greenblood = true;
+			setGreen(true);
 		}
-		else if (Mob == 10)
+		else if (mob == 10)
 		{
 			setOctoped(2);
 		}
-		else if (Mob == 11)
+		else if (mob == 11)
 		{
-			size = origin.getEntityBoundingBox().getAverageEdgeLength();
-			if (size > 2 || size < 1) greenblood = true;
+			setSize((float) origin.getBoundingBox().getAverageSideLength());
+			if (getSize() > 2 || getSize() < 1) setGreen(true);
 			setDefault();
 		}
 
-		motionyaw = (float) ((rand.nextDouble() - 0.5) * 135);
-		motionpitch = (float) ((rand.nextDouble() - 0.5) * 135);
+		motionyaw = (float) ((random.nextDouble() - 0.5) * 135);
+		motionpitch = (float) ((random.nextDouble() - 0.5) * 135);
 
-		setLocationAndAngles(toBeGibbed.posX + x, toBeGibbed.posY + y, toBeGibbed.posZ + z, rotYaw, rotPitch);
-		setPosition(posX, posY, posZ);
+		refreshPositionAndAngles(toBeGibbed.getX() + x, toBeGibbed.getY() + y, toBeGibbed.getZ() + z, rotYaw, rotPitch);
+		setPosition(getX(), getY(), getZ());
 		shoot(0.3f);
 	}
 
 	private void setNoped()
 	{
-		if (type == 0)
-		{
-			y = origin.getEyeHeight();
+		if (getTypeOfGore() == 0) {
+			y = origin.getEyeHeight(origin.getPose());
 			offset = 0.5f;
-		}
-		if (type == 1)
-		{
-			y = origin.getEyeHeight();
+		} else if (getTypeOfGore() == 1) {
+			y = origin.getEyeHeight(origin.getPose());
 			offset = 0.25F;
 		}
-		rotYaw = origin.rotationYaw;
+		rotYaw = origin.getYaw();
 	}
 
-	private void setBiped(int thin)
+    public int getTypeOfGore() {
+        return dataTracker.get(TYPE_OF_GORE);
+    }
+
+    public void setTypeOfGore(int type) {
+        dataTracker.set(TYPE_OF_GORE, type);
+    }
+
+    private void setBiped(int thin)
 	{
-		if (type == 0)
-		{
-			y = origin.getEyeHeight() + 0.20f;
+		if (getTypeOfGore() == 0) {
+			y = origin.getEyeHeight(origin.getPose()) + 0.20f;
 			offset = 0.25f;
-			rotYaw = origin.rotationYaw;
-			rotPitch = origin.rotationPitch;
-		}
-		if (type == 1)
-		{
+			rotYaw = origin.getYaw();
+			rotPitch = origin.getPitch();
+		} else if (getTypeOfGore() == 1) {
 			if (thin == 2) y = 2f;
 			else y = 1.1f;
 			offset = 0.125F;
-			rotYaw = origin.rotationYaw;
-		}
-		if (type == 2)
-		{
-			x = (float) rand.nextDouble() - 0.5f;
+			rotYaw = origin.getYaw();
+		} else if (getTypeOfGore() == 2) {
+			x = (float) random.nextDouble() - 0.5f;
 			if (thin == 2) y = 1.6f;
 			else y = 1.1f;
-			z = (float) rand.nextDouble() - 0.5f;
+			z = (float) random.nextDouble() - 0.5f;
 			if (thin == 0) offset = 0.125F;
 			else offset = 0.0625F;
-			rotYaw = origin.rotationYaw;
-		}
-		if (type == 3)
-		{
-			x = (float) rand.nextDouble() - 0.5f;
+			rotYaw = origin.getYaw();
+		} else if (getTypeOfGore() == 3) {
+			x = (float) random.nextDouble() - 0.5f;
 			if (thin == 2) y = 0.95f;
 			else y = 0.35f;
-			z = (float) rand.nextDouble() - 0.5f;
+			z = (float) random.nextDouble() - 0.5f;
 			if (thin == 0) offset = 0.125F;
 			else offset = 0.0625F;
-			rotYaw = origin.rotationYaw;
+			rotYaw = origin.getYaw();
 		}
 	}
 
 	private void setQuadruped()
 	{
-		if (type == 0)
-		{
-			y = origin.getEyeHeight();
+		if (getTypeOfGore() == 0) {
+			y = origin.getEyeHeight(origin.getPose());
 			offset = 0.25f;
-			rotYaw = origin.rotationYaw;
-			rotPitch = origin.rotationPitch;
-		}
-		if (type == 1)
-		{
+			rotYaw = origin.getYaw();
+			rotPitch = origin.getPitch();
+		} else if (getTypeOfGore() == 1) {
 			y = 0.875f;
 			offset = 0.125F;
-			rotYaw = origin.rotationYaw;
-		}
-		if (type == 3)
-		{
-			x = (float) (rand.nextDouble() - 0.5);
+			rotYaw = origin.getYaw();
+		} else if (getTypeOfGore() == 3) {
+			x = (float) (random.nextDouble() - 0.5);
 			y = 0.25f;
-			z = (float) (rand.nextDouble() - 0.5);
+			z = (float) (random.nextDouble() - 0.5);
 			offset = 0.125F;
-			rotYaw = origin.rotationYaw;
+			rotYaw = origin.getYaw();
 		}
 	}
 
@@ -235,44 +249,37 @@ public class EntityGore extends EntityInanimate
 		{
 			float scale = 1f;
 			if (mode == 1) scale = 0.666f;
-			if (type == 0)
+			if (getTypeOfGore() == 0)
 			{
-				y = origin.getEyeHeight();
+				y = origin.getEyeHeight(origin.getPose());
 				offset = 0.25f * scale;
-				rotYaw = origin.rotationYaw;
-				rotPitch = origin.rotationPitch;
-			}
-			if (type == 1)
-			{
-				x = (float) (rand.nextDouble() - 0.5f) * scale;
+				rotYaw = origin.getYaw();
+				rotPitch = origin.getPitch();
+			} else if (getTypeOfGore() == 1) {
+				x = (float) (random.nextDouble() - 0.5f) * scale;
 				y = 0.25f * scale;
-				z = (float) (rand.nextDouble() - 0.5f) * scale;
+				z = (float) (random.nextDouble() - 0.5f) * scale;
 				offset = 0.1F * scale;
-				rotYaw = origin.rotationYaw;
-			}
-			if (type == 3)
-			{
-				x = (float) (rand.nextDouble() - 0.5f) * scale;
+				rotYaw = origin.getYaw();
+			} else if (getTypeOfGore() == 3) {
+				x = (float) (random.nextDouble() - 0.5f) * scale;
 				y = 0.25f * scale;
-				z = (float) (rand.nextDouble() - 0.5f) * scale;
+				z = (float) (random.nextDouble() - 0.5f) * scale;
 				offset = 0.0625F * scale;
-				rotYaw = (float) (rand.nextDouble() * 360);
+				rotYaw = (float) (random.nextDouble() * 360);
 				rotPitch = 25;
 			}
 		}
 		else
 		{
-			if (type == 0)
-			{
-				y = origin.getEyeHeight();
+			if (getTypeOfGore() == 0) {
+				y = origin.getEyeHeight(origin.getPose());
 				offset = 1.5f;
-				rotYaw = origin.rotationYaw;
-				rotPitch = origin.rotationPitch;
-			}
-			if (type == 3)
-			{
-				x = (float) (rand.nextDouble() - 0.5f) * 4f;
-				z = (float) (rand.nextDouble() - 0.5f) * 4f;
+				rotYaw = origin.getYaw();
+				rotPitch = origin.getPitch();
+			} else if (getTypeOfGore() == 3) {
+				x = (float) (random.nextDouble() - 0.5f) * 4f;
+				z = (float) (random.nextDouble() - 0.5f) * 4f;
 				offset = 0.125F;
 			}
 		}
@@ -280,119 +287,115 @@ public class EntityGore extends EntityInanimate
 
 	private void setDefault()
 	{
-		if (type == 0)
-		{
-			y = origin.getEyeHeight() + 0.20f;
-			offset = 0.25f;
-			rotYaw = origin.rotationYaw;
-			rotPitch = origin.rotationPitch;
-		}
-		if (type == 1)
-		{
-			y = origin.getEyeHeight() / 2;
-			offset = 0.125F;
-			rotYaw = origin.rotationYaw;
-		}
-		if (type == 2)
-		{
-			x = (float) ((rand.nextDouble() - 0.5f) * size);
-			y = origin.getEyeHeight() / 2;
-			z = (float) ((rand.nextDouble() - 0.5f) * size);
-			offset = 0.0625F;
-			rotYaw = origin.rotationYaw;
-		}
-		if (type == 3)
-		{
-			x = (float) ((rand.nextDouble() - 0.5f) * size);
-			y = origin.getEyeHeight() / 4;
-			z = (float) ((rand.nextDouble() - 0.5f) * size);
-			offset = 0.0625F;
-			rotYaw = origin.rotationYaw;
-		}
+        if (getTypeOfGore() == 0) {
+            y = origin.getEyeHeight(origin.getPose()) + 0.20f;
+            offset = 0.25f;
+            rotYaw = origin.getYaw();
+            rotPitch = origin.getPitch();
+        } else if (getTypeOfGore() == 1) {
+            y = origin.getEyeHeight(origin.getPose()) / 2;
+            offset = 0.125F;
+            rotYaw = origin.getYaw();
+        } else if (getTypeOfGore() == 2) {
+            x = (float) ((random.nextDouble() - 0.5f) * getSize());
+            y = origin.getEyeHeight(origin.getPose()) / 2;
+            z = (float) ((random.nextDouble() - 0.5f) * getSize());
+            offset = 0.0625F;
+            rotYaw = origin.getYaw();
+        } else if (getTypeOfGore() == 3) {
+            x = (float) ((random.nextDouble() - 0.5f) * getSize());
+            y = origin.getEyeHeight(origin.getPose()) / 4;
+            z = (float) ((random.nextDouble() - 0.5f) * getSize());
+            offset = 0.0625F;
+            rotYaw = origin.getYaw();
+        }
 	}
 
-	public void shoot(float par7)
+    public float getSize() {
+        return dataTracker.get(SIZE);
+    }
+
+    public void setSize(float size) {
+        dataTracker.set(SIZE, size);
+    }
+
+    public void shoot(float par7)
 	{
-		motionX = rand.nextGaussian() * par7;
-		motionY = Math.abs(rand.nextGaussian() * par7);
-		motionZ = rand.nextGaussian() * par7;
+		setVelocity(random.nextGaussian() * par7,
+            Math.abs(random.nextGaussian() * par7),
+            random.nextGaussian() * par7);
 	}
+
+    @Nullable
+    public UUID getOwner() {
+        return dataTracker.get(OWNER).orElse(null);
+    }
+
+    public void setOwner(@Nullable UUID owner) {
+        dataTracker.set(OWNER, Optional.ofNullable(owner));
+    }
 
 	@Override
-	public void onUpdate()
+	public void tick()
 	{
-		if (ticksExisted == 0)
-		{
-            if (!world.isRemote)
-			{
-				PacketDispatcher.packetsys.sendToAll(new EntityGorePacket(this));
-			}
-		}
-
-		if (playerSkin == null && world.isRemote && !username.equals("Steve"))
-		{
-            for (EntityPlayer player : world.playerEntities) {
-                if (player.getName().equals(username)) {
-                    AbstractClientPlayer acp = (AbstractClientPlayer) player;
-                    playerSkin = acp.getLocationSkin();
+		if (playerSkin == null && world.isClient && getOwner() != null) {
+            for (PlayerEntity player : world.getPlayers()) {
+                if (player.getGameProfile().getId().equals(getOwner())) {
+                    AbstractClientPlayerEntity acp = (AbstractClientPlayerEntity) player;
+                    playerSkin = acp.getSkinTexture();
                 }
             }
 		}
 
-		++ticksExisted;
+		++age;
 
-		super.onUpdate();
+		super.tick();
 
 		if (inGround)
 		{
 			inGround = false;
-			motionX *= (rand.nextFloat() * 0.2F);
-			motionY *= (rand.nextFloat() * 0.2F);
-			motionZ *= (rand.nextFloat() * 0.2F);
+            setVelocity(getVelocity().multiply(random.nextFloat() * 0.2F,
+                random.nextFloat() * 0.2F,
+                random.nextFloat() * 0.2F));
 		}
 		if (isSliding)
 		{
 			slideCount++;
-			if (slideCount == 140) setDead();
+			if (slideCount == 140) kill();
 		}
 
-		Vec3d vec3 = new Vec3d(posX, posY, posZ);
-		Vec3d vec31 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult movingobjectposition = world.rayTraceBlocks(vec3, vec31);
-		vec3 = new Vec3d(posX, posY, posZ);
-		vec31 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3d vec3 = getPos();
+		Vec3d vec31 = getPos().add(getVelocity());
+		BlockHitResult hitResult = world.raycast(new RaycastContext(vec3, vec31, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
-		if (movingobjectposition != null)
+		if (hitResult != null)
 		{
 			isSliding = true;
-			posY = movingobjectposition.hitVec.y + offset;
+            setPos(getX(), hitResult.getPos().getY() + offset, getZ());
 		}
 
-		rotationPitch += motionpitch;
-		rotationYaw += motionyaw;
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
+		setPitch(getPitch() + motionpitch);
+        setYaw(getYaw() + motionyaw);
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
 
-		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.5F;
-		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.5F;
+		setPitch(prevPitch + (getPitch() - prevPitch) * 0.5F);
+		setYaw(prevYaw + (getYaw() - prevYaw) * 0.5F);
 
 		float f2 = 0.99F;
 		float f3 = 0.05F;
 
-		if (isInWater())
+		if (isInsideWaterOrBubbleColumn())
 		{
-			// for (int k = 0; k < 4; ++k)
-			// {
-			// float f4 = 0.25F;
-			// world.spawnParticle("bubble", posX - motionX * (double)f4, posY - motionY * (double)f4, posZ - motionZ * (double)f4, motionX, motionY, motionZ);
-			// }
+            for (int k = 0; k < 4; ++k) {
+                float f4 = 0.25F;
+                world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * (double)f4, getY() - getVelocity().getY() * (double)f4, getZ() - getVelocity().getZ() * (double)f4, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
+            }
 
 			f2 = 0.9F;
 		}
 		else if (!isSliding)
 		{
-			if (world.isRemote && RivalRebels.goreEnabled)
+			if (world.isClient && RRConfig.CLIENT.isGoreEnabled())
 			{
 				spawnBlood();
 			}
@@ -404,70 +407,70 @@ public class EntityGore extends EntityInanimate
 
 		motionpitch *= (double) f2;
 		motionyaw *= (double) f2;
-		motionX *= f2;
-		motionY *= f2;
-		motionZ *= f2;
-		motionY -= f3;
+        setVelocity(getVelocity().multiply(f2));
+        setVelocity(getVelocity().subtract(0, f3, 0));
 
-		if (isSliding == true)
+		if (isSliding)
 		{
-			if (bounces == -1) bounces = world.rand.nextInt(2) + 2;
+			if (bounces == -1) bounces = world.random.nextInt(2) + 2;
 			if (bounces > 0)
 			{
 				bounces--;
-				motionY *= -((rand.nextDouble() * 0.5) + 0.35);
+                setVelocity(getVelocity().multiply(1, -((random.nextDouble() * 0.5) + 0.35), 1));
 				isSliding = false;
 				slideCount = 0;
-				pitchLock = (int) ((Math.ceil((rotationPitch / 90f))) * 90);
+				pitchLock = (int) ((Math.ceil((getPitch() / 90f))) * 90);
 			}
-			else motionY = 0;
+			else setVelocity(getVelocity().getX(), 0, getVelocity().getZ());
 			motionpitch = 0;
-			rotationPitch = pitchLock;
+			setPitch(pitchLock);
 		}
 
-		setPosition(posX, posY, posZ);
+		setPosition(getX(), getY(), getZ());
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	private void spawnBlood()
 	{
 		for (int i = 0; i < 3; ++i)
 		{
-			RivalRebels.proxy.spawnGore(world, this, !greenblood);
+			RivalRebels.proxy.spawnGore(world, this, !isGreen());
 		}
 	}
 
-	public static byte[] getBytesString(String str)
-	{
-		char[] buffer = str.toCharArray();
-		byte[] bytes = new byte[buffer.length];
-		for (int i = 0; i < bytes.length; i++)
-		{
-			bytes[i] = (byte) buffer[i];
-		}
-		return bytes;
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public boolean isInRangeToRenderDist(double par1)
+    @Override
+	@OnlyIn(Dist.CLIENT)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-	{
-		par1NBTTagCompound.setByte("Mob", (byte) mob);
-		par1NBTTagCompound.setByte("Type", (byte) type);
-		par1NBTTagCompound.setByte("Green", (byte) (greenblood ? 1 : 0));
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+		nbt.putInt("Mob", getMob());
+		nbt.putInt("TypeOfGore", getTypeOfGore());
+		nbt.putBoolean("Green", isGreen());
+        if (getOwner() != null) {
+            nbt.putUuid("owner", getOwner());
+        }
 	}
 
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
-		mob = par1NBTTagCompound.getByte("Mob") & 255;
-		type = par1NBTTagCompound.getByte("Type") & 255;
-		greenblood = par1NBTTagCompound.getByte("Green") == 1;
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+		setMob(nbt.getInt("Mob"));
+		setTypeOfGore(nbt.getInt("TypeOfGore"));
+		setGreen(nbt.getBoolean("Green"));
+        if (nbt.contains("owner")) {
+            setOwner(nbt.getUuid("owner"));
+        }
 	}
+
+    @Override
+    protected void initDataTracker() {
+        dataTracker.startTracking(MOB, -1);
+        dataTracker.startTracking(TYPE_OF_GORE, 0);
+        dataTracker.startTracking(SIZE, 0F);
+        dataTracker.startTracking(IS_GREEN, false);
+        dataTracker.startTracking(OWNER, Optional.empty());
+    }
 }

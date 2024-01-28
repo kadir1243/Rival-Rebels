@@ -15,7 +15,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
 
 public class ModelAstroBlasterBarrel
 {
@@ -30,28 +32,26 @@ public class ModelAstroBlasterBarrel
 	private float	cos			= (float) Math.cos(deg);
 	private float	add			= 360 / segments;
 
-	public void render()
+	public void render(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		GlStateManager.disableCull();
+		matrices.push();
 		for (float i = 0; i < segments; i++)
 		{
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate(add * i, 0, 1, 0);
+			matrices.push();
+			matrices.multiply(new Quaternion(add * i, 0, 1, 0));
 			for (int f = 1; f < barrelx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
 				TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
 				TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
 				TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
-				RenderHelper.addFace(new Vertice(0f, barrely[f], barrelx[f]),
+				RenderHelper.addFace(buffer, new Vertice(0f, barrely[f], barrelx[f]),
 						new Vertice(0f, barrely[f - 1], barrelx[f - 1]),
 						new Vertice(barrelx[f - 1] * sin, barrely[f - 1], barrelx[f - 1] * cos),
 						new Vertice(barrelx[f] * sin, barrely[f], barrelx[f] * cos), t1, t2, t3, t4);
 			}
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }

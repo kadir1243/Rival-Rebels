@@ -11,173 +11,163 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityTNTPrimed;
-import net.minecraft.entity.monster.*;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityBat;
-import net.minecraft.entity.passive.EntitySquid;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.TntEntity;
+import net.minecraft.entity.mob.*;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.entity.passive.SquidEntity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Optional;
 
-public class EntityLaserBurst extends EntityInanimate
-{
-	private EntityPlayer	shooter;
+public class EntityLaserBurst extends EntityInanimate {
+	private LivingEntity shooter;
 
-	public EntityLaserBurst(World par1World)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+    public EntityLaserBurst(EntityType<? extends EntityLaserBurst> type, World world) {
+        super(type, world);
+    }
+
+	public EntityLaserBurst(World par1World) {
+		this(RREntities.LASER_BURST, par1World);
 	}
 
-	public EntityLaserBurst(World par1World, EntityPlayer player)
+	public EntityLaserBurst(World par1World, LivingEntity player)
 	{
-		super(par1World);
+		this(par1World);
 		shooter = player;
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(player.posX, player.posY + player.getEyeHeight(), player.posZ, player.rotationYaw, player.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		posY -= 0.12D;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		setPosition(posX, posY, posZ);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		setAccurateHeading(motionX, motionY, motionZ, 4F, 0.075f);
+		refreshPositionAndAngles(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYaw(), player.getPitch());
+        setPos(getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.2F),
+            getY() - 0.12D,
+            getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.2F));
+		setPosition(getX(), getY(), getZ());
+        setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+
+        setAccurateHeading(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 4F, 0.075f);
 	}
 
-	public EntityLaserBurst(World par1World, EntityPlayer player, boolean accurate)
+	public EntityLaserBurst(World par1World, PlayerEntity player, boolean accurate)
 	{
-		super(par1World);
+		this(par1World);
 		shooter = player;
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(player.posX, player.posY + player.getEyeHeight(), player.posZ, player.rotationYaw, player.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		posY -= 0.12D;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		setPosition(posX, posY, posZ);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		setAccurateHeading(motionX, motionY, motionZ, 4F * (float)rand.nextDouble() + 1.0F, accurate?0.001F:0.075F);
+		refreshPositionAndAngles(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYaw(), player.getPitch());
+        setPos(getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.2F),
+            getY() - 0.12D,
+            getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.2F));
+		setPosition(getX(), getY(), getZ());
+        setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+
+        setAccurateHeading(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 4F * (float)random.nextDouble() + 1.0F, accurate?0.001F:0.075F);
 	}
-	public EntityLaserBurst(World par1World, double x, double y,double z, double mx, double my, double mz)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+	public EntityLaserBurst(World par1World, double x, double y,double z, double mx, double my, double mz) {
+		this(par1World);
 		setPosition(x,y,z);
 		setAnglesMotion(mx, my, mz);
 	}
 
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
+        setVelocity(mx, my, mz);
+		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
-	public EntityLaserBurst(World par1World, double x, double y, double z, double mx, double my, double mz, EntityPlayer player)
+	public EntityLaserBurst(World par1World, double x, double y, double z, double mx, double my, double mz, LivingEntity player)
 	{
-		super(par1World);
+		this(par1World);
 		shooter = player;
-		setSize(0.5F, 0.5F);
 		setPosition(x, y, z);
-		motionX = mx;
-		motionZ = mz;
-		motionY = my;
+        setVelocity(mx, my, mz);
 	}
 
 	public void setAccurateHeading(double par1, double par3, double par5, float par7, float par8)
 	{
-		float var9 = MathHelper.sqrt(par1 * par1 + par3 * par3 + par5 * par5);
+		float var9 = MathHelper.sqrt((float) (par1 * par1 + par3 * par3 + par5 * par5));
 		par1 /= var9;
 		par3 /= var9;
 		par5 /= var9;
-		par1 += rand.nextGaussian() * par8;
-		par3 += rand.nextGaussian() * par8;
-		par5 += rand.nextGaussian() * par8;
+		par1 += random.nextGaussian() * par8;
+		par3 += random.nextGaussian() * par8;
+		par5 += random.nextGaussian() * par8;
 		par1 *= par7;
 		par3 *= par7;
 		par5 *= par7;
-		motionX = par1;
-		motionY = par3;
-		motionZ = par5;
-		float var10 = MathHelper.sqrt(par1 * par1 + par5 * par5);
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI);
+        setVelocity(par1, par3, par5);
+		float var10 = MathHelper.sqrt((float) (par1 * par1 + par5 * par5));
+		setYaw(prevYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI));
 	}
 
 	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000;
-	}
-
-	@Override
-	public float getBrightness()
+	public float getBrightnessAtEyes()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
-	@Override
-	public void onUpdate()
+    @Override
+	public void tick()
 	{
-		super.onUpdate();
+		super.tick();
 
-		++ticksExisted;
-		if (ticksExisted > 60) setDead();
+		++age;
+		if (age > 60) kill();
 
-		Vec3d var15 = new Vec3d(posX, posY, posZ);
-		Vec3d var2 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult var3 = world.rayTraceBlocks(var15, var2);
-		var15 = new Vec3d(posX, posY, posZ);
-		var2 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3d var15 = getPos();
+		Vec3d var2 = getPos().add(getVelocity());
+		HitResult var3 = world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		var15 = getPos();
+		var2 = getPos().add(getVelocity());
 
 		if (var3 != null)
 		{
-			var2 = var3.hitVec;
+			var2 = var3.getPos();
 		}
 
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			Entity var4 = null;
-			List<Entity> var5 = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.canBeCollidedWith() && var9 != shooter) {
+                if (var9.collides() && var9 != shooter) {
                     float var10 = 0.3F;
-                    AxisAlignedBB var11 = var9.getEntityBoundingBox().grow(var10, var10, var10);
-                    RayTraceResult var12 = var11.calculateIntercept(var15, var2);
+                    Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
+                    Optional<Vec3d> var12 = var11.raycast(var15, var2);
 
-                    if (var12 != null) {
-                        double var13 = var15.distanceTo(var12.hitVec);
+                    if (var12.isPresent()) {
+                        double var13 = var15.distanceTo(var12.get());
 
                         if (var13 < var6 || var6 == 0.0D) {
                             var4 = var9;
@@ -189,128 +179,123 @@ public class EntityLaserBurst extends EntityInanimate
 
 			if (var4 != null)
 			{
-				var3 = new RayTraceResult(var4);
+				var3 = new EntityHitResult(var4);
 			}
 		}
 
 		if (var3 != null)
 		{
-			if (var3.entityHit == null)
+			if (var3.getType() == HitResult.Type.BLOCK)
 			{
-				Block blockID = world.getBlockState(var3.getBlockPos()).getBlock();
-				if (blockID == Blocks.TNT)
-				{
-					if (!world.isRemote)
-					{
-						EntityTNTPrimed entitytntprimed = new EntityTNTPrimed(world, (var3.getBlockPos().getX() + 0.5F), (var3.getBlockPos().getY() + 0.5F), (var3.getBlockPos().getZ() + 0.5F), shooter);
-						entitytntprimed.setFuse(world.rand.nextInt(entitytntprimed.getFuse() / 4) + entitytntprimed.getFuse() / 8);
+                BlockPos pos = ((BlockHitResult) var3).getBlockPos();
+                BlockState state = world.getBlockState(pos);
+                Block block = state.getBlock();
+				if (block == Blocks.TNT) {
+					if (!world.isClient) {
+						TntEntity entitytntprimed = new TntEntity(world, (pos.getX() + 0.5F), (pos.getY() + 0.5F), (pos.getZ() + 0.5F), shooter);
+						entitytntprimed.setFuse(world.random.nextInt(entitytntprimed.getFuse() / 4) + entitytntprimed.getFuse() / 8);
 						world.spawnEntity(entitytntprimed);
-						world.setBlockToAir(var3.getBlockPos());
+						world.setBlockState(pos, Blocks.AIR.getDefaultState());
 					}
+				} else if (block == RRBlocks.remotecharge) {
+					state.onBlockExploded(world, pos, null);
+				} else if (block == RRBlocks.timedbomb) {
+					state.onBlockExploded(world, pos, null);
 				}
-				if (blockID == RivalRebels.remotecharge)
-				{
-					RivalRebels.remotecharge.onBlockExploded(world, var3.getBlockPos(), null);
-				}
-				if (blockID == RivalRebels.timedbomb)
-				{
-					RivalRebels.timedbomb.onBlockExploded(world, var3.getBlockPos(), null);
-				}
-				setDead();
+				kill();
 			}
 			else
 			{
-				if (var3.entityHit instanceof EntityPlayer player && shooter != var3.entityHit) {
-                    NonNullList<ItemStack> armorSlots = player.inventory.armorInventory;
-					int i = world.rand.nextInt(4);
-					if (!armorSlots.get(i).isEmpty() && !world.isRemote)
+                Entity hitEntity = ((EntityHitResult) var3).getEntity();
+                if (hitEntity instanceof PlayerEntity player && shooter != hitEntity) {
+                    DefaultedList<ItemStack> armorSlots = player.getInventory().armor;
+					int i = world.random.nextInt(4);
+					if (!armorSlots.get(i).isEmpty() && !world.isClient)
 					{
-						armorSlots.get(i).damageItem(24, player);
+						armorSlots.get(i).damage(24, player, player1 -> {});
 					}
-					player.attackEntityFrom(RivalRebelsDamageSource.laserburst, 16);
-					if (player.getHealth() < 3 && player.isEntityAlive())
+					player.damage(RivalRebelsDamageSource.laserburst, 16);
+					if (player.getHealth() < 3 && player.isAlive())
 					{
-						player.attackEntityFrom(RivalRebelsDamageSource.laserburst, 2000000);
+						player.damage(RivalRebelsDamageSource.laserburst, 2000000);
 						player.deathTime = 0;
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 0, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 1, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 2, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 2, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 3, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 3, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 0, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 1, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 2, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 2, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 3, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 3, 0));
 					}
-					setDead();
+					kill();
 				}
-				else if ((var3.entityHit instanceof EntityLivingBase
-						&& !(var3.entityHit instanceof EntityAnimal)
-						&& !(var3.entityHit instanceof EntityBat)
-						&& !(var3.entityHit instanceof EntityVillager)
-						&& !(var3.entityHit instanceof EntitySquid)))
-				{
-					EntityLivingBase entity = (EntityLivingBase) var3.entityHit;
-					entity.attackEntityFrom(RivalRebelsDamageSource.laserburst, 6);
+				else if ((hitEntity instanceof LivingEntity entity
+						&& !(hitEntity instanceof AnimalEntity)
+						&& !(hitEntity instanceof BatEntity)
+						&& !(hitEntity instanceof VillagerEntity)
+						&& !(hitEntity instanceof SquidEntity))) {
+					entity.damage(RivalRebelsDamageSource.laserburst, 6);
 					if (entity.getHealth() < 3)
 					{
 						int legs = -1;
 						int arms = -1;
 						int mobs = -1;
-						entity.setDead();
+						entity.kill();
 						RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
-						if (entity instanceof EntityZombie && !(entity instanceof EntityPigZombie))
+						if (entity instanceof ZombieEntity && !(entity instanceof ZombifiedPiglinEntity))
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 1;
 						}
-						else if (entity instanceof EntityPigZombie)
+						else if (entity instanceof ZombifiedPiglinEntity)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 2;
 						}
-						else if (entity instanceof EntitySkeleton)
+						else if (entity instanceof SkeletonEntity)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 3;
 						}
-						else if (entity instanceof EntityEnderman)
+						else if (entity instanceof EndermanEntity)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 4;
 						}
-						else if (entity instanceof EntityCreeper)
+						else if (entity instanceof CreeperEntity)
 						{
 							legs = 4;
 							arms = 0;
 							mobs = 5;
 						}
-						else if (entity instanceof EntitySlime && !(entity instanceof EntityMagmaCube))
+                        else if (entity instanceof MagmaCubeEntity)
+                        {
+                            legs = 0;
+                            arms = 0;
+                            mobs = 7;
+                        }
+						else if (entity instanceof SlimeEntity)
 						{
 							legs = 0;
 							arms = 0;
 							mobs = 6;
 						}
-						else if (entity instanceof EntityMagmaCube)
-						{
-							legs = 0;
-							arms = 0;
-							mobs = 7;
-						}
-						else if (entity instanceof EntitySpider && !(entity instanceof EntityCaveSpider))
+						else if (entity instanceof SpiderEntity && !(entity instanceof CaveSpiderEntity))
 						{
 							legs = 8;
 							arms = 0;
 							mobs = 8;
 						}
-						else if (entity instanceof EntityCaveSpider)
+						else if (entity instanceof CaveSpiderEntity)
 						{
 							legs = 8;
 							arms = 0;
 							mobs = 9;
 						}
-						else if (entity instanceof EntityGhast)
+						else if (entity instanceof GhastEntity)
 						{
 							legs = 9;
 							arms = 0;
@@ -318,61 +303,59 @@ public class EntityLaserBurst extends EntityInanimate
 						}
 						else
 						{
-							legs = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
-							arms = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
+							legs = (int) (entity.getBoundingBox().getAverageSideLength() * 2);
+							arms = (int) (entity.getBoundingBox().getAverageSideLength() * 2);
 							mobs = 11;
 						}
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 0, mobs));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 1, mobs));
+						world.spawnEntity(new EntityGore(world, hitEntity, 0, mobs));
+						world.spawnEntity(new EntityGore(world, hitEntity, 1, mobs));
 						for (int i = 0; i < arms; i++)
-							world.spawnEntity(new EntityGore(world, var3.entityHit, 2, mobs));
+							world.spawnEntity(new EntityGore(world, hitEntity, 2, mobs));
 						for (int i = 0; i < legs; i++)
-							world.spawnEntity(new EntityGore(world, var3.entityHit, 3, mobs));
+							world.spawnEntity(new EntityGore(world, hitEntity, 3, mobs));
 					}
-					setDead();
+					kill();
 				}
-				else if((var3.entityHit instanceof EntityRhodesHead
-					  || var3.entityHit instanceof EntityRhodesLeftLowerArm
-				      || var3.entityHit instanceof EntityRhodesLeftLowerLeg
-				      || var3.entityHit instanceof EntityRhodesLeftUpperArm
-				      || var3.entityHit instanceof EntityRhodesLeftUpperLeg
-				      || var3.entityHit instanceof EntityRhodesRightLowerArm
-				      || var3.entityHit instanceof EntityRhodesRightLowerLeg
-				      || var3.entityHit instanceof EntityRhodesRightUpperArm
-				      || var3.entityHit instanceof EntityRhodesRightUpperLeg
-				      || var3.entityHit instanceof EntityRhodesTorso))
+				else if((hitEntity instanceof EntityRhodesHead
+					  || hitEntity instanceof EntityRhodesLeftLowerArm
+				      || hitEntity instanceof EntityRhodesLeftLowerLeg
+				      || hitEntity instanceof EntityRhodesLeftUpperArm
+				      || hitEntity instanceof EntityRhodesLeftUpperLeg
+				      || hitEntity instanceof EntityRhodesRightLowerArm
+				      || hitEntity instanceof EntityRhodesRightLowerLeg
+				      || hitEntity instanceof EntityRhodesRightUpperArm
+				      || hitEntity instanceof EntityRhodesRightUpperLeg
+				      || hitEntity instanceof EntityRhodesTorso))
 				{
-					var3.entityHit.attackEntityFrom(RivalRebelsDamageSource.laserburst, 6);
+					hitEntity.damage(RivalRebelsDamageSource.laserburst, 6);
 				}
 			}
 		}
 
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
-		float var16 = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
-		rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+		float var16 = MathHelper.sqrt((float) (getVelocity().getX() * getVelocity().getX() + getVelocity().getZ() * getVelocity().getZ()));
+		setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
 
-		for (rotationPitch = (float) (Math.atan2(motionY, var16) * 180.0D / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F)
+		for (setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); getPitch() - prevPitch < -180.0F; prevPitch -= 360.0F)
 		{
         }
-		while (rotationPitch - prevRotationPitch >= 180.0F)
+		while (getPitch() - prevPitch >= 180.0F)
 		{
-			prevRotationPitch += 360.0F;
+			prevPitch += 360.0F;
 		}
 
-		while (rotationYaw - prevRotationYaw < -180.0F)
+		while (getYaw() - prevYaw < -180.0F)
 		{
-			prevRotationYaw -= 360.0F;
+			prevYaw -= 360.0F;
 		}
 
-		while (rotationYaw - prevRotationYaw >= 180.0F)
+		while (getYaw() - prevYaw >= 180.0F)
 		{
-			prevRotationYaw += 360.0F;
+			prevYaw += 360.0F;
 		}
 
-		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2F;
-		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
-		setPosition(posX, posY, posZ);
+		setPitch(prevPitch + (getPitch() - prevPitch) * 0.2F);
+		setYaw(prevYaw + (getYaw() - prevYaw) * 0.2F);
+		setPosition(getX(), getY(), getZ());
 	}
 }

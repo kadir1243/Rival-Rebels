@@ -11,90 +11,56 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityMeltDown;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-public class BlockMeltDown extends BlockContainer {
-    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
-	public BlockMeltDown()
+public class BlockMeltDown extends BlockWithEntity {
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+	public BlockMeltDown(Settings settings)
 	{
-		super(Material.PORTAL);
-        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
+		super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(META);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
     }
 
-    @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(META, meta);
-    }
-    @Override
-    public BlockStateContainer getBlockState() {
-        return new BlockStateContainer(this, META);
-    }
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return null;
-    }
-
-    @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
-    }
-
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityMeltDown(pos, state);
 	}
-
-	@Override
-	public TileEntity createNewTileEntity(World var1, int var)
-	{
-		return new TileEntityMeltDown();
-	}
-
+    @Nullable
     @Override
-    public void onBlockAdded(World worldIn, BlockPos pos, IBlockState state) {
-        worldIn.scheduleBlockUpdate(pos, this, 1, 1);
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 
     @Override
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-		int meta = state.getValue(META);
-		if (meta < 14)
-		{
-			world.setBlockState(pos.up(2), state.withProperty(META, meta + 1), 2);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.createAndScheduleBlockTick(pos, this, 1);
+    }
+
+    @Override
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+		int meta = state.get(META);
+		if (meta < 14) {
+			world.setBlockState(pos.up(2), state.with(META, meta + 1), 2);
 		}
 	}
-
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
-	}*/
 }

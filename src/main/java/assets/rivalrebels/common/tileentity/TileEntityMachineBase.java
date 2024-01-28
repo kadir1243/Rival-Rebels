@@ -11,13 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.nbt.NbtCompound;
 import net.minecraft.util.math.BlockPos;
 
-public abstract class TileEntityMachineBase extends TileEntity implements ITickable
-{
+import java.util.HashMap;
+import java.util.Map;
+
+public abstract class TileEntityMachineBase extends BlockEntity implements Tickable {
+    public static final Map<BlockPos, TileEntityMachineBase> BLOCK_ENTITIES = new HashMap<>();
 	public float	pInM		= 0;
 	public float	pInR		= 0;
 	public float	edist		= 0;
@@ -25,35 +29,38 @@ public abstract class TileEntityMachineBase extends TileEntity implements ITicka
 	public float	powerGiven	= 0;
     public BlockPos pos = BlockPos.ORIGIN;
 
-	@Override
-	public void update() {
+    public TileEntityMachineBase(BlockEntityType<?> type, BlockPos pos, BlockState state) {
+        super(type, pos, state);
+
+        BLOCK_ENTITIES.put(pos, this);
+    }
+
+    @Override
+	public void tick() {
 		if (pInR > 0) pInR = powered(pInR, edist);
 		pInR -= decay;
 	}
 
-	@Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		super.readFromNBT(nbt);
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
         pos = BlockPos.fromLong(nbt.getLong("rpos"));
-		edist = nbt.getFloat("edist");
-	}
-
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-	{
-		super.writeToNBT(nbt);
-        nbt.setLong("rpos", pos.toLong());
-		nbt.setFloat("edist", edist);
-        return nbt;
+        edist = nbt.getFloat("edist");
     }
 
-	@Override
-	public void invalidate()
-	{
-		super.invalidate();
-		TileEntity connectedTo = world.getTileEntity(pos);
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+		super.writeNbt(nbt);
+        nbt.putLong("rpos", pos.asLong());
+		nbt.putFloat("edist", edist);
+    }
+
+    @Override
+    public void markRemoved() {
+        super.markRemoved();
+		BlockEntity connectedTo = world.getBlockEntity(pos);
 		if (connectedTo instanceof TileEntityReactor) ((TileEntityReactor)connectedTo).machines.remove(this);
+        BLOCK_ENTITIES.remove(getPos());
 	}
 
 	abstract public float powered(float power, float distance);

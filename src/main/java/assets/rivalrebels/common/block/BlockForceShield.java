@@ -11,48 +11,39 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import assets.rivalrebels.RivalRebels;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.EnumPushReaction;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
+import net.minecraft.block.piston.PistonBehavior;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
 public class BlockForceShield extends Block
 {
-	public BlockForceShield()
+	public BlockForceShield(Settings settings)
 	{
-		super(Material.IRON);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+		super(settings);
 	}
 
 	boolean	Destroy	= false;
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
-		Block id = world.getBlockState(pos).getBlock();
-		if (!Destroy && id != RivalRebels.fshield && id != RivalRebels.omegaobj && id != RivalRebels.sigmaobj && id != RivalRebels.reactive)
-		{
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+		Block id = state.getBlock();
+		if (!Destroy && id != RRBlocks.fshield && id != RRBlocks.omegaobj && id != RRBlocks.sigmaobj && id != RRBlocks.reactive) {
 			world.setBlockState(pos, state);
 		}
 		Destroy = false;
 	}
 
-    @Override
-    public void onBlockHarvested(World world, BlockPos pos, IBlockState state, EntityPlayer player) {
-		if (!world.isRemote && player.capabilities.isCreativeMode && player.isSneaking())
+    //@Override
+    public void onBlockHarvested(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+		if (!world.isClient && player.getAbilities().invulnerable && player.isSneaking())
 		{
 			Destroy = true;
-			world.setBlockToAir(pos);
+			world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		}
 		else
 		{
@@ -62,30 +53,7 @@ public class BlockForceShield extends Block
 	}
 
     @Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
+    public PistonBehavior getPistonBehavior(BlockState state) {
+        return PistonBehavior.BLOCK;
     }
-
-    @Override
-    public EnumPushReaction getPushReaction(IBlockState state) {
-        return EnumPushReaction.BLOCK;
-    }
-
-    /*@SideOnly(Side.CLIENT)
-	IIcon	icon1;
-	IIcon	icon2;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0 || side == 1) return icon2;
-		return icon1;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ao");
-		icon2 = iconregister.registerIcon("RivalRebels:ap");
-	}*/
 }

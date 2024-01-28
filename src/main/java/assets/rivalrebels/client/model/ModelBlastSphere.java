@@ -13,11 +13,13 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vector4f;
 
 public class ModelBlastSphere
 {
@@ -37,61 +39,44 @@ public class ModelBlastSphere
 	Vertice	vz2	= new Vertice(0.25f, 0.25f, 0.5f).normalize();
 	Vertice	vz3	= new Vertice(0, 0.25f, 0.75f).normalize();
 
-	public void renderModel(float size, float red, float green, float blue, float alpha)
+	public void renderModel(MatrixStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha)
 	{
-		renderModel(size, red, green, blue, alpha, true);
-	}
-
-	public void renderModel(float size, float red, float green, float blue, float alpha, boolean blend)
-	{
-		GlStateManager.pushMatrix();
-		GlStateManager.color(red, green, blue, alpha);
-		GlStateManager.scale(size, size, size);
-		GlStateManager.disableTexture2D();
-		GlStateManager.disableLighting();
-		if (blend)
-		{
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-		}
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+        matrices.push();
+        matrices.scale(size, size, size);
+        Vector4f color = new Vector4f(red, green, blue, alpha);
+        RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
         for (int i = 0; i < 2; i++)
 		{
-			GlStateManager.rotate(i * 180, 0, 0, 1);
+			matrices.multiply(new Quaternion(i * 180, 0, 0, 1));
 			for (int p = 0; p < 4; p++)
 			{
-				GlStateManager.pushMatrix();
-				GlStateManager.rotate(p * 90, 0, 1, 0);
+				matrices.push();
+				matrices.multiply(new Quaternion(p * 90, 0, 1, 0));
 
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-				RenderHelper.addTri(buffer, vy, vy1, vy3);
-				RenderHelper.addTri(buffer, vy1, vyz, vy2);
-				RenderHelper.addTri(buffer, vy3, vy2, vxy);
-				RenderHelper.addTri(buffer, vy1, vy2, vy3);
+				RenderHelper.addTri(buffer, vy, vy1, vy3, color);
+				RenderHelper.addTri(buffer, vy1, vyz, vy2, color);
+				RenderHelper.addTri(buffer, vy3, vy2, vxy, color);
+				RenderHelper.addTri(buffer, vy1, vy2, vy3, color);
 
-				RenderHelper.addTri(buffer, vx, vx1, vx3);
-				RenderHelper.addTri(buffer, vx1, vxy, vx2);
-				RenderHelper.addTri(buffer, vx3, vx2, vxz);
-				RenderHelper.addTri(buffer, vx1, vx2, vx3);
+				RenderHelper.addTri(buffer, vx, vx1, vx3, color);
+				RenderHelper.addTri(buffer, vx1, vxy, vx2, color);
+				RenderHelper.addTri(buffer, vx3, vx2, vxz, color);
+				RenderHelper.addTri(buffer, vx1, vx2, vx3, color);
 
-				RenderHelper.addTri(buffer, vz, vz1, vz3);
-				RenderHelper.addTri(buffer, vz1, vxz, vz2);
-				RenderHelper.addTri(buffer, vz3, vz2, vyz);
-				RenderHelper.addTri(buffer, vz1, vz2, vz3);
+				RenderHelper.addTri(buffer, vz, vz1, vz3, color);
+				RenderHelper.addTri(buffer, vz1, vxz, vz2, color);
+				RenderHelper.addTri(buffer, vz3, vz2, vyz, color);
+				RenderHelper.addTri(buffer, vz1, vz2, vz3, color);
 
-				RenderHelper.addTri(buffer, vyz, vz2, vy2);
-				RenderHelper.addTri(buffer, vxy, vy2, vx2);
-				RenderHelper.addTri(buffer, vxz, vx2, vz2);
-				RenderHelper.addTri(buffer, vx2, vy2, vz2);
-                tessellator.draw();
+				RenderHelper.addTri(buffer, vyz, vz2, vy2, color);
+				RenderHelper.addTri(buffer, vxy, vy2, vx2, color);
+				RenderHelper.addTri(buffer, vxz, vx2, vz2, color);
+				RenderHelper.addTri(buffer, vx2, vy2, vz2, color);
 
-				GlStateManager.popMatrix();
+				matrices.pop();
 			}
 		}
-		GlStateManager.enableLighting();
-		GlStateManager.enableTexture2D();
-		GlStateManager.disableBlend();
-		GlStateManager.popMatrix();
-	}
+        matrices.pop();
+    }
+
 }

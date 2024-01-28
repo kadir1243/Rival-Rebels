@@ -12,53 +12,40 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesLeftLowerArm;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3f;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderRhodesLeftLowerArm extends Render
+@OnlyIn(Dist.CLIENT)
+public class RenderRhodesLeftLowerArm extends EntityRenderer<EntityRhodesLeftLowerArm>
 {
-    public RenderRhodesLeftLowerArm(RenderManager renderManager) {
+    public RenderRhodesLeftLowerArm(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
 
-    public void renderRhodes(EntityRhodesLeftLowerArm rhodes, double x, double y, double z, float par8, float ptt)
-	{
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x, (float) y, (float) z);
-		GlStateManager.scale(rhodes.scale, rhodes.scale, rhodes.scale);
-		GlStateManager.color(RenderRhodes.colors[rhodes.color*3], RenderRhodes.colors[rhodes.color*3+1], RenderRhodes.colors[rhodes.color*3+2]);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RenderRhodes.texture);
-		GlStateManager.disableCull();
-		GlStateManager.rotate(rhodes.rotationYaw, 0, 1, 0);
-		GlStateManager.rotate(rhodes.rotationPitch, 1, 0, 0);
-		GlStateManager.translate(0, 4f, 0);
-		GlStateManager.scale(-1, 1, 1);
-		//RenderRhodes.lowerarm.renderAll();
-		//RenderRhodes.rocketlauncher.renderAll();
-		GlStateManager.popMatrix();
-	}
+    @Override
+    public void render(EntityRhodesLeftLowerArm entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
+        float[] colors = RenderRhodes.colors;
+        RenderSystem.setShaderColor(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2], 1);
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(entity.getYaw()));
+        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(entity.getPitch()));
+        matrices.translate(0, 4f, 0);
+        matrices.scale(-1, 1, 1);
+        //RenderRhodes.lowerarm.renderAll();
+        //RenderRhodes.rocketlauncher.renderAll();
+        matrices.pop();
+    }
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderRhodes((EntityRhodesLeftLowerArm) par1Entity, par2, par4, par6, par8, par9);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityRhodesLeftLowerArm entity) {
+        return RenderRhodes.texture;
+    }
 }

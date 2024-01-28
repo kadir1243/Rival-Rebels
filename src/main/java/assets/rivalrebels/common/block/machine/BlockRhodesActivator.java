@@ -11,41 +11,37 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class BlockRhodesActivator extends BlockContainer
+public class BlockRhodesActivator extends BlockWithEntity
 {
-	public BlockRhodesActivator()
+	public BlockRhodesActivator(Settings settings)
 	{
-		super(Material.IRON);
+		super(settings);
 	}
 
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return true;
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityRhodesActivator(pos, state);
 	}
-
-	@Override
-	public boolean hasTileEntity(IBlockState state)
-	{
-		return true;
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(World world, int meta)
-	{
-		return new TileEntityRhodesActivator();
-	}
-
-	/*@SideOnly(Side.CLIENT)
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icontop;
 
 	@Override

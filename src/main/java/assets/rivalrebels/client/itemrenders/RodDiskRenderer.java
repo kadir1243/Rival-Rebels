@@ -11,37 +11,42 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelDisk;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.math.Quaternion;
 
-public class RodDiskRenderer extends TileEntityItemStackRenderer
+public class RodDiskRenderer extends BuiltinModelItemRenderer
 {
 	ModelDisk	md;
 
-	public RodDiskRenderer()
-	{
+	public RodDiskRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		md = new ModelDisk();
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-		GlStateManager.enableLighting();
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etdisk0);
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.5f, 0.25f, 0f);
-		GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(-25, 1.0F, 0.0F, 0.0F);
-		GlStateManager.scale(0.5f, 0.5f, 0.5f);
-		GlStateManager.pushMatrix();
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etdisk0);
+		matrices.push();
+		matrices.translate(0.5f, 0.25f, 0f);
+		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternion(-25, 1.0F, 0.0F, 0.0F));
+		matrices.scale(0.5f, 0.5f, 0.5f);
+		matrices.push();
 
-		md.render();
+		md.render(matrices, vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true)));
 
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
+		matrices.pop();
+		matrices.pop();
 	}
 }
 

@@ -11,39 +11,33 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import java.util.List;
-
-import net.minecraft.entity.Entity;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 
-public class TileEntityPlasmaExplosion extends TileEntity implements ITickable
+import java.util.List;
+
+public class TileEntityPlasmaExplosion extends BlockEntity implements Tickable
 {
 	public float	size		= 0;
 	float			increment	= 0.3f;
 	float			prevsize	= 0;
 
-	public TileEntityPlasmaExplosion()
-	{
-
+	public TileEntityPlasmaExplosion(BlockPos pos, BlockState state) {
+        super(RRTileEntities.PLASMA_EXPLOSION, pos, state);
 	}
 
-	/**
-	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
-	 */
-	@Override
-	public void update()
-	{
+    @Override
+	public void tick() {
 		prevsize = size;
 		size += increment;
 		if (prevsize == 0)
@@ -53,37 +47,32 @@ public class TileEntityPlasmaExplosion extends TileEntity implements ITickable
 		if (size > 3.1f)
 		{
 			size = 0f;
-			world.setBlockToAir(getPos());
-			this.invalidate();
+			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
+			this.markRemoved();
 		}
 
 		double fsize = Math.sin(size) * 5.9 * 2;
 		double fsqr = fsize * fsize;
-		List<Entity> l = this.world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(getPos().getX() - fsize + 0.5, getPos().getY() - fsize + 0.5, getPos().getZ() - fsize + 0.5, getPos().getX() + fsize + 0.5, getPos().getY() + fsize + 0.5, getPos().getZ() + fsize + 0.5));
+		List<Entity> l = this.world.getOtherEntities(null, new Box(getPos().getX() - fsize + 0.5, getPos().getY() - fsize + 0.5, getPos().getZ() - fsize + 0.5, getPos().getX() + fsize + 0.5, getPos().getY() + fsize + 0.5, getPos().getZ() + fsize + 0.5));
         for (Entity e : l) {
-            double var15 = e.posX - getPos().getX();
-            double var17 = e.posY + e.getEyeHeight() - getPos().getY() + 1.5f;
-            double var19 = e.posZ - getPos().getZ();
-            double dist = 0.5f / (MathHelper.sqrt(var15 * var15 + var17 * var17 + var19 * var19) + 0.01f);
+            double var15 = e.getZ() - getPos().getX();
+            double var17 = e.getZ() + e.getEyeHeight(e.getPose()) - getPos().getY() + 1.5f;
+            double var19 = e.getZ() - getPos().getZ();
+            double dist = 0.5f / (Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19) + 0.01f);
             if (dist <= 0.5f && !(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityTsarBlast) && !(e instanceof EntityRhodes)) {
-                e.attackEntityFrom(RivalRebelsDamageSource.plasmaexplosion, 2);
-                e.motionX += var15 * dist;
-                e.motionY += var17 * dist;
-                e.motionZ += var19 * dist;
+                e.damage(RivalRebelsDamageSource.plasmaexplosion, 2);
+                e.addVelocity(
+                    var15 * dist,
+                    var17 * dist,
+                    var19 * dist);
             }
         }
 	}
 
 	@Override
-	public AxisAlignedBB getRenderBoundingBox()
+	public Box getRenderBoundingBox()
 	{
-		return new AxisAlignedBB(getPos().add(-2, -2, -2), getPos().add(3, 3, 3));
+		return new Box(getPos().add(-2, -2, -2), getPos().add(3, 3, 3));
 	}
 
-	@Override
-	@SideOnly(Side.CLIENT)
-	public double getMaxRenderDistanceSquared()
-	{
-		return 16384.0D;
-	}
 }

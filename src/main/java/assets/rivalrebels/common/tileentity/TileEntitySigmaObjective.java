@@ -11,70 +11,105 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import net.minecraft.command.ICommandSender;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Vec2f;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.CommandBlockExecutor;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class TileEntitySigmaObjective extends TileEntity implements IInventory, ICommandSender, ITickable
+public class TileEntitySigmaObjective extends BlockEntity implements Inventory, Tickable
 {
-	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(16, ItemStack.EMPTY);
+	private final DefaultedList<ItemStack> chestContents = DefaultedList.ofSize(16, ItemStack.EMPTY);
 
 	public double slide	= 0;
 	private double test	= Math.PI - 0.05;
+    private final CommandBlockExecutor commandExecutor = new CommandBlockExecutor() {
+        @Override
+        public void setCommand(String command) {
+            super.setCommand(command);
+            TileEntitySigmaObjective.this.markDirty();
+        }
 
-    /**
-	 * Returns the number of slots in the inventory.
-	 */
-	@Override
-	public int getSizeInventory()
+        @Override
+        public ServerWorld getWorld() {
+            return (ServerWorld)world;
+        }
+
+        @Override
+        public void markDirty() {
+            BlockState lv = world.getBlockState(pos);
+            this.getWorld().updateListeners(pos, lv, lv, 3);
+        }
+
+        @OnlyIn(Dist.CLIENT)
+        @Override
+        public Vec3d getPos() {
+            return Vec3d.ofCenter(pos);
+        }
+
+        @Override
+        public ServerCommandSource getSource() {
+            return new ServerCommandSource(
+                this,
+                getPos(),
+                Vec2f.ZERO,
+                this.getWorld(),
+                2,
+                this.getCustomName().getString(),
+                this.getCustomName(),
+                this.getWorld().getServer(),
+                null
+            );
+        }
+    };
+
+    public TileEntitySigmaObjective(BlockPos pos, BlockState state) {
+        super(RRTileEntities.SIGMA_OBJECTIVE, pos, state);
+    }
+
+    @Override
+	public int size()
 	{
 		return 16;
 	}
 
-	/**
-	 * Returns the stack in slot i
-	 */
-	@Override
-	public ItemStack getStackInSlot(int par1)
+    @Override
+	public ItemStack getStack(int slot)
 	{
-		return this.chestContents.get(par1);
+		return this.chestContents.get(slot);
 	}
 
-	/**
-	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
-	 */
-	@Override
-	public ItemStack decrStackSize(int par1, int par2)
+    @Override
+	public ItemStack removeStack(int slot, int amount)
 	{
-		if (!this.chestContents.get(par1).isEmpty())
+		if (!this.chestContents.get(slot).isEmpty())
 		{
 			ItemStack var3;
 
-			if (this.chestContents.get(par1).getCount() <= par2)
+			if (this.chestContents.get(slot).getCount() <= amount)
 			{
-				var3 = this.chestContents.get(par1);
-				this.chestContents.set(par1, ItemStack.EMPTY);
+				var3 = this.chestContents.get(slot);
+				this.chestContents.set(slot, ItemStack.EMPTY);
             }
 			else
 			{
-				var3 = this.chestContents.get(par1).splitStack(par2);
+				var3 = this.chestContents.get(slot).split(amount);
 
-				if (this.chestContents.get(par1).isEmpty())
+				if (this.chestContents.get(slot).isEmpty())
 				{
-					this.chestContents.set(par1, ItemStack.EMPTY);
+					this.chestContents.set(slot, ItemStack.EMPTY);
 				}
             }
             return var3;
@@ -83,7 +118,7 @@ public class TileEntitySigmaObjective extends TileEntity implements IInventory, 
 	}
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
+    public ItemStack removeStack(int index) {
 		if (!this.chestContents.get(index).isEmpty())
 		{
 			ItemStack var2 = this.chestContents.get(index);
@@ -93,60 +128,43 @@ public class TileEntitySigmaObjective extends TileEntity implements IInventory, 
 		return ItemStack.EMPTY;
 	}
 
-	/**
-	 * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
-	 */
-	@Override
-	public void setInventorySlotContents(int index, ItemStack stack)
+    @Override
+	public void setStack(int index, ItemStack stack)
 	{
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getInventoryStackLimit())
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack())
 		{
-			stack.setCount(this.getInventoryStackLimit());
+			stack.setCount(this.getMaxCountPerStack());
 		}
 	}
 
-	/**
-	 * Reads a tile entity from NBT.
-	 */
-	@Override
-	public void readFromNBT(NBTTagCompound compound)
-	{
-		super.readFromNBT(compound);
-        ItemStackHelper.loadAllItems(compound, this.chestContents);
-	}
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
 
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound compound)
-	{
-		super.writeToNBT(compound);
-        ItemStackHelper.saveAllItems(compound, this.chestContents);
-        return compound;
+        Inventories.readNbt(nbt, this.chestContents);
+        commandExecutor.readNbt(nbt);
     }
 
     @Override
-	public int getInventoryStackLimit()
+    public void writeNbt(NbtCompound nbt) {
+		super.writeNbt(nbt);
+        Inventories.writeNbt(nbt, this.chestContents);
+        commandExecutor.writeNbt(nbt);
+    }
+
+    @Override
+	public boolean canPlayerUse(PlayerEntity player)
 	{
-		return 64;
+		return this.world.getBlockEntity(this.getPos()) == this && player.squaredDistanceTo(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
 
     @Override
-	public boolean isUsableByPlayer(EntityPlayer player)
-	{
-		return this.world.getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
-	}
-
-    @Override
-	public void update() {
+	public void tick() {
 		slide = (Math.cos(test) + 1) / 32 * 10;
 
-        boolean i = false;
-        for (EntityPlayer player : world.playerEntities) {
-            if (player.getDistanceSq(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f) <= 9) {
-                i = true;
-            }
-        }
+        boolean i = world.isPlayerInRange(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f, 9);
 		if (i)
 		{
 			if (slide < 0.621) test += 0.05;
@@ -158,94 +176,10 @@ public class TileEntitySigmaObjective extends TileEntity implements IInventory, 
 	}
 
 	@Override
-	public AxisAlignedBB getRenderBoundingBox()
+	public Box getRenderBoundingBox()
 	{
-		return new AxisAlignedBB(getPos().add(-1, -1, -1), getPos().add(2, 2, 2));
+		return new Box(getPos().add(-1, -1, -1), getPos().add(2, 2, 2));
 	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public double getMaxRenderDistanceSquared()
-	{
-		return 16384.0D;
-	}
-
-	/**
-	 * invalidates a tile entity
-	 */
-	@Override
-	public void invalidate()
-	{
-		super.invalidate();
-		this.updateContainingBlockInfo();
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack)
-	{
-		return true;
-	}
-
-    @Override
-    public int getField(int id) {
-        return 0;
-    }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-	public String getName()
-	{
-		return "RivalRebelsSigma";
-	}
-
-    @Override
-    public boolean canUseCommand(int permLevel, String commandName) {
-        return true;
-    }
-
-    @Override
-    public BlockPos getPosition() {
-        return this.getPos();
-    }
-
-	@Override
-	public World getEntityWorld()
-	{
-		return world;
-	}
-
-	@Override
-	public boolean hasCustomName()
-	{
-		return false;
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {
-	}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-	}
-
-    @Nullable
-    @Override
-    public MinecraftServer getServer() {
-        if (!world.isRemote) {
-            return world.getMinecraftServer();
-        }
-
-        return null;
-    }
 
     @Override
     public void clear() {

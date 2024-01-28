@@ -12,159 +12,158 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.IProjectile;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.PersistentProjectileEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumParticleTypes;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.extensions.IForgeBlockEntity;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
-public class EntitySeekB83 extends EntityInanimate implements IProjectile
-{
-	private EntityLivingBase	thrower;
-	public boolean				fins			= false;
+public class EntitySeekB83 extends PersistentProjectileEntity {
+    public boolean				fins			= false;
 	public int					rotation		= 45;
 	public float				slide			= 0;
 	private boolean				inwaterprevtick	= false;
 	private int					soundfile		= 0;
 
-	public EntitySeekB83(World par1World)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+    public EntitySeekB83(EntityType<? extends EntitySeekB83> type, World world) {
+        super(type, world);
+    }
+
+	public EntitySeekB83(World par1World) {
+		this(RREntities.SEEK_B83, par1World);
 	}
 
-	public EntitySeekB83(World par1World, double par2, double par4, double par6)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+    @Override
+    protected ItemStack asItemStack() {
+        return ItemStack.EMPTY;
+    }
+
+    public EntitySeekB83(World par1World, double par2, double par4, double par6) {
+		this(par1World);
 		setPosition(par2, par4, par6);
 	}
 
-	public EntitySeekB83(World par1World, EntityPlayer entity2, float par3)
-	{
-		super(par1World);
-		thrower = entity2;
+	public EntitySeekB83(World par1World, PlayerEntity entity2, float par3) {
+		this(par1World);
 		fins = false;
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(entity2.posX, entity2.posY + entity2.getEyeHeight(), entity2.posZ, entity2.rotationYaw, entity2.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		posY -= 0.0D;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		setPosition(posX, posY, posZ);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		shoot(motionX, motionY, motionZ, 0.5f, 1f);
+		refreshPositionAndAngles(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYaw(), entity2.getPitch());
+        setPos(
+            getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.16F),
+            getY(),
+            getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.16F)
+        );
+		setPosition(getX(), getY(), getZ());
+        setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+
+        setVelocity(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 0.5f, 1f);
 	}
 
-	public EntitySeekB83(World par1World, EntityPlayer entity2, float par3, float yawdelta)
+	public EntitySeekB83(World par1World, PlayerEntity entity2, float par3, float yawdelta)
 	{
-		super(par1World);
-		thrower = entity2;
+		this(par1World);
 		fins = false;
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(entity2.posX, entity2.posY + entity2.getEyeHeight(), entity2.posZ, entity2.rotationYaw + yawdelta, entity2.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		posY -= 0.0D;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		setPosition(posX, posY, posZ);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		shoot(motionX, motionY, motionZ, 0.5f, 1f);
+		refreshPositionAndAngles(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYaw() + yawdelta, entity2.getPitch());
+        setPos(
+            getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.16F),
+            getY(),
+            getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.16F)
+        );
+		setPosition(getX(), getY(), getZ());
+        setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+
+        setVelocity(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), 0.5f, 1f);
 	}
 
-	public EntitySeekB83(World w, double x, double y, double z, double mx, double my, double mz)
-	{
-		super(w);
-		setSize(0.5F, 0.5F);
+	public EntitySeekB83(World w, double x, double y, double z, double mx, double my, double mz) {
+		this(w);
 		setPosition(x+mx*16, y+my*16, z+mz*16);
 		fins = false;
-		shoot(mx, my, mz, 0.5f, 0.1f);
+		setVelocity(mx, my, mz, 0.5f, 0.1f);
 	}
 
-	@Override
-	public void shoot(double mx, double my, double mz, float speed, float randomness)
-	{
-		float f2 = MathHelper.sqrt(mx * mx + my * my + mz * mz);
-		mx /= f2;
-		my /= f2;
-		mz /= f2;
-		mx += rand.nextGaussian() * 0.0075 * randomness;
-		my += rand.nextGaussian() * 0.0075 * randomness;
-		mz += rand.nextGaussian() * 0.0075 * randomness;
-		mx *= speed;
-		my *= speed;
-		mz *= speed;
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
+    @Override
+    public void setVelocity(double x, double y, double z, float speed, float divergence) {
+        Vec3d vec3d = new Vec3d(x, y, z);
+        double f2 = vec3d.length();
+        vec3d = vec3d.multiply(1/f2);
+		vec3d = vec3d.add(random.nextGaussian() * 0.0075 * divergence,
+            random.nextGaussian() * 0.0075 * divergence,
+            random.nextGaussian() * 0.0075 * divergence).multiply(speed);
+        setVelocity(vec3d.getX(), vec3d.getY(), vec3d.getZ());
+		setYaw(prevYaw = (float) (Math.atan2(vec3d.getX(), vec3d.getZ()) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(vec3d.getY(), MathHelper.sqrt((float) (vec3d.getX() * vec3d.getX() + vec3d.getZ() * vec3d.getZ()))) * 180.0D / Math.PI));
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
-	@Override
-	public void onUpdate()
+    @Override
+	public void tick()
 	{
-		super.onUpdate();
+		super.tick();
 
-		if (ticksExisted == 0)
+		if (age == 0)
 		{
-			rotation = world.rand.nextInt(360);
-			slide = world.rand.nextInt(21) - 10;
+			rotation = world.random.nextInt(360);
+			slide = world.random.nextInt(21) - 10;
 			for (int i = 0; i < 10; i++)
 			{
-				world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, posX - motionX * 2, posY - motionY * 2, posZ - motionZ * 2, -motionX + (world.rand.nextFloat() - 0.5f) * 0.1f, -motionY + (world.rand.nextFloat() - 0.5) * 0.1f, -motionZ + (world.rand.nextFloat() - 0.5f) * 0.1f);
+				world.addParticle(ParticleTypes.EXPLOSION, getX() - getVelocity().getX() * 2, getY() - getVelocity().getY() * 2, getZ() - getVelocity().getZ() * 2, -getVelocity().getX() + (world.random.nextFloat() - 0.5f) * 0.1f, -getVelocity().getY() + (world.random.nextFloat() - 0.5) * 0.1f, -getVelocity().getZ() + (world.random.nextFloat() - 0.5f) * 0.1f);
 			}
 		}
 		rotation += (int) slide;
 		slide *= 0.9;
 
-		if (ticksExisted >= 800)
+		if (age >= 800)
 		{
 			explode(null);
 		}
-		// world.spawnEntity(new EntityLightningLink(world, posX, posY, posZ, rotationYaw, rotationPitch, 100));
+		// world.spawnEntity(new EntityLightningLink(world, getX(), getY(), getZ(), yaw, pitch, 100));
 
-		if (world.isRemote && ticksExisted >= 5 && !inWater && ticksExisted <= 100)
+		if (world.isClient && age >= 5 && !isInsideWaterOrBubbleColumn() && age <= 100)
 		{
-			world.spawnEntity(new EntityPropulsionFX(world, posX, posY, posZ, -motionX * 0.5, -motionY * 0.5 - 0.1, -motionZ * 0.5));
+			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX() * 0.5, -getVelocity().getY() * 0.5 - 0.1, -getVelocity().getZ() * 0.5));
 		}
-		Vec3d vec31 = new Vec3d(posX, posY, posZ);
-		Vec3d vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult mop = world.rayTraceBlocks(vec31, vec3, false, true, false);
-		if (!world.isRemote)
+		Vec3d vec31 = getPos();
+		Vec3d vec3 = getPos().add(getVelocity());
+		HitResult mop = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		if (!world.isClient)
 		{
-			vec31 = new Vec3d(posX, posY, posZ);
-			if (mop != null) vec3 = mop.hitVec;
-			else vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+			vec31 = getPos();
+			if (mop != null) vec3 = mop.getPos();
+			else vec3 = getPos().add(getVelocity());
 
-			List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
             for (Entity entity : list) {
-                if ((entity.canBeCollidedWith() && ticksExisted >= 7 && entity != thrower) || entity instanceof EntityHackB83 || entity instanceof EntityB83) {
-                    RayTraceResult mop1 = entity.getEntityBoundingBox().grow(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
-                    if (mop1 != null) {
-                        double d1 = vec31.squareDistanceTo(mop1.hitVec);
+                if ((entity.collides() && age >= 7 && entity != getOwner()) || entity instanceof EntityHackB83 || entity instanceof EntityB83) {
+                    Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
+                    if (mop1.isPresent()) {
+                        double d1 = vec31.squaredDistanceTo(mop1.get());
                         if (d1 < d0) {
-                            mop = new RayTraceResult(entity, mop1.hitVec);
+                            mop = new EntityHitResult(entity, mop1.get());
                             d0 = d1;
                         }
                     }
@@ -173,60 +172,49 @@ public class EntitySeekB83 extends EntityInanimate implements IProjectile
 		}
 		if (mop != null) explode(mop);
 
-		Iterator<Entity> iter = world.loadedEntityList.iterator();
-		double ddx = motionX;
-		double ddy = motionY;
-		double ddz = motionZ;
+		Iterator<Entity> iter = world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB).iterator();
+        Vec3d ddvec = getVelocity();
 		double dist = 1000000;
 		while (iter.hasNext())
 		{
 			Entity e = iter.next();
 			if (e instanceof EntityB83 || e instanceof EntityHackB83)
 			{
-				double dx = e.posX - posX;
-				double dy = e.posY - posY;
-				double dz = e.posZ - posZ;
-				double temp = dx*dx+dy*dy+dz*dz;
-				if (temp < dist)
-				{
-					if (dx*motionX+dy*motionY+dz*motionZ>0f)
-					{
+                Vec3d dpos = e.getPos().subtract(getPos());
+				double temp = dpos.lengthSquared();
+				if (temp < dist) {
+                    Vec3d d = dpos.multiply(getVelocity());
+                    if (d.getX()+d.getY()+d.getZ()>0f) {
 						dist = temp;
 						temp = Math.sqrt(temp)*0.9f;
-						ddx = dx / temp;
-						ddy = dy / temp;
-						ddz = dz / temp;
+                        ddvec = dpos.multiply(1/temp);
 					}
 				}
 			}
 		}
-		motionX = ddx;
-		motionY = ddy;
-		motionZ = ddz;
+        setVelocity(ddvec);
 
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
-		float var16 = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
-		rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
-		for (rotationPitch = (float) (Math.atan2(motionY, var16) * 180.0D / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F)
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+		float var16 = MathHelper.sqrt((float) (getVelocity().getX() * getVelocity().getX() + getVelocity().getZ() * getVelocity().getZ()));
+		setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
+		for (setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); getPitch() - prevPitch < -180.0F; prevPitch -= 360.0F)
 			;
-		while (rotationPitch - prevRotationPitch >= 180.0F)
-			prevRotationPitch += 360.0F;
-		while (rotationYaw - prevRotationYaw < -180.0F)
-			prevRotationYaw -= 360.0F;
-		while (rotationYaw - prevRotationYaw >= 180.0F)
-			prevRotationYaw += 360.0F;
-		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2F;
-		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
+		while (getPitch() - prevPitch >= 180.0F)
+			prevPitch += 360.0F;
+		while (getYaw() - prevYaw < -180.0F)
+			prevYaw -= 360.0F;
+		while (getYaw() - prevYaw >= 180.0F)
+			prevYaw += 360.0F;
+		setPitch(prevPitch + (getPitch() - prevPitch) * 0.2F);
+		setYaw(prevYaw + (getYaw() - prevYaw) * 0.2F);
 		float var17 = 1.1f;
-		if (ticksExisted > 25) var17 = 0.9999F;
+		if (age > 25) var17 = 0.9999F;
 
-		if (isInWater())
+		if (isInsideWaterOrBubbleColumn())
 		{
 			for (int var7 = 0; var7 < 4; ++var7)
 			{
-				world.spawnParticle(EnumParticleTypes.WATER_BUBBLE, posX - motionX * 0.25F, posY - motionY * 0.25F, posZ - motionZ * 0.25F, motionX, motionY, motionZ);
+				world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
 			}
 			if (!inwaterprevtick)
 			{
@@ -241,98 +229,79 @@ public class EntitySeekB83 extends EntityInanimate implements IProjectile
 			soundfile = 0;
 		}
 
-		motionX *= var17;
-		motionY *= var17;
-		motionZ *= var17;
-		if (ticksExisted == 3)
+        setVelocity(getVelocity().multiply(var17));
+		if (age == 3)
 		{
 			fins = true;
-			rotationPitch += 22.5;
+            setPitch(getPitch() + 22.5F);
 		}
-		setPosition(posX, posY, posZ);
-		++ticksExisted;
+		setPosition(getX(), getY(), getZ());
+		++age;
 	}
 
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-	{
-
-	}
-
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
-
-	}
-
-	public void explode(RayTraceResult mop)
+	public void explode(HitResult mop)
 	{
 		if (mop != null)
 		{
-			if (mop.entityHit != null)
+			if (mop.getType() == HitResult.Type.ENTITY)
 			{
-				if (mop.entityHit instanceof EntityHackB83)
+                Entity entityHit = ((EntityHitResult) mop).getEntity();
+                if (entityHit instanceof EntityHackB83)
 				{
-					mop.entityHit.setDead();
-					world.setBlockState(getPosition(), RivalRebels.plasmaexplosion.getDefaultState());
-					setDead();
+					entityHit.kill();
+					world.setBlockState(getBlockPos(), RRBlocks.plasmaexplosion.getDefaultState());
+					kill();
 				}
-				else if (mop.entityHit instanceof EntityPlayer player)
-				{
-                    for (ItemStack armorSlot : player.inventory.armorInventory) {
+				else if (entityHit instanceof PlayerEntity player) {
+                    for (ItemStack armorSlot : player.getInventory().armor) {
                         if (!armorSlot.isEmpty()) {
-                            armorSlot.damageItem(48, player);
+                            armorSlot.damage(48, player, player1 -> {});
                         }
                     }
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-					new Explosion(world, posX, posY, posZ, RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
-					setDead();
+					new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+					kill();
 				}
 				else
 				{
-					new Explosion(world, posX, posY, posZ, RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
-					setDead();
+					new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+					kill();
 				}
 			}
 			else
 			{
-				Block block = world.getBlockState(mop.getBlockPos()).getBlock();
-				if (block == Blocks.GLASS || block == Blocks.GLASS_PANE || block == Blocks.STAINED_GLASS || block == Blocks.STAINED_GLASS_PANE)
+                BlockPos pos = ((BlockHitResult) mop).getBlockPos();
+                BlockState state = world.getBlockState(pos);
+                if (state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS_PANES) || state.isIn(Tags.Blocks.STAINED_GLASS) || state.isIn(Tags.Blocks.STAINED_GLASS_PANES))
 				{
-					world.setBlockToAir(mop.getBlockPos());
+					world.setBlockState(pos, Blocks.AIR.getDefaultState());
 					RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
 				}
 				else
 				{
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-					new Explosion(world, posX, posY, posZ, RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
-					setDead();
+					new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+					kill();
 				}
 			}
 		}
 		else
 		{
 			RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-			new Explosion(world, posX, posY, posZ, RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
-			setDead();
+			new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+			kill();
 		}
 	}
 
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000;
-	}
-
-	@Override
-	public float getBrightness()
+	public float getBrightnessAtEyes()
 	{
 		return 1000F;
 	}

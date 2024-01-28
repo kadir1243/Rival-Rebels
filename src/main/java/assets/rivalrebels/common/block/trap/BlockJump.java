@@ -11,70 +11,73 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
+import assets.rivalrebels.common.tileentity.TileEntityJumpBlock;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockEntityProvider;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
+import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockJump extends Block
+public class BlockJump extends Block implements BlockEntityProvider
 {
-	public BlockJump()
+	public BlockJump(Settings settings)
 	{
-		super(Material.SPONGE);
+		super(settings);
 	}
 
     @Override
-    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if (entity instanceof EntityLivingBase)
-		{
-			entity.motionY += 2;
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (entity instanceof LivingEntity) {
+            entity.addVelocity(0, 2, 0);
 			world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ENTITY_ARROW_HIT, SoundCategory.BLOCKS, 3F, 2, true);
 		}
 	}
 
-    @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
 		int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
         float f = 0.0625F;
-		return new AxisAlignedBB(x, y, z, x + 1, y + 1 - f, z + 1);
+		return VoxelShapes.cuboid(new Box(x, y, z, x + 1, y + 1 - f, z + 1));
 	}
 
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return new AxisAlignedBB(pos, pos.add(1, 1, 1));
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return VoxelShapes.cuboid(new Box(pos, pos.add(1, 1, 1)));
     }
 
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new TileEntityJumpBlock(pos, state);
+    }
 
-	/*@SideOnly(Side.CLIENT)
+    /*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -87,7 +90,7 @@ public class BlockJump extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

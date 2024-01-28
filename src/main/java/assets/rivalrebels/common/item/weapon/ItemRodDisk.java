@@ -12,36 +12,48 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.RodDiskRenderer;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.*;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.EnumAction;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
+import net.minecraftforge.client.IItemRenderProperties;
+
+import java.util.function.Consumer;
 
 public class ItemRodDisk extends Item
 {
 	public ItemRodDisk() {
-		super();
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+		super(new Settings().maxCount(1).group(RRItems.rralltab));
 	}
-
     @Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new RodDiskRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
+    @Override
+	public UseAction getUseAction(ItemStack par1ItemStack)
 	{
-		return EnumAction.BOW;
+		return UseAction.BOW;
 	}
 
 	@Override
-	public int getMaxItemUseDuration(ItemStack stack)
+	public int getMaxUseTime(ItemStack stack)
 	{
 		return 300;
 	}
@@ -49,29 +61,29 @@ public class ItemRodDisk extends Item
 	boolean pass = false;
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
+        ItemStack stack = user.getStackInHand(hand);
 
 		if (!pass)
 		{
-			player.sendMessage(new TextComponentString("Password?"));
+			user.sendMessage(Text.of("Password?"), true);
 			pass = true;
 		}
-		player.setActiveHand(hand);
-		if (RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank.id > 1) RivalRebelsSoundPlayer.playSound(player, 6, 2);
-		else RivalRebelsSoundPlayer.playSound(player, 7, 2);
-		return ActionResult.newResult(EnumActionResult.PASS, stack);
+		user.setCurrentHand(hand);
+		if (RivalRebels.round.rrplayerlist.getForGameProfile(user.getGameProfile()).rrrank.id > 1) RivalRebelsSoundPlayer.playSound(user, 6, 2);
+		else RivalRebelsSoundPlayer.playSound(user, 7, 2);
+		return TypedActionResult.success(stack, world.isClient());
 	}
 
     @Override
-    public void onPlayerStoppedUsing(ItemStack stack, World world, EntityLivingBase entityLiving, int timeLeft) {
-		EntityPlayer player;
-        if (entityLiving instanceof EntityPlayer) player = (EntityPlayer) entityLiving;
+    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
+		PlayerEntity player;
+        if (user instanceof PlayerEntity) player = (PlayerEntity) user;
         else return;
-        if (!world.isRemote) {
-			if (!player.capabilities.isCreativeMode) player.inventory.deleteStack(stack);
+        if (!world.isClient) {
+			if (!player.getAbilities().invulnerable) player.getInventory().removeOne(stack);
 			int rank = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank.id;
-			//float f = (getMaxItemUseDuration(item) - i) / 20.0F;
+			//float f = (getMaxUseTime(item) - i) / 20.0F;
 			//f = (f * f + f * 2) * 0.33333f;
 			//if (f > 1.0F) f = 1.0F;
 			//f *= 1.0f-rank*0.1f;

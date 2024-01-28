@@ -11,21 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
 import net.minecraft.item.Item;
 
-public class ItemFuse extends Item
-{
+public class ItemFuse extends Item {
 	public ItemFuse()
 	{
-		super();
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+		super(new Settings().group(RRItems.rralltab).maxCount(1));
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ag");
-	}*/
 }

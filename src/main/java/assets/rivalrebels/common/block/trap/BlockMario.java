@@ -11,58 +11,43 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
-import net.minecraft.item.Item;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 public class BlockMario extends Block
 {
-	public BlockMario()
-	{
-		super(Material.ROCK);
+	public BlockMario(Settings settings) {
+		super(settings);
 	}
 
     @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-		return Item.getItemFromBlock(RivalRebels.amario);
-	}
-
-    @Nullable
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
 		float f = 0.0625F;
-		return new AxisAlignedBB(x, y, z, x + 1, y + 1 - f, z + 1);
+		return VoxelShapes.cuboid(new Box(x, y, z, x + 1, y + 1 - f, z + 1));
 	}
 
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return new AxisAlignedBB(pos, pos.add(1, 1, 1));
-    }
-
-    @Override
-    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if (entity instanceof EntityPlayer || entity instanceof EntityAnimal || entity instanceof EntityMob)
-		{
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+		if (entity instanceof PlayerEntity || entity instanceof AnimalEntity || entity instanceof MobEntity) {
 			world.setBlockState(pos, Blocks.GRAVEL.getDefaultState());
 		}
 	}
@@ -135,8 +120,8 @@ public class BlockMario extends Block
 	}*/
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        return new ItemStack(RivalRebels.amario);
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        return RRBlocks.amario.asItem().getDefaultStack();
     }
 
 	/*@Override

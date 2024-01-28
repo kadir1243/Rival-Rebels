@@ -11,21 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
 import net.minecraft.item.Item;
 
-public class ItemAntenna extends Item
-{
+public class ItemAntenna extends Item {
 	public ItemAntenna()
 	{
-		super();
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+		super(new Settings().maxCount(1).group(RRItems.rralltab));
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:aa");
-	}*/
 }

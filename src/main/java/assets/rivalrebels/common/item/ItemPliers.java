@@ -12,19 +12,20 @@
 package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.command.CommandHotPotato;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.packet.TextPacket;
 import net.minecraft.block.Block;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -34,87 +35,86 @@ public class ItemPliers extends Item
 
 	public ItemPliers()
 	{
-		super();
-		setMaxStackSize(1);
-		setContainerItem(this);
-		setCreativeTab(RivalRebels.rralltab);
+		super(new Settings().maxCount(1).group(RRItems.rralltab));
 	}
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-		player.swingArm(hand);
-		if (!world.isRemote)
+    public ItemStack getContainerItem(ItemStack stack) {
+        return this.getDefaultStack();
+    }
+
+    @Override
+    public ActionResult onItemUseFirst(ItemStack stack, ItemUsageContext context) {
+        BlockPos pos = context.getBlockPos();
+        World world = context.getWorld();
+        PlayerEntity player = context.getPlayer();
+        Hand hand = context.getHand();
+		player.swingHand(hand);
+		if (!world.isClient)
 		{
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
             Block block = world.getBlockState(pos).getBlock();
-            if (block == RivalRebels.jump && player.capabilities.isCreativeMode)
-			{
+            if (block == RRBlocks.jump && player.getAbilities().invulnerable) {
                 CommandHotPotato.pos = pos.up(400);
-				CommandHotPotato.world = world;
-				PacketDispatcher.packetsys.sendTo(new TextPacket("Hot Potato drop point set. Use /rrhotpotato to start a round."),(EntityPlayerMP) player);
+				player.sendMessage(Text.of("Hot Potato drop point set. Use /rrhotpotato to start a round."), false);
 			}
-			if (block == RivalRebels.remotecharge)
+			if (block == RRBlocks.remotecharge)
 			{
 				int t = 25;
 				i = i + 1;
-				PacketDispatcher.packetsys.sendTo(new TextPacket("RivalRebels.Defuse " + i * 100 / t + "§7'/."),(EntityPlayerMP) player);
+				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".defuse", i * 100 / t), false);
 				if (i >= t)
 				{
-					EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.remotecharge, 1));
+					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.remotecharge.asItem().getDefaultStack());
 					world.spawnEntity(ei);
-					world.setBlockToAir(pos);
+					world.setBlockState(pos, Blocks.AIR.getDefaultState());
 					i = 0;
-					return EnumActionResult.SUCCESS;
+					return ActionResult.SUCCESS;
 				}
 			}
-			if (block == RivalRebels.timedbomb)
+			if (block == RRBlocks.timedbomb)
 			{
 				int t = 25;
 				i = i + 1;
-				PacketDispatcher.packetsys.sendTo(new TextPacket("RivalRebels.Defuse " + i * 100 / t + "§7'/."),(EntityPlayerMP) player);
+				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".defuse", i * 100 / t), false);
 				if (i >= t)
 				{
-					EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.timedbomb, 1));
+					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.timedbomb.asItem().getDefaultStack());
 					world.spawnEntity(ei);
-					world.setBlockToAir(pos);
-					world.setBlockToAir(pos.up());
+					world.setBlockState(pos, Blocks.AIR.getDefaultState());
+					world.setBlockState(pos.up(), Blocks.AIR.getDefaultState());
 					i = 0;
-					return EnumActionResult.SUCCESS;
+					return ActionResult.SUCCESS;
 				}
 			}
 			if (block instanceof BlockAutoTemplate worldBlock)
 			{
                 i = i + 1;
-				PacketDispatcher.packetsys.sendTo(new TextPacket("RivalRebels.Status RivalRebels.building " + i * 100 / worldBlock.time + "§7'/."),(EntityPlayerMP) player);
+				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".building", i * 100 / worldBlock.time), false);
 				if (i >= worldBlock.time)
 				{
-					world.setBlockToAir(pos);
+                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
 					worldBlock.build(world, x, y, z);
 					i = 0;
-					return EnumActionResult.SUCCESS;
+					return ActionResult.SUCCESS;
 				}
 			}
-			if (block == RivalRebels.supplies && world.getBlockState(pos.down()).getBlock() == RivalRebels.supplies)
+			if (block == RRBlocks.supplies && world.getBlockState(pos.down()).getBlock() == RRBlocks.supplies)
 			{
 				i++;
-				PacketDispatcher.packetsys.sendTo(new TextPacket("RivalRebels.Status RivalRebels.building ToKaMaK " + i * 100 / 15 + "§7'/."),(EntityPlayerMP) player);
+				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".building.tokamak ", i * 100 / 15), false);
 				if (i >= 15)
 				{
-					world.setBlockToAir(pos);
-					world.setBlockState(pos.down(), RivalRebels.reactor.getDefaultState());
+                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
+					world.setBlockState(pos.down(), RRBlocks.reactor.getDefaultState());
 					i = 0;
-					return EnumActionResult.SUCCESS;
+					return ActionResult.SUCCESS;
 				}
 			}
 		}
-		return EnumActionResult.PASS;
+		return ActionResult.PASS;
 	}
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ap");
-	}*/
 }

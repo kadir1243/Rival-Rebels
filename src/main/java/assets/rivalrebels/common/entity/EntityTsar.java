@@ -12,41 +12,51 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.explosion.TsarBomba;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.Material;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.EntityThrowable;
-import net.minecraft.init.Blocks;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.projectile.thrown.ThrownEntity;
+import net.minecraft.block.Blocks;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.tag.BlockTags;
+import net.minecraft.tag.FluidTags;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 
 import java.util.List;
+import java.util.Optional;
 
-public class EntityTsar extends EntityThrowable
+public class EntityTsar extends ThrownEntity
 {
 	public int	ticksInAir	= 0;
 	public int aoc = 0;
 	public boolean hasTrollface;
 
-	public EntityTsar(World par1World)
-	{
-		super(par1World);
-		this.setSize(0.5F, 0.5F);
+    public EntityTsar(EntityType<? extends EntityTsar> type, World world) {
+        super(type, world);
+    }
+
+	public EntityTsar(World par1World) {
+		this(RREntities.TSAR, par1World);
 	}
 
 	public EntityTsar(World par1World, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
 	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(x, y, z, yaw, pitch);
-		prevRotationYaw = rotationYaw = yaw;
-		prevRotationPitch = rotationPitch = pitch;
+		this(par1World);
+		refreshPositionAndAngles(x, y, z, yaw, pitch);
+		this.setYaw(prevYaw = yaw);
+		this.setPitch(prevPitch = pitch);
 		aoc = charges;
 		hasTrollface = troll;
 		if (!RivalRebels.nukedrop)
@@ -59,16 +69,12 @@ public class EntityTsar extends EntityThrowable
 	{
 		this(world);
 		setPosition(px, py, pz);
-		motionX = f;
-		motionY = g;
-		motionZ = h;
+        setVelocity(f, g, h);
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityTsar(World par1World, double x, double y,double z, double mx, double my, double mz, int charges)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+	public EntityTsar(World par1World, double x, double y,double z, double mx, double my, double mz, int charges) {
+		this(par1World);
 		setPosition(x,y,z);
 		aoc = charges;
 		setAnglesMotion(mx, my, mz);
@@ -76,51 +82,46 @@ public class EntityTsar extends EntityThrowable
 
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
+        setVelocity(mx, my, mz);
 		if (mx*mx+my*my+mz*mz<0.01) return;
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
+		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
-	@Override
-	public void onUpdate()
-	{
-		this.lastTickPosX = this.posX;
-		this.lastTickPosY = this.posY;
-		this.lastTickPosZ = this.posZ;
+    @Override
+    protected void initDataTracker() {
+    }
 
-		if (!world.isRemote)
+	@Override
+	public void tick()
+	{
+		if (!world.isClient)
 		{
 			if (ticksInAir == - 100) explode();
 			++this.ticksInAir;
 
-			Vec3d var15 = new Vec3d(this.posX, this.posY, this.posZ);
-			Vec3d var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-			RayTraceResult var3 = this.world.rayTraceBlocks(var15, var2);
-			var15 = new Vec3d(this.posX, this.posY, this.posZ);
-			var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+			Vec3d var15 = getPos();
+			Vec3d var2 = getPos().add(getVelocity());
+			HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+			var15 = getPos();
+			var2 = getPos().add(getVelocity());
 
 			if (var3 != null)
 			{
-				var2 = var3.hitVec;
+				var2 = var3.getPos();
 			}
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.canBeCollidedWith()) {
+                if (var9.collides()) {
                     float var10 = 0.3F;
-                    AxisAlignedBB var11 = var9.getEntityBoundingBox().grow(var10, var10, var10);
-                    RayTraceResult var12 = var11.calculateIntercept(var15, var2);
+                    Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
+                    Optional<Vec3d> var12 = var11.raycast(var15, var2);
 
-                    if (var12 != null) {
-                        double var13 = var15.distanceTo(var12.hitVec);
+                    if (var12.isPresent()) {
+                        double var13 = var15.distanceTo(var12.get());
 
                         if (var13 < var6 || var6 == 0.0D) {
                             var4 = var9;
@@ -132,113 +133,112 @@ public class EntityTsar extends EntityThrowable
 
 			if (var4 != null)
 			{
-				var3 = new RayTraceResult(var4);
+				var3 = new EntityHitResult(var4);
 			}
 
 			if (var3 != null)
 			{
-				this.onImpact(var3);
+				this.onCollision(var3);
 			}
 		}
 
-		this.posX += this.motionX;
-		this.posY += this.motionY;
-		this.posZ += this.motionZ;
-		if (posY < 0) setDead();
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+		if (getY() < 0) kill();
 
-		if (this.getRidingEntity()==null)
+		if (this.hasVehicle())
 		{
-		this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
-		float var16 = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
+		this.setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
+		float var16 = MathHelper.sqrt((float) (this.getVelocity().getX() * this.getVelocity().getX() + this.getVelocity().getZ() * this.getVelocity().getZ()));
 
-		for (this.rotationPitch = (float) (Math.atan2(this.motionY, var16) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+		for (this.setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); this.getPitch() - this.prevPitch < -180.0F; this.prevPitch -= 360.0F)
 		{
         }
 
-		while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+		while (this.getPitch() - this.prevPitch >= 180.0F)
 		{
-			this.prevRotationPitch += 360.0F;
+			this.prevPitch += 360.0F;
 		}
 
-		while (this.rotationYaw - this.prevRotationYaw < -180.0F)
+		while (this.getYaw() - this.prevYaw < -180.0F)
 		{
-			this.prevRotationYaw -= 360.0F;
+			this.prevYaw -= 360.0F;
 		}
 
-		while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
+		while (this.getYaw() - this.prevYaw >= 180.0F)
 		{
-			this.prevRotationYaw += 360.0F;
+			this.prevYaw += 360.0F;
 		}
 
-		this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.05F;
-		this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.05F;
+		this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.05F);
+		this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.05F);
 		}
 		float var17 = 0.98f;
-		float var18 = this.getGravityVelocity();
+		float var18 = this.getGravity();
 
-		this.motionX *= var17;
-		this.motionY *= var17;
-		this.motionZ *= var17;
-		this.motionY -= var18;
-		this.setPosition(this.posX, this.posY, this.posZ);
+        setVelocity(getVelocity().multiply(var17));
+        setVelocity(getVelocity().subtract(0, var18, 0));
+		this.setPosition(this.getX(), this.getY(), this.getZ());
 	}
 
 	@Override
-	public void writeEntityToNBT(NBTTagCompound nbt)
+	public void writeCustomDataToNbt(NbtCompound nbt)
 	{
-		nbt.setInteger("charge", aoc);
-		nbt.setBoolean("troll", hasTrollface);
+		nbt.putInt("charge", aoc);
+		nbt.putBoolean("troll", hasTrollface);
 	}
 
 	@Override
-	public void readEntityFromNBT(NBTTagCompound nbt)
+	public void readCustomDataFromNbt(NbtCompound nbt)
 	{
-		aoc = nbt.getInteger("charge");
+		aoc = nbt.getInt("charge");
 		hasTrollface = nbt.getBoolean("troll");
-		prevRotationYaw = rotationYaw = nbt.getFloat("rot");
+		setYaw(prevYaw = nbt.getFloat("rot"));
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
-	@Override
-	protected void onImpact(RayTraceResult var1)
-	{
-		if (var1.entityHit == null)
-		{
-            IBlockState state = world.getBlockState(var1.getBlockPos());
-            Block b = state.getBlock();
-			Material m = state.getMaterial();
-			if (b == RivalRebels.jump || b == Blocks.ICE)
-			{
-				motionY = Math.max(-motionY, 0.2f);
-				return;
-			}
-			if (hasTrollface && world.rand.nextInt(10)!=0)
-			{
-				motionY = Math.max(-motionY, 0.2f);
-				return;
-			}
-			else if (!hasTrollface && (m == Material.LEAVES || m == Material.CLAY || m == Material.GROUND || m == Material.PLANTS || m == Material.CAKE || m == Material.CIRCUITS || m == Material.CACTUS || m == Material.CLOTH || m == Material.CRAFTED_SNOW || m == Material.GLASS || m == Material.GRASS || m == Material.SAND || m == Material.SNOW || m == Material.WOOD || m == Material.VINE || m == Material.WATER || m == Material.SPONGE || m == Material.ICE))
-			{
-				world.setBlockToAir(var1.getBlockPos());
-				return;
-			}
-		}
+    @Override
+    protected void onBlockHit(BlockHitResult blockHitResult) {
+        super.onBlockHit(blockHitResult);
+        BlockState state = world.getBlockState(blockHitResult.getBlockPos());
+        Block b = state.getBlock();
+        Material m = state.getMaterial();
+        if (b == RRBlocks.jump || state.isIn(BlockTags.ICE))
+        {
+            setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
+            return;
+        }
+        if (hasTrollface && world.random.nextInt(10)!=0)
+        {
+            setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
+            return;
+        }
+        else if (!hasTrollface && (state.isIn(BlockTags.LEAVES) || m == Material.ORGANIC_PRODUCT || m == Material.SOIL || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || m == Material.CAKE || m == Material.DECORATION || state.isIn(BlockTags.WOOL) || m == Material.SNOW_BLOCK || state.isIn(Tags.Blocks.GLASS) || m == Material.SOLID_ORGANIC || state.isIn(Tags.Blocks.SAND) || m == Material.SNOW_LAYER || m == Material.WOOD || m == Material.REPLACEABLE_PLANT || state.getFluidState().isIn(FluidTags.WATER) || m == Material.SPONGE || state.isIn(BlockTags.ICE)))
+        {
+            world.setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
+            return;
+        }
+    }
+
+    @Override
+    protected void onCollision(HitResult hitResult) {
+        super.onCollision(hitResult);
+
 		explode();
 	}
 
     public void explode()
 	{
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			TsarBomba tsar = new TsarBomba((int)posX, (int)posY, (int)posZ, world, (int) ((RivalRebels.tsarBombaStrength + (aoc * aoc)) * 0.8f));
-			EntityTsarBlast tsarblast = new EntityTsarBlast(world, (int)posX, (int)posY, (int)posZ, tsar, RivalRebels.tsarBombaStrength + (aoc * aoc));
+			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), world, (int) ((RivalRebels.tsarBombaStrength + (aoc * aoc)) * 0.8f));
+			EntityTsarBlast tsarblast = new EntityTsarBlast(world, (int)getX(), (int)getY(), (int)getZ(), tsar, RivalRebels.tsarBombaStrength + (aoc * aoc));
 			world.spawnEntity(tsarblast);
-			this.setDead();
+			this.kill();
 		}
 	}
 }

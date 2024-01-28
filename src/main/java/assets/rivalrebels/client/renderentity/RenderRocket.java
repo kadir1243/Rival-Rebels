@@ -11,56 +11,44 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocket;
 import assets.rivalrebels.common.entity.EntityRocket;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.Vec3f;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderRocket extends Render
+@OnlyIn(Dist.CLIENT)
+public class RenderRocket extends EntityRenderer<EntityRocket>
 {
 	ModelRocket	md;
 
-	public RenderRocket(RenderManager manager)
+	public RenderRocket(EntityRendererFactory.Context manager)
 	{
         super(manager);
 		md = new ModelRocket();
 	}
 
-	public void renderRocket(EntityRocket rocket, double par2, double par4, double par6, float par8, float par9)
-	{
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) par2, (float) par4, (float) par6);
-		GlStateManager.rotate(rocket.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(rocket.rotationPitch - 90.0f, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(rocket.rotation, 0.0F, 1.0F, 0.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etrocket);
-		md.render(rocket.fins);
-		GlStateManager.popMatrix();
-	}
-
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderRocket((EntityRocket) par1Entity, par2, par4, par6, par8, par9);
+    @Override
+    public void render(EntityRocket entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		matrices.push();
+		matrices.multiply(new Quaternion(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternion(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(entity.rotation));
+		md.render(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()), entity.fins);
+		matrices.pop();
 	}
 
 	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
+    public Identifier getTexture(EntityRocket entity)
 	{
-		return null;
+		return RRIdentifiers.etrocket;
 	}
 }

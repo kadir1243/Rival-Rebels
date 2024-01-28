@@ -11,108 +11,92 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.item.EnumAction;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.text.Text;
+import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
+import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
 
 public class ItemExPill extends Item
 {
-	public ItemExPill()
-	{
-		super();
-		setMaxStackSize(6);
-		setCreativeTab(RivalRebels.rralltab);
+	public ItemExPill() {
+		super(new Settings().maxCount(6).group(RRItems.rralltab));
 	}
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-        ItemStack stack = player.getHeldItem(hand);
+    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
+        ItemStack stack = player.getStackInHand(hand);
 		RivalRebelsSoundPlayer.playSound(player, 15, 0);
 		RivalRebelsSoundPlayer.playSound(player, 28, 18, 1.0f, 0.6f);
-		player.setActiveHand(hand);
-		if (!world.isRemote)
+		player.setCurrentHand(hand);
+		if (!world.isClient)
 		{
-			int rand = world.rand.nextInt(100);
-			if (rand >= 40)
+			int random = world.random.nextInt(100);
+			if (random >= 40)
 			{
-				player.sendMessage(new TextComponentString("§7[§6Status§7]§e The experiment turned out a success."));
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_MAGMACUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 30, 20));
-				player.getFoodStats().addStats(20, 200);
+				player.sendMessage(Text.of("§7[§6Status§7]§e The experiment turned out a success."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 30, 20));
+				player.getHungerManager().add(20, 200);
 				player.heal(20);
 			}
-			else if (rand >= 30)
+			else if (random >= 30)
 			{
-				player.sendMessage(new TextComponentString("§7[§6Status§7]§e Begrüßen Sie den Uber-Soldat."));
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_MAGMACUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 30, 20));
-				player.getFoodStats().addStats(20, 200);
+				player.sendMessage(Text.of("§7[§6Status§7]§e Begrüßen Sie den Uber-Soldat."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 30, 20));
+				player.getHungerManager().add(20, 200);
 				player.heal(20);
-				player.addPotionEffect(new PotionEffect(MobEffects.RESISTANCE, 450, 20));
-				player.addPotionEffect(new PotionEffect(MobEffects.STRENGTH, 500, 20));
-				player.addPotionEffect(new PotionEffect(MobEffects.JUMP_BOOST, 300, 2));
-				player.addPotionEffect(new PotionEffect(MobEffects.HASTE, 500, 2));
-				player.addPotionEffect(new PotionEffect(MobEffects.SPEED, 550, 2));
-				player.addPotionEffect(new PotionEffect(MobEffects.WATER_BREATHING, 800, 20));
-				player.addPotionEffect(new PotionEffect(MobEffects.FIRE_RESISTANCE, 800, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 450, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 500, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 300, 2));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 500, 2));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 550, 2));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING, 800, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 800, 20));
 			}
-			else if (rand >= 20)
+			else if (random >= 20)
 			{
-				player.sendMessage(new TextComponentString("§7[§6Status§7]§e The test subject has perished."));
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_MAGMACUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.attackEntityFrom(RivalRebelsDamageSource.cyanide, 2000);
+				player.sendMessage(Text.of("§7[§6Status§7]§e The test subject has perished."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				player.damage(RivalRebelsDamageSource.cyanide, 2000);
 			}
 			else
 			{
-				player.sendMessage(new TextComponentString("§7[§6Status§7]§e Unexpected results have occurred."));
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_MAGMACUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.posX, player.posY, player.posZ, SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 1500, 20));
-				player.addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 1500, 20));
-				player.addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 1500, 20));
-				player.addPotionEffect(new PotionEffect(MobEffects.MINING_FATIGUE, 1500, 20));
-				player.addPotionEffect(new PotionEffect(MobEffects.WEAKNESS, 1500, 20));
+				player.sendMessage(Text.of("§7[§6Status§7]§e Unexpected results have occurred."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 1500, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 1500, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 1500, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1500, 20));
+				player.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1500, 20));
 			}
-			stack.shrink(1);
-            return ActionResult.newResult(EnumActionResult.PASS, stack);
+			stack.decrement(1);
         }
-		return ActionResult.newResult(EnumActionResult.SUCCESS, stack);
+		return TypedActionResult.success(stack, world.isClient);
 	}
 
 	@Override
-	public EnumAction getItemUseAction(ItemStack par1ItemStack)
+	public UseAction getUseAction(ItemStack stack)
 	{
-		return EnumAction.EAT;
+		return UseAction.EAT;
 	}
 
-	/**
-	 * How long it takes to use or consume an item
-	 */
-	@Override
-	public int getMaxItemUseDuration(ItemStack par1ItemStack)
-	{
+    @Override
+    public int getMaxUseTime(ItemStack stack) {
 		return 32;
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ai");
-	}*/
 }

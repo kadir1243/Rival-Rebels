@@ -11,44 +11,42 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.common.entity.EntityLaptop;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 
-public class RenderLaptop extends Render
-{
+public class RenderLaptop extends EntityRenderer<EntityLaptop> {
 	ModelLaptop	ml;
 
-	public RenderLaptop(RenderManager manager)
+	public RenderLaptop(EntityRendererFactory.Context manager)
 	{
         super(manager);
 		ml = new ModelLaptop();
 	}
 
-	@Override
-	public void doRender(Entity var1, double d, double d1, double d2, float var8, float var9)
-	{
-		GlStateManager.enableLighting();
-		EntityLaptop tile = (EntityLaptop) var1;
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) d, (float) d1, (float) d2);
-		GlStateManager.rotate(180 - var1.rotationYaw, 0, 1, 0);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
-		ml.renderModel((float) -tile.slide);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etubuntu);
-		ml.renderScreen((float) -tile.slide);
-		GlStateManager.popMatrix();
+    @Override
+    public void render(EntityLaptop entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+		matrices.multiply(new Quaternion(180 - entity.getYaw(), 0, 1, 0));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etlaptop);
+		ml.renderModel(buffer, matrices, (float) -entity.slide);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etubuntu);
+		ml.renderScreen(buffer, matrices, (float) -entity.slide);
+		matrices.pop();
 	}
 
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityLaptop entity) {
+        return null;
+    }
 }

@@ -15,7 +15,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
 
 public class ModelNukeCloud
 {
@@ -30,45 +32,45 @@ public class ModelNukeCloud
 	private float	cos			= (float) Math.cos(deg);
 	private float	add			= 360 / segments;
 
-	public void renderTop()
+	public void renderTop(MatrixStack matrices, VertexConsumer buffer)
 	{
 		for (float i = 0; i < segments; i++)
 		{
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate(add * i, 0, 1, 0);
+			matrices.push();
+			matrices.multiply(new Quaternion(add * i, 0, 1, 0));
 			for (int f = 1; f < topx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / topx.length) * f);
 				TextureVertice t2 = new TextureVertice((1f / segments) * (i - 1), (1f / topx.length) * (f - 1));
 				TextureVertice t3 = new TextureVertice((1f / segments) * i, (1f / topx.length) * (f - 1));
 				TextureVertice t4 = new TextureVertice((1f / segments) * i, (1f / topx.length) * f);
-				RenderHelper.addFace(new Vertice(0f, topy[f], topx[f]),
+				RenderHelper.addFace(buffer, new Vertice(0f, topy[f], topx[f]),
 						new Vertice(0f, topy[f - 1], topx[f - 1]),
 						new Vertice(topx[f - 1] * sin, topy[f - 1], topx[f - 1] * cos),
 						new Vertice(topx[f] * sin, topy[f], topx[f] * cos), t1, t2, t3, t4);
 			}
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
 	}
 
-	public void renderBottom()
+	public void renderBottom(MatrixStack matrices, VertexConsumer buffer)
 	{
 		for (float i = 0; i < segments; i++)
 		{
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate(add * i, 0, 1, 0);
+			matrices.push();
+			matrices.multiply(new Quaternion(add * i, 0, 1, 0));
 			for (int f = 1; f < bottomx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / bottomx.length) * f);
 				TextureVertice t2 = new TextureVertice((1f / segments) * (i - 1), (1f / bottomx.length) * (f - 1));
 				TextureVertice t3 = new TextureVertice((1f / segments) * i, (1f / bottomx.length) * (f - 1));
 				TextureVertice t4 = new TextureVertice((1f / segments) * i, (1f / bottomx.length) * f);
-				RenderHelper.addFace(new Vertice(0f, bottomy[f], bottomx[f]),
+				RenderHelper.addFace(buffer, new Vertice(0f, bottomy[f], bottomx[f]),
 						new Vertice(0f, bottomy[f - 1], bottomx[f - 1]),
 						new Vertice(bottomx[f - 1] * sin, bottomy[f - 1], bottomx[f - 1] * cos),
 						new Vertice(bottomx[f] * sin, bottomy[f], bottomx[f] * cos), t1, t2, t3, t4);
 			}
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
 	}
 }

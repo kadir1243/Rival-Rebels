@@ -11,15 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.init.Blocks;
+import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.block.machine.BlockReciever;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
 public class BlockAutoBarricade extends BlockAutoTemplate
 {
-	public BlockAutoBarricade()
+	public BlockAutoBarricade(Settings settings)
 	{
-		super();
+		super(settings);
 	}
 
 	@Override
@@ -28,41 +29,41 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 		super.build(par1World, x, y, z);
 
 		placeBlockCarefully(par1World, x, y, z, Blocks.AIR);
-		placeBlockCarefully(par1World, x + 1, y, z + 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x + 1, y, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y, z + 1, RivalRebels.reactive);
+		placeBlockCarefully(par1World, x + 1, y, z + 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x + 1, y, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y, z + 1, RRBlocks.reactive);
 
-		placeBlockCarefully(par1World, x + 1, y + 1, z + 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x + 1, y + 1, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y + 1, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y + 1, z + 1, RivalRebels.reactive);
+		placeBlockCarefully(par1World, x + 1, y + 1, z + 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x + 1, y + 1, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y + 1, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y + 1, z + 1, RRBlocks.reactive);
 
-		placeBlockCarefully(par1World, x + 1, y + 2, z + 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x + 1, y + 2, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y + 2, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y + 2, z + 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x, y + 2, z + 1, RivalRebels.steel);
-		placeBlockCarefully(par1World, x + 1, y + 2, z, RivalRebels.steel);
-		placeBlockCarefully(par1World, x, y + 2, z - 1, RivalRebels.steel);
-		placeBlockCarefully(par1World, x - 1, y + 2, z, RivalRebels.steel);
-		placeBlockCarefully(par1World, x, y + 2, z + 2, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x + 2, y + 2, z, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x, y + 2, z - 2, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 2, y + 2, z, RivalRebels.reactive);
+		placeBlockCarefully(par1World, x + 1, y + 2, z + 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x + 1, y + 2, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y + 2, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y + 2, z + 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x, y + 2, z + 1, RRBlocks.steel);
+		placeBlockCarefully(par1World, x + 1, y + 2, z, RRBlocks.steel);
+		placeBlockCarefully(par1World, x, y + 2, z - 1, RRBlocks.steel);
+		placeBlockCarefully(par1World, x - 1, y + 2, z, RRBlocks.steel);
+		placeBlockCarefully(par1World, x, y + 2, z + 2, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x + 2, y + 2, z, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x, y + 2, z - 2, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 2, y + 2, z, RRBlocks.reactive);
 
-		placeBlockCarefully(par1World, x + 1, y + 3, z + 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x + 1, y + 3, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y + 3, z - 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x - 1, y + 3, z + 1, RivalRebels.reactive);
-		placeBlockCarefully(par1World, x, y + 3, z + 1, RivalRebels.steel);
-		placeBlockCarefully(par1World, x + 1, y + 3, z, RivalRebels.steel);
-		placeBlockCarefully(par1World, x, y + 3, z - 1, RivalRebels.steel);
-		placeBlockCarefully(par1World, x - 1, y + 3, z, RivalRebels.steel);
-		placeBlockCarefully(par1World, x, y + 3, z - 2, RivalRebels.ffreciever, 2);
-		placeBlockCarefully(par1World, x, y + 3, z + 2, RivalRebels.ffreciever, 3);
-		placeBlockCarefully(par1World, x - 2, y + 3, z, RivalRebels.ffreciever, 4);
-		placeBlockCarefully(par1World, x + 2, y + 3, z, RivalRebels.ffreciever, 5);
+		placeBlockCarefully(par1World, x + 1, y + 3, z + 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x + 1, y + 3, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y + 3, z - 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x - 1, y + 3, z + 1, RRBlocks.reactive);
+		placeBlockCarefully(par1World, x, y + 3, z + 1, RRBlocks.steel);
+		placeBlockCarefully(par1World, x + 1, y + 3, z, RRBlocks.steel);
+		placeBlockCarefully(par1World, x, y + 3, z - 1, RRBlocks.steel);
+		placeBlockCarefully(par1World, x - 1, y + 3, z, RRBlocks.steel);
+		placeBlockCarefully(par1World, x, y + 3, z - 2, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 2));
+		placeBlockCarefully(par1World, x, y + 3, z + 2, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 3));
+		placeBlockCarefully(par1World, x - 2, y + 3, z, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 4));
+		placeBlockCarefully(par1World, x + 2, y + 3, z, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 5));
 
 		// int h = 1;
 		// int s = 1;
@@ -128,20 +129,20 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 		// placeBlockCarefully(par1World, x + 1, y - h, z - s, RivalRebels.jump);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -154,7 +155,7 @@ public class BlockAutoBarricade extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

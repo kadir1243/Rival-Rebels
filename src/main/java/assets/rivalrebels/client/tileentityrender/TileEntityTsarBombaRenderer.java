@@ -12,52 +12,50 @@
 package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.client.model.ModelTsarBomba;
+import assets.rivalrebels.common.block.trap.BlockTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityTsarBombaRenderer extends TileEntitySpecialRenderer<TileEntityTsarBomba>
-{
-	private final ModelTsarBomba	model;
+@OnlyIn(Dist.CLIENT)
+public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEntityTsarBomba> {
+    private final ModelTsarBomba model;
 
-	public TileEntityTsarBombaRenderer()
-	{
-		model = new ModelTsarBomba();
-	}
+    public TileEntityTsarBombaRenderer(BlockEntityRendererFactory.Context context) {
+        model = new ModelTsarBomba();
+    }
 
     @Override
-    public void render(TileEntityTsarBomba te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		GlStateManager.disableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 1F, (float) z + 0.5F);
-		int metadata = te.getBlockMetadata();
+    public void render(TileEntityTsarBomba entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        matrices.push();
+        matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 1F, (float) entity.getPos().getZ() + 0.5F);
+        int metadata = entity.getCachedState().get(BlockTsarBomba.META);
 
-		if (metadata == 2)
-		{
-			GlStateManager.rotate(180, 0, 1, 0);
-			GlStateManager.rotate(90, 1, 0, 0);
-		}
+        if (metadata == 2) {
+            matrices.multiply(new Quaternion(180, 0, 1, 0));
+            matrices.multiply(new Quaternion(90, 1, 0, 0));
+        } else if (metadata == 3) {
+            matrices.multiply(new Quaternion(90, 1, 0, 0));
+        } else if (metadata == 4) {
+            matrices.multiply(new Quaternion(-90, 0, 1, 0));
+            matrices.multiply(new Quaternion(90, 1, 0, 0));
+        } else if (metadata == 5) {
+            matrices.multiply(new Quaternion(90, 0, 1, 0));
+            matrices.multiply(new Quaternion(90, 1, 0, 0));
+        }
+        model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()));
+        matrices.pop();
+    }
 
-		if (metadata == 3)
-		{
-			GlStateManager.rotate(90, 1, 0, 0);
-		}
+    @Override
+    public int getRenderDistance() {
+        return 16384;
+    }
 
-		if (metadata == 4)
-		{
-			GlStateManager.rotate(-90, 0, 1, 0);
-			GlStateManager.rotate(90, 1, 0, 0);
-		}
-
-		if (metadata == 5)
-		{
-			GlStateManager.rotate(90, 0, 1, 0);
-			GlStateManager.rotate(90, 1, 0, 0);
-		}
-		model.render();
-		GlStateManager.popMatrix();
-	}
 }

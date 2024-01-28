@@ -14,118 +14,90 @@ package assets.rivalrebels.common.block;
 import assets.rivalrebels.common.entity.EntityBlood;
 import assets.rivalrebels.common.entity.EntityGoo;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.block.*;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-public class BlockGore extends BlockContainer {
-    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 5);
-	public BlockGore()
+public class BlockGore extends BlockWithEntity {
+    public static final IntProperty META = IntProperty.of("meta", 0, 5);
+	public BlockGore(Settings settings)
 	{
-		super(Material.CAKE);
-        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
-    }
-    @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(META);
+		super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(META, meta);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
     }
-    @Override
-    public BlockStateContainer getBlockState() {
-        return new BlockStateContainer(this, META);
-    }
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
-	}
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (player.capabilities.isCreativeMode)
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		if (player.getAbilities().creativeMode)
 		{
-			int meta = state.getValue(META) + 1;
+			int meta = state.get(META) + 1;
 			if (meta >= 6) meta = 0;
-			world.setBlockState(pos, state.withProperty(META, meta));
-			return true;
+			world.setBlockState(pos, state.with(META, meta));
+			return ActionResult.success(world.isClient);
 		}
-		return false;
+		return ActionResult.FAIL;
 	}
 
     @Override
-    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
-		if (world.isAirBlock(pos.down()) && state.getValue(META) < 2) world.spawnEntity(new EntityBlood(world, pos.getX() + rand.nextDouble(), pos.getY() + 0.9f, pos.getZ() + rand.nextDouble()));
-		else if (world.isAirBlock(pos.down()) && state.getValue(META) < 4) world.spawnEntity(new EntityGoo(world, pos.getX() + rand.nextDouble(), pos.getY() + 0.9f, pos.getZ() + rand.nextDouble()));
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+        if (world.isAir(pos.down()) && state.get(META) < 2) world.spawnEntity(new EntityBlood(world, pos.getX() + random.nextDouble(), pos.getY() + 0.9f, pos.getZ() + random.nextDouble()));
+		else if (world.isAir(pos.down()) && state.get(META) < 4) world.spawnEntity(new EntityGoo(world, pos.getX() + random.nextDouble(), pos.getY() + 0.9f, pos.getZ() + random.nextDouble()));
 	}
 
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
+    @Override
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return VoxelShapes.empty();
+    }
+
+    @Override
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        if (!Block.sideCoversSmallSquare(world, pos.down(), Direction.UP) ||
+            !Block.sideCoversSmallSquare(world, pos.east(), Direction.WEST) ||
+            !Block.sideCoversSmallSquare(world, pos.west(), Direction.EAST) ||
+            !Block.sideCoversSmallSquare(world, pos.south(), Direction.NORTH) ||
+            !Block.sideCoversSmallSquare(world, pos.north(), Direction.SOUTH) ||
+            !Block.sideCoversSmallSquare(world, pos.up(), Direction.DOWN)) {
+			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+		}
 	}
 
     @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return null;
-    }
-
-    @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return new AxisAlignedBB(BlockPos.ORIGIN, BlockPos.ORIGIN);
-    }
-
-    @Override
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        if (world.isBlockNormalCube(pos.down(), false) ||
-            world.isBlockNormalCube(pos.east(), false) ||
-            world.isBlockNormalCube(pos.west(), false) ||
-            world.isBlockNormalCube(pos.south(), false) ||
-            world.isBlockNormalCube(pos.north(), false) ||
-            world.isBlockNormalCube(pos.up(), false)) {
-			world.setBlockToAir(pos);
-		}
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityGore(pos, state);
 	}
 
-    @Override
-    public boolean hasTileEntity(IBlockState state) {
-        return true;
-    }
-
-    @Override
-	public TileEntity createNewTileEntity(World var1, int var)
-	{
-		return new TileEntityGore();
-	}
-
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
 	@Override

@@ -12,8 +12,8 @@
 package assets.rivalrebels.common.round;
 
 import com.mojang.authlib.GameProfile;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
 
 import java.util.UUID;
 
@@ -35,10 +35,13 @@ public class RivalRebelsPlayer
         resets = r;
     }
 
-	public RivalRebelsPlayer(ByteBuf buf)
-	{
+	public RivalRebelsPlayer(PacketByteBuf buf) {
 		fromBytes(buf);
 	}
+
+    public RivalRebelsPlayer(NbtCompound nbt) {
+        fromNbt(nbt);
+    }
 
 	public boolean equals(RivalRebelsPlayer o)
 	{
@@ -74,26 +77,41 @@ public class RivalRebelsPlayer
 		resets = -1;
 	}
 
-	public void toBytes(ByteBuf buf)
-	{
-        PacketBuffer buffer = new PacketBuffer(buf);
+	public void toBytes(PacketByteBuf buf) {
 		buf.writeByte(rrclass.id);
 		buf.writeByte(rrteam.id);
 		buf.writeByte(rrrank.id);
-		buf.writeByte(resets);
-		buf.writeByte(isreset?'t':'f');
-        buffer.writeUniqueId(getId());
-        buffer.writeString(getUsername());
+		buf.writeInt(resets);
+		buf.writeBoolean(isreset);
+        buf.writeUuid(getId());
+        buf.writeString(getUsername());
 	}
 
-	public void fromBytes(ByteBuf buf)
-	{
+    public void toNbt(NbtCompound nbt) {
+        nbt.putByte("rrclass", (byte) rrclass.id);
+        nbt.putByte("rrteam", (byte) rrteam.id);
+        nbt.putByte("rrrank", (byte) rrrank.id);
+        nbt.putInt("resets", (byte) resets);
+        nbt.putBoolean("isreset", isreset);
+        nbt.putUuid("id", getId());
+        nbt.putString("username", getUsername());
+    }
+
+	public void fromBytes(PacketByteBuf buf) {
 		rrclass = RivalRebelsClass.getForID(buf.readByte());
 		rrteam = RivalRebelsTeam.getForID(buf.readByte());
 		rrrank = RivalRebelsRank.getForID(buf.readByte());
-		resets = buf.readByte();
-		isreset = buf.readByte()=='t';
-        PacketBuffer buffer = new PacketBuffer(buf);
-        this.profile = new GameProfile(buffer.readUniqueId(), buffer.readString(Short.MAX_VALUE));
+		resets = buf.readInt();
+		isreset = buf.readBoolean();
+        this.profile = new GameProfile(buf.readUuid(), buf.readString());
 	}
+
+    public void fromNbt(NbtCompound nbt) {
+        rrclass = RivalRebelsClass.getForID(nbt.getByte("rrclass"));
+        rrteam = RivalRebelsTeam.getForID(nbt.getByte("rrteam"));
+        rrrank = RivalRebelsRank.getForID(nbt.getByte("rrrank"));
+        resets = nbt.getInt("resets");
+        isreset = nbt.getBoolean("isreset");
+        this.profile = new GameProfile(nbt.getUuid("id"), nbt.getString("username"));
+    }
 }

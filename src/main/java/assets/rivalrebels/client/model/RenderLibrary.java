@@ -11,40 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
 
 import java.util.Random;
 
-public class RenderLibrary
-{
-	Tessellator					t		= Tessellator.getInstance();
-	Random						random	= new Random();
-	public static RenderLibrary	instance;
+public class RenderLibrary {
 
-	public RenderLibrary()
-	{
-
-	}
-
-	public void init()
-	{
-		instance = this;
-	}
-
-	public void renderModel(float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a)
-	{
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(x1, y1, z1);
-		GlStateManager.enableRescaleNormal();
-		GlStateManager.disableTexture2D();
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-		GlStateManager.rotate((float) (Math.atan2(x, z) * 57.295779513 - 90), 0, 1, 0);
-		GlStateManager.color(r, g, b, a);
+	public static void renderModel(MatrixStack matrices, VertexConsumer buffer, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
+        Random random = MinecraftClient.getInstance().world.random;
+        matrices.push();
+		matrices.translate(x1, y1, z1);
+		RenderSystem.enableBlend();
+		RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+        RenderSystem.disableBlend();
+        matrices.multiply(new Quaternion((float) (Math.atan2(x, z) * 57.295779513 - 90), 0, 1, 0));
 		double dist = Math.sqrt(x * x + z * z);
 		double hdist = dist / 2f;
 		double hdists = hdist * hdist;
@@ -54,8 +40,7 @@ public class RenderLibrary
 		double[] yv = new double[segNum];
 		double[] zv = new double[segNum];
 
-		for (int i = 1; i < segNum; i++)
-		{
+		for (int i = 1; i < segNum; i++) {
 			double interp = (double) i / (double) segNum;
 			double X = (dist * interp);
 			double Y = (y * interp);
@@ -71,39 +56,31 @@ public class RenderLibrary
 		yv[0] = 0;
 		zv[0] = 0;
 
-        BufferBuilder buffer = t.getBuffer();
-        for (int o = 0; o < steps; o++)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION);
-			for (int i = 1; i < segNum; i++)
-			{
+        for (int o = 0; o < steps; o++) {
+			for (int i = 1; i < segNum; i++) {
 				double s = rs * o;
-				buffer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).endVertex();
-				buffer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).endVertex();
-				buffer.pos(xv[i], yv[i] + s, zv[i] + s).endVertex();
-				buffer.pos(xv[i], yv[i] + s, zv[i] - s).endVertex();
+				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).color(r, g, b, a).next();
+				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] + s, zv[i] + s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] + s, zv[i] - s).color(r, g, b, a).next();
 
-				buffer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).endVertex();
-				buffer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).endVertex();
-				buffer.pos(xv[i], yv[i] - s, zv[i] + s).endVertex();
-				buffer.pos(xv[i], yv[i] + s, zv[i] + s).endVertex();
+				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).color(r, g, b, a).next();
+				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] - s, zv[i] + s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] + s, zv[i] + s).color(r, g, b, a).next();
 
-				buffer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).endVertex();
-				buffer.pos(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).endVertex();
-				buffer.pos(xv[i], yv[i] + s, zv[i] - s).endVertex();
-				buffer.pos(xv[i], yv[i] - s, zv[i] - s).endVertex();
+				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).color(r, g, b, a).next();
+				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] + s, zv[i] - s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] - s, zv[i] - s).color(r, g, b, a).next();
 
-				buffer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).endVertex();
-				buffer.pos(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).endVertex();
-				buffer.pos(xv[i], yv[i] - s, zv[i] - s).endVertex();
-				buffer.pos(xv[i], yv[i] - s, zv[i] + s).endVertex();
+				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).color(r, g, b, a).next();
+				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] - s, zv[i] - s).color(r, g, b, a).next();
+				buffer.vertex(xv[i], yv[i] - s, zv[i] + s).color(r, g, b, a).next();
 			}
-			t.draw();
 		}
 
-		GlStateManager.disableBlend();
-		GlStateManager.enableTexture2D();
-		GlStateManager.disableRescaleNormal();
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }

@@ -11,61 +11,48 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityNuke;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.client.model.IModel;
-import net.minecraftforge.client.model.obj.OBJLoader;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.model.obj.OBJModel;
 
-@SideOnly(Side.CLIENT)
-public class RenderNuke extends Render
+@OnlyIn(Dist.CLIENT)
+public class RenderNuke extends EntityRenderer<EntityNuke>
 {
-    public static IModel model;
+    public static OBJModel model;
 
-	public RenderNuke(RenderManager manager)
+	public RenderNuke(EntityRendererFactory.Context manager)
 	{
         super(manager);
         try {
-            model = OBJLoader.INSTANCE.loadModel(new ResourceLocation(RivalRebels.MODID, "models/wacknuke.obj"));
+            model = RenderHelper.getModel("wacknuke");
         } catch (Exception e) {
-            RivalRebels.LOGGER.error(e);
+            RivalRebels.LOGGER.error("Failed to load nuke model", e);
         }
     }
 
-	public void renderB83(EntityNuke b83, double x, double y, double z, float par8, float par9)
-	{
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x, (float) y, (float) z);
-		GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-		GlStateManager.rotate(b83.rotationYaw - 90.0f, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(b83.rotationPitch - 90.0f, 0.0F, 0.0F, 1.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etwacknuke);
-		//model.renderAll();
-		GlStateManager.popMatrix();
-	}
+    @Override
+    public void render(EntityNuke entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
+        matrices.multiply(new Quaternion(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternion(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
+        // render model
+        matrices.pop();
+    }
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderB83((EntityNuke) par1Entity, par2, par4, par6, par8, par9);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityNuke entity) {
+        return RRIdentifiers.etwacknuke;
+    }
 }

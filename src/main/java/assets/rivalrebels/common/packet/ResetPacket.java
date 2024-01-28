@@ -11,42 +11,33 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraftforge.network.NetworkEvent;
 
-public class ResetPacket implements IMessage {
-	public ResetPacket() {
-	}
+import java.util.function.Supplier;
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-	}
+public class ResetPacket {
+    public static ResetPacket fromBytes(PacketByteBuf buf) {
+        return new ResetPacket();
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-	}
+    public static void toBytes(ResetPacket packet, PacketByteBuf buf) {
+    }
 
-	public static class Handler implements IMessageHandler<ResetPacket, IMessage>
-	{
-		@Override
-		public IMessage onMessage(ResetPacket m, MessageContext ctx)
-		{
-            EntityPlayerMP player = ctx.getServerHandler().player;
-            player.getServer().addScheduledTask(() ->{
-                RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
-                if (!p.isreset && p.resets > 0) {
-                    p.isreset = true;
-                    p.resets--;
-                    player.inventory.clear();
-                    PacketDispatcher.packetsys.sendToAll(RivalRebels.round.rrplayerlist);
-                }
-            });
-			return null;
-		}
-	}
+    public static void onMessage(ResetPacket m, Supplier<NetworkEvent.Context> ctx) {
+        NetworkEvent.Context context = ctx.get();
+        ServerPlayerEntity player = context.getSender();
+        context.enqueueWork(() -> {
+            RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
+            if (!p.isreset && p.resets > 0) {
+                p.isreset = true;
+                p.resets--;
+                player.getInventory().clear();
+                RivalRebels.round.rrplayerlist.refreshForWorld(player.getWorld());
+            }
+        });
+    }
 }

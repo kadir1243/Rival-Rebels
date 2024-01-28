@@ -11,103 +11,46 @@
  *******************************************************************************/
 package assets.rivalrebels.common.core;
 
+import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.gui.*;
 import assets.rivalrebels.common.container.*;
-import assets.rivalrebels.common.tileentity.*;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.ScreenHandlerType;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-public class RivalRebelsGuiHandler implements IGuiHandler
-{
-	@Override
-	public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
-	{
-		TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
-		if (tileEntity instanceof TileEntityTsarBomba)
-		{
-			return new ContainerTsar(player.inventory, (TileEntityTsarBomba) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityAntimatterBomb)
-		{
-			return new ContainerAntimatterBomb(player.inventory, (TileEntityAntimatterBomb) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityTachyonBomb)
-		{
-			return new ContainerTachyonBomb(player.inventory, (TileEntityTachyonBomb) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityTheoreticalTsarBomba)
-		{
-			return new ContainerTheoreticalTsar(player.inventory, (TileEntityTheoreticalTsarBomba) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityNuclearBomb)
-		{
-			return new ContainerNuclearBomb(player.inventory, (TileEntityNuclearBomb) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityLoader)
-		{
-			return new ContainerLoader(player.inventory, (TileEntityLoader) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityReactor)
-		{
-			return new ContainerReactor(player.inventory, (TileEntityReactor) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityLaptop)
-		{
-			return new ContainerLaptop(player.inventory, (TileEntityLaptop) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityReciever)
-		{
-			return new ContainerReciever(player.inventory, (TileEntityReciever) tileEntity);
-		}
-		return null;
-	}
+import java.util.HashSet;
+import java.util.Set;
 
-	@Override
-	public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
-	{
-		TileEntity tileEntity = world.getTileEntity(new BlockPos(x, y, z));
-		if (tileEntity instanceof TileEntityTsarBomba)
-		{
-			return new GuiTsar(player.inventory, (TileEntityTsarBomba) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityAntimatterBomb)
-		{
-			return new GuiAntimatterBomb(player.inventory, (TileEntityAntimatterBomb) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityTachyonBomb)
-		{
-			return new GuiTachyonBomb(player.inventory, (TileEntityTachyonBomb) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityTheoreticalTsarBomba)
-		{
-			return new GuiTheoreticalTsar(player.inventory, (TileEntityTheoreticalTsarBomba) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityNuclearBomb)
-		{
-			return new GuiNuclearBomb(player.inventory, (TileEntityNuclearBomb) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityLoader)
-		{
-			return new GuiLoader(player.inventory, (TileEntityLoader) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityReactor)
-		{
-			return new GuiReactor(player.inventory, (TileEntityReactor) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityLaptop)
-		{
-			return new GuiLaptop(player.inventory, (TileEntityLaptop) tileEntity);
-		}
-		if (tileEntity instanceof TileEntityReciever)
-		{
-			return new GuiTray(player.inventory, (TileEntityReciever) tileEntity);
-		}
-        if (id == 24) {
-            return new GuiOptiFineWarning();
-        }
-		return null;
-	}
+public class RivalRebelsGuiHandler {
+    public static final Set<ScreenHandlerType<?>> SCREEN_HANDLER_TYPES = new HashSet<>();
+    public static final ScreenHandlerType<ContainerTsar> TSAR_SCREEN_HANDLER_TYPE = register("tsar", new ScreenHandlerType<>(ContainerTsar::new));
+    public static final ScreenHandlerType<ContainerAntimatterBomb> ANTIMATTER_SCREEN_HANDLER_TYPE = register("antimatter", new ScreenHandlerType<>(ContainerAntimatterBomb::new));
+    public static final ScreenHandlerType<ContainerReactor> REACTOR_SCREEN_HANDLER_TYPE = register("reactor", new ScreenHandlerType<>(ContainerReactor::new));
+    public static final ScreenHandlerType<ContainerLaptop> LAPTOP_SCREEN_HANDLER_TYPE = register("laptop", new ScreenHandlerType<>(ContainerLaptop::new));
+    public static final ScreenHandlerType<ContainerLoader> LOADER_SCREEN_HANDLER_TYPE = register("loader", new ScreenHandlerType<>(ContainerLoader::new));
+    public static final ScreenHandlerType<ContainerReciever> RECIEVER_SCREEN_HANDLER_TYPE = register("reciever", new ScreenHandlerType<>(ContainerReciever::new));
+    public static final ScreenHandlerType<ContainerNuclearBomb> NUCLEAR_BOMB_SCREEN_HANDLER_TYPE = register("nuclear_bomb", new ScreenHandlerType<>(ContainerNuclearBomb::new));
+    public static final ScreenHandlerType<ContainerTachyonBomb> TACHYON_SCREEN_HANDLER_TYPE = register("tachyon", new ScreenHandlerType<>(ContainerTachyonBomb::new));
+    public static final ScreenHandlerType<ContainerTheoreticalTsar> THEORETICAL_TSAR_SCREEN_HANDLER_TYPE = register("theoretical_tsar", new ScreenHandlerType<>(ContainerTheoreticalTsar::new));
+
+    @OnlyIn(Dist.CLIENT)
+    public static void registerClientGuiBinds() {
+        HandledScreens.register(TSAR_SCREEN_HANDLER_TYPE, GuiTsar::new);
+        HandledScreens.register(ANTIMATTER_SCREEN_HANDLER_TYPE, GuiAntimatterBomb::new);
+        HandledScreens.register(REACTOR_SCREEN_HANDLER_TYPE, GuiReactor::new);
+        HandledScreens.register(LAPTOP_SCREEN_HANDLER_TYPE, GuiLaptop::new);
+        HandledScreens.register(LOADER_SCREEN_HANDLER_TYPE, GuiLoader::new);
+        HandledScreens.register(RECIEVER_SCREEN_HANDLER_TYPE, GuiTray::new);
+        HandledScreens.register(NUCLEAR_BOMB_SCREEN_HANDLER_TYPE, GuiNuclearBomb::new);
+        HandledScreens.register(TACHYON_SCREEN_HANDLER_TYPE, GuiTachyonBomb::new);
+        HandledScreens.register(THEORETICAL_TSAR_SCREEN_HANDLER_TYPE, GuiTheoreticalTsar::new);
+    }
+
+    public static <U extends ScreenHandler, T extends ScreenHandlerType<U>> T register(String name, T type) {
+        type.setRegistryName(RivalRebels.MODID, name);
+        SCREEN_HANDLER_TYPES.add(type);
+        return type;
+    }
 }

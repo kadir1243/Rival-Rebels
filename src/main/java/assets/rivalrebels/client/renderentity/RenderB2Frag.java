@@ -11,25 +11,28 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.entity.EntityB2Frag;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderB2Frag extends Render
+@OnlyIn(Dist.CLIENT)
+public class RenderB2Frag extends EntityRenderer<EntityB2Frag>
 {
 	ModelFromObj	md1;
 	ModelFromObj	md2;
 
-	public RenderB2Frag(RenderManager manager)
+	public RenderB2Frag(EntityRendererFactory.Context manager)
 	{
         super(manager);
         md1 = ModelFromObj.readObjFile("f.obj");
@@ -38,34 +41,21 @@ public class RenderB2Frag extends Render
         md2.scale(3, 3, 3);
 	}
 
-	public void renderB2Frag(EntityB2Frag b2spirit, double x, double y, double z, float par8, float par9)
-	{
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x, (float) y, (float) z);
-		GlStateManager.rotate(b2spirit.rotationYaw, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(b2spirit.rotationPitch, 0.0F, 0.0F, 1.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etb2spirit);
-		GlStateManager.disableCull();
-		if (b2spirit.type == 0) md1.render();
-		if (b2spirit.type == 1) md2.render();
-		GlStateManager.popMatrix();
+    @Override
+    public void render(EntityB2Frag entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		matrices.push();
+		matrices.multiply(new Quaternion(entity.getYaw(), 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternion(entity.getPitch(), 0.0F, 0.0F, 1.0F));
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etb2spirit);
+
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        if (entity.type == 0) md1.render(buffer);
+		if (entity.type == 1) md2.render(buffer);
+		matrices.pop();
 	}
 
-	/**
-	 * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then handing it off to a worker function which does the actual work. In all
-	 * probabilty, the class Render is generic (Render<T extends Entity) and this method has signature public void doRender(T entity, double d, double d1, double d2, float f, float f1). But JAD is pre
-	 * 1.5 so doesn't do that.
-	 */
-	@Override
-	public void doRender(Entity par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-		renderB2Frag((EntityB2Frag) par1Entity, par2, par4, par6, par8, par9);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityB2Frag entity) {
+        return null;
+    }
 }

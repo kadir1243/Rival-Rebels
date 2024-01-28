@@ -15,16 +15,19 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.monster.EntityZombie;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.mob.ZombieEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 import java.util.List;
 
-public class EntityB2Spirit extends Entity
+public class EntityB2Spirit extends EntityInanimate
 {
 	private int					ticksSinceStart	= 0;
 	private int					timeLeft	= -1;
@@ -37,21 +40,22 @@ public class EntityB2Spirit extends Entity
 	public static int			staticEntityIndex		= 10;
 	public int					entityIndex				= 10;
 	public boolean dropAnything = true;
-	public static boolean randchance = true;
-	public boolean dropOnlyOne = false;
+    public boolean dropOnlyOne = false;
 	public static boolean trash = true;
 	public static boolean leave = true;
 
 	public int mode = 0; //0=straight 1=left 2=right
 
-	public EntityB2Spirit(World par1World)
-	{
-		super(par1World);
-		setSize(30F, 4F);
-		ignoreFrustumCheck = true;
-		setEntityBoundingBox(new AxisAlignedBB(-10, -3, -10, 10, 4, 10));
+	public EntityB2Spirit(EntityType<? extends EntityB2Spirit> entityType, World par1World) {
+		super(entityType, par1World);
+		ignoreCameraFrustum = true;
+		setBoundingBox(new Box(-10, -3, -10, 10, 4, 10));
 		health = RivalRebels.b2spirithealth;
 	}
+
+    public EntityB2Spirit(World par1World) {
+        this(RREntities.B2SPIRIT, par1World);
+    }
 
 	public EntityB2Spirit(World par1World, double x, double y, double z, double x1, double y1, double z1, boolean c, boolean da)
 	{
@@ -77,65 +81,50 @@ public class EntityB2Spirit extends Entity
 				entityIndex = staticEntityIndex;
 			}
 		}
-		if (!world.isRemote) startBombRun(tz-z1, x1-tx); //perpendicular to view
+		if (!world.isClient) startBombRun(tz-z1, x1-tx); //perpendicular to view
 	}
 
 	public EntityB2Spirit(EntityRhodes r)
 	{
 		this(r.world);
 		rhodeswing = r;
-		posX = r.posX - r.motionX * 500;
-		posY = 120;
-		posZ = r.posZ - r.motionZ * 500;
+		setPos(
+            r.getX() - r.getVelocity().getX() * 500,
+            120,
+            r.getZ() - r.getVelocity().getZ() * 500
+        );
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBox(Entity par1Entity)
-	{
-		return par1Entity.getEntityBoundingBox();
-	}
-
-	@Override
-	public boolean canBeCollidedWith()
+	public boolean collides()
 	{
 		return true;
 	}
 
-    /**
-	 * Called to update the entity's position/logic.
-	 */
-	@Override
-	public void onUpdate()
+    @Override
+	public void tick()
 	{
-		super.onUpdate();
-		this.lastTickPosX = this.posX;
-		this.lastTickPosY = this.posY;
-		this.lastTickPosZ = this.posZ;
+		super.tick();
 
-		if (rand.nextDouble() > 0.8f) RivalRebelsSoundPlayer.playSound(this, 8, 0, 4.5f, 1.3f);
+		if (random.nextDouble() > 0.8f) RivalRebelsSoundPlayer.playSound(this, 8, 0, 4.5f, 1.3f);
 
-		if (rhodeswing != null)
-		{
-			motionX = rhodeswing.posX - posX;
-			motionY = rhodeswing.posY - posY;
-			motionZ = rhodeswing.posZ - posZ;
-			double t = Math.sqrt(motionX*motionX+motionY*motionY+motionZ*motionZ);
-			motionX /= t;
-			motionY /= t;
-			motionZ /= t;
-			rotationYaw = rhodeswing.rotationYaw;
-			rotationPitch = (float) (Math.min(t,90.0));
-			if (t < 25.0 || ticksExisted > 100)
+		if (rhodeswing != null) {
+            setVelocity(rhodeswing.getPos().subtract(getPos()));
+			double t = Math.sqrt(getVelocity().lengthSquared());
+            setVelocity(getVelocity().multiply(1/t));
+            setYaw(rhodeswing.getYaw());
+			setPitch((float) (Math.min(t, 90.0)));
+			if (t < 25.0 || age > 100)
 			{
 				rhodeswing.b2energy = 8000;
 				rhodeswing.freeze = false;
-				setDead();
+				kill();
 			}
 		}
 
-		if (!this.world.isRemote)
+		if (!this.world.isClient)
 		{
-			double distfromtarget = Math.sqrt((tx-posX)*(tx-posX)+(tz-posZ)*(tz-posZ));
+			double distfromtarget = Math.sqrt((tx-getX())*(tx-getX())+(tz-getZ())*(tz-getZ()));
 			ticksSinceStart++;
 
 			if (ticksSinceStart >= 60 && mode == 0)
@@ -145,21 +134,21 @@ public class EntityB2Spirit extends Entity
 
 				if (distfromtarget > 80.0f)
 				{
-					mode = world.rand.nextBoolean() ? 1 : 2;
+					mode = world.random.nextBoolean() ? 1 : 2;
 					if (trash)
 					{
 						carpet = true;
-						entityIndex = world.rand.nextInt(ItemRoda.rodaindex);
+						entityIndex = world.random.nextInt(ItemRoda.rodaindex);
 					}
 					if (leave)
 					{
-						if (ticksSinceStart > 1000 && world.rand.nextInt(4) == 1)
+						if (ticksSinceStart > 1000 && world.random.nextInt(4) == 1)
 						{
-							motionY = 2.0f;
+                            setVelocity(getVelocity().getX(), 2F, getVelocity().getZ());
 						}
 						if (!trash && dropOnlyOne)
 						{
-							motionY = 2.0f;
+                            setVelocity(getVelocity().getX(), 2F, getVelocity().getZ());
 						}
 					}
 				}
@@ -167,16 +156,18 @@ public class EntityB2Spirit extends Entity
 			if (mode > 0)
 			{
 				if (mode == 1)
-					rotationYaw += 10.0f;
+                    setYaw(getYaw() + 10.0f);
 				else if (mode == 2)
-					rotationYaw -= 10.0f;
-				motionX = MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI);
-				motionZ = MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI);
+                    setYaw(getYaw() - 10.0f);
+				setVelocity(MathHelper.sin(getYaw() / 180.0F * (float) Math.PI),
+                    getVelocity().getY(),
+                    MathHelper.cos(getYaw() / 180.0F * (float) Math.PI)
+                );
 				if (distfromtarget < 80.0f)
 					mode = 0;
 			}
 
-			List<Entity> var5 = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
@@ -188,141 +179,131 @@ public class EntityB2Spirit extends Entity
                 }
 
                 if (var9 instanceof EntityLaserBurst) {
-                    var9.setDead();
-                    this.attackEntityFrom(DamageSource.GENERIC, 6);
+                    var9.kill();
+                    this.damage(DamageSource.GENERIC, 6);
                 }
             }
 
 			timeLeft--;
 			if (timeLeft == 0)
 			{
-				motionY = 2.0f;
+                setVelocity(getVelocity().getX(), 2F, getVelocity().getZ());
 			}
-			if (posY > 256.0f)
+			if (getY() > 256.0f)
 			{
-				setDead();
+				kill();
 			}
 		}
 
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
+        Vec3d vec3d = getPos().add(getVelocity());
+        setPos(vec3d.getX(), vec3d.getY(), vec3d.getZ());
 		if (rhodeswing == null)
 		{
-			float var16 = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-			this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+			double var16 = Math.sqrt(this.getVelocity().getX() * this.getVelocity().getX() + this.getVelocity().getZ() * this.getVelocity().getZ());
+			this.setYaw((float) (Math.atan2(this.getVelocity().getX(), this.getVelocity().getZ()) * 180.0D / Math.PI));
 
-			for (this.rotationPitch = (float) (Math.atan2(-this.motionY, var16) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+			for (this.setPitch((float) (Math.atan2(-this.getVelocity().getY(), var16) * 180.0D / Math.PI)); this.getPitch() - this.prevPitch < -180.0F; this.prevPitch -= 360.0F)
 			{
             }
 
-			while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+			while (this.getPitch() - this.prevPitch >= 180.0F)
 			{
-				this.prevRotationPitch += 360.0F;
+				this.prevPitch += 360.0F;
 			}
 
-			while (this.rotationYaw - this.prevRotationYaw < -180.0F)
+			while (this.getYaw() - this.prevYaw < -180.0F)
 			{
-				this.prevRotationYaw -= 360.0F;
+				this.prevYaw -= 360.0F;
 			}
 
-			while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
+			while (this.getYaw() - this.prevYaw >= 180.0F)
 			{
-				this.prevRotationYaw += 360.0F;
+				this.prevYaw += 360.0F;
 			}
 
-			this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
-			this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
+			this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.2F);
+			this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.2F);
 		}
-		this.setPosition(this.posX, this.posY, this.posZ);
+		this.setPosition(this.getX(), this.getY(), this.getZ());
 	}
 
 	public void dropNuke()
 	{
-		if (dropAnything) ItemRoda.spawn(entityIndex, world, posX+rand.nextDouble()*4-2, posY - 3.5f, posZ+rand.nextDouble()*4-2, motionX * 0.1f, -1.0f, motionZ * 0.1f, 1.0f, 0.0f);
+		if (dropAnything) ItemRoda.spawn(entityIndex, world, getX()+random.nextDouble()*4-2, getY() - 3.5f, getZ()+random.nextDouble()*4-2, getVelocity().getX() * 0.1f, -1.0f, getVelocity().getZ() * 0.1f, 1.0f, 0.0f);
 	}
 	Entity rhodes = null;
 	public void startBombRun(double x, double z)
 	{
 		if (rhodes != null)
 		{
-			tx = rhodes.posX;
-			ty = rhodes.posY;
-			tz = rhodes.posZ;
-			x = -rhodes.motionX;
-			z = -rhodes.motionZ;
+			tx = rhodes.getX();
+			ty = rhodes.getY();
+			tz = rhodes.getZ();
+			x = -rhodes.getVelocity().getX();
+			z = -rhodes.getVelocity().getZ();
 		}
 		double dist = 1.0/Math.sqrt(x*x + z*z);
 		x *= dist;
 		z *= dist;
-		motionX = -x;
-		motionZ = -z;
+        setVelocity(-x, getVelocity().getY(), -z);
 		setPosition(tx + x*80, ty+60, tz + z*80);
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
+        setYaw(prevYaw = (float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
 	}
 
 	@Override
-	public void writeEntityToNBT(NBTTagCompound nbt)
+	public void writeCustomDataToNbt(NbtCompound nbt)
 	{
-		nbt.setInteger("drop", entityIndex);
-		nbt.setFloat("tx", (float) tx);
-		nbt.setFloat("ty", (float) ty);
-		nbt.setFloat("tz", (float) tz);
-		nbt.setInteger("age", ticksSinceStart);
-		nbt.setInteger("health", health);
-		nbt.setInteger("duration", timeLeft);
+		nbt.putInt("drop", entityIndex);
+		nbt.putFloat("tx", (float) tx);
+		nbt.putFloat("ty", (float) ty);
+		nbt.putFloat("tz", (float) tz);
+		nbt.putInt("age", ticksSinceStart);
+		nbt.putInt("health", health);
+		nbt.putInt("duration", timeLeft);
 	}
 
 	@Override
-	public void readEntityFromNBT(NBTTagCompound nbt)
+	public void readCustomDataFromNbt(NbtCompound nbt)
 	{
-		entityIndex = nbt.getInteger("drop");
+		entityIndex = nbt.getInt("drop");
 		carpet = entityIndex < ItemRoda.rodaindex;
 		tx = nbt.getFloat("tx");
 		ty = nbt.getFloat("ty");
 		tz = nbt.getFloat("tz");
-		ticksSinceStart = nbt.getInteger("age");
-		health = nbt.getInteger("health");
-		timeLeft = nbt.getInteger("duration");
+		ticksSinceStart = nbt.getInt("age");
+		health = nbt.getInt("health");
+		timeLeft = nbt.getInt("duration");
 		if (ticksSinceStart == 0)
 		{
-			double dx = tx - posX;
-			double dy = ty - posY;
+			double dx = tx - getX();
+			double dy = ty - getY();
 			startBombRun(dx, dy);
 		}
 	}
 
-	@Override
-	public boolean isInRangeToRenderDist(double par1)
-	{
-		return true;
-	}
+    @Override
+    public boolean shouldRender(double distance) {
+        return true;
+    }
 
-	@Override
-	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
+    @Override
+	public boolean damage(DamageSource par1DamageSource, float par2)
 	{
-		super.attackEntityFrom(par1DamageSource, par2);
-		if (!this.isDead && !this.world.isRemote)
-		{
+		super.damage(par1DamageSource, par2);
+		if (this.isAlive() && !this.world.isClient) {
 			this.health -= par2;
-			if (this.health <= 0)
-			{
-				this.setDead();
-				this.world.createExplosion(null, this.posX, this.posY, this.posZ, 6.0F, true);
+			if (this.health <= 0) {
+				this.kill();
+				this.world.createExplosion(null, this.getX(), this.getY(), this.getZ(), 6.0F, Explosion.DestructionType.DESTROY);
 				world.spawnEntity(new EntityB2Frag(world, this, 0));
 				world.spawnEntity(new EntityB2Frag(world, this, 1));
-				EntityZombie pz = new EntityZombie(world);
-				pz.setPosition(posX, posY, posZ);
+				ZombieEntity pz = new ZombieEntity(world);
+				pz.setPosition(getX(), getY(), getZ());
 				world.spawnEntity(pz);
 				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
 			}
 		}
 
 		return true;
-	}
-
-	@Override
-	protected void entityInit()
-	{
 	}
 }

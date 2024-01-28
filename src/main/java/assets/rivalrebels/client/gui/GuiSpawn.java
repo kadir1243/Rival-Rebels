@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.client.guihelper.GuiScroll;
@@ -21,18 +22,21 @@ import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import com.mojang.authlib.GameProfile;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.network.NetworkPlayerInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
-import org.lwjgl.input.Mouse;
-import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.network.PlayerListEntry;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
 
-public class GuiSpawn extends GuiScreen
+import static net.minecraftforge.client.gui.GuiUtils.drawGradientRect;
+
+public class GuiSpawn extends Screen
 {
 	private final int	xSizeOfTexture	= 256;
 	private final int	ySizeOfTexture	= 256;
@@ -47,133 +51,125 @@ public class GuiSpawn extends GuiScreen
 	private GuiScroll	playerScroll;
 	private GuiScroll	gameScroll;
 	private boolean		prevClick		= true;
-	private RivalRebelsClass rrclass = RivalRebelsClass.NONE;
+	private final RivalRebelsClass rrclass;
 
 	public GuiSpawn(RivalRebelsClass rrc)
 	{
-		posX = (width - xSizeOfTexture) / 2;
+        super(Text.of(""));
+        posX = (width - xSizeOfTexture) / 2;
 		posY = (height - ySizeOfTexture) / 2;
 		rrclass = rrc;
 	}
 
 	@Override
-	public void initGui()
+	public void init()
 	{
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-		this.buttonList.clear();
+		this.drawables.clear();
 
-		classButton = new GuiButton(0, posX + 188, posY + 102, 60, 11, "RivalRebels.spawn.class");
-		resetButton = new GuiButton(1, posX + 188, posY + 119, 60, 11, "RivalRebels.spawn.reset");
-		omegaButton = new GuiButton(2, posX + 35, posY + 237, 60, 11, "RivalRebels.spawn.joinomega");
-		sigmaButton = new GuiButton(3, posX + 160, posY + 237, 60, 11, "RivalRebels.spawn.joinsigma");
-		omegaScroll = new GuiScroll(4, posX + 118, posY + 140, 80);
-		sigmaScroll = new GuiScroll(5, posX + 243, posY + 140, 80);
-		playerScroll = new GuiScroll(6, posX + 154, posY + 103, 16);
-		gameScroll = new GuiScroll(7, posX + 243, posY + 66, 16);
-		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getMinecraft().player.getGameProfile());
-		resetButton.enabled = nw.resets > 0 && !nw.isreset;
-		omegaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
-		sigmaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
-		classButton.enabled = nw.isreset;
-		this.buttonList.add(classButton);
-		this.buttonList.add(resetButton);
-		this.buttonList.add(omegaButton);
-		this.buttonList.add(sigmaButton);
-		this.buttonList.add(omegaScroll);
-		this.buttonList.add(sigmaScroll);
-		this.buttonList.add(playerScroll);
-		this.buttonList.add(gameScroll);
-	}
-
-	@Override
-	public boolean doesGuiPauseGame()
-	{
-		return false;
-	}
-
-	@Override
-	public void handleKeyboardInput()
-	{
-
+		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, new TranslatableText("RivalRebels.spawn.class"));
+		resetButton = new GuiButton(posX + 188, posY + 119, 60, 11, new TranslatableText("RivalRebels.spawn.reset"));
+		omegaButton = new GuiButton(posX + 35, posY + 237, 60, 11, new TranslatableText("RivalRebels.spawn.joinomega"));
+		sigmaButton = new GuiButton(posX + 160, posY + 237, 60, 11, new TranslatableText("RivalRebels.spawn.joinsigma"));
+		omegaScroll = new GuiScroll(posX + 118, posY + 140, 80);
+		sigmaScroll = new GuiScroll(posX + 243, posY + 140, 80);
+		playerScroll = new GuiScroll(posX + 154, posY + 103, 16);
+		gameScroll = new GuiScroll(posX + 243, posY + 66, 16);
+		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(MinecraftClient.getInstance().player.getGameProfile());
+		resetButton.active = nw.resets > 0 && !nw.isreset;
+		omegaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
+		sigmaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
+		classButton.active = nw.isreset;
+		this.addDrawable(classButton);
+		this.addDrawable(resetButton);
+		this.addDrawable(omegaButton);
+		this.addDrawable(sigmaButton);
+		this.addDrawable(omegaScroll);
+		this.addDrawable(sigmaScroll);
+		this.addDrawable(playerScroll);
+		this.addDrawable(gameScroll);
 	}
 
     @Override
-	public void drawScreen(int x, int y, float d)
-	{
-		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getMinecraft().player.getGameProfile());
-		classButton.enabled = nw.isreset;
-		omegaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
-		sigmaButton.enabled = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
-		resetButton.enabled = nw.resets > 0 && !nw.isreset;
+    public boolean shouldPause() {
+        return false;
+    }
+
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(MinecraftClient.getInstance().player.getGameProfile());
+		classButton.active = nw.isreset;
+		omegaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
+		sigmaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
+		resetButton.active = nw.resets > 0 && !nw.isreset;
 		Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         float f = 0.00390625F;
-		drawDefaultBackground();
-		drawGradientRect(posX, posY, posX + xSizeOfTexture, posY + ySizeOfTexture, 0xFF000000, 0xFF000000); // 0xFF587075, 0xFF041010);
-		drawPanel(posX + 10, posY + 142, 80, omegaScroll.getScroll(), omegaScroll.limit, RivalRebelsTeam.OMEGA);
-		drawPanel(posX + 135, posY + 142, 80, sigmaScroll.getScroll(), sigmaScroll.limit, RivalRebelsTeam.SIGMA);
-		drawPanel(posX + 10, posY + 68, 228, 50, gameScroll.getScroll(), gameScroll.limit, RivalRebels.round.getMotD() + "\nMod by Rodolphito. \nVisit www.RivalRebels.com for official downloads.");
-		drawGradientRect(posX + 6, posY + 99, posX + 161, posY + 131, 0xFF000000, 0xFF000000);
-		drawPanel(posX + 10, posY + 105, 50, playerScroll.getScroll(), playerScroll.limit, new String[] { rrclass.name }, new int[] { rrclass.color });
+		renderBackground(matrices);
+		drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), posX, posY, posX + xSizeOfTexture, posY + ySizeOfTexture, 0xFF000000, 0xFF000000); // 0xFF587075, 0xFF041010);
+		drawPanel(matrices, posX + 10, posY + 142, 80, omegaScroll.getScroll(), omegaScroll.limit, RivalRebelsTeam.OMEGA);
+		drawPanel(matrices, posX + 135, posY + 142, 80, sigmaScroll.getScroll(), sigmaScroll.limit, RivalRebelsTeam.SIGMA);
+		drawPanel(matrices, posX + 10, posY + 68, 228, 50, gameScroll.getScroll(), gameScroll.limit, RivalRebels.round.getMotD() + "\nMod by Rodolphito. \nVisit www.RivalRebels.com for official downloads.");
+		drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), posX + 6, posY + 99, posX + 161, posY + 131, 0xFF000000, 0xFF000000);
+		drawPanel(matrices, posX + 10, posY + 105, 50, playerScroll.getScroll(), playerScroll.limit, new String[] { rrclass.name }, new int[] { rrclass.color });
 
-		GlStateManager.color(1F, 1F, 1F);
-		this.mc.renderEngine.bindTexture(RivalRebels.guitspawn);
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(posX, posY + ySizeOfTexture, zLevel).tex(0, ySizeOfTexture * f).endVertex();
-		buffer.pos(posX + xSizeOfTexture, posY + ySizeOfTexture, zLevel).tex(xSizeOfTexture * f, ySizeOfTexture * f).endVertex();
-		buffer.pos(posX + xSizeOfTexture, posY, zLevel).tex(xSizeOfTexture * f, 0).endVertex();
-		buffer.pos(posX, posY, zLevel).tex(0, 0).endVertex();
+		RenderSystem.setShaderColor(1F, 1F, 1F, 1F);
+        RenderSystem.setShaderTexture(0, RRIdentifiers.guitspawn);
+        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		buffer.vertex(posX, posY + ySizeOfTexture, getZOffset()).texture(0, ySizeOfTexture * f).next();
+		buffer.vertex(posX + xSizeOfTexture, posY + ySizeOfTexture, getZOffset()).texture(xSizeOfTexture * f, ySizeOfTexture * f).next();
+		buffer.vertex(posX + xSizeOfTexture, posY, getZOffset()).texture(xSizeOfTexture * f, 0).next();
+		buffer.vertex(posX, posY, getZOffset()).texture(0, 0).next();
 		tessellator.draw();
 
-		if (RivalRebels.banner != null)
-		{
-			this.mc.renderEngine.bindTexture(RivalRebels.banner);
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(posX + 3, posY + 61, zLevel).tex(0, 1).endVertex();
-			buffer.pos(posX + 253, posY + 61, zLevel).tex(1, 1).endVertex();
-			buffer.pos(posX + 253, posY + 3, zLevel).tex(1, 0).endVertex();
-			buffer.pos(posX + 3, posY + 3, zLevel).tex(0, 0).endVertex();
+		if (RRIdentifiers.banner != null) {
+            RenderSystem.setShaderTexture(0, RRIdentifiers.banner);
+			buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+			buffer.vertex(posX + 3, posY + 61, getZOffset()).texture(0, 1).next();
+			buffer.vertex(posX + 253, posY + 61, getZOffset()).texture(1, 1).next();
+			buffer.vertex(posX + 253, posY + 3, getZOffset()).texture(1, 0).next();
+			buffer.vertex(posX + 3, posY + 3, getZOffset()).texture(0, 0).next();
 			tessellator.draw();
 		}
 
-		super.drawScreen(x, y, d);
+		super.render(matrices, mouseX, mouseY, delta);
 
-		fontRenderer.drawString(String.valueOf(RivalRebels.round.getOmegaWins()), posX + 9, posY + 239, 0xFFFFFF);
-		fontRenderer.drawString(String.valueOf(RivalRebels.round.getSigmaWins()), posX + 134, posY + 239, 0xFFFFFF);
+		textRenderer.draw(matrices, String.valueOf(RivalRebels.round.getOmegaWins()), posX + 9, posY + 239, 0xFFFFFF);
+		textRenderer.draw(matrices, String.valueOf(RivalRebels.round.getSigmaWins()), posX + 134, posY + 239, 0xFFFFFF);
 
-		if (resetButton.mousePressed(mc, x, y) && resetButton.enabled)
+		if (resetButton.mouseClicked(mouseX, mouseY, 0) && resetButton.active)
 		{
-			drawGradientRect(x, y, x + 120, y + 20, 0xaa111111, 0xaa111111);
+			drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mouseX, mouseY, mouseX + 120, mouseY + 20, 0xaa111111, 0xaa111111);
 			float scalefactor = 0.666f;
-			GlStateManager.scale(scalefactor, scalefactor, scalefactor);
-			fontRenderer.drawSplitString(I18n.format("RivalRebels.spawn.resetwarning"), (int) ((x + 2) / scalefactor), (int) ((y + 2) / scalefactor), (int) (116 / scalefactor), 0xFF0000);
-			GlStateManager.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
+			matrices.scale(scalefactor, scalefactor, scalefactor);
+			textRenderer.drawTrimmed(new TranslatableText("RivalRebels.spawn.resetwarning"), (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), (int) (116 / scalefactor), 0xFF0000);
+			matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 		}
 
-		if (Mouse.isButtonDown(0) && !prevClick)
+		if (client.mouse.wasLeftButtonClicked() && !prevClick)
 		{
-			if (classButton.mousePressed(mc, x, y)) this.mc.displayGuiScreen(new GuiClass(rrclass));
-			if (resetButton.mousePressed(mc, x, y))
+			if (classButton.mouseClicked(mouseX, mouseY, 0)) this.client.setScreen(new GuiClass(rrclass));
+			if (resetButton.mouseClicked(mouseX, mouseY, 0))
 			{
-				this.mc.displayGuiScreen(new GuiClass(rrclass));
+				this.client.setScreen(new GuiClass(rrclass));
 				PacketDispatcher.packetsys.sendToServer(new ResetPacket());
 			}
-			if (omegaButton.mousePressed(mc, x, y))
+			if (omegaButton.mouseClicked(mouseX, mouseY, 0))
 			{
-				PacketDispatcher.packetsys.sendToServer(new JoinTeamPacket(RivalRebelsTeam.OMEGA,rrclass));
-				this.mc.displayGuiScreen(null);
+				PacketDispatcher.packetsys.sendToServer(new JoinTeamPacket(rrclass, RivalRebelsTeam.OMEGA));
+				this.client.setScreen(null);
 			}
-			if (sigmaButton.mousePressed(mc, x, y))
+			if (sigmaButton.mouseClicked(mouseX, mouseY, 0))
 			{
-				PacketDispatcher.packetsys.sendToServer(new JoinTeamPacket(RivalRebelsTeam.SIGMA,rrclass));
-				this.mc.displayGuiScreen(null);
+				PacketDispatcher.packetsys.sendToServer(new JoinTeamPacket(rrclass, RivalRebelsTeam.SIGMA));
+				this.client.setScreen(null);
 			}
 		}
-		prevClick = Mouse.isButtonDown(0);
+		prevClick = client.mouse.wasLeftButtonClicked();
 	}
 
-	protected void drawPanel(int x, int y, int height, int scroll, int scrolllimit, RivalRebelsTeam team)
+	protected void drawPanel(MatrixStack matrices, int x, int y, int height, int scroll, int scrolllimit, RivalRebelsTeam team)
 	{
 		RivalRebelsPlayer[] nlist = new RivalRebelsPlayer[RivalRebels.round.rrplayerlist.getSize()];
 		RivalRebelsPlayer[] list = RivalRebels.round.rrplayerlist.getArray();
@@ -216,32 +212,12 @@ public class GuiSpawn extends GuiScreen
 					b /= 2;
 				}
 				color = (r << 16) | (g << 8) | b;
-				drawString(fontRenderer, nlist[i].getUsername(), x, y + Y, color);
+                textRenderer.draw(matrices, nlist[i].getUsername(), x, y + Y, color);
 			}
 		}
-		// RivalRebelsPlayer[] list = RivalRebels.rrplayerlist.getArray();
-		// int num = 0;
-		// for (int i = 0; i < list.length; i++)
-		// {
-		// if (list[i].online && list[i].rrteam.equals(team)) num++;
-		// }
-		// if (num == 0) return;
-		// int dist = (int) (-((float) scroll / (float) scrolllimit) * ((num * 10) - height));
-		// boolean shouldScroll = num * 10 > height;
-		// for (int i = 0; i < list.length; i++)
-		// {
-		// if (list[i].online && list[i].rrteam.equals(team))
-		// {
-		// RivalRebelsPlayer rrplayer = (RivalRebelsPlayer) list[i];
-		// int Y = dist + (i * 10);
-		// if (!shouldScroll) Y -= dist;
-		// if (Y > -9 && Y < height + 9)
-		// drawString(fontRenderer, rrplayer.username, x, y + (int) Y, rrplayer.rrclass.color);
-		// }
-		// }
 	}
 
-	protected void drawPanel(int x, int y, int height, int scroll, int scrolllimit, String[] display, int[] color)
+	protected void drawPanel(MatrixStack matrices, int x, int y, int height, int scroll, int scrolllimit, String[] display, int[] color)
 	{
 		int dist = (int) (-((float) scroll / (float) scrolllimit) * (((display.length) * 10) - height));
 		boolean shouldScroll = (display.length) * 10 > height;
@@ -249,25 +225,25 @@ public class GuiSpawn extends GuiScreen
 		{
 			int Y = dist + (i * 10);
 			if (!shouldScroll) Y -= dist;
-			if (Y > -9 && Y < height + 9) drawString(fontRenderer, I18n.format(display[i]), x, y + Y, color[i]);
+			if (Y > -9 && Y < height + 9) textRenderer.draw(matrices, new TranslatableText(display[i]), x, y + Y, color[i]);
 		}
 	}
 
-	protected void drawPanel(int x, int y, int width, int height, int scroll, int scrolllimit, String display)
+	protected void drawPanel(MatrixStack matrices, int x, int y, int width, int height, int scroll, int scrolllimit, String display)
 	{
 		int length = 10;
 		int dist = (int) (-((float) scroll / (float) scrolllimit) * (((length) * 10) - height));
 		float scalefactor = 0.6666f;
-		GlStateManager.scale(scalefactor, scalefactor, scalefactor);
-		fontRenderer.drawSplitString(display, (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), 0xffffff);
-		GlStateManager.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
+		matrices.scale(scalefactor, scalefactor, scalefactor);
+		textRenderer.drawTrimmed(Text.of(display), (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), 0xffffff);
+		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 	}
 
 	protected boolean isOnline(GameProfile user)
 	{
-        if (mc.getConnection() == null || mc.getConnection().getPlayerInfoMap().isEmpty()) return false;
-        for (NetworkPlayerInfo guiPlayerInfo : mc.getConnection().getPlayerInfoMap()) {
-            if (user.equals(guiPlayerInfo.getGameProfile())) return true;
+        if (client == null || client.getNetworkHandler() == null || client.getNetworkHandler().getPlayerList().isEmpty()) return false;
+        for (PlayerListEntry guiPlayerInfo : client.getNetworkHandler().getPlayerList()) {
+            if (user.equals(guiPlayerInfo.getProfile())) return true;
         }
 		return false;
 	}

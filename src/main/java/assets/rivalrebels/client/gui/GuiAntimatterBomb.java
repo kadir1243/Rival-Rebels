@@ -11,41 +11,34 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerAntimatterBomb;
-import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.Sys;
-import org.lwjgl.input.Mouse;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Util;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.GuiUtils;
 
-@SideOnly(Side.CLIENT)
-public class GuiAntimatterBomb extends GuiContainer {
-	TileEntityAntimatterBomb	tsar;
+import static net.minecraftforge.client.gui.GuiUtils.drawGradientRect;
 
-	public GuiAntimatterBomb(Container container) {
-		super(container);
+@OnlyIn(Dist.CLIENT)
+public class GuiAntimatterBomb extends HandledScreen<ContainerAntimatterBomb> {
+	public GuiAntimatterBomb(ContainerAntimatterBomb bomb, PlayerInventory inventoryPlayer, Text title) {
+		super(bomb, inventoryPlayer, title);
+		backgroundHeight = 206;
 	}
 
-	public GuiAntimatterBomb(InventoryPlayer inventoryPlayer, TileEntityAntimatterBomb tileEntity)
-	{
-		super(new ContainerAntimatterBomb(inventoryPlayer, tileEntity));
-		ySize = 206;
-		tsar = tileEntity;
-	}
-
-	@Override
-	protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-	{
-		super.drawGuiContainerForegroundLayer(mouseX, mouseY);
-		int seconds = (tsar.countdown / 20);
-		int millis = (tsar.countdown % 20) * 3;
+    @Override
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+        super.drawForeground(matrices, mouseX, mouseY);
+		int seconds = (handler.getCountdown() / 20);
+		int millis = (handler.getCountdown() % 20) * 3;
 		String milli;
 		if (millis < 10)
 		{
@@ -55,36 +48,33 @@ public class GuiAntimatterBomb extends GuiContainer {
 		{
 			milli = "" + millis;
 		}
-		if (tsar.countdown % 20 >= 10)
-		{
-			fontRenderer.drawString(I18n.format("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, ySize - 107, 0xFFFFFF);
-		}
-		else
-		{
-			fontRenderer.drawString(I18n.format("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, ySize - 107, 0xFF0000);
+		if (handler.getCountdown() % 20 >= 10) {
+			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, getYSize() - 107, 0xFFFFFF);
+		} else {
+			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, getYSize() - 107, 0xFF0000);
 		}
 		float scalef = 0.666f;
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(scalef, scalef, scalef);
-		fontRenderer.drawString(I18n.format("RivalRebels.antimatterbomb"), 18, 16, 4210752);
-		GlStateManager.popMatrix();
-		if (tsar.nuclear != tsar.hydrogen)
+		matrices.push();
+		matrices.scale(scalef, scalef, scalef);
+		textRenderer.draw(matrices, new TranslatableText("RivalRebels.antimatterbomb"), 18, 16, 4210752);
+		matrices.pop();
+		if (handler.isUnbalanced())
 		{
-			fontRenderer.drawString(I18n.format("RivalRebels.tsar.unbalanced"), 6, ySize - 97, 0xFF0000);
+			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.unbalanced"), 6, getYSize() - 97, 0xFF0000);
 		}
-		else if (tsar.hasExplosive && tsar.hasFuse && tsar.hasAntennae)
+		else if (handler.isArmed())
 		{
-			fontRenderer.drawString(I18n.format("RivalRebels.tsar.armed"), 6, ySize - 97, 0xFF0000);
+			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.armed"), 6, getYSize() - 97, 0xFF0000);
 		}
 		else
 		{
-			fontRenderer.drawString(tsar.megaton + " " + I18n.format("RivalRebels.tsar.megatons"), 6, ySize - 97, 0xFFFFFF);
+			textRenderer.draw(matrices, new LiteralText(handler.getMegaton() + " ").append(new TranslatableText("RivalRebels.tsar.megatons")), 6, getYSize() - 97, 0xFFFFFF);
 		}
 
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - xSize) / 2;
-		int posy = (height - ySize) / 2;
+		int posx = (width - getXSize()) / 2;
+		int posy = (height - getYSize()) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 194;
 		int widthx = 72;
@@ -93,24 +83,23 @@ public class GuiAntimatterBomb extends GuiContainer {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			drawGradientRect(mousex, mousey, mousex + fontRenderer.getStringWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			fontRenderer.drawString("rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
-			if (!buttondown && Mouse.isButtonDown(0)) {
-                Sys.openURL("http://rivalrebels.com");
+			drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			if (!buttondown && client.mouse.wasLeftButtonClicked()) {
+                Util.getOperatingSystem().open("http://rivalrebels.com");
             }
 		}
-		buttondown = Mouse.isButtonDown(0);
+		buttondown = client.mouse.wasLeftButtonClicked();
 	}
 
 	boolean	buttondown;
 
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
-	{
-		GlStateManager.color(1, 1, 1);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guitantimatterbomb);
-		int x = (width - xSize) / 2;
-		int y = (height - ySize) / 2;
-		this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+    @Override
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+        RenderSystem.setShaderTexture(0, RRIdentifiers.guitantimatterbomb);
+		int x = (width - getXSize()) / 2;
+		int y = (height - getYSize()) / 2;
+		GuiUtils.drawTexturedModalRect(matrices, x, y, 0, 0, getXSize(), getYSize(), getZOffset());
 	}
 }

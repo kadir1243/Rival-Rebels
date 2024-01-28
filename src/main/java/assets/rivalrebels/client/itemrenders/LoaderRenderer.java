@@ -11,30 +11,36 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLoader;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
-public class LoaderRenderer extends TileEntityItemStackRenderer
+public class LoaderRenderer extends BuiltinModelItemRenderer
 {
 	ModelLoader	ml;
 
-	public LoaderRenderer()
-	{
+	public LoaderRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		ml = new ModelLoader();
 	}
 
     @Override
-    public void renderByItem(ItemStack itemStackIn) {
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.0F, 0.05F, 0.0F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etloader);
-		ml.renderA();
-		ml.renderB(0);
-		GlStateManager.popMatrix();
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		matrices.translate(0.0F, 0.05F, 0.0F);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etloader);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true));
+        ml.renderA(buffer, matrices);
+		ml.renderB(buffer, matrices, 0);
+		matrices.pop();
 	}
 }

@@ -11,85 +11,75 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class BlockExplosives extends Block
 {
-	public BlockExplosives()
+	public BlockExplosives(Settings settings)
 	{
-		super(Material.WOOD);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+		super(settings);
 	}
 
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-        blockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player);
-    }
-
-    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
-	{
-		if (world.isRemote)
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+		if (!world.isClient)
 		{
-			player.sendMessage(new TextComponentTranslation("RivalRebels.Inventory"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.timedbomb.getTranslationKey() + ".name") + ". §9(" + "1 minute countdown." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.pliers.getTranslationKey() + ".name") + ". §9(" + "to defuse explosives." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.remotecharge.getTranslationKey() + ".name") + ". §9(" + "Remote charge." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.remote.getTranslationKey() + ".name") + ". §9(" + "Set and detonate charge." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.minetrap.getTranslationKey() + ".name") + ". §9(" + "Handle with care." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.flare.getTranslationKey() + ".name") + ". §9(" + "Incendiary defense." + ")"));
-		}
-		if (!world.isRemote)
-		{
-			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.timedbomb, 1));
-			EntityItem ei1 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.remotecharge, 8));
-			EntityItem ei2 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.minetrap, 16));
-			EntityItem ei3 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.flare, 8));
-			EntityItem ei4 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.remote));
-			EntityItem ei5 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.pliers));
+            player.sendMessage(new TranslatableText("RivalRebels.Inventory"), false);
+            player.sendMessage(Text.of("§a" + RRBlocks.timedbomb.getName() + ". §9(" + "1 minute countdown." + ")"), false);
+            player.sendMessage(Text.of("§a" + RRItems.pliers.getName() + ". §9(" + "to defuse explosives." + ")"), false);
+            player.sendMessage(Text.of("§a" + RRBlocks.remotecharge.getName() + ". §9(" + "Remote charge." + ")"), false);
+            player.sendMessage(Text.of("§a" + RRItems.remote.getName() + ". §9(" + "Set and detonate charge." + ")"), false);
+            player.sendMessage(Text.of("§a" + RRBlocks.minetrap.getName() + ". §9(" + "Handle with care." + ")"), false);
+            player.sendMessage(Text.of("§a" + RRBlocks.flare.getName() + ". §9(" + "Incendiary defense." + ")"), false);
+            ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.timedbomb.asItem().getDefaultStack());
+			ItemEntity ei1 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.remotecharge, 8));
+			ItemEntity ei2 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.minetrap, 16));
+			ItemEntity ei3 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.flare, 8));
+			ItemEntity ei4 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.remote.getDefaultStack());
+			ItemEntity ei5 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.pliers.getDefaultStack());
 			world.spawnEntity(ei);
 			world.spawnEntity(ei1);
 			world.spawnEntity(ei2);
 			world.spawnEntity(ei3);
 			world.spawnEntity(ei4);
 			world.spawnEntity(ei5);
-			world.setBlockToAir(new BlockPos(x, y, z));
-			return true;
+			world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
 		}
-		return true;
-
+		return ActionResult.success(world.isClient);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -102,7 +92,7 @@ public class BlockExplosives extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

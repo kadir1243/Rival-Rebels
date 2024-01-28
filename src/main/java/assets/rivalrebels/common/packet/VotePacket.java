@@ -11,52 +11,38 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
-public class VotePacket implements IMessage {
-	public boolean newround;
+import java.util.function.Supplier;
 
-	public VotePacket() {
-	}
+public class VotePacket {
+    private final boolean newround;
 
-	public VotePacket(boolean vote)
-	{
-		newround = vote;
-	}
+    public VotePacket(boolean vote) {
+        newround = vote;
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		newround = buf.readBoolean();
-	}
+    public static VotePacket fromBytes(PacketByteBuf buf) {
+        return new VotePacket(buf.readBoolean());
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeBoolean(newround);
-	}
+    public static void onMessage(VotePacket m, Supplier<NetworkEvent.Context> ctx) {
+        NetworkEvent.Context context = ctx.get();
+        context.enqueueWork(() -> {
+            RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(context.getSender().getGameProfile());
+            if (!p.voted) {
+                p.voted = true;
+                if (m.newround) RivalRebels.round.newBattleVotes++;
+                else RivalRebels.round.waitVotes++;
+            }
+        });
+    }
 
-	public static class Handler implements IMessageHandler<VotePacket, IMessage>
-	{
-		@Override
-		public IMessage onMessage(VotePacket m, MessageContext ctx)
-		{
-            EntityPlayerMP player = ctx.getServerHandler().player;
-            player.getServer().addScheduledTask(() -> {
-                RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
-                if (!p.voted) {
-                    p.voted = true;
-                    if (m.newround) RivalRebels.round.newBattleVotes++;
-                    else RivalRebels.round.waitVotes++;
-                }
-            });
-			return null;
-		}
-	}
+    public static void toBytes(VotePacket packet, PacketByteBuf buf) {
+        buf.writeBoolean(packet.newround);
+    }
+
 }

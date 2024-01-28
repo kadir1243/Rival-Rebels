@@ -15,11 +15,12 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureFace;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.model.Model;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
 
-public class ModelAstroBlasterHandle extends ModelBase
-{
+public class ModelAstroBlasterHandle extends Model {
 	TextureFace	handleside		= new TextureFace(
 										new TextureVertice(0f / 64f, 11f / 32f),
 										new TextureVertice(0f / 64f, 18f / 32f),
@@ -79,29 +80,31 @@ public class ModelAstroBlasterHandle extends ModelBase
 	Vertice		vbb3			= new Vertice(20f, 0f, -2f);
 	Vertice		vbb4			= new Vertice(8f, 0f, -2f);
 
-	public void render()
-	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableCull();
-		GlStateManager.disableLighting();
+    public ModelAstroBlasterHandle() {
+        super(identifier -> RenderLayer.getSolid());
+    }
 
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(1.3, 1, 1);
+    @Override
+    public void render(MatrixStack matrices, VertexConsumer vertices, int light, int overlay, float red, float green, float blue, float alpha) {
+		matrices.push();
+
+		matrices.push();
+		matrices.scale(1.3F, 1, 1);
 		// bottom
-		RenderHelper.addFace(vbt3, vbt4, vbt1, vbt2, bottombottom);
-		RenderHelper.addFace(vbb1, vbt1, vbt4, vbb4, bottomfront);
-		RenderHelper.addFace(vbb3, vbt3, vbt2, vbb2, bottomback);
-		RenderHelper.addFace(vbt2, vbb2, vbb1, vbt1, bottomside);
-		RenderHelper.addFace(vbt3, vbb3, vbb4, vbt4, bottomside);
-		RenderHelper.addFace(vbb3, vbb4, vbb1, vbb2, bottombottom);
-		GlStateManager.popMatrix();
+		RenderHelper.addFace(vertices, vbt3, vbt4, vbt1, vbt2, bottombottom);
+		RenderHelper.addFace(vertices, vbb1, vbt1, vbt4, vbb4, bottomfront);
+		RenderHelper.addFace(vertices, vbb3, vbt3, vbt2, vbb2, bottomback);
+		RenderHelper.addFace(vertices, vbt2, vbb2, vbb1, vbt1, bottomside);
+		RenderHelper.addFace(vertices, vbt3, vbb3, vbb4, vbt4, bottomside);
+		RenderHelper.addFace(vertices, vbb3, vbb4, vbb1, vbb2, bottombottom);
+		matrices.pop();
 
 		// handle
-		RenderHelper.addFace(vht4, vhb4, vhb1, vht1, handlefront);
-		RenderHelper.addFace(vht2, vhb2, vhb3, vht3, handlefront);
-		RenderHelper.addFace(vht1, vhb1, vhb2, vht2, handleside);
-		RenderHelper.addFace(vht3, vhb3, vhb4, vht4, handleside);
-		RenderHelper.addFace(vhb2, vhb1, vhb4, vhb3, handlebottom);
-		GlStateManager.popMatrix();
+		RenderHelper.addFace(vertices, vht4, vhb4, vhb1, vht1, handlefront);
+		RenderHelper.addFace(vertices, vht2, vhb2, vhb3, vht3, handlefront);
+		RenderHelper.addFace(vertices, vht1, vhb1, vhb2, vht2, handleside);
+		RenderHelper.addFace(vertices, vht3, vhb3, vhb4, vht4, handleside);
+		RenderHelper.addFace(vertices, vhb2, vhb1, vhb4, vhb3, handlebottom);
+		matrices.pop();
 	}
 }

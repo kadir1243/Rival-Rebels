@@ -11,21 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
-
 public class ItemCoreTungsten extends ItemCore
 {
 	public ItemCoreTungsten()
 	{
-		super();
-		setMaxStackSize(1);
+		super(new Settings());
 		timemult = 0.75f;
-		setCreativeTab(RivalRebels.rralltab);
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:az");
-	}*/
 }

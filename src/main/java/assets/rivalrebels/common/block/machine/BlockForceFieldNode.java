@@ -15,53 +15,46 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-public class BlockForceFieldNode extends BlockContainer {
-    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
-	public BlockForceFieldNode()
+public class BlockForceFieldNode extends BlockWithEntity {
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+	public BlockForceFieldNode(Settings settings)
 	{
-		super(Material.IRON);
-        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
+		super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(META);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(META, meta);
-    }    @Override
-    public BlockStateContainer getBlockState() {
-        return new BlockStateContainer(this, META);
-    }
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		TileEntity te = world.getTileEntity(pos);
-		if (te instanceof TileEntityForceFieldNode teffn && !world.isRemote)
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		BlockEntity te = world.getBlockEntity(pos);
+		if (te instanceof TileEntityForceFieldNode teffn && !world.isClient)
 		{
-            ItemStack stack = player.getHeldItem(hand);
+            ItemStack stack = player.getStackInHand(hand);
 			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.uuid == null && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
@@ -73,57 +66,46 @@ public class BlockForceFieldNode extends BlockContainer {
 				RivalRebelsSoundPlayer.playSound(world, 10, 5, pos);
 			}
 		}
-		return false;
+		return ActionResult.PASS;
 	}
 
+    @Nullable
     @Override
-    public void onBlockPlacedBy(World world, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-		int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        BlockState state = super.getPlacementState(ctx);
 
-		if (l == 0)
-		{
-			world.setBlockState(pos, state.withProperty(META, 2), 2);
-		}
+        return switch (MathHelper.floor((ctx.getPlayerYaw() * 4.0F / 360.0F) + 0.5D) & 3) {
+            case 0 -> state.with(META, 2);
+            case 1 -> state.with(META, 5);
+            case 2 -> state.with(META, 3);
+            case 3 -> state.with(META, 4);
+            default -> state;
+        };
+    }
 
-		if (l == 1)
-		{
-            world.setBlockState(pos, state.withProperty(META, 5), 2);
-		}
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
 
-		if (l == 2)
-		{
-            world.setBlockState(pos, state.withProperty(META, 3), 2);
-		}
-
-		if (l == 3)
-		{
-            world.setBlockState(pos, state.withProperty(META, 4), 2);
-		}
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityForceFieldNode(pos, state);
 	}
 
-	@Override
-	public boolean hasTileEntity(IBlockState state)
-	{
-		return true;
-	}
-
-	@Override
-	public TileEntity createNewTileEntity(World var1, int var)
-	{
-		return new TileEntityForceFieldNode();
-	}
-
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icontop1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icontop2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icontop3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icontop4;
 
 	@Override

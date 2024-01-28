@@ -13,11 +13,12 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelRocketLauncherTube
 {
 	Vertice	vy1		= new Vertice(0, 0, 0);
@@ -44,24 +45,24 @@ public class ModelRocketLauncherTube
 	float	ty1		= 0;
 	float	ty2		= 0.09375f;
 
-	public void render()
+	public void render(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
+		matrices.push();
 
-		RenderHelper.addFace(vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnxpz1, vnxpz2, vnx2, vnx1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnx1, vnx2, vnxnz2, vnxnz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnxpz1, vnxpz2, vnx2, vnx1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnx1, vnx2, vnxnz2, vnxnz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2);
 
-		RenderHelper.addFace(vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2);
-		RenderHelper.addFace(vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2);
-		RenderHelper.addFace(vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2);
-		RenderHelper.addFace(vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }

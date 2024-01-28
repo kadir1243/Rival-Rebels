@@ -15,157 +15,139 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.FallingBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraft.world.explosion.Explosion;
 
 import java.util.List;
 
-public class EntityNuclearBlast extends EntityInanimate
-{
-	public int	ticksExisted;
-	int			time;
-	int			Strength;
+public class EntityNuclearBlast extends EntityInanimate {
+    int			time;
+    int			Strength;
+
+    public EntityNuclearBlast(EntityType<? extends EntityNuclearBlast> type, World world) {
+        super(type, world);
+    }
 
 	public EntityNuclearBlast(World par1World)
 	{
-		super(par1World);
-		ignoreFrustumCheck = true;
-		ticksExisted = 0;
+		this(RREntities.NUCLEAR_BLAST, par1World);
+		ignoreCameraFrustum = true;
+		age = 0;
 		time = 0;
-		setSize(0.5F, 0.5F);
 	}
 
 	public EntityNuclearBlast(World par1World, double par2, double par4, double par6, int s, boolean hasTroll)
 	{
-		super(par1World);
-		ignoreFrustumCheck = true;
-		ticksExisted = 0;
-		time = 0;
-		motionY = Strength = s;
-		if (hasTroll)
-		{
-			motionX = 1;
-		}
-		else
-		{
-			motionX = 0;
-		}
-		setSize(0.5F, 0.5F);
+		this(par1World);
+        setVelocity(hasTroll ? 1 : 0, Strength = s, getVelocity().getZ());
 		setPosition(par2, par4, par6);
 	}
 
 	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000;
-	}
-
-	@Override
-	public float getBrightness()
+	public float getBrightnessAtEyes()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
-	@Override
-	public void onUpdate()
+    @Override
+	public void tick()
 	{
-		super.onUpdate();
-		if (!world.isRemote)
+		super.tick();
+		if (!world.isClient)
 		{
-			if (ticksExisted == 0)
+			if (age == 0)
 			{
-				world.createExplosion(null, posX, posY - 5, posZ, 4, true);
+				world.createExplosion(null, getX(), getY() - 5, getZ(), 4, Explosion.DestructionType.DESTROY);
 			}
-			if (ticksExisted % 20 == 0 && ticksExisted > 60)
+			if (age % 20 == 0 && age > 60)
 			{
 				time++;
 				if (time <= Strength)
 				{
-					new NuclearExplosion(world, (int) posX, (int) posY - 5, (int) posZ, (time * time) / 2 + RivalRebels.nuclearBombStrength);
+					new NuclearExplosion(world, (int) getX(), (int) getY() - 5, (int) getZ(), (time * time) / 2 + RivalRebels.nuclearBombStrength);
 				}
 			}
-			if (ticksExisted % 2 == 0 && ticksExisted < 400) pushAndHurtEntities();
+			if (age % 2 == 0 && age < 400) pushAndHurtEntities();
 		}
-		if (ticksExisted < 30)
+		if (age < 30)
 		{
-			world.playSound(posX, posY + ticksExisted - 5, posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, world.rand.nextFloat() * 0.1f + 0.9f, true);
+			world.playSound(getX(), getY() + age - 5, getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, world.random.nextFloat() * 0.1f + 0.9f, true);
 		}
-		if (ticksExisted % 3 == 0 && ticksExisted < 40 && ticksExisted > 30)
+		if (age % 3 == 0 && age < 40 && age > 30)
 		{
 			for (int i = 0; i < 21; i++)
 			{
-				world.playSound(posX + Math.sin(i) * (i / 0.5), posY + 17, posZ + Math.cos(i) * (i / 0.5), SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, world.rand.nextFloat() + 1.0f, true);
+				world.playSound(getX() + Math.sin(i) * (i / 0.5), getY() + 17, getZ() + Math.cos(i) * (i / 0.5), SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, world.random.nextFloat() + 1.0f, true);
 			}
 		}
-		if (ticksExisted < 600)
+		if (age < 600)
 		{
-			if (ticksExisted % 5 == world.rand.nextInt(5))
+			if (age % 5 == world.random.nextInt(5))
 			{
-                for (EntityPlayer p : world.playerEntities) {
-                    world.playSound(p, p.posX, p.posY, p.posZ, SoundEvents.ENTITY_LIGHTNING_THUNDER, SoundCategory.MASTER, 10.0F, 0.50F);
-                    world.playSound(p, p.posX, p.posY, p.posZ, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 5.0F, 0.10F);
+                for (PlayerEntity p : world.getPlayers()) {
+                    world.playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 10.0F, 0.50F);
+                    world.playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 5.0F, 0.10F);
                 }
 			}
 		}
 		else
 		{
-			setDead();
+			kill();
 		}
 
-		ticksExisted++;
+		age++;
 	}
 
 	private void pushAndHurtEntities()
 	{
-		int radius = Strength * RivalRebels.nuclearBombStrength * 1;
+		int radius = Strength * RivalRebels.nuclearBombStrength;
 		if (radius > 80) radius = 80;
-		int var3 = MathHelper.floor(posX - radius - 1.0D);
-		int var4 = MathHelper.floor(posX + radius + 1.0D);
-		int var5 = MathHelper.floor(posY - radius - 1.0D);
-		int var28 = MathHelper.floor(posY + radius + 1.0D);
-		int var7 = MathHelper.floor(posZ - radius - 1.0D);
-		int var29 = MathHelper.floor(posZ + radius + 1.0D);
-		List<Entity> var9 = world.getEntitiesWithinAABBExcludingEntity(this, new AxisAlignedBB(var3, var5, var7, var4, var28, var29));
-		Vec3d var30 = new Vec3d(posX, posY, posZ);
+		int var3 = MathHelper.floor(getX() - radius - 1.0D);
+		int var4 = MathHelper.floor(getX() + radius + 1.0D);
+		int var5 = MathHelper.floor(getY() - radius - 1.0D);
+		int var28 = MathHelper.floor(getY() + radius + 1.0D);
+		int var7 = MathHelper.floor(getZ() - radius - 1.0D);
+		int var29 = MathHelper.floor(getZ() + radius + 1.0D);
+		List<Entity> var9 = world.getOtherEntities(this, new Box(var3, var5, var7, var4, var28, var29));
 
         for (Entity entity : var9) {
-            double var13 = entity.getDistance(posX, posY, posZ) / radius;
+            double var13 = Math.sqrt(entity.squaredDistanceTo(getX(), getY(), getZ())) / radius;
 
             if (var13 <= 1.0D) {
-                double var15 = entity.posX - posX;
-                double var17 = entity.posY + entity.getEyeHeight() - posY;
-                double var19 = entity.posZ - posZ;
-                double var33 = MathHelper.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
+                double var15 = entity.getX() - getX();
+                double var17 = entity.getY() + entity.getEyeHeight(entity.getPose()) - getY();
+                double var19 = entity.getZ() - getZ();
+                double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
 
                 if (var33 != 0.0D) {
                     var15 /= var33;
                     var17 /= var33;
                     var19 /= var33;
                     if (!(entity instanceof EntityNuclearBlast) && !(entity instanceof EntityTsarBlast)) {
-                        if (entity instanceof EntityFallingBlock) entity.setDead();
+                        if (entity instanceof FallingBlockEntity) entity.kill();
                         else {
-                            if (entity instanceof EntityPlayer && ((EntityPlayer) entity).capabilities.isCreativeMode)
+                            if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getAbilities().invulnerable)
                                 continue;
-                            entity.attackEntityFrom(RivalRebelsDamageSource.nuclearblast, 16 * radius);
-                            entity.motionX -= var15 * 8;
-                            entity.motionY -= var17 * 8;
-                            entity.motionZ -= var19 * 8;
+                            entity.damage(RivalRebelsDamageSource.nuclearblast, 16 * radius);
+                            entity.setVelocity(getVelocity().subtract(
+                                var15 * 8,
+                                var17 * 8,
+                                var19 * 8
+                            ));
                         }
                     }
                 }
@@ -174,20 +156,19 @@ public class EntityNuclearBlast extends EntityInanimate
 	}
 
 	@Override
-	public void readEntityFromNBT(NBTTagCompound var1)
+	public void readCustomDataFromNbt(NbtCompound nbt)
 	{
-		ticksExisted = var1.getInteger("ticksExisted");
-		time = var1.getInteger("time");
-		motionY = Strength = var1.getInteger("charges");
-		motionX = var1.getBoolean("troll") ? 1.0f : 0.0f;
+		age = nbt.getInt("age");
+		time = nbt.getInt("time");
+        setVelocity(nbt.getBoolean("troll") ? 1 : 0, Strength = nbt.getInt("charges"), getVelocity().getZ());
 	}
 
 	@Override
-	public void writeEntityToNBT(NBTTagCompound var1)
+	public void writeCustomDataToNbt(NbtCompound nbt)
 	{
-		var1.setInteger("ticksExisted", ticksExisted);
-		var1.setInteger("time", time);
-		var1.setInteger("charges", Strength);
+		nbt.putInt("age", age);
+		nbt.putInt("time", time);
+		nbt.putInt("charges", Strength);
 	}
 
 }

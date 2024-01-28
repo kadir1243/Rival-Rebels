@@ -15,95 +15,95 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.packet.RhodesPiecePacket;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.MoverType;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.MovementType;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.Packet;
+import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
-public class EntityRhodesPiece extends Entity
-{
-	protected int health;
+public class EntityRhodesPiece extends Entity {
+    public static final TrackedData<Float> SCALE = DataTracker.registerData(EntityRhodesPiece.class, TrackedDataHandlerRegistry.FLOAT);
+    public static final TrackedData<Integer> COLOR = DataTracker.registerData(EntityRhodesPiece.class, TrackedDataHandlerRegistry.INTEGER);
+    protected double health;
 	private float myaw;
 	private float mpitch;
-	public float scale = 1.0f;
-	public int color = 0;
+    public int color = 0;
 
-	public EntityRhodesPiece(World w)
-	{
-		super(w);
-		setSize(4F, 2F);
-		setEntityBoundingBox(new AxisAlignedBB(-1.5, -1.5, -1.5, 1.5, 1.5, 1.5));
+	public EntityRhodesPiece(EntityType<? extends EntityRhodesPiece> type, World w) {
+		super(type, w);
+		setBoundingBox(new Box(-1.5, -1.5, -1.5, 1.5, 1.5, 1.5));
 	}
 
-	public EntityRhodesPiece(World w, double x, double y, double z, float s, int c)
+	public EntityRhodesPiece(EntityType<? extends EntityRhodesPiece> type, World w, double x, double y, double z, float scale, int color)
 	{
-		this(w);
+		this(type, w);
 		setPosition(x, y, z);
-		scale = s;
-		color = c;
-		myaw = (float) (rand.nextGaussian()*20);
-		mpitch = (float) (rand.nextGaussian()*20);
-		motionX = (float) (rand.nextGaussian()*0.75);
-		motionY = (float) Math.abs(rand.nextGaussian()*0.75);
-		motionZ = (float) (rand.nextGaussian()*0.75);
+		setScale(scale);
+		setColor(color);
+		myaw = (float) (random.nextGaussian()*20);
+		mpitch = (float) (random.nextGaussian()*20);
+		setVelocity((float) (random.nextGaussian()*0.75),
+        (float) Math.abs(random.nextGaussian()*0.75),
+        (float) (random.nextGaussian()*0.75));
 	}
 
-	@Override
-	public AxisAlignedBB getCollisionBox(Entity par1Entity)
-	{
-		return par1Entity.getEntityBoundingBox();
-	}
+    public float getScale() {
+        return dataTracker.get(SCALE);
+    }
 
-	@Override
-	public boolean canBeCollidedWith()
+    public void setScale(float scale) {
+        dataTracker.set(SCALE, scale);
+    }
+
+    public int getColor() {
+        return dataTracker.get(COLOR);
+    }
+
+    public void setColor(int color) {
+        dataTracker.set(COLOR, color);
+    }
+
+    @Override
+	public boolean collides()
 	{
 		return true;
 	}
 
 	@Override
-	public boolean canBePushed()
-	{
+	public boolean isPushable() {
 		return true;
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
 	@Override
-	public void onUpdate()
-	{
-		super.onUpdate();
-		if (ticksExisted == 1) PacketDispatcher.packetsys.sendToAll(new RhodesPiecePacket(this));
-		ticksExisted++;
-		if (world.rand.nextInt(Math.max(getMaxAge()*(RivalRebels.rhodesPromode?1:30) - ticksExisted, RivalRebels.rhodesPromode?100:1))==0)
+	public void tick() {
+		super.tick();
+		age++;
+		if (world.random.nextInt(Math.max(getMaxAge()*(RivalRebels.rhodesPromode?1:30) - age, RivalRebels.rhodesPromode?100:1))==0)
 		{
-			setDead();
+			kill();
 		}
-		lastTickPosX = posX;
-		lastTickPosY = posY;
-		lastTickPosZ = posZ;
-		motionX *= 0.999f;
-		motionY *= 0.999f;
-		motionZ *= 0.999f;
+        setVelocity(getVelocity().multiply(0.999));
 		myaw *= 0.98f;
 		mpitch *= 0.98f;
-		rotationYaw += myaw;
-		rotationPitch += mpitch;
-		if (collidedVertically)
+        setYaw(getYaw() + myaw);
+        setPitch(getPitch() + mpitch);
+		if (verticalCollision)
 		{
-			rotationPitch = Math.round(rotationPitch / 90f)*90;
-			motionX *= 0.7f;
-			motionZ *= 0.7f;
+			setPitch(Math.round(getPitch() / 90f) * 90);
+            setVelocity(getVelocity().multiply(0.7, 1, 0.7));
 		}
 		else
 		{
-			motionY -= 0.1;
+            setVelocity(getVelocity().subtract(0, 0.1, 0));
 		}
-		move(MoverType.SELF, motionX, motionY, motionZ);
+		move(MovementType.SELF, getVelocity());
 	}
 
 	public int getMaxAge()
@@ -112,22 +112,22 @@ public class EntityRhodesPiece extends Entity
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
+	public boolean damage(DamageSource par1DamageSource, float par2)
 	{
-		super.attackEntityFrom(par1DamageSource, par2);
-		if (!isDead && !world.isRemote)
+		super.damage(par1DamageSource, par2);
+		if (isAlive() && !world.isClient)
 		{
 			health -= par2;
 			if (health <= 0)
 			{
-				setDead();
-				new Explosion(world, posX, posY, posZ, 6, true, true, RivalRebelsDamageSource.rocket);
+				kill();
+				new Explosion(world, getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket);
 				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
 			}
 		}
@@ -135,20 +135,24 @@ public class EntityRhodesPiece extends Entity
 		return true;
 	}
 
-	@Override
-	protected void entityInit()
-	{
+    @Override
+    protected void initDataTracker() {
+        dataTracker.startTracking(SCALE, 1F);
+        dataTracker.startTracking(COLOR, 0);
+    }
+
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+		health = nbt.getDouble("health");
 	}
 
-	@Override
-	protected void readEntityFromNBT(NBTTagCompound nbt)
-	{
-		health = nbt.getInteger("health");
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+		nbt.putDouble("health", health);
 	}
 
-	@Override
-	protected void writeEntityToNBT(NBTTagCompound nbt)
-	{
-		nbt.setInteger("health", health);
-	}
+    @Override
+    public Packet<?> createSpawnPacket() {
+        return new EntitySpawnS2CPacket(this);
+    }
 }

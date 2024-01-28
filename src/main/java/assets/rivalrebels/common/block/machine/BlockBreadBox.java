@@ -12,61 +12,65 @@
 package assets.rivalrebels.common.block.machine;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
-import net.minecraft.item.ItemStack;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.Items;
+import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class BlockBreadBox extends Block
 {
-	public BlockBreadBox()
+	public BlockBreadBox(Settings settings)
 	{
-		super(Material.IRON);
+		super(settings);
 	}
 
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
         if (!player.isSneaking())
         {
-            EntityItem ei = new EntityItem(world, x + .5, y + 1, z + .5, Items.BREAD.getDefaultInstance());
-            if (!world.isRemote)
+            ItemEntity ei = new ItemEntity(world, x + .5, y + 1, z + .5, Items.BREAD.getDefaultStack());
+            if (!world.isClient)
             {
                 world.spawnEntity(ei);
-                if (world.rand.nextInt(64) == 0) player.sendMessage(new TextComponentString("§7[§4Orders§7] §cShift-click (Sneak) to pack up toaster."));
+                if (world.random.nextInt(64) == 0) player.sendMessage(Text.of("§7[§4Orders§7] §cShift-click (Sneak) to pack up toaster."), false);
             }
         }
         else
         {
-            world.setBlockToAir(pos);
-            EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(this));
-            if (!world.isRemote)
+            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+            ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, this.asItem().getDefaultStack());
+            if (!world.isClient)
             {
                 world.spawnEntity(ei);
             }
         }
+        return ActionResult.success(world.isClient);
     }
 
-    /*@SideOnly(Side.CLIENT)
+    /*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -79,7 +83,7 @@ public class BlockBreadBox extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

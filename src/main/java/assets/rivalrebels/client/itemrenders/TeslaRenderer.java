@@ -11,125 +11,121 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.util.math.Quaternion;
 
-public class TeslaRenderer extends TileEntityItemStackRenderer
+public class TeslaRenderer extends BuiltinModelItemRenderer
 {
-	ModelFromObj	tesla;
-	ModelFromObj	dynamo;
-	int				spin	= 0;
+	private final ModelFromObj tesla;
+	private final ModelFromObj dynamo;
+	private int	spin;
 
-	public TeslaRenderer() {
+	public TeslaRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		tesla = ModelFromObj.readObjFile("i.obj");
 		dynamo = ModelFromObj.readObjFile("j.obj");
 	}
 
 	public int getDegree(ItemStack item) {
-		if (!item.hasTagCompound()) return 0;
-		else return item.getTagCompound().getInteger("dial");
+        return item.getOrCreateNbt().getInt("dial");
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-        if (!stack.isItemEnchanted()) {
-			GlStateManager.enableLighting();
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true));
+        if (!stack.hasEnchantments()) {
 			int degree = getDegree(stack);
 			spin += 5 + (degree / 36f);
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettesla);
-			GlStateManager.pushMatrix();
-			GlStateManager.translate(0.8f, 0.5f, -0.03f);
-			GlStateManager.rotate(35, 0.0F, 0.0F, 1.0F);
-			GlStateManager.rotate(90, 0.0F, 1.0F, 0.0F);
-			GlStateManager.scale(0.12f, 0.12f, 0.12f);
-			// GlStateManager.translate(0.3f, 0.05f, -0.1f);
+			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ettesla);
+			matrices.push();
+			matrices.translate(0.8f, 0.5f, -0.03f);
+			matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+			matrices.multiply(new Quaternion(90, 0.0F, 1.0F, 0.0F));
+			matrices.scale(0.12f, 0.12f, 0.12f);
+			// matrices.translate(0.3f, 0.05f, -0.1f);
 
-			tesla.render();
-			GlStateManager.rotate(spin, 1.0F, 0.0F, 0.0F);
-			dynamo.render();
+			tesla.render(buffer);
+			matrices.multiply(new Quaternion(spin, 1.0F, 0.0F, 0.0F));
+			dynamo.render(buffer);
 
-			GlStateManager.popMatrix();
-		}
-		else
-		{
-			/*if (type != ItemRenderType.ENTITY) GlStateManager.popMatrix();*/
-			GlStateManager.pushMatrix();
-			Tessellator t = Tessellator.getInstance();
-            BufferBuilder buffer = t.getBuffer();
-            GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			GlStateManager.enableBlend();
-			GlStateManager.scale(1.01f, 1.01f, 1.01f);
-			GlStateManager.rotate(45.0f, 0, 1, 0);
-			GlStateManager.rotate(10.0f, 0, 0, 1);
-			GlStateManager.scale(0.6f, 0.2f, 0.2f);
-			GlStateManager.translate(-0.99f, 0.5f, 0.0f);
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-            GlStateManager.disableLighting();
-			GlStateManager.enableCull();
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-            buffer.pos(-1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(-1, 1, -1).tex(1, 0).endVertex();
-            buffer.pos(-1, 1, 1).tex(1, 1).endVertex();
-            buffer.pos(-1, -1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(1, -1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, 1, 1).tex(1, 1).endVertex();
-            buffer.pos(1, 1, -1).tex(1, 0).endVertex();
-            buffer.pos(-1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(-1, -1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, -1, 1).tex(3, 1).endVertex();
-            buffer.pos(1, -1, -1).tex(3, 0).endVertex();
-            buffer.pos(-1, 1, -1).tex(0, 0).endVertex();
-            buffer.pos(1, 1, -1).tex(3, 0).endVertex();
-            buffer.pos(1, 1, 1).tex(3, 1).endVertex();
-            buffer.pos(-1, 1, 1).tex(0, 1).endVertex();
-            buffer.pos(-1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(1, -1, -1).tex(3, 0).endVertex();
-            buffer.pos(1, 1, -1).tex(3, 1).endVertex();
-            buffer.pos(-1, 1, -1).tex(0, 1).endVertex();
-            buffer.pos(-1, -1, 1).tex(0, 0).endVertex();
-            buffer.pos(-1, 1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, 1, 1).tex(3, 1).endVertex();
-            buffer.pos(1, -1, 1).tex(3, 0).endVertex();
-            buffer.pos(-1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(-1, 1, -1).tex(1, 0).endVertex();
-            buffer.pos(-1, 1, 1).tex(1, 1).endVertex();
-            buffer.pos(-1, -1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(1, -1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, 1, 1).tex(1, 1).endVertex();
-            buffer.pos(1, 1, -1).tex(1, 0).endVertex();
-            buffer.pos(-1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(-1, -1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, -1, 1).tex(3, 1).endVertex();
-            buffer.pos(1, -1, -1).tex(3, 0).endVertex();
-            buffer.pos(-1, 1, -1).tex(0, 0).endVertex();
-            buffer.pos(1, 1, -1).tex(3, 0).endVertex();
-            buffer.pos(1, 1, 1).tex(3, 1).endVertex();
-            buffer.pos(-1, 1, 1).tex(0, 1).endVertex();
-            buffer.pos(-1, -1, -1).tex(0, 0).endVertex();
-            buffer.pos(1, -1, -1).tex(3, 0).endVertex();
-            buffer.pos(1, 1, -1).tex(3, 1).endVertex();
-            buffer.pos(-1, 1, -1).tex(0, 1).endVertex();
-            buffer.pos(-1, -1, 1).tex(0, 0).endVertex();
-            buffer.pos(-1, 1, 1).tex(0, 1).endVertex();
-            buffer.pos(1, 1, 1).tex(3, 1).endVertex();
-            buffer.pos(1, -1, 1).tex(3, 0).endVertex();
-            t.draw();
-            GlStateManager.disableBlend();
-            GlStateManager.enableLighting();
-            GlStateManager.disableCull();
-			GlStateManager.popMatrix();
-			/*if (type != ItemRenderType.ENTITY) GlStateManager.pushMatrix();*/
+			matrices.pop();
+		} else {
+			if (mode != ModelTransformation.Mode.FIRST_PERSON_RIGHT_HAND) matrices.pop();
+			matrices.push();
+            RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+			RenderSystem.enableBlend();
+			matrices.scale(1.01f, 1.01f, 1.01f);
+			matrices.multiply(new Quaternion(45.0f, 0, 1, 0));
+			matrices.multiply(new Quaternion(10.0f, 0, 0, 1));
+			matrices.scale(0.6f, 0.2f, 0.2f);
+			matrices.translate(-0.99f, 0.5f, 0.0f);
+			RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+            buffer.vertex(-1, -1, -1).texture(0, 0).next();
+            buffer.vertex(-1, 1, -1).texture(1, 0).next();
+            buffer.vertex(-1, 1, 1).texture(1, 1).next();
+            buffer.vertex(-1, -1, 1).texture(0, 1).next();
+            buffer.vertex(1, -1, -1).texture(0, 0).next();
+            buffer.vertex(1, -1, 1).texture(0, 1).next();
+            buffer.vertex(1, 1, 1).texture(1, 1).next();
+            buffer.vertex(1, 1, -1).texture(1, 0).next();
+            buffer.vertex(-1, -1, -1).texture(0, 0).next();
+            buffer.vertex(-1, -1, 1).texture(0, 1).next();
+            buffer.vertex(1, -1, 1).texture(3, 1).next();
+            buffer.vertex(1, -1, -1).texture(3, 0).next();
+            buffer.vertex(-1, 1, -1).texture(0, 0).next();
+            buffer.vertex(1, 1, -1).texture(3, 0).next();
+            buffer.vertex(1, 1, 1).texture(3, 1).next();
+            buffer.vertex(-1, 1, 1).texture(0, 1).next();
+            buffer.vertex(-1, -1, -1).texture(0, 0).next();
+            buffer.vertex(1, -1, -1).texture(3, 0).next();
+            buffer.vertex(1, 1, -1).texture(3, 1).next();
+            buffer.vertex(-1, 1, -1).texture(0, 1).next();
+            buffer.vertex(-1, -1, 1).texture(0, 0).next();
+            buffer.vertex(-1, 1, 1).texture(0, 1).next();
+            buffer.vertex(1, 1, 1).texture(3, 1).next();
+            buffer.vertex(1, -1, 1).texture(3, 0).next();
+            buffer.vertex(-1, -1, -1).texture(0, 0).next();
+            buffer.vertex(-1, 1, -1).texture(1, 0).next();
+            buffer.vertex(-1, 1, 1).texture(1, 1).next();
+            buffer.vertex(-1, -1, 1).texture(0, 1).next();
+            buffer.vertex(1, -1, -1).texture(0, 0).next();
+            buffer.vertex(1, -1, 1).texture(0, 1).next();
+            buffer.vertex(1, 1, 1).texture(1, 1).next();
+            buffer.vertex(1, 1, -1).texture(1, 0).next();
+            buffer.vertex(-1, -1, -1).texture(0, 0).next();
+            buffer.vertex(-1, -1, 1).texture(0, 1).next();
+            buffer.vertex(1, -1, 1).texture(3, 1).next();
+            buffer.vertex(1, -1, -1).texture(3, 0).next();
+            buffer.vertex(-1, 1, -1).texture(0, 0).next();
+            buffer.vertex(1, 1, -1).texture(3, 0).next();
+            buffer.vertex(1, 1, 1).texture(3, 1).next();
+            buffer.vertex(-1, 1, 1).texture(0, 1).next();
+            buffer.vertex(-1, -1, -1).texture(0, 0).next();
+            buffer.vertex(1, -1, -1).texture(3, 0).next();
+            buffer.vertex(1, 1, -1).texture(3, 1).next();
+            buffer.vertex(-1, 1, -1).texture(0, 1).next();
+            buffer.vertex(-1, -1, 1).texture(0, 0).next();
+            buffer.vertex(-1, 1, 1).texture(0, 1).next();
+            buffer.vertex(1, 1, 1).texture(3, 1).next();
+            buffer.vertex(1, -1, 1).texture(3, 0).next();
+            RenderSystem.disableBlend();
+			matrices.pop();
+			if (mode != ModelTransformation.Mode.FIRST_PERSON_RIGHT_HAND) matrices.push();
 		}
 	}
 

@@ -12,18 +12,20 @@
 package assets.rivalrebels.common.round;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.packet.PacketDispatcher;
 import com.mojang.authlib.GameProfile;
-import io.netty.buffer.ByteBuf;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.world.World;
+import net.minecraftforge.network.NetworkEvent;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Arrays;
+import java.util.function.Supplier;
 
-public class RivalRebelsPlayerList implements IMessage
-{
-	private int					size	= 0;
-	private RivalRebelsPlayer[]	list	= new RivalRebelsPlayer[0];
+public class RivalRebelsPlayerList {
+	private int	size = 0;
+	private RivalRebelsPlayer[]	list = new RivalRebelsPlayer[0];
 
 	public RivalRebelsPlayerList()
 	{
@@ -37,13 +39,10 @@ public class RivalRebelsPlayerList implements IMessage
 	public RivalRebelsPlayer add(RivalRebelsPlayer o)
 	{
 		size++;
-		if (size <= list.length) {
-        }
-		else
-		{
-			int nsize = ((list.length * 3) / 2) + 1;
-			if (nsize < size) nsize = size;
-			list = Arrays.copyOf(list, nsize);
+        if (size > list.length) {
+            int nsize = ((list.length * 3) / 2) + 1;
+            if (nsize < size) nsize = size;
+            list = Arrays.copyOf(list, nsize);
         }
         list[size - 1] = o;
         return o;
@@ -78,33 +77,48 @@ public class RivalRebelsPlayerList implements IMessage
 		}
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		size = buf.readInt();
-		list = new RivalRebelsPlayer[size];
-		for (int i = 0; i < size; i++) list[i] = new RivalRebelsPlayer(buf);
+	public static RivalRebelsPlayerList fromBytes(PacketByteBuf buf) {
+        RivalRebelsPlayerList rivalRebelsPlayerList = new RivalRebelsPlayerList();
+        rivalRebelsPlayerList.size = buf.readInt();
+        rivalRebelsPlayerList.list = new RivalRebelsPlayer[rivalRebelsPlayerList.size];
+		for (int i = 0; i < rivalRebelsPlayerList.size; i++) rivalRebelsPlayerList.list[i] = new RivalRebelsPlayer(buf);
+        return rivalRebelsPlayerList;
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(size);
-		for (int i = 0; i < size; i++) list[i].toBytes(buf);
+    public static RivalRebelsPlayerList fromNbt(NbtCompound nbt) {
+        RivalRebelsPlayerList rivalRebelsPlayerList = new RivalRebelsPlayerList();
+        rivalRebelsPlayerList.size = nbt.getInt("size");
+        rivalRebelsPlayerList.list = new RivalRebelsPlayer[rivalRebelsPlayerList.size];
+        for (int i = 0; i < rivalRebelsPlayerList.size; i++) {
+            rivalRebelsPlayerList.list[i] = new RivalRebelsPlayer(nbt.getCompound("list_" + i));
+        }
+        return rivalRebelsPlayerList;
+    }
+
+	public static void toBytes(RivalRebelsPlayerList playerList, PacketByteBuf buf) {
+		buf.writeInt(playerList.size);
+		for (int i = 0; i < playerList.size; i++) playerList.list[i].toBytes(buf);
 	}
 
-	public static class Handler implements IMessageHandler<RivalRebelsPlayerList, IMessage>
-	{
-		@Override
-		public IMessage onMessage(RivalRebelsPlayerList m, MessageContext ctx)
-		{
-			RivalRebels.round.rrplayerlist = m;
-			return null;
-		}
+    public void toNbt(NbtCompound nbt) {
+        nbt.putInt("size", size);
+        for (int i = 0; i < size; i++) {
+            NbtCompound compound = new NbtCompound();
+            list[i].toNbt(compound);
+            nbt.put("list_" + i, compound);
+        }
+    }
+
+	public static void onMessage(RivalRebelsPlayerList m, Supplier<NetworkEvent.Context> ctx) {
+		RivalRebels.round.rrplayerlist = m;
 	}
 
 	public RivalRebelsPlayer[] getArray()
 	{
 		return list;
 	}
+
+    public void refreshForWorld(World world) {
+        PacketDispatcher.packetsys.send(PacketDistributor.ALL.noArg(), this);
+    }
 }

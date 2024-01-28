@@ -12,39 +12,24 @@
 package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
-import net.minecraft.command.CommandBase;
+import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 
-public class CommandContinueRound extends CommandBase
-{
-	@Override
-	public String getName()
-	{
-		return "rrstartround";
-	}
+public class CommandContinueRound {
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(CommandManager.literal("rrstartround")
+            .requires(arg -> arg.hasPermissionLevel(3))
+            .executes(commandContext -> execute(commandContext.getSource()))
+        );
+    }
 
-	@Override
-	public String getUsage(ICommandSender par1ICommandSender)
-	{
-		return "/" + getName();
-	}
-
-	/**
-	 * Return the required permission level for this command.
-	 */
-	@Override
-	public int getRequiredPermissionLevel()
-	{
-		return 3;
-	}
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
+    private static int execute(ServerCommandSource source) throws CommandException {
 		RivalRebels.round.stopRounds();
 		RivalRebels.round.newRound();
-		sender.sendMessage(new TextComponentString("The current round has been successfully started."));
+		source.sendFeedback(Text.of("The current round has been restarted."), true);
+        return 0;
 	}
 }

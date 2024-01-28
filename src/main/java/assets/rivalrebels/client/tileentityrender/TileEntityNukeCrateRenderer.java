@@ -11,57 +11,48 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelNukeCrate;
+import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.Quaternion;
 
-public class TileEntityNukeCrateRenderer extends TileEntitySpecialRenderer<TileEntityNukeCrate>
-{
-	private ModelNukeCrate	model;
+public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEntityNukeCrate> {
+    private final ModelNukeCrate model;
 
-	public TileEntityNukeCrateRenderer()
-	{
-		model = new ModelNukeCrate();
-	}
+    public TileEntityNukeCrateRenderer(BlockEntityRendererFactory.Context context) {
+        model = new ModelNukeCrate();
+    }
 
     @Override
-    public void render(TileEntityNukeCrate te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        GlStateManager.enableLighting();
-        GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		int metadata = te.getBlockMetadata();
-		if (metadata == 0)
-		{
-			GlStateManager.rotate(180, 1, 0, 0);
-		}
-
-		if (metadata == 2)
-		{
-			GlStateManager.rotate(-90, 1, 0, 0);
-		}
-
-		if (metadata == 3)
-		{
-			GlStateManager.rotate(90, 1, 0, 0);
-		}
-
-		if (metadata == 4)
-		{
-			GlStateManager.rotate(90, 0, 0, 1);
-		}
-
-		if (metadata == 5)
-		{
-			GlStateManager.rotate(-90, 0, 0, 1);
-		}
-		if (te.getWorld().getBlockState(te.getPos()).getBlock() == RivalRebels.nukeCrateBottom) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btnukebottom);
-		if (te.getWorld().getBlockState(te.getPos()).getBlock() == RivalRebels.nukeCrateTop) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btnuketop);
-		model.renderModelA();
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btcrate);
-		model.renderModelB();
-        GlStateManager.popMatrix();
-	}
+    public void render(TileEntityNukeCrate entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        matrices.push();
+        matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+        Direction metadata = entity.getCachedState().get(BlockNukeCrate.DIRECTION);
+        switch (metadata) {
+            case DOWN -> matrices.multiply(new Quaternion(180, 1, 0, 0));
+            case NORTH -> matrices.multiply(new Quaternion(-90, 1, 0, 0));
+            case SOUTH -> matrices.multiply(new Quaternion(90, 1, 0, 0));
+            case WEST -> matrices.multiply(new Quaternion(90, 0, 0, 1));
+            case EAST -> matrices.multiply(new Quaternion(-90, 0, 0, 1));
+        }
+        if (entity.getWorld().getBlockState(entity.getPos()).getBlock() == RRBlocks.nukeCrateBottom)
+            MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btnukebottom);
+        if (entity.getWorld().getBlockState(entity.getPos()).getBlock() == RRBlocks.nukeCrateTop)
+            MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btnuketop);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        model.renderModelA(matrices, buffer);
+        MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btcrate);
+        model.renderModelB(matrices, buffer);
+        matrices.pop();
+    }
 }

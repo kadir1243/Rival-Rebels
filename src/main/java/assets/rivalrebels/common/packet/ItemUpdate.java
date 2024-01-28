@@ -11,60 +11,45 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
 import assets.rivalrebels.common.item.weapon.ItemFlameThrower;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraftforge.network.NetworkEvent;
 
-public class ItemUpdate implements IMessage
-{
-	public int item;
-	public int value;
+import java.util.function.Supplier;
 
-	public ItemUpdate() {
-	}
+public class ItemUpdate {
+	private final int item;
+	private final int value;
 
-	public ItemUpdate(int currentItem, int i)
-	{
+	public ItemUpdate(int currentItem, int i) {
 		item = currentItem;
 		value = i;
 	}
 
-	@Override
-	public void fromBytes(ByteBuf buf)
-	{
-		item = buf.readInt();
-		value = buf.readInt();
+	public static ItemUpdate fromBytes(PacketByteBuf buf) {
+        return new ItemUpdate(buf.readInt(), buf.readInt());
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf)
-	{
-		buf.writeInt(item);
-		buf.writeInt(value);
+	public static void toBytes(ItemUpdate packet, PacketByteBuf buf) {
+		buf.writeInt(packet.item);
+		buf.writeInt(packet.value);
 	}
 
-	public static class Handler implements IMessageHandler<ItemUpdate, IMessage>
-	{
-		@Override
-		public IMessage onMessage(ItemUpdate message, MessageContext ctx)
-		{
-            ctx.getServerHandler().player.getServer().addScheduledTask(() -> {
-                ItemStack itemstack = ctx.getServerHandler().player.inventory.getStackInSlot(message.item);
-                if (itemstack.getItem() instanceof ItemTesla) {
-                    if (!itemstack.hasTagCompound()) itemstack.setTagCompound(new NBTTagCompound());
-                    itemstack.getTagCompound().setInteger("dial", message.value);
-                }
-                if (itemstack.getItem() instanceof ItemFlameThrower) {
-                    if (!itemstack.hasTagCompound()) itemstack.setTagCompound(new NBTTagCompound());
-                    itemstack.getTagCompound().setInteger("mode", message.value);
-                }
-            });
-			return null;
-		}
-	}
+
+    public static void onMessage(ItemUpdate message, Supplier<NetworkEvent.Context> ctx) {
+        NetworkEvent.Context context = ctx.get();
+        ServerPlayerEntity sender = context.getSender();
+        context.enqueueWork(() -> {
+            ItemStack itemstack = sender.getInventory().getStack(message.item);
+            if (itemstack.getItem() instanceof ItemTesla) {
+                itemstack.getOrCreateNbt().putInt("dial", message.value);
+            }
+            if (itemstack.getItem() instanceof ItemFlameThrower) {
+                itemstack.getOrCreateNbt().putInt("mode", message.value);
+            }
+        });
+    }
 }

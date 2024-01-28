@@ -11,66 +11,61 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Items;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class BlockSupplies extends Block
 {
-	public BlockSupplies()
+	public BlockSupplies(Settings settings)
 	{
-		super(Material.WOOD);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+		super(settings);
 	}
 
     @Override
-    public void onBlockClicked(World worldIn, BlockPos pos, EntityPlayer playerIn) {
-        blockActivated(worldIn, pos.getX(), pos.getY(), pos.getZ(), playerIn);
-    }
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
 
-    public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
-	{
-		if (world.isRemote)
+		if (world.isClient)
 		{
-			player.sendMessage(new TextComponentTranslation("RivalRebels.Inventory"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.armyshovel.getTranslationKey() + ".name") + ". §9(" + "Ideal for special blocks." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.jump.getTranslationKey() + ".name") + ". §9(" + "Use at your own risk." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.quicksand.getTranslationKey() + ".name") + ". §9(" + "Sand that is quick" + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.mario.getTranslationKey() + ".name") + ". §9(" + "For trap making." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.loader.getTranslationKey() + ".name") + ". §9(" + "Modular item container." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.steel.getTranslationKey() + ".name") + ". §9(" + "Climbable and blast resistant." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.expill.getTranslationKey() + ".name") + ". §9(" + "Take at your own risk." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.safepill.getTranslationKey() + ".name") + ". §9(" + "Restores health." + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.breadbox.getTranslationKey() + ".name") + ". §9(" + "Unlimited toast! You don't say..." + ")"));
+			player.sendMessage(new TranslatableText("RivalRebels.Inventory"), false);
+			player.sendMessage(Text.of("§a" + RRItems.armyshovel.getName() + ". §9(" + "Ideal for special blocks." + ")"), false);
+			player.sendMessage(Text.of("§a" + RRBlocks.jump.getName() + ". §9(" + "Use at your own risk." + ")"), false);
+			player.sendMessage(Text.of("§a" + RRBlocks.quicksand.getName() + ". §9(" + "Sand that is quick" + ")"), false);
+			player.sendMessage(Text.of("§a" + RRBlocks.mario.getName() + ". §9(" + "For trap making." + ")"), false);
+			player.sendMessage(Text.of("§a" + RRBlocks.loader.getName() + ". §9(" + "Modular item container." + ")"), false);
+			player.sendMessage(Text.of("§a" + RRBlocks.steel.getName() + ". §9(" + "Climbable and blast resistant." + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.expill.getName() + ". §9(" + "Take at your own risk." + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.safepill.getName() + ". §9(" + "Restores health." + ")"), false);
+			player.sendMessage(Text.of("§a" + RRBlocks.breadbox.getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"), false);
 		}
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.breadbox));
-			EntityItem ei1 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.armyshovel));
-			EntityItem ei2 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.jump, 4));
-			EntityItem ei3 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.quicksandtrap, 4));
-			EntityItem ei4 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.steel, 32));
-			EntityItem ei5 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.loader, 2));
-			EntityItem ei6 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(Items.BUCKET, 2));
-			EntityItem ei7 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.mariotrap, 4));
-			EntityItem ei8 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.expill, 6));
-			EntityItem ei9 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.safepill, 3));
+			ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.breadbox));
+			ItemEntity ei1 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.armyshovel));
+			ItemEntity ei2 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.jump, 4));
+			ItemEntity ei3 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.quicksandtrap, 4));
+			ItemEntity ei4 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.steel, 32));
+			ItemEntity ei5 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.loader, 2));
+			ItemEntity ei6 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(Items.BUCKET, 2));
+			ItemEntity ei7 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.mariotrap, 4));
+			ItemEntity ei8 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.expill, 6));
+			ItemEntity ei9 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.safepill, 3));
 			world.spawnEntity(ei);
 			world.spawnEntity(ei1);
 			world.spawnEntity(ei2);
@@ -81,31 +76,31 @@ public class BlockSupplies extends Block
 			world.spawnEntity(ei7);
 			world.spawnEntity(ei8);
 			world.spawnEntity(ei9);
-			world.setBlockToAir(new BlockPos(x, y, z));
-			if (world.rand.nextInt(5) == 0)
+            world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+			if (world.random.nextInt(5) == 0)
 			{
-				world.spawnEntity(new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.nuclearelement, 1)));
-				player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.nuclearelement.getTranslationKey() + ".name") + ". §9" + "(Used in nuclear weapons)"));
+				world.spawnEntity(new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.nuclearelement.getDefaultStack()));
+				player.sendMessage(Text.of("§a" + RRItems.nuclearelement.getName() + ". §9" + "(Used in nuclear weapons)"), false);
 			}
-			return true;
+			return ActionResult.success(world.isClient);
 		}
-		return true;
+		return ActionResult.PASS;
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -118,7 +113,7 @@ public class BlockSupplies extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

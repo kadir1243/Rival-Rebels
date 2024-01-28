@@ -11,7 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.util.math.BlockPos;
 
-public class TileEntityGore extends TileEntity {
+public class TileEntityGore extends BlockEntity {
+    public TileEntityGore(BlockPos pos, BlockState state) {
+        super(RRTileEntities.GORE, pos, state);
+    }
 }

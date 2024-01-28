@@ -12,116 +12,79 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.MobEffects;
-import net.minecraft.potion.PotionEffect;
-import net.minecraft.util.EnumBlockRenderType;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.effect.StatusEffectInstance;
+import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.entity.mob.PathAwareEntity;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
 public class BlockToxicGas extends Block
 {
-	public BlockToxicGas()
-	{
-		super(Material.CACTUS);
-		setTickRandomly(true);
+	public BlockToxicGas(Settings settings) {
+		super(settings);
 	}
 
     @Override
-    public int getFlammability(IBlockAccess world, BlockPos pos, EnumFacing face) {
+    public int getFlammability(BlockState state, BlockView world, BlockPos pos, Direction face) {
         return 300;
     }
 
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
-	}
-
-    @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return null;
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+        return VoxelShapes.cuboid(new Box(pos, pos));
     }
 
     @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
-        return new AxisAlignedBB(pos, pos);
-    }
-
-    @Override
-    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-        if (entity instanceof EntityPlayer) {
-			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.POISON, 200, 0));
-			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.NAUSEA, 200, 0));
-			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.BLINDNESS, 80, 0));
-			((EntityLivingBase) entity).addPotionEffect(new PotionEffect(MobEffects.SLOWNESS, 80, 0));
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+        if (entity instanceof LivingEntity living) {
+			living.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 200, 0));
+			living.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
+			living.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 80, 0));
+			living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));
 		}
-		if (entity instanceof EntityMob || entity instanceof EntityAnimal || entity instanceof EntityPlayer) {
-			entity.attackEntityFrom(RivalRebelsDamageSource.gasgrenade, 1);
+		if (entity instanceof PathAwareEntity || entity instanceof AnimalEntity || entity instanceof PlayerEntity) {
+			entity.damage(RivalRebelsDamageSource.gasgrenade, 1);
 		}
 	}
 
     @Override
-    public EnumBlockRenderType getRenderType(IBlockState state) {
-        return EnumBlockRenderType.INVISIBLE;
+    public BlockRenderType getRenderType(BlockState state) {
+        return BlockRenderType.INVISIBLE;
     }
 
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
+    @Override
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+		world.createAndScheduleBlockTick(pos, this, 8);
 	}
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		world.scheduleBlockUpdate(pos, this, 8, 0);
-	}
-
-    @Override
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-		world.scheduleBlockUpdate(pos, this, 8, 0);
-		if (rand.nextInt(25) == 1)
-		{
-			world.setBlockToAir(pos);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+		world.createAndScheduleBlockTick(pos, this, 8);
+		if (random.nextInt(25) == 1) {
+			world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		}
 	}
 
     @Override
-    public void randomDisplayTick(IBlockState state, World world, BlockPos pos, Random rand) {
+    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        world.spawnParticle(EnumParticleTypes.SMOKE_NORMAL, x + 0.5, y + 0.5, z + 0.5, (rand.nextFloat() - 0.5) * 0.1, (rand.nextFloat() - 0.5) * 0.1, (rand.nextFloat() - 0.5) * 0.1);
-		world.spawnParticle(EnumParticleTypes.SPELL, x + 0.5, y + 0.5, z + 0.5, (rand.nextFloat() - 0.5) * 0.1, (rand.nextFloat() - 0.5) * 0.1, (rand.nextFloat() - 0.5) * 0.1);
+        world.addParticle(ParticleTypes.SMOKE, x + 0.5, y + 0.5, z + 0.5, (random.nextFloat() - 0.5) * 0.1, (random.nextFloat() - 0.5) * 0.1, (random.nextFloat() - 0.5) * 0.1);
+		world.addParticle(ParticleTypes.ENCHANT, x + 0.5, y + 0.5, z + 0.5, (random.nextFloat() - 0.5) * 0.1, (random.nextFloat() - 0.5) * 0.1, (random.nextFloat() - 0.5) * 0.1);
 	}
-
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
-	}*/
 }

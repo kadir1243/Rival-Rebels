@@ -11,32 +11,32 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelJump;
 import assets.rivalrebels.common.tileentity.TileEntityJumpBlock;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityJumpBlockRenderer extends TileEntitySpecialRenderer<TileEntityJumpBlock>
-{
+@OnlyIn(Dist.CLIENT)
+public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEntityJumpBlock> {
 	private final ModelJump model;
 
-	public TileEntityJumpBlockRenderer()
-	{
-		model = new ModelJump();
+	public TileEntityJumpBlockRenderer(BlockEntityRendererFactory.Context context) {
+        model = new ModelJump();
 	}
 
     @Override
-    public void render(TileEntityJumpBlock te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btcrate);
-		model.renderModel();
-		GlStateManager.popMatrix();
+    public void render(TileEntityJumpBlock entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btcrate);
+		model.renderModel(vertexConsumers.getBuffer(RenderLayer.getSolid()));
+		matrices.pop();
 	}
 }

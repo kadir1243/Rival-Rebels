@@ -11,25 +11,27 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.autobuilds.BlockRhodesScaffold;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 
-public class TileEntityRhodesActivator extends TileEntityMachineBase
-{
-	int charge = 0;
-	public TileEntityRhodesActivator()
-	{
-		pInM = 40;
+public class TileEntityRhodesActivator extends TileEntityMachineBase {
+	private int charge = 0;
+	public TileEntityRhodesActivator(BlockPos pos, BlockState state) {
+        super(RRTileEntities.RHODES_ACTIVATOR, pos, state);
+        pInM = 40;
 		pInR = 20;
+        EntityRhodes.BLOCK_ENTITIES.put(pos, this);
 	}
 
 	@Override
 	public float powered(float power, float distance)
 	{
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			if (charge == 100)
 			{
@@ -49,12 +51,12 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 					int fx2 = 7-(i%9);
 					Block s1 = world.getBlockState(pos.add(fx1, fy, 0)).getBlock();
 					Block s2 = world.getBlockState(pos.add(fx2, fy, 0)).getBlock();
-					if (b == 1 && (s1 != RivalRebels.conduit || s2 != RivalRebels.conduit))
+					if (b == 1 && (s1 != RRBlocks.conduit || s2 != RRBlocks.conduit))
 					{
 						buildrhodes = false;
 						break;
 					}
-					if (b == 2 && (s1 != RivalRebels.rhodesactivator || s2 != RivalRebels.rhodesactivator))
+					if (b == 2 && (s1 != RRBlocks.rhodesactivator || s2 != RRBlocks.rhodesactivator))
 					{
 						buildrhodes = false;
 						break;
@@ -72,12 +74,12 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 					fx2 *= 2;
 					Block s1 = world.getBlockState(pos.add(fx1, fy, 0)).getBlock();
 					Block s2 = world.getBlockState(pos.add(fx2, fy, 0)).getBlock();
-					if (b == 1 && (s1 != RivalRebels.conduit || s2 != RivalRebels.conduit))
+					if (b == 1 && (s1 != RRBlocks.conduit || s2 != RRBlocks.conduit))
 					{
 						buildrhodes1 = false;
 						break;
 					}
-					if (b == 2 && (s1 != RivalRebels.rhodesactivator || s2 != RivalRebels.rhodesactivator))
+					if (b == 2 && (s1 != RRBlocks.rhodesactivator || s2 != RRBlocks.rhodesactivator))
 					{
 						buildrhodes1 = false;
 						break;
@@ -95,12 +97,12 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 					fx2 *= 3;
 					Block s1 = world.getBlockState(pos.add(fx1, fy, 0)).getBlock();
 					Block s2 = world.getBlockState(pos.add(fx2, fy, 0)).getBlock();
-					if (b == 1 && (s1 != RivalRebels.conduit || s2 != RivalRebels.conduit))
+					if (b == 1 && (s1 != RRBlocks.conduit || s2 != RRBlocks.conduit))
 					{
 						buildrhodes2 = false;
 						break;
 					}
-					if (b == 2 && (s1 != RivalRebels.rhodesactivator || s2 != RivalRebels.rhodesactivator))
+					if (b == 2 && (s1 != RRBlocks.rhodesactivator || s2 != RRBlocks.rhodesactivator))
 					{
 						buildrhodes2 = false;
 						break;
@@ -116,8 +118,8 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 							int fy = 2-(i/9);
 							int fx1 = -10+(i%9);
 							int fx2 = 7 -(i%9);
-							world.setBlockToAir(pos.add(fx1, fy, 0));
-							world.setBlockToAir(pos.add(fx2, fy, 0));
+							setBlockToAir(pos.add(fx1, fy, 0));
+							setBlockToAir(pos.add(fx2, fy, 0));
 						}
 					}
 					EntityRhodes er = new EntityRhodes(world, x-1f, y-13, z, 1);
@@ -137,14 +139,14 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 							fy *= 2;
 							fx1 *= 2;
 							fx2 *= 2;
-							world.setBlockToAir(pos.add(fx1, fy, 0));
-							world.setBlockToAir(pos.add(fx2, fy, 0));
-							world.setBlockToAir(pos.add(fx1, fy, 0).east());
-							world.setBlockToAir(pos.add(fx2, fy, 0).east());
-							world.setBlockToAir(pos.add(fx1, fy, 0).up());
-							world.setBlockToAir(pos.add(fx2, fy, 0).up());
-							world.setBlockToAir(pos.add(fx1, fy, 0).east().up());
-							world.setBlockToAir(pos.add(fx2, fy, 0).east().up());
+							setBlockToAir(pos.add(fx1, fy, 0));
+							setBlockToAir(pos.add(fx2, fy, 0));
+							setBlockToAir(pos.add(fx1, fy, 0).east());
+							setBlockToAir(pos.add(fx2, fy, 0).east());
+							setBlockToAir(pos.add(fx1, fy, 0).up());
+							setBlockToAir(pos.add(fx2, fy, 0).up());
+							setBlockToAir(pos.add(fx1, fy, 0).east().up());
+							setBlockToAir(pos.add(fx2, fy, 0).east().up());
 						}
 					}
 					EntityRhodes er = new EntityRhodes(world, x-2f, y-26, z, 2);
@@ -164,45 +166,45 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 							fy *= 3;
 							fx1 *= 3;
 							fx2 *= 3;
-							world.setBlockToAir(pos.add(fx1, fy, 0));
-							world.setBlockToAir(pos.add(fx2, fy, 0));
-							world.setBlockToAir(pos.add(fx1, fy, 0).east());
-							world.setBlockToAir(pos.add(fx2, fy, 0).east());
-							world.setBlockToAir(pos.add(fx1, fy, 0).east(2));
-							world.setBlockToAir(pos.add(fx2, fy, 0).east(2));
-							world.setBlockToAir(pos.add(fx1, fy, 0).up());
-							world.setBlockToAir(pos.add(fx2, fy, 0).up());
-							world.setBlockToAir(pos.add(fx1, fy, 0).east().up());
-							world.setBlockToAir(pos.add(fx2, fy, 0).east().up());
-							world.setBlockToAir(pos.add(fx1, fy, 0).east(2).up());
-							world.setBlockToAir(pos.add(fx2, fy, 0).east(2).up());
-							world.setBlockToAir(pos.add(fx1, fy, 0).up(2));
-							world.setBlockToAir(pos.add(fx2, fy, 0).up(2));
-							world.setBlockToAir(pos.add(fx1, fy, 0).east().up(2));
-							world.setBlockToAir(pos.add(fx2, fy, 0).east().up(2));
-							world.setBlockToAir(pos.add(fx1, fy, 0).east(2).up(2));
-							world.setBlockToAir(pos.add(fx2, fy, 0).east(2).up(2));
+							setBlockToAir(pos.add(fx1, fy, 0));
+							setBlockToAir(pos.add(fx2, fy, 0));
+							setBlockToAir(pos.add(fx1, fy, 0).east());
+							setBlockToAir(pos.add(fx2, fy, 0).east());
+							setBlockToAir(pos.add(fx1, fy, 0).east(2));
+							setBlockToAir(pos.add(fx2, fy, 0).east(2));
+							setBlockToAir(pos.add(fx1, fy, 0).up());
+							setBlockToAir(pos.add(fx2, fy, 0).up());
+							setBlockToAir(pos.add(fx1, fy, 0).east().up());
+							setBlockToAir(pos.add(fx2, fy, 0).east().up());
+							setBlockToAir(pos.add(fx1, fy, 0).east(2).up());
+							setBlockToAir(pos.add(fx2, fy, 0).east(2).up());
+							setBlockToAir(pos.add(fx1, fy, 0).up(2));
+							setBlockToAir(pos.add(fx2, fy, 0).up(2));
+							setBlockToAir(pos.add(fx1, fy, 0).east().up(2));
+							setBlockToAir(pos.add(fx2, fy, 0).east().up(2));
+							setBlockToAir(pos.add(fx1, fy, 0).east(2).up(2));
+							setBlockToAir(pos.add(fx2, fy, 0).east(2).up(2));
 						}
 					}
 					EntityRhodes er = new EntityRhodes(world, x-3f, y-39, z, 3);
 					if (getPos().getZ() > this.pos.getZ()) er.bodyyaw = 180;
 					world.spawnEntity(er);
 				}
-				else if (world.getBlockState(pos.up()).getBlock() == RivalRebels.conduit
-					&& world.getBlockState(pos.west()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.east()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.west().up()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.east().up()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.west().up(3)).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.east().up(3)).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.up(3)).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.up(2)).getBlock() == RivalRebels.conduit
-					&& world.getBlockState(pos.west().up(2)).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.east().up(2)).getBlock() == RivalRebels.steel)
+				else if (world.getBlockState(pos.up()).getBlock() == RRBlocks.conduit
+					&& world.getBlockState(pos.west()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.east()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.west().up()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.east().up()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.west().up(3)).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.east().up(3)).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.up(3)).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.up(2)).getBlock() == RRBlocks.conduit
+					&& world.getBlockState(pos.west().up(2)).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.east().up(2)).getBlock() == RRBlocks.steel)
 				{
-					world.setBlockToAir(pos.up());
-					world.setBlockToAir(pos.up(2));
-					world.setBlockToAir(pos.up(3));
+					setBlockToAir(pos.up());
+					setBlockToAir(pos.up(2));
+					setBlockToAir(pos.up(3));
 					EntityRhodes er = new EntityRhodes(world, x+0.5f, y+2.5f, z+0.5f, 0.0666666666666f);
 					er.wakeX = x;
 					er.wakeY = y;
@@ -210,17 +212,17 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 					if (getPos().getZ() > this.pos.getZ()) er.bodyyaw = 180;
 					world.spawnEntity(er);
 				}
-				else if (world.getBlockState(pos.up()).getBlock() == RivalRebels.conduit
-					&& world.getBlockState(pos.west()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.east()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.west().up()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.east().up()).getBlock() == RivalRebels.steel
-					&& world.getBlockState(pos.west().up(2)) == RivalRebels.steel
-					&& world.getBlockState(pos.east().up(2)) == RivalRebels.steel
-					&& world.getBlockState(pos.up(2)).getBlock() == RivalRebels.steel)
+				else if (world.getBlockState(pos.up()).getBlock() == RRBlocks.conduit
+					&& world.getBlockState(pos.west()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.east()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.west().up()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.east().up()).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.west().up(2)).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.east().up(2)).getBlock() == RRBlocks.steel
+					&& world.getBlockState(pos.up(2)).getBlock() == RRBlocks.steel)
 				{
-					world.setBlockToAir(pos.up());
-					world.setBlockToAir(pos.up(2));
+					setBlockToAir(pos.up());
+					setBlockToAir(pos.up(2));
 					EntityRhodes er = new EntityRhodes(world, x+0.5f, y+1.5f, z+0.5f, 0.0333333333333f);
 					er.wakeX = x;
 					er.wakeY = y;
@@ -238,4 +240,14 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase
 		}
 		return power;
 	}
+
+    private void setBlockToAir(BlockPos pos) {
+        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+    }
+
+    @Override
+    public void markRemoved() {
+        super.markRemoved();
+        EntityRhodes.BLOCK_ENTITIES.remove(getPos());
+    }
 }

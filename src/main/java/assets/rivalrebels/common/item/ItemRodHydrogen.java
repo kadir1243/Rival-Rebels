@@ -11,23 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.item.ItemStack;
+import assets.rivalrebels.client.itemrenders.HydrogenRodRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraftforge.client.IItemRenderProperties;
 
-public class ItemRodHydrogen extends ItemRod
-{
-	public ItemRodHydrogen()
-	{
-		super();
-		setMaxStackSize(1);
+import java.util.function.Consumer;
+
+public class ItemRodHydrogen extends ItemRod {
+	public ItemRodHydrogen() {
+        super();
 		power = 250000;
-		this.setMaxDamage(32);
-		setCreativeTab(RivalRebels.rralltab);
 	}
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:au");
-	}*/
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new HydrogenRodRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 }

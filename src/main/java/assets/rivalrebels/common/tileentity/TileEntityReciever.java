@@ -12,35 +12,44 @@
 package assets.rivalrebels.common.tileentity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.machine.BlockReciever;
+import assets.rivalrebels.common.container.ContainerReciever;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRhodes;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
-import assets.rivalrebels.common.packet.ADSUpdatePacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.monster.EntityGhast;
-import net.minecraft.entity.monster.EntityMob;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityBat;
-import net.minecraft.entity.passive.EntitySquid;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.GhastEntity;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.entity.passive.SquidEntity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.text.Text;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.world.RaycastContext;
+import org.jetbrains.annotations.Nullable;
 
-public class TileEntityReciever extends TileEntityMachineBase implements IInventory
+public class TileEntityReciever extends TileEntityMachineBase implements Inventory, NamedScreenHandlerFactory
 {
 	public double			yaw;
 	public double			pitch;
@@ -51,7 +60,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	double					ll						= -50;
 	double					ul						= 90;
 	double					scale					= 1.5;
-	public NonNullList<ItemStack> chestContents			= NonNullList.withSize(9, ItemStack.EMPTY);
+	public DefaultedList<ItemStack> chestContents			= DefaultedList.ofSize(9, ItemStack.EMPTY);
 	private int				ticksSinceLastTarget	= 0;
 	public int				yawLimit				= 180;
 	public boolean			kTeam					= true;
@@ -60,9 +69,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	public boolean			hasWeapon				= false;
 	private RivalRebelsTeam	team;
 	private int				ammoCounter;
-	private double			prevTx					= 0;
-	private double			prevTy					= 0;
-	private double			prevTz					= 0;
+    private Vec3d prevTpos = Vec3d.ZERO;
 	private Entity			le						= null;
 	public int				wepSelected;
 	public static int		staticEntityIndex		= 1;
@@ -71,8 +78,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	private int ticksincepacket;
 	int ticksSinceLastShot = 0;
 
-	public TileEntityReciever()
-	{
+	public TileEntityReciever(BlockPos pos, BlockState state) {
+        super(RRTileEntities.RECIEVER, pos, state);
 		entityIndex = staticEntityIndex;
 		pInM = 400;
 		if (RivalRebels.freeDragonAmmo)
@@ -80,19 +87,19 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			hasWeapon = true;
 			team = RivalRebelsTeam.NONE;
 			kPlayers = true;
-			chestContents.set(3, new ItemStack(RivalRebels.battery, 64));
-			chestContents.set(4, new ItemStack(RivalRebels.battery, 64));
-			chestContents.set(5, new ItemStack(RivalRebels.battery, 64));
-			chestContents.set(0, new ItemStack(RivalRebels.fuel, 64));
-			chestContents.set(1, new ItemStack(RivalRebels.fuel, 64));
-			chestContents.set(2, new ItemStack(RivalRebels.fuel, 64));
+			chestContents.set(3, new ItemStack(RRItems.battery, 64));
+			chestContents.set(4, new ItemStack(RRItems.battery, 64));
+			chestContents.set(5, new ItemStack(RRItems.battery, 64));
+			chestContents.set(0, new ItemStack(RRItems.fuel, 64));
+			chestContents.set(1, new ItemStack(RRItems.fuel, 64));
+			chestContents.set(2, new ItemStack(RRItems.fuel, 64));
 		}
 	}
 
 	@Override
-	public void update()
+	public void tick()
 	{
-		super.update();
+		super.tick();
 		if (xO == zO) updateDirection();
 		powered(0, 0);
 		convertBatteryToEnergy();
@@ -100,16 +107,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	}
 
 	@Override
-	@SideOnly(Side.CLIENT)
-	public double getMaxRenderDistanceSquared()
+	public Box getRenderBoundingBox()
 	{
-		return 16384.0D;
-	}
-
-	@Override
-	public AxisAlignedBB getRenderBoundingBox()
-	{
-		return new AxisAlignedBB(getPos().add(-1, -1, -1), getPos().add(2, 2, 2));
+		return new Box(getPos().add(-1, -1, -1), getPos().add(2, 2, 2));
 	}
 
 	private boolean hasBattery()
@@ -131,9 +131,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 
 	private void consumeBattery()
 	{
-		if (!chestContents.get(3).isEmpty()) decrStackSize(3, 1);
-		else if (!chestContents.get(4).isEmpty()) decrStackSize(4, 1);
-		else if (!chestContents.get(5).isEmpty()) decrStackSize(5, 1);
+		if (!chestContents.get(3).isEmpty()) removeStack(3, 1);
+		else if (!chestContents.get(4).isEmpty()) removeStack(4, 1);
+		else if (!chestContents.get(5).isEmpty()) removeStack(5, 1);
 	}
 
 	public boolean hasWepReqs()
@@ -147,10 +147,10 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
 		if (wep != 0)
 		{
-			if (!chestContents.get(6).isEmpty() && chestContents.get(6).hasTagCompound())
+			if (!chestContents.get(6).isEmpty() && chestContents.get(6).hasNbt())
 			{
-				team = RivalRebelsTeam.getForID(chestContents.get(6).getTagCompound().getInteger("team"));
-				username = chestContents.get(6).getTagCompound().getString("username");
+				team = RivalRebelsTeam.getForID(chestContents.get(6).getNbt().getInt("team"));
+				username = chestContents.get(6).getNbt().getString("username");
 			}
 			chestContents.set(6, ItemStack.EMPTY);
             chestContents.set(7, ItemStack.EMPTY);
@@ -180,15 +180,15 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 					lookAt(target);
 					if (hasAmmo())
 					{
-						if (world.rand.nextInt(3) == 0)
+						if (world.random.nextInt(3) == 0)
 						{
 							RivalRebelsSoundPlayer.playSound(world, getPos().getX(), getPos().getY(), getPos().getZ(), 8, 1, 0.1f);
 						}
-						float rotationYaw = (float) (180 - yaw);
-						float rotationPitch = (float) (-pitch);
-						double motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-						double motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-						double motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
+						float yaw = (float) (180 - this.yaw);
+						float pitch = (float) (-this.pitch);
+						double motionX = (-MathHelper.sin(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI));
+						double motionZ = (MathHelper.cos(yaw / 180.0F * (float) Math.PI) * MathHelper.cos(pitch / 180.0F * (float) Math.PI));
+						double motionY = (-MathHelper.sin(pitch / 180.0F * (float) Math.PI));
 						ItemRoda.spawn(entityIndex,world,getPos().getX() + xO + 0.5, getPos().getY() + 0.75, getPos().getZ() + zO + 0.5,motionX,motionY,motionZ,1.0f,0.0f);
 						useAmmo();
 					}
@@ -196,21 +196,27 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 				}
 			}
 			ticksincepacket++;
-			if (ticksincepacket > 6 && !world.isRemote)
-			{
+			if (ticksincepacket > 6 && !world.isClient) {
 				ticksincepacket = 0;
-				PacketDispatcher.packetsys.sendToAll(new ADSUpdatePacket(getPos(), yawLimit, kMobs, kTeam, kPlayers, hasWeapon, username));
 			}
 		}
 		return power - 1;
 	}
 
-	/*
-	 * public Packet getDescriptionPacket() { Packet132TileEntityData p = new Packet132TileEntityData(); NBTTagCompound nbt = new NBTTagCompound(); writeToNBT(nbt); p.data = nbt; p.xPosition = getPos().getX();
-	 * p.yPosition = getPos().getY(); p.zPosition = getPos().getZ(); return p; } public void onDataPacket(INetworkManager net, Packet132TileEntityData pkt) { readFromNBT(pkt.data); }
-	 */
+    @Nullable
+    @Override
+    public BlockEntityUpdateS2CPacket toUpdatePacket() {
+        return BlockEntityUpdateS2CPacket.create(this);
+    }
 
-	private boolean hasAmmo()
+    @Override
+    public NbtCompound toInitialChunkDataNbt() {
+        NbtCompound nbt = new NbtCompound();
+        writeNbt(nbt);
+        return nbt;
+    }
+
+    private boolean hasAmmo()
 	{
 		return !chestContents.get(0).isEmpty() ||
             !chestContents.get(1).isEmpty() ||
@@ -224,9 +230,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		if (ammoCounter == 9)
 		{
 			ammoCounter = 0;
-			if (!chestContents.get(0).isEmpty()) decrStackSize(0, 1);
-			else if (!chestContents.get(1).isEmpty()) decrStackSize(1, 1);
-			else if (!chestContents.get(2).isEmpty()) decrStackSize(2, 1);
+			if (!chestContents.get(0).isEmpty()) removeStack(0, 1);
+			else if (!chestContents.get(1).isEmpty()) removeStack(1, 1);
+			else if (!chestContents.get(2).isEmpty()) removeStack(2, 1);
 			else return false;
 			return true;
 		}
@@ -237,56 +243,55 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	{
         double ldist = 40*40;
 		Entity result = null;
-        for (Entity e : world.loadedEntityList) {
-            double dist = e.getDistanceSq(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO);
+        Box box = new Box(getPos().add(40, 40, 40), getPos().add(-40, -40, -40));
+        for (Entity e : world.getEntitiesByType(null, box, this::canTarget)) {
+            double dist = e.squaredDistanceTo(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO);
             if (dist < ldist) {
-                if (canTarget(e)) {
-                    ldist = dist;
-                    result = e;
-                }
+                ldist = dist;
+                result = e;
             }
         }
-		return result;
+        return result;
 	}
 
 	private boolean canTarget(Entity e)
 	{
-		return e != null && ((e instanceof EntityLivingBase && ((EntityLivingBase) e).getHealth() > 0) || e instanceof EntityRhodes) && getPitchTo(e, 0) > ll && getPitchTo(e, 0) < ul && isValidTarget(e) && canSee(e);
+		return ((e instanceof LivingEntity && ((LivingEntity) e).getHealth() > 0) || e instanceof EntityRhodes) && getPitchTo(e, 0) > ll && getPitchTo(e, 0) < ul && isValidTarget(e) && canSee(e);
 	}
 
 	private boolean isValidTarget(Entity e)
 	{
 		if (e == null) return false;
-		else if (e instanceof EntityPlayer p)
+		else if (e instanceof PlayerEntity p)
 		{
-            if (p.capabilities.isCreativeMode) return false;
+            if (p.getAbilities().invulnerable) return false;
 			else
 			{
 				if (kPlayers) return true;
 				else if (!kTeam) return false;
-				RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(((EntityPlayer) e).getGameProfile());
+				RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(((PlayerEntity) e).getGameProfile());
 				if (rrp == null) return kTeam;
-				if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getName().equals(username);
+				if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getEntityName().equals(username);
 				if (rrp.rrteam != team) return kTeam;
 				else return false;
 			}
 		}
-		else return (kMobs && (e instanceof EntityRhodes || (e instanceof EntityMob && !(e instanceof EntityAnimal) && !(e instanceof EntityBat) && !(e instanceof EntityVillager) && !(e instanceof EntitySquid)) || e instanceof EntityGhast));
+		else return (kMobs && (e instanceof EntityRhodes || (e instanceof MobEntity && !(e instanceof AnimalEntity) && !(e instanceof BatEntity) && !(e instanceof VillagerEntity) && !(e instanceof SquidEntity)) || e instanceof GhastEntity));
 	}
 
 	private boolean canSee(Entity e)
 	{
 		int yaw = (int) (getYawTo(e, 0) - getBaseRotation() + 360) % 360;
 		if (Math.abs(yaw) > yawLimit / 2 && Math.abs(yaw) < 360 - (yawLimit / 2)) return false;
-		Vec3d start = new Vec3d(e.posX, e.posY + e.getEyeHeight(), e.posZ);
-		Vec3d end = new Vec3d(getPos()).add(0.5 + xO, 0.5, 0.5 + zO);
-		RayTraceResult mop = world.rayTraceBlocks(start, end, false, true, false);
+		Vec3d start = e.getPos().add(0, e.getEyeHeight(e.getPose()), 0);
+		Vec3d end = new Vec3d(getPos().getX(), getPos().getY(), getPos().getZ()).add(0.5 + xO, 0.5, 0.5 + zO);
+		BlockHitResult mop = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, null));
 		return mop == null || (mop.getBlockPos().equals(this.getPos()));
 	}
 
 	private void updateDirection()
 	{
-		direction = this.getBlockMetadata();
+		direction = this.getCachedState().get(BlockReciever.META);
 		xO = 0.0;
 		zO = 0.0;
 		if (direction == 2) zO = -0.76f;
@@ -297,9 +302,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 
 	public int lookAt(Entity t)
 	{
-		double dist = t.getDistance(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO);
-		double ya = getYawTo(t, le == t ? dist * 1.00 : 0);
-		double pi = getPitchTo(t, le == t ? dist * 1.00 : 0);
+		double dist = Math.sqrt(t.squaredDistanceTo(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO));
+		double ya = getYawTo(t, le == t ? dist : 0);
+		double pi = getPitchTo(t, le == t ? dist : 0);
 		if (pi > ll && pi < ul)
 		{
 			pitch = (pitch + pitch + pitch + pi) / 4;
@@ -307,9 +312,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 			else if (yaw - ya > 180) yaw -= 360;
 			yaw = (yaw + yaw + yaw + ya) / 4;
 			//pitch += dist / 10;
-			prevTx = t.posX;
-			prevTy = t.posY;
-			prevTz = t.posZ;
+            prevTpos = t.getPos();
 			le = t;
 			return 1;
 		}
@@ -318,17 +321,16 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 
 	public double getYawTo(Entity t, double off)
 	{
-		double x = getPos().getX() + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
-		double z = getPos().getZ() + 0.5 + zO - t.posZ - (t.posZ - prevTz) * off;
+		double x = getPos().getX() + 0.5 + xO - t.getX() - (t.getX() - prevTpos.getX()) * off;
+		double z = getPos().getZ() + 0.5 + zO - t.getZ() - (t.getZ() - prevTpos.getZ()) * off;
 		double ya = Math.atan2(x, z);
 		return ((ya / Math.PI) * 180);
 	}
 
-	public double getPitchTo(Entity t, double off)
-	{
-		double x = getPos().getX() + 0.5 + xO - t.posX - (t.posX - prevTx) * off;
-		double y = getPos().getY() + (0.5 * scale) - t.posY - t.getEyeHeight() - (t.posY - prevTy) * off;
-		double z = getPos().getZ() + 0.5 + zO - t.posZ - (t.posZ - prevTz) * off;
+	public double getPitchTo(Entity t, double off) {
+		double x = getPos().getX() + 0.5 + xO - t.getX() - (t.getX() - prevTpos.getX()) * off;
+		double y = getPos().getY() + (0.5 * scale) - t.getY() - t.getEyeHeight(t.getPose()) - (t.getY() - prevTpos.getY()) * off;
+		double z = getPos().getZ() + 0.5 + zO - t.getZ() - (t.getZ() - prevTpos.getZ()) * off;
 		double d = Math.sqrt(x * x + z * z);
 		double pi = Math.atan2(d, -y);
 		return 90 - ((pi / Math.PI) * 180);
@@ -336,8 +338,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 
 	public int getBaseRotation()
 	{
-		int m = getBlockMetadata();
-		short r = 0;
+		int m = getCachedState().get(BlockReciever.META);
+		int r = 0;
 		if (m == 2) r = 0;
 		if (m == 3) r = 180;
 		if (m == 4) r = 90;
@@ -349,7 +351,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	 * Returns the number of slots in the inventory.
 	 */
 	@Override
-	public int getSizeInventory()
+	public int size()
 	{
 		return 9;
 	}
@@ -358,9 +360,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	 * Returns the stack in slot i
 	 */
 	@Override
-	public ItemStack getStackInSlot(int par1)
+	public ItemStack getStack(int par1)
 	{
-		if (par1 >= getSizeInventory()) return ItemStack.EMPTY;
+		if (par1 >= size()) return ItemStack.EMPTY;
 		return this.chestContents.get(par1);
 	}
 
@@ -368,7 +370,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
 	 */
 	@Override
-	public ItemStack decrStackSize(int par1, int par2)
+	public ItemStack removeStack(int par1, int par2)
 	{
 		if (!this.chestContents.get(par1).isEmpty())
 		{
@@ -381,7 +383,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
             }
 			else
 			{
-				var3 = this.chestContents.get(par1).splitStack(par2);
+				var3 = this.chestContents.get(par1).split(par2);
 
 				if (this.chestContents.get(par1).isEmpty())
 				{
@@ -394,8 +396,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 	}
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
-		if (index >= getSizeInventory()) return ItemStack.EMPTY;
+    public ItemStack removeStack(int index) {
+		if (index >= size()) return ItemStack.EMPTY;
 		if (!this.chestContents.get(index).isEmpty())
 		{
 			ItemStack var2 = this.chestContents.get(index);
@@ -405,112 +407,58 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
 		return ItemStack.EMPTY;
 	}
 
-	/**
-	 * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
-	 */
-	@Override
-	public void setInventorySlotContents(int index, ItemStack stack)
+    @Override
+	public void setStack(int index, ItemStack stack)
 	{
-		if (index >= getSizeInventory()) return;
+		if (index >= size()) return;
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getInventoryStackLimit())
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack())
 		{
-			stack.setCount(this.getInventoryStackLimit());
+			stack.setCount(this.getMaxCountPerStack());
 		}
 	}
 
-	/**
-	 * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't this more of a set than a get?*
-	 */
-	@Override
-	public int getInventoryStackLimit()
+    @Override
+	public boolean canPlayerUse(PlayerEntity par1EntityPlayer)
 	{
-		return 64;
-	}
-
-	/**
-	 * Do not make give this method the name canInteractWith because it clashes with Container
-	 */
-	@Override
-	public boolean isUsableByPlayer(EntityPlayer par1EntityPlayer)
-	{
-		return this.world.getTileEntity(this.getPos()) == this && par1EntityPlayer.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack)
-	{
-		return true;
+		return this.world.getBlockEntity(this.getPos()) == this && par1EntityPlayer.squaredDistanceTo(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
 
     @Override
-    public int getField(int id) {
-        return 0;
-    }
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
 
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-	public void readFromNBT(NBTTagCompound nbt)
-	{
-		super.readFromNBT(nbt);
-
-        ItemStackHelper.loadAllItems(nbt, this.chestContents);
-		yawLimit = nbt.getInteger("yawLimit");
+        Inventories.readNbt(nbt, this.chestContents);
+		yawLimit = nbt.getInt("yawLimit");
 		kPlayers = nbt.getBoolean("kPlayers");
 		kTeam = nbt.getBoolean("kTeam");
 		kMobs = nbt.getBoolean("kMobs");
 		hasWeapon = nbt.getBoolean("hasWeapon");
 		username = nbt.getString("username");
-		team = RivalRebelsTeam.getForID(nbt.getInteger("team"));
-		entityIndex = nbt.getInteger("entityIndex");
+		team = RivalRebelsTeam.getForID(nbt.getInt("team"));
+		entityIndex = nbt.getInt("entityIndex");
 	}
 
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound nbt)
-	{
-		super.writeToNBT(nbt);
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+		super.writeNbt(nbt);
 
-        ItemStackHelper.saveAllItems(nbt, this.chestContents);
-		nbt.setInteger("yawLimit", yawLimit);
-		nbt.setBoolean("kPlayers", kPlayers);
-		nbt.setBoolean("kTeam", kTeam);
-		nbt.setBoolean("kMobs", kMobs);
-		nbt.setBoolean("hasWeapon", hasWeapon);
-		nbt.setString("username", username);
-		nbt.setInteger("entityIndex", entityIndex);
-		if (team != null) nbt.setInteger("team", team.ordinal());
-        return nbt;
+        Inventories.writeNbt(nbt, this.chestContents);
+		nbt.putInt("yawLimit", yawLimit);
+		nbt.putBoolean("kPlayers", kPlayers);
+		nbt.putBoolean("kTeam", kTeam);
+		nbt.putBoolean("kMobs", kMobs);
+		nbt.putBoolean("hasWeapon", hasWeapon);
+		nbt.putString("username", username);
+		nbt.putInt("entityIndex", entityIndex);
+		if (team != null) nbt.putInt("team", team.ordinal());
     }
 
-	@Override
-	public String getName()
-	{
-		return "Automated Defense System";
-	}
-
-	@Override
-	public boolean hasCustomName()
-	{
-		return false;
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {
-	}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-	}
+    @Override
+    public Text getDisplayName() {
+        return Text.of("Automated Defense System");
+    }
 
     @Override
     public void clear() {
@@ -526,4 +474,44 @@ public class TileEntityReciever extends TileEntityMachineBase implements IInvent
         }
         return true;
     }
+
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+        return new ContainerReciever(syncId, inv, this, propertyDelegate);
+    }
+
+    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+        @Override
+        public int get(int index) {
+            return switch (index) {
+                case 0 -> yawLimit;
+                case 1 -> kTeam ? 1 : 0;
+                case 2 -> kPlayers ? 1 : 0;
+                case 3 -> kMobs ? 1 : 0;
+                case 4 -> hasWeapon ? 1 : 0;
+                case 5 -> hasWepReqs() ? 1 : 0;
+                case 6 -> Float.floatToIntBits(pInR);
+
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {
+            switch (index) {
+                case 1 -> kTeam = value == 1;
+                case 2 -> kPlayers = value == 1;
+                case 3 -> kMobs = value == 1;
+                case 4 -> hasWeapon = value == 1;
+                case 5 -> setWep(value);
+                default -> {}
+            }
+        }
+
+        @Override
+        public int size() {
+            return 7;
+        }
+    };
 }

@@ -11,97 +11,87 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
+import assets.rivalrebels.common.block.machine.BlockForceFieldNode;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 import org.lwjgl.BufferUtils;
-import org.lwjgl.Sys;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.util.Random;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer<TileEntityForceFieldNode>
-{
+@OnlyIn(Dist.CLIENT)
+public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<TileEntityForceFieldNode> {
 	public static int				frames	= 28;
 	public static int[]			id		= new int[frames];
 	RenderHelper	model;
 
-	public TileEntityForceFieldNodeRenderer()
-	{
-		model = new RenderHelper();
+	public TileEntityForceFieldNodeRenderer(BlockEntityRendererFactory.Context context) {
+        model = new RenderHelper();
 		id = genTexture(28, 28, frames);
 	}
 
-	int	count	= 0;
-
     @Override
-    public void render(TileEntityForceFieldNode te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		if (te.pInR <= 0) return;
+    public void render(TileEntityForceFieldNode entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        if (entity.pInR <= 0) return;
 
-		count++;
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
 
-		if (te.getBlockMetadata() == 2)
+        int meta = entity.getCachedState().get(BlockForceFieldNode.META);
+        if (meta == 2)
 		{
-			GlStateManager.rotate(90, 0, 1, 0);
+			matrices.multiply(new Quaternion(90, 0, 1, 0));
 		}
 
-		if (te.getBlockMetadata() == 3)
+		if (meta == 3)
 		{
-			GlStateManager.rotate(-90, 0, 1, 0);
+			matrices.multiply(new Quaternion(-90, 0, 1, 0));
 		}
 
-		if (te.getBlockMetadata() == 4)
+		if (meta == 4)
 		{
-			GlStateManager.rotate(180, 0, 1, 0);
+			matrices.multiply(new Quaternion(180, 0, 1, 0));
 		}
 
-		GlStateManager.bindTexture(id[(int) ((getTime() / 100) % frames)]);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-		GlStateManager.disableLighting();
-		GlStateManager.rotate(90, 0.0F, 1.0F, 0.0F);
-		GlStateManager.translate(0, 0, 0.5f);
-		Tessellator tess = Tessellator.getInstance();
-        BufferBuilder buffer = tess.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(-0.0625f, 3.5f, 0f).tex(0, 0).endVertex();
-		buffer.pos(-0.0625f, -3.5f, 0f).tex(0, 1).endVertex();
-		buffer.pos(-0.0625f, -3.5f, 35f).tex(5, 1).endVertex();
-		buffer.pos(-0.0625f, 3.5f, 35f).tex(5, 0).endVertex();
-		buffer.pos(0.0625f, -3.5f, 0f).tex(0, 1).endVertex();
-		buffer.pos(0.0625f, 3.5f, 0f).tex(0, 0).endVertex();
-		buffer.pos(0.0625f, 3.5f, 35f).tex(5, 0).endVertex();
-		buffer.pos(0.0625f, -3.5f, 35f).tex(5, 1).endVertex();
-		tess.draw();
+		RenderSystem.bindTexture(id[(int) ((getTime() / 100) % frames)]);
+		RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+		matrices.multiply(new Quaternion(90, 0.0F, 1.0F, 0.0F));
+		matrices.translate(0, 0, 0.5f);
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+		vertexConsumer.vertex(-0.0625f, 3.5f, 0f).texture(0, 0).next();
+		vertexConsumer.vertex(-0.0625f, -3.5f, 0f).texture(0, 1).next();
+		vertexConsumer.vertex(-0.0625f, -3.5f, 35f).texture(5, 1).next();
+		vertexConsumer.vertex(-0.0625f, 3.5f, 35f).texture(5, 0).next();
+		vertexConsumer.vertex(0.0625f, -3.5f, 0f).texture(0, 1).next();
+		vertexConsumer.vertex(0.0625f, 3.5f, 0f).texture(0, 0).next();
+		vertexConsumer.vertex(0.0625f, 3.5f, 35f).texture(5, 0).next();
+		vertexConsumer.vertex(0.0625f, -3.5f, 35f).texture(5, 1).next();
 
-		GlStateManager.enableTexture2D();
-		GlStateManager.enableLighting();
-		GlStateManager.disableBlend();
-		GlStateManager.popMatrix();
-		if (RivalRebels.optiFineWarn)
-		{
-            Minecraft.getMinecraft().player.openGui(RivalRebels.instance, 24, te.getWorld(), 0, 0, 0);
-			RivalRebels.optiFineWarn = false;
-		}
+		matrices.pop();
 	}
+
+    private static final Random random = new Random();
 
 	private int[] genTexture(int xs, int zs, int ys)
 	{
 		int[] ids = new int[ys];
-		RivalRebelsCellularNoise.refresh3D(Minecraft.getMinecraft().world.rand);
+		RivalRebelsCellularNoise.refresh3D(random);
 		int size = xs * zs * 4;
 		byte red = (byte) 0xBB;
 		byte grn = (byte) 0x88;
@@ -121,26 +111,27 @@ public class TileEntityForceFieldNodeRenderer extends TileEntitySpecialRenderer<
 				}
 			}
 			bb.flip();
-			int id = GlStateManager.generateTexture();
-			GlStateManager.enableTexture2D();
-			GlStateManager.bindTexture(id);
-			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-			GlStateManager.glTexParameteri(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			int id = GL11.glGenTextures();
+			RenderSystem.bindTexture(id);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
+			RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
 			GL11.glTexImage2D(GL11.GL_TEXTURE_2D, 0, GL11.GL_RGBA8, xs, zs, 0, GL11.GL_RGBA, GL11.GL_UNSIGNED_BYTE, bb);
 			ids[i] = id;
 		}
 		return ids;
 	}
 
-	protected float lerp(float f1, float f2, float f3)
+    public static long getTime()
 	{
-		return f1 * f3 + f2 * (1 - f3);
+		return System.currentTimeMillis();
 	}
 
-	public static long getTime()
-	{
-		return (Sys.getTime() * 1000) / Sys.getTimerResolution();
-	}
+    @Override
+    public int getRenderDistance()
+    {
+        return 16384;
+    }
+
 }

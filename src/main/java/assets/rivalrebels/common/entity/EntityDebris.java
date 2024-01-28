@@ -11,133 +11,134 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.common.packet.EntityDebrisPacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
 import net.minecraft.block.Block;
-import net.minecraft.block.ITileEntityProvider;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.crash.CrashReportCategory;
-import net.minecraft.nbt.NBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.data.DataTracker;
+import net.minecraft.entity.data.TrackedData;
+import net.minecraft.entity.data.TrackedDataHandlerRegistry;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.nbt.NbtElement;
+import net.minecraft.nbt.NbtHelper;
+import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
-public class EntityDebris extends EntityInanimate {
-    public IBlockState state;
-	public int				ticksExisted;
-    public NBTTagCompound	tileEntityData;
+import java.util.Optional;
 
-	public EntityDebris(World w)
-	{
-		super(w);
+public class EntityDebris extends EntityInanimate {
+    public static final TrackedData<Optional<BlockState>> STATE = DataTracker.registerData(EntityDebris.class, TrackedDataHandlerRegistry.OPTIONAL_BLOCK_STATE);
+    public BlockState state;
+    public NbtCompound	tileEntityData;
+
+	public EntityDebris(EntityType<? extends EntityDebris> type, World w) {
+		super(type, w);
 	}
+
+    public EntityDebris(World w) {
+        super(RREntities.DEBRIS, w);
+    }
 
 	public EntityDebris(World w, int x, int y, int z)
 	{
-		super(w);
-        state = w.getBlockState(new BlockPos(x, y, z));
-		w.setBlockToAir(new BlockPos(x, y, z));
-		setSize(1F, 1F);
+		this(w);
+        setState(w.getBlockState(new BlockPos(x, y, z)));
+		w.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
 		setPosition(x + 0.5f, y + 0.5f, z + 0.5f);
-		prevPosX = x + 0.5f;
-		prevPosY = y + 0.5f;
-		prevPosZ = z + 0.5f;
+        prevX = x + 0.5f;
+        prevY = y + 0.5f;
+        prevZ = z + 0.5f;
 	}
 
     @Override
-    public double getYOffset() {
+    public double getHeightOffset() {
         return 0.5F;
     }
 
     public EntityDebris(World w, double x, double y, double z, double mx, double my, double mz, Block b)
 	{
-		super(w);
-		state = b.getDefaultState();
-		setSize(1F, 1F);
+		this(w);
+        setState(b.getDefaultState());
 		setPosition(x, y, z);
-		prevPosX = x;
-		prevPosY = y;
-		prevPosZ = z;
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
+        prevX = x;
+        prevY = y;
+        prevZ = z;
+        setVelocity(mx, my, mz);
 	}
+
+    public BlockState getState() {
+        return dataTracker.get(STATE).orElse(null);
+    }
+
+    public void setState(BlockState state) {
+        dataTracker.set(STATE, Optional.ofNullable(state));
+    }
 
     @Override
-	public void onUpdate()
-	{
-		if (ticksExisted == 0 && !world.isRemote) PacketDispatcher.packetsys.sendToAll(new EntityDebrisPacket(this));
-		prevPosX = posX;
-		prevPosY = posY;
-		prevPosZ = posZ;
-		++ticksExisted;
-		motionY -= 0.04;
-		motionX *= 0.98;
-		motionY *= 0.98;
-		motionZ *= 0.98;
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
+	public void tick() {
+		prevX = getX();
+		prevY = getY();
+		prevZ = getZ();
+		++age;
+        setVelocity(getVelocity().subtract(0, -0.04, 0));
+        setVelocity(getVelocity().multiply(0.98));
+        Vec3d add = getVelocity().add(getPos());
+        setPos(add.getX(), add.getY(), add.getZ());
 
-		if (!world.isRemote && world.getBlockState(new BlockPos(MathHelper.floor(posX), MathHelper.floor(posY), MathHelper.floor(posZ))).isOpaqueCube()) die(prevPosX, prevPosY, prevPosZ);
+		if (!world.isClient && world.getBlockState(this.getBlockPos()).isOpaque()) die(prevX, prevY, prevZ);
 	}
 
-	public void die(double X, double Y, double Z)
-	{
-		int x = MathHelper.floor(X);
-		int y = MathHelper.floor(Y);
-		int z = MathHelper.floor(Z);
-		setDead();
-		world.setBlockState(new BlockPos(x, y, z), state);
-		//if (block instanceof BlockFalling) ((BlockFalling) block).playSoundWhenFallen(world, x, y, z, metadata);
-		if (tileEntityData != null && state.getBlock() instanceof ITileEntityProvider)
-		{
-			TileEntity tileentity = world.getTileEntity(new BlockPos(x, y, z));
-			if (tileentity != null)
-			{
-				NBTTagCompound nbttagcompound = new NBTTagCompound();
-				tileentity.writeToNBT(nbttagcompound);
-                for (String s : tileEntityData.getKeySet()) {
-                    NBTBase nbtbase = tileEntityData.getTag(s);
+	public void die(double x, double y, double z) {
+		kill();
+        BlockPos pos = new BlockPos(x, y, z);
+        world.setBlockState(pos, getState());
+		if (tileEntityData != null && getState().hasBlockEntity()) {
+			BlockEntity blockEntity = world.getBlockEntity(pos);
+			if (blockEntity != null) {
+				NbtCompound nbt = blockEntity.createNbt();
+                for (String s : tileEntityData.getKeys()) {
+                    NbtElement nbtbase = tileEntityData.get(s);
                     if (!s.equals("x") && !s.equals("y") && !s.equals("z")) {
-                        nbttagcompound.setTag(s, nbtbase.copy());
+                        nbt.put(s, nbtbase.copy());
                     }
                 }
-				tileentity.readFromNBT(nbttagcompound);
-				tileentity.markDirty();
+				blockEntity.readNbt(nbt);
+				blockEntity.markDirty();
 			}
 		}
 	}
 
-	@Override
-	protected void writeEntityToNBT(NBTTagCompound nbt)
-	{
-        nbt.setString("Block", Block.REGISTRY.getNameForObject(state.getBlock()).toString());
-		nbt.setInteger("Data", state.getBlock().getMetaFromState(state));
-		nbt.setByte("Time", (byte) ticksExisted);
-		if (tileEntityData != null) nbt.setTag("TileEntityData", tileEntityData);
+    @Override
+    protected void writeCustomDataToNbt(NbtCompound nbt) {
+        if (getState() != null) {
+            nbt.put("Block", NbtHelper.fromBlockState(getState()));
+        }
+		nbt.putInt("Age", age);
+		if (tileEntityData != null) nbt.put("TileEntityData", tileEntityData);
 	}
 
-	@Override
-	protected void readEntityFromNBT(NBTTagCompound nbt)
-	{
-        Block block = Block.getBlockFromName(nbt.getString("Block"));
-		int metadata = nbt.getInteger("Data");
-		state = block.getStateFromMeta(metadata);
-        ticksExisted = nbt.getByte("Time") & 255;
-		if (nbt.hasKey("TileEntityData", 10)) tileEntityData = nbt.getCompoundTag("TileEntityData");
+    @Override
+    protected void readCustomDataFromNbt(NbtCompound nbt) {
+        if (nbt.contains("Block")) {
+            setState(NbtHelper.toBlockState(nbt.getCompound("Block")));
+        }
+        age = nbt.getInt("Age");
+		if (nbt.contains("TileEntityData", NbtElement.COMPOUND_TYPE)) tileEntityData = nbt.getCompound("TileEntityData");
 	}
 
-	@Override
-	public void addEntityCrashInfo(CrashReportCategory crash)
-	{
-		super.addEntityCrashInfo(crash);
-        if (state != null) {
-            Block block = state.getBlock();
-            crash.addCrashSection("Immitating block ID", Block.getIdFromBlock(block));
-            crash.addCrashSection("Immitating block data", block.getMetaFromState(this.state));
+    @Override
+    public void populateCrashReport(CrashReportSection section) {
+        super.populateCrashReport(section);
+        if (getState() != null) {
+            section.add("Immitating BlockState", this.getState().toString());
         }
 	}
+
+    @Override
+    protected void initDataTracker() {
+        dataTracker.startTracking(STATE, Optional.empty());
+    }
 }

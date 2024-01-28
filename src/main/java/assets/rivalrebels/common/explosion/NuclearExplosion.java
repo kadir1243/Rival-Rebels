@@ -12,43 +12,55 @@
 package assets.rivalrebels.common.explosion;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.entity.*;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityFallingBlock;
-import net.minecraft.init.Blocks;
-import net.minecraft.init.SoundEvents;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.FallingBlockEntity;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvents;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import static assets.rivalrebels.RivalRebels.getBlocks;
 
 public class NuclearExplosion
 {
-	public static Block[]	prblocks	= {
-						Blocks.COAL_ORE,
-						Blocks.IRON_ORE,
-						Blocks.REDSTONE_ORE,
-						Blocks.GOLD_ORE,
-						Blocks.LAPIS_ORE,
-						Blocks.DIAMOND_ORE,
-						Blocks.EMERALD_ORE,
-						};
+	public static Block[]	prblocks;
+    public static Block[]	pgblocks;
 
-	public static Block[]	pgblocks	= {
-						Blocks.STONE,
-						Blocks.COBBLESTONE,
-						Blocks.DIRT,
-						};
+    static {
+        Set<Block> pgblocks = new HashSet<>();
+        pgblocks.addAll(getBlocks(BlockTags.BASE_STONE_OVERWORLD));
+        pgblocks.addAll(getBlocks(Tags.Blocks.COBBLESTONE));
+        pgblocks.addAll(getBlocks(BlockTags.DIRT));
+        NuclearExplosion.pgblocks = pgblocks.toArray(new Block[0]);
+        Set<Block> prblocks = new HashSet<>();
+        prblocks.addAll(getBlocks(Tags.Blocks.ORES_COAL));
+        prblocks.addAll(getBlocks(Tags.Blocks.ORES_IRON));
+        prblocks.addAll(getBlocks(Tags.Blocks.ORES_REDSTONE));
+        prblocks.addAll(getBlocks(Tags.Blocks.ORES_GOLD));
+        prblocks.addAll(getBlocks(Tags.Blocks.ORES_LAPIS));
+        prblocks.addAll(getBlocks(Tags.Blocks.ORES_DIAMOND));
+        prblocks.addAll(getBlocks(Tags.Blocks.ORES_EMERALD));
+
+        NuclearExplosion.prblocks = prblocks.toArray(new Block[0]);
+    }
 
 	public NuclearExplosion(World world, int x, int y, int z, int strength) {
-		if (!world.isRemote)
-		{
+		if (!world.isClient) {
 			createHole(world, x, y, z, strength, true);
 			// pushAndHurtEntities(world, x, y, z, strength);
 			fixLag(world, x, y, z, strength);
@@ -56,7 +68,7 @@ public class NuclearExplosion
 	}
 
 	public NuclearExplosion(World world, int x, int y, int z, int strength, boolean breakobj) {
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			createHole(world, x, y, z, strength, breakobj);
 			// pushAndHurtEntities(world, x, y, z, strength);
@@ -87,8 +99,9 @@ public class NuclearExplosion
 					if (YY < onepointfiveradiussqrd)
 					{
                         BlockPos pos = new BlockPos(xx, yy, zz);
-                        Block block = world.getBlockState(pos).getBlock();
-						if (block != Blocks.AIR)
+                        BlockState state = world.getBlockState(pos);
+                        Block block = state.getBlock();
+						if (!world.isAir(pos))
 						{
 							int dist = (int) Math.sqrt(YY);
 							if (dist < radius && block != Blocks.BEDROCK)
@@ -96,87 +109,87 @@ public class NuclearExplosion
 								int varrand = 1 + dist - halfradius;
 								if (dist < halfradius)
 								{
-									if (breakobj && block == RivalRebels.omegaobj)
+									if (breakobj && block == RRBlocks.omegaobj)
 									{
 										RivalRebels.round.winSigma();
-										block = RivalRebels.plasmaexplosion;
+										state = RRBlocks.plasmaexplosion.getDefaultState();
 									}
-									else if (breakobj && block == RivalRebels.sigmaobj)
+									else if (breakobj && block == RRBlocks.sigmaobj)
 									{
 										RivalRebels.round.winOmega();
-										block = RivalRebels.plasmaexplosion;
+										state = RRBlocks.plasmaexplosion.getDefaultState();
 									}
-									else if (block == RivalRebels.reactive)
+									else if (block == RRBlocks.reactive)
 									{
-										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.rand.nextDouble() * 2); i++)
-											world.setBlockToAir(pos);
+										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.random.nextDouble() * 2); i++)
+											world.setBlockState(pos, Blocks.AIR.getDefaultState());
 									}
 									else
 									{
-										world.setBlockToAir(pos);
-										block = Blocks.AIR;
+										world.setBlockState(pos, Blocks.AIR.getDefaultState());
+										state = Blocks.AIR.getDefaultState();
 									}
 								}
 								else if (varrand > 0)
 								{
 									int randomness = halfradius - varrand / 2;
-									if (breakobj && block == RivalRebels.omegaobj)
+									if (breakobj && state.isOf(RRBlocks.omegaobj))
 									{
 										RivalRebels.round.winSigma();
-										block = RivalRebels.plasmaexplosion;
+										state = RRBlocks.plasmaexplosion.getDefaultState();
 									}
-									else if (breakobj && block == RivalRebels.sigmaobj)
+									else if (breakobj && state.isOf(RRBlocks.sigmaobj))
 									{
 										RivalRebels.round.winOmega();
-										block = RivalRebels.plasmaexplosion;
+										state = RRBlocks.plasmaexplosion.getDefaultState();
 									}
-									else if (block == RivalRebels.reactive)
+									else if (state.isOf(RRBlocks.reactive))
 									{
-										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.rand.nextDouble() * 2); i++)
-                                            world.setBlockToAir(pos);
+										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.random.nextDouble() * 2); i++)
+                                            world.setBlockState(pos, Blocks.AIR.getDefaultState());
 									}
-									else if (block == Blocks.WATER || block == Blocks.LAVA || block == Blocks.FLOWING_WATER || block == Blocks.FLOWING_LAVA)
+									else if (!state.getFluidState().isEmpty())
 									{
-										world.setBlockToAir(pos);
-										block = Blocks.AIR;
+										world.setBlockState(pos, Blocks.AIR.getDefaultState());
+										state = Blocks.AIR.getDefaultState();
 									}
-									else if (block == Blocks.STONE && world.rand.nextInt(randomness) < randomness / 2)
+									else if (state.isIn(BlockTags.BASE_STONE_OVERWORLD) && world.random.nextInt(randomness) < randomness / 2)
 									{
 										world.setBlockState(pos, Blocks.COBBLESTONE.getDefaultState());
-										block = Blocks.COBBLESTONE;
+										state = Blocks.COBBLESTONE.getDefaultState();
 									}
-									else if ((block == Blocks.GRASS || block == Blocks.DIRT))
+									else if (state.isIn(BlockTags.DIRT))
 									{
-										world.setBlockState(pos, RivalRebels.radioactivedirt.getDefaultState());
+										world.setBlockState(pos, RRBlocks.radioactivedirt.getDefaultState());
 									}
-									else if ((block == Blocks.SAND || block == Blocks.SANDSTONE))
+									else if ((state.isIn(Tags.Blocks.SAND) || state.isIn(Tags.Blocks.SANDSTONE)))
 									{
-										world.setBlockState(pos, RivalRebels.radioactivesand.getDefaultState());
+										world.setBlockState(pos, RRBlocks.radioactivesand.getDefaultState());
 									}
-									else if ((world.rand.nextInt(varrand) == 0 || world.rand.nextInt(varrand / 2 + 1) == 0))
+									else if ((world.random.nextInt(varrand) == 0 || world.random.nextInt(varrand / 2 + 1) == 0))
 									{
-										world.setBlockToAir(pos);
-										block = Blocks.AIR;
+										world.setBlockState(pos, Blocks.AIR.getDefaultState());
+										state = Blocks.AIR.getDefaultState();
 									}
 								}
 							}
-							if (dist < onepointfiveradius && block != Blocks.AIR && block != Blocks.BEDROCK)
+							if (dist < onepointfiveradius && !state.isAir() && block != Blocks.BEDROCK)
 							{
 								if (Y >= twoAOC || (dist < onepointfiveradius && Y >= AOC))
 								{
-									world.setBlockToAir(pos);
+									world.setBlockState(pos, Blocks.AIR.getDefaultState());
 								}
-								else if (world.getBlockState(pos.down()).getBlock() == Blocks.LOG)
+								else if (world.getBlockState(pos.down()).isIn(BlockTags.LOGS_THAT_BURN))
 								{
 									world.setBlockState(pos, Blocks.FIRE.getDefaultState());
 								}
-								else if ((block == Blocks.GRASS || block == Blocks.DIRT))
+								else if (state.isIn(BlockTags.DIRT))
 								{
-									world.setBlockState(pos, RivalRebels.radioactivedirt.getDefaultState());
+									world.setBlockState(pos, RRBlocks.radioactivedirt.getDefaultState());
 								}
-								else if ((block == Blocks.SAND || block == Blocks.SANDSTONE))
+								else if ((state.isIn(Tags.Blocks.SAND) || state.isIn(Tags.Blocks.SANDSTONE)))
 								{
-									world.setBlockState(pos, RivalRebels.radioactivesand.getDefaultState());
+									world.setBlockState(pos, RRBlocks.radioactivesand.getDefaultState());
 								}
 							}
 						}
@@ -184,7 +197,7 @@ public class NuclearExplosion
 				}
 			}
 		}
-		world.playSound(x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 4.0F, (1.0F + (world.rand.nextFloat() - world.rand.nextFloat()) * 0.2F) * 0.7F, true);
+		world.playSound(x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F, true);
 	}
 
 	private void pushAndHurtEntities(World world, int x, int y, int z, int radius)
@@ -196,33 +209,35 @@ public class NuclearExplosion
 		int var28 = MathHelper.floor(y + (double) radius + 1.0D);
 		int var7 = MathHelper.floor(z - (double) radius - 1.0D);
 		int var29 = MathHelper.floor(z + (double) radius + 1.0D);
-		List<Entity> var9 = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(var3, var5, var7, var4, var28, var29));
+		List<Entity> var9 = world.getOtherEntities(null, new Box(var3, var5, var7, var4, var28, var29));
 		Vec3d var30 = new Vec3d(x, y, z);
 
         for (Entity var31 : var9) {
-            double var13 = var31.getDistance(x, y, z) / radius;
+            double var13 = Math.sqrt(var31.squaredDistanceTo(x, y, z)) / radius;
 
             if (var13 <= 1.0D) {
-                double var15 = var31.posX - x;
-                double var17 = var31.posY + var31.getEyeHeight() - y;
-                double var19 = var31.posZ - z;
-                double var33 = MathHelper.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
+                double var15 = var31.getX() - x;
+                double var17 = var31.getY() + var31.getEyeHeight(var31.getPose()) - y;
+                double var19 = var31.getZ() - z;
+                double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
 
                 if (var33 != 0.0D) {
                     var15 /= var33;
                     var17 /= var33;
                     var19 /= var33;
-                    double var32 = world.getBlockDensity(var30, var31.getEntityBoundingBox());
+                    double var32 = net.minecraft.world.explosion.Explosion.getExposure(var30, var31);
                     double var34 = (1.0D - var13) * var32 * ((var31 instanceof EntityB83 || var31 instanceof EntityHackB83) ? -1 : 1);
                     if (!(var31 instanceof EntityNuclearBlast) && !(var31 instanceof EntityTsarBlast) && !(var31 instanceof EntityRhodes)) {
-                        if (var31 instanceof EntityFallingBlock) var31.setDead();
-                        var31.attackEntityFrom(RivalRebelsDamageSource.nuclearblast, (int) ((var34 * var34 + var34) / 2.0D * 8.0D * radius + 1.0D) * 4);
-                        var31.motionX -= var15 * var34 * 8;
-                        var31.motionY -= var17 * var34 * 8;
-                        var31.motionZ -= var19 * var34 * 8;
+                        if (var31 instanceof FallingBlockEntity) var31.kill();
+                        var31.damage(RivalRebelsDamageSource.nuclearblast, (int) ((var34 * var34 + var34) / 2.0D * 8.0D * radius + 1.0D) * 4);
+                        var31.setVelocity(var31.getVelocity().subtract(
+                            var15 * var34 * 8,
+                            var17 * var34 * 8,
+                            var19 * var34 * 8
+                        ));
                     }
                     if (var31 instanceof EntityRhodes) {
-                        var31.attackEntityFrom(RivalRebelsDamageSource.nuclearblast, (int) (radius * var34 * 0.2f));
+                        var31.damage(RivalRebelsDamageSource.nuclearblast, (int) (radius * var34 * 0.2f));
                     }
                 }
             }
@@ -241,24 +256,23 @@ public class NuclearExplosion
 				{
 					int zz = z + Z;
                     BlockPos pos = new BlockPos(xx, yy, zz);
-                    if (world.isAirBlock(pos) && world.getBlockLightOpacity(pos) == 0)
-					{
-						if (!world.isAirBlock(pos.up()) &&
-                            !world.isAirBlock(pos.down()) &&
-                            !world.isAirBlock(pos.south()) &&
-                            !world.isAirBlock(pos.east()) &&
-                            !world.isAirBlock(pos.west()) &&
-                            !world.isAirBlock(pos.north()))
+                    if (world.isAir(pos) && world.getLightLevel(pos) == 0) {
+						if (!world.isAir(pos.up()) &&
+                            !world.isAir(pos.down()) &&
+                            !world.isAir(pos.south()) &&
+                            !world.isAir(pos.east()) &&
+                            !world.isAir(pos.west()) &&
+                            !world.isAir(pos.north()))
 						{
-							int r = world.rand.nextInt(50);
+							int r = world.random.nextInt(50);
 							Block id;
 							if (r == 0)
 							{
-								id = prblocks[world.rand.nextInt(prblocks.length)];
+								id = prblocks[world.random.nextInt(prblocks.length)];
 							}
 							else
 							{
-								id = pgblocks[world.rand.nextInt(pgblocks.length)];
+								id = pgblocks[world.random.nextInt(pgblocks.length)];
 							}
 							world.setBlockState(pos, id.getDefaultState());
 						}

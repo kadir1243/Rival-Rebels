@@ -11,24 +11,23 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-
-import org.lwjgl.input.Keyboard;
-
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiKnob;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.common.packet.PacketDispatcher;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 
-public class GuiTesla extends GuiScreen
+public class GuiTesla extends Screen
 {
 	private final int	xSizeOfTexture	= 256;
 	private final int	ySizeOfTexture	= 256;
@@ -39,51 +38,46 @@ public class GuiTesla extends GuiScreen
 
 	public GuiTesla(int start)
 	{
-		s = start - 90;
-	}
-
-	@Override
-	public void initGui()
-	{
-		posX = (this.width - xSizeOfTexture) / 2;
-		posY = (this.height - ySizeOfTexture) / 2;
-		this.buttonList.clear();
-		knob = new GuiKnob(0, posX + 108, posY + 176, -90, 90, s, true, "Knob");
-		this.buttonList.add(knob);
-		// mc.inGameHasFocus = true;
-	}
-
-	@Override
-	public boolean doesGuiPauseGame()
-	{
-		return false;
+        super(Text.of(""));
+        s = start - 90;
 	}
 
     @Override
-	public void drawScreen(int x, int y, float d)
-	{
+    protected void init() {
+		posX = (this.width - xSizeOfTexture) / 2;
+		posY = (this.height - ySizeOfTexture) / 2;
+		this.drawables.clear();
+		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, "Knob");
+		this.addDrawable(knob);
+	}
+
+    @Override
+    public boolean shouldPause() {
+        return false;
+    }
+
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         float f = 0.00390625F;
-		mc = Minecraft.getMinecraft();
-		mc.renderEngine.bindTexture(RivalRebels.guitesla);
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(posX, posY + ySizeOfTexture, zLevel).tex(0, ySizeOfTexture * f).endVertex();
-		buffer.pos(posX + xSizeOfTexture, posY + ySizeOfTexture, zLevel).tex(xSizeOfTexture * f, ySizeOfTexture * f).endVertex();
-		buffer.pos(posX + xSizeOfTexture, posY, zLevel).tex(xSizeOfTexture * f, 0).endVertex();
-		buffer.pos(posX, posY, zLevel).tex(0, 0).endVertex();
+		client = MinecraftClient.getInstance();
+		client.textureManager.bindTexture(RRIdentifiers.guitesla);
+		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
+		buffer.vertex(posX, posY + ySizeOfTexture, getZOffset()).texture(0, ySizeOfTexture * f).next();
+		buffer.vertex(posX + xSizeOfTexture, posY + ySizeOfTexture, getZOffset()).texture(xSizeOfTexture * f, ySizeOfTexture * f).next();
+		buffer.vertex(posX + xSizeOfTexture, posY, getZOffset()).texture(xSizeOfTexture * f, 0).next();
+		buffer.vertex(posX, posY, getZOffset()).texture(0, 0).next();
 		tessellator.draw();
-		super.drawScreen(x, y, d);
-		if (!(RivalRebels.altRkey?Keyboard.isKeyDown(Keyboard.KEY_F):Keyboard.isKeyDown(Keyboard.KEY_R)))
+        super.render(matrices, mouseX, mouseY, delta);
+		if (!(ClientProxy.USE_KEY.isPressed()))
 		{
-			this.mc.displayGuiScreen(null);
-			this.mc.setIngameFocus();
-			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(mc.player.inventory.currentItem, knob.getDegree()));
-			ItemStack stack = mc.player.inventory.getStackInSlot(mc.player.inventory.currentItem);
-			if (stack.getItem() instanceof ItemTesla)
-			{
-				if (!stack.hasTagCompound()) stack.setTagCompound(new NBTTagCompound());
-				stack.getTagCompound().setInteger("dial", knob.getDegree());
+			this.client.setScreen(null);
+			this.client.onWindowFocusChanged(true);
+			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
+			ItemStack stack = client.player.getInventory().getStack(client.player.getInventory().selectedSlot);
+			if (stack.getItem() instanceof ItemTesla) {
+				stack.getOrCreateNbt().putInt("dial", knob.getDegree());
 			}
 		}
 	}

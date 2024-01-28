@@ -11,67 +11,61 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 
 public class EntityLaserLink extends EntityInanimate {
-	public int			ticksExisted;
+	public PlayerEntity	shooter;
 
-	public EntityPlayer	shooter;
+    public EntityLaserLink(EntityType<? extends EntityLaserLink> type, World world) {
+        super(type, world);
+    }
 
-	public EntityLaserLink(World par1World)
-	{
-		super(par1World);
-		ignoreFrustumCheck = true;
+	public EntityLaserLink(World par1World) {
+		this(RREntities.LASER_LINK, par1World);
+		ignoreCameraFrustum = true;
 	}
 
-	public EntityLaserLink(World par1World, EntityPlayer player, double distance)
+	public EntityLaserLink(World par1World, PlayerEntity player, double distance)
 	{
 		this(par1World);
 		shooter = player;
-		ticksExisted = 0;
-		motionX = distance / 100f;
-		setLocationAndAngles(shooter.posX, shooter.posY + shooter.getEyeHeight(), shooter.posZ, shooter.rotationYaw, shooter.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		posY -= 0.08;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.2F);
-		setPosition(posX, posY, posZ);
-		setSize(0.5F, 0.5F);
+		age = 0;
+        setVelocity(distance / 100f, getVelocity().getY(), getVelocity().getZ());
+		refreshPositionAndAngles(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYaw(), shooter.getPitch());
+        setPos(getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.2F),
+		getY() - 0.08,
+		getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.2F));
+		setPosition(getX(), getY(), getZ());
 	}
 
 	public EntityLaserLink(World par1World, double x, double y, double z, float yaw, float pitch, double distance)
 	{
 		this(par1World);
-		setLocationAndAngles(x, y, z, yaw, pitch);
-		motionX = distance/100f;
-		ticksExisted = 0;
-		setPosition(posX, posY, posZ);
-		setSize(0.5F, 0.5F);
+		refreshPositionAndAngles(x, y, z, yaw, pitch);
+        setVelocity(distance / 100f, getVelocity().getY(), getVelocity().getZ());
+		age = 0;
+		setPosition(getX(), getY(), getZ());
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000;
-	}
-
-	@Override
-	public float getBrightness()
+	public float getBrightnessAtEyes()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public void onUpdate() {
-        super.onUpdate();
-        if (ticksExisted == 1) setDead();
-        ticksExisted++;
+	public void tick() {
+        super.tick();
+        if (age == 1) kill();
+        age++;
     }
 }

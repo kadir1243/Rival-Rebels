@@ -11,83 +11,88 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ModelTsarBlast;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 
-public class RenderTsarBlast extends Render
+public class RenderTsarBlast extends EntityRenderer<EntityTsarBlast>
 {
 	private ModelTsarBlast		model;
 	private ModelBlastSphere	modelsphere;
 
-	public RenderTsarBlast(RenderManager manager)
+	public RenderTsarBlast(EntityRendererFactory.Context manager)
 	{
         super(manager);
 		model = new ModelTsarBlast();
 		modelsphere = new ModelBlastSphere();
 	}
 
-	@Override
-	public void doRender(Entity var1, double x, double y, double z, float var8, float var9)
-	{
-		EntityTsarBlast tsar = (EntityTsarBlast) var1;
-		tsar.time++;
-		double radius = (((tsar.motionX * 10) - 1) * ((tsar.motionX * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		if (tsar.time < 60)
+    @Override
+    public void render(EntityTsarBlast entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		double x = entity.getX();
+        double y = entity.getY();
+        double z = entity.getZ();
+        entity.time++;
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        double radius = (((entity.getVelocity().getX() * 10) - 1) * ((entity.getVelocity().getX() * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;
+		matrices.push();
+		if (entity.time < 60)
 		{
-			double elev = tsar.time / 5f;
-			GlStateManager.translate(x, y + elev, z);
-			modelsphere.renderModel(tsar.time * RivalRebels.shroomScale, 1, 1, 1, 1);
+			double elev = entity.time / 5f;
+			matrices.translate(x, y + elev, z);
+			modelsphere.renderModel(matrices, buffer, entity.time * RRConfig.CLIENT.getShroomScale(), 1, 1, 1, 1);
 		}
-		else if (tsar.time < 300 && radius - RivalRebels.tsarBombaStrength > 9)
+		else if (entity.time < 300 && radius - RivalRebels.tsarBombaStrength > 9)
 		{
-			double elev = (tsar.time - 60f) / 4f;
-			GlStateManager.translate(x, y + elev, z);
-			GlStateManager.scale(RivalRebels.shroomScale,RivalRebels.shroomScale,RivalRebels.shroomScale);
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate((float) (elev * 2), 0, 1, 0);
-			GlStateManager.rotate((float) (elev * 3), 1, 0, 0);
-			modelsphere.renderModel((float) elev, 1, 0.25f, 0, 1f);
-			GlStateManager.popMatrix();
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate((float) (elev * -2), 0, 1, 0);
-			GlStateManager.rotate((float) (elev * 4), 0, 0, 1);
-			modelsphere.renderModel((float) (elev - 0.2f), 1, 0.5f, 0, 1f);
-			GlStateManager.popMatrix();
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate((float) (elev * -3), 1, 0, 0);
-			GlStateManager.rotate((float) (elev * 2), 0, 0, 1);
-			modelsphere.renderModel((float) (elev - 0.4f), 1, 0, 0, 1f);
-			GlStateManager.popMatrix();
-			GlStateManager.pushMatrix();
-			GlStateManager.rotate((float) (elev * -1), 0, 1, 0);
-			GlStateManager.rotate((float) (elev * 3), 0, 0, 1);
-			modelsphere.renderModel((float) (elev - 0.6f), 1, 1, 0, 1);
-			GlStateManager.popMatrix();
+			double elev = (entity.time - 60f) / 4f;
+			matrices.translate(x, y + elev, z);
+			matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
+			matrices.push();
+			matrices.multiply(new Quaternion((float) (elev * 2), 0, 1, 0));
+			matrices.multiply(new Quaternion((float) (elev * 3), 1, 0, 0));
+			modelsphere.renderModel(matrices, buffer, (float) elev, 1, 0.25f, 0, 1f);
+			matrices.pop();
+			matrices.push();
+			matrices.multiply(new Quaternion((float) (elev * -2), 0, 1, 0));
+			matrices.multiply(new Quaternion((float) (elev * 4), 0, 0, 1));
+			modelsphere.renderModel(matrices, buffer, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
+			matrices.pop();
+			matrices.push();
+			matrices.multiply(new Quaternion((float) (elev * -3), 1, 0, 0));
+			matrices.multiply(new Quaternion((float) (elev * 2), 0, 0, 1));
+			modelsphere.renderModel(matrices, buffer, (float) (elev - 0.4f), 1, 0, 0, 1f);
+			matrices.pop();
+			matrices.push();
+			matrices.multiply(new Quaternion((float) (elev * -1), 0, 1, 0));
+			matrices.multiply(new Quaternion((float) (elev * 3), 0, 0, 1));
+			modelsphere.renderModel(matrices, buffer, (float) (elev - 0.6f), 1, 1, 0, 1);
+			matrices.pop();
 		}
 		else
 		{
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.ettsarflame);
-			GlStateManager.translate(x, y + 10 + ((tsar.motionX - 0.1d) * 14.14213562), z);
-			GlStateManager.scale(RivalRebels.shroomScale,RivalRebels.shroomScale,RivalRebels.shroomScale);
-			GlStateManager.scale((float) (radius * 0.116f), (float) (radius * 0.065f), (float) (radius * 0.116f));
-			model.render();
+			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ettsarflame);
+			matrices.translate(x, y + 10 + ((entity.getVelocity().getX() - 0.1d) * 14.14213562), z);
+			matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
+			matrices.scale((float) (radius * 0.116f), (float) (radius * 0.065f), (float) (radius * 0.116f));
+			model.render(matrices, buffer);
 		}
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityTsarBlast entity) {
+        return null;
+    }
 }

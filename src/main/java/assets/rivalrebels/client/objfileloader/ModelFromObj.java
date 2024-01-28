@@ -12,20 +12,23 @@
 package assets.rivalrebels.client.objfileloader;
 
 import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.resource.Resource;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.IOException;
+import java.io.UncheckedIOException;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelFromObj
 {
 	Triangle[]		pa;
@@ -37,8 +40,15 @@ public class ModelFromObj
 	}
 
 	public static ModelFromObj readObjFile(String path) {
-        String text = readZippedFile("/assets/rivalrebels/models/" + path);
-		String[] lines = text.split("\n");
+        Resource result;
+        byte[] bytes;
+        try {
+            result = MinecraftClient.getInstance().getResourceManager().getResource(new Identifier(RivalRebels.MODID, "models/" + path));
+            bytes = result.getInputStream().readAllBytes();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        String[] lines = new String(bytes, StandardCharsets.UTF_8).split("\n");
 		String name = "";
 		List<Triangle> tri = new ArrayList<>();
 		List<Vec3d> v = new ArrayList<>();
@@ -79,18 +89,7 @@ public class ModelFromObj
 		return modelFromObj;
 	}
 
-	public void renderWireframe()
-	{
-		GlStateManager.disableTexture2D();
-
-        for (Triangle triangle : pa) {
-            triangle.renderWireframe();
-        }
-
-		GlStateManager.enableTexture2D();
-	}
-
-	public void normalize()
+    public void normalize()
 	{
         for (Triangle triangle : pa) {
             triangle.normalize();
@@ -104,9 +103,9 @@ public class ModelFromObj
         }
 	}
 
-	public void render() {
+	public void render(VertexConsumer buffer) {
         for (Triangle triangle : pa) {
-            triangle.render();
+            triangle.render(buffer);
         }
 	}
 
@@ -115,21 +114,4 @@ public class ModelFromObj
 	}
 
 
-	public static String readZippedFile(String file)
-	{
-		StringBuilder source = new StringBuilder();
-		String line;
-		try
-		{
-			InputStream in = RivalRebels.instance.getClass().getResourceAsStream(file);
-			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-			while ((line = reader.readLine()) != null)
-				source.append(line).append('\n');
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-		return source.toString();
-	}
 }

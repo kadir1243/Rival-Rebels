@@ -11,63 +11,72 @@
  *******************************************************************************/
 package assets.rivalrebels.common.container;
 
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.SimpleInventory;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.screen.slot.Slot;
 import net.minecraft.item.ItemStack;
 
-public class ContainerLoader extends Container
+public class ContainerLoader extends ScreenHandler
 {
-	private final IInventory	lowerLoaderInventory;
-	private final IInventory	upperLoaderInventory;
+	private final Inventory loader;
+	private final Inventory playerInventory;
 
-	public ContainerLoader(IInventory par1IInventory, IInventory par2IInventory)
+    public ContainerLoader(int syncId, PlayerInventory playerInventory) {
+        this(syncId, playerInventory, new SimpleInventory(64));
+    }
+
+	public ContainerLoader(int syncId, PlayerInventory playerInventory, Inventory loader)
 	{
-		this.lowerLoaderInventory = par2IInventory;
-		this.upperLoaderInventory = par1IInventory;
+        super(RivalRebelsGuiHandler.LOADER_SCREEN_HANDLER_TYPE, syncId);
+        this.loader = loader;
+		this.playerInventory = playerInventory;
 		addSlots();
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer par1EntityPlayer)
+	public boolean canUse(PlayerEntity par1EntityPlayer)
 	{
-		return this.lowerLoaderInventory.isUsableByPlayer(par1EntityPlayer);
+		return this.loader.canPlayerUse(par1EntityPlayer);
 	}
 
-	/**
-	 * Called when a player shift-clicks on a slot. You must override this or you will crash when someone does that.
-	 */
-	@Override
-	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
+    public int size() {
+        return this.loader.size();
+    }
+
+    @Override
+	public ItemStack transferSlot(PlayerEntity par1EntityPlayer, int par2)
 	{
 		ItemStack var3 = ItemStack.EMPTY;
-		Slot var4 = this.inventorySlots.get(par2);
+		Slot var4 = this.slots.get(par2);
 
-		if (var4 != null && var4.getHasStack())
+		if (var4 != null && var4.hasStack())
 		{
 			ItemStack var5 = var4.getStack();
 			var3 = var5.copy();
 
 			if (par2 < 60)
 			{
-				if (!this.mergeItemStack(var5, 60, this.inventorySlots.size(), true))
+				if (!this.insertItem(var5, 60, this.slots.size(), true))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (!this.mergeItemStack(var5, 0, 60, false))
+			else if (!this.insertItem(var5, 0, 60, false))
 			{
 				return ItemStack.EMPTY;
 			}
 
 			if (var5.isEmpty())
 			{
-				var4.putStack(ItemStack.EMPTY);
+				var4.setStack(ItemStack.EMPTY);
 			}
 			else
 			{
-				var4.onSlotChanged();
+				var4.markDirty();
 			}
 		}
 
@@ -76,7 +85,7 @@ public class ContainerLoader extends Container
 
 	public void clearSlots()
 	{
-		this.inventorySlots.clear();
+		this.slots.clear();
 	}
 
 	public void addSlots()
@@ -88,7 +97,7 @@ public class ContainerLoader extends Container
 		{
 			for (var5 = 0; var5 < 2; ++var5)
 			{
-				this.addSlotToContainer(new Slot(lowerLoaderInventory, var5 + var4 * 2, 10 + var5 * 18, 73 + var4 * 18));
+				this.addSlot(new Slot(loader, var5 + var4 * 2, 10 + var5 * 18, 73 + var4 * 18));
 			}
 		}
 
@@ -96,7 +105,7 @@ public class ContainerLoader extends Container
 		{
 			for (var5 = 0; var5 < 2; ++var5)
 			{
-				this.addSlotToContainer(new Slot(lowerLoaderInventory, 12 + var5 + var4 * 2, 212 + var5 * 18, 73 + var4 * 18));
+				this.addSlot(new Slot(loader, 12 + var5 + var4 * 2, 212 + var5 * 18, 73 + var4 * 18));
 			}
 		}
 
@@ -104,7 +113,7 @@ public class ContainerLoader extends Container
 		{
 			for (var5 = 0; var5 < 9; ++var5)
 			{
-				this.addSlotToContainer(new Slot(lowerLoaderInventory, 24 + var5 + var4 * 9, 48 + var5 * 18, 48 + var4 * 18));
+				this.addSlot(new Slot(loader, 24 + var5 + var4 * 9, 48 + var5 * 18, 48 + var4 * 18));
 			}
 		}
 
@@ -112,13 +121,13 @@ public class ContainerLoader extends Container
 		{
 			for (var5 = 0; var5 < 9; ++var5)
 			{
-				this.addSlotToContainer(new Slot(upperLoaderInventory, var5 + var4 * 9 + 9, 48 + var5 * 18, 127 + var4 * 18));
+				this.addSlot(new Slot(playerInventory, var5 + var4 * 9 + 9, 48 + var5 * 18, 127 + var4 * 18));
 			}
 		}
 
 		for (var4 = 0; var4 < 9; ++var4)
 		{
-			this.addSlotToContainer(new Slot(upperLoaderInventory, var4, 48 + var4 * 18, 183));
+			this.addSlot(new Slot(playerInventory, var4, 48 + var4 * 18, 183));
 		}
 	}
 }

@@ -11,21 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
-
 public class ItemCoreCopper extends ItemCore
 {
 	public ItemCoreCopper()
 	{
-		super();
-		setMaxStackSize(1);
+		super(new Settings());
 		timemult = 0.25f;
-		setCreativeTab(RivalRebels.rralltab);
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ay");
-	}*/
 }

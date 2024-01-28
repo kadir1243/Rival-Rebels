@@ -19,116 +19,90 @@ import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.minecraft.block.BlockFalling;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
-import net.minecraft.init.Blocks;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.FallingBlockEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.server.world.ServerWorld;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.Box;
+import net.minecraft.util.math.Direction;
+import net.minecraft.util.shape.VoxelShape;
+import net.minecraft.util.shape.VoxelShapes;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Random;
 
-public class BlockRemoteCharge extends BlockFalling {
-    public static final PropertyInteger META = PropertyInteger.create("meta", 0, 15);
-	public BlockRemoteCharge()
+public class BlockRemoteCharge extends FallingBlock {
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+	public BlockRemoteCharge(Settings settings)
 	{
-		super(Material.CLOTH);
-		setTickRandomly(true);
-        this.setDefaultState(this.getBlockState().getBaseState().withProperty(META, 0));
+		super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(META);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
     }
 
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(META, meta);
-    }
-    @Override
-    public BlockStateContainer getBlockState() {
-        return new BlockStateContainer(this, META);
-    }
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
-	}
-
-    @Override
-    public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-		int i = state.getValue(META);
+    public VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos) {
+		int i = state.get(META);
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return new AxisAlignedBB(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
+		return VoxelShapes.cuboid(new Box(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f));
 	}
 
-    @Nullable
     @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState state, IBlockAccess world, BlockPos pos) {
+    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-		int meta = state.getValue(META);
+		int meta = state.get(META);
 		float f = 0.0625F;
 		float f1 = (1 + meta * 2) / 16F;
 		float f2 = 0.5F;
-		return new AxisAlignedBB(x + f1, y, z + f, (x + 1) - f, (y + f2) - f, (z + 1) - f);
+		return VoxelShapes.cuboid(new Box(x + f1, y, z + f, (x + 1) - f, (y + f2) - f, (z + 1) - f));
 	}
 
     @Override
-	public int tickRate(World world)
-	{
-		return 1;
-	}
-
-    @Override
-    public AxisAlignedBB getSelectedBoundingBox(IBlockState state, World worldIn, BlockPos pos) {
+    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        int i = state.getValue(META);
+        int i = state.get(META);
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return new AxisAlignedBB(x + f1, y, z + f, (x + 1) - f, y + f2, (z + 1) - f);
+		return VoxelShapes.cuboid(new Box(x + f1, y, z + f, (x + 1) - f, y + f2, (z + 1) - f));
 	}
 
     @Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Override
-    public void onPlayerDestroy(World worldIn, BlockPos pos, IBlockState state) {
-        explode(worldIn, pos);
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        explode(world, pos);
     }
 
     @Override
-    public void onExplosionDestroy(World worldIn, BlockPos pos, net.minecraft.world.Explosion explosionIn) {
-		explode(worldIn, pos);
+    public void onDestroyedByExplosion(World world, BlockPos pos, net.minecraft.world.explosion.Explosion explosion) {
+		explode(world, pos);
 	}
 
 	public boolean boom = false;
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-		world.scheduleBlockUpdate(pos, this, this.tickRate(world), 1);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+		world.createAndScheduleBlockTick(pos, this, 1);
 	}
 
     @Override
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        for (EnumFacing facing : EnumFacing.VALUES) {
-            if (world.getBlockState(pos.offset(facing)).getBlock() == Blocks.FIRE) {
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        for (Direction facing : Direction.values()) {
+            if (world.getBlockState(pos.offset(facing)).isIn(BlockTags.FIRE)) {
                 explode(world, pos);
             }
         }
@@ -138,13 +112,12 @@ public class BlockRemoteCharge extends BlockFalling {
 			explode(world, pos);
 			boom = false;
 		}
-		world.scheduleBlockUpdate(pos, this, this.tickRate(world), 1);
+		world.createAndScheduleBlockTick(pos, this, 1);
 	}
 
     @Override
-    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
-		if (entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader)
-		{
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+		if (entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
 			explode(world, pos);
 		}
 	}
@@ -155,25 +128,25 @@ public class BlockRemoteCharge extends BlockFalling {
         int y = pos.getY();
         int z = pos.getZ();
 
-        world.setBlockToAir(pos);
+        world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge);
 		RivalRebelsSoundPlayer.playSound(world, 22, 0, x, y, z, 1f, 0.3f);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -186,7 +159,7 @@ public class BlockRemoteCharge extends BlockFalling {
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{
@@ -199,7 +172,7 @@ public class BlockRemoteCharge extends BlockFalling {
 	}*/
 
     @Override
-    public void onEndFalling(World worldIn, BlockPos pos, IBlockState fallingState, IBlockState hitState) {
-        explode(worldIn, pos);
+    public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
+        explode(world, pos);
     }
 }

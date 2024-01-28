@@ -12,34 +12,28 @@
 package assets.rivalrebels.common.packet;
 
 import assets.rivalrebels.RivalRebels;
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
-public class GuiSpawnPacket implements IMessage {
-	@Override
-	public void fromBytes(ByteBuf buf) {
+import java.util.function.Supplier;
+
+public class GuiSpawnPacket {
+	public static GuiSpawnPacket fromBytes(PacketByteBuf buf) {
+        return new GuiSpawnPacket();
 	}
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-	}
+	public static void toBytes(GuiSpawnPacket packet, PacketByteBuf buf) {
+    }
 
-	public static class Handler implements IMessageHandler<GuiSpawnPacket, IMessage>
-	{
-		@Override
-		public IMessage onMessage(GuiSpawnPacket m, MessageContext ctx)
-		{
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                if (RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getMinecraft().player.getGameProfile()).isreset) {
-                    RivalRebels.proxy.guiClass();
-                } else {
-                    RivalRebels.proxy.guiSpawn();
-                }
-            });
-			return null;
-		}
+	public static void onMessage(GuiSpawnPacket m, Supplier<NetworkEvent.Context> ctx) {
+        NetworkEvent.Context context = ctx.get();
+        context.enqueueWork(() -> {
+            if (RivalRebels.round.rrplayerlist.getForGameProfile(MinecraftClient.getInstance().player.getGameProfile()).isreset) {
+                RivalRebels.proxy.guiClass();
+            } else {
+                RivalRebels.proxy.guiSpawn();
+            }
+        });
 	}
 }

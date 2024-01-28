@@ -12,66 +12,59 @@
 package assets.rivalrebels.common.entity;
 
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class EntityLightningLink extends EntityInanimate {
-	public EntityLightningLink(World par1World)
-	{
-		super(par1World);
-		ignoreFrustumCheck = true;
-		setSize(0.5F, 0.5F);
-		ticksExisted = 0;
+    public EntityLightningLink(EntityType<? extends EntityLightningLink> type, World world) {
+        super(type, world);
+    }
+
+	public EntityLightningLink(World par1World) {
+		this(RREntities.LIGHTNING_LINK, par1World);
+		ignoreCameraFrustum = true;
+		age = 0;
 	}
 
-	public EntityLightningLink(World par1World, Entity player, double distance)
-	{
-		super(par1World);
-		ignoreFrustumCheck = true;
-		motionX = distance / 100;
-		setLocationAndAngles(player.posX, player.posY, player.posZ, player.rotationYaw, player.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		posY -= 0.12;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		setPosition(posX, posY, posZ);
-		setSize(0.5F, 0.5F);
-		ticksExisted = 0;
+	public EntityLightningLink(World par1World, Entity player, double distance) {
+		this(par1World);
+        setVelocity(distance / 100, getVelocity().getY(), getVelocity().getZ());
+		refreshPositionAndAngles(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
+        Vec3d vec3d = getPos().subtract(
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.16F),
+            0.12,
+            (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.16F)
+        );
+        setPos(vec3d.getX(), vec3d.getY(), vec3d.getZ());
+		setPosition(getX(), getY(), getZ());
 	}
 
-	public EntityLightningLink(World par1World, double x, double y, double z, float yaw, float pitch, double distance)
-	{
-		super(par1World);
-		ignoreFrustumCheck = true;
-		setLocationAndAngles(x, y, z, yaw, pitch);
-		motionX = distance / 100;
-		setPosition(posX, posY, posZ);
-		setSize(0.5F, 0.5F);
-		ticksExisted = 0;
+	public EntityLightningLink(World par1World, double x, double y, double z, float yaw, float pitch, double distance) {
+		this(par1World);
+		refreshPositionAndAngles(x, y, z, yaw, pitch);
+        setVelocity(distance / 100, getVelocity().getY(), getVelocity().getZ());
+		setPosition(getX(), getY(), getZ());
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000;
-	}
-
-	@Override
-	public float getBrightness()
+	public float getBrightnessAtEyes()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public void onUpdate()
+	public void tick()
 	{
-		super.onUpdate();
-		if (ticksExisted > 1) setDead();
-		ticksExisted++;
+		super.tick();
+		if (age > 1) kill();
+		age++;
 	}
 }

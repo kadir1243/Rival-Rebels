@@ -12,30 +12,28 @@
 
 package assets.rivalrebels.client.gui;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.*;
 import assets.rivalrebels.client.tileentityrender.TileEntityRecieverRenderer;
 import assets.rivalrebels.common.container.ContainerReciever;
-import assets.rivalrebels.common.packet.ADSClosePacket;
-import assets.rivalrebels.common.packet.ADSWeaponPacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.inventory.GuiContainer;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.OpenGlHelper;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.Sys;
-import org.lwjgl.input.Mouse;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.client.render.*;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.Util;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.client.gui.GuiUtils;
 
-@SideOnly(Side.CLIENT)
-public class GuiTray extends GuiContainer {
-	public TileEntityReciever	r;
+import static net.minecraftforge.client.gui.GuiUtils.drawTexturedModalRect;
+
+@OnlyIn(Dist.CLIENT)
+public class GuiTray extends HandledScreen<ContainerReciever> {
 	private float				xSize_lo;
 	private float				ySize_lo;
 	GuiRotor					range;
@@ -44,74 +42,69 @@ public class GuiTray extends GuiContainer {
 	GuiCustomButton				mobs;
 	GuiDropdownOption			select1;
 
-	public GuiTray(Container container)
+	public GuiTray(ContainerReciever containerReciever, PlayerInventory inventoryPlayer, Text title)
 	{
-		super(container);
-	}
-
-	public GuiTray(InventoryPlayer inventoryPlayer, TileEntityReciever tileEntity)
-	{
-		super(new ContainerReciever(inventoryPlayer, tileEntity));
-		ySize = 206;
-		r = tileEntity;
+		super(containerReciever, inventoryPlayer, title);
+		backgroundHeight = 206;
 	}
 
 	@Override
-	public void initGui()
+	public void init()
 	{
-		super.initGui();
-		int x = (width - xSize) / 2;
-		int y = (height - ySize) / 2;
-		buttonList.clear();
-		range = new GuiRotor(0, x + 93 - 16, y + 92 - 16, r.yawLimit, "Range");
-		chip = new GuiCustomButton(1, new Rectangle(x + 94, y + 10, 19, 19), RivalRebels.guitray, new Vector(237, 10), true);
-		chip.isPressed = r.kTeam;
-		players = new GuiCustomButton(2, new Rectangle(x + 94, y + 28, 19, 19), RivalRebels.guitray, new Vector(237, 28), true);
-		players.isPressed = r.kPlayers;
-		mobs = new GuiCustomButton(3, new Rectangle(x + 94, y + 46, 19, 19), RivalRebels.guitray, new Vector(237, 46), true);
-		mobs.isPressed = r.kMobs;
-		select1 = new GuiDropdownOption(4, new Vector(119 + x, 8 + y), 45, 0, "RivalRebels.ads.dragon", this);
-		buttonList.add(range);
-		buttonList.add(chip);
-		buttonList.add(players);
-		buttonList.add(mobs);
-		buttonList.add(select1);
+		super.init();
+		int x = (width - getXSize()) / 2;
+		int y = (height - getYSize()) / 2;
+		drawables.clear();
+		range = new GuiRotor(x + 93 - 16, y + 92 - 16, handler.getYawLimit(), "Range");
+		chip = new GuiCustomButton(new Rectangle(x + 94, y + 10, 19, 19), RRIdentifiers.guitray, new Vector(237, 10), true);
+		chip.isPressed = handler.getKTeam();
+		players = new GuiCustomButton(new Rectangle(x + 94, y + 28, 19, 19), RRIdentifiers.guitray, new Vector(237, 28), true);
+		players.isPressed = handler.getKPlayers();
+		mobs = new GuiCustomButton(new Rectangle(x + 94, y + 46, 19, 19), RRIdentifiers.guitray, new Vector(237, 46), true);
+		mobs.isPressed = handler.getKMobs();
+		select1 = new GuiDropdownOption(new Vector(119 + x, 8 + y), 45, 0, new TranslatableText("RivalRebels.ads.dragon"), this);
+		addDrawable(range);
+		addDrawable(chip);
+		addDrawable(players);
+		addDrawable(mobs);
+		addDrawable(select1);
 	}
 
-	@Override
-	public void drawScreen(int par1, int par2, float par3)
-	{
-		super.drawScreen(par1, par2, par3);
-		this.xSize_lo = par1;
-		this.ySize_lo = par2;
-	}
+    @Override
+    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+        super.render(matrices, mouseX, mouseY, delta);
+        this.xSize_lo = mouseX;
+        this.ySize_lo = mouseY;
+    }
 
-	@Override
-	protected void keyTyped(char par1, int par2)
-	{
-		if (par2 == 1)
-		{
-			this.mc.displayGuiScreen(null);
-			this.mc.setIngameFocus();
-			PacketDispatcher.packetsys.sendToServer(new ADSClosePacket(r.getPos(), mobs.isPressed, chip.isPressed, players.isPressed, range.getDegree()*2));
+    @Override
+    public boolean charTyped(char chr, int modifiers) {
+		if (modifiers == 1) {
+			this.client.setScreen(null);
+            handler.setKMobs(mobs.isPressed);
+            handler.setKTeam(chip.isPressed);
+            handler.setKPlayers(players.isPressed);
+            handler.setYawLimit(range.getDegree() * 2);
 		}
+        return super.charTyped(chr, modifiers);
 	}
 
-	@Override
-	protected void drawGuiContainerForegroundLayer(int par1, int par2)
-	{
-		super.drawGuiContainerForegroundLayer(par1, par2);
+    @Override
+    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
+        super.drawForeground(matrices, mouseX, mouseY);
 
 		if (select1.isPressed)
 		{
-			PacketDispatcher.packetsys.sendToServer(new ADSWeaponPacket(r.getPos(), 1));
+            if (handler.hasWepReqs()) {
+                handler.setWep(true);
+            }
 		}
 		select1.isPressed = false;
 
-		int mousex = par1;
-		int mousey = par2;
-		int posx = (width - xSize) / 2;
-		int posy = (height - ySize) / 2;
+		int mousex = mouseX;
+		int mousey = mouseY;
+		int posx = (width - getXSize()) / 2;
+		int posy = (height - getYSize()) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 194;
 		int widthx = 72;
@@ -120,82 +113,79 @@ public class GuiTray extends GuiContainer {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			drawGradientRect(mousex, mousey, mousex + fontRenderer.getStringWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			fontRenderer.drawString("rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
-			if (!buttondown && Mouse.isButtonDown(0))
+			GuiUtils.drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			if (!buttondown && client.mouse.wasLeftButtonClicked())
 			{
-                Sys.openURL("http://rivalrebels.com");
+                Util.getOperatingSystem().open("http://rivalrebels.com");
 			}
 		}
-		buttondown = Mouse.isButtonDown(0);
+		buttondown = client.mouse.wasLeftButtonClicked();
 	}
 
 	boolean		buttondown;
 
 	static int	spinfac	= 0;
 
-	public void drawADS(int x, int y, int scale, float px, float py)
+	public void drawADS(MatrixStack matrices, int x, int y, int scale, float px, float py)
 	{
 		spinfac += 1;
-		GlStateManager.enableColorMaterial();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(x, y - 40, 50);
-		GlStateManager.scale(-scale, scale, scale);
-		GlStateManager.rotate(180.0F, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(135.0F, 0.0F, 1.0F, 0.0F);
-		RenderHelper.enableStandardItemLighting();
-		GlStateManager.rotate(-135.0F, 0.0F, 1.0F, 0.0F);
-		GlStateManager.rotate(20, 1.0F, 0.0F, 0.0F);
-		if (!r.hasWeapon)
+		matrices.push();
+		matrices.translate(x, y - 40, 50);
+		matrices.scale(-scale, scale, scale);
+		matrices.multiply(new Quaternion(180.0F, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternion(135.0F, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternion(-135.0F, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternion(20, 1.0F, 0.0F, 0.0F));
+		if (!handler.hasWeapon())
 		{
-			GlStateManager.translate(0, 0, -0.5f);
-			GlStateManager.rotate(spinfac, 0.0F, 1.0F, 0.0F);
-			GlStateManager.translate(0, 0, 0.5f);
+			matrices.translate(0, 0, -0.5f);
+			matrices.multiply(new Quaternion(spinfac, 0.0F, 1.0F, 0.0F));
+			matrices.translate(0, 0, 0.5f);
 		}
 		// GL11.glRotated(Math.sin(spinfac/(40 * Math.PI)) * 10, 1.0F, 0.0F, 0.0F);
 
-		// entity.rotationPitch = -((float)Math.atan((double)(py / 40.0F))) * 40.0F;
-		// entity.rotationYawHead = (float)Math.atan((double)(px / 40.0F)) * 40.0F;
+		// entity.pitch = -((float)Math.atan((double)(py / 40.0F))) * 40.0F;
+		// entity.headYaw = (float)Math.atan((double)(px / 40.0F)) * 40.0F;
 		// + (Math.sin(spinfac/(40 * Math.PI)) * 10)
 		// - (spinfac * 0.5)
 
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreciever);
-		GlStateManager.rotate(180, 0, 1, 0);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etreciever);
+		matrices.multiply(new Quaternion(180, 0, 1, 0));
 		// GL11.glRotated((spinfac * 0.5), 0, 1, 0);
-		GlStateManager.translate(0, -0.5 * 1.5, (-0.5 - 0.34) * -1.5);
-		TileEntityRecieverRenderer.base.render();
-		if (r.hasWeapon)
+		matrices.translate(0, -0.5 * 1.5, (-0.5 - 0.34) * -1.5);
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder bufferBuilder = tessellator.getBuffer();
+        VertexConsumerProvider.Immediate vertexConsumerProvider = VertexConsumerProvider.immediate(bufferBuilder);
+        VertexConsumer buffer = vertexConsumerProvider.getBuffer(RenderLayer.getSolid());
+        TileEntityRecieverRenderer.base.render(buffer);
+		if (handler.hasWeapon())
 		{
-			GlStateManager.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			GlStateManager.rotate((float) (-Math.atan(px / 40.0F) * 40.0F), 0, 1, 0);
-			TileEntityRecieverRenderer.arm.render();
-			GlStateManager.rotate((float) (Math.atan(py / 40.0F) * 40.0F + 20), 1, 0, 0);
-			Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etadsdragon);
-			TileEntityRecieverRenderer.adsdragon.render();
+			matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
+			matrices.multiply(new Quaternion((float) (-Math.atan(px / 40.0F) * 40.0F), 0, 1, 0));
+			TileEntityRecieverRenderer.arm.render(buffer);
+			matrices.multiply(new Quaternion((float) (Math.atan(py / 40.0F) * 40.0F + 20), 1, 0, 0));
+			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etadsdragon);
+			TileEntityRecieverRenderer.adsdragon.render(buffer);
 		}
-		GlStateManager.popMatrix();
-		RenderHelper.disableStandardItemLighting();
-		GlStateManager.disableRescaleNormal();
-		OpenGlHelper.setActiveTexture(OpenGlHelper.lightmapTexUnit);
-		GlStateManager.disableTexture2D();
-		OpenGlHelper.setActiveTexture(OpenGlHelper.defaultTexUnit);
-	}
+		matrices.pop();
+        vertexConsumerProvider.draw();
+    }
 
-	@Override
-	protected void drawGuiContainerBackgroundLayer(float par1, int par2, int par3)
-	{
-		GlStateManager.color(1, 1, 1);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.guitray);
-		int x = (width - xSize) / 2;
-		int y = (height - ySize) / 2;
-		this.drawTexturedModalRect(x, y, 0, 0, xSize, ySize);
+    @Override
+    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
+		RenderSystem.setShaderColor(1, 1, 1, 1);
+		RenderSystem.setShaderTexture(0, RRIdentifiers.guitray);
+		int x = (width - getXSize()) / 2;
+		int y = (height - getYSize()) / 2;
+        drawTexturedModalRect(matrices, x, y, 0, 0, getXSize(), getYSize(), getZOffset());
 
-		if (r.pInR > 0)
+		if (handler.getPInR() > 0)
 		{
-			drawTexturedModalRect(x + 104, y + 68, 248, 0, 8, 8);
+			drawTexturedModalRect(matrices, x + 104, y + 68, 248, 0, 8, 8, getZOffset());
 		}
 
-		fontRenderer.drawString(I18n.format("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff);
-		drawADS(guiLeft + 51, guiTop + 75, 30, guiLeft + 51 - this.xSize_lo, guiTop + 25 - this.ySize_lo);
+		textRenderer.draw(matrices, new TranslatableText("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff);
+		drawADS(matrices, getGuiLeft() + 51, getGuiTop() + 75, 30, getGuiLeft() + 51 - this.xSize_lo, getGuiTop() + 25 - this.ySize_lo);
 	}
 }

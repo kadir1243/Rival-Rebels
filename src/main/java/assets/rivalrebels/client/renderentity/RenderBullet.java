@@ -11,60 +11,54 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import assets.rivalrebels.RRIdentifiers;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 
-public class RenderBullet extends Render<Entity>
+public class RenderBullet extends EntityRenderer<Entity>
 {
 	/**
 	 * Have the icon index (in items.png) that will be used to render the image. Currently, eggs and snowballs uses this classes.
 	 */
 	private final String path;
 
-	public RenderBullet(RenderManager manager, String par1)
+	public RenderBullet(EntityRendererFactory.Context manager, String par1)
 	{
         super(manager);
 		path = par1;
 	}
 
     @Override
-	public void doRender(Entity entity, double x, double y, double z, float par8, float par9) {
-		if (entity.ticksExisted > 1)
-		{
-			GlStateManager.pushMatrix();
-			GlStateManager.translate((float) x, (float) y, (float) z);
-			GlStateManager.scale(0.5F, 0.5F, 0.5F);
-			if (path.equals("flame")) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etflame);
-			if (path.equals("fire")) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etfire);
-			Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
+    public void render(Entity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+		if (entity.age > 1) {
+			matrices.push();
+			matrices.scale(0.5F, 0.5F, 0.5F);
+			if (path.equals("flame")) MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etflame);
+			if (path.equals("fire")) MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etfire);
             float var7 = 1.0F;
             float var8 = 0.5F;
             float var9 = 0.25F;
-            GlStateManager.rotate(180.0F - this.renderManager.playerViewY, 0.0F, 1.0F, 0.0F);
-            GlStateManager.rotate(-this.renderManager.playerViewX, 1.0F, 0.0F, 0.0F);
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_NORMAL);
-            buffer.pos((0.0F - var8), (0.0F - var9), 0.0D).tex(0, 0).normal(0, 1, 0).endVertex();
-            buffer.pos((var7 - var8), (0.0F - var9), 0.0D).tex(1, 0).normal(0, 1, 0).endVertex();
-            buffer.pos((var7 - var8), (var7 - var9), 0.0D).tex(1, 1).normal(0, 1, 0).endVertex();
-            buffer.pos((0.0F - var8), (var7 - var9), 0.0D).tex(0, 1).normal(0, 1, 0).endVertex();
-            tessellator.draw();
-			GlStateManager.popMatrix();
+            matrices.multiply(new Quaternion((float) (180.0F - this.dispatcher.camera.getPos().getY()), 0.0F, 1.0F, 0.0F));
+            matrices.multiply(new Quaternion((float) -this.dispatcher.camera.getPos().getX(), 1.0F, 0.0F, 0.0F));
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+            buffer.vertex((0.0F - var8), (0.0F - var9), 0.0D).texture(0, 0).normal(0, 1, 0).next();
+            buffer.vertex((var7 - var8), (0.0F - var9), 0.0D).texture(1, 0).normal(0, 1, 0).next();
+            buffer.vertex((var7 - var8), (var7 - var9), 0.0D).texture(1, 1).normal(0, 1, 0).next();
+            buffer.vertex((0.0F - var8), (var7 - var9), 0.0D).texture(0, 1).normal(0, 1, 0).next();
+			matrices.pop();
 		}
 	}
 
     @Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    public Identifier getTexture(Entity entity) {
+        return null;
+    }
 }

@@ -11,27 +11,27 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.world.World;
-
-import org.lwjgl.opengl.GL11;
-
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.Vertice;
+import assets.rivalrebels.common.block.machine.BlockForceField;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.block.Block;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
+import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntityGoreRenderer extends TileEntitySpecialRenderer<TileEntityGore>
-{
-	float	s	= 0.5F;
-
+@OnlyIn(Dist.CLIENT)
+public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGore> {
+	private static final float s = 0.5F;
 	Vertice	v1	= new Vertice(s, s, s);
 	Vertice	v2	= new Vertice(s, s, -s);
 	Vertice	v3	= new Vertice(-s, s, -s);
@@ -42,95 +42,85 @@ public class TileEntityGoreRenderer extends TileEntitySpecialRenderer<TileEntity
 	Vertice	v7	= new Vertice(-s, -s, -s);
 	Vertice	v8	= new Vertice(-s, -s, s);
 
+    public TileEntityGoreRenderer(BlockEntityRendererFactory.Context context) {
+    }
+
+    private static boolean isFaceFull(World world, BlockPos pos, Direction direction) {
+        return Block.isFaceFullSquare(world.getBlockState(pos.offset(direction)).getCollisionShape(world, pos.offset(direction)), direction.getOpposite());
+    }
+
     @Override
-    public void render(TileEntityGore te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		World world = te.getWorld();
+    public void render(TileEntityGore entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        World world = entity.getWorld();
 
-		boolean ceil = world.isBlockNormalCube(te.getPos().up(), false);
-		boolean floor = world.isBlockNormalCube(te.getPos().down(), false);
-		boolean side1 = world.isBlockNormalCube(te.getPos().south(), false);
-		boolean side2 = world.isBlockNormalCube(te.getPos().west(), false);
-		boolean side3 = world.isBlockNormalCube(te.getPos().north(), false);
-		boolean side4 = world.isBlockNormalCube(te.getPos().east(), false);
-		int meta = te.getBlockMetadata();
+		boolean ceil = isFaceFull(world, entity.getPos(), Direction.UP);
+		boolean floor = isFaceFull(world, entity.getPos(), Direction.DOWN);
+		boolean side1 = isFaceFull(world, entity.getPos(), Direction.SOUTH);
+		boolean side2 = isFaceFull(world, entity.getPos(), Direction.WEST);
+		boolean side3 = isFaceFull(world, entity.getPos(), Direction.NORTH);
+		boolean side4 = isFaceFull(world, entity.getPos(), Direction.EAST);
+		int meta = entity.getCachedState().get(BlockForceField.META);
 
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		if (meta == 0) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash1);
-		else if (meta == 1) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash2);
-		else if (meta == 2) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash3);
-		else if (meta == 3) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash4);
-		else if (meta == 4) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash5);
-		else if (meta == 5) Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash6);
-		else Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.btsplash1);
-		GlStateManager.disableLighting();
-		Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+		matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+        switch (meta) {
+            case 0 -> MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btsplash1);
+            case 1 -> MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btsplash2);
+            case 2 -> MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btsplash3);
+            case 3 -> MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btsplash4);
+            case 4 -> MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btsplash5);
+            case 5 -> MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btsplash6);
+            default -> MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btsplash1);
+        }
 
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
         if (side1)
 		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 			addVertex(buffer, v1, 0, 0);
 			addVertex(buffer, v5, 1, 0);
 			addVertex(buffer, v8, 1, 1);
 			addVertex(buffer, v4, 0, 1);
-			tessellator.draw();
 		}
 
-		if (side2)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		if (side2) {
 			addVertex(buffer, v4, 0, 0);
 			addVertex(buffer, v8, 1, 0);
 			addVertex(buffer, v7, 1, 1);
 			addVertex(buffer, v3, 0, 1);
-			tessellator.draw();
 		}
 
-		if (side3)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		if (side3) {
 			addVertex(buffer, v3, 0, 0);
 			addVertex(buffer, v7, 1, 0);
 			addVertex(buffer, v6, 1, 1);
 			addVertex(buffer, v2, 0, 1);
-			tessellator.draw();
 		}
 
-		if (side4)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		if (side4) {
 			addVertex(buffer, v2, 0, 0);
 			addVertex(buffer, v6, 1, 0);
 			addVertex(buffer, v5, 1, 1);
 			addVertex(buffer, v1, 0, 1);
-			tessellator.draw();
 		}
 
-		if (ceil)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		if (ceil) {
 			addVertex(buffer, v4, 0, 0);
 			addVertex(buffer, v3, 1, 0);
 			addVertex(buffer, v2, 1, 1);
 			addVertex(buffer, v1, 0, 1);
-			tessellator.draw();
 		}
 
-		if (floor)
-		{
-			buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
+		if (floor) {
 			addVertex(buffer, v5, 0, 0);
 			addVertex(buffer, v6, 1, 0);
 			addVertex(buffer, v7, 1, 1);
 			addVertex(buffer, v8, 0, 1);
-			tessellator.draw();
 		}
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 
-	private void addVertex(BufferBuilder buffer, Vertice v, double t, double t2) {
-		buffer.pos(v.x * 0.999, v.y * 0.999, v.z * 0.999).tex(t, t2).endVertex();
+	private void addVertex(VertexConsumer buffer, Vertice v, float t, float t2) {
+		buffer.vertex(v.x * 0.999, v.y * 0.999, v.z * 0.999).texture(t, t2).next();
 	}
 }

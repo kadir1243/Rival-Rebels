@@ -12,126 +12,127 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.block.Block;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.NonNullList;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EntityRaytrace extends EntityInanimate
 {
 	public Entity	shootingEntity;
-	private int		ticksInAir	= 0;
-	private float	range		= 0;
+    private float	range		= 0;
 	private float	c;
 
-	public EntityRaytrace(World par1World)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+    public EntityRaytrace(EntityType<? extends EntityRaytrace> type, World world) {
+        super(type, world);
+    }
+
+	public EntityRaytrace(World par1World) {
+		this(RREntities.RAYTRACE, par1World);
 	}
 
-	public EntityRaytrace(World par1World, double x, double y,double z, double mx, double my, double mz)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+	public EntityRaytrace(World par1World, double x, double y,double z, double mx, double my, double mz) {
+		this(par1World);
 		setPosition(x,y,z);
 		setAnglesMotion(mx, my, mz);
 		c = 1.0f;
-		range = MathHelper.sqrt(mx*mx+my*my+mz*mz);
+		range = MathHelper.sqrt((float) (mx*mx+my*my+mz*mz));
 	}
 
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
-		motionX = mx;
-		motionY = my;
-		motionZ = mz;
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(my, MathHelper.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI);
+        setVelocity(mx, my, mz);
+		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+        setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
 	public EntityRaytrace(World par1World, Entity player, float distance, float randomness, float chance, boolean shift)
 	{
-		super(par1World);
+		this(par1World);
 		c = chance;
 		range = distance;
 		shootingEntity = player;
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(player.posX, player.posY + player.getEyeHeight(), player.posZ, player.rotationYaw, player.rotationPitch);
-		setPosition(posX, posY, posZ);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		if (shift)
+		refreshPositionAndAngles(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYaw(), player.getPitch());
+		setPosition(getX(), getY(), getZ());
+        setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+
+        if (shift)
 		{
-			posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-			posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-			posX += motionX;
-			posY += motionY;
-			posZ += motionZ;
+            setPos(
+                getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.16F),
+                getY(),
+                getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.16F)
+            );
+            setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
 		}
 		else
 		{
-			posY-=0.05f;
-			posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.3F);
-			posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.3F);
+            setPos(
+                getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.3F),
+                getY() - 0.05f,
+                getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.3F)
+            );
 		}
-		setArrowHeading(motionX, motionY, motionZ, range, randomness);
+		setArrowHeading(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ(), range, randomness);
 	}
 
     public void setArrowHeading(double par1, double par3, double par5, float par7, float par8)
 	{
-		float var9 = MathHelper.sqrt(par1 * par1 + par3 * par3 + par5 * par5);
+		float var9 = MathHelper.sqrt((float) (par1 * par1 + par3 * par3 + par5 * par5));
 		par1 /= var9;
 		par3 /= var9;
 		par5 /= var9;
-		par1 += world.rand.nextGaussian() * par8;
-		par3 += world.rand.nextGaussian() * par8;
-		par5 += world.rand.nextGaussian() * par8;
+		par1 += world.random.nextGaussian() * par8;
+		par3 += world.random.nextGaussian() * par8;
+		par5 += world.random.nextGaussian() * par8;
 		par1 *= par7;
 		par3 *= par7;
 		par5 *= par7;
-		motionX = par1;
-		motionY = par3;
-		motionZ = par5;
-		float var10 = MathHelper.sqrt(par1 * par1 + par5 * par5);
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI);
+		setVelocity(par1, par3, par5);
+		float var10 = MathHelper.sqrt((float) (par1 * par1 + par5 * par5));
+		setYaw(prevYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI));
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
-	@Override
-	public void onUpdate()
+    @Override
+	public void tick()
 	{
-		super.onUpdate();
-		Vec3d vec31 = new Vec3d(posX, posY, posZ);
-		Vec3d vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult MOP = world.rayTraceBlocks(vec31, vec3, false, true, false);
-		vec31 = new Vec3d(posX, posY, posZ);
-		if (MOP != null) vec3 = MOP.hitVec;
-		else vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		super.tick();
+		Vec3d vec31 = getPos();
+		Vec3d vec3 = getPos().add(getVelocity());
+		HitResult MOP = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		vec31 = getPos();
+		if (MOP != null) vec3 = MOP.getPos();
+		else vec3 = getPos().add(getVelocity());
 
-		List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 30.0D, 1.0D));
+		List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 30.0D, 1.0D));
 		double d0 = Double.MAX_VALUE;
         for (Entity entity : list) {
-            if ((entity.canBeCollidedWith() || entity instanceof EntityRhodes) && entity != shootingEntity) {
-                RayTraceResult mop1 = entity.getEntityBoundingBox().grow(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
-                if (mop1 != null) {
-                    double d1 = vec31.squareDistanceTo(mop1.hitVec);
+            if ((entity.collides() || entity instanceof EntityRhodes) && entity != shootingEntity) {
+                Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
+                if (mop1.isPresent()) {
+                    double d1 = vec31.squaredDistanceTo(mop1.get());
                     if (d1 < d0) {
-                        MOP = new RayTraceResult(entity, mop1.hitVec);
+                        MOP = new EntityHitResult(entity, mop1.get());
                         d0 = d1;
                     }
                 }
@@ -139,91 +140,76 @@ public class EntityRaytrace extends EntityInanimate
         }
 		if (MOP != null)
 		{
-			if (MOP.entityHit == null)
+			if (MOP.getType() == HitResult.Type.BLOCK)
 			{
-				if (!world.isRemote) world.spawnEntity(new EntityLightningLink(world, this, getDistance(MOP.hitVec.x, MOP.hitVec.y, MOP.hitVec.z)));
-				// world.spawnEntity(new EntityNuclearBlast(world, MOP.blockX, MOP.getBlockPos().getY(), MOP.getBlockPos().getZ(), 5, false));
-				Block BlockHit = world.getBlockState(MOP.getBlockPos()).getBlock();
-				float r = world.rand.nextFloat();
-				if (BlockHit == RivalRebels.camo1 || BlockHit == RivalRebels.camo2 || BlockHit == RivalRebels.camo3)
+                BlockPos pos = ((BlockHitResult) MOP).getBlockPos();
+                if (!world.isClient) world.spawnEntity(new EntityLightningLink(world, this, Math.sqrt(squaredDistanceTo(MOP.getPos().x, MOP.getPos().y, MOP.getPos().z))));
+				// world.spawnEntity(new EntityNuclearBlast(world, MOP.blockX, pos.getY(), pos.getZ(), 5, false));
+				Block BlockHit = world.getBlockState(pos).getBlock();
+				float r = world.random.nextFloat();
+				if (BlockHit == RRBlocks.camo1 || BlockHit == RRBlocks.camo2 || BlockHit == RRBlocks.camo3)
 				{
 					if (r * 10 <= c)
 					{
-						if (!world.isRemote) world.setBlockToAir(MOP.getBlockPos());
+						if (!world.isClient) world.setBlockState(pos, Blocks.AIR.getDefaultState());
 						for (int i = 0; i < 4; i++)
 						{
-							world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, MOP.getBlockPos().getX(), MOP.getBlockPos().getY() - 1 + i * 0.5, MOP.getBlockPos().getZ(), (world.rand.nextFloat() - 0.5F) * 0.1, world.rand.nextFloat() * 0.05, (world.rand.nextFloat() - 0.5F) * 0.1);
+							world.addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (world.random.nextFloat() - 0.5F) * 0.1, world.random.nextFloat() * 0.05, (world.random.nextFloat() - 0.5F) * 0.1);
 						}
 					}
 				}
-				else if (BlockHit == RivalRebels.reactive)
+				else if (BlockHit == RRBlocks.reactive)
 				{
 					if (r * 15 <= c)
 					{
-						if (!world.isRemote) world.setBlockToAir(MOP.getBlockPos());
+						if (!world.isClient) world.setBlockState(pos, Blocks.AIR.getDefaultState());
 						for (int i = 0; i < 4; i++)
 						{
-							world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, MOP.getBlockPos().getX(), MOP.getBlockPos().getY() - 1 + i * 0.5, MOP.getBlockPos().getZ(), (world.rand.nextFloat() - 0.5F) * 0.1, world.rand.nextFloat() * 0.05, (world.rand.nextFloat() - 0.5F) * 0.1);
+							world.addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (world.random.nextFloat() - 0.5F) * 0.1, world.random.nextFloat() * 0.05, (world.random.nextFloat() - 0.5F) * 0.1);
 						}
 					}
 				}
 				else if (!BlackList.tesla(BlockHit) && r <= c)
 				{
-					if (!world.isRemote) world.setBlockToAir(MOP.getBlockPos());
+					if (!world.isClient) world.setBlockState(pos, Blocks.AIR.getDefaultState());
 					for (int i = 0; i < 4; i++)
 					{
-						world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, MOP.getBlockPos().getX(), MOP.getBlockPos().getY() - 1 + i * 0.5, MOP.getBlockPos().getZ(), (world.rand.nextFloat() - 0.5F) * 0.1, world.rand.nextFloat() * 0.05, (world.rand.nextFloat() - 0.5F) * 0.1);
+						world.addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (world.random.nextFloat() - 0.5F) * 0.1, world.random.nextFloat() * 0.05, (world.random.nextFloat() - 0.5F) * 0.1);
 					}
 				}
 			}
 			else
 			{
-				if (!world.isRemote) world.spawnEntity(new EntityLightningLink(world, this, getDistance(MOP.entityHit)));
-				if (MOP.entityHit instanceof EntityPlayer)
+                Entity entityHit = ((EntityHitResult) MOP).getEntity();
+                if (!world.isClient) world.spawnEntity(new EntityLightningLink(world, this, distanceTo(entityHit)));
+				if (entityHit instanceof PlayerEntity entityPlayerHit)
 				{
-					EntityPlayer entityPlayerHit = (EntityPlayer) MOP.entityHit;
-					NonNullList<ItemStack> armorSlots = entityPlayerHit.inventory.armorInventory;
-					int i = world.rand.nextInt(4);
-					if (!armorSlots.get(i).isEmpty())
+                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, world.random.nextInt(4));
+					int i = slot.getEntitySlotId();
+					if (!entityPlayerHit.getEquippedStack(slot).isEmpty())
 					{
-						armorSlots.get(i).damageItem(14, entityPlayerHit);
-						entityPlayerHit.attackEntityFrom(RivalRebelsDamageSource.electricity, 1);
+						entityPlayerHit.getEquippedStack(slot).damage(14, entityPlayerHit, player -> player.sendEquipmentBreakStatus(slot));
+						entityPlayerHit.damage(RivalRebelsDamageSource.electricity, 1);
 					}
 					else
 					{
-						entityPlayerHit.attackEntityFrom(RivalRebelsDamageSource.electricity, (RivalRebels.teslaDecay / ((int) MOP.entityHit.getDistance(this) + 1) / (i + 1)));
+						entityPlayerHit.damage(RivalRebelsDamageSource.electricity, (RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
 					}
 				}
-				else if (MOP.entityHit instanceof EntityB2Spirit)
+				else if (entityHit instanceof EntityB2Spirit)
 				{
-					MOP.entityHit.attackEntityFrom(RivalRebelsDamageSource.electricity, (RivalRebels.teslaDecay / 1.5f) / ((int) MOP.entityHit.getDistance(this) + 1));
+					entityHit.damage(RivalRebelsDamageSource.electricity, (RivalRebels.teslaDecay / 1.5f) / ((int) entityHit.distanceTo(this) + 1));
 				}
 				else
 				{
-					MOP.entityHit.attackEntityFrom(RivalRebelsDamageSource.electricity, RivalRebels.teslaDecay / ((int) MOP.entityHit.getDistance(this) + 1));
+					entityHit.damage(RivalRebelsDamageSource.electricity, RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1));
 				}
 			}
 		}
 		else
 		{
-			if (!world.isRemote) world.spawnEntity(new EntityLightningLink(world, this, range));
+			if (!world.isClient) world.spawnEntity(new EntityLightningLink(world, this, range));
 		}
-		setDead();
-	}
-
-	/**
-	 * (abstract) Protected helper method to write subclass entity data to NBT.
-	 */
-	@Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
-	{
-	}
-
-	/**
-	 * (abstract) Protected helper method to read subclass entity data from NBT.
-	 */
-	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
-	{
+		kill();
 	}
 }

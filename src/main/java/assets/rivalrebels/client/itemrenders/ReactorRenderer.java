@@ -11,40 +11,46 @@
  *******************************************************************************/
 package assets.rivalrebels.client.itemrenders;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.client.model.ModelReactor;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
+import net.minecraft.client.render.entity.model.EntityModelLoader;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
+import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
-public class ReactorRenderer extends TileEntityItemStackRenderer
+public class ReactorRenderer extends BuiltinModelItemRenderer
 {
 	ModelReactor	mr;
 	ModelLaptop		ml;
 
-	public ReactorRenderer()
-	{
+	public ReactorRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
+        super(dispatcher, loader);
 		mr = new ModelReactor();
 		ml = new ModelLaptop();
 	}
 
     @Override
-    public void renderByItem(ItemStack stack) {
-		GlStateManager.enableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.5F, 1.1875F, 0.5F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etlaptop);
-		ml.renderModel(0);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etscreen);
-		ml.renderScreen(0);
-		GlStateManager.popMatrix();
-		GlStateManager.pushMatrix();
-		GlStateManager.translate(0.5F, 0.5F, 0.5F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etreactor);
-		mr.renderModel();
-		GlStateManager.popMatrix();
+    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+		matrices.push();
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        matrices.translate(0.5F, 1.1875F, 0.5F);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etlaptop);
+		ml.renderModel(buffer, matrices, 0);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etscreen);
+		ml.renderScreen(buffer, matrices, 0);
+		matrices.pop();
+		matrices.push();
+		matrices.translate(0.5F, 0.5F, 0.5F);
+		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etreactor);
+		mr.renderModel(matrices, buffer);
+		matrices.pop();
 	}
 }
 

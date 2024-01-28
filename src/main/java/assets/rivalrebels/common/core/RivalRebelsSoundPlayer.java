@@ -13,10 +13,10 @@ package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RivalRebels;
 import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.sound.SoundCategory;
+import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
 public class RivalRebelsSoundPlayer
@@ -219,14 +219,19 @@ public class RivalRebelsSoundPlayer
 			"q",
 			"r",
 			"s"}
-									};
+                                    };
 
 	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume, float pitch)
 	{
 		if (world != null && dir >= 0 && dir < directory.length && num >= 0 && num < number[dir].length)
 		{
 			String sound = dir + "." + num;
-			world.playSound(x, y, z, new SoundEvent(new ResourceLocation(RivalRebels.MODID, sound)), SoundCategory.MASTER, volume, pitch, false);
+            SoundEvent event = RivalRebelsSoundEventHandler.SOUNDS.get(sound);
+            if (event == null) {
+                RivalRebels.LOGGER.error("Sound not found: " + sound);
+                return false;
+            }
+            world.playSound(x, y, z, event, SoundCategory.MASTER, volume, pitch, false);
 			return true;
 		}
 		else
@@ -264,7 +269,7 @@ public class RivalRebelsSoundPlayer
 	{
 		if (entity != null)
 		{
-			return playSound(entity.world, dir, num, entity.posX, entity.posY, entity.posZ, volume, pitch);
+			return playSound(entity.world, dir, num, entity.getX(), entity.getY(), entity.getZ(), volume, pitch);
 		}
 		else
 		{
@@ -277,8 +282,11 @@ public class RivalRebelsSoundPlayer
 		return playSound(entity, dir, num, volume, 1);
 	}
 
-	public static boolean playSound(Entity entity, int dir, int num)
-	{
+	public static boolean playSound(Entity entity, int dir, int num) {
 		return playSound(entity, dir, num, 1, 1);
 	}
+
+    public static boolean playSound(World world, int dir, int num, Vec3d pos) {
+        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ());
+    }
 }

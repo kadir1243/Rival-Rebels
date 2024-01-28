@@ -11,9 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.*;
+import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -29,33 +28,18 @@ public class BlockCycle extends Block
 
 	public BlockCycle()
 	{
-		super(Material.IRON);
+		super(Settings.of(Material.METAL));
 	}
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
-        world.scheduleBlockUpdate(pos, this, 1, 1);
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.createAndScheduleBlockTick(pos, this, 1);
     }
 
     @Override
-    public void updateTick(World world, BlockPos pos, IBlockState state, Random rand) {
-        world.scheduleBlockUpdate(pos, this, 1, 1);
-        world.setBlockToAir(pos);
+    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+        world.createAndScheduleBlockTick(pos, this, 1);
+        world.setBlockState(pos, Blocks.AIR.getDefaultState());
         world.setBlockState(pos, state);
     }
-
-    /*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ak");
-	}*/
 }

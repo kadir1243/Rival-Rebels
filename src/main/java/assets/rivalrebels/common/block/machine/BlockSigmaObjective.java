@@ -12,78 +12,67 @@
 package assets.rivalrebels.common.block.machine;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntitySigmaObjective;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockSigmaObjective extends BlockContainer
+public class BlockSigmaObjective extends BlockWithEntity
 {
-	public BlockSigmaObjective()
+	public BlockSigmaObjective(Settings settings)
 	{
-		super(Material.IRON);
-		this.setCreativeTab(CreativeTabs.DECORATIONS);
-	}
-
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
+		super(settings);
 	}
 
     @Override
-    public void onBlockAdded(World world, BlockPos pos, IBlockState state) {
+    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
 		if (!pos.equals(RivalRebels.round.sigmaObjPos)) {
-			world.setBlockState(RivalRebels.round.sigmaObjPos, RivalRebels.plasmaexplosion.getDefaultState());
+			world.setBlockState(RivalRebels.round.sigmaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
 			RivalRebels.round.sigmaObjPos = pos;
-			if (world.getBlockState(RivalRebels.round.omegaObjPos) == RivalRebels.omegaobj)
+			if (world.getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj)
 				RivalRebels.round.roundManualStart();
 		}
 	}
 
     @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
-        super.breakBlock(world, pos, state);
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        super.onBreak(world, pos, state, player);
 
-		if (world.getBlockState(pos).getBlock() != RivalRebels.plasmaexplosion)
-		{
+		if (state.getBlock() != RRBlocks.plasmaexplosion) {
 			world.setBlockState(pos, state);
 		}
 	}
 
     @Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
 
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
-	/**
-	 * Returns a new instance of a block's tile entity class. Called on placing the block.
-	 */
-	@Override
-	public TileEntity createNewTileEntity(World world, int meta)
-	{
-		return new TileEntitySigmaObjective();
-	}
-
-	/*@SideOnly(Side.CLIENT)
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new TileEntitySigmaObjective(pos, state);
+    }
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
 
 	@Override

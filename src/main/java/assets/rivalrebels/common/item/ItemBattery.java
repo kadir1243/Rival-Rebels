@@ -11,20 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.itemrenders.BatteryRenderer;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.item.Item;
+import net.minecraftforge.client.IItemRenderProperties;
 
-public class ItemBattery extends Item
-{
-	public ItemBattery()
-	{
-		super();
-		setCreativeTab(RivalRebels.rralltab);
+import java.util.function.Consumer;
+
+public class ItemBattery extends Item {
+	public ItemBattery() {
+		super(new Settings().group(RRItems.rralltab));
 	}
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ac");
-	}*/
+    @Override
+    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
+        consumer.accept(new IItemRenderProperties() {
+            @Override
+            public BuiltinModelItemRenderer getItemStackRenderer() {
+                return new BatteryRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
+            }
+        });
+    }
 }

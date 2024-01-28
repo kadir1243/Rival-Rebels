@@ -11,18 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import net.minecraft.entity.EntityType;
 import net.minecraft.world.World;
 
 public class EntityRhodesRightLowerArm extends EntityRhodesPiece
 {
-	public EntityRhodesRightLowerArm(World w)
+	public EntityRhodesRightLowerArm(EntityType<? extends EntityRhodesRightLowerArm> type, World w)
 	{
-		super(w);
+		super(type, w);
 	}
 
 	public EntityRhodesRightLowerArm(World w, double x, double y, double z, float scale, int color)
 	{
-		super(w, x, y, z, scale, color);
+		super(RREntities.RHODES_RIGHT_LOWER_ARM, w, x, y, z, scale, color);
 		health = 600;
 	}
 

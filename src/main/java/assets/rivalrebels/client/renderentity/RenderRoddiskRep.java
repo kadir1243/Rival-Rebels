@@ -14,52 +14,49 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.client.model.ModelDisk;
 import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
 import assets.rivalrebels.common.entity.EntityRoddiskRep;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Vec3f;
 
-public class RenderRoddiskRep extends Render
+public class RenderRoddiskRep extends EntityRenderer<EntityRoddiskRep>
 {
 	int					er	= 0;
 	private ModelDisk	model;
 
-	public RenderRoddiskRep(RenderManager manager)
+	public RenderRoddiskRep(EntityRendererFactory.Context manager)
 	{
         super(manager);
 		model = new ModelDisk();
 	}
 
-	@Override
-	public void doRender(Entity var1, double var2, double var4, double var6, float var8, float var9)
-	{
+    @Override
+    public void render(EntityRoddiskRep entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		er += 13.46;
-		EntityRoddiskRep erd = (EntityRoddiskRep) var1;
-		GlStateManager.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-		GlStateManager.enableBlend();
-		GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-		GlStateManager.disableLighting();
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(0.4f, 0.4f, 0.4f);
-		GlStateManager.translate((float) var2, (float) var4, (float) var6);
-		GlStateManager.pushMatrix();
-		GlStateManager.rotate(erd.rotationPitch, 0.0F, 0.0F, 1.0F);
-		GlStateManager.rotate(erd.rotationYaw - 90.0f + er, 0.0F, 1.0F, 0.0F);
+        RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
+        RenderSystem.enableBlend();
+		RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+        RenderSystem.disableBlend();
+        matrices.push();
+        matrices.scale(0.4f, 0.4f, 0.4f);
+        matrices.push();
+        matrices.multiply(Vec3f.POSITIVE_Z.getDegreesQuaternion(entity.getPitch()));
+        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(entity.getYaw() - 90.0f + er));
 
-		model.render();
-		model.render();
-		model.render();
+		model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()));
 
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
-		GlStateManager.disableBlend();
-		GlStateManager.enableLighting();
+        matrices.pop();
+        matrices.pop();
 	}
 
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityRoddiskRep entity) {
+        return null;
+    }
 }

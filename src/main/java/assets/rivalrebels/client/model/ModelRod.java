@@ -14,7 +14,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
 
 public class ModelRod
 {
@@ -48,25 +50,24 @@ public class ModelRod
 	Vertice			vd5				= new Vertice(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * -6, 0.03125f * 9 * (float) Math.sin(deg));
 	Vertice			vd6				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -9, 0.03125f * 8 * (float) Math.sin(deg));
 
-	public void render()
+	public void render(MatrixStack matrices, VertexConsumer buffer)
 	{
 		for (float i = 0; i < 360; i += 360 / numOfSegs)
 		{
-			GlStateManager.pushMatrix();
-			GlStateManager.disableLighting();
-			GlStateManager.rotate(i, 0, 1, 0);
-			RenderHelper.addFace(v0, vd1, v1, v0, t1, t3, t2, t1);
-			RenderHelper.addFace(vd1, vd2, v2, v1, t2, t4, t5, t3);
-			RenderHelper.addFace(vd2, vd3, v3, v2, t4, t6, t7, t5);
-			RenderHelper.addFace(vd3, vd4, v4, v3, t6, t8, t9, t7);
+			matrices.push();
+			matrices.multiply(new Quaternion(i, 0, 1, 0));
+			RenderHelper.addFace(buffer, v0, vd1, v1, v0, t1, t3, t2, t1);
+			RenderHelper.addFace(buffer, vd1, vd2, v2, v1, t2, t4, t5, t3);
+			RenderHelper.addFace(buffer, vd2, vd3, v3, v2, t4, t6, t7, t5);
+			RenderHelper.addFace(buffer, vd3, vd4, v4, v3, t6, t8, t9, t7);
 			if (rendersecondcap)
 			{
-				RenderHelper.addFace(v7, v6, vd6, v7, t1, t3, t2, t1);
-				RenderHelper.addFace(v6, v5, vd5, vd6, t2, t4, t5, t3);
-				RenderHelper.addFace(v5, v4, vd4, vd5, t4, t6, t7, t5);
+				RenderHelper.addFace(buffer, v7, v6, vd6, v7, t1, t3, t2, t1);
+				RenderHelper.addFace(buffer, v6, v5, vd5, vd6, t2, t4, t5, t3);
+				RenderHelper.addFace(buffer, v5, v4, vd4, vd5, t4, t6, t7, t5);
 			}
 
-			GlStateManager.popMatrix();
+			matrices.pop();
 		}
 	}
 }

@@ -12,16 +12,12 @@
 package assets.rivalrebels.common.item;
 
 import net.minecraft.item.Item;
-import assets.rivalrebels.RivalRebels;
 
 public class ItemCore extends Item
 {
 	public float timemult = 0;
 
-	public ItemCore()
-	{
-		super();
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+	public ItemCore(Settings settings) {
+		super(settings.group(RRItems.rralltab).maxCount(1));
 	}
 }

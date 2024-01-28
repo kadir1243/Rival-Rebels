@@ -11,67 +11,59 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.Material;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.LiteralText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Formatting;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.Style;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.util.text.TextComponentTranslation;
-import net.minecraft.util.text.TextFormatting;
-import net.minecraft.util.text.translation.I18n;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class BlockAmmunition extends Block
 {
-	public BlockAmmunition()
+	public BlockAmmunition(Settings settings)
 	{
-		super(Material.WOOD);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+		super(settings);
 	}
 
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-		blockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player);
-	}
-
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
-	{
-		if (world.isRemote)
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
+		if (world.isClient)
 		{
-			player.sendMessage(new TextComponentTranslation("RivalRebels.Inventory"));
-            player.sendMessage(new TextComponentTranslation(RivalRebels.rocket.getTranslationKey() + ".name").setStyle(new Style().setColor(TextFormatting.GREEN)).appendText(". ").appendSibling(new TextComponentTranslation(RivalRebels.rpg.getTranslationKey() + ".name").setStyle(new Style().setColor(TextFormatting.BLUE))).appendText(" ").appendSibling(new TextComponentTranslation("RivalRebels.ammunition")).appendText(")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.battery.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal(RivalRebels.tesla.getTranslationKey() + ".name") + " " + I18n.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.hydrod.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal(RivalRebels.plasmacannon.getTranslationKey() + ".name") + " " + I18n.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.fuel.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal(RivalRebels.flamethrower.getTranslationKey() + ".name") + " " + I18n.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.redrod.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal(RivalRebels.einsten.getTranslationKey() + ".name") + " " + I18n.translateToLocal("RivalRebels.ammunition") + ")"));
-			player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.gasgrenade.getTranslationKey() + ".name") + ". §9(" + I18n.translateToLocal("RivalRebels.chemicalweapon") + ")"));
-		}
-		if (!world.isRemote)
-		{
-			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.rocket, 32));
-			EntityItem ei1 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.battery, 16));
-			EntityItem ei2 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.hydrod, 1));
-			EntityItem ei3 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.hydrod, 1));
-			EntityItem ei4 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.hydrod, 1));
-			EntityItem ei5 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.hydrod, 1));
-			EntityItem ei10 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.fuel, 64));
-			EntityItem ei11 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.gasgrenade, 6));
-			EntityItem ei12 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.redrod, 1));
-			EntityItem ei13 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.redrod, 1));
-			EntityItem ei14 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.redrod, 1));
-			EntityItem ei15 = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.redrod, 1));
+			player.sendMessage(new TranslatableText("RivalRebels.Inventory"), false);
+            player.sendMessage(RRItems.rocket.getName().copy().formatted(Formatting.GREEN).append(". ").append(RRItems.rpg.getName().copy().formatted(Formatting.BLUE)).append(" ").append(new TranslatableText("RivalRebels.ammunition")).append(")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.battery.getName() + ". §9(" + RRItems.tesla.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.hydrod.getName() + ". §9(" + RRItems.plasmacannon.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.fuel.getName() + ". §9(" + RRItems.flamethrower.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.redrod.getName() + ". §9(" + RRItems.einsten.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.gasgrenade.getName() + ". §9(" + new TranslatableText("RivalRebels.chemicalweapon") + ")"), false);
+		} else {
+			ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.rocket, 32));
+			ItemEntity ei1 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.battery, 16));
+			ItemEntity ei2 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultStack());
+			ItemEntity ei3 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultStack());
+			ItemEntity ei4 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultStack());
+			ItemEntity ei5 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultStack());
+			ItemEntity ei10 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.fuel, 64));
+			ItemEntity ei11 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.gasgrenade, 6));
+			ItemEntity ei12 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultStack());
+			ItemEntity ei13 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultStack());
+			ItemEntity ei14 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultStack());
+			ItemEntity ei15 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultStack());
 			world.spawnEntity(ei);
 			world.spawnEntity(ei1);
 			world.spawnEntity(ei2);
@@ -84,31 +76,30 @@ public class BlockAmmunition extends Block
 			world.spawnEntity(ei13);
 			world.spawnEntity(ei14);
 			world.spawnEntity(ei15);
-			world.setBlockToAir(new BlockPos(x, y, z));
-			if (world.rand.nextInt(3) == 0)
+			world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+			if (world.random.nextInt(3) == 0)
 			{
-				world.spawnEntity(new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.nuclearelement, 1)));
-				player.sendMessage(new TextComponentString("§a" + I18n.translateToLocal(RivalRebels.nuclearelement.getTranslationKey() + ".name") + ". §9(" + "Used in nuclear weapons" + ")"));
+				world.spawnEntity(new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.nuclearelement, 1)));
+				player.sendMessage(Text.of("§a" + RRItems.nuclearelement.getName() + ". §9(" + "Used in nuclear weapons" + ")"), false);
 			}
-			return true;
 		}
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -121,7 +112,7 @@ public class BlockAmmunition extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

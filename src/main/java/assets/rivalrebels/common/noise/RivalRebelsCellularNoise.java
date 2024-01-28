@@ -16,8 +16,8 @@ import net.minecraft.util.math.Vec3d;
 import java.util.Random;
 
 public class RivalRebelsCellularNoise {
-    public static int		pointa3D	= 32;
-	public static Vec3d[]	points3D	= new Vec3d[pointa3D];
+    public static int pointa3D = 32;
+	public static Vec3d[] points3D = new Vec3d[pointa3D];
 
     public static void refresh3D(Random random)
 	{
@@ -42,24 +42,7 @@ public class RivalRebelsCellularNoise {
 		return (Math.sqrt(result) * 4) - 0.75d;
 	}
 
-	private static double getDist(Vec3d point, double xin, double yin)
-	{
-		double result = 1;
-		for (int x = -1; x <= 1; x++)
-		{
-			double xx = point.x - (xin + x);
-			double X = xx * xx;
-			for (int y = -1; y <= 1; y++)
-			{
-				double yy = point.y - (yin + y);
-				double Y = yy * yy + X;
-				if (Y < result) result = Y;
-			}
-		}
-		return result;
-	}
-
-	private static double getDist(Vec3d point, double xin, double yin, double zin)
+    private static double getDist(Vec3d point, double xin, double yin, double zin)
 	{
 		double result = 1;
 		for (int x = -1; x <= 1; x++)

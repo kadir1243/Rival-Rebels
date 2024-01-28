@@ -12,19 +12,24 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.BlackList;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLiving;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.mob.MobEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.List;
+import java.util.Optional;
 
 public class EntityPlasmoid extends EntityInanimate
 {
@@ -34,31 +39,31 @@ public class EntityPlasmoid extends EntityInanimate
 	public float			slide		= 0;
 	boolean gravity = false;
 
+    public EntityPlasmoid(EntityType<? extends EntityPlasmoid> type, World world) {
+        super(type, world);
+    }
+
 	public EntityPlasmoid(World par1World)
 	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+		this(RREntities.PLASMOID, par1World);
 		size = 3;
 	}
 
-	public EntityPlasmoid(World par1World, double par2, double par4, double par6)
-	{
-		super(par1World);
-		setSize(0.5F, 0.5F);
+	public EntityPlasmoid(World par1World, double par2, double par4, double par6) {
+		this(par1World);
 		setPosition(par2, par4, par6);
-		size = 3;
 	}
 
-	public EntityPlasmoid(World par1World, EntityPlayer thrower, EntityLiving par3EntityLiving, float par4, float par5)
+	public EntityPlasmoid(World par1World, PlayerEntity thrower, MobEntity par3EntityLiving, float par4, float par5)
 	{
-		super(par1World);
+		this(par1World);
 		this.thrower = thrower;
 
-		posY = thrower.posY + thrower.getEyeHeight() - 0.10000000149011612D;
-		double var6 = par3EntityLiving.posX - thrower.posX;
-		double var8 = par3EntityLiving.posY + par3EntityLiving.getEyeHeight() - 0.699999988079071D - posY;
-		double var10 = par3EntityLiving.posZ - thrower.posZ;
-		double var12 = MathHelper.sqrt(var6 * var6 + var10 * var10);
+        setPos(getX(), thrower.getY() + thrower.getEyeHeight(thrower.getPose()) - 0.10000000149011612D, getZ());
+		double var6 = par3EntityLiving.getX() - thrower.getX();
+		double var8 = par3EntityLiving.getY() + par3EntityLiving.getEyeHeight(par3EntityLiving.getPose()) - 0.699999988079071D - getY();
+		double var10 = par3EntityLiving.getZ() - thrower.getZ();
+		double var12 = Math.sqrt(var6 * var6 + var10 * var10);
 
 		if (var12 >= 1.0E-7D)
 		{
@@ -66,118 +71,90 @@ public class EntityPlasmoid extends EntityInanimate
 			float var15 = (float) (-(Math.atan2(var8, var12) * 180.0D / Math.PI));
 			double var16 = var6 / var12;
 			double var18 = var10 / var12;
-			setLocationAndAngles(thrower.posX + var16, posY, thrower.posZ + var18, var14, var15);
+			refreshPositionAndAngles(thrower.getX() + var16, getY(), thrower.getZ() + var18, var14, var15);
 			float var20 = (float) var12 * 0.2F;
-			setAccurateHeading(var6, var8 + var20, var10, par4, par5);
+			setAccurateHeading(new Vec3d(var6, var8 + var20, var10), par4, par5);
 		}
-		size = 3;
 	}
 
 	public EntityPlasmoid(World par1World, Entity thrower, float par3, boolean drop)
 	{
-		super(par1World);
+		this(par1World);
 		par3 *= (gravity ? 3 : 1);
 		gravity = drop;
 		this.thrower = thrower;
-		setSize(0.5F, 0.5F);
-		setLocationAndAngles(thrower.posX, thrower.posY + thrower.getEyeHeight(), thrower.posZ, thrower.rotationYaw, thrower.rotationPitch);
-		posX -= (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		posY -= 0.0D;
-		posZ -= (MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		setPosition(posX, posY, posZ);
-		motionX = (-MathHelper.sin(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionZ = (MathHelper.cos(rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(rotationPitch / 180.0F * (float) Math.PI));
-		motionY = (-MathHelper.sin(rotationPitch / 180.0F * (float) Math.PI));
-		setAccurateHeading(motionX, motionY, motionZ, par3 * 1.5F, 1.0F);
+		refreshPositionAndAngles(thrower.getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.16F), thrower.getY() + thrower.getEyeHeight(thrower.getPose()), thrower.getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.16F), thrower.getYaw(), thrower.getPitch());
+		refreshPosition();
+		setVelocity(-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI),
+		 (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
+		 (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+		setAccurateHeading(getVelocity(), par3 * 1.5F, 1.0F);
 	}
 
-	public EntityPlasmoid(World world, double px, double py, double pz, double x, double y, double z, float d)
-	{
-		super(world);
-		setSize(0.5F, 0.5F);
-		double f = d/MathHelper.sqrt(x*x+y*y+z*z);
+	public EntityPlasmoid(World world, double px, double py, double pz, double x, double y, double z, float d) {
+		this(world);
+		double f = d/Math.sqrt(x*x+y*y+z*z);
 		setPosition(px+x*f, py+y*f, pz+z*f);
-		size = 3;
-		motionX = x;
-		motionY = y;
-		motionZ = z;
-		float var10 = MathHelper.sqrt(x * x + z * z);
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(x, z) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(y, var10) * 180.0D / Math.PI);
+        setVelocity(x, y, z);
+		float var10 = MathHelper.sqrt((float) (x * x + z * z));
+		setYaw(prevYaw = (float) (Math.atan2(x, z) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(y, var10) * 180.0D / Math.PI));
 	}
 
-	public void setAccurateHeading(double par1, double par3, double par5, float par7, float par8)
-	{
-		float var9 = MathHelper.sqrt(par1 * par1 + par3 * par3 + par5 * par5);
-		par1 /= var9;
-		par3 /= var9;
-		par5 /= var9;
-		par1 *= par7;
-		par3 *= par7;
-		par5 *= par7;
-		motionX = par1;
-		motionY = par3;
-		motionZ = par5;
-		float var10 = MathHelper.sqrt(par1 * par1 + par5 * par5);
-		prevRotationYaw = rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
-		prevRotationPitch = rotationPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI);
+	public void setAccurateHeading(Vec3d vec, float speed, float par8) {
+        vec = vec.multiply(1/vec.length()).multiply(speed);
+        setVelocity(vec);
+		float var10 = MathHelper.sqrt((float) (vec.x * vec.x + vec.z * vec.z));
+		setYaw(prevYaw = (float) (Math.atan2(vec.x, vec.z) * 180.0D / Math.PI));
+		setPitch(prevPitch = (float) (Math.atan2(vec.y, var10) * 180.0D / Math.PI));
 	}
 
 	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000;
-	}
-
-	@Override
-	public float getBrightness()
+	public float getBrightnessAtEyes()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
-	/**
-	 * Called to update the entity's position/logic.
-	 */
 	@Override
-	public void onUpdate()
+	public void tick()
 	{
-		super.onUpdate();
-		if (ticksExisted == 0)
+		super.tick();
+		if (age == 0)
 		{
-			rotation = world.rand.nextInt(360);
-			slide = world.rand.nextInt(21) - 10;
+			rotation = world.random.nextInt(360);
+			slide = world.random.nextInt(21) - 10;
 		}
 		if (gravity)
 		{
-			motionY -= 0.05f;
+            setVelocity(getVelocity().subtract(0, 0.05, 0));
 		}
-		++ticksExisted;
+		++age;
 		rotation += (int) slide;
 		slide *= 0.9;
-		if (ticksExisted >= RivalRebels.plasmoidDecay * (gravity ? 3 : 1)) explode();
+		if (age >= RivalRebels.plasmoidDecay * (gravity ? 3 : 1)) explode();
 
-		Vec3d vec31 = new Vec3d(posX, posY, posZ);
-		Vec3d vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult mop = world.rayTraceBlocks(vec31, vec3, false, true, false);
-		vec31 = new Vec3d(posX, posY, posZ);
-		if (mop != null) vec3 = mop.hitVec;
-		else vec3 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3d vec31 = getPos();
+		Vec3d vec3 = getPos().add(getVelocity());
+        HitResult mop = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		vec31 = getPos();
+		if (mop != null) vec3 = mop.getPos();
+		else vec3 = getPos().add(getVelocity());
 
-		List<Entity> list = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
+		List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 		double d0 = Double.MAX_VALUE;
         for (Entity entity : list) {
-            if (entity.canBeCollidedWith() && (entity != thrower || ticksExisted >= 5)) {
-                RayTraceResult mop1 = entity.getEntityBoundingBox().grow(0.5f, 0.5f, 0.5f).calculateIntercept(vec31, vec3);
-                if (mop1 != null) {
-                    double d1 = vec31.squareDistanceTo(mop1.hitVec);
+            if (entity.collides() && (entity != thrower || age >= 5)) {
+                Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
+                if (mop1.isPresent()) {
+                    double d1 = vec31.squaredDistanceTo(mop1.get());
                     if (d1 < d0) {
-                        mop = new RayTraceResult(entity, mop1.hitVec);
+                        mop = new EntityHitResult(entity, mop1.get());
                         d0 = d1;
                     }
                 }
@@ -185,38 +162,37 @@ public class EntityPlasmoid extends EntityInanimate
         }
 		if (mop != null) explode();
 
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
-		float var16 = MathHelper.sqrt(motionX * motionX + motionZ * motionZ);
-		rotationYaw = (float) (Math.atan2(motionX, motionZ) * 180.0D / Math.PI);
-		for (rotationPitch = (float) (Math.atan2(motionY, var16) * 180.0D / Math.PI); rotationPitch - prevRotationPitch < -180.0F; prevRotationPitch -= 360.0F)
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+		float var16 = MathHelper.sqrt((float) (getVelocity().getX() * getVelocity().getX() + getVelocity().getZ() * getVelocity().getZ()));
+		setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
+		for (setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); getPitch() - prevPitch < -180.0F; prevPitch -= 360.0F)
 			;
-		while (rotationPitch - prevRotationPitch >= 180.0F)
-			prevRotationPitch += 360.0F;
-		while (rotationYaw - prevRotationYaw < -180.0F)
-			prevRotationYaw -= 360.0F;
-		while (rotationYaw - prevRotationYaw >= 180.0F)
-			prevRotationYaw += 360.0F;
-		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.2F;
-		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.2F;
-		setPosition(posX, posY, posZ);
+		while (getPitch() - prevPitch >= 180.0F)
+			prevPitch += 360.0F;
+		while (getYaw() - prevYaw < -180.0F)
+			prevYaw -= 360.0F;
+		while (getYaw() - prevYaw >= 180.0F)
+			prevYaw += 360.0F;
+		setPitch(prevPitch + (getPitch() - prevPitch) * 0.2F);
+		setYaw(prevYaw + (getYaw() - prevYaw) * 0.2F);
+		setPosition(getX(), getY(), getZ());
 	}
 
 	protected void explode()
 	{
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			setDead();
-			IBlockState block = Blocks.STONE.getDefaultState();
+			kill();
+			BlockState state = Blocks.STONE.getDefaultState();
 			int i = -1;
-            BlockPos pos = new BlockPos((int) (posX - motionX * i), (int) (posY - motionY * i), (int) (posZ - motionZ * i));
-            while ((block.isOpaqueCube() || BlackList.plasmaExplosion(block.getBlock())) && i < 4)
+            Vec3d subtract = getPos().subtract(getVelocity().multiply(i));
+            BlockPos pos = new BlockPos(subtract);
+            while ((state.isOpaque() || BlackList.plasmaExplosion(state.getBlock())) && i < 4)
 			{
 				++i;
-				block = world.getBlockState(pos);
+				state = world.getBlockState(pos);
 			}
-			world.setBlockState(pos, RivalRebels.plasmaexplosion.getDefaultState());
+			world.setBlockState(pos, RRBlocks.plasmaexplosion.getDefaultState());
 		}
 	}
 

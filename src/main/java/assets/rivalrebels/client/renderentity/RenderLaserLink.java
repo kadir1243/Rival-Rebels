@@ -12,88 +12,58 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityLaserLink;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
 
-public class RenderLaserLink extends Render
-{
-	static float	red		= 0.5F;
-	static float	green	= 0.1F;
-	static float	blue	= 0.1F;
+public class RenderLaserLink extends EntityRenderer<EntityLaserLink> {
+    static float red = 0.5F;
+    static float green = 0.1F;
+    static float blue = 0.1F;
 
-    public RenderLaserLink(RenderManager renderManager) {
+    public RenderLaserLink(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
 
-    public void renderLaserLink(EntityLaserLink ell, double x, double y, double z, float yaw, float pitch)
-	{
-		double distance = ell.motionX * 100;
-		if (distance > 0)
-		{
-			float radius = 0.7F;
-			Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
+    @Override
+    public void render(EntityLaserLink entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        double distance = entity.getVelocity().getX() * 100;
+        if (distance > 0) {
+            float radius = 0.7F;
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
 
-            GlStateManager.pushMatrix();
-			GlStateManager.enableRescaleNormal();
-			GlStateManager.disableTexture2D();
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE);
-			GlStateManager.translate((float) x, (float) y, (float) z);
-			GlStateManager.rotate(-ell.rotationYaw, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(ell.rotationPitch, 1.0F, 0.0F, 0.0F);
+            matrices.push();
+            RenderSystem.enableBlend();
+            RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
+            matrices.multiply(new Quaternion(-entity.getYaw(), 0.0F, 1.0F, 0.0F));
+            matrices.multiply(new Quaternion(entity.getPitch(), 1.0F, 0.0F, 0.0F));
 
-			for (float o = 0; o <= radius; o += radius / 16)
-			{
-				buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-				buffer.pos(0 + o, 0 - o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 + o, 0 + o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 + o, 0 + o, 0 + distance).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 + o, 0 - o, 0 + distance).color(red, green, blue, 1).endVertex();
-				tessellator.draw();
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-				buffer.pos(0 - o, 0 - o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 + o, 0 - o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 + o, 0 - o, 0 + distance).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 - o, 0 - o, 0 + distance).color(red, green, blue, 1).endVertex();
-				tessellator.draw();
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-				buffer.pos(0 - o, 0 + o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 - o, 0 - o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 - o, 0 - o, 0 + distance).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 - o, 0 + o, 0 + distance).color(red, green, blue, 1).endVertex();
-				tessellator.draw();
-                buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-				buffer.pos(0 + o, 0 + o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 - o, 0 + o, 0).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 - o, 0 + o, 0 + distance).color(red, green, blue, 1).endVertex();
-				buffer.pos(0 + o, 0 + o, 0 + distance).color(red, green, blue, 1).endVertex();
-				tessellator.draw();
-			}
+            for (float o = 0; o <= radius; o += radius / 16) {
+                buffer.vertex(0 + o, 0 - o, 0).color(red, green, blue, 1).next();
+                buffer.vertex(0 + o, 0 + o, 0).color(red, green, blue, 1).next();
+                buffer.vertex(0 + o, 0 + o, 0 + distance).color(red, green, blue, 1).next();
+                buffer.vertex(0 + o, 0 - o, 0 + distance).color(red, green, blue, 1).next();
+                buffer.vertex(0 - o, 0 - o, 0).color(red, green, blue, 1).next();
+                buffer.vertex(0 - o, 0 - o, 0 + distance).color(red, green, blue, 1).next();
+                buffer.vertex(0 - o, 0 + o, 0).color(red, green, blue, 1).next();
+                buffer.vertex(0 - o, 0 + o, 0 + distance).color(red, green, blue, 1).next();
+            }
 
-			GlStateManager.disableBlend();
-			GlStateManager.enableTexture2D();
-			GlStateManager.disableRescaleNormal();
-			GlStateManager.popMatrix();
-		}
-	}
+            RenderSystem.disableBlend();
+            matrices.pop();
+        }
+    }
 
-	@Override
-	public void doRender(Entity entityLaserLink, double x, double y, double z, float yaw, float pitch)
-	{
-		this.renderLaserLink((EntityLaserLink) entityLaserLink, x, y, z, yaw, pitch);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityLaserLink entity) {
+        return null;
+    }
 }

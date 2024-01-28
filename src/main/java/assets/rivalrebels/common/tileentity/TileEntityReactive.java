@@ -11,24 +11,29 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.common.block.BlockReactive;
+import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.block.BlockState;
+import net.minecraft.util.math.BlockPos;
+
 public class TileEntityReactive extends TileEntityMachineBase
 {
-	int	cooldown	= 0;
+	private int	cooldown	= 0;
 
-	public TileEntityReactive()
-	{
+	public TileEntityReactive(BlockPos pos, BlockState state) {
+        super(RRTileEntities.REACTIVE, pos, state);
 		pInM = 1;
 	}
 
 	@Override
 	public float powered(float power, float distance)
 	{
-		int metadata = this.getBlockMetadata();
+		int metadata = this.getCachedState().get(BlockReactive.META);
 		if (metadata > 0)
 		{
 			if (cooldown <= 0)
 			{
-				world.setBlockState(getPos(), getBlockType().getStateFromMeta(metadata - 1), 2);
+				world.setBlockState(getPos(), RRBlocks.reactive.getDefaultState().with(BlockReactive.META, metadata - 1), 2);
 				cooldown = 10;
 				return power - 1;
 			}

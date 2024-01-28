@@ -12,15 +12,17 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RivalRebels;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
-import net.minecraftforge.client.event.sound.SoundLoadEvent;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RivalRebelsSoundEventHandler {
-	@SubscribeEvent
-	public void onSoundLoad(RegistryEvent.Register<SoundEvent> event) {
+    public static final Map<String, SoundEvent> SOUNDS = new HashMap<>();
+
+	public static void onSoundLoad(RegistryEvent.Register<SoundEvent> event) {
 		String[] soundFiles = {
 				// artillery
 				"aa/a1.ogg",
@@ -201,9 +203,10 @@ public class RivalRebelsSoundEventHandler {
 				"ba/s.ogg",
 		};
         for (String soundFile : soundFiles) {
-            SoundEvent soundEvent = new SoundEvent(new ResourceLocation(RivalRebels.MODID, soundFile));
+            SoundEvent soundEvent = new SoundEvent(new Identifier(RivalRebels.MODID, soundFile));
             soundEvent.setRegistryName(RivalRebels.MODID, soundFile);
             event.getRegistry().register(soundEvent);
+            SOUNDS.put(soundFile, soundEvent);
         }
 	}
 }

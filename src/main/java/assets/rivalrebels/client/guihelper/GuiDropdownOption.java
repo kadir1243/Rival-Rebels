@@ -12,49 +12,48 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.client.gui.GuiTray;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.input.Mouse;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.widget.ButtonWidget;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class GuiDropdownOption extends net.minecraft.client.gui.GuiButton
+@OnlyIn(Dist.CLIENT)
+public class GuiDropdownOption extends ButtonWidget
 {
 	Rectangle		bbox;
 	public boolean	isPressed	= false;
 	public boolean	mouseDown	= false;
-	public String	text;
 	public GuiTray	t;
 
-	public GuiDropdownOption(int id, Vector p, int l, int n, String text, GuiTray tray)
+	public GuiDropdownOption(Vector p, int l, int n, Text text, GuiTray tray)
 	{
-		super(id, p.x, p.y + n * 10, l, (n + 1) * 10, text);
+		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {});
 		bbox = new Rectangle(p.x, p.y + n * 10, l, (n + 1) * 10);
-		this.text = text;
 		t = tray;
 	}
 
     @Override
-    public void drawButton(Minecraft mc, int mouseX, int mouseY, float partialTicks) {
+    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
 		boolean inside = bbox.isVecInside(new Vector(mouseX, mouseY));
-		boolean current = Mouse.isButtonDown(0) && inside;
-		boolean on = t.r.hasWepReqs();
+		boolean current = MinecraftClient.getInstance().mouse.wasLeftButtonClicked() && inside;
+		boolean on = t.getScreenHandler().hasWepReqs();
 		if (current && !mouseDown && on) isPressed = !isPressed;
 		int color = 0x999999;
 		if (on)
 		{
 			int team = 0;
-			if (!t.r.chestContents.get(6).isEmpty() && t.r.chestContents.get(6).hasTagCompound())
+			if (t.getScreenHandler().getSlot(6).hasStack() && t.getScreenHandler().getSlot(6).getStack().hasNbt())
 			{
-				team = t.r.chestContents.get(6).getTagCompound().getInteger("team");
+				team = t.getScreenHandler().getSlot(6).getStack().getNbt().getInt("team");
 			}
 			if (team == 0) color = 0xffff55;
 			if (team == 1) color = 0x55ff55;
 			if (team == 2) color = 0x5555ff;
 		}
 		if (inside && on) color = 0xffffff;
-		drawString(Minecraft.getMinecraft().fontRenderer, I18n.format(text), bbox.xMin + 1, bbox.yMin + 1, color);
+		drawCenteredText(matrices, MinecraftClient.getInstance().textRenderer, getMessage(), bbox.xMin + 1, bbox.yMin + 1, color);
 		mouseDown = current;
 	}
 }

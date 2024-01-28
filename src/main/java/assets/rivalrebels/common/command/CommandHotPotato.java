@@ -12,78 +12,45 @@
 package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.common.entity.EntityHotPotato;
-import net.minecraft.command.CommandBase;
+import com.mojang.brigadier.CommandDispatcher;
+import com.mojang.brigadier.arguments.IntegerArgumentType;
 import net.minecraft.command.CommandException;
-import net.minecraft.command.ICommandSender;
-import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.command.CommandManager;
+import net.minecraft.server.command.ServerCommandSource;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
-import java.util.List;
-
-public class CommandHotPotato extends CommandBase {
+public class CommandHotPotato {
     public static BlockPos pos = BlockPos.ORIGIN;
 	public static World world = null;
 	public static boolean roundinprogress = false;
-	@Override
-	public String getName()
-	{
-		return "rrhotpotato";
-	}
 
-	@Override
-	public String getUsage(ICommandSender par1ICommandSender)
-	{
-		return "/" + getName();
-	}
+    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
+        dispatcher.register(CommandManager.literal("rrhotpotato")
+            .requires(arg -> arg.hasPermissionLevel(3))
+            .then(CommandManager.argument("numberOfRounds", IntegerArgumentType.integer())
+                .executes(context -> execute(context.getSource(), IntegerArgumentType.getInteger(context, "numberOfRounds"))))
+            .then(CommandManager.literal("stop")
+                .executes(context -> execute(context.getSource(), -1))
+            )
+        );
+    }
 
-	/**
-	 * Return the required permission level for this command.
-	 */
-	@Override
-	public int getRequiredPermissionLevel()
-	{
-		return 3;
-	}
-
-    @Override
-    public void execute(MinecraftServer server, ICommandSender sender, String[] args) throws CommandException {
-		if (world == null)
-		{
-			sender.sendMessage(new TextComponentString("§cPlace a jump block and use pliers on it to set the hot potato drop point."));
-			return;
-		}
-		if (args.length == 1)
-		{
-			String str = args[0];
-			if ("stop".equals(str))
-			{
-				roundinprogress = false;
-				sender.sendMessage(new TextComponentString("§cRound stopped."));
+    private static int execute(ServerCommandSource source, int numberOfRounds) throws CommandException {
+        if (numberOfRounds == -1) {
+            roundinprogress = false;
+            source.sendFeedback(Text.of("§cRound stopped."), true);
+        } else {
+            if (roundinprogress) {
+                source.sendError(Text.of("§cRound already in progress! Do /rrhotpotato stop to end the current round."));
+                return 0;
             }
-			else
-			{
-				if (roundinprogress)
-				{
-					sender.sendMessage(new TextComponentString("§cRound already in progress! Do /rrhotpotato stop to end the current round."));
-					return;
-				}
-				int n = Integer.parseInt(args[0]);
-				sender.sendMessage(new TextComponentString("§cLet the Hot Potato games begin! " + n + " rounds."));
-				EntityHotPotato tsar = new EntityHotPotato(world,pos.getX(),pos.getY(), pos.getZ(),n);
-				world.spawnEntity(tsar);
-				roundinprogress = true;
-            }
-            return;
+            source.sendFeedback(Text.of("§cLet the Hot Potato games begin! " + numberOfRounds + " rounds."), true);
+            EntityHotPotato tsar = new EntityHotPotato(source.getWorld(),pos.getX(),pos.getY(), pos.getZ(), numberOfRounds);
+            source.getWorld().spawnEntity(tsar);
+            roundinprogress = true;
         }
-		sender.sendMessage(new TextComponentString("§cUsage: /rrhotpotato [number of rounds]"));
-	}
-
-    @Override
-    public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args, @Nullable BlockPos targetPos) {
-		return Collections.singletonList("nuketime");
+        return 0;
     }
 }

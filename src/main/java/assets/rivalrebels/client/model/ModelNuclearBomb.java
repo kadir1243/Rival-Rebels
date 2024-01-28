@@ -11,17 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelNuclearBomb
 {
 	float	s	= 0.5F;
@@ -58,39 +55,35 @@ public class ModelNuclearBomb
 	Vertice	v19	= new Vertice(-s, -g * 24, -s);
 	Vertice	v20	= new Vertice(-s, -g * 24, s);
 
-	public void renderModel(boolean hasFuse)
+	public void renderModel(MatrixStack matrices, VertexConsumer buffer, boolean hasFuse)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(RivalRebels.nukeScale,RivalRebels.nukeScale,RivalRebels.nukeScale);
-		Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+		matrices.push();
+		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
         int itemIcon = 39;
 		float var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
 		float var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
 		float var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
 		float var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(1.01f, 1.01f, 1.01f);
-		GlStateManager.disableLighting();
+		matrices.push();
+		matrices.scale(1.01f, 1.01f, 1.01f);
 
-		buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
-		buffer.pos(v2.x, v2.y, v2.z).tex(var3, var6).endVertex();
-		buffer.pos(v1.x, v1.y, v1.z).tex(var4, var6).endVertex();
-		buffer.pos(v5.x, v5.y, v5.z).tex(var4, var5).endVertex();
-		buffer.pos(v6.x, v6.y, v6.z).tex(var3, var5).endVertex();
-		buffer.pos(v3.x, v3.y, v3.z).tex(var3, var6).endVertex();
-		buffer.pos(v2.x, v2.y, v2.z).tex(var4, var6).endVertex();
-		buffer.pos(v6.x, v6.y, v6.z).tex(var4, var5).endVertex();
-		buffer.pos(v7.x, v7.y, v7.z).tex(var3, var5).endVertex();
-		buffer.pos(v4.x, v4.y, v4.z).tex(var3, var6).endVertex();
-		buffer.pos(v3.x, v3.y, v3.z).tex(var4, var6).endVertex();
-		buffer.pos(v7.x, v7.y, v7.z).tex(var4, var5).endVertex();
-		buffer.pos(v8.x, v8.y, v8.z).tex(var3, var5).endVertex();
-		buffer.pos(v1.x, v1.y, v1.z).tex(var3, var6).endVertex();
-		buffer.pos(v4.x, v4.y, v4.z).tex(var4, var6).endVertex();
-		buffer.pos(v8.x, v8.y, v8.z).tex(var4, var5).endVertex();
-		buffer.pos(v5.x, v5.y, v5.z).tex(var3, var5).endVertex();
+		buffer.vertex(v2.x, v2.y, v2.z).texture(var3, var6).next();
+		buffer.vertex(v1.x, v1.y, v1.z).texture(var4, var6).next();
+		buffer.vertex(v5.x, v5.y, v5.z).texture(var4, var5).next();
+		buffer.vertex(v6.x, v6.y, v6.z).texture(var3, var5).next();
+		buffer.vertex(v3.x, v3.y, v3.z).texture(var3, var6).next();
+		buffer.vertex(v2.x, v2.y, v2.z).texture(var4, var6).next();
+		buffer.vertex(v6.x, v6.y, v6.z).texture(var4, var5).next();
+		buffer.vertex(v7.x, v7.y, v7.z).texture(var3, var5).next();
+		buffer.vertex(v4.x, v4.y, v4.z).texture(var3, var6).next();
+		buffer.vertex(v3.x, v3.y, v3.z).texture(var4, var6).next();
+		buffer.vertex(v7.x, v7.y, v7.z).texture(var4, var5).next();
+		buffer.vertex(v8.x, v8.y, v8.z).texture(var3, var5).next();
+		buffer.vertex(v1.x, v1.y, v1.z).texture(var3, var6).next();
+		buffer.vertex(v4.x, v4.y, v4.z).texture(var4, var6).next();
+		buffer.vertex(v8.x, v8.y, v8.z).texture(var4, var5).next();
+		buffer.vertex(v5.x, v5.y, v5.z).texture(var3, var5).next();
 
 		itemIcon = 40;
 		var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -98,38 +91,38 @@ public class ModelNuclearBomb
 		var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
 		var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-		buffer.pos(v6.x, v6.y, v6.z).tex(var3, var6).endVertex();
-		buffer.pos(v5.x, v5.y, v5.z).tex(var4, var6).endVertex();
-		buffer.pos(v21.x, v21.y, v21.z).tex(var4, var5).endVertex();
-		buffer.pos(v22.x, v22.y, v22.z).tex(var3, var5).endVertex();
-		buffer.pos(v7.x, v7.y, v7.z).tex(var3, var6).endVertex();
-		buffer.pos(v6.x, v6.y, v6.z).tex(var4, var6).endVertex();
-		buffer.pos(v22.x, v22.y, v22.z).tex(var4, var5).endVertex();
-		buffer.pos(v23.x, v23.y, v23.z).tex(var3, var5).endVertex();
-		buffer.pos(v8.x, v8.y, v8.z).tex(var3, var6).endVertex();
-		buffer.pos(v7.x, v7.y, v7.z).tex(var4, var6).endVertex();
-		buffer.pos(v23.x, v23.y, v23.z).tex(var4, var5).endVertex();
-		buffer.pos(v24.x, v24.y, v24.z).tex(var3, var5).endVertex();
-		buffer.pos(v5.x, v5.y, v5.z).tex(var3, var6).endVertex();
-		buffer.pos(v8.x, v8.y, v8.z).tex(var4, var6).endVertex();
-		buffer.pos(v24.x, v24.y, v24.z).tex(var4, var5).endVertex();
-		buffer.pos(v21.x, v21.y, v21.z).tex(var3, var5).endVertex();
-		buffer.pos(v22.x, v22.y, v22.z).tex(var3, var6).endVertex();
-		buffer.pos(v21.x, v21.y, v21.z).tex(var4, var6).endVertex();
-		buffer.pos(v9.x, v9.y, v9.z).tex(var4, var5).endVertex();
-		buffer.pos(v10.x, v10.y, v10.z).tex(var3, var5).endVertex();
-		buffer.pos(v23.x, v23.y, v23.z).tex(var3, var6).endVertex();
-		buffer.pos(v22.x, v22.y, v22.z).tex(var4, var6).endVertex();
-		buffer.pos(v10.x, v10.y, v10.z).tex(var4, var5).endVertex();
-		buffer.pos(v11.x, v11.y, v11.z).tex(var3, var5).endVertex();
-		buffer.pos(v24.x, v24.y, v24.z).tex(var3, var6).endVertex();
-		buffer.pos(v23.x, v23.y, v23.z).tex(var4, var6).endVertex();
-		buffer.pos(v11.x, v11.y, v11.z).tex(var4, var5).endVertex();
-		buffer.pos(v12.x, v12.y, v12.z).tex(var3, var5).endVertex();
-		buffer.pos(v21.x, v21.y, v21.z).tex(var3, var6).endVertex();
-		buffer.pos(v24.x, v24.y, v24.z).tex(var4, var6).endVertex();
-		buffer.pos(v12.x, v12.y, v12.z).tex(var4, var5).endVertex();
-		buffer.pos(v9.x, v9.y, v9.z).tex(var3, var5).endVertex();
+		buffer.vertex(v6.x, v6.y, v6.z).texture(var3, var6).next();
+		buffer.vertex(v5.x, v5.y, v5.z).texture(var4, var6).next();
+		buffer.vertex(v21.x, v21.y, v21.z).texture(var4, var5).next();
+		buffer.vertex(v22.x, v22.y, v22.z).texture(var3, var5).next();
+		buffer.vertex(v7.x, v7.y, v7.z).texture(var3, var6).next();
+		buffer.vertex(v6.x, v6.y, v6.z).texture(var4, var6).next();
+		buffer.vertex(v22.x, v22.y, v22.z).texture(var4, var5).next();
+		buffer.vertex(v23.x, v23.y, v23.z).texture(var3, var5).next();
+		buffer.vertex(v8.x, v8.y, v8.z).texture(var3, var6).next();
+		buffer.vertex(v7.x, v7.y, v7.z).texture(var4, var6).next();
+		buffer.vertex(v23.x, v23.y, v23.z).texture(var4, var5).next();
+		buffer.vertex(v24.x, v24.y, v24.z).texture(var3, var5).next();
+		buffer.vertex(v5.x, v5.y, v5.z).texture(var3, var6).next();
+		buffer.vertex(v8.x, v8.y, v8.z).texture(var4, var6).next();
+		buffer.vertex(v24.x, v24.y, v24.z).texture(var4, var5).next();
+		buffer.vertex(v21.x, v21.y, v21.z).texture(var3, var5).next();
+		buffer.vertex(v22.x, v22.y, v22.z).texture(var3, var6).next();
+		buffer.vertex(v21.x, v21.y, v21.z).texture(var4, var6).next();
+		buffer.vertex(v9.x, v9.y, v9.z).texture(var4, var5).next();
+		buffer.vertex(v10.x, v10.y, v10.z).texture(var3, var5).next();
+		buffer.vertex(v23.x, v23.y, v23.z).texture(var3, var6).next();
+		buffer.vertex(v22.x, v22.y, v22.z).texture(var4, var6).next();
+		buffer.vertex(v10.x, v10.y, v10.z).texture(var4, var5).next();
+		buffer.vertex(v11.x, v11.y, v11.z).texture(var3, var5).next();
+		buffer.vertex(v24.x, v24.y, v24.z).texture(var3, var6).next();
+		buffer.vertex(v23.x, v23.y, v23.z).texture(var4, var6).next();
+		buffer.vertex(v11.x, v11.y, v11.z).texture(var4, var5).next();
+		buffer.vertex(v12.x, v12.y, v12.z).texture(var3, var5).next();
+		buffer.vertex(v21.x, v21.y, v21.z).texture(var3, var6).next();
+		buffer.vertex(v24.x, v24.y, v24.z).texture(var4, var6).next();
+		buffer.vertex(v12.x, v12.y, v12.z).texture(var4, var5).next();
+		buffer.vertex(v9.x, v9.y, v9.z).texture(var3, var5).next();
 
 		itemIcon = 38;
 		var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -137,10 +130,10 @@ public class ModelNuclearBomb
 		var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
 		var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-		buffer.pos(v10.x, v10.y, v10.z).tex(var3, var6).endVertex();
-		buffer.pos(v9.x, v9.y, v9.z).tex(var4, var6).endVertex();
-		buffer.pos(v12.x, v12.y, v12.z).tex(var4, var5).endVertex();
-		buffer.pos(v11.x, v11.y, v11.z).tex(var3, var5).endVertex();
+		buffer.vertex(v10.x, v10.y, v10.z).texture(var3, var6).next();
+		buffer.vertex(v9.x, v9.y, v9.z).texture(var4, var6).next();
+		buffer.vertex(v12.x, v12.y, v12.z).texture(var4, var5).next();
+		buffer.vertex(v11.x, v11.y, v11.z).texture(var3, var5).next();
 
 		itemIcon = 41;
 		var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -149,38 +142,38 @@ public class ModelNuclearBomb
 		var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 		float o = 0.999F;
 
-		buffer.pos(v13.x * o, v13.y, v13.z * o).tex(var3, var6).endVertex();
-		buffer.pos(v14.x * o, v14.y, v14.z * o).tex(var4, var6).endVertex();
-		buffer.pos(v18.x * o, v18.y, v18.z * o).tex(var4, var5).endVertex();
-		buffer.pos(v17.x * o, v17.y, v17.z * o).tex(var3, var5).endVertex();
-		buffer.pos(v14.x * o, v14.y, v14.z * o).tex(var3, var6).endVertex();
-		buffer.pos(v15.x * o, v15.y, v15.z * o).tex(var4, var6).endVertex();
-		buffer.pos(v19.x * o, v19.y, v19.z * o).tex(var4, var5).endVertex();
-		buffer.pos(v18.x * o, v18.y, v18.z * o).tex(var3, var5).endVertex();
-		buffer.pos(v15.x * o, v15.y, v15.z * o).tex(var3, var6).endVertex();
-		buffer.pos(v16.x * o, v16.y, v16.z * o).tex(var4, var6).endVertex();
-		buffer.pos(v20.x * o, v20.y, v20.z * o).tex(var4, var5).endVertex();
-		buffer.pos(v19.x * o, v19.y, v19.z * o).tex(var3, var5).endVertex();
-		buffer.pos(v16.x * o, v16.y, v16.z * o).tex(var3, var6).endVertex();
-		buffer.pos(v13.x * o, v13.y, v13.z * o).tex(var4, var6).endVertex();
-		buffer.pos(v17.x * o, v17.y, v17.z * o).tex(var4, var5).endVertex();
-		buffer.pos(v20.x * o, v20.y, v20.z * o).tex(var3, var5).endVertex();
-		buffer.pos(v14.x, v14.y, v14.z).tex(var3, var6).endVertex();
-		buffer.pos(v13.x, v13.y, v13.z).tex(var4, var6).endVertex();
-		buffer.pos(v17.x, v17.y, v17.z).tex(var4, var5).endVertex();
-		buffer.pos(v18.x, v18.y, v18.z).tex(var3, var5).endVertex();
-		buffer.pos(v15.x, v15.y, v15.z).tex(var3, var6).endVertex();
-		buffer.pos(v14.x, v14.y, v14.z).tex(var4, var6).endVertex();
-		buffer.pos(v18.x, v18.y, v18.z).tex(var4, var5).endVertex();
-		buffer.pos(v19.x, v19.y, v19.z).tex(var3, var5).endVertex();
-		buffer.pos(v16.x, v16.y, v16.z).tex(var3, var6).endVertex();
-		buffer.pos(v15.x, v15.y, v15.z).tex(var4, var6).endVertex();
-		buffer.pos(v19.x, v19.y, v19.z).tex(var4, var5).endVertex();
-		buffer.pos(v20.x, v20.y, v20.z).tex(var3, var5).endVertex();
-		buffer.pos(v13.x, v13.y, v13.z).tex(var3, var6).endVertex();
-		buffer.pos(v16.x, v16.y, v16.z).tex(var4, var6).endVertex();
-		buffer.pos(v20.x, v20.y, v20.z).tex(var4, var5).endVertex();
-		buffer.pos(v17.x, v17.y, v17.z).tex(var3, var5).endVertex();
+		buffer.vertex(v13.x * o, v13.y, v13.z * o).texture(var3, var6).next();
+		buffer.vertex(v14.x * o, v14.y, v14.z * o).texture(var4, var6).next();
+		buffer.vertex(v18.x * o, v18.y, v18.z * o).texture(var4, var5).next();
+		buffer.vertex(v17.x * o, v17.y, v17.z * o).texture(var3, var5).next();
+		buffer.vertex(v14.x * o, v14.y, v14.z * o).texture(var3, var6).next();
+		buffer.vertex(v15.x * o, v15.y, v15.z * o).texture(var4, var6).next();
+		buffer.vertex(v19.x * o, v19.y, v19.z * o).texture(var4, var5).next();
+		buffer.vertex(v18.x * o, v18.y, v18.z * o).texture(var3, var5).next();
+		buffer.vertex(v15.x * o, v15.y, v15.z * o).texture(var3, var6).next();
+		buffer.vertex(v16.x * o, v16.y, v16.z * o).texture(var4, var6).next();
+		buffer.vertex(v20.x * o, v20.y, v20.z * o).texture(var4, var5).next();
+		buffer.vertex(v19.x * o, v19.y, v19.z * o).texture(var3, var5).next();
+		buffer.vertex(v16.x * o, v16.y, v16.z * o).texture(var3, var6).next();
+		buffer.vertex(v13.x * o, v13.y, v13.z * o).texture(var4, var6).next();
+		buffer.vertex(v17.x * o, v17.y, v17.z * o).texture(var4, var5).next();
+		buffer.vertex(v20.x * o, v20.y, v20.z * o).texture(var3, var5).next();
+		buffer.vertex(v14.x, v14.y, v14.z).texture(var3, var6).next();
+		buffer.vertex(v13.x, v13.y, v13.z).texture(var4, var6).next();
+		buffer.vertex(v17.x, v17.y, v17.z).texture(var4, var5).next();
+		buffer.vertex(v18.x, v18.y, v18.z).texture(var3, var5).next();
+		buffer.vertex(v15.x, v15.y, v15.z).texture(var3, var6).next();
+		buffer.vertex(v14.x, v14.y, v14.z).texture(var4, var6).next();
+		buffer.vertex(v18.x, v18.y, v18.z).texture(var4, var5).next();
+		buffer.vertex(v19.x, v19.y, v19.z).texture(var3, var5).next();
+		buffer.vertex(v16.x, v16.y, v16.z).texture(var3, var6).next();
+		buffer.vertex(v15.x, v15.y, v15.z).texture(var4, var6).next();
+		buffer.vertex(v19.x, v19.y, v19.z).texture(var4, var5).next();
+		buffer.vertex(v20.x, v20.y, v20.z).texture(var3, var5).next();
+		buffer.vertex(v13.x, v13.y, v13.z).texture(var3, var6).next();
+		buffer.vertex(v16.x, v16.y, v16.z).texture(var4, var6).next();
+		buffer.vertex(v20.x, v20.y, v20.z).texture(var4, var5).next();
+		buffer.vertex(v17.x, v17.y, v17.z).texture(var3, var5).next();
 
 		itemIcon = 42;
 		var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -188,22 +181,22 @@ public class ModelNuclearBomb
 		var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
 		var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-		buffer.pos(v13.x, v13.y, v13.z).tex(var3, var6).endVertex();
-		buffer.pos(v15.x, v15.y, v15.z).tex(var4, var6).endVertex();
-		buffer.pos(v19.x, v19.y, v19.z).tex(var4, var5).endVertex();
-		buffer.pos(v17.x, v17.y, v17.z).tex(var3, var5).endVertex();
-		buffer.pos(v16.x, v16.y, v16.z).tex(var3, var6).endVertex();
-		buffer.pos(v14.x, v14.y, v14.z).tex(var4, var6).endVertex();
-		buffer.pos(v18.x, v18.y, v18.z).tex(var4, var5).endVertex();
-		buffer.pos(v20.x, v20.y, v20.z).tex(var3, var5).endVertex();
-		buffer.pos(v15.x, v15.y, v15.z).tex(var3, var6).endVertex();
-		buffer.pos(v13.x, v13.y, v13.z).tex(var4, var6).endVertex();
-		buffer.pos(v17.x, v17.y, v17.z).tex(var4, var5).endVertex();
-		buffer.pos(v19.x, v19.y, v19.z).tex(var3, var5).endVertex();
-		buffer.pos(v14.x, v14.y, v14.z).tex(var3, var6).endVertex();
-		buffer.pos(v16.x, v16.y, v16.z).tex(var4, var6).endVertex();
-		buffer.pos(v20.x, v20.y, v20.z).tex(var4, var5).endVertex();
-		buffer.pos(v18.x, v18.y, v18.z).tex(var3, var5).endVertex();
+		buffer.vertex(v13.x, v13.y, v13.z).texture(var3, var6).next();
+		buffer.vertex(v15.x, v15.y, v15.z).texture(var4, var6).next();
+		buffer.vertex(v19.x, v19.y, v19.z).texture(var4, var5).next();
+		buffer.vertex(v17.x, v17.y, v17.z).texture(var3, var5).next();
+		buffer.vertex(v16.x, v16.y, v16.z).texture(var3, var6).next();
+		buffer.vertex(v14.x, v14.y, v14.z).texture(var4, var6).next();
+		buffer.vertex(v18.x, v18.y, v18.z).texture(var4, var5).next();
+		buffer.vertex(v20.x, v20.y, v20.z).texture(var3, var5).next();
+		buffer.vertex(v15.x, v15.y, v15.z).texture(var3, var6).next();
+		buffer.vertex(v13.x, v13.y, v13.z).texture(var4, var6).next();
+		buffer.vertex(v17.x, v17.y, v17.z).texture(var4, var5).next();
+		buffer.vertex(v19.x, v19.y, v19.z).texture(var3, var5).next();
+		buffer.vertex(v14.x, v14.y, v14.z).texture(var3, var6).next();
+		buffer.vertex(v16.x, v16.y, v16.z).texture(var4, var6).next();
+		buffer.vertex(v20.x, v20.y, v20.z).texture(var4, var5).next();
+		buffer.vertex(v18.x, v18.y, v18.z).texture(var3, var5).next();
 		if (!hasFuse)
 		{
 			itemIcon = 37;
@@ -212,37 +205,32 @@ public class ModelNuclearBomb
 			var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
 			var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-			buffer.pos(v1.x, v1.y, v1.z).tex(var3, var6).endVertex();
-			buffer.pos(v2.x, v2.y, v2.z).tex(var4, var6).endVertex();
-			buffer.pos(v3.x, v3.y, v3.z).tex(var4, var5).endVertex();
-			buffer.pos(v4.x, v4.y, v4.z).tex(var3, var5).endVertex();
-			tessellator.draw();
+			buffer.vertex(v1.x, v1.y, v1.z).texture(var3, var6).next();
+			buffer.vertex(v2.x, v2.y, v2.z).texture(var4, var6).next();
+			buffer.vertex(v3.x, v3.y, v3.z).texture(var4, var5).next();
+			buffer.vertex(v4.x, v4.y, v4.z).texture(var3, var5).next();
 		}
-		else
-		{
-			tessellator.draw();
+		else {
 			itemIcon = 43;
 			var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
 			var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
 			var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
 			var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-			buffer.begin(GL11.GL_TRIANGLES, DefaultVertexFormats.POSITION_TEX);
-			buffer.pos(v0.x, v0.y, v0.z).tex(var3, var6).endVertex();
-			buffer.pos(v1.x, v1.y, v1.z).tex(var4, var6).endVertex();
-			buffer.pos(v2.x, v2.y, v2.z).tex(var4, var5).endVertex();
-			buffer.pos(v0.x, v0.y, v0.z).tex(var3, var6).endVertex();
-			buffer.pos(v2.x, v2.y, v2.z).tex(var4, var5).endVertex();
-			buffer.pos(v3.x, v3.y, v3.z).tex(var4, var6).endVertex();
-			buffer.pos(v0.x, v0.y, v0.z).tex(var3, var6).endVertex();
-			buffer.pos(v3.x, v3.y, v3.z).tex(var3, var5).endVertex();
-			buffer.pos(v4.x, v4.y, v4.z).tex(var4, var5).endVertex();
-			buffer.pos(v0.x, v0.y, v0.z).tex(var3, var6).endVertex();
-			buffer.pos(v4.x, v4.y, v4.z).tex(var4, var5).endVertex();
-			buffer.pos(v1.x, v1.y, v1.z).tex(var4, var6).endVertex();
-			tessellator.draw();
+			buffer.vertex(v0.x, v0.y, v0.z).texture(var3, var6).next();
+			buffer.vertex(v1.x, v1.y, v1.z).texture(var4, var6).next();
+			buffer.vertex(v2.x, v2.y, v2.z).texture(var4, var5).next();
+			buffer.vertex(v0.x, v0.y, v0.z).texture(var3, var6).next();
+			buffer.vertex(v2.x, v2.y, v2.z).texture(var4, var5).next();
+			buffer.vertex(v3.x, v3.y, v3.z).texture(var4, var6).next();
+			buffer.vertex(v0.x, v0.y, v0.z).texture(var3, var6).next();
+			buffer.vertex(v3.x, v3.y, v3.z).texture(var3, var5).next();
+			buffer.vertex(v4.x, v4.y, v4.z).texture(var4, var5).next();
+			buffer.vertex(v0.x, v0.y, v0.z).texture(var3, var6).next();
+			buffer.vertex(v4.x, v4.y, v4.z).texture(var4, var5).next();
+			buffer.vertex(v1.x, v1.y, v1.z).texture(var4, var6).next();
 		}
-		GlStateManager.popMatrix();
-		GlStateManager.popMatrix();
+		matrices.pop();
+		matrices.pop();
 	}
 }

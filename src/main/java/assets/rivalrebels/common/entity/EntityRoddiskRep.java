@@ -11,157 +11,147 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.block.Block;
+import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.monster.*;
-import net.minecraft.entity.passive.EntityAnimal;
-import net.minecraft.entity.passive.EntityBat;
-import net.minecraft.entity.passive.EntitySquid;
-import net.minecraft.entity.passive.EntityVillager;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.projectile.EntityArrow;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.mob.*;
+import net.minecraft.entity.passive.AnimalEntity;
+import net.minecraft.entity.passive.BatEntity;
+import net.minecraft.entity.passive.SquidEntity;
+import net.minecraft.entity.passive.VillagerEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.projectile.ArrowEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.particle.ParticleTypes;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.EntityHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.*;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
+import net.minecraftforge.common.Tags;
 
 import java.util.List;
+import java.util.Optional;
 
-public class EntityRoddiskRep extends EntityInanimate
-{
-	public EntityPlayer	shooter;
+public class EntityRoddiskRep extends RoddiskBase {
+    public EntityRoddiskRep(EntityType<? extends EntityRoddiskRep> type, World world) {
+        super(type, world);
+    }
 
-	public EntityRoddiskRep(World par1World)
-	{
-		super(par1World);
-	}
-
-	public EntityRoddiskRep(World par1World, EntityPlayer par2EntityLiving, float par3)
-	{
-		super(par1World);
-		this.shooter = par2EntityLiving;
-		this.setSize(0.5F, 0.5F);
-		this.setEntityBoundingBox(new AxisAlignedBB(-0.4, -0.0625, -0.4, 0.4, 0.0625, 0.4));
-		this.setLocationAndAngles(par2EntityLiving.posX, par2EntityLiving.posY + par2EntityLiving.getEyeHeight(), par2EntityLiving.posZ, par2EntityLiving.rotationYaw, par2EntityLiving.rotationPitch);
-		this.posX -= (MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		this.posY -= 0.1;
-		this.posZ -= (MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * 0.16F);
-		this.setPosition(this.posX, this.posY, this.posZ);
-		this.motionX = (-MathHelper.sin(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
-		this.motionZ = (MathHelper.cos(this.rotationYaw / 180.0F * (float) Math.PI) * MathHelper.cos(this.rotationPitch / 180.0F * (float) Math.PI));
-		this.motionY = (-MathHelper.sin(this.rotationPitch / 180.0F * (float) Math.PI));
-		this.setHeading(this.motionX, this.motionY, this.motionZ, par3 * 1.5F, 1.0F);
+	public EntityRoddiskRep(World par1World, PlayerEntity shooter, float par3) {
+		super(RREntities.RODDISK_REP, par1World, shooter);
+		this.refreshPositionAndAngles(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYaw(), shooter.getPitch());
+        setPos(getX() - (MathHelper.cos(this.getYaw() / 180.0F * (float) Math.PI) * 0.16F),
+            getY() - 0.1,
+            getZ() - (MathHelper.sin(this.getYaw() / 180.0F * (float) Math.PI) * 0.16F)
+        );
+		this.setPosition(this.getX(), this.getY(), this.getZ());
+		setVelocity((-MathHelper.sin(this.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(this.getPitch() / 180.0F * (float) Math.PI)),
+            (MathHelper.cos(this.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(this.getPitch() / 180.0F * (float) Math.PI)),
+            (-MathHelper.sin(this.getPitch() / 180.0F * (float) Math.PI)));
+		this.setHeading(this.getVelocity().getX(), this.getVelocity().getY(), this.getVelocity().getZ(), par3 * 1.5F, 1.0F);
 	}
 
 	public void setHeading(double par1, double par3, double par5, float par7, float par8)
 	{
-		float var9 = MathHelper.sqrt(par1 * par1 + par3 * par3 + par5 * par5);
+		float var9 = MathHelper.sqrt((float) (par1 * par1 + par3 * par3 + par5 * par5));
 		par1 /= var9;
 		par3 /= var9;
 		par5 /= var9;
-		par1 += this.rand.nextGaussian() * 0.005 * par8;
-		par3 += this.rand.nextGaussian() * 0.005 * par8;
-		par5 += this.rand.nextGaussian() * 0.005 * par8;
+		par1 += this.random.nextGaussian() * 0.005 * par8;
+		par3 += this.random.nextGaussian() * 0.005 * par8;
+		par5 += this.random.nextGaussian() * 0.005 * par8;
 		par1 *= par7;
 		par3 *= par7;
 		par5 *= par7;
-		this.motionX = par1;
-		this.motionY = par3;
-		this.motionZ = par5;
-		float var10 = MathHelper.sqrt(par1 * par1 + par5 * par5);
-		this.prevRotationYaw = this.rotationYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI);
-		this.prevRotationPitch = this.rotationPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI);
+		setVelocity(par1, par3, par5);
+		float var10 = MathHelper.sqrt((float) (par1 * par1 + par5 * par5));
+		this.setYaw(prevYaw = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
+		this.setPitch(prevPitch = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI));
 	}
 
     @Override
-	public void onUpdate()
-	{
-		this.lastTickPosX = this.posX;
-		this.lastTickPosY = this.posY;
-		this.lastTickPosZ = this.posZ;
-
-		if (ticksExisted > 100 && shooter == null && !world.isRemote)
+	public void tick() {
+		if (age > 100 && shooter == null && !world.isClient)
 		{
-			//world.spawnEntity(new EntityItem(world, posX, posY, posZ, new ItemStack(RivalRebels.roddisk)));
-			setDead();
+			//world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), new ItemStack(RivalRebels.roddisk)));
+			kill();
 			RivalRebelsSoundPlayer.playSound(this, 5, 0);
 		}
-		if (ticksExisted >= 120 && !world.isRemote && shooter != null)
+		if (age >= 120 && !world.isClient && shooter != null)
 		{
-			EntityItem ei = new EntityItem(world, shooter.posX, shooter.posY, shooter.posZ, new ItemStack(RivalRebels.roddisk));
+			ItemEntity ei = new ItemEntity(world, shooter.getX(), shooter.getY(), shooter.getZ(), new ItemStack(RRItems.roddisk));
 			world.spawnEntity(ei);
-			setDead();
+			kill();
 			RivalRebelsSoundPlayer.playSound(this, 6, 1);
 		}
-		if (ticksExisted == 10)
+		if (age == 10)
 		{
 			RivalRebelsSoundPlayer.playSound(this, 6, 0);
 		}
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			double randx = world.rand.nextGaussian();
-			double randy = world.rand.nextGaussian();
+			double randx = world.random.nextGaussian();
+			double randy = world.random.nextGaussian();
 			double d = 1.0f/Math.sqrt(randx*randx+randy*randy);
-			world.spawnEntity(new EntityLaserBurst(world, posX, posY, posZ, randx*d, -Math.abs(motionY), randy*d, shooter));
+			world.spawnEntity(new EntityLaserBurst(world, getX(), getY(), getZ(), randx*d, -Math.abs(getVelocity().getY()), randy*d, shooter));
 		}
 
 		int radius = 2;
-		int nx = MathHelper.floor(posX - radius - 1.0D);
-		int px = MathHelper.floor(posX + radius + 1.0D);
-		int ny = MathHelper.floor(posY - radius - 1.0D);
-		int py = MathHelper.floor(posY + radius + 1.0D);
-		int nz = MathHelper.floor(posZ - radius - 1.0D);
-		int pz = MathHelper.floor(posZ + radius + 1.0D);
-		List<Entity> par9 = world.getEntitiesWithinAABBExcludingEntity(null, new AxisAlignedBB(nx, ny, nz, px, py, pz));
+		int nx = MathHelper.floor(getX() - radius - 1.0D);
+		int px = MathHelper.floor(getX() + radius + 1.0D);
+		int ny = MathHelper.floor(getY() - radius - 1.0D);
+		int py = MathHelper.floor(getY() + radius + 1.0D);
+		int nz = MathHelper.floor(getZ() - radius - 1.0D);
+		int pz = MathHelper.floor(getZ() + radius + 1.0D);
+		List<Entity> par9 = world.getOtherEntities(null, new Box(nx, ny, nz, px, py, pz));
 
         for (Entity var31 : par9) {
-            if (var31 instanceof EntityArrow) {
-                var31.setDead();
+            if (var31 instanceof ArrowEntity) {
+                var31.kill();
             }
         }
 
-		Vec3d var15 = new Vec3d(this.posX, this.posY, this.posZ);
-		Vec3d var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
-		RayTraceResult var3 = this.world.rayTraceBlocks(var15, var2);
-		var15 = new Vec3d(this.posX, this.posY, this.posZ);
-		var2 = new Vec3d(this.posX + this.motionX, this.posY + this.motionY, this.posZ + this.motionZ);
+		Vec3d var15 = getPos();
+		Vec3d var2 = getPos().add(getVelocity());
+		HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		var15 = getPos();
+		var2 = getPos().add(getVelocity());
 
 		if (var3 != null)
 		{
-			var2 = var3.hitVec;
+			var2 = var3.getPos();
 		}
 
-		if (!this.world.isRemote)
+		if (!this.world.isClient)
 		{
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getEntitiesWithinAABBExcludingEntity(this, this.getEntityBoundingBox().expand(this.motionX, this.motionY, this.motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRoddiskRegular || var9 instanceof EntityRoddiskRebel || var9 instanceof EntityRoddiskLeader || var9 instanceof EntityRoddiskOfficer) {
-                    var9.setDead();
-                    EntityItem ei = new EntityItem(world, var9.posX, var9.posY, var9.posZ, new ItemStack(RivalRebels.roddisk));
+                    var9.kill();
+                    ItemEntity ei = new ItemEntity(world, var9.getX(), var9.getY(), var9.getZ(), new ItemStack(RRItems.roddisk));
                     world.spawnEntity(ei);
-                } else if (var9.canBeCollidedWith() && var9 != this.shooter) {
+                } else if (var9.collides() && var9 != this.shooter) {
                     float var10 = 0.3F;
-                    AxisAlignedBB var11 = var9.getEntityBoundingBox().grow(var10, var10, var10);
-                    RayTraceResult var12 = var11.calculateIntercept(var15, var2);
+                    Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
+                    Optional<Vec3d> var12 = var11.raycast(var15, var2);
 
-                    if (var12 != null) {
-                        double var13 = var15.distanceTo(var12.hitVec);
+                    if (var12.isPresent()) {
+                        double var13 = var15.distanceTo(var12.get());
 
                         if (var13 < var6 || var6 == 0.0D) {
                             var4 = var9;
@@ -173,116 +163,117 @@ public class EntityRoddiskRep extends EntityInanimate
 
 			if (var4 != null)
 			{
-				var3 = new RayTraceResult(var4);
+				var3 = new EntityHitResult(var4);
 			}
 		}
 
 		if (var3 != null)
 		{
-			world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.x, var3.hitVec.y, var3.hitVec.z, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
-			world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.x, var3.hitVec.y, var3.hitVec.z, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
-			world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.x, var3.hitVec.y, var3.hitVec.z, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
-			world.spawnParticle(EnumParticleTypes.EXPLOSION_NORMAL, var3.hitVec.x, var3.hitVec.y, var3.hitVec.z, motionX * 0.1, motionY * 0.1, motionZ * 0.1);
+			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
+			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
+			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
+			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
 
-			if (var3.entityHit != null)
+			if (var3.getType() == HitResult.Type.ENTITY)
 			{
-				RivalRebelsSoundPlayer.playSound(this, 5, 1);
-				if (var3.entityHit instanceof EntityPlayer entityPlayerHit && var3.entityHit != shooter)
+                Entity hitEntity = ((EntityHitResult) var3).getEntity();
+                RivalRebelsSoundPlayer.playSound(this, 5, 1);
+				if (hitEntity instanceof PlayerEntity entityPlayerHit && hitEntity != shooter)
 				{
-                    NonNullList<ItemStack> armorSlots = entityPlayerHit.inventory.armorInventory;
+                    DefaultedList<ItemStack> armorSlots = entityPlayerHit.getInventory().armor;
 					for (int i = 0; i < 4; i++)
 					{
 						if (!armorSlots.get(i).isEmpty())
 						{
-							armorSlots.get(i).damageItem(30, entityPlayerHit);
-							entityPlayerHit.attackEntityFrom(RivalRebelsDamageSource.tron, 1);
+							armorSlots.get(i).damage(30, entityPlayerHit, player -> {});
+							entityPlayerHit.damage(RivalRebelsDamageSource.tron, 1);
 						}
 						else
 						{
-							entityPlayerHit.attackEntityFrom(RivalRebelsDamageSource.tron, 15);
+							entityPlayerHit.damage(RivalRebelsDamageSource.tron, 15);
 						}
 					}
-					if (entityPlayerHit.getHealth() < 3 && entityPlayerHit.isEntityAlive())
+					if (entityPlayerHit.getHealth() < 3 && entityPlayerHit.isAlive())
 					{
-						entityPlayerHit.attackEntityFrom(RivalRebelsDamageSource.tron, 2000000);
+						entityPlayerHit.damage(RivalRebelsDamageSource.tron, 2000000);
 						entityPlayerHit.deathTime = 0;
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 0, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 1, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 2, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 2, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 3, 0));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 3, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 0, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 1, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 2, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 2, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 3, 0));
+						world.spawnEntity(new EntityGore(world, hitEntity, 3, 0));
 					}
 				}
-				else if ((var3.entityHit instanceof EntityLivingBase entity
-						&& !(var3.entityHit instanceof EntityAnimal)
-						&& !(var3.entityHit instanceof EntityBat)
-						&& !(var3.entityHit instanceof EntityVillager)
-						&& !(var3.entityHit instanceof EntitySquid)))
+				else if ((hitEntity instanceof LivingEntity entity
+						&& !(hitEntity instanceof AnimalEntity)
+						&& !(hitEntity instanceof BatEntity)
+						&& !(hitEntity instanceof VillagerEntity)
+						&& !(hitEntity instanceof SquidEntity)))
 				{
-                    entity.attackEntityFrom(RivalRebelsDamageSource.tron, 40);
+                    entity.damage(RivalRebelsDamageSource.tron, 40);
 					if (entity.getHealth() < 3)
 					{
 						int legs = -1;
 						int arms = -1;
 						int mobs = -1;
-						entity.setDead();
+						entity.kill();
 						RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
-						if (entity instanceof EntityZombie && !(entity instanceof EntityPigZombie))
+						if (entity instanceof ZombieEntity && !(entity instanceof ZombifiedPiglinEntity))
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 1;
 						}
-						else if (entity instanceof EntityPigZombie)
+						else if (entity instanceof ZombifiedPiglinEntity)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 2;
 						}
-						else if (entity instanceof EntitySkeleton)
+						else if (entity instanceof SkeletonEntity)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 3;
 						}
-						else if (entity instanceof EntityEnderman)
+						else if (entity instanceof EndermanEntity)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 4;
 						}
-						else if (entity instanceof EntityCreeper)
+						else if (entity instanceof CreeperEntity)
 						{
 							legs = 4;
 							arms = 0;
 							mobs = 5;
 						}
-						else if (entity instanceof EntitySlime && !(entity instanceof EntityMagmaCube))
+						else if (entity instanceof SlimeEntity && !(entity instanceof MagmaCubeEntity))
 						{
 							legs = 0;
 							arms = 0;
 							mobs = 6;
 						}
-						else if (entity instanceof EntityMagmaCube)
+						else if (entity instanceof MagmaCubeEntity)
 						{
 							legs = 0;
 							arms = 0;
 							mobs = 7;
 						}
-						else if (entity instanceof EntitySpider && !(entity instanceof EntityCaveSpider))
+						else if (entity instanceof SpiderEntity && !(entity instanceof CaveSpiderEntity))
 						{
 							legs = 8;
 							arms = 0;
 							mobs = 8;
 						}
-						else if (entity instanceof EntityCaveSpider)
+						else if (entity instanceof CaveSpiderEntity)
 						{
 							legs = 8;
 							arms = 0;
 							mobs = 9;
 						}
-						else if (entity instanceof EntityGhast)
+						else if (entity instanceof GhastEntity)
 						{
 							legs = 9;
 							arms = 0;
@@ -290,155 +281,107 @@ public class EntityRoddiskRep extends EntityInanimate
 						}
 						else
 						{
-							legs = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
-							arms = (int) (entity.getEntityBoundingBox().getAverageEdgeLength() * 2);
+							legs = (int) (entity.getBoundingBox().getAverageSideLength() * 2);
+							arms = (int) (entity.getBoundingBox().getAverageSideLength() * 2);
 							mobs = 11;
 						}
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 0, mobs));
-						world.spawnEntity(new EntityGore(world, var3.entityHit, 1, mobs));
+						world.spawnEntity(new EntityGore(world, hitEntity, 0, mobs));
+						world.spawnEntity(new EntityGore(world, hitEntity, 1, mobs));
 						for (int i = 0; i < arms; i++)
-							world.spawnEntity(new EntityGore(world, var3.entityHit, 2, mobs));
+							world.spawnEntity(new EntityGore(world, hitEntity, 2, mobs));
 						for (int i = 0; i < legs; i++)
-							world.spawnEntity(new EntityGore(world, var3.entityHit, 3, mobs));
+							world.spawnEntity(new EntityGore(world, hitEntity, 3, mobs));
 					}
 				}
-				else if((var3.entityHit instanceof EntityRhodesHead
-					  || var3.entityHit instanceof EntityRhodesLeftLowerArm
-				      || var3.entityHit instanceof EntityRhodesLeftLowerLeg
-				      || var3.entityHit instanceof EntityRhodesLeftUpperArm
-				      || var3.entityHit instanceof EntityRhodesLeftUpperLeg
-				      || var3.entityHit instanceof EntityRhodesRightLowerArm
-				      || var3.entityHit instanceof EntityRhodesRightLowerLeg
-				      || var3.entityHit instanceof EntityRhodesRightUpperArm
-				      || var3.entityHit instanceof EntityRhodesRightUpperLeg
-				      || var3.entityHit instanceof EntityRhodesTorso))
+				else if((hitEntity instanceof EntityRhodesHead
+					  || hitEntity instanceof EntityRhodesLeftLowerArm
+				      || hitEntity instanceof EntityRhodesLeftLowerLeg
+				      || hitEntity instanceof EntityRhodesLeftUpperArm
+				      || hitEntity instanceof EntityRhodesLeftUpperLeg
+				      || hitEntity instanceof EntityRhodesRightLowerArm
+				      || hitEntity instanceof EntityRhodesRightLowerLeg
+				      || hitEntity instanceof EntityRhodesRightUpperArm
+				      || hitEntity instanceof EntityRhodesRightUpperLeg
+				      || hitEntity instanceof EntityRhodesTorso))
 				{
-					var3.entityHit.attackEntityFrom(RivalRebelsDamageSource.tron, 20);
+					hitEntity.damage(RivalRebelsDamageSource.tron, 20);
 				}
 			}
-			else if (world.getBlockState(var3.getBlockPos()).getBlock() == RivalRebels.flare)
-			{
-				RivalRebels.flare.onPlayerDestroy(world, var3.getBlockPos(), world.getBlockState(var3.getBlockPos()));
-			}
-			else if (world.getBlockState(var3.getBlockPos()).getBlock() == RivalRebels.landmine || world.getBlockState(var3.getBlockPos()).getBlock() == RivalRebels.alandmine)
-			{
-				RivalRebels.landmine.onEntityCollision(world, var3.getBlockPos(), world.getBlockState(var3.getBlockPos()), this);
-			}
-			else
-			{
-				Block block = world.getBlockState(var3.getBlockPos()).getBlock();
-				if (block == Blocks.GLASS || block == Blocks.GLASS_PANE)
-				{
-					world.setBlockToAir(var3.getBlockPos());
-				}
-				RivalRebelsSoundPlayer.playSound(this, 5, 2);
+			else {
+                BlockPos pos = ((BlockHitResult) var3).getBlockPos();
+                BlockState state = world.getBlockState(pos);
+                if (state.isOf(RRBlocks.flare))
+                {
+                    state.getBlock().onBroken(world, pos, state);
+                }
+                else if (state.getBlock() == RRBlocks.landmine || state.getBlock() == RRBlocks.alandmine)
+                {
+                    state.onEntityCollision(world, pos, this);
+                }
+                else
+                {
+                    if (state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS_PANES))
+                    {
+                        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                    }
+                    RivalRebelsSoundPlayer.playSound(this, 5, 2);
 
-				if (var3.sideHit == EnumFacing.WEST || var3.sideHit == EnumFacing.EAST) this.motionX *= -1;
-				if (var3.sideHit == EnumFacing.DOWN || var3.sideHit == EnumFacing.UP) this.motionY *= -1;
-				if (var3.sideHit == EnumFacing.NORTH || var3.sideHit == EnumFacing.SOUTH) this.motionZ *= -1;
-			}
+                    Direction side = ((BlockHitResult) var3).getSide();
+                    if (side == Direction.WEST || side == Direction.EAST) this.setVelocity(getVelocity().multiply(-1, 1, 1));
+                    if (side == Direction.DOWN || side == Direction.UP) this.setVelocity(getVelocity().multiply(1, -1, 1));
+                    if (side == Direction.NORTH || side == Direction.SOUTH) this.setVelocity(getVelocity().multiply(1, 1, -1));
+                }
+            }
 		}
 
-		this.posX += this.motionX;
-		this.posY += this.motionY;
-		this.posZ += this.motionZ;
-		float var16 = MathHelper.sqrt(this.motionX * this.motionX + this.motionZ * this.motionZ);
-		this.rotationYaw = (float) (Math.atan2(this.motionX, this.motionZ) * 180.0D / Math.PI);
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+		float var16 = MathHelper.sqrt((float) (this.getVelocity().getX() * this.getVelocity().getX() + this.getVelocity().getZ() * this.getVelocity().getZ()));
+		this.setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
 
-		for (this.rotationPitch = (float) (Math.atan2(this.motionY, var16) * 180.0D / Math.PI); this.rotationPitch - this.prevRotationPitch < -180.0F; this.prevRotationPitch -= 360.0F)
+		for (this.setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); this.getPitch() - this.prevPitch < -180.0F; this.prevPitch -= 360.0F)
 		{
         }
 
-		while (this.rotationPitch - this.prevRotationPitch >= 180.0F)
+		while (this.getPitch() - this.prevPitch >= 180.0F)
 		{
-			this.prevRotationPitch += 360.0F;
+			this.prevPitch += 360.0F;
 		}
 
-		while (this.rotationYaw - this.prevRotationYaw < -180.0F)
+		while (this.getYaw() - this.prevYaw < -180.0F)
 		{
-			this.prevRotationYaw -= 360.0F;
+			this.prevYaw -= 360.0F;
 		}
 
-		while (this.rotationYaw - this.prevRotationYaw >= 180.0F)
+		while (this.getYaw() - this.prevYaw >= 180.0F)
 		{
-			this.prevRotationYaw += 360.0F;
+			this.prevYaw += 360.0F;
 		}
 
-		this.rotationPitch = this.prevRotationPitch + (this.rotationPitch - this.prevRotationPitch) * 0.2F;
-		this.rotationYaw = this.prevRotationYaw + (this.rotationYaw - this.prevRotationYaw) * 0.2F;
+		this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.2F);
+		this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.2F);
 
 		if (shooter != null)
 		{
-			motionX += (shooter.posX - posX) * 0.01f;
-			motionY += ((shooter.posY + 1.62) - posY) * 0.01f;
-			motionZ += (shooter.posZ - posZ) * 0.01f;
+            setVelocity(getVelocity().add(
+                (shooter.getX() - getX()) * 0.01f,
+                ((shooter.getY() + 1.62) - getY()) * 0.01f,
+                (shooter.getZ() - getZ()) * 0.01f
+            ));
 		}
-		motionX *= 0.995f;
-		motionY *= 0.995f;
-		motionZ *= 0.995f;
+        setVelocity(getVelocity().multiply(0.995f));
 
-		this.setPosition(this.posX, this.posY, this.posZ);
+		this.setPosition(this.getX(), this.getY(), this.getZ());
 	}
 
     @Override
-    public boolean processInitialInteract(EntityPlayer player, EnumHand hand) {
-		if (ticksExisted < 10 || player != shooter) return false;
-		if (player.inventory.addItemStackToInventory(RivalRebels.roddisk.getDefaultInstance()))
+    public ActionResult interact(PlayerEntity player, Hand hand) {
+		if (age < 10 || player != shooter) return ActionResult.PASS;
+		if (player.getInventory().insertStack(RRItems.roddisk.getDefaultStack()))
 		{
-			setDead();
+			kill();
 			RivalRebelsSoundPlayer.playSound(this, 6, 1);
 		}
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
-	@Override
-	public int getBrightnessForRender()
-	{
-		return 1000000;
-	}
-
-	@Override
-	public float getBrightness()
-	{
-		return 1000000F;
-	}
-
-	@Override
-	public boolean isInRangeToRenderDist(double par1)
-	{
-		return true;
-	}
-
-	@Override
-	public void readEntityFromNBT(NBTTagCompound var1)
-	{
-
-	}
-
-	@Override
-	public void writeEntityToNBT(NBTTagCompound var1)
-	{
-
-	}
-
-	@Override
-	public AxisAlignedBB getCollisionBox(Entity par1Entity)
-	{
-		return par1Entity.getEntityBoundingBox();
-	}
-
-	@Override
-	public boolean canBeCollidedWith()
-	{
-		return !this.isDead;
-	}
-
-	/**
-	 * Returns true if this entity should push and be pushed by other entities when colliding.
-	 */
-	@Override
-	public boolean canBePushed()
-	{
-		return true;
-	}
 }

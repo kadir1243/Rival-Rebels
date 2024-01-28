@@ -11,98 +11,87 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockLaptop extends BlockContainer
-{
-
-    public BlockLaptop()
-	{
-		super(Material.IRON);
-		this.setCreativeTab(CreativeTabs.DECORATIONS);
-	}
-
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
+public class BlockLaptop extends BlockWithEntity {
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+    public BlockLaptop(Settings settings) {
+		super(settings);
 	}
 
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-		int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
+    }
 
-        int metaS = meta;
-		if (l == 0) {
-			metaS = 2;
-		} else if (l == 1) {
-			metaS = 5;
-		} else if (l == 2) {
-			metaS = 3;
-		} else if (l == 3) {
-            metaS = 4;
-		}
-        return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, metaS, placer, hand);
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        int meta = switch (ctx.getPlayerLookDirection()) {
+            case DOWN -> 2;
+            case UP -> 5;
+            case NORTH -> 3;
+            case SOUTH -> 4;
+            default -> 0;
+        };
+        return super.getPlacementState(ctx).with(META, meta);
 	}
 
     @Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
-        TileEntity entity = world.getTileEntity(pos);
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+        BlockEntity entity = world.getBlockEntity(pos);
         if (!(entity instanceof TileEntityLaptop)) {
             entity = null;
         }
 
-        world.spawnEntity(new EntityItem(world, pos.getX(), pos.getY(), pos.getZ(), new ItemStack(RivalRebels.controller, 1)));
+        world.spawnEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), RRBlocks.controller.asItem().getDefaultStack()));
 
-        entity.invalidate();
-        super.breakBlock(world, pos, state);
+        entity.markRemoved();
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		((TileEntityLaptop) world.getTileEntity(pos)).refreshTasks();
-		if (!world.isRemote) {
-			player.openGui(RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
-		}
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        TileEntityLaptop laptop = (TileEntityLaptop) world.getBlockEntity(pos);
+        player.openHandledScreen(laptop);
 		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
 
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
-	/**
-	 * Returns a new instance of a block's tile entity class. Called on placing the block.
-	 */
-	@Override
-	public TileEntity createNewTileEntity(World par1World, int var)
-	{
-		return new TileEntityLaptop();
-	}
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+        return new TileEntityLaptop(pos, state);
+    }
 
-	/*@SideOnly(Side.CLIENT)
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
+    /*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
 
 	@Override

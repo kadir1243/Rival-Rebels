@@ -14,11 +14,12 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelNukeCrate
 {
 	float			s	= 0.5F;
@@ -35,23 +36,21 @@ public class ModelNukeCrate
 	TextureVertice	t3	= new TextureVertice(1, 1);
 	TextureVertice	t4	= new TextureVertice(0, 1);
 
-	public void renderModelA()
+	public void renderModelA(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		RenderHelper.addFace(v4, v8, v5, v1, t1, t2, t3, t4);
-		RenderHelper.addFace(v3, v7, v8, v4, t1, t2, t3, t4);
-		RenderHelper.addFace(v2, v6, v7, v3, t1, t2, t3, t4);
-		RenderHelper.addFace(v1, v5, v6, v2, t1, t2, t3, t4);
-		GlStateManager.popMatrix();
+		matrices.push();
+		RenderHelper.addFace(buffer, v4, v8, v5, v1, t1, t2, t3, t4);
+		RenderHelper.addFace(buffer, v3, v7, v8, v4, t1, t2, t3, t4);
+		RenderHelper.addFace(buffer, v2, v6, v7, v3, t1, t2, t3, t4);
+		RenderHelper.addFace(buffer, v1, v5, v6, v2, t1, t2, t3, t4);
+		matrices.pop();
 	}
 
-	public void renderModelB()
+	public void renderModelB(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-		RenderHelper.addFace(v1, v2, v3, v4, t1, t2, t3, t4);
-		RenderHelper.addFace(v8, v7, v6, v5, t1, t2, t3, t4);
-		GlStateManager.popMatrix();
+		matrices.push();
+		RenderHelper.addFace(buffer, v1, v2, v3, v4, t1, t2, t3, t4);
+		RenderHelper.addFace(buffer, v8, v7, v6, v5, t1, t2, t3, t4);
+		matrices.pop();
 	}
 }

@@ -13,58 +13,54 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityLightningLink;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.*;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
 import java.util.Random;
 
-@SideOnly(Side.CLIENT)
-public class RenderLightningLink extends Render
+@OnlyIn(Dist.CLIENT)
+public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 {
 	static float	red		= 0.65F;
 	static float	green	= 0.75F;
 	static float	blue	= 1F;
 
-    public RenderLightningLink(RenderManager renderManager) {
+    public RenderLightningLink(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
 
-    public void renderLightningLink(EntityLightningLink ell, double x, double y, double z, float yaw, float pitch)
-	{
+    @Override
+    public void render(EntityLightningLink entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		float segmentDistance = RivalRebels.teslasegments;
-		float distance = (float) ell.motionX * 100;
+		float distance = (float) entity.getVelocity().getX() * 100;
 		distance = 100;
 
 		// RenderLibrary.instance.renderModel((float) x, (float) y, (float) z,
-		// (float) Math.sin(-ell.rotationYaw / 180 * Math.PI) * distance,
-		// (float) Math.sin(-ell.rotationPitch / 180 * Math.PI) * distance,
-		// (float) Math.cos(-ell.rotationYaw / 180 * Math.PI) * distance,
+		// (float) Math.sin(-entity.yaw / 180 * Math.PI) * distance,
+		// (float) Math.sin(-entity.pitch / 180 * Math.PI) * distance,
+		// (float) Math.cos(-entity.yaw / 180 * Math.PI) * distance,
 		// 2f, 0.07f, 8, 5f, 0.5f, red, green, blue, 1);
 
 		if (distance > 0)
 		{
-			Random rand = ell.world.rand;
+			Random random = entity.world.random;
 			float radius = 0.07F;
-			Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
 
-            GlStateManager.pushMatrix();
-			GlStateManager.enableRescaleNormal();
-			GlStateManager.disableTexture2D();
-			GlStateManager.enableBlend();
-			GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE);
-			GlStateManager.translate((float) x, (float) y, (float) z);
-			GlStateManager.rotate(ell.rotationYaw, 0.0F, 1.0F, 0.0F);
-			GlStateManager.rotate(-ell.rotationPitch, 1.0F, 0.0F, 0.0F);
+            matrices.push();
+			RenderSystem.enableBlend();
+            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
+			matrices.multiply(new Quaternion(entity.getYaw(), 0.0F, 1.0F, 0.0F));
+			matrices.multiply(new Quaternion(-entity.getPitch(), 1.0F, 0.0F, 0.0F));
 
 			double AddedX = 0;
 			double AddedY = 0;
@@ -74,8 +70,8 @@ public class RenderLightningLink extends Render
 			{
 				prevAddedX = AddedX;
 				prevAddedY = AddedY;
-				AddedX += (rand.nextFloat() - 0.5) * 2;
-				AddedY += (rand.nextFloat() - 0.5) * 2;
+				AddedX += (random.nextFloat() - 0.5) * 2;
+				AddedY += (random.nextFloat() - 0.5) * 2;
 				double dist = Math.sqrt(AddedX * AddedX + AddedY * AddedY) / 1.5;
 				if (dist != 0)
 				{
@@ -89,37 +85,25 @@ public class RenderLightningLink extends Render
 					AddedX = AddedY = 0;
 				}
 
-				for (float o = 0; o <= radius; o += radius / 8)
-				{
-                    buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-					buffer.pos(AddedX + o, AddedY - o, addedZ).color(red, green, blue, 0.95f).endVertex();
-					buffer.pos(AddedX + o, AddedY + o, addedZ).color(red, green, blue, 0.95f).endVertex();
-					buffer.pos(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
-					buffer.pos(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
-					buffer.pos(AddedX - o, AddedY - o, addedZ).color(red, green, blue, 0.95f).endVertex();
-					buffer.pos(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
-					buffer.pos(AddedX - o, AddedY + o, addedZ).color(red, green, blue, 0.95f).endVertex();
-					buffer.pos(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).endVertex();
-					tessellator.draw();
+				for (float o = 0; o <= radius; o += radius / 8) {
+					buffer.vertex(AddedX + o, AddedY - o, addedZ).color(red, green, blue, 0.95f).next();
+					buffer.vertex(AddedX + o, AddedY + o, addedZ).color(red, green, blue, 0.95f).next();
+					buffer.vertex(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
+					buffer.vertex(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
+					buffer.vertex(AddedX - o, AddedY - o, addedZ).color(red, green, blue, 0.95f).next();
+					buffer.vertex(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
+					buffer.vertex(AddedX - o, AddedY + o, addedZ).color(red, green, blue, 0.95f).next();
+					buffer.vertex(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
 				}
 			}
 
-			GlStateManager.disableBlend();
-			GlStateManager.enableTexture2D();
-			GlStateManager.disableRescaleNormal();
-			GlStateManager.popMatrix();
+			RenderSystem.disableBlend();
+			matrices.pop();
 		}
 	}
 
-	@Override
-	public void doRender(Entity entityLightningLink, double x, double y, double z, float yaw, float pitch)
-	{
-		this.renderLightningLink((EntityLightningLink) entityLightningLink, x, y, z, yaw, pitch);
-	}
-
-	@Override
-	protected ResourceLocation getEntityTexture(Entity entity)
-	{
-		return null;
-	}
+    @Override
+    public Identifier getTexture(EntityLightningLink entity) {
+        return null;
+    }
 }

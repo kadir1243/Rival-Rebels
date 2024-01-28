@@ -15,11 +15,8 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureFace;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelPlasmaCannon
 {
@@ -212,14 +209,10 @@ public class ModelPlasmaCannon
 	Vertice		vbb3				= new Vertice(20f, 0f, -2f);
 	Vertice		vbb4				= new Vertice(8f, 0f, -2f);
 
-	public void render()
+	public void render(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableCull();
+		matrices.push();
 		// body
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
         RenderHelper.addFace(buffer, vt1, vt2, vt3, vt4, bodytop);
 		RenderHelper.addFace(buffer, vs1, vt1, vt2, vs4, bodytopside);
 		RenderHelper.addFace(buffer, vs5, vt4, vt3, vs8, bodytopside);
@@ -264,7 +257,6 @@ public class ModelPlasmaCannon
 		RenderHelper.addFace(buffer, vht1, vhb1, vhb2, vht2, handleside);
 		RenderHelper.addFace(buffer, vht3, vhb3, vhb4, vht4, handleside);
 		RenderHelper.addFace(buffer, vhb2, vhb1, vhb4, vhb3, handlebottom);
-        tessellator.draw();
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }

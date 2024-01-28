@@ -13,11 +13,12 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelRocket
 {
 	Vertice	vy1		= new Vertice(0, 0, 0);
@@ -55,38 +56,38 @@ public class ModelRocket
 	float	ty2		= 0.09375f;
 	float	ty3		= 0.1875f;
 
-	public void render(boolean fins)
+	public void render(MatrixStack matrices, VertexConsumer buffer, boolean fins)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.scale(0.125f, 0.25f, 0.125f);
+		matrices.push();
+		matrices.scale(0.125f, 0.25f, 0.125f);
 
-		RenderHelper.addFace(vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnxpz1, vnxpz2, vnx2, vnx1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnx1, vnx2, vnxnz2, vnxnz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2);
-		RenderHelper.addFace(vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnxpz1, vnxpz2, vnx2, vnx1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnx1, vnx2, vnxnz2, vnxnz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2);
+		RenderHelper.addFace(buffer, vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2);
 
-		RenderHelper.addFace(vpxpz2, vpx2, vy2, vpz2, tx2, tx3, ty1, ty2);
-		RenderHelper.addFace(vnxpz2, vpz2, vy2, vnx2, tx2, tx3, ty1, ty2);
-		RenderHelper.addFace(vnxnz2, vnx2, vy2, vnz2, tx2, tx3, ty1, ty2);
-		RenderHelper.addFace(vpxnz2, vnz2, vy2, vpx2, tx2, tx3, ty1, ty2);
+		RenderHelper.addFace(buffer, vpxpz2, vpx2, vy2, vpz2, tx2, tx3, ty1, ty2);
+		RenderHelper.addFace(buffer, vnxpz2, vpz2, vy2, vnx2, tx2, tx3, ty1, ty2);
+		RenderHelper.addFace(buffer, vnxnz2, vnx2, vy2, vnz2, tx2, tx3, ty1, ty2);
+		RenderHelper.addFace(buffer, vpxnz2, vnz2, vy2, vpx2, tx2, tx3, ty1, ty2);
 
-		RenderHelper.addFace(vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2);
-		RenderHelper.addFace(vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2);
-		RenderHelper.addFace(vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2);
-		RenderHelper.addFace(vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2);
+		RenderHelper.addFace(buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
 
 		if (fins)
 		{
-			RenderHelper.addFace(vnx3, vpx3, vpx4, vnx4, tx3, tx4, ty1, ty3);
-			RenderHelper.addFace(vpx3, vnx3, vnx4, vpx4, tx3, tx4, ty1, ty3);
-			RenderHelper.addFace(vnz3, vpz3, vpz4, vnz4, tx3, tx4, ty1, ty3);
-			RenderHelper.addFace(vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3);
+			RenderHelper.addFace(buffer, vnx3, vpx3, vpx4, vnx4, tx3, tx4, ty1, ty3);
+			RenderHelper.addFace(buffer, vpx3, vnx3, vnx4, vpx4, tx3, tx4, ty1, ty3);
+			RenderHelper.addFace(buffer, vnz3, vpz3, vpz4, vnz4, tx3, tx4, ty1, ty3);
+			RenderHelper.addFace(buffer, vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3);
 		}
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 }

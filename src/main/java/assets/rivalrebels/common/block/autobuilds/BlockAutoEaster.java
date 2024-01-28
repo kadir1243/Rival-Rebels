@@ -11,15 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.init.Blocks;
+import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
 public class BlockAutoEaster extends BlockAutoTemplate
 {
-	public BlockAutoEaster()
-	{
-		super();
+	public BlockAutoEaster(Settings settings) {
+		super(settings);
 	}
 
 	@Override
@@ -28,22 +27,22 @@ public class BlockAutoEaster extends BlockAutoTemplate
 		super.build(par1World, x, y, z);
 		int h = 0;
 		placeBlockCarefully(par1World, x, y, z, Blocks.AIR);
-		placeBlockCarefully(par1World, x + 1, y + h, z, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 2, y + h, z, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 3, y + h, z, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 4, y + h, z, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 1, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 1, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 1, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 1, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 2, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 2, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 2, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 2, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 1, y + h, z + 3, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 2, y + h, z + 3, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 3, y + h, z + 3, RivalRebels.jump);
-		placeBlockCarefully(par1World, x + 4, y + h, z + 3, RivalRebels.jump);
+		placeBlockCarefully(par1World, x + 1, y + h, z, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 2, y + h, z, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 3, y + h, z, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 4, y + h, z, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 1, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 1, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 1, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 1, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 2, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 2, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 2, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 2, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 1, y + h, z + 3, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 2, y + h, z + 3, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 3, y + h, z + 3, RRBlocks.jump);
+		placeBlockCarefully(par1World, x + 4, y + h, z + 3, RRBlocks.jump);
 		h = h + 1;
 		placeBlockCarefully(par1World, x + 1, y + h, z, Blocks.SNOW);
 		placeBlockCarefully(par1World, x + 2, y + h, z, Blocks.SNOW);
@@ -97,20 +96,20 @@ public class BlockAutoEaster extends BlockAutoTemplate
 		placeBlockCarefully(par1World, x + 4, y + h, z + 3, Blocks.PUMPKIN);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -123,7 +122,7 @@ public class BlockAutoEaster extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

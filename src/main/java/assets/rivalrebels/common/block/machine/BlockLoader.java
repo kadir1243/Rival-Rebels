@@ -11,137 +11,133 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockLoader extends BlockContainer {
-    public BlockLoader() {
-		super(Material.IRON);
-		this.setCreativeTab(CreativeTabs.DECORATIONS);
-	}
-
-	@Override
-	public int quantityDropped(Random random)
-	{
-		return 0;
+public class BlockLoader extends BlockWithEntity {
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+    public BlockLoader(Settings settings) {
+		super(settings);
 	}
 
     @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-        int l = MathHelper.floor((placer.rotationYaw * 4.0F / 360.0F) + 0.5D) & 3;
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
+    }
 
-        int metaS = meta;
+    @Nullable
+    @Override
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        int l = MathHelper.floor((ctx.getPlayerYaw() * 4.0F / 360.0F) + 0.5D) & 3;
+
+        int meta = 0;
         if (l == 0) {
-            metaS = 2;
+            meta = 2;
         } else if (l == 1) {
-            metaS = 5;
+            meta = 5;
         } else if (l == 2) {
-            metaS = 3;
+            meta = 3;
         } else if (l == 3) {
-            metaS = 4;
+            meta = 4;
         }
-        return super.getStateForPlacement(world, pos, facing, hitX, hitY, hitZ, metaS, placer, hand);
+        return super.getPlacementState(ctx).with(META, meta);
     }
 
     @Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Override
-    public void breakBlock(World world, BlockPos pos, IBlockState state) {
+    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         TileEntityLoader var7 = null;
-        try
-        {
-            var7 = (TileEntityLoader) world.getTileEntity(pos);
-        }
-        catch (Exception e)
-        {
+        try {
+            var7 = (TileEntityLoader) world.getBlockEntity(pos);
+        } catch (Exception e) {
             // no error message ;]
         }
 
         int x = pos.getX();
-        int y= pos.getY();
+        int y = pos.getY();
         int z =pos.getZ();
-        world.spawnEntity(new EntityItem(world, x, y, z, new ItemStack(RivalRebels.loader)));
+        world.spawnEntity(new ItemEntity(world, x, y, z, new ItemStack(RRBlocks.loader)));
         if (var7 != null)
         {
-            for (int var8 = 0; var8 < var7.getSizeInventory(); ++var8)
+            for (int var8 = 0; var8 < var7.size(); ++var8)
             {
-                ItemStack var9 = var7.getStackInSlot(var8);
+                ItemStack var9 = var7.getStack(var8);
 
-                if (var9 != null)
+                if (!var9.isEmpty())
                 {
-                    float var10 = world.rand.nextFloat() * 0.8F + 0.1F;
-                    float var11 = world.rand.nextFloat() * 0.8F + 0.1F;
-                    EntityItem var14;
+                    float var10 = world.random.nextFloat() * 0.8F + 0.1F;
+                    float var11 = world.random.nextFloat() * 0.8F + 0.1F;
+                    ItemEntity var14;
 
-                    for (float var12 = world.rand.nextFloat() * 0.8F + 0.1F; var9.getCount() > 0; world.spawnEntity(var14))
+                    for (float var12 = world.random.nextFloat() * 0.8F + 0.1F; var9.getCount() > 0; world.spawnEntity(var14))
                     {
-                        int var13 = world.rand.nextInt(21) + 10;
+                        int var13 = world.random.nextInt(21) + 10;
 
                         if (var13 > var9.getCount())
                         {
                             var13 = var9.getCount();
                         }
 
-                        var9.shrink(var13);
-                        var14 = new EntityItem(world, (x + var10), (y + var11), (z + var12), new ItemStack(var9.getItem(), var13, var9.getItemDamage()));
+                        var9.decrement(var13);
+                        ItemStack copy = var9.copy();
+                        copy.setCount(var13);
+                        var14 = new ItemEntity(world, (x + var10), (y + var11), (z + var12), copy);
                         float var15 = 0.05F;
-                        var14.motionX = ((float) world.rand.nextGaussian() * var15);
-                        var14.motionY = ((float) world.rand.nextGaussian() * var15 + 0.2F);
-                        var14.motionZ = ((float) world.rand.nextGaussian() * var15);
-
-                        if (var9.hasTagCompound())
-                        {
-                            var14.getItem().setTagCompound(var9.getTagCompound().copy());
-                        }
+                        var14.setVelocity(((float) world.random.nextGaussian() * var15),
+                            ((float) world.random.nextGaussian() * var15 + 0.2F),
+                            ((float) world.random.nextGaussian() * var15));
                     }
                 }
             }
-            var7.invalidate();
+            var7.markRemoved();
         }
-        super.breakBlock(world, pos, state);
+        super.onBreak(world, pos, state, player);
     }
 
     @Override
-    public boolean onBlockActivated(World world, BlockPos pos, IBlockState state, EntityPlayer player, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-		if (!world.isRemote) {
-			player.openGui(RivalRebels.instance, 0, world, pos.getX(), pos.getY(), pos.getZ());
-		}
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+		if (!world.isClient) {
+            player.openHandledScreen((NamedScreenHandlerFactory) world.getBlockEntity(pos));
+        }
 		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
 
-		return true;
+		return ActionResult.success(world.isClient);
 	}
 
-	/**
-	 * Returns a new instance of a block's tile entity class. Called on placing the block.
-	 */
-	@Override
-	public TileEntity createNewTileEntity(World par1World, int var)
-	{
-		return new TileEntityLoader();
+    @Nullable
+    @Override
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityLoader(pos, state);
 	}
 
-	/*@SideOnly(Side.CLIENT)
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
+
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
 
 	@Override

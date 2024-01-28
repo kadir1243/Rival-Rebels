@@ -12,63 +12,50 @@
 package assets.rivalrebels.common.block;
 
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.properties.PropertyInteger;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Material;
+import net.minecraft.item.ItemPlacementContext;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+
+import javax.annotation.Nullable;
 
 public class BlockConduit extends Block
 {
-    public static final PropertyInteger VARIANT = PropertyInteger.create("variant", 0, 8);
-	public BlockConduit()
+    public static final IntProperty VARIANT = IntProperty.of("variant", 0, 8);
+	public BlockConduit(Settings settings)
 	{
-		super(Material.IRON);
-        this.setDefaultState(this.getBlockState().getBaseState().withProperty(VARIANT, 0));
+		super(settings);
+        this.setDefaultState(this.getStateManager().getDefaultState().with(VARIANT, 0));
     }
     @Override
-    public int getMetaFromState(IBlockState state) {
-        return state.getValue(VARIANT);
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(VARIANT);
     }
 
+    @Nullable
     @Override
-    public IBlockState getStateFromMeta(int meta) {
-        return this.getDefaultState().withProperty(VARIANT, meta);
-    }
-    @Override
-    public BlockStateContainer getBlockState() {
-        return new BlockStateContainer(this, VARIANT);
-    }@Override
-    public boolean isOpaqueCube(IBlockState state) {
-        return false;
+    public BlockState getPlacementState(ItemPlacementContext ctx) {
+        return super.getPlacementState(ctx).with(VARIANT, ctx.getWorld().getRandom().nextInt(9));
     }
 
-    @Override
-    public IBlockState getStateForPlacement(World world, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer, EnumHand hand) {
-        return this.getDefaultState().withProperty(VARIANT, world.rand.nextInt(9));
-    }
-
-    /*@SideOnly(Side.CLIENT)
+    /*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon7;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon8;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon9;
 
 	@Override

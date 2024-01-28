@@ -12,91 +12,118 @@
 package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.block.trap.BlockTimedBomb;
+import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.*;
-import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 
-public class ContainerAntimatterBomb extends Container
+public class ContainerAntimatterBomb extends ScreenHandler
 {
-	protected TileEntityAntimatterBomb	entity;
+	protected Inventory antimatter;
+    private final PropertyDelegate propertyDelegate;
 
-	public ContainerAntimatterBomb(InventoryPlayer inventoryPlayer, TileEntityAntimatterBomb tileEntity)
-	{
-		entity = tileEntity;
-		addSlotToContainer(new SlotRR(entity, 0, 18, 48, 1, ItemFuse.class));
-		addSlotToContainer(new SlotRR(entity, 1, 40, 59, 1, ItemAntenna.class));
-		addSlotToContainer(new SlotRR(entity, 2, 40, 37, 1, ItemAntenna.class));
+    public ContainerAntimatterBomb(int syncId, PlayerInventory inv) {
+        this(syncId, inv, new SimpleInventory(36), new ArrayPropertyDelegate(4));
+    }
+
+    public ContainerAntimatterBomb(int syncId, PlayerInventory inv, Inventory antimatter, PropertyDelegate propertyDelegate) {
+        super(RivalRebelsGuiHandler.ANTIMATTER_SCREEN_HANDLER_TYPE, syncId);
+		this.antimatter = antimatter;
+        this.propertyDelegate = propertyDelegate;
+        addSlot(new SlotRR(antimatter, 0, 18, 48, 1, ItemFuse.class));
+		addSlot(new SlotRR(antimatter, 1, 40, 59, 1, ItemAntenna.class));
+		addSlot(new SlotRR(antimatter, 2, 40, 37, 1, ItemAntenna.class));
 		for (int i = 0; i <= 3; i++)
 		{
-			addSlotToContainer(new SlotRR(entity, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlotToContainer(new SlotRR(entity, i + 7, 62 + i * 18, 37, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlotToContainer(new SlotRR(entity, i + 11, 62 + i * 18, 59, 1, ItemRodRedstone.class).setAcceptsTrollface(true));
-			addSlotToContainer(new SlotRR(entity, i + 15, 62 + i * 18, 77, 1, ItemRodRedstone.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 7, 62 + i * 18, 37, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 11, 62 + i * 18, 59, 1, ItemRodRedstone.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 15, 62 + i * 18, 77, 1, ItemRodRedstone.class).setAcceptsTrollface(true));
 		}
-		addSlotToContainer(new SlotRR(entity, 19, 138, 48, 1, BlockTimedBomb.class));
-		addSlotToContainer(new SlotRR(entity, 20, 98, 99, 1, ItemChip.class));
-		bindPlayerInventory(inventoryPlayer);
+		addSlot(new SlotRR(antimatter, 19, 138, 48, 1, BlockTimedBomb.class));
+		addSlot(new SlotRR(antimatter, 20, 98, 99, 1, ItemChip.class));
+		bindPlayerInventory(inv);
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer player)
+	public boolean canUse(PlayerEntity player)
 	{
-		return entity.isUsableByPlayer(player);
+		return antimatter.canPlayerUse(player);
 	}
 
-	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
+	protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
+				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; i++)
 		{
-			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
+			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
 		}
 	}
 
-	@Override
-	public ItemStack transferStackInSlot(EntityPlayer player, int index)
+    @Override
+	public ItemStack transferSlot(PlayerEntity player, int index)
 	{
 		ItemStack var3 = ItemStack.EMPTY;
 		Slot var4 = this.getSlot(index);
 
-		if (var4 != null && var4.getHasStack())
+		if (var4 != null && var4.hasStack())
 		{
 			ItemStack var5 = var4.getStack();
 			var3 = var5.copy();
 
 			if (index <= 19)
 			{
-				if (!this.mergeItemStack(var5, 19, this.inventorySlots.size(), true))
+				if (!this.insertItem(var5, 19, this.slots.size(), true))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (!this.mergeItemStack(var5, 0, 19, false))
+			else if (!this.insertItem(var5, 0, 19, false))
 			{
 				return ItemStack.EMPTY;
 			}
 
 			if (var5.isEmpty())
 			{
-				var4.putStack(ItemStack.EMPTY);
+				var4.setStack(ItemStack.EMPTY);
 			}
 			else
 			{
-				var4.onSlotChanged();
+				var4.markDirty();
 			}
 		}
 
 		return var3;
 	}
+
+    public int getCountdown() {
+        return this.propertyDelegate.get(0);
+    }
+
+    public boolean isUnbalanced() {
+        return this.propertyDelegate.get(1) == 1;
+    }
+
+    public boolean isArmed() {
+        return this.propertyDelegate.get(2) == 1;
+    }
+
+    public float getMegaton() {
+        return Float.intBitsToFloat(this.propertyDelegate.get(3));
+    }
+
 }

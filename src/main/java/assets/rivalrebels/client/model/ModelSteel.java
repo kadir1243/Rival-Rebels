@@ -11,22 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.Tessellator;
-
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import org.lwjgl.opengl.GL11;
-
 import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
+@OnlyIn(Dist.CLIENT)
 public class ModelSteel
 {
-	Tessellator	tessellator	= Tessellator.getInstance();
-	float		s			= 0.5F;
+    float		s			= 0.5F;
 
 	Vertice		v1			= new Vertice(s, s, s);
 	Vertice		v2			= new Vertice(s, s, -s);
@@ -38,13 +32,10 @@ public class ModelSteel
 	Vertice		v7			= new Vertice(-s, -s, -s);
 	Vertice		v8			= new Vertice(-s, -s, s);
 
-	public void renderModel()
+	public void renderModel(MatrixStack matrices, VertexConsumer buffer)
 	{
-		GlStateManager.pushMatrix();
-		GlStateManager.disableLighting();
-        BufferBuilder buffer = tessellator.getBuffer();
+		matrices.push();
 
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX);
 		addVertex(buffer, v1, 0, 0);
 		addVertex(buffer, v5, 1, 0);
 		addVertex(buffer, v8, 1, 1);
@@ -65,12 +56,11 @@ public class ModelSteel
 		addVertex(buffer, v2, 1, 1);
 		addVertex(buffer, v5, 0, 0);
 		addVertex(buffer, v8, 0, 1);
-		tessellator.draw();
 
-		GlStateManager.popMatrix();
+		matrices.pop();
 	}
 
-	private void addVertex(BufferBuilder buffer, Vertice v, double t, double t2) {
-		buffer.pos(v.x * 0.999, v.y * 0.999, v.z * 0.999).tex(t, t2).endVertex();
+	private void addVertex(VertexConsumer buffer, Vertice v, float t, float t2) {
+		buffer.vertex(v.x * 0.999, v.y * 0.999, v.z * 0.999).texture(t, t2).next();
 	}
 }

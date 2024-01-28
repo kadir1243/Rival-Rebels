@@ -11,22 +11,20 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.item.ItemTool;
+import net.minecraft.item.ToolItem;
+import net.minecraft.item.ToolMaterials;
 
-import java.util.HashSet;
-
-public class ItemRod extends ItemTool
+public class ItemRod extends ToolItem
 {
 	public int power;
 
-	public ItemRod()
-	{
-		super(ToolMaterial.DIAMOND, new HashSet<>());
-		setMaxStackSize(1);
-		this.setMaxDamage(32);
-		setCreativeTab(RivalRebels.rralltab);
+	public ItemRod() {
+		super(ToolMaterials.DIAMOND, new Settings().maxDamage(32).group(RRItems.rralltab));
 	}
+
+    public ItemRod(Settings settings) {
+        super(ToolMaterials.DIAMOND, settings);
+    }
 
 	@Override
 	public boolean isDamageable()

@@ -11,60 +11,69 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.entity.player.EntityPlayer;
+import assets.rivalrebels.common.util.ItemUtil;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUsageContext;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 
 public class ItemRemote extends Item {
-    private BlockPos RCpos;
-
-	public ItemRemote()
-	{
-		super();
-		setMaxStackSize(1);
-		setCreativeTab(RivalRebels.rralltab);
+	public ItemRemote() {
+		super(new Settings().maxCount(1).group(RRItems.rralltab));
 	}
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand) {
-		if (player.world.getBlockState(RCpos.up()).getBlock() == RivalRebels.remotecharge && player.isSneaking())
-		{
-			player.swingArm(hand);
+    public ActionResult useOnBlock(ItemUsageContext context) {
+        Hand hand = context.getHand();
+        PlayerEntity player = context.getPlayer();
+        World world = context.getWorld();
+        NbtCompound tag = context.getStack().getOrCreateNbt();
+        BlockPos RCpos = tag.contains("RCpos") ? BlockPos.fromLong(tag.getLong("RCpos")) : BlockPos.ORIGIN;
+        if (player.world.getBlockState(RCpos.up()).getBlock() == RRBlocks.remotecharge && player.isSneaking()) {
+			player.swingHand(hand);
 			RivalRebelsSoundPlayer.playSound(player, 22, 3);
 			BlockRemoteCharge.explode(world, RCpos.up());
 		}
-		return super.onItemRightClick(world, player, hand);
+		return super.useOnBlock(context);
 	}
 
     @Override
-    public EnumActionResult onItemUseFirst(EntityPlayer player, World world, BlockPos pos, EnumFacing side, float hitX, float hitY, float hitZ, EnumHand hand) {
-		if (((player.capabilities.isCreativeMode && world.isAirBlock(pos.up()) || player.inventory.hasItemStack(Item.getItemFromBlock(RivalRebels.remotecharge).getDefaultInstance()) && world.isAirBlock(pos.up()))) && !player.isSneaking())
-		{
+    public ActionResult onItemUseFirst(ItemStack stack, ItemUsageContext context) {
+        PlayerEntity player = context.getPlayer();
+        Hand hand = context.getHand();
+        World world = context.getWorld();
+        BlockPos pos = context.getBlockPos();
+
+        ItemStack itemStack = ItemUtil.getItemStack(player, RRBlocks.remotecharge.asItem());
+        if (((player.getAbilities().invulnerable && world.isAir(pos.up()) || !itemStack.isEmpty() && world.isAir(pos.up()))) && !player.isSneaking()) {
 			RivalRebelsSoundPlayer.playSound(player, 22, 2);
-			player.swingArm(hand);
-			if (!world.isRemote) {
-				player.sendMessage(new TextComponentString("§7[§4Orders§7] §cShift-click (Sneak) to detonate."));
+			player.swingHand(hand);
+			if (!world.isClient) {
+				player.sendMessage(Text.of("§7[§4Orders§7] §cShift-click (Sneak) to detonate."), false);
 			}
-            RCpos = pos;
-			player.inventory.deleteStack(Item.getItemFromBlock(RivalRebels.remotecharge).getDefaultInstance());
-			world.setBlockState(pos.up(), RivalRebels.remotecharge.getDefaultState());
+            itemStack.getOrCreateNbt().putLong("RCpos", pos.asLong());
+            itemStack.decrement(1);
+            if (itemStack.isEmpty()) {
+                player.getInventory().removeOne(itemStack);
+            }
+			world.setBlockState(pos.up(), RRBlocks.remotecharge.getDefaultState());
         }
-        return EnumActionResult.FAIL;
+        return ActionResult.FAIL;
     }
 
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:am");
-	}*/
+    @Override
+    public ItemStack getDefaultStack() {
+        ItemStack stack = super.getDefaultStack();
+        stack.getOrCreateNbt().putLong("RCpos", BlockPos.ORIGIN.asLong());
+        return stack;
+    }
 }

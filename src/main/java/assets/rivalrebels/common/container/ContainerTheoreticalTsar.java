@@ -12,94 +12,117 @@
 package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.block.trap.BlockTimedBomb;
+import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.ItemAntenna;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.item.ItemFuse;
 import assets.rivalrebels.common.item.ItemRodNuclear;
-import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.SimpleInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.screen.ArrayPropertyDelegate;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
 
-public class ContainerTheoreticalTsar extends Container
+public class ContainerTheoreticalTsar extends ScreenHandler
 {
-	protected TileEntityTheoreticalTsarBomba	entity;
+	protected Inventory bomb;
+    private final PropertyDelegate propertyDelegate;
 
-	public ContainerTheoreticalTsar(InventoryPlayer inventoryPlayer, TileEntityTheoreticalTsarBomba tileEntity)
-	{
-		entity = tileEntity;
-		addSlotToContainer(new SlotRR(entity, 0, 18, 48, 1, ItemFuse.class));
-		addSlotToContainer(new SlotRR(entity, 1, 40, 59, 1, ItemAntenna.class));
-		addSlotToContainer(new SlotRR(entity, 2, 40, 37, 1, ItemAntenna.class));
+    public ContainerTheoreticalTsar(int syncId, PlayerInventory inv) {
+        this(syncId, inv, new SimpleInventory(36), new ArrayPropertyDelegate(3));
+    }
+
+    public ContainerTheoreticalTsar(int syncId, PlayerInventory inventoryPlayer, Inventory bomb, PropertyDelegate propertyDelegate) {
+        super(RivalRebelsGuiHandler.THEORETICAL_TSAR_SCREEN_HANDLER_TYPE, syncId);
+        this.bomb = bomb;
+        this.propertyDelegate = propertyDelegate;
+        addSlot(new SlotRR(bomb, 0, 18, 48, 1, ItemFuse.class));
+		addSlot(new SlotRR(bomb, 1, 40, 59, 1, ItemAntenna.class));
+		addSlot(new SlotRR(bomb, 2, 40, 37, 1, ItemAntenna.class));
 		for (int i = 0; i <= 3; i++)
 		{
-			addSlotToContainer(new SlotRR(entity, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlotToContainer(new SlotRR(entity, i + 7, 62 + i * 18, 37, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlotToContainer(new SlotRR(entity, i + 11, 62 + i * 18, 59, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlotToContainer(new SlotRR(entity, i + 15, 62 + i * 18, 77, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 7, 62 + i * 18, 37, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 11, 62 + i * 18, 59, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 15, 62 + i * 18, 77, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
 		}
-		addSlotToContainer(new SlotRR(entity, 19, 138, 48, 1, BlockTimedBomb.class));
-		addSlotToContainer(new SlotRR(entity, 20, 98, 99, 1, ItemChip.class));
+		addSlot(new SlotRR(bomb, 19, 138, 48, 1, BlockTimedBomb.class));
+		addSlot(new SlotRR(bomb, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
 	}
 
 	@Override
-	public boolean canInteractWith(EntityPlayer player)
+	public boolean canUse(PlayerEntity player)
 	{
-		return entity.isUsableByPlayer(player);
+		return bomb.canPlayerUse(player);
 	}
 
-	protected void bindPlayerInventory(InventoryPlayer inventoryPlayer)
+	protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
 			for (int j = 0; j < 9; j++)
 			{
-				addSlotToContainer(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
+				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
 			}
 		}
 
 		for (int i = 0; i < 9; i++)
 		{
-			addSlotToContainer(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
+			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
 		}
 	}
 
 	@Override
-	public ItemStack transferStackInSlot(EntityPlayer par1EntityPlayer, int par2)
+	public ItemStack transferSlot(PlayerEntity par1EntityPlayer, int par2)
 	{
 		ItemStack var3 = ItemStack.EMPTY;
-		Slot var4 = this.inventorySlots.get(par2);
+		Slot var4 = this.slots.get(par2);
 
-		if (var4 != null && var4.getHasStack())
+		if (var4 != null && var4.hasStack())
 		{
 			ItemStack var5 = var4.getStack();
 			var3 = var5.copy();
 
 			if (par2 <= 19)
 			{
-				if (!this.mergeItemStack(var5, 19, this.inventorySlots.size(), true))
+				if (!this.insertItem(var5, 19, this.slots.size(), true))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (!this.mergeItemStack(var5, 0, 19, false))
+			else if (!this.insertItem(var5, 0, 19, false))
 			{
 				return ItemStack.EMPTY;
 			}
 
 			if (var5.isEmpty())
 			{
-				var4.putStack(ItemStack.EMPTY);
+				var4.setStack(ItemStack.EMPTY);
 			}
 			else
 			{
-				var4.onSlotChanged();
+				var4.markDirty();
 			}
 		}
 
 		return var3;
 	}
+
+    public int getCountdown() {
+        return this.propertyDelegate.get(0);
+    }
+
+    public boolean isArmed() {
+        return this.propertyDelegate.get(1) == 1;
+    }
+
+    public float getMegaton() {
+        return Float.intBitsToFloat(this.propertyDelegate.get(2));
+    }
+
 }

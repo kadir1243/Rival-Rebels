@@ -11,55 +11,41 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
+import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
-import net.minecraft.block.BlockContainer;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.tileentity.TileEntity;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.BlockWithEntity;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.block.entity.BlockEntityTicker;
+import net.minecraft.block.entity.BlockEntityType;
+import net.minecraft.state.StateManager;
+import net.minecraft.state.property.IntProperty;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
-public class BlockReactive extends BlockContainer
-{
-	public BlockReactive()
+public class BlockReactive extends BlockWithEntity {
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+	public BlockReactive(Settings settings)
 	{
-		super(Material.IRON);
+		super(settings);
 	}
 
     @Override
-    public boolean hasTileEntity(IBlockState state) {
-        return true;
+    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+        builder.add(META);
     }
 
+    @Nullable
     @Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+		return new TileEntityReactive(pos, state);
 	}
 
-	/*@SideOnly(Side.CLIENT)
-	IIcon	icon;
-	@SideOnly(Side.CLIENT)
-	IIcon	icontop;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0 || side == 1) return icontop;
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:cf");
-		icontop = iconregister.registerIcon("RivalRebels:cn");
-	}*/
-
-	@Override
-	public TileEntity createNewTileEntity(World world, int var)
-	{
-		return new TileEntityReactive();
-	}
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+    }
 }

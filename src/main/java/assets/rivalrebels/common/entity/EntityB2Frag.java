@@ -15,12 +15,14 @@ import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
 import net.minecraft.entity.Entity;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.DamageSource;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.entity.EntityType;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
 
 import java.util.List;
@@ -34,85 +36,78 @@ public class EntityB2Frag extends EntityInanimate
 	float				motionyaw	= 0;
 	float				motionpitch	= 0;
 	float				offset		= 0;
-	double				size		= 0;
-	public int			health;
+    public int			health;
 
-	public EntityB2Frag(World par1World)
-	{
-		super(par1World);
+    public EntityB2Frag(EntityType<? extends EntityB2Frag> type, World world) {
+        super(type, world);
+    }
+
+	public EntityB2Frag(World par1World) {
+		this(RREntities.B2FRAG, par1World);
 		health = 300;
-		setEntityBoundingBox(new AxisAlignedBB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
-		setSize(7.5F, 7.5F);
-		ignoreFrustumCheck = true;
+		setBoundingBox(new Box(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
+		ignoreCameraFrustum = true;
 	}
 
 	public EntityB2Frag(World par1World, Entity toBeGibbed, int Type)
 	{
-		super(par1World);
+		this(par1World);
 		health = 300;
-		setEntityBoundingBox(new AxisAlignedBB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
-		setSize(7.5F, 7.5F);
-		ignoreFrustumCheck = true;
+		setBoundingBox(new Box(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
+		ignoreCameraFrustum = true;
 
 		isSliding = false;
 		type = Type;
 
-		motionyaw = (float) ((rand.nextDouble() - 0.5) * 35);
-		motionpitch = (float) ((rand.nextDouble() - 0.5) * 25);
+		motionyaw = (float) ((random.nextDouble() - 0.5) * 35);
+		motionpitch = (float) ((random.nextDouble() - 0.5) * 25);
 
-		setLocationAndAngles(toBeGibbed.posX, toBeGibbed.posY, toBeGibbed.posZ, toBeGibbed.rotationYaw, toBeGibbed.rotationPitch);
+		refreshPositionAndAngles(toBeGibbed.getX(), toBeGibbed.getY(), toBeGibbed.getZ(), toBeGibbed.getYaw(), toBeGibbed.getPitch());
 
-		double ox = posX;
-		double oz = posZ;
+		double ox = getX();
+		double oz = getZ();
 
 		if (Type == 1)
 		{
-			posX -= (MathHelper.cos(((-rotationYaw) / 180.0F) * (float) Math.PI) * 7.5F);
-			posZ -= (MathHelper.sin(((-rotationYaw) / 180.0F) * (float) Math.PI) * 7.5F);
+            setPos(getX() - (MathHelper.cos(((-getYaw()) / 180.0F) * (float) Math.PI) * 7.5F),
+                getY(),
+                getZ() - (MathHelper.sin(((-getYaw()) / 180.0F) * (float) Math.PI) * 7.5F));
 		}
 		else if (Type == 0)
 		{
-			posX -= (MathHelper.cos(((-rotationYaw + 180) / 180.0F) * (float) Math.PI) * 7.5F);
-			posZ -= (MathHelper.sin(((-rotationYaw + 180) / 180.0F) * (float) Math.PI) * 7.5F);
+            setPos(getX() - (MathHelper.cos(((-getYaw() + 180) / 180.0F) * (float) Math.PI) * 7.5F),
+                getY(),
+                getZ() - (MathHelper.sin(((-getYaw() + 180) / 180.0F) * (float) Math.PI) * 7.5F));
 		}
 
-		setPosition(posX, posY, posZ);
+		setPosition(getX(), getY(), getZ());
 
-		motionX = toBeGibbed.motionX;
-		motionY = toBeGibbed.motionY;
-		motionZ = toBeGibbed.motionZ;
+        setVelocity(toBeGibbed.getVelocity());
 
-		motionX += (-ox + posX) * 0.1;
-		motionZ += (-oz + posZ) * 0.1;
+        setVelocity(getVelocity().add((-ox + getX()) * 0.1, 0, (-oz + getZ()) * 0.1));
 
-		setFire(10);
+		setOnFireFor(10);
 	}
 
 	@Override
-	public AxisAlignedBB getCollisionBox(Entity par1Entity)
-	{
-		return par1Entity.getEntityBoundingBox();
-	}
-
-	@Override
-	public boolean canBeCollidedWith()
+	public boolean collides()
 	{
 		return true;
 	}
 
 	@Override
-	public void onUpdate()
+	public void tick()
 	{
 		/*if (ticksInAir == 0)
 		{
-			Side side = FMLCommonHandler.instance().getEffectiveSide();
-			if (side == Side.SERVER)
+			Dist side = FMLCommonHandler.instance().getEffectiveSide();
+			if (side == Dist.SERVER)
 			{
-                for (EntityPlayer player : world.playerEntities) {
+                for (PlayerEntity player : world.playerEntities) {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream(9);
                     try (DataOutputStream outputStream = new DataOutputStream(bos)) {
                         outputStream.writeInt(17);
-                        outputStream.writeInt(getEntityId());
+                        outputStream.writeInt(getId());
                         outputStream.writeByte(type);
                     } catch (Exception ex) {
                         ex.printStackTrace();
@@ -125,10 +120,7 @@ public class EntityB2Frag extends EntityInanimate
 			}
 		}*/
 
-        lastTickPosX = posX;
-		lastTickPosY = posY;
-		lastTickPosZ = posZ;
-		super.onUpdate();
+		super.tick();
 
 		if (inGround)
 		{
@@ -136,31 +128,29 @@ public class EntityB2Frag extends EntityInanimate
 
 			if (ticksInGround == 1200)
 			{
-				setDead();
+				kill();
 			}
 
 			inGround = false;
-			motionX *= (rand.nextFloat() * 0.2F);
-			motionY *= (rand.nextFloat() * 0.2F);
-			motionZ *= (rand.nextFloat() * 0.2F);
+			setVelocity(getVelocity().multiply((random.nextFloat() * 0.2F),
+                (random.nextFloat() * 0.2F),
+                (random.nextFloat() * 0.2F)));
 			ticksInGround = 0;
         }
 
-		Vec3d vec3 = new Vec3d(posX, posY, posZ);
-		Vec3d vec31 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
-		RayTraceResult movingobjectposition = world.rayTraceBlocks(vec3, vec31);
-		vec3 = new Vec3d(posX, posY, posZ);
-		vec31 = new Vec3d(posX + motionX, posY + motionY, posZ + motionZ);
+		Vec3d vec3 = getPos();
+		Vec3d vec31 = getPos().add(getVelocity());
+		BlockHitResult hitResult = world.raycast(new RaycastContext(vec3, vec31, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
-		if (movingobjectposition != null)
+		if (hitResult != null)
 		{
 			isSliding = true;
-			posY = movingobjectposition.hitVec.y + offset;
+            setPos(getX(), hitResult.getPos().getY() + offset, getZ());
 		}
 
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
-			List<Entity> var5 = world.getEntitiesWithinAABBExcludingEntity(this, getEntityBoundingBox().expand(motionX, motionY, motionZ).grow(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
@@ -172,20 +162,18 @@ public class EntityB2Frag extends EntityInanimate
                 }
 
                 if (var9 instanceof EntityLaserBurst) {
-                    var9.setDead();
-                    attackEntityFrom(DamageSource.GENERIC, 6);
+                    var9.kill();
+                    damage(DamageSource.GENERIC, 6);
                 }
             }
 		}
 
-		rotationPitch += motionpitch;
-		rotationYaw += motionyaw;
-		posX += motionX;
-		posY += motionY;
-		posZ += motionZ;
+        setPitch(getPitch() + motionpitch);
+		setYaw(getYaw() + motionyaw);
+        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
 
-		rotationPitch = prevRotationPitch + (rotationPitch - prevRotationPitch) * 0.5F;
-		rotationYaw = prevRotationYaw + (rotationYaw - prevRotationYaw) * 0.5F;
+		setPitch(prevPitch + (getPitch() - prevPitch) * 0.5F);
+		setYaw(prevYaw + (getYaw() - prevYaw) * 0.5F);
 
 		float f2 = 0.99F;
 		float f3 = 0.05F;
@@ -194,52 +182,50 @@ public class EntityB2Frag extends EntityInanimate
 		{
 			motionpitch = 0;
 			motionyaw = 0;
-			motionY = 0;
+            setVelocity(getVelocity().getX(), 0, getVelocity().getZ());
 			f2 = 0.7f;
 			f3 = 0.0f;
 		}
 
 		motionpitch *= (double) f2;
 		motionyaw *= (double) f2;
-		motionX *= f2;
-		motionY *= f2;
-		motionZ *= f2;
-		motionY -= f3;
+        setVelocity(getVelocity().multiply(f2));
+        setVelocity(getVelocity().subtract(0, f3, 0));
 
-		setPosition(posX, posY, posZ);
+		setPosition(getX(), getY(), getZ());
 	}
 
     @Override
-	public void writeEntityToNBT(NBTTagCompound par1NBTTagCompound)
+	public void writeCustomDataToNbt(NbtCompound par1NBTTagCompound)
 	{
-		par1NBTTagCompound.setByte("Type", (byte) type);
-		par1NBTTagCompound.setByte("inGround", (byte) (inGround ? 1 : 0));
+		par1NBTTagCompound.putInt("Type", type);
+		par1NBTTagCompound.putBoolean("inGround", inGround);
 	}
 
 	@Override
-	public void readEntityFromNBT(NBTTagCompound par1NBTTagCompound)
+	public void readCustomDataFromNbt(NbtCompound par1NBTTagCompound)
 	{
-		type = par1NBTTagCompound.getByte("Type") & 255;
-		inGround = par1NBTTagCompound.getByte("inGround") == 1;
+		type = par1NBTTagCompound.getInt("Type");
+		inGround = par1NBTTagCompound.getBoolean("inGround");
 	}
 
 	@Override
-	public boolean isInRangeToRenderDist(double par1)
+	public boolean shouldRender(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean attackEntityFrom(DamageSource par1DamageSource, float par2)
+	public boolean damage(DamageSource par1DamageSource, float par2)
 	{
-		if (!isDead)
+		if (isAlive())
 		{
 			health -= par2;
 
 			if (health <= 0)
 			{
-				setDead();
-				new Explosion(world, posX, posY, posZ, 6, true, true, RivalRebelsDamageSource.rocket);
+				kill();
+				new Explosion(world, getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket);
 				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
 			}
 		}

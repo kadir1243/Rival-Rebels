@@ -11,47 +11,58 @@
  *******************************************************************************/
 package assets.rivalrebels.client.tileentityrender;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelObjective;
 import assets.rivalrebels.common.tileentity.TileEntitySigmaObjective;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.tileentity.TileEntitySpecialRenderer;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.block.entity.BlockEntityRenderer;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class TileEntitySigmaObjectiveRenderer extends TileEntitySpecialRenderer<TileEntitySigmaObjective>
-{
-	private ModelObjective	loaderModel;
+@OnlyIn(Dist.CLIENT)
+public class TileEntitySigmaObjectiveRenderer implements BlockEntityRenderer<TileEntitySigmaObjective> {
+	private final ModelObjective loaderModel;
 
-	public TileEntitySigmaObjectiveRenderer()
-	{
+	public TileEntitySigmaObjectiveRenderer(BlockEntityRendererFactory.Context context) {
 		loaderModel = new ModelObjective();
 	}
 
     @Override
-    public void render(TileEntitySigmaObjective te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-		GlStateManager.pushMatrix();
-		GlStateManager.translate((float) x + 0.5F, (float) y + 0.5F, (float) z + 0.5F);
-		Minecraft.getMinecraft().renderEngine.bindTexture(RivalRebels.etsigmaobj);
+    public void render(TileEntitySigmaObjective entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        matrices.push();
+		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etsigmaobj);
 
-		GlStateManager.rotate(90, 1, 0, 0);
-		loaderModel.renderA();
-		GlStateManager.rotate(-90, 1, 0, 0);
-		GlStateManager.rotate(90, 0, 0, 1);
-		loaderModel.renderB((float) te.slide, 96f / 256f, 44f / 128f, 0.125f, 0.84375f);
-		GlStateManager.rotate(-90, 0, 0, 1);
-		loaderModel.renderB((float) te.slide, 32f / 256f, 44f / 128f, 0.625f, 0.84375f);
-		GlStateManager.rotate(90, 0, 1, 0);
-		loaderModel.renderB((float) te.slide, 96f / 256f, 108f / 128f, 0.625f, 0.84375f);
-		GlStateManager.rotate(90, 0, 1, 0);
-		loaderModel.renderB((float) te.slide, 160f / 256f, 44f / 128f, 0.625f, 0.84375f);
-		GlStateManager.rotate(90, 0, 1, 0);
-		loaderModel.renderB((float) te.slide, 224f / 256f, 108f / 128f, 0.625f, 0.84375f);
-		GlStateManager.rotate(90, 0, 1, 0);
-		GlStateManager.rotate(-90, 0, 0, 1);
-		loaderModel.renderB((float) te.slide, 224f / 256f, 44f / 128f, 0.625f, 0.84375f);
-		GlStateManager.popMatrix();
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        matrices.multiply(new Quaternion(90, 1, 0, 0));
+        loaderModel.renderA(matrices, buffer);
+        matrices.multiply(new Quaternion(-90, 1, 0, 0));
+        matrices.multiply(new Quaternion(90, 0, 0, 1));
+        loaderModel.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 44f / 128f, 0.125f, 0.84375f);
+        matrices.multiply(new Quaternion(-90, 0, 0, 1));
+        loaderModel.renderB(matrices, buffer, (float) entity.slide, 32f / 256f, 44f / 128f, 0.625f, 0.84375f);
+        matrices.multiply(new Quaternion(90, 0, 1, 0));
+        loaderModel.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 108f / 128f, 0.625f, 0.84375f);
+        matrices.multiply(new Quaternion(90, 0, 1, 0));
+        loaderModel.renderB(matrices, buffer, (float) entity.slide, 160f / 256f, 44f / 128f, 0.625f, 0.84375f);
+        matrices.multiply(new Quaternion(90, 0, 1, 0));
+        loaderModel.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 108f / 128f, 0.625f, 0.84375f);
+        matrices.multiply(new Quaternion(90, 0, 1, 0));
+        matrices.multiply(new Quaternion(-90, 0, 0, 1));
+        loaderModel.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 44f / 128f, 0.625f, 0.84375f);
+		matrices.pop();
 	}
+
+    @Override
+    public int getRenderDistance()
+    {
+        return 16384;
+    }
+
 }

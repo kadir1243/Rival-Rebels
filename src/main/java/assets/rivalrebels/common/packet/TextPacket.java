@@ -11,58 +11,45 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import io.netty.buffer.ByteBuf;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.resource.language.I18n;
+import net.minecraft.network.PacketByteBuf;
+import net.minecraft.text.Text;
+import net.minecraftforge.network.NetworkEvent;
 
-public class TextPacket implements IMessage
-{
-	private String text;
+import java.util.function.Supplier;
 
-	public TextPacket() {
-	}
+public class TextPacket {
+    private final String text;
 
-	public TextPacket(String t)
-	{
-		text = t;
-	}
+    public TextPacket(String t) {
+        text = t;
+    }
 
-	@Override
-	public void fromBytes(ByteBuf buf) {
-        text = ByteBufUtils.readUTF8String(buf);
-	}
+    public static TextPacket fromBytes(PacketByteBuf buf) {
+        return new TextPacket(buf.readString());
+    }
 
-	@Override
-	public void toBytes(ByteBuf buf) {
-        ByteBufUtils.writeUTF8String(buf, text);
-	}
+    public static void toBytes(TextPacket packet, PacketByteBuf buf) {
+        buf.writeString(packet.text);
+    }
 
-	public static class Handler implements IMessageHandler<TextPacket, IMessage>
-	{
-		@Override
-		public IMessage onMessage(TextPacket m, MessageContext ctx)
-		{
-            Minecraft.getMinecraft().addScheduledTask(() -> {
-                if (m.text.startsWith("-t")) {
-                    String[] str = m.text.substring(2).split("\n");
-                    for (String string : str)
-                        Minecraft.getMinecraft().player.sendMessage(new TextComponentString(string));
-                } else {
-                    String[] s = m.text.split(" ");
-                    StringBuilder strb = new StringBuilder();
-                    for (String string : s) {
-                        strb.append(I18n.format(string));
-                        strb.append(" ");
-                    }
-                    Minecraft.getMinecraft().player.sendMessage(new TextComponentString(strb.toString()));
+    public static void onMessage(TextPacket m, Supplier<NetworkEvent.Context> ctx) {
+        NetworkEvent.Context context = ctx.get();
+        context.enqueueWork(() -> {
+            if (m.text.startsWith("-t")) {
+                String[] str = m.text.substring(2).split("\n");
+                for (String string : str)
+                    MinecraftClient.getInstance().player.sendMessage(Text.of(string), false);
+            } else {
+                String[] s = m.text.split(" ");
+                StringBuilder strb = new StringBuilder();
+                for (String string : s) {
+                    strb.append(I18n.translate(string));
+                    strb.append(" ");
                 }
-            });
-			return null;
-		}
-	}
+                MinecraftClient.getInstance().player.sendMessage(Text.of(strb.toString()), false);
+            }
+        });
+    }
 }

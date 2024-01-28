@@ -11,53 +11,30 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.state.IBlockState;
+import net.minecraft.block.BlockState;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.item.Item;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Random;
 
 public class BlockQuickSand extends Block
 {
-	public BlockQuickSand()
+	public BlockQuickSand(Settings settings)
 	{
-		super(Material.GROUND);
+		super(settings);
 	}
 
     @Override
-    public void onEntityCollision(World world, BlockPos pos, IBlockState state, Entity entity) {
+    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
 		entity.fallDistance = 0.0F;
-		entity.motionY = entity.motionY * 0.005;
-		if (world.rand.nextFloat() > 0.95) RivalRebelsSoundPlayer.playSound(world, 20, 0, pos, 0.2f);
-	}
-
-	@Override
-	public boolean isOpaqueCube(IBlockState state)
-	{
-		return false;
-	}
-
-    @Nullable
-    @Override
-    public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-        return null;
-    }
-
-    @Override
-    public Item getItemDropped(IBlockState state, Random rand, int fortune) {
-		return Item.getItemFromBlock(RivalRebels.aquicksand);
+        entity.setVelocity(entity.getVelocity().multiply(1, 0.005, 1));
+		if (world.random.nextFloat() > 0.95) RivalRebelsSoundPlayer.playSound(world, 20, 0, pos, 0.2f);
 	}
 
 	/*@Override
@@ -126,8 +103,8 @@ public class BlockQuickSand extends Block
 	}*/
 
     @Override
-    public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
-        return new ItemStack(RivalRebels.aquicksand);
+    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+        return RRBlocks.aquicksand.asItem().getDefaultStack();
     }
 
 	/*@Override

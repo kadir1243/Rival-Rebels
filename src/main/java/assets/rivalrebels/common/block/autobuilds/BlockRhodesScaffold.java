@@ -12,8 +12,9 @@
 package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.block.Block;
-import net.minecraft.init.Blocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
@@ -53,28 +54,28 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 		0,3,0,0,0,1,0,0,0,
 		6,6,6,6,6,6,6,6,6,
 	};
-	public BlockRhodesScaffold()
+	public BlockRhodesScaffold(Settings settings)
 	{
-		super();
+		super(settings);
 	}
 
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			int scale = 1;
-			if (world.getBlockState(new BlockPos(x, y-1, z)).getBlock() == RivalRebels.buildrhodes && world.getBlockState(new BlockPos(x, y-2, z)).getBlock() == RivalRebels.buildrhodes)
+			if (world.getBlockState(new BlockPos(x, y-1, z)).getBlock() == RRBlocks.buildrhodes && world.getBlockState(new BlockPos(x, y-2, z)).getBlock() == RRBlocks.buildrhodes)
 			{
-				if (world.getBlockState(new BlockPos(x, y-3, z)).getBlock() == RivalRebels.buildrhodes && world.getBlockState(new BlockPos(x, y-4, z)) == RivalRebels.buildrhodes) scale = 3;
+				if (world.getBlockState(new BlockPos(x, y-3, z)).getBlock() == RRBlocks.buildrhodes && world.getBlockState(new BlockPos(x, y-4, z)).getBlock() == RRBlocks.buildrhodes) scale = 3;
 				else scale = 2;
 			}
 			for (int i = 0; i < 32*9; i++)
 			{
-				int fy = +30-(i/9);
+				int fy = 30 -(i/9);
 				int fx1 = -8+(i%9);
-				int fx2 = +9-(i%9);
+				int fx2 = 9 -(i%9);
 				fy *= scale;
 				fx1 *= scale;
 				fx2 *= scale;
@@ -124,15 +125,15 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 	{
 		if (b == 0)
 		{
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z-4));
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z-3));
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z-2));
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z-1));
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z), RivalRebels.steel.getDefaultState());
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z+1));
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z+2));
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z+3));
-			world.setBlockToAir(new BlockPos(x+fx1, y+fy, z+4));
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z-4), Blocks.AIR.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z-3), Blocks.AIR.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z-2), Blocks.AIR.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z-1), Blocks.AIR.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z), RRBlocks.steel.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z+1), Blocks.AIR.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z+2), Blocks.AIR.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z+3), Blocks.AIR.getDefaultState());
+			world.setBlockState(new BlockPos(x+fx1, y+fy, z+4), Blocks.AIR.getDefaultState());
 		}
 		if (b == 1)
 		{
@@ -140,7 +141,7 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 			setBlock(world, x+fx1, y+fy, z-3, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z-2, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z-1, Blocks.AIR);
-			if (RivalRebels.prefillrhodes) setBlock(world, x+fx1, y+fy, z, RivalRebels.conduit);
+			if (RivalRebels.prefillrhodes) setBlock(world, x+fx1, y+fy, z, RRBlocks.conduit);
 			else setBlock(world, x+fx1, y+fy, z, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z+1, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z+2, Blocks.AIR);
@@ -153,7 +154,7 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 			setBlock(world, x+fx1, y+fy, z-3, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z-2, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z-1, Blocks.AIR);
-			setBlock(world, x+fx1, y+fy, z, RivalRebels.rhodesactivator);
+			setBlock(world, x+fx1, y+fy, z, RRBlocks.rhodesactivator);
 			setBlock(world, x+fx1, y+fy, z+1, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z+2, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z+3, Blocks.AIR);
@@ -162,50 +163,50 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 		if (b == 3)
 		{
 			setBlock(world, x+fx1, y+fy, z-4, Blocks.AIR);
-			setBlock(world, x+fx1, y+fy, z-3, RivalRebels.steel);
+			setBlock(world, x+fx1, y+fy, z-3, RRBlocks.steel);
 			setBlock(world, x+fx1, y+fy, z-2, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z-1, Blocks.AIR);
-			setBlock(world, x+fx1, y+fy, z, RivalRebels.steel);
+			setBlock(world, x+fx1, y+fy, z, RRBlocks.steel);
 			setBlock(world, x+fx1, y+fy, z+1, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z+2, Blocks.AIR);
-			setBlock(world, x+fx1, y+fy, z+3, RivalRebels.steel);
+			setBlock(world, x+fx1, y+fy, z+3, RRBlocks.steel);
 			setBlock(world, x+fx1, y+fy, z+4, Blocks.AIR);
 		}
 		if (b == 4)
 		{
 			setBlock(world, x+fx1, y+fy, z-4, Blocks.AIR);
-			setBlock(world, x+fx1, y+fy, z-3, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z-2, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z-1, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z+1, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z+2, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z+3, RivalRebels.steel);
+			setBlock(world, x+fx1, y+fy, z-3, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z-2, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z-1, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z+1, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z+2, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z+3, RRBlocks.steel);
 			setBlock(world, x+fx1, y+fy, z+4, Blocks.AIR);
 		}
 		if (b == 5)
 		{
 			setBlock(world, x+fx1, y+fy, z-4, Blocks.AIR);
-			setBlock(world, x+fx1, y+fy, z-3, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z-2, RivalRebels.conduit);
-			setBlock(world, x+fx1, y+fy, z-1, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z+1, RivalRebels.steel);
-			setBlock(world, x+fx1, y+fy, z+2, RivalRebels.conduit);
-			setBlock(world, x+fx1, y+fy, z+3, RivalRebels.steel);
+			setBlock(world, x+fx1, y+fy, z-3, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z-2, RRBlocks.conduit);
+			setBlock(world, x+fx1, y+fy, z-1, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z+1, RRBlocks.steel);
+			setBlock(world, x+fx1, y+fy, z+2, RRBlocks.conduit);
+			setBlock(world, x+fx1, y+fy, z+3, RRBlocks.steel);
 			setBlock(world, x+fx1, y+fy, z+4, Blocks.AIR);
 		}
 		if (b == 6)
 		{
-			setBlock(world, x+fx1, y+fy, z-4, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z-3, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z-2, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z-1, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z+1, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z+2, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z+3, RivalRebels.reactive);
-			setBlock(world, x+fx1, y+fy, z+4, RivalRebels.reactive);
+			setBlock(world, x+fx1, y+fy, z-4, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z-3, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z-2, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z-1, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z+1, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z+2, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z+3, RRBlocks.reactive);
+			setBlock(world, x+fx1, y+fy, z+4, RRBlocks.reactive);
 		}
 		if (b == 7)
 		{
@@ -225,20 +226,20 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
         world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
     }
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -251,7 +252,7 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

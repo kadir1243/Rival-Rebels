@@ -11,22 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RivalRebels;
-import net.minecraft.init.Blocks;
+import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
 public class BlockAutoMarioTrap extends BlockAutoTemplate
 {
-	public BlockAutoMarioTrap()
+	public BlockAutoMarioTrap(Settings settings)
 	{
-		super();
+		super(settings);
 	}
 
 	@Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isRemote)
+		if (!world.isClient)
 		{
 			placeBlockCarefully(world, x, y, z, Blocks.AIR);
 			int r = 2;
@@ -34,7 +34,7 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 			{
 				for (int x1 = -r; x1 <= r; x1++)
 				{
-					placeBlockCarefully(world, x + x1, y - 1, z + z1, RivalRebels.amario);
+					placeBlockCarefully(world, x + x1, y - 1, z + z1, RRBlocks.amario);
 					placeBlockCarefully(world, x + x1, y - 2, z + z1, Blocks.AIR);
 					placeBlockCarefully(world, x + x1, y - 3, z + z1, Blocks.AIR);
 				}
@@ -42,20 +42,20 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 		}
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -68,7 +68,7 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

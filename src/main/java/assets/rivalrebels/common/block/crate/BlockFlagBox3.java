@@ -11,68 +11,63 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.block.Block;
-import net.minecraft.block.material.Material;
-import net.minecraft.entity.item.EntityItem;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.entity.ItemEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.ActionResult;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
-
-import java.util.Random;
 
 public class BlockFlagBox3 extends Block
 {
-	public BlockFlagBox3()
+	public BlockFlagBox3(Settings settings)
 	{
-		super(Material.WOOD);
-	}
-
-	@Override
-	public int quantityDropped(Random par1Random)
-	{
-		return 0;
+		super(settings);
 	}
 
     @Override
-    public void onBlockClicked(World world, BlockPos pos, EntityPlayer player) {
-		blockActivated(world, pos.getX(), pos.getY(), pos.getZ(), player);
-	}
+    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+        int x = pos.getX();
+        int y = pos.getY();
+        int z = pos.getZ();
 
-	public boolean blockActivated(World world, int x, int y, int z, EntityPlayer player)
-	{
-		if (player.isSneaking() && !world.isRemote)
+		if (player.isSneaking() && !world.isClient)
 		{
-			EntityItem ei = new EntityItem(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.flag3, 10));
+			ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.flag3, 10));
 			world.spawnEntity(ei);
-			world.setBlockToAir(new BlockPos(x, y, z));
-			return false;
+            world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+			return ActionResult.PASS;
 		}
-		if (!player.isSneaking() && !world.isRemote)
+		if (!player.isSneaking() && !world.isClient)
 		{
-			player.sendMessage(new TextComponentTranslation("RivalRebels.Orders").appendText(" ").appendSibling(new TextComponentTranslation("RivalRebels.sneak")));
-			world.setBlockState(new BlockPos(x, y, z), RivalRebels.flagbox4.getDefaultState());
-			return false;
+			player.sendMessage(new TranslatableText("RivalRebels.Orders").append(" ").append(new TranslatableText("RivalRebels.sneak")), false);
+			world.setBlockState(new BlockPos(x, y, z), RRBlocks.flagbox4.getDefaultState());
+			return ActionResult.PASS;
 		}
-		return false;
+		return ActionResult.PASS;
 	}
 
-	/*@SideOnly(Side.CLIENT)
+	/*@OnlyIn(Dist.CLIENT)
 	IIcon	icon1;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon3;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon4;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon5;
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	IIcon	icon6;
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -85,7 +80,7 @@ public class BlockFlagBox3 extends Block
 		return icon1;
 	}
 
-	@SideOnly(Side.CLIENT)
+	@OnlyIn(Dist.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

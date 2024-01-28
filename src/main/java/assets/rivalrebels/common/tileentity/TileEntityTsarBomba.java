@@ -12,31 +12,42 @@
 package assets.rivalrebels.common.tileentity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.block.trap.BlockTsarBomba;
+import assets.rivalrebels.common.container.ContainerTsar;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityTsar;
-import assets.rivalrebels.common.packet.PacketDispatcher;
-import assets.rivalrebels.common.packet.TextPacket;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.ItemStackHelper;
+import net.minecraft.block.BlockState;
+import net.minecraft.block.Blocks;
+import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.Inventories;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.screen.NamedScreenHandlerFactory;
+import net.minecraft.screen.PropertyDelegate;
+import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.ITickable;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.text.MutableText;
+import net.minecraft.text.Text;
+import net.minecraft.text.TranslatableText;
+import net.minecraft.util.collection.DefaultedList;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Box;
+import net.minecraft.world.explosion.Explosion;
+import org.jetbrains.annotations.Nullable;
 
-public class TileEntityTsarBomba extends TileEntity implements IInventory, ITickable
+public class TileEntityTsarBomba extends BlockEntity implements Inventory, Tickable, NamedScreenHandlerFactory
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
-	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
+	private final DefaultedList<ItemStack> chestContents	= DefaultedList.ofSize(36, ItemStack.EMPTY);
     public int				countdown		= RivalRebels.nuclearBombCountdown * 20;
 	public int				nuclear			= 0;
 	public int				hydrogen		= 0;
@@ -47,48 +58,36 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
 	public boolean			hasTrollface	= false;
 	public float			megaton			= 0;
 
-	/**
-	 * Returns the number of slots in the inventory.
-	 */
-	@Override
-	public int getSizeInventory()
+    public TileEntityTsarBomba(BlockPos pos, BlockState state) {
+        super(RRTileEntities.TSAR_BOMB, pos, state);
+    }
+
+    @Override
+	public int size()
 	{
 		return 21;
 	}
 
-	/**
-	 * Returns the stack in slot i
-	 */
-	@Override
-	public ItemStack getStackInSlot(int par1)
+    @Override
+	public ItemStack getStack(int slot)
 	{
-		return this.chestContents.get(par1);
+		return this.chestContents.get(slot);
 	}
 
-	/**
-	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
-	 */
-	@Override
-	public ItemStack decrStackSize(int par1, int par2)
-	{
-		if (!this.chestContents.get(par1).isEmpty())
-		{
+    @Override
+    public ItemStack removeStack(int slot, int amount) {
+		if (!this.chestContents.get(slot).isEmpty()) {
 			ItemStack var3;
 
-			if (this.chestContents.get(par1).getCount() <= par2)
-			{
-				var3 = this.chestContents.get(par1);
-				this.chestContents.set(par1, ItemStack.EMPTY);
-            }
-			else
-			{
-				var3 = this.chestContents.get(par1).splitStack(par2);
+			if (this.chestContents.get(slot).getCount() <= amount) {
+				var3 = this.chestContents.get(slot);
+				this.chestContents.set(slot, ItemStack.EMPTY);
+            } else {
+				var3 = this.chestContents.get(slot).split(amount);
 
-				if (this.chestContents.get(par1).isEmpty())
-				{
-					this.chestContents.set(par1, ItemStack.EMPTY);
+				if (this.chestContents.get(slot).isEmpty()) {
+					this.chestContents.set(slot, ItemStack.EMPTY);
 				}
-
             }
             return var3;
         }
@@ -96,94 +95,70 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
     }
 
     @Override
-    public ItemStack removeStackFromSlot(int index) {
-		if (!this.chestContents.get(index).isEmpty())
+    public ItemStack removeStack(int slot) {
+		if (!this.chestContents.get(slot).isEmpty())
 		{
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
+			ItemStack var2 = this.chestContents.get(slot);
+			this.chestContents.set(slot, ItemStack.EMPTY);
 			return var2;
 		}
         return ItemStack.EMPTY;
     }
 
-	/**
-	 * Sets the given item stack to the specified slot in the inventory (can be crafting or armor sections).
-	 */
-	@Override
-	public void setInventorySlotContents(int index, ItemStack stack)
-	{
-		this.chestContents.set(index, stack);
+    @Override
+    public void setStack(int slot, ItemStack stack) {
+		this.chestContents.set(slot, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getInventoryStackLimit())
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack())
 		{
-			stack.setCount(this.getInventoryStackLimit());
+			stack.setCount(this.getMaxCountPerStack());
 		}
 
 	}
 
-	/**
-	 * Reads a tile entity from NBT.
-	 */
-	@Override
-	public void readFromNBT(NBTTagCompound compound)
-	{
-		super.readFromNBT(compound);
+    @Override
+    public void readNbt(NbtCompound nbt) {
+        super.readNbt(nbt);
 
-        ItemStackHelper.loadAllItems(compound, this.chestContents);
+        Inventories.readNbt(nbt, this.chestContents);
 	}
 
-	/**
-     * Writes a tile entity to NBT.
-     *
-     * @return
-     */
-	@Override
-	public NBTTagCompound writeToNBT(NBTTagCompound compound)
-	{
-		super.writeToNBT(compound);
-        ItemStackHelper.saveAllItems(compound, this.chestContents);
-        return compound;
+    @Override
+    public void writeNbt(NbtCompound nbt) {
+        super.writeNbt(nbt);
+        Inventories.writeNbt(nbt, this.chestContents);
     }
 
-	/**
-	 * Returns the maximum stack size for a inventory slot. Seems to always be 64, possibly will be extended. *Isn't this more of a set than a get?*
-	 */
-	@Override
-	public int getInventoryStackLimit()
+    @Override
+	public int getMaxCountPerStack()
 	{
 		return 1;
 	}
 
-	/**
-	 * Do not make give this method the name canInteractWith because it clashes with Container
-	 */
-	@Override
-	public boolean isUsableByPlayer(EntityPlayer player)
+    @Override
+	public boolean canPlayerUse(PlayerEntity player)
 	{
-		return this.world.getTileEntity(this.getPos()) == this && player.getDistanceSq(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
+		return this.world.getBlockEntity(this.getPos()) == this && player.squaredDistanceTo(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
 	}
 
-	/**
-	 * Allows the entity to update its state. Overridden in most subclasses, e.g. the mob spawner uses this to count ticks and creates a new spawn inside its implementation.
-	 */
-	@Override
-	public void update() {
+    @Override
+	public void tick() {
 		nuclear = 0;
 		hydrogen = 0;
 		for (int i = 3; i <= 18; i++)
 		{
-			if (!getStackInSlot(i).isEmpty())
+			if (!getStack(i).isEmpty())
 			{
-				Item item = getStackInSlot(i).getItem();
-				if (i < 11 && item == RivalRebels.nuclearelement)
+				Item item = getStack(i).getItem();
+				if (i < 11 && item == RRItems.nuclearelement)
 				{
 					nuclear++;
 				}
-				else if (i > 10 && item == RivalRebels.hydrod)
+				else if (i > 10 && item == RRItems.hydrod)
 				{
 					hydrogen++;
 				}
-				if (item == RivalRebels.trollmask)
+				if (item == RRItems.trollmask)
 				{
 					hasTrollface = true;
 				}
@@ -191,23 +166,22 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
 		}
 		if (nuclear == hydrogen) megaton = nuclear * 6.25f;
 
-		if (!getStackInSlot(0).isEmpty())
+		if (!getStack(0).isEmpty())
 		{
-			hasFuse = getStackInSlot(0).getItem() == RivalRebels.fuse;
+			hasFuse = getStack(0).getItem() == RRItems.fuse;
 		}
 		else
 		{
 			hasFuse = false;
 		}
 
-        ItemStack chipSlotStack = getStackInSlot(20);
+        ItemStack chipSlotStack = getStack(20);
         if (!chipSlotStack.isEmpty())
 		{
-			hasChip = chipSlotStack.getItem() == RivalRebels.chip;
-			if (hasChip && chipSlotStack.hasTagCompound())
-			{
-				rrteam = RivalRebelsTeam.getForID(chipSlotStack.getTagCompound().getInteger("team"));
-				username = chipSlotStack.getTagCompound().getString("username");
+			hasChip = chipSlotStack.getItem() == RRItems.chip;
+			if (hasChip && chipSlotStack.hasNbt()) {
+				rrteam = RivalRebelsTeam.getForID(chipSlotStack.getNbt().getInt("team"));
+				username = chipSlotStack.getNbt().getString("username");
 			}
 		}
 		else
@@ -215,18 +189,18 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
 			hasChip = false;
 		}
 
-		if (!getStackInSlot(1).isEmpty() && !getStackInSlot(2).isEmpty())
+		if (!getStack(1).isEmpty() && !getStack(2).isEmpty())
 		{
-			hasAntennae = getStackInSlot(1).getItem() == RivalRebels.antenna && getStackInSlot(2).getItem() == RivalRebels.antenna;
+			hasAntennae = getStack(1).getItem() == RRItems.antenna && getStack(2).getItem() == RRItems.antenna;
 		}
 		else
 		{
 			hasAntennae = false;
 		}
 
-		if (!getStackInSlot(19).isEmpty())
+		if (!getStack(19).isEmpty())
 		{
-			hasExplosive = true;// getStackInSlot(19).func_150998_b(RivalRebels.timedbomb);
+			hasExplosive = true;// getStack(19).func_150998_b(RivalRebels.timedbomb);
 		}
 		else
 		{
@@ -234,10 +208,10 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
 		}
 
 		boolean sp;
-        if (world.isRemote) {
-            sp = Minecraft.getMinecraft().isSingleplayer();
+        if (world.isClient) {
+            sp = MinecraftClient.getInstance().isInSingleplayer();
         } else {
-            MinecraftServer server = world.getMinecraftServer();
+            MinecraftServer server = world.getServer();
             sp = server.getCurrentPlayerCount() == 1;
         }
 
@@ -249,24 +223,24 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
 				{
-					dist = getDistanceSq(RivalRebels.round.omegaObjPos.getX(), getPos().getY(), RivalRebels.round.omegaObjPos.getZ());
+					dist = getPos().getSquaredDistance(RivalRebels.round.omegaObjPos.getX(), getPos().getY(), RivalRebels.round.omegaObjPos.getZ());
 				}
 				if (rrteam == RivalRebelsTeam.SIGMA)
 				{
-					dist = getDistanceSq(RivalRebels.round.sigmaObjPos.getX(), getPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
+					dist = getPos().getSquaredDistance(RivalRebels.round.sigmaObjPos.getX(), getPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
 				}
 			}
 			if (dist > (RivalRebels.tsarBombaStrength + (nuclear * hydrogen) + 29) * (RivalRebels.tsarBombaStrength + (nuclear * hydrogen) + 29))
 			{
 				if (countdown > 0) countdown--;
 			}
-			else if (!world.isRemote)
+			else if (!world.isClient)
 			{
 				this.chestContents.set(0, ItemStack.EMPTY);
-				PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING " + username));
-				PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.Status " + (rrteam == RivalRebelsTeam.OMEGA ? RivalRebels.omegaobj.getTranslationKey() : rrteam == RivalRebelsTeam.SIGMA ? RivalRebels.sigmaobj.getTranslationKey() : "NONE") + ".name RivalRebels.Defuse RivalRebels.tsar.tsar"));
-				// ChatMessageComponent.createFromText(I18n.translateToLocal("RivalRebels.spawn.join" + rrteam.name().toLowerCase()) + " " +
-				// I18n.translateToLocal("RivalRebels.nukedefuse")));
+                for (PlayerEntity player : world.getPlayers()) {
+                    player.sendMessage(new TranslatableText(RivalRebels.MODID + ".warning_to_specific_player", username), false);
+                    player.sendMessage(new TranslatableText(RivalRebels.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Text.of("NONE")), false);
+                }
 			}
 		}
 		else
@@ -275,21 +249,26 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
 			if (RivalRebels.nuclearBombCountdown == 0) countdown = 10;
 		}
 
-		if (countdown == 200 && !world.isRemote && RivalRebels.nuclearBombCountdown > 10)
+		if (countdown == 200 && !world.isClient && RivalRebels.nuclearBombCountdown > 10)
 		{
-			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning1"));
-			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning2"));
-			PacketDispatcher.packetsys.sendToAll(new TextPacket("RivalRebels.WARNING RivalRebels.warning3"));
+            MutableText line1 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
+            MutableText line2 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
+            MutableText line3 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
+            for (PlayerEntity player : world.getPlayers()) {
+                player.sendMessage(line1, false);
+                player.sendMessage(line2, false);
+                player.sendMessage(line3, false);
+            }
 		}
 
 		if (countdown % 20 == 0 && countdown <= 200 && RivalRebels.nuclearBombCountdown > 10) RivalRebelsSoundPlayer.playSound(world, 14, 0, getPos(), 100);
 
-		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !world.isRemote && nuclear == hydrogen)
+		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !world.isClient && nuclear == hydrogen)
 		{
-			world.setBlockToAir(getPos());
-			world.setLastLightningBolt(2);
+			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
+			world.setLightningTicksLeft(2);
 			float pitch = 0;
-			float yaw = switch (this.getBlockMetadata()) {
+			float yaw = switch (this.getCachedState().get(BlockTsarBomba.META)) {
                 case 2 -> 180;
                 case 3 -> 0;
                 case 4 -> 270;
@@ -303,74 +282,21 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
 
 		if (countdown == 0 && nuclear == 0 && hydrogen == 0)
 		{
-			world.setBlockToAir(getPos());
-			world.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, false);
+			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
+			world.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, Explosion.DestructionType.NONE);
 		}
     }
 
-	/**
-	 * invalidates a tile entity
-	 */
 	@Override
-	public void invalidate()
+	public Box getRenderBoundingBox()
 	{
-		this.updateContainingBlockInfo();
-		super.invalidate();
-	}
-
-	@Override
-	public AxisAlignedBB getRenderBoundingBox()
-	{
-		return new AxisAlignedBB(getPos().add(-5, 0, -5), getPos().add(6, 2, 6));
-	}
-
-	@Override
-	@SideOnly(Side.CLIENT)
-	public double getMaxRenderDistanceSquared()
-	{
-		return 16384.0D;
-	}
-
-	@Override
-	public boolean isItemValidForSlot(int i, ItemStack itemstack)
-	{
-		return true;
+		return new Box(getPos().add(-5, 0, -5), getPos().add(6, 2, 6));
 	}
 
     @Override
-    public int getField(int id) {
-        return 0;
+    public Text getDisplayName() {
+        return Text.of("Tsar Bomba");
     }
-
-    @Override
-    public void setField(int id, int value) {
-
-    }
-
-    @Override
-    public int getFieldCount() {
-        return 0;
-    }
-
-    @Override
-	public String getName()
-	{
-		return "Tsar Bomba";
-	}
-
-	@Override
-	public boolean hasCustomName()
-	{
-		return false;
-	}
-
-	@Override
-	public void openInventory(EntityPlayer player) {
-	}
-
-	@Override
-	public void closeInventory(EntityPlayer player) {
-	}
 
     @Override
     public void clear() {
@@ -386,4 +312,36 @@ public class TileEntityTsarBomba extends TileEntity implements IInventory, ITick
         }
         return true;
     }
+
+    @Nullable
+    @Override
+    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+        return new ContainerTsar(syncId, inv, this, propertyDelegate);
+    }
+
+    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+        @Override
+        public int get(int index) {
+            return switch (index) {
+                case 0 -> countdown;
+                case 1 -> nuclear != hydrogen ? 1 : 0;
+                case 2 -> hasExplosive && hasFuse && hasAntennae ? 1 : 0;
+                case 3 -> Float.floatToIntBits(megaton);
+                default -> 0;
+            };
+        }
+
+        @Override
+        public void set(int index, int value) {
+            switch (index) {
+                case 0 -> countdown = value;
+                default -> {}
+            }
+        }
+
+        @Override
+        public int size() {
+            return 4;
+        }
+    };
 }

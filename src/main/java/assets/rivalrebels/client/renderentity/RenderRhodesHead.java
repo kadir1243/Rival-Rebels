@@ -12,39 +12,37 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesHead;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.Render;
-import net.minecraft.client.renderer.entity.RenderManager;
-import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.relauncher.SideOnly;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.util.Identifier;
+import net.minecraft.util.math.Quaternion;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
 
-@SideOnly(Side.CLIENT)
-public class RenderRhodesHead extends Render<EntityRhodesHead>
+@OnlyIn(Dist.CLIENT)
+public class RenderRhodesHead extends EntityRenderer<EntityRhodesHead>
 {
-    public RenderRhodesHead(RenderManager renderManager) {
+    public RenderRhodesHead(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-	public void doRender(EntityRhodesHead par1Entity, double par2, double par4, double par6, float par8, float par9)
-	{
-        GlStateManager.pushMatrix();
-        GlStateManager.translate((float) par2, (float) par4, (float) par6);
-        GlStateManager.scale(par1Entity.scale, par1Entity.scale, par1Entity.scale);
-        GlStateManager.color(RenderRhodes.colors[par1Entity.color*3], RenderRhodes.colors[par1Entity.color*3+1], RenderRhodes.colors[par1Entity.color*3+2]);
-        Minecraft.getMinecraft().renderEngine.bindTexture(RenderRhodes.texture);
-        GlStateManager.disableCull();
-        GlStateManager.rotate(par1Entity.rotationYaw, 0, 1, 0);
-        GlStateManager.rotate(par1Entity.rotationPitch, 1, 0, 0);
+    public void render(EntityRhodesHead entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+        matrices.push();
+        matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
+        RenderSystem.setShaderColor(RenderRhodes.colors[entity.getColor()*3], RenderRhodes.colors[entity.getColor()*3+1], RenderRhodes.colors[entity.getColor()*3+2], 1);
+        matrices.multiply(new Quaternion(yaw, 0, 1, 0));
+        matrices.multiply(new Quaternion(entity.getPitch(), 1, 0, 0));
         //RenderRhodes.head.renderAll();
-        GlStateManager.popMatrix();
+        matrices.pop();
     }
 
 	@Override
-	protected ResourceLocation getEntityTexture(EntityRhodesHead entity)
+    public Identifier getTexture(EntityRhodesHead entity)
 	{
-		return null;
+		return RenderRhodes.texture;
 	}
 }
