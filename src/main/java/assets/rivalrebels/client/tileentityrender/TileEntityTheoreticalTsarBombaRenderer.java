@@ -14,21 +14,19 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.client.model.ModelTheoreticalTsarBomba;
 import assets.rivalrebels.common.block.trap.BlockTheoreticalTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
-import net.minecraft.client.render.RenderLayer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRenderer<TileEntityTheoreticalTsarBomba> {
-    private final ModelTheoreticalTsarBomba model;
-
+@Environment(EnvType.CLIENT)
+public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRenderer<TileEntityTheoreticalTsarBomba>, CustomRenderBoxExtension<TileEntityTheoreticalTsarBomba> {
     public TileEntityTheoreticalTsarBombaRenderer(BlockEntityRendererFactory.Context context) {
-        model = new ModelTheoreticalTsarBomba();
     }
 
     @Override
@@ -39,18 +37,18 @@ public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRender
         int metadata = entity.getCachedState().get(BlockTheoreticalTsarBomba.META);
 
         if (metadata == 2) {
-            matrices.multiply(new Quaternion(180, 0, 1, 0));
-            matrices.multiply(new Quaternion(90, 1, 0, 0));
+            matrices.multiply(new Quaternionf(180, 0, 1, 0));
+            matrices.multiply(new Quaternionf(90, 1, 0, 0));
         } else if (metadata == 3) {
-            matrices.multiply(new Quaternion(90, 1, 0, 0));
+            matrices.multiply(new Quaternionf(90, 1, 0, 0));
         } else if (metadata == 4) {
-            matrices.multiply(new Quaternion(-90, 0, 1, 0));
-            matrices.multiply(new Quaternion(90, 1, 0, 0));
+            matrices.multiply(new Quaternionf(-90, 0, 1, 0));
+            matrices.multiply(new Quaternionf(90, 1, 0, 0));
         } else if (metadata == 5) {
-            matrices.multiply(new Quaternion(90, 0, 1, 0));
-            matrices.multiply(new Quaternion(90, 1, 0, 0));
+            matrices.multiply(new Quaternionf(90, 0, 1, 0));
+            matrices.multiply(new Quaternionf(90, 1, 0, 0));
         }
-        model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()));
+        ModelTheoreticalTsarBomba.render(matrices, vertexConsumers, light, overlay);
         matrices.pop();
     }
 
@@ -60,4 +58,8 @@ public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRender
         return 16384;
     }
 
+    @Override
+    public Box getRenderBoundingBox(TileEntityTheoreticalTsarBomba blockEntity) {
+        return Box.from(BlockBox.create(blockEntity.getPos().add(-5, 0, -5), blockEntity.getPos().add(6, 2, 6)));
+    }
 }

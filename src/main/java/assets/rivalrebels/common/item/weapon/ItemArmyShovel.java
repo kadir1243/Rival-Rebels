@@ -12,24 +12,20 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
+import net.minecraft.item.MiningToolItem;
 import net.minecraft.item.ToolMaterials;
-import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.common.ToolActions;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ItemArmyShovel extends ToolItem
-{
+public class ItemArmyShovel extends MiningToolItem {
 	private static final Set<Block> blocksEffectiveAgainst;
 
 	public ItemArmyShovel() {
-		super(ToolMaterials.DIAMOND, new Settings().group(RRItems.rralltab));
+		super(1, 1, ToolMaterials.DIAMOND, null, new Settings());
     }
 
 	@Override
@@ -39,13 +35,13 @@ public class ItemArmyShovel extends ToolItem
 	}
 
     @Override
-    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
-        return super.isCorrectToolForDrops(stack, state) || blocksEffectiveAgainst.contains(state.getBlock());
+    public boolean isSuitableFor(BlockState state) {
+        return blocksEffectiveAgainst.contains(state.getBlock());
     }
 
     @Override
-    public boolean canPerformAction(ItemStack stack, ToolAction toolAction) {
-        return toolAction == ToolActions.AXE_DIG || toolAction == ToolActions.SHOVEL_DIG || toolAction == ToolActions.PICKAXE_DIG;
+    public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
+        return blocksEffectiveAgainst.contains(state.getBlock()) ? this.miningSpeed : 1.0f;
     }
 
     static
@@ -77,10 +73,4 @@ public class ItemArmyShovel extends ToolItem
 		blocksEffectiveAgainst.add(RRBlocks.petrifiedstone4);
 		blocksEffectiveAgainst.add(RRBlocks.petrifiedwood);
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:aw");
-	}*/
 }

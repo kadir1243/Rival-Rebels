@@ -19,7 +19,7 @@ public class RoddiskBase extends EntityInanimate {
     }
 
     @Override
-    public boolean collides() {
+    public boolean isCollidable() {
         return isAlive();
     }
 

@@ -15,20 +15,20 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.entity.*;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
-import net.minecraft.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import java.util.HashSet;
 import java.util.List;
@@ -42,19 +42,18 @@ public class NuclearExplosion
     public static Block[]	pgblocks;
 
     static {
-        Set<Block> pgblocks = new HashSet<>();
-        pgblocks.addAll(getBlocks(BlockTags.BASE_STONE_OVERWORLD));
-        pgblocks.addAll(getBlocks(Tags.Blocks.COBBLESTONE));
+        Set<Block> pgblocks = new HashSet<>(getBlocks(BlockTags.BASE_STONE_OVERWORLD));
+        pgblocks.add(Blocks.COBBLESTONE);
         pgblocks.addAll(getBlocks(BlockTags.DIRT));
         NuclearExplosion.pgblocks = pgblocks.toArray(new Block[0]);
         Set<Block> prblocks = new HashSet<>();
-        prblocks.addAll(getBlocks(Tags.Blocks.ORES_COAL));
-        prblocks.addAll(getBlocks(Tags.Blocks.ORES_IRON));
-        prblocks.addAll(getBlocks(Tags.Blocks.ORES_REDSTONE));
-        prblocks.addAll(getBlocks(Tags.Blocks.ORES_GOLD));
-        prblocks.addAll(getBlocks(Tags.Blocks.ORES_LAPIS));
-        prblocks.addAll(getBlocks(Tags.Blocks.ORES_DIAMOND));
-        prblocks.addAll(getBlocks(Tags.Blocks.ORES_EMERALD));
+        prblocks.addAll(getBlocks(BlockTags.COAL_ORES));
+        prblocks.addAll(getBlocks(BlockTags.IRON_ORES));
+        prblocks.addAll(getBlocks(BlockTags.REDSTONE_ORES));
+        prblocks.addAll(getBlocks(BlockTags.GOLD_ORES));
+        prblocks.addAll(getBlocks(BlockTags.LAPIS_ORES));
+        prblocks.addAll(getBlocks(BlockTags.DIAMOND_ORES));
+        prblocks.addAll(getBlocks(BlockTags.EMERALD_ORES));
 
         NuclearExplosion.prblocks = prblocks.toArray(new Block[0]);
     }
@@ -162,7 +161,7 @@ public class NuclearExplosion
 									{
 										world.setBlockState(pos, RRBlocks.radioactivedirt.getDefaultState());
 									}
-									else if ((state.isIn(Tags.Blocks.SAND) || state.isIn(Tags.Blocks.SANDSTONE)))
+									else if ((state.isIn(BlockTags.SAND) || state.isIn(ConventionalBlockTags.SANDSTONE_BLOCKS)))
 									{
 										world.setBlockState(pos, RRBlocks.radioactivesand.getDefaultState());
 									}
@@ -187,7 +186,7 @@ public class NuclearExplosion
 								{
 									world.setBlockState(pos, RRBlocks.radioactivedirt.getDefaultState());
 								}
-								else if ((state.isIn(Tags.Blocks.SAND) || state.isIn(Tags.Blocks.SANDSTONE)))
+								else if ((state.isIn(BlockTags.SAND) || state.isIn(ConventionalBlockTags.SANDSTONE_BLOCKS)))
 								{
 									world.setBlockState(pos, RRBlocks.radioactivesand.getDefaultState());
 								}
@@ -229,7 +228,7 @@ public class NuclearExplosion
                     double var34 = (1.0D - var13) * var32 * ((var31 instanceof EntityB83 || var31 instanceof EntityHackB83) ? -1 : 1);
                     if (!(var31 instanceof EntityNuclearBlast) && !(var31 instanceof EntityTsarBlast) && !(var31 instanceof EntityRhodes)) {
                         if (var31 instanceof FallingBlockEntity) var31.kill();
-                        var31.damage(RivalRebelsDamageSource.nuclearblast, (int) ((var34 * var34 + var34) / 2.0D * 8.0D * radius + 1.0D) * 4);
+                        var31.damage(RivalRebelsDamageSource.nuclearBlast(world), (int) ((var34 * var34 + var34) / 2.0D * 8.0D * radius + 1.0D) * 4);
                         var31.setVelocity(var31.getVelocity().subtract(
                             var15 * var34 * 8,
                             var17 * var34 * 8,
@@ -237,7 +236,7 @@ public class NuclearExplosion
                         ));
                     }
                     if (var31 instanceof EntityRhodes) {
-                        var31.damage(RivalRebelsDamageSource.nuclearblast, (int) (radius * var34 * 0.2f));
+                        var31.damage(RivalRebelsDamageSource.nuclearBlast(world), (int) (radius * var34 * 0.2f));
                     }
                 }
             }

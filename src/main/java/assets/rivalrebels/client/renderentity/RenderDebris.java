@@ -14,9 +14,7 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.common.entity.EntityDebris;
 import net.minecraft.block.BlockRenderType;
 import net.minecraft.block.BlockState;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.RenderLayers;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.BlockRenderManager;
@@ -26,15 +24,19 @@ import net.minecraft.client.texture.SpriteAtlasTexture;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
-
-import java.util.Random;
+import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.random.Random;
 
 public class RenderDebris extends EntityRenderer<EntityDebris> {
-	public RenderDebris(EntityRendererFactory.Context manager)
+
+    private final BlockRenderManager blockRenderManager;
+
+    public RenderDebris(EntityRendererFactory.Context manager)
 	{
         super(manager);
         this.shadowRadius = 0.5F;
-	}
+        blockRenderManager = manager.getBlockRenderManager();
+    }
 
     @Override
     public void render(EntityDebris entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
@@ -43,26 +45,9 @@ public class RenderDebris extends EntityRenderer<EntityDebris> {
         if (state == null || state.getRenderType() != BlockRenderType.MODEL) return; // Why ???
         matrices.push();
 
-        BlockPos blockpos = new BlockPos(entity.getX(), entity.getBoundingBox().maxY, entity.getZ());
-        BlockRenderManager blockrendererdispatcher = MinecraftClient.getInstance().getBlockRenderManager();
+        BlockPos blockpos = new BlockPos(MathHelper.floor(entity.getX()), MathHelper.floor(entity.getBoundingBox().maxY), MathHelper.floor(entity.getZ()));
 
-        for(RenderLayer type : RenderLayer.getBlockLayers()) {
-            if (RenderLayers.canRenderInLayer(state, type)) {
-                blockrendererdispatcher.getModelRenderer()
-                    .render(
-                        entity.world,
-                        blockrendererdispatcher.getModel(state),
-                        state,
-                        blockpos,
-                        matrices,
-                        vertexConsumers.getBuffer(type),
-                        false,
-                        new Random(),
-                        state.getRenderingSeed(entity.getBlockPos()),
-                        OverlayTexture.DEFAULT_UV
-                    );
-            }
-        }
+        blockRenderManager.getModelRenderer().render(entity.getWorld(), blockRenderManager.getModel(state), state, blockpos, matrices, vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(state)), false, Random.create(), state.getRenderingSeed(blockpos), OverlayTexture.DEFAULT_UV);
 
         matrices.pop();
     }

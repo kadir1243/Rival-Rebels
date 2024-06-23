@@ -127,8 +127,8 @@ public class EntityPlasmoid extends EntityInanimate
 		super.tick();
 		if (age == 0)
 		{
-			rotation = world.random.nextInt(360);
-			slide = world.random.nextInt(21) - 10;
+			rotation = getWorld().random.nextInt(360);
+			slide = getWorld().random.nextInt(21) - 10;
 		}
 		if (gravity)
 		{
@@ -141,15 +141,15 @@ public class EntityPlasmoid extends EntityInanimate
 
 		Vec3d vec31 = getPos();
 		Vec3d vec3 = getPos().add(getVelocity());
-        HitResult mop = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+        HitResult mop = getWorld().raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 		vec31 = getPos();
 		if (mop != null) vec3 = mop.getPos();
 		else vec3 = getPos().add(getVelocity());
 
-		List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+		List<Entity> list = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 		double d0 = Double.MAX_VALUE;
         for (Entity entity : list) {
-            if (entity.collides() && (entity != thrower || age >= 5)) {
+            if (entity.isCollidable() && (entity != thrower || age >= 5)) {
                 Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
                 if (mop1.isPresent()) {
                     double d1 = vec31.squaredDistanceTo(mop1.get());
@@ -180,19 +180,19 @@ public class EntityPlasmoid extends EntityInanimate
 
 	protected void explode()
 	{
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			kill();
 			BlockState state = Blocks.STONE.getDefaultState();
 			int i = -1;
             Vec3d subtract = getPos().subtract(getVelocity().multiply(i));
-            BlockPos pos = new BlockPos(subtract);
+            BlockPos pos = BlockPos.ofFloored(subtract);
             while ((state.isOpaque() || BlackList.plasmaExplosion(state.getBlock())) && i < 4)
 			{
 				++i;
-				state = world.getBlockState(pos);
+				state = getWorld().getBlockState(pos);
 			}
-			world.setBlockState(pos, RRBlocks.plasmaexplosion.getDefaultState());
+			getWorld().setBlockState(pos, RRBlocks.plasmaexplosion.getDefaultState());
 		}
 	}
 

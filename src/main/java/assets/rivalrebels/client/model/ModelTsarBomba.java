@@ -16,62 +16,66 @@ import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
-import assets.rivalrebels.client.renderhelper.Vertice;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
-public class ModelTsarBomba
-{
-	private float[]	tsarx		= { 0.5f, 0.5f, 0.875f, 1f, 1f, 0.875f, 0.5f, 0f };
-	private float[]	tsary		= { -5f, -3.5f, -2f, -1f, 1f, 2f, 2.75f, 3f };
-	private float[]	tsart		= { 1f, 0.8125f, 0.625f, 0.5f, 0.25f, 0.125f, 0.03125f, 0f };
+public class ModelTsarBomba {
+    private static final SpriteIdentifier TSAR_SHELL_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ettsarshell);
+    private static final SpriteIdentifier TSAR_FINS_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ettsarfins);
+    private static final float[]	tsarx		= { 0.5f, 0.5f, 0.875f, 1f, 1f, 0.875f, 0.5f, 0f };
+	private static final float[]	tsary		= { -5f, -3.5f, -2f, -1f, 1f, 2f, 2.75f, 3f };
+	private static final float[]	tsart		= { 1f, 0.8125f, 0.625f, 0.5f, 0.25f, 0.125f, 0.03125f, 0f };
+	private static final int		segments	= 20;
+	private static final float	deg			= (float) Math.PI * 2f / segments;
+	private static final float	sin			= (float) Math.sin(deg);
+	private static final float	cos			= (float) Math.cos(deg);
+	private static final float	add			= 360 / segments;
 
-	private int		segments	= 20;
-	private float	deg			= (float) Math.PI * 2f / segments;
-	private float	sin			= (float) Math.sin(deg);
-	private float	cos			= (float) Math.cos(deg);
-	private float	add			= 360 / segments;
-
-	public void render(MatrixStack matrices, VertexConsumer buffer)
+	public static void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay)
 	{
 		matrices.push();
 		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
 		matrices.push();
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ettsarshell);
-		for (float i = 0; i < segments; i++)
+
+        VertexConsumer tsarShellTextureVertexConsumer = TSAR_SHELL_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        for (float i = 0; i < segments; i++)
 		{
 			matrices.push();
-			matrices.multiply(new Quaternion(add * i, 0, 1, 0));
+			matrices.multiply(new Quaternionf(add * i, 0, 1, 0));
 			for (int f = 1; f < tsarx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
 				TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
 				TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
 				TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
-				RenderHelper.addFace(buffer, new Vertice(0f, tsary[f], tsarx[f]),
-						new Vertice(0f, tsary[f - 1], tsarx[f - 1]),
-						new Vertice(tsarx[f - 1] * sin, tsary[f - 1], tsarx[f - 1] * cos),
-						new Vertice(tsarx[f] * sin, tsary[f], tsarx[f] * cos), t1, t2, t3, t4);
+				RenderHelper.addFace(tsarShellTextureVertexConsumer, new Vector3f(0f, tsary[f], tsarx[f]),
+						new Vector3f(0f, tsary[f - 1], tsarx[f - 1]),
+						new Vector3f(tsarx[f - 1] * sin, tsary[f - 1], tsarx[f - 1] * cos),
+						new Vector3f(tsarx[f] * sin, tsary[f], tsarx[f] * cos), t1, t2, t3, t4, light, overlay);
 			}
 			matrices.pop();
 		}
 		matrices.pop();
 
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ettsarfins);
+        VertexConsumer tsarFinsTextureVertexConsumer = TSAR_FINS_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
 
-		matrices.push();
+        matrices.push();
 
 		TextureVertice t5 = new TextureVertice(70f / 256f, 0f);
 		TextureVertice t6 = new TextureVertice(134f / 256f, 0f);
 		TextureVertice t7 = new TextureVertice(134f / 256f, 64f / 256f);
 		TextureVertice t8 = new TextureVertice(70 / 256f, 64f / 256f);
 
-		RenderHelper.addFace(buffer, new Vertice(0.5f, -5f, 0.5f),
-				new Vertice(-0.5f, -5f, 0.5f),
-				new Vertice(-0.5f, -5f, -0.5f),
-				new Vertice(0.5f, -5f, -0.5f), t5, t6, t7, t8);
+		RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0.5f, -5f, 0.5f),
+				new Vector3f(-0.5f, -5f, 0.5f),
+				new Vector3f(-0.5f, -5f, -0.5f),
+				new Vector3f(0.5f, -5f, -0.5f), t5, t6, t7, t8, light, overlay);
 
 		matrices.pop();
 
@@ -82,22 +86,22 @@ public class ModelTsarBomba
 		TextureVertice t3 = new TextureVertice(70f / 256f, 96f / 256f);
 		TextureVertice t4 = new TextureVertice(0, 96f / 256f);
 
-		RenderHelper.addFace(buffer, new Vertice(0f, -5f, -1.4f),
-				new Vertice(0f, -5f, -0.5f),
-				new Vertice(0f, -3.5f, -0.5f),
-				new Vertice(0f, -3.5f, -1.4f), t1, t2, t3, t4);
+		RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+				new Vector3f(0f, -5f, -0.5f),
+				new Vector3f(0f, -3.5f, -0.5f),
+				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		matrices.multiply(new Quaternion(120, 0, 1, 0));
-		RenderHelper.addFace(buffer, new Vertice(0f, -5f, -1.4f),
-				new Vertice(0f, -5f, -0.5f),
-				new Vertice(0f, -3.5f, -0.5f),
-				new Vertice(0f, -3.5f, -1.4f), t1, t2, t3, t4);
+		matrices.multiply(new Quaternionf(120, 0, 1, 0));
+		RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+				new Vector3f(0f, -5f, -0.5f),
+				new Vector3f(0f, -3.5f, -0.5f),
+				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		matrices.multiply(new Quaternion(120, 0, 1, 0));
-		RenderHelper.addFace(buffer, new Vertice(0f, -5f, -1.4f),
-				new Vertice(0f, -5f, -0.5f),
-				new Vertice(0f, -3.5f, -0.5f),
-				new Vertice(0f, -3.5f, -1.4f), t1, t2, t3, t4);
+		matrices.multiply(new Quaternionf(120, 0, 1, 0));
+		RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+				new Vector3f(0f, -5f, -0.5f),
+				new Vector3f(0f, -3.5f, -0.5f),
+				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
 		matrices.pop();
 		matrices.pop();

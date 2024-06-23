@@ -11,31 +11,31 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.resource.Resource;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Vector4f;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-@OnlyIn(Dist.CLIENT)
-public class ModelFromObj
-{
-	Triangle[]		pa;
-	public String	name;
+@Environment(EnvType.CLIENT)
+public class ModelFromObj {
+    public static final ModelFromObj EMPTY = new ModelFromObj(new Triangle[0]);
+	public Triangle[] pa;
+	public String name;
 
-	public ModelFromObj(Triangle[] PA)
-	{
+	public ModelFromObj(Triangle[] PA) {
 		pa = PA;
 	}
 
@@ -43,12 +43,16 @@ public class ModelFromObj
         Resource result;
         byte[] bytes;
         try {
-            result = MinecraftClient.getInstance().getResourceManager().getResource(new Identifier(RivalRebels.MODID, "models/" + path));
+            result = MinecraftClient.getInstance().getResourceManager().getResource(RRIdentifiers.create("models/" + path)).orElseThrow();
             bytes = result.getInputStream().readAllBytes();
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            RivalRebels.LOGGER.error("Failed to get model: " + path, e);
+            return EMPTY;
+        } catch (Exception e) {
+            RivalRebels.LOGGER.error("Failed to load model: " + path, e);
+            return EMPTY;
         }
-        String[] lines = new String(bytes, StandardCharsets.UTF_8).split("\n");
+        List<String> lines = new String(bytes, StandardCharsets.UTF_8).lines().toList();
 		String name = "";
 		List<Triangle> tri = new ArrayList<>();
 		List<Vec3d> v = new ArrayList<>();
@@ -103,11 +107,26 @@ public class ModelFromObj
         }
 	}
 
+    @Deprecated
 	public void render(VertexConsumer buffer) {
         for (Triangle triangle : pa) {
             triangle.render(buffer);
         }
 	}
+
+    public void render(VertexConsumer buffer, int light, int overlay) {
+        render(buffer, new Vector4f(1, 1, 1, 1), light, overlay);
+    }
+
+    public void render(VertexConsumer buffer, Vector4f color, int light, int overlay) {
+        for (Triangle triangle : pa) {
+            triangle.render(buffer, color, light, overlay);
+        }
+    }
+
+    public void render(VertexConsumer buffer, int light) {
+        render(buffer, light, OverlayTexture.DEFAULT_UV);
+    }
 
 	public void refine() {
         pa = Arrays.stream(pa).map(Triangle::refine).flatMap(Arrays::stream).toArray(Triangle[]::new);

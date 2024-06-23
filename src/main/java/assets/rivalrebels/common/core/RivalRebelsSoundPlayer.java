@@ -83,7 +83,7 @@ public class RivalRebelsSoundPlayer
 			"ba"
 									};
 
-	static String[][]	number		=
+	static String[][] number =
 									{
 									// artillery
 			{ "a",
@@ -221,12 +221,10 @@ public class RivalRebelsSoundPlayer
 			"s"}
                                     };
 
-	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume, float pitch)
-	{
-		if (world != null && dir >= 0 && dir < directory.length && num >= 0 && num < number[dir].length)
-		{
+	public static boolean playSound(World world, int dir, int num, double x, double y, double z, float volume, float pitch) {
+		if (world != null && dir >= 0 && dir < directory.length && num >= 0 && num < number[dir].length) {
 			String sound = dir + "." + num;
-            SoundEvent event = RivalRebelsSoundEventHandler.SOUNDS.get(sound);
+            SoundEvent event = RRSounds.SOUNDS.get(sound);
             if (event == null) {
                 RivalRebels.LOGGER.error("Sound not found: " + sound);
                 return false;
@@ -269,7 +267,7 @@ public class RivalRebelsSoundPlayer
 	{
 		if (entity != null)
 		{
-			return playSound(entity.world, dir, num, entity.getX(), entity.getY(), entity.getZ(), volume, pitch);
+			return playSound(entity.getWorld(), dir, num, entity.getX(), entity.getY(), entity.getZ(), volume, pitch);
 		}
 		else
 		{

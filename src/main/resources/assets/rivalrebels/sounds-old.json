@@ -1,0 +1,121 @@
+{
+"4.0":  {"sounds": ["ae/a1","ae/a2","ae/a3"]},
+"4.1":  {"sounds": ["ae/b1","ae/b2","ae/b3","ae/b4"]},
+"4.2":  {"sounds": ["ae/c1","ae/c2","ae/c3"]},
+"4.3":  {"sounds": ["ae/d1","ae/d2","ae/d3"]},
+"4.4":  {"sounds": ["ae/e"]},
+
+"5.0":  {"sounds": ["af/a"]},
+"5.1":  {"sounds": ["af/b1","af/b2","af/b3","af/b4"]},
+"5.2":  {"sounds": ["af/c"]},
+
+"6.0":  {"sounds": ["af/a/a"]},
+"6.1":  {"sounds": ["af/a/b"]},
+"6.2":  {"sounds": ["af/a/c"]},
+"6.3":  {"sounds": ["af/a/d"]},
+
+"7.0":  {"sounds": ["af/b/a"]},
+"7.1":  {"sounds": ["af/b/b"]},
+"7.2":  {"sounds": ["af/b/c"]},
+"7.3":  {"sounds": ["af/b/d"]},
+
+"8.0":  {"sounds": ["ag/a1","ag/a2"]},
+"8.1":  {"sounds": ["ag/b"]},
+"8.2":  {"sounds": ["ag/c"]},
+
+"9.0":  {"sounds": ["ah/a1","ah/a2"]},
+"9.1":  {"sounds": ["ah/b"]},
+"9.2":  {"sounds": ["ah/c"]},
+"9.3":  {"sounds": ["ah/d1","ah/d2","ah/d3"]},
+
+"10.0": {"sounds": ["ai/a"]},
+"10.1": {"sounds": ["ai/b"]},
+"10.2": {"sounds": ["ai/c"]},
+"10.3": {"sounds": ["ai/d"]},
+"10.4": {"sounds": ["ai/e"]},
+"10.5": {"sounds": ["ai/f"]},
+"10.6": {"sounds": ["ai/g"]},
+"10.7": {"sounds": ["ai/h"]},
+"10.8": {"sounds": ["ai/i"]},
+
+"11.0": {"sounds": ["aj/a"]},
+"11.1": {"sounds": ["aj/b"]},
+
+"12.0": {"sounds": ["ak/a"]},
+"12.1": {"sounds": ["ak/b"]},
+"12.2": {"sounds": ["ak/c"]},
+
+"13.0": {"sounds": ["al/a"]},
+"13.1": {"sounds": ["al/b"]},
+
+"14.0": {"sounds": ["am/a"]},
+
+"15.0": {"sounds": ["an/a1","an/a2"]},
+"15.1": {"sounds": ["an/b1","an/b2"]},
+
+"16.0": {"sounds": ["ao/a"]},
+"16.1": {"sounds": ["ao/b"]},
+"16.2": {"sounds": ["ao/c"]},
+
+"17.0": {"sounds": ["ap/a1","ap/a2","ap/a3","ap/a4"]},
+
+"18.0": {"sounds": ["aq/a"]},
+"18.1": {"sounds": ["aq/b"]},
+
+"19.0": {"sounds": ["ar/a"]},
+"19.1": {"sounds": ["ar/b"]},
+"19.2": {"sounds": ["ar/c"]},
+
+"20.0": {"sounds": ["as/a1","as/a2"]},
+
+"21.0": {"sounds": ["at/a"]},
+"21.1": {"sounds": ["at/b"]},
+"21.2": {"sounds": ["at/c"]},
+"21.3": {"sounds": ["at/d"]},
+
+"22.0": {"sounds": ["au/a"]},
+"22.1": {"sounds": ["au/b1","au/b2"]},
+"22.2": {"sounds": ["au/c"]},
+"22.3": {"sounds": ["au/d"]},
+
+"23.0": {"sounds": ["av/a1","av/a2"]},
+"23.1": {"sounds": ["av/b"]},
+"23.2": {"sounds": ["av/c1","av/c2"]},
+"23.3": {"sounds": ["av/d"]},
+"23.4": {"sounds": ["av/e"]},
+
+"24.0": {"sounds": ["aw/a"]},
+"24.1": {"sounds": ["aw/b"]},
+"24.2": {"sounds": ["aw/c"]},
+"24.3": {"sounds": ["aw/d1","aw/d2"]},
+"24.4": {"sounds": ["aw/e"]},
+
+"25.0": {"sounds": ["ax/a"]},
+"25.1": {"sounds": ["ax/b1","ax/b2","ax/b3","ax/b4"]},
+
+"26.0": {"sounds": ["ay/a1","ay/a2"]},
+"26.1": {"sounds": ["ay/b"]},
+"26.2": {"sounds": ["ay/c"]},
+
+"27.0": {"sounds": ["az/a1","az/a2"]},
+
+"28.0": {"sounds": ["ba/a1","ba/a2"]},
+"28.1": {"sounds": ["ba/b"]},
+"28.2": {"sounds": ["ba/c"]},
+"28.3": {"sounds": ["ba/d"]},
+"28.4": {"sounds": ["ba/e"]},
+"28.5": {"sounds": ["ba/f"]},
+"28.6": {"sounds": ["ba/g"]},
+"28.7": {"sounds": ["ba/h"]},
+"28.8": {"sounds": ["ba/i"]},
+"28.9": {"sounds": ["ba/j"]},
+"28.10": {"sounds": ["ba/k"]},
+"28.11": {"sounds": ["ba/l"]},
+"28.12": {"sounds": ["ba/m"]},
+"28.13": {"sounds": ["ba/n"]},
+"28.14": {"sounds": ["ba/o"]},
+"28.15": {"sounds": ["ba/p"]},
+"28.16": {"sounds": ["ba/q"]},
+"28.17": {"sounds": ["ba/r"]},
+"28.18": {"sounds": ["ba/s"]}
+}

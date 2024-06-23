@@ -12,15 +12,15 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.explosion.Explosion;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.NbtCompound;
 import net.minecraft.entity.damage.DamageSource;
+import net.minecraft.nbt.NbtCompound;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
@@ -90,7 +90,7 @@ public class EntityB2Frag extends EntityInanimate
 	}
 
 	@Override
-	public boolean collides()
+	public boolean isCollidable()
 	{
 		return true;
 	}
@@ -100,8 +100,8 @@ public class EntityB2Frag extends EntityInanimate
 	{
 		/*if (ticksInAir == 0)
 		{
-			Dist side = FMLCommonHandler.instance().getEffectiveSide();
-			if (side == Dist.SERVER)
+			EnvType side = FMLCommonHandler.instance().getEffectiveSide();
+			if (side == EnvType.SERVER)
 			{
                 for (PlayerEntity player : world.playerEntities) {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream(9);
@@ -140,7 +140,7 @@ public class EntityB2Frag extends EntityInanimate
 
 		Vec3d vec3 = getPos();
 		Vec3d vec31 = getPos().add(getVelocity());
-		BlockHitResult hitResult = world.raycast(new RaycastContext(vec3, vec31, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		BlockHitResult hitResult = getWorld().raycast(new RaycastContext(vec3, vec31, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
 		if (hitResult != null)
 		{
@@ -148,9 +148,9 @@ public class EntityB2Frag extends EntityInanimate
             setPos(getX(), hitResult.getPos().getY() + offset, getZ());
 		}
 
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
-			List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
@@ -163,7 +163,7 @@ public class EntityB2Frag extends EntityInanimate
 
                 if (var9 instanceof EntityLaserBurst) {
                     var9.kill();
-                    damage(DamageSource.GENERIC, 6);
+                    damage(getDamageSources().generic(), 6);
                 }
             }
 		}
@@ -216,17 +216,14 @@ public class EntityB2Frag extends EntityInanimate
 	}
 
 	@Override
-	public boolean damage(DamageSource par1DamageSource, float par2)
-	{
-		if (isAlive())
-		{
-			health -= par2;
+	public boolean damage(DamageSource source, float amount) {
+		if (isAlive()) {
+			health -= amount;
 
-			if (health <= 0)
-			{
+			if (health <= 0) {
 				kill();
-				new Explosion(world, getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket);
-				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
+				new Explosion(getWorld(), getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket(getWorld()));
+                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
 			}
 		}
 

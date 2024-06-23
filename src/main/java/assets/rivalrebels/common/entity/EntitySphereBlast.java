@@ -46,13 +46,13 @@ public class EntitySphereBlast extends EntityTsarBlast {
 	@Override
 	public void tick()
 	{
-		if (world.random.nextInt(10) == 0)
+		if (getWorld().random.nextInt(10) == 0)
 		{
-			world.playSound(this.getX(), getY(), getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 10.0F, 0.50F, true);
+			getWorld().playSound(this.getX(), getY(), getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 10.0F, 0.50F, true);
 		}
 		else
 		{
-			if (world.random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
+			if (getWorld().random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
 		}
 
 		if (random.nextBoolean()&&random.nextBoolean()) pushAndHurtEntities();
@@ -71,7 +71,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
 		int var28 = MathHelper.floor(getY() + radius + 1.0D);
 		int var7 = MathHelper.floor(getZ() - radius - 1.0D);
 		int var29 = MathHelper.floor(getZ() + radius + 1.0D);
-		List<Entity> var9 = world.getOtherEntities(this, new Box(var3, var5, var7, var4, var28, var29));
+		List<Entity> var9 = getWorld().getOtherEntities(this, new Box(var3, var5, var7, var4, var28, var29));
 
         for (Entity var31 : var9) {
             if (var31 instanceof LivingEntity) {
@@ -90,7 +90,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
                         var17 /= var33;
                         var19 /= var33;
                         double var34 = (1.0D - var13);
-                        var31.damage(RivalRebelsDamageSource.nuclearblast, (int) ((var34 * var34 + var34) * 20 * radius + 20) * 200);
+                        var31.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) ((var34 * var34 + var34) * 20 * radius + 20) * 200);
                         var31.setVelocity(
                             var31.getVelocity().subtract(
                                 var15 * var34 * 8,
@@ -102,7 +102,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
                 }
             }
             if (var31 instanceof EntityRhodes) {
-                var31.damage(RivalRebelsDamageSource.nuclearblast, 30);
+                var31.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), 30);
             }
         }
 	}

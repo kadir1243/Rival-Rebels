@@ -13,6 +13,7 @@ package assets.rivalrebels.common.block;
 
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -26,11 +27,17 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockReactive extends BlockWithEntity {
+    public static final MapCodec<BlockReactive> CODEC = createCodec(BlockReactive::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockReactive(Settings settings)
 	{
 		super(settings);
 	}
+
+    @Override
+    protected MapCodec<BlockReactive> getCodec() {
+        return CODEC;
+    }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {

@@ -22,7 +22,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
 public class RenderLaserLink extends EntityRenderer<EntityLaserLink> {
     static float red = 0.5F;
@@ -43,8 +43,8 @@ public class RenderLaserLink extends EntityRenderer<EntityLaserLink> {
             matrices.push();
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
-            matrices.multiply(new Quaternion(-entity.getYaw(), 0.0F, 1.0F, 0.0F));
-            matrices.multiply(new Quaternion(entity.getPitch(), 1.0F, 0.0F, 0.0F));
+            matrices.multiply(new Quaternionf(-entity.getYaw(), 0.0F, 1.0F, 0.0F));
+            matrices.multiply(new Quaternionf(entity.getPitch(), 1.0F, 0.0F, 0.0F));
 
             for (float o = 0; o <= radius; o += radius / 16) {
                 buffer.vertex(0 + o, 0 - o, 0).color(red, green, blue, 1).next();

@@ -15,53 +15,60 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
-import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
+import assets.rivalrebels.client.objfileloader.WavefrontObject;
 import assets.rivalrebels.common.entity.EntityRhodes;
+import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import org.lwjgl.opengl.GL11;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
+import org.joml.Vector4f;
 
-@OnlyIn(Dist.CLIENT)
-public class RenderRhodes extends EntityRenderer<EntityRhodes>
-{
-    public static Identifier texture;
-    public static Identifier flametex;
-    //public static IModel head;
-    //public static IModel torso;
-    //public static IModel flag;
-    //public static IModel upperarm;
-    //public static IModel lowerarm;
-    //public static IModel flamethrower;
-    //public static IModel rocketlauncher;
-    //public static IModel thigh;
-    //public static IModel shin;
-    //private static IModel booster;
-    //private static IModel flame;
-    //private static IModel laser;
-    //public static IModel ffhead;
-    //public static IModel fftorso;
-    //public static IModel ffupperarm;
-    //public static IModel fflowerarm;
-    //public static IModel ffthigh;
-    //public static IModel ffshin;
-	private ModelBlastSphere modelsphere;
-	public static ModelFromObj	md;
-	public static ModelFromObj	b2jet;
+@Environment(EnvType.CLIENT)
+public class RenderRhodes extends EntityRenderer<EntityRhodes> {
+    public static final SpriteIdentifier RHODES_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, new Identifier("entity/rhodes.png"));
+    public static final SpriteIdentifier B2_SPIRIT_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etb2spirit);
+    public static final SpriteIdentifier BOOSTER_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etbooster);
+    public static final SpriteIdentifier FLAME_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.create("entity/flame"));
+    public static Identifier texture = RRIdentifiers.create("entity/rhodes");
+    public static WavefrontObject head = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/head.obj"));
+    public static WavefrontObject torso = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/torso.obj"));
+    public static WavefrontObject flag = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/flag.obj"));
+    public static WavefrontObject upperarm = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/upperarm.obj"));
+    public static WavefrontObject lowerarm = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/lowerarm.obj"));
+    public static WavefrontObject flamethrower = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/flamethrower.obj"));
+    public static WavefrontObject rocketlauncher = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/rocketlauncher.obj"));
+    public static WavefrontObject thigh = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/thigh.obj"));
+    public static WavefrontObject shin = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/shin.obj"));
+    private static WavefrontObject booster = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/booster.obj"));
+    private static WavefrontObject flame = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/flame.obj"));
+    private static WavefrontObject laser = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/laser.obj"));
+    public static WavefrontObject ffhead = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffhead.obj"));
+    public static WavefrontObject fftorso = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/fftorso.obj"));
+    public static WavefrontObject ffupperarm = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffupperarm.obj"));
+    public static WavefrontObject fflowerarm = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/fflowerarm.obj"));
+    public static WavefrontObject ffthigh = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffthigh.obj"));
+    public static WavefrontObject ffshin = WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffshin.obj"));
+	public static final ModelFromObj	md = ModelFromObj.readObjFile("d.obj");
+	public static final ModelFromObj	b2jet = ModelFromObj.readObjFile("s.obj");
 	public static String[] texfolders = {
 			"blocks/",
 			"entity/",
@@ -69,47 +76,14 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
 			"flags/",
 	};
 
-	public RenderRhodes(EntityRendererFactory.Context manager)
-	{
-        super(manager);
-    	texture = new Identifier(RivalRebels.MODID, "textures/entity/rhodes.png");
-    	flametex = new Identifier(RivalRebels.MODID, "textures/entity/flame.png");
-        try {
-            //head = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/head.obj"));
-            //torso = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/torso.obj"));
-            //flag = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/flag.obj"));
-            //upperarm = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/upperarm.obj"));
-            //lowerarm = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/lowerarm.obj"));
-            //flamethrower = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/flamethrower.obj"));
-            //rocketlauncher = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/rocketlauncher.obj"));
-            //thigh = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/thigh.obj"));
-            //shin = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/shin.obj"));
-            //flame = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/flame.obj"));
-            //laser = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/laser.obj"));
-            //booster = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/booster.obj"));
-            //ffhead = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffhead.obj"));
-            //fftorso = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/fftorso.obj"));
-            //ffupperarm = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffupperarm.obj"));
-            //fflowerarm = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/fflowerarm.obj"));
-            //ffthigh = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffthigh.obj"));
-            //ffshin = OBJLoader.INSTANCE.loadModel(new Identifier(RivalRebels.MODID, "models/rhodes/ffshin.obj"));
-        } catch (Exception e) {
-            RivalRebels.LOGGER.error("Can not load model for rhodes", e);
-        }
+    static {
+        md.scale(2.5f, 2.5f, 2.5f);
+        b2jet.scale(2.5f, 2.5f, 2.5f);
+    }
 
-		modelsphere = new ModelBlastSphere();
-		try
-		{
-			md = ModelFromObj.readObjFile("d.obj");
-			b2jet = ModelFromObj.readObjFile("s.obj");
-			md.scale(2.5f, 2.5f, 2.5f);
-			b2jet.scale(2.5f, 2.5f, 2.5f);
-		}
-		catch (Exception e)
-		{
-			e.printStackTrace();
-		}
-	}
+	public RenderRhodes(EntityRendererFactory.Context manager) {
+        super(manager);
+    }
 
 	public static float[] colors = {
 		255/255f,     255/255f,     255/255f, //1
@@ -146,20 +120,19 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
             float f1 = 0.016666668F * f;
             matrices.push();
             matrices.translate(0, 16, 0);
-            GL11.glNormal3f(0.0F, 1.0F, 0.0F);
-            matrices.multiply(new Quaternion((float) -this.dispatcher.camera.getPos().y, 0.0F, 1.0F, 0.0F));
-            matrices.multiply(new Quaternion((float) this.dispatcher.camera.getPos().x, 1.0F, 0.0F, 0.0F));
+            // FIXME: GL11.glNormal3f(0.0F, 1.0F, 0.0F);
+            matrices.multiply(new Quaternionf((float) -this.dispatcher.camera.getPos().y, 0.0F, 1.0F, 0.0F));
+            matrices.multiply(new Quaternionf((float) this.dispatcher.camera.getPos().x, 1.0F, 0.0F, 0.0F));
             matrices.scale(-f1, -f1, f1);
             RenderSystem.depthMask(false);
             RenderSystem.disableDepthTest();
             RenderSystem.enableBlend();
-            RenderSystem.blendFuncSeparate(SrcFactor.SRC_ALPHA, DstFactor.ONE_MINUS_SRC_ALPHA, SrcFactor.ONE, DstFactor.ZERO);
-            RenderSystem.disableTexture();
-            String name = entity.getEntityName();
+            RenderSystem.defaultBlendFunc();
+            Text name = entity.getDisplayName();
             int color = -1;
             if (entity.rider != null)
             {
-            	name += " - " + entity.rider.getDisplayName();
+                name = name.copy().append(" - ").append(entity.rider.getDisplayName());
             	RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(entity.rider.getGameProfile());
             	if (rrp!=null)
             	{
@@ -175,37 +148,32 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
             buffer.vertex(-j - 1, 8, 0.0D).color(0, 0, 0, 0.25F).next();
             buffer.vertex(j + 1, 8, 0.0D).color(0, 0, 0, 0.25F).next();
             buffer.vertex(j + 1, -1, 0.0D).color(0, 0, 0, 0.25F).next();
-            RenderSystem.enableTexture();
-            fontrenderer.draw(matrices, name, -fontrenderer.getWidth(name) / 2F, 0, color);
+            float textBackgroundOpacity = MinecraftClient.getInstance().options.getTextBackgroundOpacity(0.25f);
+            int backgroundColor = (int)(textBackgroundOpacity * 255.0f) << 24;
+            Matrix4f positionMatrix = matrices.peek().getPositionMatrix();
+            fontrenderer.draw(name, -fontrenderer.getWidth(name) / 2F, 0, color, true, positionMatrix, vertexConsumers, TextRenderer.TextLayerType.NORMAL, backgroundColor, light);
             RenderSystem.enableDepthTest();
             RenderSystem.depthMask(true);
-            fontrenderer.draw(matrices, name, -fontrenderer.getWidth(name) / 2F, 0, color);
+            fontrenderer.draw(name, -fontrenderer.getWidth(name) / 2F, 0, color, true, positionMatrix, vertexConsumers, TextRenderer.TextLayerType.NORMAL, backgroundColor, light);
             RenderSystem.disableBlend();
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
             matrices.pop();
 
-			if (entity.colorType == 16)
-			{
+			if (entity.colorType == 16) {
 				matrices.push();
-                matrices.multiply(new Quaternion(entity.getbodyyaw(ptt), 0, 1, 0));
+                matrices.multiply(new Quaternionf(entity.getbodyyaw(ptt), 0, 1, 0));
 				matrices.translate(0, 10f, 0);
-				MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etbooster);
-		    	//booster.renderAll();
-				MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etb2spirit);
+		    	booster.render(BOOSTER_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, OverlayTexture.DEFAULT_UV);
 				matrices.push();
-				matrices.multiply(new Quaternion(-90f, 1, 0, 0));
+				matrices.multiply(new Quaternionf(-90f, 1, 0, 0));
 				matrices.translate(0, 4, -2);
 				matrices.scale(2.2f, 2.2f, 2.2f);
-				if (entity.b2energy > 0) RenderB2Spirit.shuttle.render(buffer);
+				if (entity.b2energy > 0) RenderB2Spirit.shuttle.render(B2_SPIRIT_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, OverlayTexture.DEFAULT_UV);
 				matrices.pop();
 				matrices.pop();
-			}
-			else {
-				MinecraftClient.getInstance().getTextureManager().bindTexture(texture);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
+			} else {
+                VertexConsumer textureBuffer = RHODES_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
 				RenderSystem.disableCull();
-				matrices.multiply(new Quaternion(entity.getbodyyaw(ptt), 0, 1, 0));
+				matrices.multiply(new Quaternionf(entity.getbodyyaw(ptt), 0, 1, 0));
 
 				float leftlegheight = 7.26756f - 15
 						+ (MathHelper.cos((entity.getleftthighpitch(ptt)+11.99684962f)*0.01745329252f) * 7.331691240f)
@@ -216,41 +184,33 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
 
 				//TORSO
 				matrices.push();
-				RenderSystem.setShaderColor(colors[entity.colorType*3], colors[entity.colorType*3+1], colors[entity.colorType*3+2], 1);
+                Vector4f colorOfRhodes = new Vector4f(colors[entity.colorType*3], colors[entity.colorType*3+1], colors[entity.colorType*3+2], 1);
 				matrices.translate(0, Math.max(leftlegheight, rightlegheight), 0);
 
-				MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etb2spirit);
 				matrices.push();
-				matrices.multiply(new Quaternion(-90f, 1, 0, 0));
+				matrices.multiply(new Quaternionf(-90f, 1, 0, 0));
 				matrices.translate(0, 4, -2);
-				if (entity.b2energy > 0) md.render(buffer);
-	    		RenderSystem.enableBlend();
-                RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-	    		MinecraftClient.getInstance().getTextureManager().bindTexture(flametex);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-				RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-				if (entity.jet && entity.b2energy > 0) b2jet.render(buffer);
-	    		RenderSystem.disableBlend();
+				if (entity.b2energy > 0) md.render(B2_SPIRIT_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
+				if (entity.jet && entity.b2energy > 0) b2jet.render(FLAME_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntityTranslucent), colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 				matrices.pop();
-				MinecraftClient.getInstance().getTextureManager().bindTexture(texture);
 
-		    	//torso.renderAll();
+		    	torso.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 
 
 					//RIGHT UPPERARM
 					matrices.push();
 					matrices.translate(-6.4f, 0, 0);
-					matrices.multiply(new Quaternion(entity.getrightarmyaw(ptt), 0, 1, 0));
+					matrices.multiply(new Quaternionf(entity.getrightarmyaw(ptt), 0, 1, 0));
 					matrices.scale(-1, 1, 1);
-			    	//upperarm.renderAll();
+			    	upperarm.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 
 				    	//RIGHT LOWERARM
 						matrices.push();
 						matrices.translate(0, -1.5f, 0);
-						matrices.multiply(new Quaternion(entity.getrightarmpitch(ptt), 1, 0, 0));
-				    	//lowerarm.renderAll();
+						matrices.multiply(new Quaternionf(entity.getrightarmpitch(ptt), 1, 0, 0));
+				    	lowerarm.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 						matrices.scale(-1, 1, 1);
-				    	//flamethrower.renderAll();
+				    	flamethrower.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 						matrices.pop();
 
 					matrices.pop();
@@ -258,15 +218,15 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
 					//LEFT UPPERARM
 					matrices.push();
 					matrices.translate(6.4f, 0, 0);
-					matrices.multiply(new Quaternion(entity.getleftarmyaw(ptt), 0, 1, 0));
-			    	//upperarm.renderAll();
+					matrices.multiply(new Quaternionf(entity.getleftarmyaw(ptt), 0, 1, 0));
+			    	upperarm.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 
 				    	//LEFT LOWERARM
 						matrices.push();
 						matrices.translate(0, -1.5f, 0);
-						matrices.multiply(new Quaternion(entity.getleftarmpitch(ptt), 1, 0, 0));
-				    	//lowerarm.renderAll();
-				    	//rocketlauncher.renderAll();
+						matrices.multiply(new Quaternionf(entity.getleftarmpitch(ptt), 1, 0, 0));
+				    	lowerarm.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
+				    	rocketlauncher.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 						matrices.pop();
 
 					matrices.pop();
@@ -274,25 +234,17 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
 					//RIGHT THIGH
 					matrices.push();
 					matrices.translate(0, -7.26756f, -0.27904f);
-					matrices.multiply(new Quaternion(entity.getrightthighpitch(ptt), 1, 0, 0));
+					matrices.multiply(new Quaternionf(entity.getrightthighpitch(ptt), 1, 0, 0));
 					matrices.scale(-1, 1, 1);
-			    	//thigh.renderAll();
+			    	thigh.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 
 				    	//RIGHT SHIN
 						matrices.push();
 						matrices.translate(0, -7.17156f, -1.52395f);
-						matrices.multiply(new Quaternion(entity.getrightshinpitch(ptt), 1, 0, 0));
-				    	//shin.renderAll();
-				    	if (entity.isFire())
-				    	{
-				    		RenderSystem.enableBlend();
-				    		RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-				    		MinecraftClient.getInstance().getTextureManager().bindTexture(flametex);
-							RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MIN_FILTER, GL11.GL_LINEAR);
-							RenderSystem.texParameter(GL11.GL_TEXTURE_2D, GL11.GL_TEXTURE_MAG_FILTER, GL11.GL_LINEAR);
-					    	//flame.renderAll();
-				    		MinecraftClient.getInstance().getTextureManager().bindTexture(texture);
-				    		RenderSystem.disableBlend();
+						matrices.multiply(new Quaternionf(entity.getrightshinpitch(ptt), 1, 0, 0));
+				    	shin.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
+				    	if (entity.isFire()) {
+					    	flame.render(FLAME_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntityTranslucent), light, OverlayTexture.DEFAULT_UV);
 				    	}
 						matrices.pop();
 
@@ -301,22 +253,16 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
 					//LEFT THIGH
 					matrices.push();
 					matrices.translate(0, -7.26756f, -0.27904f);
-					matrices.multiply(new Quaternion(entity.getleftthighpitch(ptt), 1, 0, 0));
-			    	//thigh.renderAll();
+					matrices.multiply(new Quaternionf(entity.getleftthighpitch(ptt), 1, 0, 0));
+			    	thigh.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 
 				    	//LEFT SHIN
 						matrices.push();
 						matrices.translate(0, -7.17156f, -1.52395f);
-						matrices.multiply(new Quaternion(entity.getleftshinpitch(ptt), 1, 0, 0));
-				    	//shin.renderAll();
-				    	if (entity.isFire())
-				    	{
-				    		RenderSystem.enableBlend();
-                            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-				    		MinecraftClient.getInstance().getTextureManager().bindTexture(flametex);
-					    	//flame.renderAll();
-				    		MinecraftClient.getInstance().getTextureManager().bindTexture(texture);
-				    		RenderSystem.disableBlend();
+						matrices.multiply(new Quaternionf(entity.getleftshinpitch(ptt), 1, 0, 0));
+				    	shin.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
+				    	if (entity.isFire()) {
+					    	flame.render(FLAME_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntityTranslucent), colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 				    	}
 						matrices.pop();
 
@@ -325,25 +271,20 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
 					//HEAD
 					matrices.push();
 					matrices.translate(0, 5.23244f, 0);
-					matrices.multiply(new Quaternion(entity.getheadpitch(ptt), 1, 0, 0));
-					matrices.multiply(new Quaternion(entity.getheadyaw(ptt), 0, 1, 0));
-			    	//head.renderAll();
+					matrices.multiply(new Quaternionf(entity.getheadpitch(ptt), 1, 0, 0));
+					matrices.multiply(new Quaternionf(entity.getheadyaw(ptt), 0, 1, 0));
+			    	head.render(textureBuffer, colorOfRhodes, light, OverlayTexture.DEFAULT_UV);
 					RenderSystem.enableCull();
 		    		RenderSystem.enableBlend();
                 RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
-                RenderSystem.setShaderColor(1f, 0f, 0f, 0.5f);
-			    	if ((entity.laserOn & 1) == 1)
-			    	{
-			    		//laser.renderAll();
-			    	}
-			    	if ((entity.laserOn & 2) == 2)
-			    	{
+			    	if ((entity.laserOn & 1) == 1) {
+			    		laser.render(buffer, new Vector4f(1, 0, 0, 0.5F), light, OverlayTexture.DEFAULT_UV);
+			    	} else if ((entity.laserOn & 2) == 2) {
 						matrices.scale(1, -1, 1);
 						//GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
-			    		//laser.renderAll();
+			    		laser.render(vertexConsumers.getBuffer(RenderLayer.getSolid()), new Vector4f(1, 0, 0, 0.5F), light, OverlayTexture.DEFAULT_UV);
 						//GlStateManager.cullFace(GlStateManager.CullFace.BACK);
 			    	}
-		    		RenderSystem.enableTexture();
 			    	RenderSystem.disableCull();
 		    		RenderSystem.disableBlend();
 					matrices.pop();
@@ -351,83 +292,74 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
 				matrices.pop();
 				//TORSO
 				matrices.push();
-					RenderSystem.setShaderColor(1,1,1, 1);
 					matrices.translate(0, Math.max(leftlegheight, rightlegheight), 0);
-					if (entity.itexfolder != -1)
-					{
-						try
-						{
-							MinecraftClient.getInstance().getTextureManager().bindTexture(new Identifier(RivalRebels.MODID, "textures/" + texfolders[entity.itexfolder] + entity.itexloc + ".png"));
-					    	//flag.renderAll();
-						}
-						catch (Exception e)
-						{
+					if (entity.itexfolder != -1) {
+						try {
+					    	flag.render(vertexConsumers.getBuffer(RenderLayer.getEntitySolid(RRIdentifiers.create(texfolders[entity.itexfolder] + entity.itexloc + ".png"))), light, OverlayTexture.DEFAULT_UV);
+						} catch (Exception ignored) {
 						}
 					}
 			    	if (entity.forcefield)
 			    	{
-				    	RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-				    	RenderSystem.enableBlend();
-                        RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-			    		//fftorso.renderAll();
+                        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
+			    		fftorso.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 						//RIGHT UPPERARM
 						matrices.push();
 						matrices.translate(-6.4f, 0, 0);
-						matrices.multiply(new Quaternion(entity.getrightarmyaw(ptt), 0, 1, 0));
+						matrices.multiply(new Quaternionf(entity.getrightarmyaw(ptt), 0, 1, 0));
 						matrices.scale(-1, 1, 1);
-				    	//ffupperarm.renderAll();
+				    	ffupperarm.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 					    	//RIGHT LOWERARM
 							matrices.push();
 							matrices.translate(0, -1.5f, 0);
-							matrices.multiply(new Quaternion(entity.getrightarmpitch(ptt), 1, 0, 0));
-					    	//fflowerarm.renderAll();
+							matrices.multiply(new Quaternionf(entity.getrightarmpitch(ptt), 1, 0, 0));
+					    	fflowerarm.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 							matrices.pop();
 						matrices.pop();
 						//LEFT UPPERARM
 						matrices.push();
 						matrices.translate(6.4f, 0, 0);
-						matrices.multiply(new Quaternion(entity.getleftarmyaw(ptt), 0, 1, 0));
-				    	//ffupperarm.renderAll();
+						matrices.multiply(new Quaternionf(entity.getleftarmyaw(ptt), 0, 1, 0));
+				    	ffupperarm.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 					    	//LEFT LOWERARM
 							matrices.push();
 							matrices.translate(0, -1.5f, 0);
-							matrices.multiply(new Quaternion(entity.getleftarmpitch(ptt), 1, 0, 0));
-					    	//fflowerarm.renderAll();
+							matrices.multiply(new Quaternionf(entity.getleftarmpitch(ptt), 1, 0, 0));
+					    	fflowerarm.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 							matrices.pop();
 						matrices.pop();
 						//RIGHT THIGH
 						matrices.push();
 						matrices.translate(0, -7.26756f, -0.27904f);
-						matrices.multiply(new Quaternion(entity.getrightthighpitch(ptt), 1, 0, 0));
+						matrices.multiply(new Quaternionf(entity.getrightthighpitch(ptt), 1, 0, 0));
 						matrices.scale(-1, 1, 1);
-				    	//ffthigh.renderAll();
+				    	ffthigh.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 					    	//RIGHT SHIN
 							matrices.push();
 							matrices.translate(0, -7.17156f, -1.52395f);
-							matrices.multiply(new Quaternion(entity.getrightshinpitch(ptt), 1, 0, 0));
-					    	//ffshin.renderAll();
+							matrices.multiply(new Quaternionf(entity.getrightshinpitch(ptt), 1, 0, 0));
+					    	ffshin.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 							matrices.pop();
 						matrices.pop();
 						//LEFT THIGH
 						matrices.push();
 						matrices.translate(0, -7.26756f, -0.27904f);
-						matrices.multiply(new Quaternion(entity.getleftthighpitch(ptt), 1, 0, 0));
-				    	//ffthigh.renderAll();
+						matrices.multiply(new Quaternionf(entity.getleftthighpitch(ptt), 1, 0, 0));
+				    	ffthigh.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 					    	//LEFT SHIN
 							matrices.push();
 							matrices.translate(0, -7.17156f, -1.52395f);
-							matrices.multiply(new Quaternion(entity.getleftshinpitch(ptt), 1, 0, 0));
-					    	//ffshin.renderAll();
+							matrices.multiply(new Quaternionf(entity.getleftshinpitch(ptt), 1, 0, 0));
+					    	ffshin.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 							matrices.pop();
 						matrices.pop();
 						//HEAD
 						matrices.push();
 						matrices.translate(0, 5.23244f, 0);
-						matrices.multiply(new Quaternion(entity.getheadpitch(ptt), 1, 0, 0));
-						matrices.multiply(new Quaternion(entity.getheadyaw(ptt), 0, 1, 0));
-				    	//ffhead.renderAll();
+						matrices.multiply(new Quaternionf(entity.getheadpitch(ptt), 1, 0, 0));
+						matrices.multiply(new Quaternionf(entity.getheadyaw(ptt), 0, 1, 0));
+				    	ffhead.render(cellularNoise, light, OverlayTexture.DEFAULT_UV);
 						matrices.pop();
-						RenderSystem.disableBlend();
 			    	}
 				matrices.pop();
 			}
@@ -442,24 +374,24 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes>
     		RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
 			double elev = Math.sin((entity.health-tickDelta)*-0.0314159265359)*15;
 			matrices.push();
-			matrices.multiply(new Quaternion((float) (elev * 2), 0, 1, 0));
-			matrices.multiply(new Quaternion((float) (elev * 3), 1, 0, 0));
-			modelsphere.renderModel(matrices, buffer, (float) elev, 1, 0.25f, 0, 1f);
+			matrices.multiply(new Quaternionf((float) (elev * 2), 0, 1, 0));
+			matrices.multiply(new Quaternionf((float) (elev * 3), 1, 0, 0));
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) elev, 1, 0.25f, 0, 1f);
 			matrices.pop();
 			matrices.push();
-            matrices.multiply(new Quaternion((float) (elev * -2), 0, 1, 0));
-            matrices.multiply(new Quaternion((float) (elev * 4), 0, 0, 1));
-			modelsphere.renderModel(matrices, buffer, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
+            matrices.multiply(new Quaternionf((float) (elev * -2), 0, 1, 0));
+            matrices.multiply(new Quaternionf((float) (elev * 4), 0, 0, 1));
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
 			matrices.pop();
 			matrices.push();
-			matrices.multiply(new Quaternion((float) (elev * -3), 1, 0, 0));
-			matrices.multiply(new Quaternion((float) (elev * 2), 0, 0, 1));
-			modelsphere.renderModel(matrices, buffer, (float) (elev - 0.4f), 1, 0, 0, 1f);
+			matrices.multiply(new Quaternionf((float) (elev * -3), 1, 0, 0));
+			matrices.multiply(new Quaternionf((float) (elev * 2), 0, 0, 1));
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.4f), 1, 0, 0, 1f);
 			matrices.pop();
 			matrices.push();
-			matrices.multiply(new Quaternion((float) (elev * -1), 0, 1, 0));
-			matrices.multiply(new Quaternion((float) (elev * 3), 0, 0, 1));
-			modelsphere.renderModel(matrices, buffer, (float) (elev - 0.6f), 1, 1, 0, 1);
+			matrices.multiply(new Quaternionf((float) (elev * -1), 0, 1, 0));
+			matrices.multiply(new Quaternionf((float) (elev * 3), 0, 0, 1));
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.6f), 1, 1, 0, 1);
 			matrices.pop();
     		RenderSystem.disableBlend();
 			matrices.pop();

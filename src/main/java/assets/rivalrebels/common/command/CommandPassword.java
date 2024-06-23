@@ -18,8 +18,6 @@ import assets.rivalrebels.common.round.RivalRebelsRank;
 import com.google.common.hash.Hashing;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -52,12 +50,12 @@ public class CommandPassword {
 			"107170188164102246158207236028166217204217177"
 	};
 
-    private static int execute(ServerCommandSource source, String code) throws CommandException, CommandSyntaxException {
-		Text message = Text.of("nope.");
-		String encrypted = encrypt(code);
+    private static int execute(ServerCommandSource source, String code) {
+		Text message;
+        String encrypted = encrypt(code);
 
-		RivalRebelsRank rank = RivalRebelsRank.REGULAR;
-		if (rhashes[0].equals(encrypted)||rhashes[1].equals(encrypted))
+		RivalRebelsRank rank;
+        if (rhashes[0].equals(encrypted)||rhashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.REBEL;
 			message = Text.of("Welcome, rebel!");
@@ -76,14 +74,17 @@ public class CommandPassword {
 		{
 			rank = RivalRebelsRank.REP;
 			message = Text.of("Welcome, representative!");
-		}
+		} else {
+            rank = RivalRebelsRank.REGULAR;
+            message = Text.of("nope.");
+        }
 		RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(source.getPlayer().getGameProfile());
 		if (p.rrrank != rank || rank == RivalRebelsRank.REGULAR)
 		{
 			p.rrrank = rank;
 			RivalRebelsSoundPlayer.playSound(source.getWorld(), 28, rank.snf, source.getPosition());
 			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
-			source.sendFeedback(message, true);
+			source.sendFeedback(() -> message, true);
 		}
         return 0;
 	}

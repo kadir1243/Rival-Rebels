@@ -13,20 +13,15 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerNuclearBomb;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Matrix4f;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.GuiUtils;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
 
 	public GuiNuclearBomb(ContainerNuclearBomb containerNuclearBomb, PlayerInventory inventoryPlayer, Text title) {
@@ -34,8 +29,8 @@ public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
 	}
 
     @Override
-    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        super.drawForeground(matrices, mouseX, mouseY);
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
 		int seconds = (handler.getCountDown() / 20);
 		int millis = (handler.getCountDown() % 20) * 3;
 		String milli;
@@ -49,34 +44,34 @@ public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
 		}
 		if (handler.getCountDown() % 20 >= 10)
 		{
-			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 80, 6, 0x000000);
+			context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
 		}
 		else
 		{
-			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 80, 6, 0xFF0000);
+            context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 80, 6, 0xFF0000, false);
 		}
-		textRenderer.draw(matrices, new TranslatableText("RivalRebels.nuke.name"), 8, 6, 0xffffff);
-		textRenderer.draw(matrices, new TranslatableText("container.inventory"), 8, getYSize() - 96 + 2, 0xffffff);
+		context.drawText(textRenderer, Text.translatable("RivalRebels.nuke.name"), 8, 6, 0xffffff, false);
+		context.drawText(textRenderer, Text.translatable("container.inventory"), 8, backgroundHeight - 96 + 2, 0xffffff, false);
 		if (handler.isArmed())
 		{
-			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.armed"), 80, getYSize() - 96 + 2, 0xffffff);
+            context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.armed"), 80, backgroundHeight - 96 + 2, 0xffffff, false);
 		}
 		else
 		{
 			if (!handler.hasTrollFace())
 			{
-				textRenderer.draw(matrices, new LiteralText(handler.getAmountOfCharges() * 2.5 + " ").append(new TranslatableText("RivalRebels.tsar.megatons")), 80, getYSize() - 96 + 2, 0xffffff);
+                context.drawText(textRenderer, Text.literal(handler.getAmountOfCharges() * 2.5 + " ").append(Text.translatable("RivalRebels.tsar.megatons")), 80, backgroundHeight - 96 + 2, 0xffffff, false);
 			}
 			else
 			{
-				textRenderer.draw(matrices, "Umad bro?", 80, getYSize() - 96 + 2, 0xffffff);
+                context.drawText(textRenderer, "Umad bro?", 80, backgroundHeight - 96 + 2, 0xffffff, false);
 			}
 		}
 
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - getXSize()) / 2;
-		int posy = (height - getYSize()) / 2;
+		int posx = (width - backgroundWidth) / 2;
+		int posy = (height - backgroundHeight) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 158;
 		int widthx = 72;
@@ -85,8 +80,8 @@ public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			GuiUtils.drawGradientRect(new Matrix4f(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			context.fillGradient(mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			context.drawText(textRenderer, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
 			if (!buttondown && client.mouse.wasLeftButtonClicked())
 			{
                 Util.getOperatingSystem().open("http://rivalrebels.com");
@@ -98,14 +93,13 @@ public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
 	boolean	buttondown;
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-		if (handler.getAmountOfCharges() != 0) RenderSystem.setShaderColor((handler.getAmountOfCharges() * 0.1F), 1 - (handler.getAmountOfCharges() * 0.1F), 0, 1);
-        RenderSystem.setShaderTexture(0, RRIdentifiers.guitnuke);
-		int x = (width - getXSize()) / 2;
-		int y = (height - getYSize()) / 2;
-		GuiUtils.drawTexturedModalRect(matrices, x, y, 0, 0, getXSize(), 81, getZOffset());
-		RenderSystem.setShaderColor(1, 1, 1, 1);
-        GuiUtils.drawTexturedModalRect(matrices, x, y + 81, 0, 81, getXSize(), getYSize() - 81, getZOffset());
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        context.setShaderColor(1, 1, 1, 1);
+		if (handler.getAmountOfCharges() != 0) context.setShaderColor((handler.getAmountOfCharges() * 0.1F), 1 - (handler.getAmountOfCharges() * 0.1F), 0, 1);
+		int x = (width - backgroundWidth) / 2;
+		int y = (height - backgroundHeight) / 2;
+		context.drawTexture(RRIdentifiers.guitnuke, x, y, 0, 0, backgroundWidth, 81);
+		context.setShaderColor(1, 1, 1, 1);
+        context.drawTexture(RRIdentifiers.guitnuke, x, y + 81, 0, 81, backgroundWidth, backgroundHeight - 81);
 	}
 }

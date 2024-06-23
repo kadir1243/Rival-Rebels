@@ -12,19 +12,25 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesLeftLowerArm;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.RotationAxis;
+import org.joml.Vector3f;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderRhodesLeftLowerArm extends EntityRenderer<EntityRhodesLeftLowerArm>
 {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RenderRhodes.texture);
     public RenderRhodesLeftLowerArm(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
@@ -34,13 +40,13 @@ public class RenderRhodesLeftLowerArm extends EntityRenderer<EntityRhodesLeftLow
         matrices.push();
         matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
         float[] colors = RenderRhodes.colors;
-        RenderSystem.setShaderColor(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2], 1);
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(entity.getYaw()));
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(entity.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(entity.getPitch()));
         matrices.translate(0, 4f, 0);
         matrices.scale(-1, 1, 1);
-        //RenderRhodes.lowerarm.renderAll();
-        //RenderRhodes.rocketlauncher.renderAll();
+        VertexConsumer vertexConsumer = TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        RenderRhodes.lowerarm.render(vertexConsumer, new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.DEFAULT_UV);
+        RenderRhodes.rocketlauncher.render(vertexConsumer, new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.DEFAULT_UV);
         matrices.pop();
     }
 

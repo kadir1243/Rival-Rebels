@@ -12,13 +12,16 @@
 package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.core.BlackList;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.FallingBlock;
-import net.minecraft.block.Material;
 import net.minecraft.entity.FallingBlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
+import net.minecraft.sound.SoundCategory;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
@@ -26,13 +29,9 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BlockAutoTemplate extends FallingBlock {
+public abstract class BlockAutoTemplate extends FallingBlock {
 	public int		time	= 15;
 	public String	name	= "building";
-
-	public BlockAutoTemplate() {
-		super(Settings.of(Material.WOOD));
-	}
 
     public BlockAutoTemplate(Settings settings) {
         super(settings);
@@ -41,14 +40,18 @@ public class BlockAutoTemplate extends FallingBlock {
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
 		if (!world.isClient) {
-			player.sendMessage(Text.of("§4[§cWarning§4]§c Use pliers to build."), true);
+            ItemStack stack = player.getStackInHand(hand);
+            if (!stack.isOf(RRItems.pliers)){
+                player.sendMessage(Text.of("§4[§cWarning§4]§c Use pliers to build."), true);
+                return ActionResult.PASS;
+            }
+            return ActionResult.success(world.isClient);
 		}
-        return ActionResult.success(world.isClient);
+        return ActionResult.PASS;
 	}
 
-	public void build(World world, int x, int y, int z)
-	{
-		RivalRebelsSoundPlayer.playSound(world, 1, 0, x, y, z, 10, 1);
+	public void build(World world, int x, int y, int z) {
+        world.playSound(x, y, z, RRSounds.AUTO_BUILD, SoundCategory.BLOCKS, 10, 1, false);
 	}
 
 	public void placeBlockCarefully(World world, int x, int y, int z, Block block) {

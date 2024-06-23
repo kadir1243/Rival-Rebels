@@ -48,17 +48,16 @@ public class ContainerLoader extends ScreenHandler
     }
 
     @Override
-	public ItemStack transferSlot(PlayerEntity par1EntityPlayer, int par2)
-	{
+    public ItemStack quickMove(PlayerEntity player, int slot) {
 		ItemStack var3 = ItemStack.EMPTY;
-		Slot var4 = this.slots.get(par2);
+		Slot var4 = this.slots.get(slot);
 
 		if (var4 != null && var4.hasStack())
 		{
 			ItemStack var5 = var4.getStack();
 			var3 = var5.copy();
 
-			if (par2 < 60)
+			if (slot < 60)
 			{
 				if (!this.insertItem(var5, 60, this.slots.size(), true))
 				{

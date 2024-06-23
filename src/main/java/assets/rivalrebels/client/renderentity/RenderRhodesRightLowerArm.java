@@ -12,19 +12,25 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesRightLowerArm;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.RotationAxis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.joml.Vector3f;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderRhodesRightLowerArm extends EntityRenderer<EntityRhodesRightLowerArm>
 {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RenderRhodes.texture);
     public RenderRhodesRightLowerArm(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
@@ -33,16 +39,14 @@ public class RenderRhodesRightLowerArm extends EntityRenderer<EntityRhodesRightL
     public void render(EntityRhodesRightLowerArm entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         matrices.push();
         matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
-        RenderSystem.setShaderColor(RenderRhodes.colors[entity.getColor()*3],
-            RenderRhodes.colors[entity.getColor()*3+1],
-            RenderRhodes.colors[entity.getColor()*3+2],
-            1);
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(entity.getYaw()));
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(entity.getPitch()));
+        float[] colors = RenderRhodes.colors;
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(entity.getPitch()));
         matrices.translate(0, 4f, 0);
         matrices.scale(-1, 1, 1);
-        //RenderRhodes.lowerarm.renderAll();
-        //RenderRhodes.flamethrower.renderAll();
+        VertexConsumer vertexConsumer = TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        RenderRhodes.lowerarm.render(vertexConsumer, new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.DEFAULT_UV);
+        RenderRhodes.flamethrower.render(vertexConsumer, new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.DEFAULT_UV);
         matrices.pop();
 	}
 

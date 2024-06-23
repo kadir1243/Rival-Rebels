@@ -13,7 +13,6 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -26,10 +25,10 @@ public class CommandContinueRound {
         );
     }
 
-    private static int execute(ServerCommandSource source) throws CommandException {
+    private static int execute(ServerCommandSource source) {
 		RivalRebels.round.stopRounds();
 		RivalRebels.round.newRound();
-		source.sendFeedback(Text.of("The current round has been restarted."), true);
+		source.sendFeedback(() -> Text.of("The current round has been restarted."), true);
         return 0;
 	}
 }

@@ -14,6 +14,7 @@ package assets.rivalrebels.common.block.trap;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -32,11 +33,11 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockAntimatterBomb extends BlockWithEntity {
+    public static final MapCodec<BlockAntimatterBomb> CODEC = createCodec(BlockAntimatterBomb::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockAntimatterBomb(Settings settings)
 	{
@@ -45,6 +46,11 @@ public class BlockAntimatterBomb extends BlockWithEntity {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
+    }
+
+    @Override
+    protected MapCodec<BlockAntimatterBomb> getCodec() {
+        return CODEC;
     }
 
     @Nullable

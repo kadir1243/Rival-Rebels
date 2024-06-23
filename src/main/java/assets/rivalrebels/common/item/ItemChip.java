@@ -33,21 +33,21 @@ import java.util.UUID;
 public class ItemChip extends Item {
 	public ItemChip()
 	{
-		super(new Settings().maxCount(1).group(RRItems.rralltab));
+		super(new Settings().maxCount(1));
 	}
 
     @Override
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
 		if (RivalRebels.round.isStarted() && !stack.getOrCreateNbt().getBoolean("isReady") && entity instanceof PlayerEntity player) {
             stack.getNbt().putUuid("player", player.getUuid());
-            stack.getNbt().putString("username", player.getEntityName());
+            stack.getNbt().putString("username", player.getName().getString());
 			stack.getNbt().putInt("team", RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam.ordinal());
 			stack.getNbt().putBoolean("isReady", true);
 		}
 	}
 
     @Override
-    public ActionResult onItemUseFirst(ItemStack stack, ItemUsageContext context) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         BlockPos pos = context.getBlockPos();
         World world = context.getWorld();

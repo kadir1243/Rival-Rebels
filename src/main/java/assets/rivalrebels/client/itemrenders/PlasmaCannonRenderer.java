@@ -14,94 +14,76 @@ package assets.rivalrebels.client.itemrenders;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRod;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
-import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
+import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
-public class PlasmaCannonRenderer extends BuiltinModelItemRenderer {
+import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
+
+public class PlasmaCannonRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier PLASMA_CANNON = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etplasmacannon);
+    public static final SpriteIdentifier HYDROD = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ethydrod);
 	private final ModelRod md2;
-	private final ModelRod md3;
-	private final ModelFromObj model;
+	private final ModelRod md3 = new ModelRod();
+	private static final ModelFromObj model = ModelFromObj.readObjFile("m.obj");
 
-	public PlasmaCannonRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
+	public PlasmaCannonRenderer() {
 		md2 = new ModelRod();
 		md2.rendersecondcap = false;
-		md3 = new ModelRod();
-        model = ModelFromObj.readObjFile("m.obj");
-	}
+    }
 
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate(-0.1f, 0f, 0f);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etplasmacannon);
 		matrices.push();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
 		matrices.push();
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-        model.render(buffer);
-		if (stack.hasEnchantments()) {
-			RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			RenderSystem.enableBlend();
-            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-			model.render(buffer);
-			RenderSystem.disableBlend();
+        VertexConsumer plasmaCannonVertexConsumer = PLASMA_CANNON.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        model.render(plasmaCannonVertexConsumer, light, overlay);
+        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
+        if (stack.hasEnchantments()) {
+			model.render(cellularNoise, light, overlay);
 		}
 
 		matrices.pop();
 		matrices.pop();
 
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ethydrod);
 		matrices.push();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
 		matrices.push();
-		matrices.multiply(new Quaternion(225, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(225, 0.0F, 0.0F, 1.0F));
 		matrices.translate(-0.5f, 0.5f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
-		md2.render(matrices, buffer);
-		if (stack.hasEnchantments())
-		{
-            RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			RenderSystem.enableBlend();
-            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-			md2.render(matrices, buffer);
-			RenderSystem.disableBlend();
+        VertexConsumer hydrodVertexConsumer = HYDROD.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        md2.render(matrices, hydrodVertexConsumer, light, overlay);
+		if (stack.hasEnchantments()) {
+			md2.render(matrices, cellularNoise, light, overlay);
 		}
 		matrices.pop();
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
 		matrices.push();
-		matrices.multiply(new Quaternion(247.5f, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(247.5f, 0.0F, 0.0F, 1.0F));
 		matrices.translate(-0.175f, 0.1f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
-		md3.render(matrices, buffer);
-		if (stack.hasEnchantments())
-		{
-			RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-			RenderSystem.enableBlend();
-			RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-			md3.render(matrices, buffer);
-			RenderSystem.disableBlend();
+		md3.render(matrices, hydrodVertexConsumer, light, overlay);
+		if (stack.hasEnchantments()) {
+			md3.render(matrices, cellularNoise, light, overlay);
 		}
 		matrices.pop();
 		matrices.pop();

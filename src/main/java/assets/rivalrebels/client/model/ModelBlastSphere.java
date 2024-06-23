@@ -12,46 +12,42 @@
 package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
-import assets.rivalrebels.client.renderhelper.Vertice;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vector4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
-public class ModelBlastSphere
-{
-	Vertice	vx	= new Vertice(1, 0, 0).normalize();
-	Vertice	vy	= new Vertice(0, 1, 0).normalize();
-	Vertice	vz	= new Vertice(0, 0, 1).normalize();
-	Vertice	vxy	= new Vertice(0.5f, 0.5f, 0).normalize();
-	Vertice	vyz	= new Vertice(0, 0.5f, 0.5f).normalize();
-	Vertice	vxz	= new Vertice(0.5f, 0, 0.5f).normalize();
-	Vertice	vx1	= new Vertice(0.75f, 0.25f, 0).normalize();
-	Vertice	vx2	= new Vertice(0.5f, 0.25f, 0.25f).normalize();
-	Vertice	vx3	= new Vertice(0.75f, 0, 0.25f).normalize();
-	Vertice	vy1	= new Vertice(0, 0.75f, 0.25f).normalize();
-	Vertice	vy2	= new Vertice(0.25f, 0.5f, 0.25f).normalize();
-	Vertice	vy3	= new Vertice(0.25f, 0.75f, 0).normalize();
-	Vertice	vz1	= new Vertice(0.25f, 0, 0.75f).normalize();
-	Vertice	vz2	= new Vertice(0.25f, 0.25f, 0.5f).normalize();
-	Vertice	vz3	= new Vertice(0, 0.25f, 0.75f).normalize();
+public class ModelBlastSphere {
+	private static final Vector3f	vx	= new Vector3f(1, 0, 0).normalize();
+	private static final Vector3f	vy	= new Vector3f(0, 1, 0).normalize();
+	private static final Vector3f	vz	= new Vector3f(0, 0, 1).normalize();
+	private static final Vector3f	vxy	= new Vector3f(0.5f, 0.5f, 0).normalize();
+	private static final Vector3f	vyz	= new Vector3f(0, 0.5f, 0.5f).normalize();
+	private static final Vector3f	vxz	= new Vector3f(0.5f, 0, 0.5f).normalize();
+	private static final Vector3f	vx1	= new Vector3f(0.75f, 0.25f, 0).normalize();
+	private static final Vector3f	vx2	= new Vector3f(0.5f, 0.25f, 0.25f).normalize();
+	private static final Vector3f	vx3	= new Vector3f(0.75f, 0, 0.25f).normalize();
+	private static final Vector3f	vy1	= new Vector3f(0, 0.75f, 0.25f).normalize();
+	private static final Vector3f	vy2	= new Vector3f(0.25f, 0.5f, 0.25f).normalize();
+	private static final Vector3f	vy3	= new Vector3f(0.25f, 0.75f, 0).normalize();
+	private static final Vector3f	vz1	= new Vector3f(0.25f, 0, 0.75f).normalize();
+	private static final Vector3f	vz2	= new Vector3f(0.25f, 0.25f, 0.5f).normalize();
+	private static final Vector3f	vz3	= new Vector3f(0, 0.25f, 0.75f).normalize();
 
-	public void renderModel(MatrixStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha)
+	public static void renderModel(MatrixStack matrices, VertexConsumerProvider vertexConsumers, float size, float red, float green, float blue, float alpha)
 	{
         matrices.push();
         matrices.scale(size, size, size);
         Vector4f color = new Vector4f(red, green, blue, alpha);
-        RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-        for (int i = 0; i < 2; i++)
-		{
-			matrices.multiply(new Quaternion(i * 180, 0, 0, 1));
-			for (int p = 0; p < 4; p++)
-			{
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
+        for (int i = 0; i < 2; i++) {
+			matrices.multiply(new Quaternionf(i * 180, 0, 0, 1));
+			for (int p = 0; p < 4; p++) {
 				matrices.push();
-				matrices.multiply(new Quaternion(p * 90, 0, 1, 0));
+				matrices.multiply(new Quaternionf(p * 90, 0, 1, 0));
 
 				RenderHelper.addTri(buffer, vy, vy1, vy3, color);
 				RenderHelper.addTri(buffer, vy1, vyz, vy2, color);

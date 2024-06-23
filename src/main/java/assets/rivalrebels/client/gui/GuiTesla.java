@@ -16,14 +16,11 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiKnob;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
 import assets.rivalrebels.common.packet.ItemUpdate;
-import assets.rivalrebels.common.packet.PacketDispatcher;
+import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 
@@ -38,7 +35,7 @@ public class GuiTesla extends Screen
 
 	public GuiTesla(int start)
 	{
-        super(Text.of(""));
+        super(Text.empty());
         s = start - 90;
 	}
 
@@ -46,7 +43,7 @@ public class GuiTesla extends Screen
     protected void init() {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-		this.drawables.clear();
+        this.clearChildren();
 		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, "Knob");
 		this.addDrawable(knob);
 	}
@@ -57,24 +54,27 @@ public class GuiTesla extends Screen
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
         float f = 0.00390625F;
 		client = MinecraftClient.getInstance();
-		client.textureManager.bindTexture(RRIdentifiers.guitesla);
-		buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-		buffer.vertex(posX, posY + ySizeOfTexture, getZOffset()).texture(0, ySizeOfTexture * f).next();
-		buffer.vertex(posX + xSizeOfTexture, posY + ySizeOfTexture, getZOffset()).texture(xSizeOfTexture * f, ySizeOfTexture * f).next();
-		buffer.vertex(posX + xSizeOfTexture, posY, getZOffset()).texture(xSizeOfTexture * f, 0).next();
-		buffer.vertex(posX, posY, getZOffset()).texture(0, 0).next();
-		tessellator.draw();
-        super.render(matrices, mouseX, mouseY, delta);
+        ((DrawContextAccessor) context).callDrawTexturedQuad(
+            RRIdentifiers.guitesla,
+            posX,
+            posX + xSizeOfTexture,
+            posY,
+            posY + ySizeOfTexture,
+            0, // z offset
+            0,
+            xSizeOfTexture * f,
+            0,
+            ySizeOfTexture * f
+        );
+        super.render(context, mouseX, mouseY, delta);
 		if (!(ClientProxy.USE_KEY.isPressed()))
 		{
 			this.client.setScreen(null);
 			this.client.onWindowFocusChanged(true);
-			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
+            ClientPlayNetworking.send(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
 			ItemStack stack = client.player.getInventory().getStack(client.player.getInventory().selectedSlot);
 			if (stack.getItem() instanceof ItemTesla) {
 				stack.getOrCreateNbt().putInt("dial", knob.getDegree());

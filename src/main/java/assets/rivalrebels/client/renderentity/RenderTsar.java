@@ -13,34 +13,29 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.entity.EntityTsar;
-import net.minecraft.client.render.RenderLayer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class RenderTsar extends EntityRenderer<EntityTsar>
-{
-	private final ModelTsarBomba model;
-
-	public RenderTsar(EntityRendererFactory.Context manager)
-	{
+@Environment(EnvType.CLIENT)
+public class RenderTsar extends EntityRenderer<EntityTsar> {
+	public RenderTsar(EntityRendererFactory.Context manager) {
         super(manager);
-		model = new ModelTsarBomba();
 	}
 
     @Override
     public void render(EntityTsar entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		matrices.push();
-		matrices.multiply(new Quaternion(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternionf(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
 		//GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
-		matrices.multiply(new Quaternion(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
-		model.render(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()));
+		matrices.multiply(new Quaternionf(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
+		ModelTsarBomba.render(matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
 		matrices.pop();
 	}
 

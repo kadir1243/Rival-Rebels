@@ -14,17 +14,14 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityGore;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
 import java.util.Objects;
 
@@ -55,109 +52,104 @@ public class RenderGore extends EntityRenderer<EntityGore>
 
 		matrices.push();
 		matrices.translate(x, y, z);
-		matrices.multiply(new Quaternion(-entity.getYaw() + 180, 0.0F, 1.0F, 0.0F));
-		matrices.multiply(new Quaternion(entity.getPitch(), 1.0F, 0.0F, 0.0F));
+		matrices.multiply(new Quaternionf(-entity.getYaw() + 180, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternionf(entity.getPitch(), 1.0F, 0.0F, 0.0F));
         int mob = entity.getMob();
 		int type = entity.getTypeOfGore();
 		float size = entity.getSize();
 
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getItemEntityTranslucentCull(getTexture(entity)));
         if (mob == 0) {
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16, light);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 32, 16, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 32, 16, light);
 		}
 		else if (mob == 1)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16, light);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16, light);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16, light);
 		}
 		else if (mob == 2)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16, light);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16, light);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16, light);
 		}
 		else if (mob == 3)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 40, 16, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 0, 16, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16, light);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 40, 16, 64, 32, 16, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 0, 16, 64, 32, 16, light);
 		}
 		else if (mob == 4)
 		{
 			if (type == 0)
 			{
-				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
+				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
 				matrices.translate(0, -0.125, 0);
 				matrices.scale(0.875F, 0.875F, 0.875F);
-				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 16, 64, 32, 16);
+				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 16, 64, 32, 16, light);
 			}
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 32, 16, 64, 32, 16);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 32, 16, 64, 32, 16, light);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16, light);
 		}
 		else if (mob == 5)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 6, 4, 0, 16, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 6, 4, 0, 16, 64, 32, 16, light);
 		}
 		else if (mob == 6)
 		{
-			if (type == 0)
-			{
-                RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE_MINUS_SRC_ALPHA);
-				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
-			}
-			else if (type == 1)
-			{
-				RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE_MINUS_SRC_ALPHA);
-				RenderHelper.renderBox(matrices, buffer, 6, 6, 6, 0, 16, 64, 32, 16);
+			if (type == 0) {
+				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(getTexture(entity))), 8, 8, 8, 0, 0, 64, 32, 16, light);
+			} else if (type == 1) {
+				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(getTexture(entity))), 6, 6, 6, 0, 16, 64, 32, 16, light);
 			}
 		}
 		else if (mob == 7)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 6, 6, 6, 0, 16, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 6, 6, 6, 0, 16, 64, 32, 16, light);
 		}
 		else if (mob == 8)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
 			else if (type == 1)
 			{
-                matrices.multiply(new Quaternion(90, 0, 1, 0));
-				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16);
+                matrices.multiply(new Quaternionf(90, 0, 1, 0));
+				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
 			}
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);
 		}
 		else if (mob == 9)
 		{
 			matrices.scale(0.666f, 0.666f, 0.666f);
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
 			else if (type == 1)
 			{
-                matrices.multiply(new Quaternion(90, 0, 1, 0));
-				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16);
+                matrices.multiply(new Quaternionf(90, 0, 1, 0));
+				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
 			}
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);
 		}
 		else if (mob == 10)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 16, 16, 16, 0, 0, 64, 32, 4);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 14, 2, 0, 0, 64, 32, 4);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, 16, 16, 16, 0, 0, 64, 32, 4, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 14, 2, 0, 0, 64, 32, 4, light);
 		}
 		else if (mob == 11)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, (int) (8 * size), (int) (8 * size), (int) (8 * size), 0, 0, 64, 64, 16);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (8 * size), 0, 0, 64, 64, 16);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16);
+			if (type == 0) RenderHelper.renderBox(matrices, buffer, (int) (8 * size), (int) (8 * size), (int) (8 * size), 0, 0, 64, 64, 16, light);
+			else if (type == 1) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (8 * size), 0, 0, 64, 64, 16, light);
+			else if (type == 2) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, light);
+			else if (type == 3) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, light);
 		}
 		matrices.pop();
 	}

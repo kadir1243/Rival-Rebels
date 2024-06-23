@@ -13,7 +13,6 @@ package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.itemrenders.FlamethrowerRenderer;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityFlameBall;
 import assets.rivalrebels.common.entity.EntityFlameBall1;
@@ -22,7 +21,6 @@ import assets.rivalrebels.common.entity.EntityFlameBallGreen;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -35,23 +33,12 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.function.Consumer;
 
 public class ItemFlameThrower extends ToolItem {
 	public ItemFlameThrower() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1).group(RRItems.rralltab));
+		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
 	}
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new FlamethrowerRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
+
     @Override
     public UseAction getUseAction(ItemStack stack) {
 		return UseAction.BOW;
@@ -99,27 +86,25 @@ public class ItemFlameThrower extends ToolItem {
 	boolean message = true;
 
     @Override
-    public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
-		World world = player.world;
-		if (!world.isClient)
-		{
-            if (world.random.nextInt(10) == 0 && !player.isInsideWaterOrBubbleColumn()) {
-                RivalRebelsSoundPlayer.playSound(player, 8, 0, 0.03f);
-                if (world.random.nextInt(3) == 0 && !player.isInsideWaterOrBubbleColumn()) {
-                    RivalRebelsSoundPlayer.playSound(player, 8, 1, 0.1f);
+    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+		if (!world.isClient) {
+            if (world.random.nextInt(10) == 0 && !user.isInsideWaterOrBubbleColumn()) {
+                RivalRebelsSoundPlayer.playSound(user, 8, 0, 0.03f);
+                if (world.random.nextInt(3) == 0 && !user.isInsideWaterOrBubbleColumn()) {
+                    RivalRebelsSoundPlayer.playSound(user, 8, 1, 0.1f);
                 }
             }
             if (!stack.hasEnchantments()) {
                 switch (getMode(stack)) {
                     case 0:
                         for (int i = 0; i < 4; i++)
-                            world.spawnEntity(new EntityFlameBall2(world, player, world.random.nextFloat() + 0.5f));
+                            world.spawnEntity(new EntityFlameBall2(world, user, world.random.nextFloat() + 0.5f));
                         break;
                     case 1:
-                        world.spawnEntity(new EntityFlameBall1(world, player, 1));
+                        world.spawnEntity(new EntityFlameBall1(world, user, 1));
                         break;
                     case 2:
-                        world.spawnEntity(new EntityFlameBall(world, player, 1));
+                        world.spawnEntity(new EntityFlameBall(world, user, 1));
                         break;
                 }
             }
@@ -133,12 +118,14 @@ public class ItemFlameThrower extends ToolItem {
 			stack.getNbt().putBoolean("isReady", true);
 			stack.getNbt().putInt("mode", 2);
 		}
-		if (entity instanceof PlayerEntity player) {
-            if (selected && world.random.nextInt(10) == 0 && !player.isInsideWaterOrBubbleColumn()) {
-                RivalRebelsSoundPlayer.playSound(player, 8, 0, 0.03f);
+		if (entity instanceof PlayerEntity) {
+            if (selected && world.random.nextInt(10) == 0 && !entity.isInsideWaterOrBubbleColumn()) {
+                RivalRebelsSoundPlayer.playSound(entity, 8, 0, 0.03f);
             }
-		}
-        if (world.isClient) openGui(stack);
+        }
+        if (world.isClient) {
+            openGui(stack);
+        }
 	}
 
 	public void openGui(ItemStack item) {
@@ -151,10 +138,4 @@ public class ItemFlameThrower extends ToolItem {
 	public int getMode(ItemStack item) {
         return item.getOrCreateNbt().getInt("mode");
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ae");
-	}*/
 }

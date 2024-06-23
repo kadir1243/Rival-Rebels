@@ -16,21 +16,23 @@ import assets.rivalrebels.client.model.ModelNukeCrate;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
 public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEntityNukeCrate> {
-    private final ModelNukeCrate model;
+    public static final SpriteIdentifier NUKE_CRATE_TOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.btnuketop);
+    public static final SpriteIdentifier NUKE_CRATE_BOTTOM_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.btnukebottom);
+    public static final SpriteIdentifier CRATE_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.btcrate);
 
     public TileEntityNukeCrateRenderer(BlockEntityRendererFactory.Context context) {
-        model = new ModelNukeCrate();
     }
 
     @Override
@@ -39,20 +41,20 @@ public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEnti
         matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
         Direction metadata = entity.getCachedState().get(BlockNukeCrate.DIRECTION);
         switch (metadata) {
-            case DOWN -> matrices.multiply(new Quaternion(180, 1, 0, 0));
-            case NORTH -> matrices.multiply(new Quaternion(-90, 1, 0, 0));
-            case SOUTH -> matrices.multiply(new Quaternion(90, 1, 0, 0));
-            case WEST -> matrices.multiply(new Quaternion(90, 0, 0, 1));
-            case EAST -> matrices.multiply(new Quaternion(-90, 0, 0, 1));
+            case DOWN -> matrices.multiply(new Quaternionf(180, 1, 0, 0));
+            case NORTH -> matrices.multiply(new Quaternionf(-90, 1, 0, 0));
+            case SOUTH -> matrices.multiply(new Quaternionf(90, 1, 0, 0));
+            case WEST -> matrices.multiply(new Quaternionf(90, 0, 0, 1));
+            case EAST -> matrices.multiply(new Quaternionf(-90, 0, 0, 1));
         }
-        if (entity.getWorld().getBlockState(entity.getPos()).getBlock() == RRBlocks.nukeCrateBottom)
-            MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btnukebottom);
-        if (entity.getWorld().getBlockState(entity.getPos()).getBlock() == RRBlocks.nukeCrateTop)
-            MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btnuketop);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-        model.renderModelA(matrices, buffer);
-        MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btcrate);
-        model.renderModelB(matrices, buffer);
+        VertexConsumer buffer;
+        if (entity.getCachedState().isOf(RRBlocks.nukeCrateBottom))
+            buffer = NUKE_CRATE_BOTTOM_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        else if (entity.getCachedState().isOf(RRBlocks.nukeCrateTop))
+            buffer = NUKE_CRATE_TOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        else throw new UnsupportedOperationException("Unknown block to render");
+        ModelNukeCrate.renderModelA(matrices, buffer, light, overlay);
+        ModelNukeCrate.renderModelB(matrices, CRATE_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
         matrices.pop();
     }
 }

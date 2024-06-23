@@ -14,34 +14,35 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLoader;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
-import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.block.machine.BlockLoader;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityLoader> {
-	private final ModelLoader loaderModel;
-	private final ModelFromObj tube;
+@Environment(EnvType.CLIENT)
+public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityLoader>, CustomRenderBoxExtension<TileEntityLoader> {
+    public static final SpriteIdentifier TUBE_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ettube);
+    public static final SpriteIdentifier LOADER_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etloader);
+    private static final ModelFromObj tube = ModelFromObj.readObjFile("l.obj");
 
 	public TileEntityLoaderRenderer(BlockEntityRendererFactory.Context context) {
-		loaderModel = new ModelLoader();
-        tube = ModelFromObj.readObjFile("l.obj");
-	}
+    }
 
     @Override
     public void render(TileEntityLoader entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etloader);
 		int var9 = entity.getCachedState().get(BlockLoader.META);
 		short var11 = 0;
 		if (var9 == 2)
@@ -64,10 +65,10 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
 			var11 = 0;
 		}
 
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderHelper.TRINGLES_POS_TEX_COLOR);
-        matrices.multiply(new Quaternion(var11, 0.0F, 1.0F, 0.0F));
-		loaderModel.renderA(vertexConsumer, matrices);
-		loaderModel.renderB(vertexConsumer, matrices, (float) entity.slide);
+        VertexConsumer vertexConsumer = LOADER_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        matrices.multiply(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+		ModelLoader.renderA(vertexConsumer, matrices, light, overlay);
+		ModelLoader.renderB(vertexConsumer, matrices, (float) entity.slide, light, overlay);
 		matrices.pop();
 		for (int i = 0; i < entity.machines.size(); i++)
 		{
@@ -75,25 +76,28 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
 			matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
 			int xdif = entity.machines.get(i).getPos().getX() - entity.getPos().getX();
 			int zdif = entity.machines.get(i).getPos().getZ() - entity.getPos().getZ();
-			matrices.multiply(new Quaternion((float) (-90 + (Math.atan2(xdif, zdif) / Math.PI) * 180F), 0, 1, 0));
+			matrices.multiply(new Quaternionf((float) (-90 + (Math.atan2(xdif, zdif) / Math.PI) * 180F), 0, 1, 0));
 			matrices.translate(-1f, -0.40f, 0);
-			MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.ettube);
 			matrices.scale(0.5F, 0.15F, 0.15F);
 			int dist = (int) Math.sqrt((xdif * xdif) + (zdif * zdif));
-			for (int d = 0; d < dist; d++)
-			{
+            VertexConsumer ettubeBuffer = TUBE_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+            for (int d = 0; d < dist; d++) {
 				matrices.translate(2, 0, 0);
-                tube.render(vertexConsumer);
+                tube.render(ettubeBuffer, light, overlay);
 			}
 			matrices.pop();
 		}
 	}
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public int getRenderDistance()
     {
         return 16384;
     }
 
+    @Override
+    public Box getRenderBoundingBox(TileEntityLoader blockEntity) {
+        return Box.from(BlockBox.create(blockEntity.getPos().add(-5, -1, -5), blockEntity.getPos().add(6, 2, 6)));
+    }
 }

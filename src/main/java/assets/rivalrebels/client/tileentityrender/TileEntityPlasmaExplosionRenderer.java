@@ -13,22 +13,20 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<TileEntityPlasmaExplosion> {
-	private final ModelBlastSphere model;
+@Environment(EnvType.CLIENT)
+public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<TileEntityPlasmaExplosion>, CustomRenderBoxExtension<TileEntityPlasmaExplosion> {
 
-	public TileEntityPlasmaExplosionRenderer(BlockEntityRendererFactory.Context context) {
-		model = new ModelBlastSphere();
+    public TileEntityPlasmaExplosionRenderer(BlockEntityRendererFactory.Context context) {
 	}
 
     @Override
@@ -38,17 +36,16 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
 		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
 
 		matrices.push();
-		matrices.multiply(new Quaternion(entity.size * 50, 0f, 1, 0f));
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
-        model.renderModel(matrices, buffer, fsize * 5.5f, 0.45f, 0.45f, 0.65f, 0.4f);
-        matrices.multiply(new Quaternion(entity.size * 50, 0f, 1, 0f));
-		model.renderModel(matrices, buffer, fsize * 5.6f, 0.45f, 0.35f, 0.65f, 0.4f);
-        matrices.multiply(new Quaternion(entity.size * 50, 0f, 1, 0f));
-		model.renderModel(matrices, buffer, fsize * 5.7f, 0.45f, 0.35f, 0.95f, 0.4f);
-        matrices.multiply(new Quaternion(entity.size * 50, 0f, 1, 0f));
-		model.renderModel(matrices, buffer, fsize * 5.8f, 0.45f, 0.35f, 0.65f, 0.4f);
+		matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+        ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.5f, 0.45f, 0.45f, 0.65f, 0.4f);
+        matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.6f, 0.45f, 0.35f, 0.65f, 0.4f);
+        matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.7f, 0.45f, 0.35f, 0.95f, 0.4f);
+        matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.8f, 0.45f, 0.35f, 0.65f, 0.4f);
 		matrices.pop();
-		model.renderModel(matrices, buffer, fsize * 5.9f, 0.45f, 0.35f, 0.65f, 0.4f);
+		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.9f, 0.45f, 0.35f, 0.65f, 0.4f);
 		matrices.pop();
 	}
 
@@ -58,4 +55,8 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
         return 16384;
     }
 
+    @Override
+    public Box getRenderBoundingBox(TileEntityPlasmaExplosion blockEntity) {
+        return Box.from(BlockBox.create(blockEntity.getPos().add(-2, -2, -2), blockEntity.getPos().add(3, 3, 3)));
+    }
 }

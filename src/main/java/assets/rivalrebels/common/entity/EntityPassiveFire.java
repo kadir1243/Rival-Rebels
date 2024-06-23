@@ -100,9 +100,9 @@ public class EntityPassiveFire extends EntityInanimate {
     @Override
 	public void setVelocity(double x, double y, double z) {
         super.setVelocity(
-            x + (world.random.nextFloat() - 0.5) / 50,
-            y + (world.random.nextFloat() - 0.5) / 50,
-            z + (world.random.nextFloat() - 0.5) / 50);
+            x + (getWorld().random.nextFloat() - 0.5) / 50,
+            y + (getWorld().random.nextFloat() - 0.5) / 50,
+            z + (getWorld().random.nextFloat() - 0.5) / 50);
 	}
 
 	@Override

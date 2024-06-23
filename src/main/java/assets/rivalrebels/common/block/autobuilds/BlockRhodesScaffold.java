@@ -13,14 +13,16 @@ package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-public class BlockRhodesScaffold extends BlockAutoTemplate
-{
-	public static final byte[] binimg = {
+public class BlockRhodesScaffold extends BlockAutoTemplate {
+    public static final MapCodec<BlockRhodesScaffold> CODEC = createCodec(BlockRhodesScaffold::new);
+
+    public static final byte[] binimg = {
 		0,0,0,0,0,0,0,7,7,
 		0,1,1,1,1,0,0,0,0,
 		0,1,1,1,0,0,0,2,1,
@@ -59,7 +61,12 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 		super(settings);
 	}
 
-	@Override
+    @Override
+    protected MapCodec<BlockRhodesScaffold> getCodec() {
+        return null;
+    }
+
+    @Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
@@ -226,20 +233,20 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
         world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
     }
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon6;
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -252,7 +259,7 @@ public class BlockRhodesScaffold extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

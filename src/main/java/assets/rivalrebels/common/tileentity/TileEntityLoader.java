@@ -27,7 +27,6 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -51,12 +50,6 @@ public class TileEntityLoader extends BlockEntity implements Inventory, Tickable
 	public int size()
 	{
 		return 60;
-	}
-
-	@Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-5, -1, -5), getPos().add(6, 2, 6));
 	}
 
 	@Override
@@ -205,8 +198,7 @@ public class TileEntityLoader extends BlockEntity implements Inventory, Tickable
 								{
 									if (ter.chestContents.get(0).isEmpty())
 									{
-										ter.chestContents.set(0, chestContents.get(q).copy());
-										ter.chestContents.get(0).setCount(amount);
+										ter.chestContents.set(0, chestContents.get(q).copyWithCount(amount));
 									}
 									else ter.chestContents.get(0).increment(amount);
 									amount = 0;
@@ -220,8 +212,7 @@ public class TileEntityLoader extends BlockEntity implements Inventory, Tickable
 								{
 									if (ter.chestContents.get(1).isEmpty())
 									{
-										ter.chestContents.set(1, chestContents.get(q).copy());
-										ter.chestContents.get(1).setCount(amount);
+										ter.chestContents.set(1, chestContents.get(q).copyWithCount(amount));
 									}
 									else ter.chestContents.get(1).increment(amount);
 									amount = 0;
@@ -235,8 +226,7 @@ public class TileEntityLoader extends BlockEntity implements Inventory, Tickable
 								{
 									if (ter.chestContents.get(2).isEmpty())
 									{
-										ter.chestContents.set(2, chestContents.get(q).copy());
-										ter.chestContents.get(2).setCount(amount);
+										ter.chestContents.set(2, chestContents.get(q).copyWithCount(amount));
 									}
 									else ter.chestContents.get(2).increment(amount);
 									amount = 0;
@@ -256,8 +246,7 @@ public class TileEntityLoader extends BlockEntity implements Inventory, Tickable
 								{
 									if (ter.chestContents.get(3).isEmpty())
 									{
-										ter.chestContents.set(3, chestContents.get(q).copy());
-										ter.chestContents.get(3).setCount(amount);
+										ter.chestContents.set(3, chestContents.get(q).copyWithCount(amount));
 									}
 									else ter.chestContents.get(3).increment(amount);
 									amount = 0;
@@ -271,8 +260,7 @@ public class TileEntityLoader extends BlockEntity implements Inventory, Tickable
 								{
 									if (ter.chestContents.get(4).isEmpty())
 									{
-										ter.chestContents.set(4, chestContents.get(q).copy());
-										ter.chestContents.get(4).setCount(amount);
+										ter.chestContents.set(4, chestContents.get(q).copyWithCount(amount));
 									}
 									else ter.chestContents.get(4).increment(amount);
 									amount = 0;
@@ -286,8 +274,7 @@ public class TileEntityLoader extends BlockEntity implements Inventory, Tickable
 								{
 									if (ter.chestContents.get(5).isEmpty())
 									{
-										ter.chestContents.set(5, chestContents.get(q).copy());
-										ter.chestContents.get(5).setCount(amount);
+										ter.chestContents.set(5, chestContents.get(q).copyWithCount(amount));
 									}
 									else ter.chestContents.get(5).increment(amount);
 									amount = 0;

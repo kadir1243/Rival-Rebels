@@ -32,7 +32,7 @@ import net.minecraft.world.World;
 public class ItemGasGrenade extends Item
 {
 	public ItemGasGrenade() {
-		super(new Settings().group(RRItems.rralltab).maxCount(6));
+		super(new Settings().maxCount(6));
 	}
 
     @Override
@@ -81,20 +81,20 @@ public class ItemGasGrenade extends Item
 	}
 
     @Override
-    public void onUsingTick(ItemStack stack, LivingEntity entityLiving, int count) {
-		int time = 75 - count;
+    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+		int time = 75 - remainingUseTicks;
 		if (time == 15 || time == 30 || time == 45 || time == 60)
 		{
-			entityLiving.world.playSound(entityLiving.getX(), entityLiving.getY(), entityLiving.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.PLAYERS, 1.0F, 1.0F, true);
+			world.playSound(user.getX(), user.getY(), user.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_SNARE.value(), SoundCategory.PLAYERS, 1.0F, 1.0F, true);
 		}
 		if (time == 75)
 		{
-			entityLiving.world.playSound(entityLiving.getX(), entityLiving.getY(), entityLiving.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_SNARE, SoundCategory.PLAYERS, 1.0F, 1.0F, true);
-			entityLiving.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 80, 1));
-			entityLiving.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
-			entityLiving.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 80, 0));
-			entityLiving.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));
-			if (entityLiving instanceof PlayerEntity player && !player.getAbilities().invulnerable) {
+			world.playSound(user.getX(), user.getY(), user.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_SNARE.value(), SoundCategory.PLAYERS, 1.0F, 1.0F, true);
+			user.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 80, 1));
+			user.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
+			user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 80, 0));
+			user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));
+			if (user instanceof PlayerEntity player && !player.getAbilities().invulnerable) {
                 ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.gasgrenade);
                 itemStack.decrement(1);
                 if (itemStack.isEmpty())
@@ -102,10 +102,4 @@ public class ItemGasGrenade extends Item
 			}
 		}
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ah");
-	}*/
 }

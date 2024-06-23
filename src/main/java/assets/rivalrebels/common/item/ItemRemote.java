@@ -23,12 +23,13 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
+import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
 public class ItemRemote extends Item {
 	public ItemRemote() {
-		super(new Settings().maxCount(1).group(RRItems.rralltab));
+		super(new Settings().maxCount(1));
 	}
 
     @Override
@@ -38,7 +39,7 @@ public class ItemRemote extends Item {
         World world = context.getWorld();
         NbtCompound tag = context.getStack().getOrCreateNbt();
         BlockPos RCpos = tag.contains("RCpos") ? BlockPos.fromLong(tag.getLong("RCpos")) : BlockPos.ORIGIN;
-        if (player.world.getBlockState(RCpos.up()).getBlock() == RRBlocks.remotecharge && player.isSneaking()) {
+        if (player.getWorld().getBlockState(RCpos.up()).getBlock() == RRBlocks.remotecharge && player.isSneaking()) {
 			player.swingHand(hand);
 			RivalRebelsSoundPlayer.playSound(player, 22, 3);
 			BlockRemoteCharge.explode(world, RCpos.up());
@@ -46,7 +47,7 @@ public class ItemRemote extends Item {
 		return super.useOnBlock(context);
 	}
 
-    @Override
+    //@Override
     public ActionResult onItemUseFirst(ItemStack stack, ItemUsageContext context) {
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();

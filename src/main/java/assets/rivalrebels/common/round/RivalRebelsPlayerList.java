@@ -12,18 +12,22 @@
 package assets.rivalrebels.common.round;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.packet.PacketDispatcher;
 import com.mojang.authlib.GameProfile;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.world.World;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Arrays;
-import java.util.function.Supplier;
 
-public class RivalRebelsPlayerList {
+public class RivalRebelsPlayerList implements FabricPacket {
+    public static final PacketType<RivalRebelsPlayerList> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "rivalrebelsplayerlist"), RivalRebelsPlayerList::fromBytes);
 	private int	size = 0;
 	private RivalRebelsPlayer[]	list = new RivalRebelsPlayer[0];
 
@@ -48,7 +52,17 @@ public class RivalRebelsPlayerList {
         return o;
 	}
 
-	public void clear()
+    @Override
+    public void write(PacketByteBuf buf) {
+        toBytes(this, buf);
+    }
+
+    @Override
+    public PacketType<?> getType() {
+        return PACKET_TYPE;
+    }
+
+    public void clear()
 	{
 		for (int i = 0; i < size; i++) list[i].clear();
 	}
@@ -109,7 +123,7 @@ public class RivalRebelsPlayerList {
         }
     }
 
-	public static void onMessage(RivalRebelsPlayerList m, Supplier<NetworkEvent.Context> ctx) {
+	public static void onMessage(RivalRebelsPlayerList m, PlayerEntity player, PacketSender responseHandler) {
 		RivalRebels.round.rrplayerlist = m;
 	}
 
@@ -119,6 +133,9 @@ public class RivalRebelsPlayerList {
 	}
 
     public void refreshForWorld(World world) {
-        PacketDispatcher.packetsys.send(PacketDistributor.ALL.noArg(), this);
+        if (world.isClient) return;
+        for (PlayerEntity player : world.getPlayers()) {
+            ServerPlayNetworking.send((ServerPlayerEntity) player, this);
+        }
     }
 }

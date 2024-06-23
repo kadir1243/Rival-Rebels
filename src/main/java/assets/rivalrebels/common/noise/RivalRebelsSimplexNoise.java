@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.noise;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 public class RivalRebelsSimplexNoise
 {

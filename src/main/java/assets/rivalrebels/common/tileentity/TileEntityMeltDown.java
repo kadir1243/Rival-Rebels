@@ -71,7 +71,7 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable
                     double var32 = net.minecraft.world.explosion.Explosion.getExposure(Vec3d.of(getPos()), e);
                     double var34 = (1.0D - var13) * var32;
                     if (!(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityRhodes)) {
-                        e.damage(RivalRebelsDamageSource.plasmaexplosion, (int) ((var34 * var34 + var34) / 16.0D * fsize + 1.0D));
+                        e.damage(RivalRebelsDamageSource.plasmaExplosion(world), (int) ((var34 * var34 + var34) / 16.0D * fsize + 1.0D));
                         e.addVelocity(
                             var15 * var34 * 4,
                             var17 * var34 * 4,
@@ -81,11 +81,5 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable
                 }
             }
         }
-	}
-
-	@Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-2, -2, -2), getPos().add(3, 3, 3));
 	}
 }

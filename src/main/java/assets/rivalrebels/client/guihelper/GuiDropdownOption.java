@@ -13,13 +13,13 @@ package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.client.gui.GuiTray;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiDropdownOption extends ButtonWidget
 {
 	Rectangle		bbox;
@@ -29,13 +29,13 @@ public class GuiDropdownOption extends ButtonWidget
 
 	public GuiDropdownOption(Vector p, int l, int n, Text text, GuiTray tray)
 	{
-		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {});
+		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {}, DEFAULT_NARRATION_SUPPLIER);
 		bbox = new Rectangle(p.x, p.y + n * 10, l, (n + 1) * 10);
 		t = tray;
 	}
 
     @Override
-    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 		boolean inside = bbox.isVecInside(new Vector(mouseX, mouseY));
 		boolean current = MinecraftClient.getInstance().mouse.wasLeftButtonClicked() && inside;
 		boolean on = t.getScreenHandler().hasWepReqs();
@@ -53,7 +53,7 @@ public class GuiDropdownOption extends ButtonWidget
 			if (team == 2) color = 0x5555ff;
 		}
 		if (inside && on) color = 0xffffff;
-		drawCenteredText(matrices, MinecraftClient.getInstance().textRenderer, getMessage(), bbox.xMin + 1, bbox.yMin + 1, color);
+        context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, getMessage(), bbox.xMin + 1, bbox.yMin + 1, color);
 		mouseDown = current;
 	}
 }

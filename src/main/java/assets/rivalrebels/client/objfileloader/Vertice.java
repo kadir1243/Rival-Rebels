@@ -11,13 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.joml.Vector4f;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Vertice
 {
 	public Vec3d p;
@@ -42,10 +44,18 @@ public class Vertice
         n = n.normalize();
 	}
 
-	public void render(VertexConsumer buffer)
-	{
-        buffer.vertex(p.x, p.y, p.z).texture(t.x, t.y).normal((float) n.x, (float) n.y, (float) n.z).next();
+    @Deprecated
+	public void render(VertexConsumer buffer) {
+        buffer.vertex(p.x, p.y, p.z).color(1, 1, 1, 1).texture(t.x, t.y).overlay(OverlayTexture.DEFAULT_UV).normal((float) n.x, (float) n.y, (float) n.z).next();
 	}
+
+    public void render(VertexConsumer buffer, int light, int overlay) {
+        render(buffer, new Vector4f(1, 1, 1, 1), light, overlay);
+    }
+
+    public void render(VertexConsumer buffer, Vector4f color, int light, int overlay) {
+        buffer.vertex((float) p.x, (float) p.y, (float) p.z, color.x, color.y, color.z, color.w, t.x, t.y, overlay, light, (float) n.x, (float) n.y, (float) n.z);
+    }
 
     public Vertice copy() {
         return new Vertice(p, n, t);
@@ -57,6 +67,6 @@ public class Vertice
 	}
 
 	public void scale(Vec3d v) {
-        p = new Vec3d(p.x * v.x, p.y * v.y, p.z * v.z);
+        p = p.multiply(v);
 	}
 }

@@ -14,7 +14,6 @@ package assets.rivalrebels.common.command;
 import assets.rivalrebels.common.entity.EntityHotPotato;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -37,16 +36,16 @@ public class CommandHotPotato {
         );
     }
 
-    private static int execute(ServerCommandSource source, int numberOfRounds) throws CommandException {
+    private static int execute(ServerCommandSource source, int numberOfRounds) {
         if (numberOfRounds == -1) {
             roundinprogress = false;
-            source.sendFeedback(Text.of("§cRound stopped."), true);
+            source.sendFeedback(() -> Text.of("§cRound stopped."), true);
         } else {
             if (roundinprogress) {
                 source.sendError(Text.of("§cRound already in progress! Do /rrhotpotato stop to end the current round."));
                 return 0;
             }
-            source.sendFeedback(Text.of("§cLet the Hot Potato games begin! " + numberOfRounds + " rounds."), true);
+            source.sendFeedback(() -> Text.of("§cLet the Hot Potato games begin! " + numberOfRounds + " rounds."), true);
             EntityHotPotato tsar = new EntityHotPotato(source.getWorld(),pos.getX(),pos.getY(), pos.getZ(), numberOfRounds);
             source.getWorld().spawnEntity(tsar);
             roundinprogress = true;

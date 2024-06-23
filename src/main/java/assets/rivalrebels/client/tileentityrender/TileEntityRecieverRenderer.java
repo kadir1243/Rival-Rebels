@@ -15,32 +15,33 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.block.machine.BlockReciever;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever> {
-	public static ModelFromObj base;
-	public static ModelFromObj arm;
-	public static ModelFromObj adsdragon;
+@Environment(EnvType.CLIENT)
+public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever>, CustomRenderBoxExtension<TileEntityReciever> {
+    public static final SpriteIdentifier RECIEVER_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etreciever);
+    public static final SpriteIdentifier ETS_DRAGON = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etadsdragon);
+    public static final ModelFromObj base = ModelFromObj.readObjFile("p.obj");
+	public static final ModelFromObj arm = ModelFromObj.readObjFile("q.obj");
+	public static final ModelFromObj adsdragon = ModelFromObj.readObjFile("r.obj");
 
 	public TileEntityRecieverRenderer(BlockEntityRendererFactory.Context context) {
-        base = ModelFromObj.readObjFile("p.obj");
-        arm = ModelFromObj.readObjFile("q.obj");
-        adsdragon = ModelFromObj.readObjFile("r.obj");
 	}
 
     @Override
     public void render(TileEntityReciever entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etreciever);
 		matrices.push();
 		matrices.translate(entity.getPos().getX() + 0.5, entity.getPos().getY(), entity.getPos().getZ() + 0.5);
 		int m = entity.getCachedState().get(BlockReciever.META);
@@ -52,18 +53,16 @@ public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntit
 		if (m == 5) r = -90;
 
 		matrices.push();
-		matrices.multiply(new Quaternion(r, 0, 1, 0));
+		matrices.multiply(new Quaternionf(r, 0, 1, 0));
         matrices.translate(0, 0, 0.5);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-        base.render(buffer);
-		if (entity.hasWeapon)
-		{
+        VertexConsumer recieverTextureVertexConsumer = RECIEVER_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        base.render(recieverTextureVertexConsumer, light, overlay);
+		if (entity.hasWeapon) {
             matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			matrices.multiply(new Quaternion((float) (entity.yaw - r), 0, 1, 0));
-			arm.render(buffer);
-            matrices.multiply(new Quaternion((float) entity.pitch, 1, 0, 0));
-			MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etadsdragon);
-			adsdragon.render(buffer);
+			matrices.multiply(new Quaternionf((float) (entity.yaw - r), 0, 1, 0));
+			arm.render(recieverTextureVertexConsumer, light, overlay);
+            matrices.multiply(new Quaternionf((float) entity.pitch, 1, 0, 0));
+			adsdragon.render(ETS_DRAGON.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 		}
 		matrices.pop();
 		matrices.pop();
@@ -75,4 +74,8 @@ public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntit
         return 16384;
     }
 
+    @Override
+    public Box getRenderBoundingBox(TileEntityReciever blockEntity) {
+        return Box.from(BlockBox.create(blockEntity.getPos().add(-1, -1, -1), blockEntity.getPos().add(2, 2, 2)));
+    }
 }

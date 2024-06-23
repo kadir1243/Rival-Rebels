@@ -13,18 +13,17 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerLoader;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Util;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.GuiUtils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiLoader extends HandledScreen<ContainerLoader> {
     /**
 	 * window height is calculated with this values, the more rows, the heigher
@@ -41,15 +40,16 @@ public class GuiLoader extends HandledScreen<ContainerLoader> {
 	}
 
     @Override
-    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-		matrices.push();
-		matrices.multiply(new Quaternion(-13, 0, 0, 1));
-		textRenderer.draw(matrices, "Loader", 165, 237, 0x444444);
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        MatrixStack matrices = context.getMatrices();
+        matrices.push();
+		matrices.multiply(new Quaternionf(-13, 0, 0, 1));
+		context.drawText(textRenderer, "Loader", 165, 237, 0x444444, false);
 		matrices.pop();
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - getXSize()) / 2;
-		int posy = (height - getYSize()) / 2;
+		int posx = (width - backgroundWidth) / 2;
+		int posy = (height - backgroundHeight) / 2;
 		int coordx = posx + 92;
 		int coordy = posy + 202;
 		int widthx = 72;
@@ -58,8 +58,8 @@ public class GuiLoader extends HandledScreen<ContainerLoader> {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			GuiUtils.drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			context.fillGradient(mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			context.drawText(textRenderer, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
 			if (!buttondown && client.mouse.wasLeftButtonClicked())
 			{
                 Util.getOperatingSystem().open("http://rivalrebels.com");
@@ -71,9 +71,8 @@ public class GuiLoader extends HandledScreen<ContainerLoader> {
 	boolean	buttondown;
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, RRIdentifiers.guitloader);
-		GuiUtils.drawTexturedModalRect(matrices, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210, getZOffset());
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.drawTexture(RRIdentifiers.guitloader, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
 	}
 }

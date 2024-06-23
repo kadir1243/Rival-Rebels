@@ -11,26 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.client.itemrenders.GasRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.item.Item;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.function.Consumer;
 
 public class ItemFuel extends Item {
 	public ItemFuel() {
-		super(new Settings().group(RRItems.rralltab));
+		super(new Settings());
 	}
-
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new GasRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
 }

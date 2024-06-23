@@ -14,6 +14,7 @@ package assets.rivalrebels.common.block;
 import assets.rivalrebels.common.entity.EntityBlood;
 import assets.rivalrebels.common.entity.EntityGoo;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -25,20 +26,25 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 public class BlockGore extends BlockWithEntity {
+    public static final MapCodec<BlockGore> CODEC = createCodec(BlockGore::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 5);
 	public BlockGore(Settings settings)
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+    }
+
+    @Override
+    protected MapCodec<BlockGore> getCodec() {
+        return CODEC;
     }
 
     @Override
@@ -87,17 +93,17 @@ public class BlockGore extends BlockWithEntity {
 		return new TileEntityGore(pos, state);
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon6;
 
 	@Override

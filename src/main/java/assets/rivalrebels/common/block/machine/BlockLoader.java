@@ -15,6 +15,7 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -37,10 +38,16 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockLoader extends BlockWithEntity {
+    public static final MapCodec<BlockLoader> CODEC = createCodec(BlockLoader::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
     public BlockLoader(Settings settings) {
 		super(settings);
 	}
+
+    @Override
+    protected MapCodec<BlockLoader> getCodec() {
+        return CODEC;
+    }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
@@ -66,7 +73,7 @@ public class BlockLoader extends BlockWithEntity {
     }
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         TileEntityLoader var7 = null;
         try {
             var7 = (TileEntityLoader) world.getBlockEntity(pos);
@@ -100,8 +107,7 @@ public class BlockLoader extends BlockWithEntity {
                         }
 
                         var9.decrement(var13);
-                        ItemStack copy = var9.copy();
-                        copy.setCount(var13);
+                        ItemStack copy = var9.copyWithCount(var13);
                         var14 = new ItemEntity(world, (x + var10), (y + var11), (z + var12), copy);
                         float var15 = 0.05F;
                         var14.setVelocity(((float) world.random.nextGaussian() * var15),
@@ -113,6 +119,7 @@ public class BlockLoader extends BlockWithEntity {
             var7.markRemoved();
         }
         super.onBreak(world, pos, state, player);
+        return state;
     }
 
     @Override
@@ -136,19 +143,4 @@ public class BlockLoader extends BlockWithEntity {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:av");
-	}*/
 }

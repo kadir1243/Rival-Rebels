@@ -13,61 +13,54 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
-import assets.rivalrebels.client.renderhelper.Vertice;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
-public class ModelRod
-{
-	public boolean	rendersecondcap	= true;
+public class ModelRod {
+    private static final int numOfSegs = 16;
+    private static final float deg = (float) Math.PI * 2 / numOfSegs;
+    private static final Vector3f vd1 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 9, 0.03125f * 8 * (float) Math.sin(deg));
+    private static final Vector3f vd2 = new Vector3f(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * 6, 0.03125f * 9 * (float) Math.sin(deg));
+    private static final Vector3f vd3 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 5, 0.03125f * 8 * (float) Math.sin(deg));
+    private static final Vector3f vd4 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -5, 0.03125f * 8 * (float) Math.sin(deg));
+    private static final Vector3f vd5 = new Vector3f(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * -6, 0.03125f * 9 * (float) Math.sin(deg));
+    private static final Vector3f vd6 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -9, 0.03125f * 8 * (float) Math.sin(deg));
+    private static final TextureVertice t1 = new TextureVertice(0.03125f * 2, 0.03125f * 0);
+    private static final TextureVertice t2 = new TextureVertice(0.03125f * 1, 0.03125f * 3);
+    private static final TextureVertice t3 = new TextureVertice(0.03125f * 3, 0.03125f * 3);
+    private static final TextureVertice t4 = new TextureVertice(0.03125f * 0, 0.03125f * 6);
+    private static final TextureVertice t5 = new TextureVertice(0.03125f * 4, 0.03125f * 6);
+    private static final TextureVertice t6 = new TextureVertice(0.03125f * 1, 0.03125f * 7);
+    private static final TextureVertice t7 = new TextureVertice(0.03125f * 3, 0.03125f * 7);
+    private static final TextureVertice t8 = new TextureVertice(0.03125f * 1, 0.03125f * 19);
+    private static final TextureVertice t9 = new TextureVertice(0.03125f * 3, 0.03125f * 19);
+    private static final Vector3f v0 = new Vector3f(0f, 0.03125f * 10, 0f);
+    private static final Vector3f v1 = new Vector3f(0.03125f * 8, 0.03125f * 9, 0f);
+    private static final Vector3f v2 = new Vector3f(0.03125f * 9, 0.03125f * 6, 0f);
+    private static final Vector3f v3 = new Vector3f(0.03125f * 8, 0.03125f * 5, 0f);
+    private static final Vector3f v4 = new Vector3f(0.03125f * 8, 0.03125f * -5, 0f);
+    private static final Vector3f v5 = new Vector3f(0.03125f * 9, 0.03125f * -6, 0f);
+    private static final Vector3f v6 = new Vector3f(0.03125f * 8, 0.03125f * -9, 0f);
+    private static final Vector3f v7 = new Vector3f(0f, 0.03125f * -10, 0f);
+    public boolean rendersecondcap = true;
 
-	int				numOfSegs		= 16;
-	float			deg				= (float) Math.PI * 2 / numOfSegs;
-	TextureVertice	t1				= new TextureVertice(0.03125f * 2, 0.03125f * 0);
-	TextureVertice	t2				= new TextureVertice(0.03125f * 1, 0.03125f * 3);
-	TextureVertice	t3				= new TextureVertice(0.03125f * 3, 0.03125f * 3);
-	TextureVertice	t4				= new TextureVertice(0.03125f * 0, 0.03125f * 6);
-	TextureVertice	t5				= new TextureVertice(0.03125f * 4, 0.03125f * 6);
-	TextureVertice	t6				= new TextureVertice(0.03125f * 1, 0.03125f * 7);
-	TextureVertice	t7				= new TextureVertice(0.03125f * 3, 0.03125f * 7);
-	TextureVertice	t8				= new TextureVertice(0.03125f * 1, 0.03125f * 19);
-	TextureVertice	t9				= new TextureVertice(0.03125f * 3, 0.03125f * 19);
+    public void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay) {
+        for (float i = 0; i < 360; i += 360 / numOfSegs) {
+            matrices.push();
+            matrices.multiply(new Quaternionf(i, 0, 1, 0));
+            RenderHelper.addFace(buffer, v0, vd1, v1, v0, t1, t3, t2, t1, light, overlay);
+            RenderHelper.addFace(buffer, vd1, vd2, v2, v1, t2, t4, t5, t3, light, overlay);
+            RenderHelper.addFace(buffer, vd2, vd3, v3, v2, t4, t6, t7, t5, light, overlay);
+            RenderHelper.addFace(buffer, vd3, vd4, v4, v3, t6, t8, t9, t7, light, overlay);
+            if (rendersecondcap) {
+                RenderHelper.addFace(buffer, v7, v6, vd6, v7, t1, t3, t2, t1, light, overlay);
+                RenderHelper.addFace(buffer, v6, v5, vd5, vd6, t2, t4, t5, t3, light, overlay);
+                RenderHelper.addFace(buffer, v5, v4, vd4, vd5, t4, t6, t7, t5, light, overlay);
+            }
 
-	Vertice			v0				= new Vertice(0f, 0.03125f * 10, 0f);
-	Vertice			v1				= new Vertice(0.03125f * 8, 0.03125f * 9, 0f);
-	Vertice			v2				= new Vertice(0.03125f * 9, 0.03125f * 6, 0f);
-	Vertice			v3				= new Vertice(0.03125f * 8, 0.03125f * 5, 0f);
-	Vertice			v4				= new Vertice(0.03125f * 8, 0.03125f * -5, 0f);
-	Vertice			v5				= new Vertice(0.03125f * 9, 0.03125f * -6, 0f);
-	Vertice			v6				= new Vertice(0.03125f * 8, 0.03125f * -9, 0f);
-	Vertice			v7				= new Vertice(0f, 0.03125f * -10, 0f);
-
-	Vertice			vd1				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 9, 0.03125f * 8 * (float) Math.sin(deg));
-	Vertice			vd2				= new Vertice(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * 6, 0.03125f * 9 * (float) Math.sin(deg));
-	Vertice			vd3				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 5, 0.03125f * 8 * (float) Math.sin(deg));
-	Vertice			vd4				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -5, 0.03125f * 8 * (float) Math.sin(deg));
-	Vertice			vd5				= new Vertice(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * -6, 0.03125f * 9 * (float) Math.sin(deg));
-	Vertice			vd6				= new Vertice(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -9, 0.03125f * 8 * (float) Math.sin(deg));
-
-	public void render(MatrixStack matrices, VertexConsumer buffer)
-	{
-		for (float i = 0; i < 360; i += 360 / numOfSegs)
-		{
-			matrices.push();
-			matrices.multiply(new Quaternion(i, 0, 1, 0));
-			RenderHelper.addFace(buffer, v0, vd1, v1, v0, t1, t3, t2, t1);
-			RenderHelper.addFace(buffer, vd1, vd2, v2, v1, t2, t4, t5, t3);
-			RenderHelper.addFace(buffer, vd2, vd3, v3, v2, t4, t6, t7, t5);
-			RenderHelper.addFace(buffer, vd3, vd4, v4, v3, t6, t8, t9, t7);
-			if (rendersecondcap)
-			{
-				RenderHelper.addFace(buffer, v7, v6, vd6, v7, t1, t3, t2, t1);
-				RenderHelper.addFace(buffer, v6, v5, vd5, vd6, t2, t4, t5, t3);
-				RenderHelper.addFace(buffer, v5, v4, vd4, vd5, t4, t6, t7, t5);
-			}
-
-			matrices.pop();
-		}
-	}
+            matrices.pop();
+        }
+    }
 }

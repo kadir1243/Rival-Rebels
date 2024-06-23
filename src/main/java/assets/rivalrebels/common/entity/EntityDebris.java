@@ -15,6 +15,7 @@ import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
@@ -22,8 +23,11 @@ import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.nbt.NbtElement;
 import net.minecraft.nbt.NbtHelper;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.crash.CrashReportSection;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 
@@ -54,7 +58,7 @@ public class EntityDebris extends EntityInanimate {
 	}
 
     @Override
-    public double getHeightOffset() {
+    protected float getUnscaledRidingOffset(Entity vehicle) {
         return 0.5F;
     }
 
@@ -88,15 +92,15 @@ public class EntityDebris extends EntityInanimate {
         Vec3d add = getVelocity().add(getPos());
         setPos(add.getX(), add.getY(), add.getZ());
 
-		if (!world.isClient && world.getBlockState(this.getBlockPos()).isOpaque()) die(prevX, prevY, prevZ);
+		if (!getWorld().isClient && getWorld().getBlockState(this.getBlockPos()).isOpaque()) die(prevX, prevY, prevZ);
 	}
 
 	public void die(double x, double y, double z) {
 		kill();
-        BlockPos pos = new BlockPos(x, y, z);
-        world.setBlockState(pos, getState());
+        BlockPos pos = new BlockPos(MathHelper.floor(x), MathHelper.floor(y), MathHelper.floor(z));
+        getWorld().setBlockState(pos, getState());
 		if (tileEntityData != null && getState().hasBlockEntity()) {
-			BlockEntity blockEntity = world.getBlockEntity(pos);
+			BlockEntity blockEntity = getWorld().getBlockEntity(pos);
 			if (blockEntity != null) {
 				NbtCompound nbt = blockEntity.createNbt();
                 for (String s : tileEntityData.getKeys()) {
@@ -123,7 +127,7 @@ public class EntityDebris extends EntityInanimate {
     @Override
     protected void readCustomDataFromNbt(NbtCompound nbt) {
         if (nbt.contains("Block")) {
-            setState(NbtHelper.toBlockState(nbt.getCompound("Block")));
+            setState(NbtHelper.toBlockState(getWorld().createCommandRegistryWrapper(RegistryKeys.BLOCK), nbt.getCompound("Block")));
         }
         age = nbt.getInt("Age");
 		if (nbt.contains("TileEntityData", NbtElement.COMPOUND_TYPE)) tileEntityData = nbt.getCompound("TileEntityData");

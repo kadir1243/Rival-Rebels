@@ -16,6 +16,6 @@ import net.minecraft.item.Item;
 public class ItemFuse extends Item {
 	public ItemFuse()
 	{
-		super(new Settings().group(RRItems.rralltab).maxCount(1));
+		super(new Settings().maxCount(1));
 	}
 }

@@ -12,21 +12,18 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityLaserBurst;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Vec3f;
+import net.minecraft.util.math.RotationAxis;
 
 public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst>
 {
-	static float	red		= 1F;
-	static float	green	= 0.0F;
-	static float	blue	= 0.0F;
+	private static final float red = 1F;
 
     public RenderLaserBurst(EntityRendererFactory.Context renderManager) {
         super(renderManager);
@@ -36,15 +33,12 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst>
     public void render(EntityLaserBurst entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         float radius = 0.12F;
         int distance = 4;
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
         matrices.push();
-        RenderSystem.disableCull();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
         matrices.translate(entity.getX(), entity.getY(), entity.getZ());
 
-        matrices.multiply(Vec3f.POSITIVE_Y.getDegreesQuaternion(entity.getYaw()));
-        matrices.multiply(Vec3f.POSITIVE_X.getDegreesQuaternion(-entity.getPitch()));
+        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.getYaw()));
+        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-entity.getPitch()));
 
         for (float o = 0; o <= radius; o += radius / 8) {
             float color = 1f - (o * 8.333f);
@@ -58,7 +52,6 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst>
             buffer.vertex(0 - o, 0 + o, 0).color(red, color, color, 1).next();
             buffer.vertex(0 - o, 0 + o, distance).color(red, color, color, 1).next();
         }
-        RenderSystem.disableBlend();
         matrices.pop();
     }
 

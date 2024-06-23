@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
 import net.minecraft.entity.Entity;
@@ -23,7 +24,6 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 
 import java.util.List;
 
@@ -81,12 +81,12 @@ public class EntityB2Spirit extends EntityInanimate
 				entityIndex = staticEntityIndex;
 			}
 		}
-		if (!world.isClient) startBombRun(tz-z1, x1-tx); //perpendicular to view
+		if (!getWorld().isClient) startBombRun(tz-z1, x1-tx); //perpendicular to view
 	}
 
 	public EntityB2Spirit(EntityRhodes r)
 	{
-		this(r.world);
+		this(r.getWorld());
 		rhodeswing = r;
 		setPos(
             r.getX() - r.getVelocity().getX() * 500,
@@ -96,7 +96,7 @@ public class EntityB2Spirit extends EntityInanimate
 	}
 
 	@Override
-	public boolean collides()
+	public boolean isCollidable()
 	{
 		return true;
 	}
@@ -122,7 +122,7 @@ public class EntityB2Spirit extends EntityInanimate
 			}
 		}
 
-		if (!this.world.isClient)
+		if (!this.getWorld().isClient)
 		{
 			double distfromtarget = Math.sqrt((tx-getX())*(tx-getX())+(tz-getZ())*(tz-getZ()));
 			ticksSinceStart++;
@@ -134,15 +134,15 @@ public class EntityB2Spirit extends EntityInanimate
 
 				if (distfromtarget > 80.0f)
 				{
-					mode = world.random.nextBoolean() ? 1 : 2;
+					mode = getWorld().random.nextBoolean() ? 1 : 2;
 					if (trash)
 					{
 						carpet = true;
-						entityIndex = world.random.nextInt(ItemRoda.rodaindex);
+						entityIndex = getWorld().random.nextInt(ItemRoda.rodaindex);
 					}
 					if (leave)
 					{
-						if (ticksSinceStart > 1000 && world.random.nextInt(4) == 1)
+						if (ticksSinceStart > 1000 && getWorld().random.nextInt(4) == 1)
 						{
                             setVelocity(getVelocity().getX(), 2F, getVelocity().getZ());
 						}
@@ -167,7 +167,7 @@ public class EntityB2Spirit extends EntityInanimate
 					mode = 0;
 			}
 
-			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
@@ -180,7 +180,7 @@ public class EntityB2Spirit extends EntityInanimate
 
                 if (var9 instanceof EntityLaserBurst) {
                     var9.kill();
-                    this.damage(DamageSource.GENERIC, 6);
+                    this.damage(getDamageSources().generic(), 6);
                 }
             }
 
@@ -229,7 +229,7 @@ public class EntityB2Spirit extends EntityInanimate
 
 	public void dropNuke()
 	{
-		if (dropAnything) ItemRoda.spawn(entityIndex, world, getX()+random.nextDouble()*4-2, getY() - 3.5f, getZ()+random.nextDouble()*4-2, getVelocity().getX() * 0.1f, -1.0f, getVelocity().getZ() * 0.1f, 1.0f, 0.0f);
+		if (dropAnything) ItemRoda.spawn(entityIndex, getWorld(), getX()+random.nextDouble()*4-2, getY() - 3.5f, getZ()+random.nextDouble()*4-2, getVelocity().getX() * 0.1f, -1.0f, getVelocity().getZ() * 0.1f, 1.0f, 0.0f);
 	}
 	Entity rhodes = null;
 	public void startBombRun(double x, double z)
@@ -290,17 +290,17 @@ public class EntityB2Spirit extends EntityInanimate
 	public boolean damage(DamageSource par1DamageSource, float par2)
 	{
 		super.damage(par1DamageSource, par2);
-		if (this.isAlive() && !this.world.isClient) {
+		if (this.isAlive() && !this.getWorld().isClient) {
 			this.health -= par2;
 			if (this.health <= 0) {
 				this.kill();
-				this.world.createExplosion(null, this.getX(), this.getY(), this.getZ(), 6.0F, Explosion.DestructionType.DESTROY);
-				world.spawnEntity(new EntityB2Frag(world, this, 0));
-				world.spawnEntity(new EntityB2Frag(world, this, 1));
-				ZombieEntity pz = new ZombieEntity(world);
+				this.getWorld().createExplosion(null, this.getX(), this.getY(), this.getZ(), 6.0F, World.ExplosionSourceType.MOB);
+				getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 0));
+				getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 1));
+				ZombieEntity pz = new ZombieEntity(getWorld());
 				pz.setPosition(getX(), getY(), getZ());
-				world.spawnEntity(pz);
-				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
+				getWorld().spawnEntity(pz);
+                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
 			}
 		}
 

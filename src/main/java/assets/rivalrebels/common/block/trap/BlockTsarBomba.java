@@ -14,6 +14,7 @@ package assets.rivalrebels.common.block.trap;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -36,11 +37,17 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockTsarBomba extends BlockWithEntity {
+    public static final MapCodec<BlockTsarBomba> CODEC = createCodec(BlockTsarBomba::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockTsarBomba(Settings settings)
 	{
 		super(settings);
         setDefaultState(getStateManager().getDefaultState().with(META, 0));
+    }
+
+    @Override
+    protected MapCodec<BlockTsarBomba> getCodec() {
+        return CODEC;
     }
 
     @Override

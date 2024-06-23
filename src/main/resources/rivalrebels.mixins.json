@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "package": "assets.rivalrebels.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "datagen.BlockLootTableGeneratorMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+    "client.ArmorFeatureRendererMixin",
+    "client.DrawContextAccessor",
+    "client.WorldRendererMixin"
+  ]
+}

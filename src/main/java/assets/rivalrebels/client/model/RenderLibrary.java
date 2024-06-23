@@ -11,26 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
+import org.joml.Quaternionf;
 
 public class RenderLibrary {
 
-	public static void renderModel(MatrixStack matrices, VertexConsumer buffer, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
+	public static void renderModel(MatrixStack matrices, VertexConsumerProvider vertexConsumers, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
         Random random = MinecraftClient.getInstance().world.random;
         matrices.push();
 		matrices.translate(x1, y1, z1);
-		RenderSystem.enableBlend();
-		RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-        RenderSystem.disableBlend();
-        matrices.multiply(new Quaternion((float) (Math.atan2(x, z) * 57.295779513 - 90), 0, 1, 0));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
+        matrices.multiply(new Quaternionf((float) (Math.atan2(x, z) * 57.295779513 - 90), 0, 1, 0));
 		double dist = Math.sqrt(x * x + z * z);
 		double hdist = dist / 2f;
 		double hdists = hdist * hdist;

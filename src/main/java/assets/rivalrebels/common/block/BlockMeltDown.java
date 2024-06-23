@@ -13,6 +13,7 @@ package assets.rivalrebels.common.block;
 
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityMeltDown;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -23,18 +24,24 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Random;
-
 public class BlockMeltDown extends BlockWithEntity {
+    public static final MapCodec<BlockMeltDown> CODEC = createCodec(BlockMeltDown::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockMeltDown(Settings settings)
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
+
+    @Override
+    protected MapCodec<BlockMeltDown> getCodec() {
+        return CODEC;
+    }
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
@@ -53,7 +60,7 @@ public class BlockMeltDown extends BlockWithEntity {
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        world.createAndScheduleBlockTick(pos, this, 1);
+        world.scheduleBlockTick(pos, this, 1);
     }
 
     @Override

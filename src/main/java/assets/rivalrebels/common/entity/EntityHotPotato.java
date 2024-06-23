@@ -21,8 +21,8 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -90,30 +90,30 @@ public class EntityHotPotato extends ThrownEntity
 		++this.age;
 		if (age < 2 && dorounds)
 		{
-			RivalRebelsSoundPlayer.playSound(world, 14, 0, getX(), getY(), getZ(), 100);
+			RivalRebelsSoundPlayer.playSound(getWorld(), 14, 0, getX(), getY(), getZ(), 100);
             setVelocity(Vec3d.ZERO);
 			setPosition(nextx+0.5f, nexty+0.5f, nextz+0.5f);
-			world.setBlockState(new BlockPos(nextx, nexty-400, nextz), RRBlocks.jump.getDefaultState());
+			getWorld().setBlockState(new BlockPos(nextx, nexty-400, nextz), RRBlocks.jump.getDefaultState());
 			setPosition(getX(), getY(), getZ());
 			return;
 		}
 
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			Vec3d var15 = getPos();
 			Vec3d var2 = getPos().add(getVelocity());
-			HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+			HitResult var3 = this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
 			if (var3 != null)
 			{
 				var2 = var3.getPos();
 			}
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.collides()) {
+                if (var9.isCollidable()) {
                     float var10 = 0.3F;
                     Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
                     Optional<Vec3d> var12 = var11.raycast(var15, var2);
@@ -139,7 +139,7 @@ public class EntityHotPotato extends ThrownEntity
 				this.onCollision(var3);
 			}
 
-			if (world.getBlockState(getBlockPos()).getFluidState().isIn(FluidTags.WATER)) {
+			if (getWorld().getBlockState(getBlockPos()).getFluidState().isIn(FluidTags.WATER)) {
                 setVelocity(getVelocity().getX(), getVelocity().getY() + 0.06F, getVelocity().getZ());
 			}
 		}
@@ -204,12 +204,12 @@ public class EntityHotPotato extends ThrownEntity
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        BlockState state = world.getBlockState(blockHitResult.getBlockPos());
+        BlockState state = getWorld().getBlockState(blockHitResult.getBlockPos());
 		if (state.isOf(RRBlocks.jump) || state.isIn(BlockTags.ICE)) {
 			setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
 			return;
 		}
-		if (world.random.nextInt(10)!=0) {
+		if (getWorld().random.nextInt(10)!=0) {
 			setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
 			return;
 		}
@@ -218,11 +218,11 @@ public class EntityHotPotato extends ThrownEntity
 
     public void explode()
 	{
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
-			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), world, charges);
-			EntityTsarBlast tsarblast = new EntityTsarBlast(world, (int)getX(), (int)getY(), (int)getZ(), tsar, charges);
-			world.spawnEntity(tsarblast);
+			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), getWorld(), charges);
+			EntityTsarBlast tsarblast = new EntityTsarBlast(getWorld(), (int)getX(), (int)getY(), (int)getZ(), tsar, charges);
+			getWorld().spawnEntity(tsarblast);
 			age = 0;
 			round = round - 1;
 			CommandHotPotato.roundinprogress = false;

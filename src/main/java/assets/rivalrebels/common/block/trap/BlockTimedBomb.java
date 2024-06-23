@@ -16,28 +16,32 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
+import com.mojang.serialization.MapCodec;
+import net.minecraft.block.AnvilBlock;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.FallingBlock;
-import net.minecraft.block.Material;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
 
-import java.util.Random;
+public class BlockTimedBomb extends FallingBlock {
+    public static final MapCodec<BlockTimedBomb> CODEC = AnvilBlock.createCodec(BlockTimedBomb::new);
+    int	ticksSincePlaced;
 
-public class BlockTimedBomb extends FallingBlock
-{
-	int	ticksSincePlaced;
-
-	public BlockTimedBomb()
-	{
-		super(Settings.of(Material.SOIL).dropsNothing());
+	public BlockTimedBomb(Settings settings) {
+		super(settings);
 		ticksSincePlaced = 0;
 	}
+
+    @Override
+    protected MapCodec<BlockTimedBomb> getCodec() {
+        return CODEC;
+    }
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, net.minecraft.world.explosion.Explosion explosion) {
@@ -45,24 +49,25 @@ public class BlockTimedBomb extends FallingBlock
         int y = pos.getY();
         int z = pos.getZ();
         world.setBlockState(pos, Blocks.AIR.getDefaultState());
-		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timebomb);
+		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timedBomb(world));
 		RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
 	}
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 		world.setBlockState(pos, Blocks.AIR.getDefaultState());
-		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timebomb);
+		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timedBomb(world));
 		RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
-	}
+        return state;
+    }
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
         ticksSincePlaced = 0;
-        world.createAndScheduleBlockTick(pos, this, 8);
+        world.scheduleBlockTick(pos, this, 8);
     }
 
     @Override
@@ -70,12 +75,12 @@ public class BlockTimedBomb extends FallingBlock
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-		world.createAndScheduleBlockTick(pos, this, 8);
+		world.scheduleBlockTick(pos, this, 8);
 		ticksSincePlaced += 1;
 		if (ticksSincePlaced >= RivalRebels.timedbombTimer * 2.5)
 		{
 			world.setBlockState(pos, Blocks.AIR.getDefaultState());
-			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timebomb);
+			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timedBomb(world));
 			RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
 		}
 		if (ticksSincePlaced == 100)
@@ -85,36 +90,36 @@ public class BlockTimedBomb extends FallingBlock
 		if (world.getBlockState(pos.up()).getBlock() == RRBlocks.light && ticksSincePlaced <= 93)
 		{
 			world.setBlockState(pos.up(), Blocks.AIR.getDefaultState());
-			world.playSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 1, 1, true);
+			world.playSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.BLOCKS, 1, 1, true);
 		}
 		else
 		{
 			if (ticksSincePlaced <= 93)
 			{
 				world.setBlockState(pos.up(), RRBlocks.light.getDefaultState());
-				world.playSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 1, 0.7F, true);
+				world.playSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.BLOCKS, 1, 0.7F, true);
 			}
 			else
 			{
-				world.playSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK, SoundCategory.BLOCKS, 2F, 2F, true);
+				world.playSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK.value(), SoundCategory.BLOCKS, 2F, 2F, true);
 			}
 		}
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon6;
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -127,7 +132,7 @@ public class BlockTimedBomb extends FallingBlock
 		return icon1;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

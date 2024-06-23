@@ -18,6 +18,6 @@ public class ItemCore extends Item
 	public float timemult = 0;
 
 	public ItemCore(Settings settings) {
-		super(settings.group(RRItems.rralltab).maxCount(1));
+		super(settings.maxCount(1));
 	}
 }

@@ -25,7 +25,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.particle.ParticleTypes;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
@@ -150,7 +150,7 @@ public class Explosion
 		{
 			world.setBlockState(pos, Blocks.AIR.getDefaultState());
 			RivalRebelsSoundPlayer.playSound(world, 22, 0, xx, yy, zz, 0.5f, 0.3f);
-			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge);
+			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge(world));
 			return;
 		}
 		if (block == RRBlocks.toxicgas || block == Blocks.CHEST || block == Blocks.VINE || block == Blocks.TALL_GRASS || block == RRBlocks.flare || block == RRBlocks.light || block == RRBlocks.light2 || block == RRBlocks.reactive || block == RRBlocks.timedbomb)

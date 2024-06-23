@@ -13,50 +13,36 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
-import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumer;
+import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
-public class FlamethrowerRenderer extends BuiltinModelItemRenderer
-{
-	private final ModelFromObj ft;
+public class FlamethrowerRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etflamethrower);
+    private static final ModelFromObj ft = ModelFromObj.readObjFile("n.obj");
 
-	public FlamethrowerRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-        ft = ModelFromObj.readObjFile("n.obj");
-	}
+	public FlamethrowerRenderer() {
+    }
 
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etflamethrower);
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
-        matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
+        matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
 		matrices.translate(0.7f, 0.1f, 00f);
-        matrices.multiply(new Quaternion(270, 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternionf(270, 0.0F, 1.0F, 0.0F));
 		matrices.scale(0.18f, 0.18f, 0.18f);
 		// matrices.translate(0.3f, 0.05f, -0.1f);
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true));
-        ft.render(buffer);
-		if (stack.hasEnchantments())
-		{
-            RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-            RenderSystem.enableBlend();
-			RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-            ft.render(buffer);
-            RenderSystem.disableBlend();
+        ft.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
+		if (stack.hasEnchantments()) {
+            ft.render(vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, overlay);
 		}
 
 		matrices.pop();

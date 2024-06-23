@@ -12,12 +12,8 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.itemrenders.RodDiskRenderer;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.*;
-import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,24 +24,13 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.function.Consumer;
 
 public class ItemRodDisk extends Item
 {
 	public ItemRodDisk() {
-		super(new Settings().maxCount(1).group(RRItems.rralltab));
+		super(new Settings().maxCount(1));
 	}
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new RodDiskRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
+
     @Override
 	public UseAction getUseAction(ItemStack par1ItemStack)
 	{
@@ -120,10 +105,4 @@ public class ItemRodDisk extends Item
 			}
 		}
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:as");
-	}*/
 }

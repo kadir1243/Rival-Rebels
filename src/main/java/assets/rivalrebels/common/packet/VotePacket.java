@@ -13,12 +13,14 @@ package assets.rivalrebels.common.packet;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.util.Identifier;
 
-import java.util.function.Supplier;
-
-public class VotePacket {
+public class VotePacket implements FabricPacket {
+   public static final PacketType<VotePacket> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "vote_packet"), VotePacket::fromBytes);
     private final boolean newround;
 
     public VotePacket(boolean vote) {
@@ -29,20 +31,22 @@ public class VotePacket {
         return new VotePacket(buf.readBoolean());
     }
 
-    public static void onMessage(VotePacket m, Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context context = ctx.get();
-        context.enqueueWork(() -> {
-            RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(context.getSender().getGameProfile());
-            if (!p.voted) {
-                p.voted = true;
-                if (m.newround) RivalRebels.round.newBattleVotes++;
-                else RivalRebels.round.waitVotes++;
-            }
-        });
+    public static void onMessage(VotePacket m, PlayerEntity player) {
+        RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
+        if (!p.voted) {
+            p.voted = true;
+            if (m.newround) RivalRebels.round.newBattleVotes++;
+            else RivalRebels.round.waitVotes++;
+        }
     }
 
-    public static void toBytes(VotePacket packet, PacketByteBuf buf) {
-        buf.writeBoolean(packet.newround);
+    @Override
+    public void write(PacketByteBuf buf) {
+        buf.writeBoolean(newround);
     }
 
+    @Override
+    public PacketType<?> getType() {
+        return PACKET_TYPE;
+    }
 }

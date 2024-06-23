@@ -19,6 +19,7 @@ import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
 import assets.rivalrebels.common.explosion.Explosion;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
@@ -26,7 +27,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Direction;
@@ -35,15 +36,22 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 public class BlockRemoteCharge extends FallingBlock {
+    public static final MapCodec<BlockRemoteCharge> CODEC = createCodec(BlockRemoteCharge::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockRemoteCharge(Settings settings)
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
+
+    @Override
+    protected MapCodec<BlockRemoteCharge> getCodec() {
+        return CODEC;
+    }
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
@@ -83,8 +91,9 @@ public class BlockRemoteCharge extends FallingBlock {
 	}
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
         explode(world, pos);
+        return state;
     }
 
     @Override
@@ -96,7 +105,7 @@ public class BlockRemoteCharge extends FallingBlock {
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-		world.createAndScheduleBlockTick(pos, this, 1);
+		world.scheduleBlockTick(pos, this, 1);
 	}
 
     @Override
@@ -112,7 +121,7 @@ public class BlockRemoteCharge extends FallingBlock {
 			explode(world, pos);
 			boom = false;
 		}
-		world.createAndScheduleBlockTick(pos, this, 1);
+		world.scheduleBlockTick(pos, this, 1);
 	}
 
     @Override
@@ -129,47 +138,9 @@ public class BlockRemoteCharge extends FallingBlock {
         int z = pos.getZ();
 
         world.setBlockState(pos, Blocks.AIR.getDefaultState());
-		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge);
+		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge(world));
 		RivalRebelsSoundPlayer.playSound(world, 22, 0, x, y, z, 1f, 0.3f);
 	}
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon6;
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ag"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ag"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:af"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:af"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:af"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:af"); // SIDE E
-	}*/
 
     @Override
     public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {

@@ -21,30 +21,27 @@ import assets.rivalrebels.common.entity.EntityAntimatterBombBlast;
 import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
+import net.minecraft.util.math.random.Random;
+import org.joml.Quaternionf;
+import org.joml.Vector4f;
 
-import java.util.Random;
-
-public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast>
-{
-	private ModelBlastSphere modelsphere;
-	private ModelBlastRing modelring;
-	private ModelAntimatterBombBlast modelabomb;
+public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast> {
+    public static final SpriteIdentifier ANTIMATTER_BLAST_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etantimatterblast);
+    private final ModelAntimatterBombBlast modelabomb = new ModelAntimatterBombBlast();
 
 	public RenderAntimatterBombBlast(EntityRendererFactory.Context manager)
 	{
         super(manager);
-        modelsphere = new ModelBlastSphere();
-		modelabomb = new ModelAntimatterBombBlast();
-		modelring = new ModelBlastRing();
-	}
+    }
 
     @Override
     public void render(EntityAntimatterBombBlast entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
@@ -54,15 +51,13 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 		matrices.push();
 		matrices.push();
 		matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
-        RenderSystem.setShaderColor(0.0f, 0.0f, 0.2f, 1);
 		float size = (entity.time % 100) * 2.0f;
-		modelring.renderModel(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()), size, 64, 6f, 2f, 0f, 0f, 0f, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ());
+		ModelBlastRing.renderModel(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()), size, 64, 6f, 2f, 0f, 0f, 0f, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), new Vector4f(0, 0, 0.2F, 1), light, OverlayTexture.DEFAULT_UV);
 		matrices.pop();
-		if (entity.time < 60)
-		{
+		if (entity.time < 60) {
 			double elev = entity.time / 5f;
 			matrices.translate(entity.getX(), entity.getY() + elev, entity.getZ());
-			modelsphere.renderModel(matrices, vertexConsumers.getBuffer(RenderLayer.getLightning()), entity.time, 1, 1, 1, 1);
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time, 1, 1, 1, 1);
 		}
 		else
 		{
@@ -71,9 +66,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 			//double hnoisy = noisy * 0.5f;
 			matrices.translate(entity.getX(), entity.getY(), entity.getZ());
 			matrices.scale((float) (radius * 0.06f), (float) (radius * 0.06f), (float) (radius * 0.06f));
-            RenderSystem.setShaderColor(1.0f, 1.0f, 1.0f, 1F);
-			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etantimatterblast);
-			modelabomb.render(matrices, vertexConsumers.getBuffer(RenderLayer.getSolid()));
+			modelabomb.render(matrices, ANTIMATTER_BLAST_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light);
 			/*modelsphere.renderModel(50.0f, 0.0f, 0.0f, 0.0f, 1.0f, false);
 			matrices.push();
 			//RenderSystem.translatef(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
@@ -112,9 +105,9 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 			}
 			RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
 			matrices.scale(random.nextFloat(), random.nextFloat(), random.nextFloat());
-			matrices.multiply(new Quaternion(random.nextFloat() * 360.0f, random.nextFloat(), random.nextFloat(), random.nextFloat()));
+			matrices.multiply(new Quaternionf(random.nextFloat() * 360.0f, random.nextFloat(), random.nextFloat(), random.nextFloat()));
 			matrices.translate(random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f);
-			modelsphere.renderModel(matrices, vertexConsumers.getBuffer(RenderLayer.getLightning()), entity.time, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble(), 1);
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble(), 1);
 		}
 	}
 

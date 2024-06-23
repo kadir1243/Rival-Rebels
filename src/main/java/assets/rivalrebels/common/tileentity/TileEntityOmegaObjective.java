@@ -12,6 +12,8 @@
 package assets.rivalrebels.common.tileentity;
 
 import assets.rivalrebels.common.block.RRBlocks;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -23,12 +25,9 @@ import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.CommandBlockExecutor;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
 public class TileEntityOmegaObjective extends BlockEntity implements Inventory, Tickable {
 	private final DefaultedList<ItemStack> chestContents = DefaultedList.ofSize(16, ItemStack.EMPTY);
@@ -54,7 +53,7 @@ public class TileEntityOmegaObjective extends BlockEntity implements Inventory, 
             this.getWorld().updateListeners(pos, lv, lv, 3);
         }
 
-        @OnlyIn(Dist.CLIENT)
+        @Environment(EnvType.CLIENT)
         @Override
         public Vec3d getPos() {
             return Vec3d.ofCenter(pos);
@@ -73,6 +72,11 @@ public class TileEntityOmegaObjective extends BlockEntity implements Inventory, 
                 this.getWorld().getServer(),
                 null
             );
+        }
+
+        @Override
+        public boolean isEditable() {
+            return !isRemoved();
         }
     };
 
@@ -180,12 +184,6 @@ public class TileEntityOmegaObjective extends BlockEntity implements Inventory, 
 		if (world.getBlockState(getPos()).getBlock() != RRBlocks.omegaobj) {
 			this.markRemoved();
 		}
-	}
-
-	@Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-1, -1, -1), getPos().add(2, 2, 2));
 	}
 
     @Override

@@ -37,8 +37,8 @@ public class ContainerTachyonBomb extends ScreenHandler {
         this.bomb = bomb;
         this.propertyDelegate = propertyDelegate;
         addSlot(new SlotRR(bomb, 0, 18, 48, 1, ItemFuse.class));
-		addSlot(new SlotRR(bomb, 1, 40, 59, 1, ItemAntenna.class));
-		addSlot(new SlotRR(bomb, 2, 40, 37, 1, ItemAntenna.class));
+		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna));
+		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna));
 		for (int i = 0; i <= 3; i++)
 		{
 			addSlot(new SlotRR(bomb, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
@@ -73,18 +73,17 @@ public class ContainerTachyonBomb extends ScreenHandler {
 		}
 	}
 
-	@Override
-	public ItemStack transferSlot(PlayerEntity par1EntityPlayer, int par2)
-	{
-		ItemStack var3 = ItemStack.EMPTY;
-		Slot var4 = this.slots.get(par2);
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slot) {
+		ItemStack itemStack = ItemStack.EMPTY;
+		Slot var4 = this.slots.get(slot);
 
 		if (var4 != null && var4.hasStack())
 		{
 			ItemStack var5 = var4.getStack();
-			var3 = var5.copy();
+			itemStack = var5.copy();
 
-			if (par2 <= 19)
+			if (slot <= 19)
 			{
 				if (!this.insertItem(var5, 19, this.slots.size(), true))
 				{
@@ -106,7 +105,7 @@ public class ContainerTachyonBomb extends ScreenHandler {
 			}
 		}
 
-		return var3;
+		return itemStack;
 	}
 
     public int getCountdown() {

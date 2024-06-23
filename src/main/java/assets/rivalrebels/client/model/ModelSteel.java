@@ -11,26 +11,26 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import assets.rivalrebels.client.renderhelper.Vertice;
+import org.joml.Vector3f;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ModelSteel
 {
     float		s			= 0.5F;
 
-	Vertice		v1			= new Vertice(s, s, s);
-	Vertice		v2			= new Vertice(s, s, -s);
-	Vertice		v3			= new Vertice(-s, s, -s);
-	Vertice		v4			= new Vertice(-s, s, s);
+	Vector3f		v1			= new Vector3f(s, s, s);
+	Vector3f		v2			= new Vector3f(s, s, -s);
+	Vector3f		v3			= new Vector3f(-s, s, -s);
+	Vector3f		v4			= new Vector3f(-s, s, s);
 
-	Vertice		v5			= new Vertice(s, -s, s);
-	Vertice		v6			= new Vertice(s, -s, -s);
-	Vertice		v7			= new Vertice(-s, -s, -s);
-	Vertice		v8			= new Vertice(-s, -s, s);
+	Vector3f		v5			= new Vector3f(s, -s, s);
+	Vector3f		v6			= new Vector3f(s, -s, -s);
+	Vector3f		v7			= new Vector3f(-s, -s, -s);
+	Vector3f		v8			= new Vector3f(-s, -s, s);
 
 	public void renderModel(MatrixStack matrices, VertexConsumer buffer)
 	{
@@ -60,7 +60,7 @@ public class ModelSteel
 		matrices.pop();
 	}
 
-	private void addVertex(VertexConsumer buffer, Vertice v, float t, float t2) {
+	private void addVertex(VertexConsumer buffer, Vector3f v, float t, float t2) {
 		buffer.vertex(v.x * 0.999, v.y * 0.999, v.z * 0.999).texture(t, t2).next();
 	}
 }

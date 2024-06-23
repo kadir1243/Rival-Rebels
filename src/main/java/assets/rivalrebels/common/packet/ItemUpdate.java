@@ -11,17 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.item.weapon.ItemFlameThrower;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.util.Identifier;
 
-import java.util.function.Supplier;
-
-public class ItemUpdate {
-	private final int item;
+public class ItemUpdate implements FabricPacket {
+    public static final PacketType<ItemUpdate> TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "item_update"), ItemUpdate::new);
+    private final int item;
 	private final int value;
 
 	public ItemUpdate(int currentItem, int i) {
@@ -29,27 +31,28 @@ public class ItemUpdate {
 		value = i;
 	}
 
-	public static ItemUpdate fromBytes(PacketByteBuf buf) {
-        return new ItemUpdate(buf.readInt(), buf.readInt());
+	public ItemUpdate(PacketByteBuf buf) {
+        this(buf.readInt(), buf.readInt());
 	}
 
-	public static void toBytes(ItemUpdate packet, PacketByteBuf buf) {
-		buf.writeInt(packet.item);
-		buf.writeInt(packet.value);
+    @Override
+    public void write(PacketByteBuf buf) {
+		buf.writeInt(item);
+		buf.writeInt(value);
 	}
 
+    @Override
+    public PacketType<?> getType() {
+        return TYPE;
+    }
 
-    public static void onMessage(ItemUpdate message, Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context context = ctx.get();
-        ServerPlayerEntity sender = context.getSender();
-        context.enqueueWork(() -> {
-            ItemStack itemstack = sender.getInventory().getStack(message.item);
-            if (itemstack.getItem() instanceof ItemTesla) {
-                itemstack.getOrCreateNbt().putInt("dial", message.value);
-            }
-            if (itemstack.getItem() instanceof ItemFlameThrower) {
-                itemstack.getOrCreateNbt().putInt("mode", message.value);
-            }
-        });
+    public static void onMessage(ItemUpdate message, PlayerEntity player) {
+        ItemStack itemstack = player.getInventory().getStack(message.item);
+        if (itemstack.getItem() instanceof ItemTesla) {
+            itemstack.getOrCreateNbt().putInt("dial", message.value);
+        }
+        if (itemstack.getItem() instanceof ItemFlameThrower) {
+            itemstack.getOrCreateNbt().putInt("mode", message.value);
+        }
     }
 }

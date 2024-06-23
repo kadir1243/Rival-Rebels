@@ -12,17 +12,13 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.itemrenders.RodaRenderer;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.*;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
-import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.TntEntity;
@@ -34,11 +30,8 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.world.World;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.Random;
-import java.util.function.Consumer;
 
 public class ItemRoda extends Item
 {
@@ -341,17 +334,9 @@ public class ItemRoda extends Item
 
 	boolean pass = false;
 	public ItemRoda() {
-		super(new Settings().maxCount(1).group(RRItems.rralltab));
+		super(new Settings().maxCount(1));
 	}
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new RodaRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
+
     @Override
     public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
         ItemStack stack = player.getStackInHand(hand);
@@ -386,11 +371,11 @@ public class ItemRoda extends Item
 		if (stack.getOrCreateNbt().getInt("happynewyear")>0)stack.getNbt().putInt("happynewyear",stack.getNbt().getInt("happynewyear")-1);
 	}
 
-	@Override
+    //@Override
 	public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity)
 	{
-		if (player.world.isClient) return true;
-		Random r = player.world.random;
+		if (player.getWorld().isClient) return true;
+		Random r = player.getWorld().random;
 		double x = entity.getX() - player.getX();
 		double y = entity.getY() - player.getY();
 		double z = entity.getZ() - player.getZ();
@@ -422,10 +407,4 @@ public class ItemRoda extends Item
 		}
 		return true;
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:be");
-	}*/
 }

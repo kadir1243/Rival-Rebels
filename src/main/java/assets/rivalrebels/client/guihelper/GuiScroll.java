@@ -12,11 +12,9 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.LiteralText;
-import net.minecraftforge.client.gui.GuiUtils;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.text.Text;
 
 public class GuiScroll extends GuiButton
 {
@@ -31,28 +29,27 @@ public class GuiScroll extends GuiButton
 
 	public GuiScroll(int par2, int par3, int par4)
 	{
-		super(par2, par3, 5, 11, LiteralText.EMPTY);
+		super(par2, par3, 5, 11, Text.empty());
 		this.limit = par4;
 		pressed = false;
 	}
 
     @Override
-    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 		if (scroll > limit) scroll = limit;
 		if (scroll < 0) scroll = 0;
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.guitbutton);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 11;
-		GuiUtils.drawTexturedModalRect(matrices, this.x, this.y + scroll, 0, state, this.width, this.height, getZOffset());
+		context.drawTexture(RRIdentifiers.guitbutton, this.getX(), this.getY() + scroll, 0, state, this.width, this.height);
 	}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
 		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
 			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
-			if (pressed) scroll = (int) (mouseY - y - 5);
+			if (pressed) scroll = (int) (mouseY - getY() - 5);
 		} else {
 			pressed = false;
 		}

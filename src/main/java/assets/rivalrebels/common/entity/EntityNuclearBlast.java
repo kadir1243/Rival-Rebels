@@ -24,7 +24,6 @@ import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 
 import java.util.List;
 
@@ -67,40 +66,40 @@ public class EntityNuclearBlast extends EntityInanimate {
 	public void tick()
 	{
 		super.tick();
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			if (age == 0)
 			{
-				world.createExplosion(null, getX(), getY() - 5, getZ(), 4, Explosion.DestructionType.DESTROY);
+				getWorld().createExplosion(null, getX(), getY() - 5, getZ(), 4, World.ExplosionSourceType.BLOCK);
 			}
 			if (age % 20 == 0 && age > 60)
 			{
 				time++;
 				if (time <= Strength)
 				{
-					new NuclearExplosion(world, (int) getX(), (int) getY() - 5, (int) getZ(), (time * time) / 2 + RivalRebels.nuclearBombStrength);
+					new NuclearExplosion(getWorld(), (int) getX(), (int) getY() - 5, (int) getZ(), (time * time) / 2 + RivalRebels.nuclearBombStrength);
 				}
 			}
 			if (age % 2 == 0 && age < 400) pushAndHurtEntities();
 		}
 		if (age < 30)
 		{
-			world.playSound(getX(), getY() + age - 5, getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, world.random.nextFloat() * 0.1f + 0.9f, true);
+			getWorld().playSound(getX(), getY() + age - 5, getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, getWorld().random.nextFloat() * 0.1f + 0.9f, true);
 		}
 		if (age % 3 == 0 && age < 40 && age > 30)
 		{
 			for (int i = 0; i < 21; i++)
 			{
-				world.playSound(getX() + Math.sin(i) * (i / 0.5), getY() + 17, getZ() + Math.cos(i) * (i / 0.5), SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, world.random.nextFloat() + 1.0f, true);
+				getWorld().playSound(getX() + Math.sin(i) * (i / 0.5), getY() + 17, getZ() + Math.cos(i) * (i / 0.5), SoundEvents.ENTITY_GENERIC_EXPLODE, getSoundCategory(), 4.0f, getWorld().random.nextFloat() + 1.0f, true);
 			}
 		}
 		if (age < 600)
 		{
-			if (age % 5 == world.random.nextInt(5))
+			if (age % 5 == getWorld().random.nextInt(5))
 			{
-                for (PlayerEntity p : world.getPlayers()) {
-                    world.playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 10.0F, 0.50F);
-                    world.playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 5.0F, 0.10F);
+                for (PlayerEntity p : getWorld().getPlayers()) {
+                    getWorld().playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 10.0F, 0.50F);
+                    getWorld().playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.MASTER, 5.0F, 0.10F);
                 }
 			}
 		}
@@ -122,7 +121,7 @@ public class EntityNuclearBlast extends EntityInanimate {
 		int var28 = MathHelper.floor(getY() + radius + 1.0D);
 		int var7 = MathHelper.floor(getZ() - radius - 1.0D);
 		int var29 = MathHelper.floor(getZ() + radius + 1.0D);
-		List<Entity> var9 = world.getOtherEntities(this, new Box(var3, var5, var7, var4, var28, var29));
+		List<Entity> var9 = getWorld().getOtherEntities(this, new Box(var3, var5, var7, var4, var28, var29));
 
         for (Entity entity : var9) {
             double var13 = Math.sqrt(entity.squaredDistanceTo(getX(), getY(), getZ())) / radius;
@@ -142,7 +141,7 @@ public class EntityNuclearBlast extends EntityInanimate {
                         else {
                             if (entity instanceof PlayerEntity && ((PlayerEntity) entity).getAbilities().invulnerable)
                                 continue;
-                            entity.damage(RivalRebelsDamageSource.nuclearblast, 16 * radius);
+                            entity.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), 16 * radius);
                             entity.setVelocity(getVelocity().subtract(
                                 var15 * 8,
                                 var17 * 8,

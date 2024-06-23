@@ -21,7 +21,6 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -43,7 +42,7 @@ public class BlockSupplies extends Block
 
 		if (world.isClient)
 		{
-			player.sendMessage(new TranslatableText("RivalRebels.Inventory"), false);
+			player.sendMessage(Text.translatable("RivalRebels.Inventory"), false);
 			player.sendMessage(Text.of("§a" + RRItems.armyshovel.getName() + ". §9(" + "Ideal for special blocks." + ")"), false);
 			player.sendMessage(Text.of("§a" + RRBlocks.jump.getName() + ". §9(" + "Use at your own risk." + ")"), false);
 			player.sendMessage(Text.of("§a" + RRBlocks.quicksand.getName() + ". §9(" + "Sand that is quick" + ")"), false);
@@ -86,42 +85,4 @@ public class BlockSupplies extends Block
 		}
 		return ActionResult.PASS;
 	}
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon6;
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ah"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ai"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:bz"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:bz"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:bz"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:bz"); // SIDE E
-	}*/
 }

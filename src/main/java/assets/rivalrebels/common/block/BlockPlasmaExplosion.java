@@ -13,6 +13,7 @@ package assets.rivalrebels.common.block;
 
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -22,8 +23,8 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockPlasmaExplosion extends BlockWithEntity
-{
+public class BlockPlasmaExplosion extends BlockWithEntity {
+    public static final MapCodec<BlockPlasmaExplosion> CODEC = createCodec(BlockPlasmaExplosion::new);
 	public BlockPlasmaExplosion(Settings settings)
 	{
 		super(settings);
@@ -34,6 +35,11 @@ public class BlockPlasmaExplosion extends BlockWithEntity
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityPlasmaExplosion(pos, state);
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     @Nullable
     @Override

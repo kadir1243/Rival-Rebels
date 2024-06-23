@@ -14,6 +14,7 @@ package assets.rivalrebels.common.block.trap;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -36,12 +37,19 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockNuclearBomb extends BlockWithEntity {
+    public static final MapCodec<BlockNuclearBomb> CODEC = createCodec(BlockNuclearBomb::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockNuclearBomb(Settings settings)
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
+
+    @Override
+    protected MapCodec<BlockNuclearBomb> getCodec() {
+        return CODEC;
+    }
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
@@ -57,7 +65,7 @@ public class BlockNuclearBomb extends BlockWithEntity {
         int z = pos.getZ();
 		if (MathHelper.abs((float) placer.getX() - x) < 2.0F && MathHelper.abs((float) placer.getZ() - z) < 2.0F)
 		{
-			double var5 = placer.getY() + 1.82D - placer.getHeightOffset();
+			double var5 = placer.getY() + 1.82D - placer.getRidingOffset(placer);
 
 			if (var5 - y > 2.0D)
 			{

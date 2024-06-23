@@ -14,6 +14,7 @@ package assets.rivalrebels.common.block.machine;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -34,12 +35,18 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockReciever extends BlockWithEntity {
+    public static final MapCodec<BlockReciever> CODEC = createCodec(BlockReciever::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockReciever(Settings settings) {
 		super(settings);
 
         setDefaultState(getStateManager().getDefaultState().with(META, 0));
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     @Nullable
     @Override
@@ -77,19 +84,4 @@ public class BlockReciever extends BlockWithEntity {
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:dj");
-	}*/
 }

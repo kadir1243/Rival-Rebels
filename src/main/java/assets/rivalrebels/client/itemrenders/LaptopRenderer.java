@@ -13,37 +13,27 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumer;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
-public class LaptopRenderer extends BuiltinModelItemRenderer
-{
-	ModelLaptop	ml;
-
-	public LaptopRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-		ml = new ModelLaptop();
-	}
+public class LaptopRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier LAPTOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etlaptop);
+    public static final SpriteIdentifier UBUNTU_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etubuntu);
 
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate((float) 0.3, (float) 0.3, 0);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true));
-        matrices.multiply(new Quaternion(180, 0, 1, 0));
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etlaptop);
-		ml.renderModel(buffer, matrices, -90);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etubuntu);
-		ml.renderScreen(buffer, matrices, -90);
+        matrices.multiply(new Quaternionf(180, 0, 1, 0));
+		ModelLaptop.renderModel(LAPTOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, -90, light, overlay);
+		ModelLaptop.renderScreen(UBUNTU_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, -90, light, overlay);
 		matrices.pop();
 	}
 }

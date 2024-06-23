@@ -21,7 +21,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -100,20 +100,20 @@ public class EntityFlameBall1 extends EntityInanimate
 
 		Vec3d start = getPos();
 		Vec3d end = getPos().add(getVelocity());
-		HitResult mop = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		HitResult mop = getWorld().raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 		start = getPos();
 		end = getPos().add(getVelocity());
 
 		if (mop != null) end = mop.getPos();
 
 		Entity e = null;
-		List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+		List<Entity> var5 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 		double var6 = 0.0D;
 
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
             for (Entity var9 : var5) {
-                if (var9.collides()) {
+                if (var9.isCollidable()) {
                     float var10 = 0.3F;
                     Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
                     Optional<Vec3d> var12 = var11.raycast(start, end);
@@ -142,10 +142,10 @@ public class EntityFlameBall1 extends EntityInanimate
 			if (((EntityHitResult) mop).getEntity() != null)
 			{
 				((EntityHitResult) mop).getEntity().setOnFireFor(3);
-				((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked, 12);
+				((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked(getWorld()), 12);
 				if (((EntityHitResult) mop).getEntity() instanceof PlayerEntity player) {
-                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, world.random.nextInt(4));
-					if (!player.getEquippedStack(slot).isEmpty() && !world.isClient)
+                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, getWorld().random.nextInt(4));
+					if (!player.getEquippedStack(slot).isEmpty() && !getWorld().isClient)
 					{
 						player.getEquippedStack(slot).damage(8, player, player1 -> player1.sendEquipmentBreakStatus(slot));
 					}
@@ -153,22 +153,22 @@ public class EntityFlameBall1 extends EntityInanimate
 			}
 			else if (mop.getType() == BlockHitResult.Type.ENTITY)
 			{
-				world.spawnEntity(new EntityLightningLink(world, this, this.distanceTo(((EntityHitResult) mop).getEntity())));
+				getWorld().spawnEntity(new EntityLightningLink(getWorld(), this, this.distanceTo(((EntityHitResult) mop).getEntity())));
 				if (((EntityHitResult) mop).getEntity() instanceof PlayerEntity player)
 				{
-                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, world.random.nextInt(4));
+                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, getWorld().random.nextInt(4));
 					if (!player.getEquippedStack(slot).isEmpty()) {
 						player.getEquippedStack(slot).damage(44, player, player1 -> player1.sendEquipmentBreakStatus(slot));
 					}
-					player.damage(RivalRebelsDamageSource.cooked, 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					player.damage(RivalRebelsDamageSource.cooked(getWorld()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
 				}
 				else if (((EntityHitResult) mop).getEntity() instanceof EntityB2Spirit)
 				{
-					((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked, 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked(getWorld()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
 				}
 				else if (((EntityHitResult) mop).getEntity().isAttackable())
 				{
-					((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked, 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked(getWorld()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
 				}
 			}
 		}
@@ -205,7 +205,7 @@ public class EntityFlameBall1 extends EntityInanimate
 
 	private void fire()
 	{
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			for (int x = -1; x < 2; x++)
 			{
@@ -214,12 +214,12 @@ public class EntityFlameBall1 extends EntityInanimate
 					for (int z = -1; z < 2; z++)
 					{
                         BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
-                        BlockState state = world.getBlockState(pos);
+                        BlockState state = getWorld().getBlockState(pos);
                         Block id = state.getBlock();
-						if (id == Blocks.AIR || id == Blocks.SNOW || state.isIn(BlockTags.ICE)) world.setBlockState(pos, Blocks.FIRE.getDefaultState());
-						else if (state.isIn(BlockTags.LEAVES)) world.setBlockState(pos, Blocks.FIRE.getDefaultState());
-						else if (id == Blocks.GRASS && world.random.nextInt(5) == 0) world.setBlockState(pos, Blocks.DIRT.getDefaultState());
-						else if (id == RRBlocks.flare) id.onBroken(world, pos, state);
+						if (id == Blocks.AIR || id == Blocks.SNOW || state.isIn(BlockTags.ICE)) getWorld().setBlockState(pos, Blocks.FIRE.getDefaultState());
+						else if (state.isIn(BlockTags.LEAVES)) getWorld().setBlockState(pos, Blocks.FIRE.getDefaultState());
+						else if (id == Blocks.GRASS_BLOCK && getWorld().random.nextInt(5) == 0) getWorld().setBlockState(pos, Blocks.DIRT.getDefaultState());
+						else if (id == RRBlocks.flare) id.onBroken(getWorld(), pos, state);
 					}
 				}
 			}

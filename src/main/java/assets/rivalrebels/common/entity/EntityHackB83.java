@@ -13,24 +13,22 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
+import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -85,11 +83,11 @@ public class EntityHackB83 extends ThrownEntity
 	{
 		if (ticksInAir == - 100 || getY() < 0 || getY() > 256) explode();
 		++this.ticksInAir;
-		if (!straight && !world.isClient)
+		if (!straight && !getWorld().isClient)
 		{
-			mmx += world.random.nextGaussian()*0.4;
-			mmy += world.random.nextGaussian()*0.4;
-			mmz += world.random.nextGaussian()*0.4;
+			mmx += getWorld().random.nextGaussian()*0.4;
+			mmy += getWorld().random.nextGaussian()*0.4;
+			mmz += getWorld().random.nextGaussian()*0.4;
 			double dist = 1/Math.sqrt(mmx*mmx + mmy*mmy + mmz*mmz);
 			mmx *= dist;
 			mmy *= dist;
@@ -107,18 +105,18 @@ public class EntityHackB83 extends ThrownEntity
 			}
 		}
 
-		if (world.isClient && !isInsideWaterOrBubbleColumn())
+		if (getWorld().isClient && !isInsideWaterOrBubbleColumn())
 		{
-			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX(), -getVelocity().getY(), -getVelocity().getZ()));
-			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.8f, -getVelocity().getY()*0.8f, -getVelocity().getZ()*0.8f));
-			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.6f, -getVelocity().getY()*0.6f, -getVelocity().getZ()*0.6f));
-			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.4f, -getVelocity().getY()*0.4f, -getVelocity().getZ()*0.4f));
-			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX()*0.2f, -getVelocity().getY()*0.2f, -getVelocity().getZ()*0.2f));
+			getWorld().spawnEntity(new EntityPropulsionFX(getWorld(), getX(), getY(), getZ(), -getVelocity().getX(), -getVelocity().getY(), -getVelocity().getZ()));
+			getWorld().spawnEntity(new EntityPropulsionFX(getWorld(), getX(), getY(), getZ(), -getVelocity().getX()*0.8f, -getVelocity().getY()*0.8f, -getVelocity().getZ()*0.8f));
+			getWorld().spawnEntity(new EntityPropulsionFX(getWorld(), getX(), getY(), getZ(), -getVelocity().getX()*0.6f, -getVelocity().getY()*0.6f, -getVelocity().getZ()*0.6f));
+			getWorld().spawnEntity(new EntityPropulsionFX(getWorld(), getX(), getY(), getZ(), -getVelocity().getX()*0.4f, -getVelocity().getY()*0.4f, -getVelocity().getZ()*0.4f));
+			getWorld().spawnEntity(new EntityPropulsionFX(getWorld(), getX(), getY(), getZ(), -getVelocity().getX()*0.2f, -getVelocity().getY()*0.2f, -getVelocity().getZ()*0.2f));
 		}
 
 		Vec3d var15 = getPos();
 		Vec3d var2 = getPos().add(getVelocity());
-		HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		HitResult var3 = this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 		var15 = getPos();
 		var2 = getPos().add(getVelocity());
 
@@ -127,14 +125,14 @@ public class EntityHackB83 extends ThrownEntity
 			var2 = var3.getPos();
 		}
 
-		if (!this.world.isClient && this.ticksInAir > 3)
+		if (!this.getWorld().isClient && this.ticksInAir > 3)
 		{
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.collides()) {
+                if (var9.isCollidable()) {
                     float var10 = 0.3F;
                     Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
                     Optional<Vec3d> var12 = var11.raycast(var15, var2);
@@ -187,7 +185,7 @@ public class EntityHackB83 extends ThrownEntity
 		this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.2F);
 		this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.2F);
 		float var17 = 0.9f;
-		if (!straight && !world.isClient)
+		if (!straight && !getWorld().isClient)
 		{
             setVelocity(getVelocity().multiply(var17));
 		}
@@ -214,11 +212,12 @@ public class EntityHackB83 extends ThrownEntity
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        BlockState state = world.getBlockState(blockHitResult.getBlockPos());
-        Material m = state.getMaterial();
-        if (state.isIn(BlockTags.LEAVES) || m == Material.ORGANIC_PRODUCT || m == Material.SOIL || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || m == Material.CAKE || m == Material.DECORATION || state.isIn(BlockTags.WOOL) || m == Material.SNOW_BLOCK || state.isIn(Tags.Blocks.GLASS) || m == Material.SOLID_ORGANIC || state.isIn(Tags.Blocks.SAND) || m == Material.SNOW_LAYER || m == Material.WOOD || m == Material.REPLACEABLE_PLANT || state.getFluidState().isIn(FluidTags.WATER) || m == Material.SPONGE || state.isIn(BlockTags.ICE))
+        BlockState state = getWorld().getBlockState(blockHitResult.getBlockPos());
+        MapColor color = state.getMapColor(getWorld(), blockHitResult.getBlockPos());
+        Block b = state.getBlock();
+        if (state.isIn(BlockTags.LEAVES) || color == MapColor.GREEN || color == MapColor.DIRT_BROWN || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || state.isOf(Blocks.CAKE) || state.getBlock().getBlastResistance() < 1 || state.isIn(BlockTags.WOOL) || state.isOf(Blocks.SNOW_BLOCK) || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(BlockTags.SAND) || b instanceof SnowBlock || state.isBurnable() || state.isReplaceable() || state.getFluidState().isIn(FluidTags.WATER) || b instanceof SpongeBlock || state.isIn(BlockTags.ICE))
         {
-            world.setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
+            getWorld().setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
             return;
         }
         explode();
@@ -226,8 +225,8 @@ public class EntityHackB83 extends ThrownEntity
 
 	public void explode()
 	{
-		new NuclearExplosion(world, (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength, false);
-		world.spawnEntity(new EntityTsarBlast(world, getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f).setTime());
+		new NuclearExplosion(getWorld(), (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength, false);
+		getWorld().spawnEntity(new EntityTsarBlast(getWorld(), getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f).setTime());
 		this.kill();
 	}
 }

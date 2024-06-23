@@ -1,21 +1,22 @@
 package assets.rivalrebels.datagen;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.data.DataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
+import net.minecraft.data.client.*;
 import net.minecraft.item.Item;
-import net.minecraft.util.Identifier;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
-import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.registries.ForgeRegistryEntry;
 
-public class ItemModelDataGen extends ItemModelProvider {
-    public ItemModelDataGen(DataGenerator generator, ExistingFileHelper existingFileHelper) {
-        super(generator, RivalRebels.MODID, existingFileHelper);
+public class ItemModelDataGen extends FabricModelProvider {
+    private ItemModelGenerator generator;
+
+    public ItemModelDataGen(FabricDataOutput output) {
+        super(output);
     }
 
     @Override
-    protected void registerModels() {
+    public void generateItemModels(ItemModelGenerator generator) {
+        this.generator = generator;
         simpleItem(RRItems.trollmask, "bf");
         simpleItem(RRItems.safepill, "ak");
         simpleItem(RRItems.redrod, "al");
@@ -34,17 +35,40 @@ public class ItemModelDataGen extends ItemModelProvider {
         simpleItem(RRItems.chip, "bd");
         simpleItem(RRItems.battery, "ac");
         simpleItem(RRItems.antenna, "aa");
+        simpleItem(RRItems.camohat, "oh");
+        simpleItem(RRItems.camohat2, "sh");
+        simpleItem(RRItems.camoshirt, "ov");
+        simpleItem(RRItems.camoshirt2, "sv");
+        simpleItem(RRItems.camopants, "op");
+        simpleItem(RRItems.camopants2, "sp");
+        simpleItem(RRItems.camoshoes, "ob");
+        simpleItem(RRItems.camoshoes2, "sb");
+        simpleItem(RRItems.armyshovel, "aw");
+        simpleItem(RRItems.einsten, "ab");
+        simpleItem(RRItems.binoculars, "bb");
+        simpleItem(RRItems.camera, "bi");
+        simpleItem(RRItems.knife, "ad");
+        simpleItem(RRItems.flamethrower, "ae");
+        simpleItem(RRItems.gasgrenade, "ah");
+        simpleItem(RRItems.hackm202, "bg");
+        simpleItem(RRItems.plasmacannon, "ao");
+        simpleItem(RRItems.roda, "be");
+        simpleItem(RRItems.roddisk, "as");
+        simpleItem(RRItems.rpg, "aq");
+        simpleItem(RRItems.seekm202, "bh");
+        simpleItem(RRItems.tesla, "ax");
+    }
+
+    @Override
+    public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
     }
 
     private void simpleItem(Item item, String tex) {
-        singleTexture(name(item), mcLoc("generated"), modLoc(tex));
+        Models.GENERATED.upload(ModelIds.getItemModelId(item), TextureMap.layer0(RRIdentifiers.create("item/" + tex)), generator.writer);
     }
 
-    private String name(ForgeRegistryEntry<?> registry) {
-        Identifier registryName = registry.getRegistryName();
-        if (registryName == null) {
-            throw new UnsupportedOperationException("Registry Name is not available");
-        }
-        return registryName.getNamespace();
+    @Override
+    public String getName() {
+        return "RivalRebels Item Models";
     }
 }

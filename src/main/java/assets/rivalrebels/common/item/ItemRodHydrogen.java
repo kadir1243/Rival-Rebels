@@ -11,26 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.client.itemrenders.HydrogenRodRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.function.Consumer;
-
 public class ItemRodHydrogen extends ItemRod {
 	public ItemRodHydrogen() {
         super();
 		power = 250000;
 	}
-
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new HydrogenRodRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
 }

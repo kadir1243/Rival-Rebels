@@ -12,37 +12,37 @@
 package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
-import assets.rivalrebels.client.renderhelper.Vertice;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraft.util.math.Vector4f;
+import org.joml.Quaternionf;
+import org.joml.Vector3f;
+import org.joml.Vector4f;
 
 public class ModelAstroBlasterBody {
-	private static final Vertice vx	= new Vertice(1, 0, 0).normalize();
-	private static final Vertice vy	= new Vertice(0, 1, 0).normalize();
-	private static final Vertice vz	= new Vertice(0, 0, 1).normalize();
-	private static final Vertice vxy = new Vertice(0.5f, 0.5f, 0).normalize();
-	private static final Vertice vyz = new Vertice(0, 0.5f, 0.5f).normalize();
-	private static final Vertice vxz = new Vertice(0.5f, 0, 0.5f).normalize();
-	private static final Vertice vx1 = new Vertice(0.75f, 0.25f, 0).normalize();
-	private static final Vertice vx2 = new Vertice(0.5f, 0.25f, 0.25f).normalize();
-	private static final Vertice vx3 = new Vertice(0.75f, 0, 0.25f).normalize();
-	private static final Vertice vy1 = new Vertice(0, 0.75f, 0.25f).normalize();
-	private static final Vertice vy2 = new Vertice(0.25f, 0.5f, 0.25f).normalize();
-	private static final Vertice vy3 = new Vertice(0.25f, 0.75f, 0).normalize();
-	private static final Vertice vz1 = new Vertice(0.25f, 0, 0.75f).normalize();
-	private static final Vertice vz2 = new Vertice(0.25f, 0.25f, 0.5f).normalize();
-	private static final Vertice vz3 = new Vertice(0, 0.25f, 0.75f).normalize();
+	private static final Vector3f vx	= new Vector3f(1, 0, 0).normalize();
+	private static final Vector3f vy	= new Vector3f(0, 1, 0).normalize();
+	private static final Vector3f vz	= new Vector3f(0, 0, 1).normalize();
+	private static final Vector3f vxy = new Vector3f(0.5f, 0.5f, 0).normalize();
+	private static final Vector3f vyz = new Vector3f(0, 0.5f, 0.5f).normalize();
+	private static final Vector3f vxz = new Vector3f(0.5f, 0, 0.5f).normalize();
+	private static final Vector3f vx1 = new Vector3f(0.75f, 0.25f, 0).normalize();
+	private static final Vector3f vx2 = new Vector3f(0.5f, 0.25f, 0.25f).normalize();
+	private static final Vector3f vx3 = new Vector3f(0.75f, 0, 0.25f).normalize();
+	private static final Vector3f vy1 = new Vector3f(0, 0.75f, 0.25f).normalize();
+	private static final Vector3f vy2 = new Vector3f(0.25f, 0.5f, 0.25f).normalize();
+	private static final Vector3f vy3 = new Vector3f(0.25f, 0.75f, 0).normalize();
+	private static final Vector3f vz1 = new Vector3f(0.25f, 0, 0.75f).normalize();
+	private static final Vector3f vz2 = new Vector3f(0.25f, 0.25f, 0.5f).normalize();
+	private static final Vector3f vz3 = new Vector3f(0, 0.25f, 0.75f).normalize();
 
-	public void render(MatrixStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
+	public static void render(MatrixStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
 		matrices.push();
         Vector4f color = new Vector4f(red, green, blue, alpha);
 
 		matrices.scale(size, size, size);
         for (int p = 0; p < 4; p++) {
 			matrices.push();
-			matrices.multiply(new Quaternion(p * 90, 0, 1, 0));
+			matrices.multiply(new Quaternionf(p * 90, 0, 1, 0));
 
 			RenderHelper.addTri(buffer, vy, vy1, vy3, color);
 			RenderHelper.addTri(buffer, vy1, vyz, vy2, color);

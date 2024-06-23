@@ -2,90 +2,141 @@ package assets.rivalrebels.datagen;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
-import it.unimi.dsi.fastutil.chars.Char2ObjectMap;
-import it.unimi.dsi.fastutil.chars.Char2ObjectOpenHashMap;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.server.RecipeProvider;
-import net.minecraft.data.server.recipe.RecipeJsonProvider;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
+import net.minecraft.data.server.recipe.RecipeExporter;
 import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemConvertible;
 import net.minecraft.item.Items;
-import net.minecraft.recipe.Ingredient;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.ItemTags;
-import net.minecraft.tag.TagKey;
-import net.minecraftforge.common.Tags;
+import net.minecraft.recipe.book.RecipeCategory;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.ItemTags;
 
-import java.util.LinkedList;
-import java.util.function.Consumer;
-
-public class RecipeDataGen extends RecipeProvider {
-    public RecipeDataGen(DataGenerator arg) {
+public class RecipeDataGen extends FabricRecipeProvider {
+    public RecipeDataGen(FabricDataOutput arg) {
         super(arg);
     }
 
     @Override
-    protected void generate(Consumer<RecipeJsonProvider> consumer) {
-        ShapedRecipeJsonBuilder.create(RRItems.fuel, 16)
-            .input('C', Tags.Items.COBBLESTONE)
-            .input('S', Tags.Items.SAND)
-            .input('G', Tags.Items.GRAVEL)
+    public void generate(RecipeExporter exporter) {
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.fuel, 16)
+            .input('C', Items.COBBLESTONE)
+            .input('S', Items.SAND)
+            .input('G', Items.GRAVEL)
             .input('D', Items.DIRT)
             .pattern("DS")
             .pattern("GC")
-            .offerTo(consumer);
-        ShapedRecipeJsonBuilder.create(RRItems.rocket, 16)
-            .input('C', Tags.Items.COBBLESTONE)
-            .input('S', Tags.Items.SAND)
-            .input('G', Tags.Items.GRAVEL)
+            .showNotification(false)
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
+
+        ShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, RRItems.rocket, 16)
+            .input('C', Items.COBBLESTONE)
+            .input('S', Items.SAND)
+            .input('G', Items.GRAVEL)
             .input('D', Items.DIRT)
             .pattern("SC")
             .pattern("DG")
-            .offerTo(consumer);
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
 
-        providerConsumer = consumer;
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.battery, 4)
+            .input('C', Items.COBBLESTONE)
+            .input('S', Items.SAND)
+            .input('G', Items.GRAVEL)
+            .input('D', ItemTags.DIRT)
+            .pattern("CG")
+            .pattern("SD")
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
 
-        addRecipe(RRItems.battery, 4, "CG", "SD", 'C', Tags.Items.COBBLESTONE, 'S', Tags.Items.SAND, 'G', Tags.Items.GRAVEL, 'D', BlockTags.DIRT);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.gasgrenade, 6)
+            .input('C', Items.COBBLESTONE)
+            .input('S', Items.SAND)
+            .input('G', Items.GRAVEL)
+            .input('D', ItemTags.DIRT)
+            .pattern("GD")
+            .pattern("CS")
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
 
-        addRecipe(RRItems.gasgrenade, 6, "GD", "CS", 'C', Tags.Items.COBBLESTONE, 'S', Tags.Items.SAND, 'G', Tags.Items.GRAVEL, 'D', BlockTags.DIRT);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.easteregg)
+            .input('C', Items.COBBLESTONE)
+            .input('D', ItemTags.DIRT)
+            .pattern("DD")
+            .pattern("CC")
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
 
-        // EasterEgg
-        addRecipee(RRBlocks.easteregg, "DD", "CC", 'C', Tags.Items.COBBLESTONE, 'D', BlockTags.DIRT);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.sigmaarmor)
+            .input('C', Items.COBBLESTONE)
+            .input('S', RRBlocks.steel)
+            .input('P', RRItems.pliers)
+            .input('D', ItemTags.DIRT)
+            .input('B', Items.BONE)
+            .pattern("SSC")
+            .pattern("SPB")
+            .pattern("SSD")
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
 
-        // Armor
-        addRecipee(RRBlocks.sigmaarmor, "SSC", "SPB", "SSD", 'C', Tags.Items.COBBLESTONE, 'S', RRBlocks.steel, 'P', RRItems.pliers, 'D', BlockTags.DIRT, 'B', Tags.Items.BONES);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.omegaarmor)
+            .input('C', Items.COBBLESTONE)
+            .input('S', RRBlocks.steel)
+            .input('P', RRItems.pliers)
+            .input('D', ItemTags.DIRT)
+            .input('B', Items.BONE)
+            .pattern("SSD")
+            .pattern("SPB")
+            .pattern("SSC")
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
 
-        addRecipee(RRBlocks.omegaarmor, "SSD", "SPB", "SSC", 'C', Tags.Items.COBBLESTONE, 'S', RRBlocks.steel, 'P', RRItems.pliers, 'D', BlockTags.DIRT, 'B', Tags.Items.BONES);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.flagbox1)
+            .input('W', ItemTags.WOOL)
+            .input('P', RRItems.pliers)
+            .pattern("WP")
+            .criterion("has_wool", conditionsFromTag(ItemTags.WOOL))
+            .offerTo(exporter);
 
-        // Flagbox
-        addRecipee(RRBlocks.flagbox1, "W", "P", 'W', ItemTags.WOOL, 'P', RRItems.pliers);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.flagbox3)
+            .input('W', ItemTags.WOOL)
+            .input('P', RRItems.pliers)
+            .pattern("PW")
+            .criterion("has_wool", conditionsFromTag(ItemTags.WOOL))
+            .offerTo(exporter);
 
-        addRecipee(RRBlocks.flagbox3, "P", "W", 'W', ItemTags.WOOL, 'P', RRItems.pliers);
+        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.armyshovel)
+            .input('C', Items.COBBLESTONE)
+            .input('S', Items.SAND)
+            .input('G', Items.GRAVEL)
+            .input('D', ItemTags.DIRT)
+            .pattern("CD")
+            .pattern("SG")
+            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
+            .offerTo(exporter);
 
         // Supplies
-        addRecipee(RRItems.armyshovel, "CD", "SG", 'C', Tags.Items.COBBLESTONE, 'S', Tags.Items.SAND, 'G', Tags.Items.GRAVEL, 'D', BlockTags.DIRT);
+        addRecipe(RRBlocks.amario, 16, "SS", "GG", 'S', Items.SAND, 'G', Items.GRAVEL);
 
-        addRecipe(RRBlocks.amario, 16, "SS", "GG", 'S', Tags.Items.SAND, 'G', Tags.Items.GRAVEL);
+        addRecipe(RRBlocks.aquicksand, 16, "SS", "DD", 'S', Items.SAND, 'D', BlockTags.DIRT);
 
-        addRecipe(RRBlocks.aquicksand, 16, "SS", "DD", 'S', Tags.Items.SAND, 'D', BlockTags.DIRT);
+        addRecipe(RRBlocks.jump, 8, "CC", "DD", 'C', Items.COBBLESTONE, 'D', BlockTags.DIRT);
 
-        addRecipe(RRBlocks.jump, 8, "CC", "DD", 'C', Tags.Items.COBBLESTONE, 'D', BlockTags.DIRT);
+        addRecipe(RRBlocks.steel, 16, "CC", "CC", 'C', Items.COBBLESTONE);
 
-        addRecipe(RRBlocks.steel, 16, "CC", "CC", 'C', Tags.Items.COBBLESTONE);
-
-        addRecipe(RRBlocks.smartcamo, 16, "SCS", "CPC", "SCS", 'C', Tags.Items.COBBLESTONE, 'S', RRBlocks.steel, 'P', RRItems.pliers);
+        addRecipe(RRBlocks.smartcamo, 16, "SCS", "CPC", "SCS", 'C', Items.COBBLESTONE, 'S', RRBlocks.steel, 'P', RRItems.pliers);
 
         // Explosives
-        addRecipee(RRItems.pliers, " C", "C ", 'C', Tags.Items.COBBLESTONE);
+        addRecipee(RRItems.pliers, " C", "C ", 'C', Items.COBBLESTONE);
 
-        addRecipee(RRItems.roda, "IN", "IH", "IR", 'I', Tags.Items.INGOTS_IRON, 'N', RRItems.nuclearelement, 'H', RRItems.hydrod, 'R', RRItems.redrod);
+        addRecipee(RRItems.roda, "IN", "IH", "IR", 'I', Items.IRON_INGOT, 'N', RRItems.nuclearelement, 'H', RRItems.hydrod, 'R', RRItems.redrod);
 
         // Weapons
-        addRecipe(RRItems.knife, 5, "CG", "GC", 'C', Tags.Items.COBBLESTONE, 'G', Tags.Items.GRAVEL);
+        addRecipe(RRItems.knife, 5, "CG", "GC", 'C', Items.COBBLESTONE, 'G', Items.GRAVEL);
 
         // Miscellaneous
-        addRecipe(RRItems.trollmask, 8, "SS", 'S', Tags.Items.SAND);
+        addRecipe(RRItems.trollmask, 8, "SS", 'S', Items.SAND);
 
         addRecipee(RRBlocks.cycle, "TT", "TT", 'T', RRItems.trollmask);
 
@@ -127,15 +178,15 @@ public class RecipeDataGen extends RecipeProvider {
 
         addRecipee(RRItems.hydrod, "W", "S", 'S', RRItems.emptyrod, 'W', Items.WATER_BUCKET);
 
-        addRecipee(RRItems.redrod, "W", "S", 'S', RRItems.emptyrod, 'W', Tags.Items.DUSTS_REDSTONE);
+        addRecipee(RRItems.redrod, "W", "S", 'S', RRItems.emptyrod, 'W', Items.REDSTONE);
 
         addRecipe(RRItems.emptyrod, 4, "SPS", 'S', RRBlocks.steel, 'P', RRItems.pliers);
 
-        addRecipe(RRItems.expill, 4, "STG", " BR", "F W", 'S', Tags.Items.SEEDS, 'T', RRItems.trollmask, 'G', RRItems.gasgrenade, 'B', Items.MILK_BUCKET, 'R', RRItems.rocket, 'F', RRItems.fuel, 'W', Items.WATER_BUCKET);
+        addRecipe(RRItems.expill, 4, "STG", " BR", "F W", 'S', Items.WHEAT_SEEDS, 'T', RRItems.trollmask, 'G', RRItems.gasgrenade, 'B', Items.MILK_BUCKET, 'R', RRItems.rocket, 'F', RRItems.fuel, 'W', Items.WATER_BUCKET);
 
-        addRecipe(RRItems.safepill, 4, "S  ", " B ", "F W", 'S', Tags.Items.SEEDS, 'B', Items.MILK_BUCKET, 'F', RRItems.fuel, 'W', Items.WATER_BUCKET);
+        addRecipe(RRItems.safepill, 4, "S  ", " B ", "F W", 'S', Items.WHEAT_SEEDS, 'B', Items.MILK_BUCKET, 'F', RRItems.fuel, 'W', Items.WATER_BUCKET);
 
-        addRecipee(RRBlocks.breadbox, " S", "GP", " B", 'G', Tags.Items.SEEDS, 'S', RRBlocks.steel, 'B', Items.WATER_BUCKET, 'P', RRItems.pliers);
+        addRecipee(RRBlocks.breadbox, " S", "GP", " B", 'G', Items.WHEAT_SEEDS, 'S', RRBlocks.steel, 'B', Items.WATER_BUCKET, 'P', RRItems.pliers);
 
         addRecipee(RRBlocks.loader, "SBS", "SPS", "SBS", 'S', RRBlocks.steel, 'B', RRItems.battery, 'P', RRItems.pliers);
 
@@ -193,42 +244,14 @@ public class RecipeDataGen extends RecipeProvider {
         addRecipe(RRBlocks.buildrhodes, 2, "SAS", "CPT", "RLB", 'B', RRItems.binoculars, 'P', RRItems.pliers, 'S', RRBlocks.supplies, 'A', RRItems.antenna, 'C', RRItems.chip, 'T', RRItems.core3, 'R', RRBlocks.controller, 'L', RRBlocks.loader);
     }
 
-    private static Consumer<RecipeJsonProvider> providerConsumer;
-
     private static void addRecipee(ItemConvertible output, Object... input) {
-        addRecipe(output, 1, input);
     }
 
-    @SuppressWarnings("unchecked")
     private static void addRecipe(ItemConvertible output, int count, Object... input) {
-        LinkedList<String> pattern = new LinkedList<>();
-        Char2ObjectMap<Ingredient> inputs = new Char2ObjectOpenHashMap<>();
-        for (int i = 0; i < input.length; i++) {
-            Object o = input[i];
-            if (o instanceof String) {
-                pattern.add((String) o);
-            } else if (o instanceof Character) {
-                Object o1 = input[i + 1];
-                Ingredient ingredient = Ingredient.EMPTY;
-                if (o1 instanceof ItemConvertible) {
-                    ingredient = Ingredient.ofItems((ItemConvertible) o1);
-                } else if (o1 instanceof TagKey<?>) {
-                    ingredient = Ingredient.fromTag((TagKey<Item>) o1);
-                }
+    }
 
-                inputs.put((char) o, ingredient);
-            }
-        }
-        ShapedRecipeJsonBuilder factory = ShapedRecipeJsonBuilder.create(output, count);
-
-        for (String s : pattern) {
-            factory.pattern(s);
-        }
-
-        for (Char2ObjectMap.Entry<Ingredient> entry : inputs.char2ObjectEntrySet()) {
-            factory.input(entry.getCharKey(), entry.getValue());
-        }
-
-        factory.offerTo(providerConsumer);
+    @Override
+    public String getName() {
+        return "Rival Rebels recipes";
     }
 }

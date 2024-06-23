@@ -26,7 +26,7 @@ import net.minecraft.world.BlockView;
 import net.minecraft.world.WorldAccess;
 import net.minecraft.world.WorldView;
 
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -275,7 +275,7 @@ public class BlockFlag extends Block {
         return flag ? blockstate1 : null;
     }
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon;
 
 	@Override

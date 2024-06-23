@@ -15,7 +15,6 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import com.google.common.hash.Hashing;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -57,7 +56,7 @@ public class CommandRobot {
         );
     }
 //TODO
-    private static void execute(ServerCommandSource source, String[] args) throws CommandException {
+    private static void execute(ServerCommandSource source, String[] args) {
         if (args.length == 2) {
             String str = args[0];
             if (str.equals("spawn") && !source.getWorld().isClient) {
@@ -75,10 +74,10 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesScaleSpeed = true;
-                    source.sendFeedback(Text.of("§cRhodes Speed Scaling Enabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Speed Scaling Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesScaleSpeed = false;
-                    source.sendFeedback(Text.of("§cRhodes Speed Scaling Disabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Speed Scaling Disabled"), true);
                 } else {
                     float scale;
                     try {
@@ -93,10 +92,10 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesBlockBreak = 1.0f;
-                    source.sendFeedback(Text.of("§cRhodes Rekt Enabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Rekt Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesBlockBreak = 0.0f;
-                    source.sendFeedback(Text.of("§cRhodes Rekt Disabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Rekt Disabled"), true);
                 } else {
                     source.sendError(Text.of("§cUsage: /rrrobot rekt [on|off]"));
                 }
@@ -105,10 +104,10 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesExit = true;
-                    source.sendFeedback(Text.of("§cRhodes Exitting Enabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Exitting Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesExit = false;
-                    source.sendFeedback(Text.of("§cRhodes Exitting Disabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Exitting Disabled"), true);
                 } else {
                     source.sendError(Text.of("§cUsage: /rrrobot exit [on|off]"));
                 }
@@ -128,7 +127,7 @@ public class CommandRobot {
                 }
                 if (good) {
                     RivalRebels.rhodesHold = !RivalRebels.rhodesHold;
-                    source.sendFeedback(Text.of("§cRhodes Stop " + RivalRebels.rhodesHold), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Stop " + RivalRebels.rhodesHold), true);
                     return;
                 }
 
@@ -138,10 +137,10 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesAI = true;
-                    source.sendFeedback(Text.of("§cRhodes AI Enabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes AI Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesAI = false;
-                    source.sendFeedback(Text.of("§cRhodes AI Disabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes AI Disabled"), true);
                 } else {
                     source.sendError(Text.of("§cUsage: /rrrobot ai [on|off]"));
                 }
@@ -150,10 +149,10 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesCC = true;
-                    source.sendFeedback(Text.of("§cRhodes Team Friendly Fire Enabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Team Friendly Fire Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesCC = false;
-                    source.sendFeedback(Text.of("§cRhodes Team Friendly Fire Disabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Team Friendly Fire Disabled"), true);
                 } else {
                     source.sendError(Text.of("§cUsage: /rrrobot tff [on|off]"));
                 }
@@ -162,10 +161,10 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesFF = true;
-                    source.sendFeedback(Text.of("§cRhodes Friendly Fire Enabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Friendly Fire Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesFF = false;
-                    source.sendFeedback(Text.of("§cRhodes Friendly Fire Disabled"), true);
+                    source.sendFeedback(() -> Text.of("§cRhodes Friendly Fire Disabled"), true);
                 } else {
                     source.sendError(Text.of("§cUsage: /rrrobot ff [on|off]"));
                 }
@@ -181,13 +180,13 @@ public class CommandRobot {
                 if (!str2.contains("/") && str2.length() < 11) {
                     EntityRhodes.texfolder = i;
                     EntityRhodes.texloc = str2;
-                    source.sendFeedback(Text.of("§cNext Rhodes Flag is " + str2), true);
+                    source.sendFeedback(() -> Text.of("§cNext Rhodes Flag is " + str2), true);
                 } else {
                     String str3 = str2.substring(str2.indexOf("/") + 1);
                     if (!str3.contains("/") && str3.length() < 11) {
                         EntityRhodes.texfolder = i;
                         EntityRhodes.texloc = str3;
-                        source.sendFeedback(Text.of("§cNext Rhodes Flag is " + str2), true);
+                        source.sendFeedback(() -> Text.of("§cNext Rhodes Flag is " + str2), true);
                     } else {
                         source.sendError(Text.of("§cUsage: /rrrobot logo [flags|blocks|items|entity]/{texturename}"));
                     }
@@ -197,7 +196,7 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("none")) {
                     EntityRhodes.forcecolor = -1;
-                    source.sendFeedback(Text.of("§cNext Rhodes: " + EntityRhodes.names[EntityRhodes.lastct]), true);
+                    source.sendFeedback(() -> Text.of("§cNext Rhodes: " + EntityRhodes.names[EntityRhodes.lastct]), true);
                     return;
                 } else {
                     int which;
@@ -218,7 +217,8 @@ public class CommandRobot {
                     }
                     if (which > -1 && which < names.length) {
                         EntityRhodes.forcecolor = which;
-                        source.sendFeedback(Text.of("§cNext Rhodes: " + EntityRhodes.names[which]), true);
+                        int finalWhich = which;
+                        source.sendFeedback(() -> Text.of("§cNext Rhodes: " + EntityRhodes.names[finalWhich]), true);
                         return;
                     }
                 }

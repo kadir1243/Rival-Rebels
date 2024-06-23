@@ -11,18 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-import static net.minecraftforge.client.gui.GuiUtils.drawTexturedModalRect;
-
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiCustomButton extends ButtonWidget
 {
 	Rectangle			bbox;
@@ -35,7 +32,7 @@ public class GuiCustomButton extends ButtonWidget
 
 	public GuiCustomButton(Rectangle rec, Identifier rl, Vector uv, boolean isToggle)
 	{
-		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Text.of(""), button -> {});
+		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Text.empty(), button -> {}, DEFAULT_NARRATION_SUPPLIER);
 		bbox = rec;
 		tbox = uv;
 		resloc = rl;
@@ -43,7 +40,7 @@ public class GuiCustomButton extends ButtonWidget
 	}
 
     @Override
-    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 		boolean current = MinecraftClient.getInstance().mouse.wasLeftButtonClicked() && bbox.isVecInside(new Vector(mouseX, mouseY));
 		wasPressed = false;
 		if (toggleable && current && !mouseDown)
@@ -65,11 +62,9 @@ public class GuiCustomButton extends ButtonWidget
 			isPressed = false;
 		}
 
-		if (isPressed)
-		{
-			MinecraftClient.getInstance().getTextureManager().bindTexture(resloc);
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			drawTexturedModalRect(matrices, bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin, getZOffset());
+		if (isPressed) {
+			context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            context.drawTexture(resloc, bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin);
 		}
 	}
 }

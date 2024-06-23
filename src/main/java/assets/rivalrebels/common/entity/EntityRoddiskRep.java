@@ -12,9 +12,11 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -39,7 +41,6 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,16 +84,16 @@ public class EntityRoddiskRep extends RoddiskBase {
 
     @Override
 	public void tick() {
-		if (age > 100 && shooter == null && !world.isClient)
+		if (age > 100 && shooter == null && !getWorld().isClient)
 		{
 			//world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), new ItemStack(RivalRebels.roddisk)));
 			kill();
 			RivalRebelsSoundPlayer.playSound(this, 5, 0);
 		}
-		if (age >= 120 && !world.isClient && shooter != null)
+		if (age >= 120 && !getWorld().isClient && shooter != null)
 		{
-			ItemEntity ei = new ItemEntity(world, shooter.getX(), shooter.getY(), shooter.getZ(), new ItemStack(RRItems.roddisk));
-			world.spawnEntity(ei);
+			ItemEntity ei = new ItemEntity(getWorld(), shooter.getX(), shooter.getY(), shooter.getZ(), new ItemStack(RRItems.roddisk));
+			getWorld().spawnEntity(ei);
 			kill();
 			RivalRebelsSoundPlayer.playSound(this, 6, 1);
 		}
@@ -100,12 +101,12 @@ public class EntityRoddiskRep extends RoddiskBase {
 		{
 			RivalRebelsSoundPlayer.playSound(this, 6, 0);
 		}
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
-			double randx = world.random.nextGaussian();
-			double randy = world.random.nextGaussian();
+			double randx = getWorld().random.nextGaussian();
+			double randy = getWorld().random.nextGaussian();
 			double d = 1.0f/Math.sqrt(randx*randx+randy*randy);
-			world.spawnEntity(new EntityLaserBurst(world, getX(), getY(), getZ(), randx*d, -Math.abs(getVelocity().getY()), randy*d, shooter));
+			getWorld().spawnEntity(new EntityLaserBurst(getWorld(), getX(), getY(), getZ(), randx*d, -Math.abs(getVelocity().getY()), randy*d, shooter));
 		}
 
 		int radius = 2;
@@ -115,7 +116,7 @@ public class EntityRoddiskRep extends RoddiskBase {
 		int py = MathHelper.floor(getY() + radius + 1.0D);
 		int nz = MathHelper.floor(getZ() - radius - 1.0D);
 		int pz = MathHelper.floor(getZ() + radius + 1.0D);
-		List<Entity> par9 = world.getOtherEntities(null, new Box(nx, ny, nz, px, py, pz));
+		List<Entity> par9 = getWorld().getOtherEntities(null, new Box(nx, ny, nz, px, py, pz));
 
         for (Entity var31 : par9) {
             if (var31 instanceof ArrowEntity) {
@@ -125,7 +126,7 @@ public class EntityRoddiskRep extends RoddiskBase {
 
 		Vec3d var15 = getPos();
 		Vec3d var2 = getPos().add(getVelocity());
-		HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		HitResult var3 = this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 		var15 = getPos();
 		var2 = getPos().add(getVelocity());
 
@@ -134,18 +135,18 @@ public class EntityRoddiskRep extends RoddiskBase {
 			var2 = var3.getPos();
 		}
 
-		if (!this.world.isClient)
+		if (!this.getWorld().isClient)
 		{
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRoddiskRegular || var9 instanceof EntityRoddiskRebel || var9 instanceof EntityRoddiskLeader || var9 instanceof EntityRoddiskOfficer) {
                     var9.kill();
-                    ItemEntity ei = new ItemEntity(world, var9.getX(), var9.getY(), var9.getZ(), new ItemStack(RRItems.roddisk));
-                    world.spawnEntity(ei);
-                } else if (var9.collides() && var9 != this.shooter) {
+                    ItemEntity ei = new ItemEntity(getWorld(), var9.getX(), var9.getY(), var9.getZ(), new ItemStack(RRItems.roddisk));
+                    getWorld().spawnEntity(ei);
+                } else if (var9.isCollidable() && var9 != this.shooter) {
                     float var10 = 0.3F;
                     Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
                     Optional<Vec3d> var12 = var11.raycast(var15, var2);
@@ -169,10 +170,10 @@ public class EntityRoddiskRep extends RoddiskBase {
 
 		if (var3 != null)
 		{
-			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
-			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
-			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
-			world.addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
+			getWorld().addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
+			getWorld().addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
+			getWorld().addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
+			getWorld().addParticle(ParticleTypes.EXPLOSION, var3.getPos().x, var3.getPos().y, var3.getPos().z, getVelocity().getX() * 0.1, getVelocity().getY() * 0.1, getVelocity().getZ() * 0.1);
 
 			if (var3.getType() == HitResult.Type.ENTITY)
 			{
@@ -186,23 +187,23 @@ public class EntityRoddiskRep extends RoddiskBase {
 						if (!armorSlots.get(i).isEmpty())
 						{
 							armorSlots.get(i).damage(30, entityPlayerHit, player -> {});
-							entityPlayerHit.damage(RivalRebelsDamageSource.tron, 1);
+							entityPlayerHit.damage(RivalRebelsDamageSource.tron(getWorld()), 1);
 						}
 						else
 						{
-							entityPlayerHit.damage(RivalRebelsDamageSource.tron, 15);
+							entityPlayerHit.damage(RivalRebelsDamageSource.tron(getWorld()), 15);
 						}
 					}
 					if (entityPlayerHit.getHealth() < 3 && entityPlayerHit.isAlive())
 					{
-						entityPlayerHit.damage(RivalRebelsDamageSource.tron, 2000000);
+						entityPlayerHit.damage(RivalRebelsDamageSource.tron(getWorld()), 2000000);
 						entityPlayerHit.deathTime = 0;
-						world.spawnEntity(new EntityGore(world, hitEntity, 0, 0));
-						world.spawnEntity(new EntityGore(world, hitEntity, 1, 0));
-						world.spawnEntity(new EntityGore(world, hitEntity, 2, 0));
-						world.spawnEntity(new EntityGore(world, hitEntity, 2, 0));
-						world.spawnEntity(new EntityGore(world, hitEntity, 3, 0));
-						world.spawnEntity(new EntityGore(world, hitEntity, 3, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 0, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 1, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 2, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 2, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 3, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 3, 0));
 					}
 				}
 				else if ((hitEntity instanceof LivingEntity entity
@@ -211,14 +212,14 @@ public class EntityRoddiskRep extends RoddiskBase {
 						&& !(hitEntity instanceof VillagerEntity)
 						&& !(hitEntity instanceof SquidEntity)))
 				{
-                    entity.damage(RivalRebelsDamageSource.tron, 40);
+                    entity.damage(RivalRebelsDamageSource.tron(getWorld()), 40);
 					if (entity.getHealth() < 3)
 					{
 						int legs = -1;
 						int arms = -1;
 						int mobs = -1;
 						entity.kill();
-						RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
+                        getWorld().playSoundFromEntity(this, RRSounds.BLASTER_FIRE, getSoundCategory(), 1, 4);
 						if (entity instanceof ZombieEntity && !(entity instanceof ZombifiedPiglinEntity))
 						{
 							legs = 2;
@@ -285,12 +286,12 @@ public class EntityRoddiskRep extends RoddiskBase {
 							arms = (int) (entity.getBoundingBox().getAverageSideLength() * 2);
 							mobs = 11;
 						}
-						world.spawnEntity(new EntityGore(world, hitEntity, 0, mobs));
-						world.spawnEntity(new EntityGore(world, hitEntity, 1, mobs));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 0, mobs));
+						getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 1, mobs));
 						for (int i = 0; i < arms; i++)
-							world.spawnEntity(new EntityGore(world, hitEntity, 2, mobs));
+							getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 2, mobs));
 						for (int i = 0; i < legs; i++)
-							world.spawnEntity(new EntityGore(world, hitEntity, 3, mobs));
+							getWorld().spawnEntity(new EntityGore(getWorld(), hitEntity, 3, mobs));
 					}
 				}
 				else if((hitEntity instanceof EntityRhodesHead
@@ -304,25 +305,25 @@ public class EntityRoddiskRep extends RoddiskBase {
 				      || hitEntity instanceof EntityRhodesRightUpperLeg
 				      || hitEntity instanceof EntityRhodesTorso))
 				{
-					hitEntity.damage(RivalRebelsDamageSource.tron, 20);
+					hitEntity.damage(RivalRebelsDamageSource.tron(getWorld()), 20);
 				}
 			}
 			else {
                 BlockPos pos = ((BlockHitResult) var3).getBlockPos();
-                BlockState state = world.getBlockState(pos);
+                BlockState state = getWorld().getBlockState(pos);
                 if (state.isOf(RRBlocks.flare))
                 {
-                    state.getBlock().onBroken(world, pos, state);
+                    state.getBlock().onBroken(getWorld(), pos, state);
                 }
                 else if (state.getBlock() == RRBlocks.landmine || state.getBlock() == RRBlocks.alandmine)
                 {
-                    state.onEntityCollision(world, pos, this);
+                    state.onEntityCollision(getWorld(), pos, this);
                 }
                 else
                 {
-                    if (state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS_PANES))
+                    if (state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(ConventionalBlockTags.GLASS_PANES))
                     {
-                        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                        getWorld().setBlockState(pos, Blocks.AIR.getDefaultState());
                     }
                     RivalRebelsSoundPlayer.playSound(this, 5, 2);
 
@@ -381,7 +382,7 @@ public class EntityRoddiskRep extends RoddiskBase {
 			kill();
 			RivalRebelsSoundPlayer.playSound(this, 6, 1);
 		}
-		return ActionResult.success(world.isClient);
+		return ActionResult.success(getWorld().isClient);
 	}
 
 }

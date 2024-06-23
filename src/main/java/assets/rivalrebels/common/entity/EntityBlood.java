@@ -14,8 +14,8 @@ package assets.rivalrebels.common.entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 public class EntityBlood extends EntityInanimate
 {
@@ -72,7 +72,7 @@ public class EntityBlood extends EntityInanimate
 	}
 
 	@Override
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public boolean shouldRender(double distance)
 	{
 		return distance < 256;

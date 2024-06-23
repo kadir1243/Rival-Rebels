@@ -19,71 +19,54 @@ import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.block.machine.BlockReactor;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntityReactor>
-{
-	private final ModelReactor mr;
-	private final ModelLaptop ml;
-	private final ModelFromObj mo;
+@Environment(EnvType.CLIENT)
+public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntityReactor>, CustomRenderBoxExtension<TileEntityReactor> {
+    public static final SpriteIdentifier ELECTRODE_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etelectrode);
+    public static final SpriteIdentifier REACTOR_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etreactor);
+    public static final SpriteIdentifier LAPTOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etlaptop);
+    public static final SpriteIdentifier SCREEN_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etscreen);
+    private final ModelReactor mr = new ModelReactor();
+	private static final ModelFromObj mo = ModelFromObj.readObjFile("a.obj");
 
 	public TileEntityReactorRenderer(BlockEntityRendererFactory.Context context) {
-		mr = new ModelReactor();
-		ml = new ModelLaptop();
-        mo = ModelFromObj.readObjFile("a.obj");
-	}
+    }
 
     @Override
     public void render(TileEntityReactor entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		int var9 = entity.getCachedState().get(BlockReactor.META);
-		short var11 = 0;
-		if (var9 == 2)
-		{
-			var11 = 180;
-		}
-
-		if (var9 == 3)
-		{
-			var11 = 0;
-		}
-
-		if (var9 == 4)
-		{
-			var11 = -90;
-		}
-
-		if (var9 == 5)
-		{
-			var11 = 90;
-		}
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+		int meta = entity.getCachedState().get(BlockReactor.META);
+		short var11 = switch (meta) {
+            case 2 -> 180;
+            case 3 -> 0;
+            case 4 -> -90;
+            case 5 -> 90;
+            default -> 0;
+        };
         matrices.push();
 		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 1.1875F, (float) entity.getPos().getZ() + 0.5F);
-		matrices.multiply(new Quaternion(var11, 0.0F, 1.0F, 0.0F));
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etlaptop);
-		ml.renderModel(buffer, matrices, (float) -entity.slide);
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etscreen);
-		ml.renderScreen(buffer, matrices, (float) -entity.slide);
+		matrices.multiply(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+		ModelLaptop.renderModel(LAPTOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, overlay);
+		ModelLaptop.renderScreen(SCREEN_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, overlay);
 		matrices.pop();
 		matrices.push();
 		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
-		matrices.multiply(new Quaternion(var11, 0.0F, 1.0F, 0.0F));
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etreactor);
-		mr.renderModel(matrices, buffer);
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etelectrode);
+		matrices.multiply(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+		mr.renderModel(matrices, REACTOR_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 		matrices.translate(0, 2, -0.125f);
 		matrices.scale(0.2f, 0.2f, 0.2f);
-		mo.render(buffer);
+		mo.render(ELECTRODE_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 		matrices.pop();
 		for (int i = 0; i < entity.machines.size(); i++) {
 			TileEntityMachineBase temb = entity.machines.get(i);
@@ -97,7 +80,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
 				if (radius > 0.15) steps++;
 				if (radius > 0.25) radius = 0.25f;
 				// if (steps == 2 && temb.world.random.nextInt(5) != 0) return;
-				RenderLibrary.renderModel(matrices, buffer, (float) entity.getPos().getX() + 0.5f, (float) entity.getPos().getY() + 2.5f, (float) entity.getPos().getZ() + 0.5f, temb.getPos().getX() - entity.getPos().getX(), temb.getPos().getY() - entity.getPos().getY() - 2.5f, temb.getPos().getZ() - entity.getPos().getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
+				RenderLibrary.renderModel(matrices, vertexConsumers, (float) entity.getPos().getX() + 0.5f, (float) entity.getPos().getY() + 2.5f, (float) entity.getPos().getZ() + 0.5f, temb.getPos().getX() - entity.getPos().getX(), temb.getPos().getY() - entity.getPos().getY() - 2.5f, temb.getPos().getZ() - entity.getPos().getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
 			}
 		}
 	}
@@ -108,4 +91,8 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
         return 16384;
     }
 
+    @Override
+    public Box getRenderBoundingBox(TileEntityReactor blockEntity) {
+        return Box.from(BlockBox.create(blockEntity.getPos().add(-100, -100, -100), blockEntity.getPos().add(100, 100, 100)));
+    }
 }

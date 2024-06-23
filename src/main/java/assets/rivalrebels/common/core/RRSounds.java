@@ -11,18 +11,33 @@
  *******************************************************************************/
 package assets.rivalrebels.common.core;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.util.Identifier;
-import net.minecraftforge.event.RegistryEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class RivalRebelsSoundEventHandler {
+public class RRSounds {
     public static final Map<String, SoundEvent> SOUNDS = new HashMap<>();
+    // TODO: Is This Names correct ?
+    public static final SoundEvent ARTILLERY_EXPLODE = register("artillery_explode"); // 0.0
+    public static final SoundEvent ARTILLERY_FLY = register("artillery_fly"); // 0.1
+    public static final SoundEvent ARTILLERY_DESTROY = register("artillery_destroy"); // 0.2
+    public static final SoundEvent ARTILLERY_FIRE = register("artillery_fire"); // 0.3
+    public static final SoundEvent AUTO_BUILD = register("auto_build"); // 1.0
+    public static final SoundEvent BLASTER_WARMING_UP = register("blaster_warming_up"); // 2.0
+    public static final SoundEvent BLASTER_FIRE = register("blaster_fire_off"); // 2.1
+    public static final SoundEvent BLASTER_MESSAGE_FROM_OTHER_PLANETS /*:D i dont know what is it*/ = register("blaster_message_from_other_planets"); // 2.2
+    public static final SoundEvent BLASTER_MESSAGE_FROM_OTHER_PLANETS2 /*:D i dont know what is it 2*/ = register("blaster_message_from_other_planets2"); // 2.3
+    public static final SoundEvent CRATE = register("crate"); // 3.0
 
-	public static void onSoundLoad(RegistryEvent.Register<SoundEvent> event) {
+    public static void init() {
+    }
+
+	public static void onSoundLoad() {
 		String[] soundFiles = {
 				// artillery
 				"aa/a1.ogg",
@@ -203,10 +218,13 @@ public class RivalRebelsSoundEventHandler {
 				"ba/s.ogg",
 		};
         for (String soundFile : soundFiles) {
-            SoundEvent soundEvent = new SoundEvent(new Identifier(RivalRebels.MODID, soundFile));
-            soundEvent.setRegistryName(RivalRebels.MODID, soundFile);
-            event.getRegistry().register(soundEvent);
-            SOUNDS.put(soundFile, soundEvent);
+            SOUNDS.put(soundFile, register(soundFile));
         }
 	}
+
+    private static SoundEvent register(String sound) {
+        Identifier identifier = RRIdentifiers.create("sounds/" + sound);
+        SoundEvent soundEvent = SoundEvent.of(identifier);
+        return Registry.register(Registries.SOUND_EVENT, identifier, soundEvent);
+    }
 }

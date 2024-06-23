@@ -13,12 +13,10 @@ package assets.rivalrebels.common.block;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
-import net.minecraft.block.Material;
 import net.minecraft.item.ItemPlacementContext;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.IntProperty;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockConduit extends Block
 {
@@ -39,23 +37,23 @@ public class BlockConduit extends Block
         return super.getPlacementState(ctx).with(VARIANT, ctx.getWorld().getRandom().nextInt(9));
     }
 
-    /*@OnlyIn(Dist.CLIENT)
+    /*@Environment(EnvType.CLIENT)
 	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon6;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon7;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon8;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon9;
 
 	@Override

@@ -17,44 +17,39 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.packet.GuiSpawnPacket;
-import assets.rivalrebels.common.packet.PacketDispatcher;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
+import net.fabricmc.fabric.api.networking.v1.*;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraft.scoreboard.Scoreboard;
-import net.minecraft.scoreboard.ScoreboardCriterion;
-import net.minecraft.scoreboard.ScoreboardObjective;
-import net.minecraft.scoreboard.Team;
+import net.minecraft.scoreboard.*;
+import net.minecraft.scoreboard.number.StyledNumberFormat;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameRules;
 import net.minecraft.world.PersistentState;
 import net.minecraft.world.World;
 import net.minecraft.world.chunk.Chunk;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.TickEvent.Phase;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.event.entity.player.PlayerEvent.PlayerRespawnEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Supplier;
 
-public class RivalRebelsRound extends PersistentState {
+public class RivalRebelsRound extends PersistentState implements FabricPacket {
+    private static final PersistentState.Type<RivalRebelsRound> WORLD_DATA_TYPE = new PersistentState.Type<>(RivalRebelsRound::new, RivalRebelsRound::fromNbt, null);
+    public static final PacketType<RivalRebelsRound> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "rivalrebelsrounddata"), RivalRebelsRound::fromBytes);
     private int						cSpawnx			= -1, cSpawnz = -1;
     public BlockPos omegaObjPos = new BlockPos(-1, -1, -1);
     public BlockPos sigmaObjPos = new BlockPos(-1, -1, -1);
@@ -105,6 +100,42 @@ public class RivalRebelsRound extends PersistentState {
         return packet;
     }
 
+    public void initClient() {
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            if (roundstarted && winCountdown > 0) {
+                updateClient();
+            }
+            updateInvisible();
+        });
+    }
+
+    public void init() {
+        ServerTickEvents.END_SERVER_TICK.register(server -> {
+            if (roundstarted && winCountdown > 0) {
+                updateServer();
+            }
+        });
+        ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
+            if (!roundstarted) return;
+            newPlayer.setPos(cSpawnx, 200, cSpawnz);
+            ServerPlayNetworking.send(newPlayer, new GuiSpawnPacket());
+        });
+        ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
+            ServerPlayerEntity player = handler.getPlayer();
+            if (!roundstarted) return;
+            if (!rrplayerlist.contains(player.getGameProfile()))
+            {
+                player.getInventory().clear();
+                player.setPos(cSpawnx, 200, cSpawnz);
+                //rrplayerlist.add(new RivalRebelsPlayer(player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RivalRebels.resetMax));
+            }
+            ServerPlayNetworking.send(player, rrplayerlist);
+            if (isInSpawn(player)) ServerPlayNetworking.send(player, new GuiSpawnPacket());
+        });
+        ServerWorldEvents.LOAD.register((server, world) -> load(world));
+        ServerWorldEvents.UNLOAD.register((server, world) -> save(world));
+    }
+
     public static RivalRebelsRound fromNbt(NbtCompound nbt) {
         RivalRebelsRound packet = new RivalRebelsRound();
         packet.roundstarted = nbt.getBoolean("roundstarted");
@@ -122,7 +153,12 @@ public class RivalRebelsRound extends PersistentState {
         return packet;
     }
 
-	public static void toBytes(RivalRebelsRound packet, PacketByteBuf buf) {
+    @Override
+    public void write(PacketByteBuf buf) {
+        toBytes(this, buf);
+    }
+
+    public static void toBytes(RivalRebelsRound packet, PacketByteBuf buf) {
         buf.writeBoolean(packet.roundstarted);
 		buf.writeInt(packet.cSpawnx);
 		buf.writeInt(packet.cSpawnz);
@@ -136,6 +172,11 @@ public class RivalRebelsRound extends PersistentState {
 		buf.writeString(packet.MotD);
 		RivalRebelsPlayerList.toBytes(packet.rrplayerlist, buf);
 	}
+
+    @Override
+    public PacketType<?> getType() {
+        return PACKET_TYPE;
+    }
 
     @Override
     public NbtCompound writeNbt(NbtCompound nbt) {
@@ -156,8 +197,8 @@ public class RivalRebelsRound extends PersistentState {
         return nbt;
     }
 
-    public static void onMessage(RivalRebelsRound m, Supplier<NetworkEvent.Context> ctx) {
-        ctx.get().enqueueWork(() -> RivalRebels.round.copy(m));
+    public static void onMessage(RivalRebelsRound m, PlayerEntity player, PacketSender responseHandler) {
+        RivalRebels.round.copy(m);
     }
 
 	public void copy(RivalRebelsRound m)
@@ -185,7 +226,7 @@ public class RivalRebelsRound extends PersistentState {
 		}
 		rrplayerlist = new RivalRebelsPlayerList();
         for (PlayerEntity player : world.getPlayers()) {
-            player.damage(DamageSource.OUT_OF_WORLD, 20000);
+            player.damage(world.getDamageSources().outOfWorld(), 20000);
             player.getInventory().clear();
         }
 		cSpawnz += spawnDist;
@@ -264,17 +305,6 @@ public class RivalRebelsRound extends PersistentState {
 		}
 	}
 
-	@SubscribeEvent
-	public void updateRound(TickEvent event)
-	{
-		if (roundstarted && winCountdown > 0 && event.phase.equals(Phase.END))
-		{
-			if (event.type == TickEvent.Type.SERVER) updateServer();
-			if (event.type == TickEvent.Type.CLIENT) updateClient();
-		}
-		if (event.type == TickEvent.Type.CLIENT && event.phase.equals(Phase.END)) updateInvisible();
-	}
-
 	public void updateServer()
 	{
 		winCountdown--;
@@ -298,9 +328,8 @@ public class RivalRebelsRound extends PersistentState {
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
-	public void updateInvisible()
-	{
+	@Environment(EnvType.CLIENT)
+	public void updateInvisible() {
 		if (MinecraftClient.getInstance().world == null) return;
         for (PlayerEntity player : MinecraftClient.getInstance().world.getPlayers()) {
             if (player.getEquippedStack(EquipmentSlot.HEAD).getItem() == RRItems.camera)
@@ -322,7 +351,7 @@ public class RivalRebelsRound extends PersistentState {
 		}
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public void updateClient()
 	{
 		winCountdown--;
@@ -342,50 +371,32 @@ public class RivalRebelsRound extends PersistentState {
             Team sigma = scrb.getTeam(RivalRebelsTeam.SIGMA.toString());
             if (omega == null) omega = scrb.addTeam(RivalRebelsTeam.OMEGA.toString());
             if (sigma == null) sigma = scrb.addTeam(RivalRebelsTeam.SIGMA.toString());
-            omega.setPrefix(new LiteralText("Ω").formatted(Formatting.GREEN));
-            sigma.setPrefix(new LiteralText("Σ").formatted(Formatting.BLUE));
+            omega.setPrefix(Text.literal("Ω").formatted(Formatting.GREEN));
+            sigma.setPrefix(Text.literal("Σ").formatted(Formatting.BLUE));
             omega.setFriendlyFireAllowed(false);
             sigma.setFriendlyFireAllowed(false);
-            ScoreboardObjective kills = scrb.containsObjective("kills") ? scrb.getObjective("kills") : scrb.addObjective("kills", ScoreboardCriterion.PLAYER_KILL_COUNT, Text.of(ScoreboardCriterion.PLAYER_KILL_COUNT.getName()), ScoreboardCriterion.PLAYER_KILL_COUNT.getDefaultRenderType());
-            scrb.setObjectiveSlot(0, kills);
-            ScoreboardObjective deaths = scrb.containsObjective("deaths") ? scrb.getObjective("deaths") : scrb.addObjective("deaths", ScoreboardCriterion.DEATH_COUNT, Text.of(ScoreboardCriterion.DEATH_COUNT.getName()), ScoreboardCriterion.DEATH_COUNT.getDefaultRenderType());
-            if (RivalRebels.scoreboardenabled) {
-                scrb.setObjectiveSlot(1, deaths);
+            ScoreboardObjective killObjective = new ScoreboardObjective(scrb, "kills", ScoreboardCriterion.PLAYER_KILL_COUNT, Text.of(ScoreboardCriterion.PLAYER_KILL_COUNT.getName()), ScoreboardCriterion.PLAYER_KILL_COUNT.getDefaultRenderType(), true, StyledNumberFormat.EMPTY);
+            ScoreboardObjective deathObjective = new ScoreboardObjective(scrb, "deaths", ScoreboardCriterion.DEATH_COUNT, Text.of(ScoreboardCriterion.DEATH_COUNT.getName()), ScoreboardCriterion.DEATH_COUNT.getDefaultRenderType(), true, StyledNumberFormat.EMPTY);
+            scrb.setObjectiveSlot(ScoreboardDisplaySlot.LIST, killObjective);
+            for (PlayerEntity player : world.getPlayers()) {
+                scrb.getOrCreateScore(player, killObjective);
+                ScoreAccess deaths = scrb.getOrCreateScore(player, deathObjective);
+                deaths.setDisplayText(Text.of("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S"));
             }
-            deaths.setDisplayName(Text.of("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S"));
+            if (RivalRebels.scoreboardenabled) {
+                scrb.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, deathObjective);
+            }
         } catch(Exception ignored) {} //just in case teams already exist etc
 
         if (world.isClient()) return;
         this.world.getGameRules().get(GameRules.KEEP_INVENTORY).set(true, world.getServer());
-        ((ServerWorld) world).getPersistentStateManager().get(RivalRebelsRound::fromNbt, "rivalrebelsgamedata");
+        ((ServerWorld) world).getPersistentStateManager().get(WORLD_DATA_TYPE, "rivalrebelsgamedata");
     }
 
     public void save(World world) {
         this.world = world;
         if (world.isClient()) return;
         ((ServerWorld) world).getPersistentStateManager().set("rivalrebelsgamedata", this);
-	}
-
-    @SubscribeEvent
-	public void onPlayerLogin(PlayerLoggedInEvent event)
-	{
-		if (!roundstarted) return;
-		if (!rrplayerlist.contains(event.getPlayer().getGameProfile()))
-		{
-			event.getPlayer().getInventory().clear();
-			event.getPlayer().setPos(cSpawnx, 200, cSpawnz);
-			//rrplayerlist.add(new RivalRebelsPlayer(event.player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RivalRebels.resetMax));
-		}
-		PacketDispatcher.packetsys.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), rrplayerlist);
-		if (isInSpawn(event.getPlayer())) PacketDispatcher.packetsys.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new GuiSpawnPacket());
-	}
-
-	@SubscribeEvent
-	public void onPlayerRespawn(PlayerRespawnEvent event)
-	{
-		if (!roundstarted) return;
-		event.getPlayer().setPos(cSpawnx, 200, cSpawnz);
-		PacketDispatcher.packetsys.send(PacketDistributor.PLAYER.with(() -> (ServerPlayerEntity) event.getPlayer()), new GuiSpawnPacket());
 	}
 
 	private void buildSpawn()
@@ -411,7 +422,7 @@ public class RivalRebelsRound extends PersistentState {
         sigmaObjPos = new BlockPos(cSpawnx - objDist, sigmaObjPos.getY(), cSpawnz);
 
 		Chunk chunk = world.getChunk(omegaObjPos);
-        for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestNonEmptySectionYOffset() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > 0; omegaObjPos.down())
+        for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestNonEmptySection() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > 0; omegaObjPos.down())
         {
             if (chunk.getBlockState(omegaObjPos).getBlock() != Blocks.AIR)
             {
@@ -419,7 +430,7 @@ public class RivalRebelsRound extends PersistentState {
             }
         }
         chunk = world.getChunk(sigmaObjPos);
-        sigmaObjPos = new BlockPos(sigmaObjPos.getX(), chunk.getHighestNonEmptySectionYOffset() + 15, sigmaObjPos.getZ());
+        sigmaObjPos = new BlockPos(sigmaObjPos.getX(), chunk.getHighestNonEmptySection() + 15, sigmaObjPos.getZ());
         for (; sigmaObjPos.getY() > 0; sigmaObjPos = sigmaObjPos.down())
         {
             if (chunk.getBlockState(sigmaObjPos).getBlock() != Blocks.AIR)
@@ -604,7 +615,12 @@ public class RivalRebelsRound extends PersistentState {
     }
 
     private void sendUpdatePacket() {
-        PacketDispatcher.packetsys.send(PacketDistributor.ALL.noArg(), this);
+        if (world.isClient) {
+            return;
+        }
+        for (PlayerEntity player : world.getPlayers()) {
+            ServerPlayNetworking.send((ServerPlayerEntity) player, this);
+        }
     }
 
     public boolean isStarted()

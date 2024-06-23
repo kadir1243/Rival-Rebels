@@ -11,11 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.core;
 
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
-import net.minecraftforge.common.Tags;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -32,11 +31,9 @@ public class BlackList {
         tesla.add(Blocks.BEDROCK);
         tesla.add(Blocks.WATER);
         tesla.add(Blocks.LAVA);
-        tesla.addAll(getBlocks(Tags.Blocks.GLASS));
+        tesla.addAll(getBlocks(ConventionalBlockTags.GLASS_BLOCKS));
         tesla.add(Blocks.OBSIDIAN);
-        tesla.addAll(getBlocks(Tags.Blocks.GLASS_PANES));
-        tesla.addAll(getBlocks(Tags.Blocks.STAINED_GLASS));
-        tesla.addAll(getBlocks(Tags.Blocks.STAINED_GLASS_PANES));
+        tesla.addAll(getBlocks(ConventionalBlockTags.GLASS_PANES));
         tesla.add(RRBlocks.nuclearBomb);
         tesla.add(RRBlocks.tsarbombablock);
         tesla.add(RRBlocks.loader);

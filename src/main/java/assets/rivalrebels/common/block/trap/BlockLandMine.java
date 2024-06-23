@@ -18,6 +18,7 @@ import assets.rivalrebels.common.entity.EntityRoddiskLeader;
 import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.FallingBlockEntity;
@@ -28,25 +29,32 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
+import net.minecraft.world.WorldView;
 import net.minecraft.world.explosion.Explosion;
-
-import java.util.Random;
 
 public class BlockLandMine extends FallingBlock
 {
+    public static final MapCodec<BlockLandMine> CODEC = createCodec(BlockLandMine::new);
+
     public static final BooleanProperty META = BooleanProperty.of("meta");
 	public BlockLandMine(Settings settings)
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(META, false));
     }
+
+    @Override
+    protected MapCodec<? extends FallingBlock> getCodec() {
+        return CODEC;
+    }
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
@@ -56,7 +64,7 @@ public class BlockLandMine extends FallingBlock
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
 		if (state.get(META)) {
 			world.setBlockState(pos, Blocks.AIR.getDefaultState());
-			if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Explosion.DestructionType.DESTROY);
+			if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, World.ExplosionSourceType.BLOCK);
 		}
 	}
 
@@ -74,14 +82,14 @@ public class BlockLandMine extends FallingBlock
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
 		if (entity instanceof PlayerEntity || entity instanceof AnimalEntity || entity instanceof MobEntity || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
 			world.setBlockState(pos, state.with(META, true));
-			world.createAndScheduleBlockTick(pos, this, 5);
+			world.scheduleBlockTick(pos, this, 5);
 			RivalRebelsSoundPlayer.playSound(world, 11, 1, pos, 3, 2);
 		}
 	}
 
     @Override
     public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
-		if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Explosion.DestructionType.DESTROY);
+		if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, World.ExplosionSourceType.BLOCK);
 	}
 
 	/*@Override
@@ -156,12 +164,12 @@ public class BlockLandMine extends FallingBlock
 	}*/
 
     @Override
-    public ItemStack getPickStack(BlockView world, BlockPos pos, BlockState state) {
+    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
         return RRBlocks.alandmine.asItem().getDefaultStack();
     }
 
     @Override
     public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
-		if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Explosion.DestructionType.DESTROY);
+		if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, World.ExplosionSourceType.BLOCK);
 	}
 }

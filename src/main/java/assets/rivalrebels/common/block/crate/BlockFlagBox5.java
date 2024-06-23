@@ -18,7 +18,7 @@ import net.minecraft.block.Blocks;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -47,27 +47,27 @@ public class BlockFlagBox5 extends Block
 		}
 		if (!player.isSneaking() && !world.isClient)
 		{
-            player.sendMessage(new TranslatableText("RivalRebels.Orders").append(" ").append(new TranslatableText("RivalRebels.sneak")), false);
+            player.sendMessage(Text.translatable("RivalRebels.Orders").append(" ").append(Text.translatable("RivalRebels.sneak")), false);
 			world.setBlockState(new BlockPos(x, y, z), RRBlocks.flagbox6.getDefaultState());
 			return ActionResult.PASS;
 		}
 		return ActionResult.PASS;
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon6;
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -80,7 +80,7 @@ public class BlockFlagBox5 extends Block
 		return icon1;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

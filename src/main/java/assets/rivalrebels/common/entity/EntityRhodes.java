@@ -13,18 +13,21 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
-import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.packet.RhodesJumpPacket;
 import assets.rivalrebels.common.packet.RhodesPacket;
-import assets.rivalrebels.common.packet.TextPacket;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
@@ -45,21 +48,17 @@ import net.minecraft.entity.vehicle.BoatEntity;
 import net.minecraft.entity.vehicle.MinecartEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
+import net.minecraft.server.network.ServerPlayerEntity;
+import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.LightType;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.common.extensions.IForgeBlockEntity;
-import net.minecraftforge.network.PacketDistributor;
 
 import java.util.*;
 
@@ -186,7 +185,7 @@ public class EntityRhodes extends Entity {
 		setBoundingBox(new Box(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
 		noClip = true;
 		//pushSpeedReduction = 100;
-		stepHeight = 0;
+		setStepHeight(0);
 		actionqueue.add(new RhodesAction(0, 1));
 		RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
 		itexfolder = texfolder;
@@ -226,9 +225,9 @@ public class EntityRhodes extends Entity {
 		health = health - 5000 + (int)(5000 * Math.min(scale,4));
 		setBoundingBox(new Box(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
 		setPosition(x, y, z);
-		if (!world.isClient) {
-            for (PlayerEntity player : world.getPlayers()) {
-                player.sendMessage(new TranslatableText(RivalRebels.MODID + ".warning_tsar_is_armed", getName()), false);
+		if (!getWorld().isClient) {
+            for (PlayerEntity player : getWorld().getPlayers()) {
+                player.sendMessage(Text.translatable(RivalRebels.MODID + ".warning_tsar_is_armed", getName()), false);
             }
         }
 	}
@@ -259,11 +258,15 @@ public class EntityRhodes extends Entity {
 			leftlegheight *= scale;
 			rightlegheight *= scale;
 			float bodyY = Math.max(leftlegheight, rightlegheight);
-			if (!world.isClient)
+			if (!getWorld().isClient)
 			{
 				doAITick(syaw, cyaw);
 				breakBlocks(syaw, cyaw, leftlegheight, rightlegheight, bodyY);
-				if (age % 5 == 0) PacketDispatcher.packetsys.send(PacketDistributor.ALL.noArg(), new RhodesPacket(this));
+				if (age % 5 == 0) {
+                    for (PlayerEntity player : getWorld().getPlayers()) {
+                        ServerPlayNetworking.send((ServerPlayerEntity) player, new RhodesPacket(this));
+                    }
+                }
 			}
             Vec3d add = getVelocity().add(getPos());
             setPos(add.getX(), add.getY(), add.getZ());
@@ -275,17 +278,17 @@ public class EntityRhodes extends Entity {
 
 			if (rider!=null)
 			{
-				rider.setPosition(((getX()+syaw*5.5*scale) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*scale - (world.isClient?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*scale) - rider.getZ()) * 0.33f + rider.getZ());
+				rider.setPosition(((getX()+syaw*5.5*scale) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*scale - (getWorld().isClient?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*scale) - rider.getZ()) * 0.33f + rider.getZ());
 				rider.setOnGround(true);
-				if (world.isClient) RivalRebels.round.setInvisible(rider);
+				if (getWorld().isClient) RivalRebels.round.setInvisible(rider);
 				rider.slowMovement(Blocks.COBWEB.getDefaultState(), new Vec3d(0.25, 0.05F, 0.25));
 				rider.getAbilities().invulnerable = true;
-				if (world.isClient && rider == MinecraftClient.getInstance().player) PacketDispatcher.packetsys.sendToServer(new RhodesJumpPacket(this.getId(), RivalRebels.proxy.spacebar(), RivalRebels.proxy.a(), RivalRebels.proxy.w(), RivalRebels.proxy.d(), RivalRebels.proxy.c(), RivalRebels.proxy.f(), RivalRebels.proxy.s(), RivalRebels.proxy.x(), RivalRebels.proxy.z(), RivalRebels.proxy.g()));
+				if (getWorld().isClient && rider == MinecraftClient.getInstance().player) ClientPlayNetworking.send(new RhodesJumpPacket(this.getId(), RivalRebels.proxy.spacebar(), RivalRebels.proxy.a(), RivalRebels.proxy.w(), RivalRebels.proxy.d(), RivalRebels.proxy.c(), RivalRebels.proxy.f(), RivalRebels.proxy.s(), RivalRebels.proxy.x(), RivalRebels.proxy.z(), RivalRebels.proxy.g()));
 			}
 			if (passenger1 != null)
 			{
 				float offset = 1.62f;
-				if (world.isClient)
+				if (getWorld().isClient)
 				{
 					if (MinecraftClient.getInstance().player == passenger1)
 					{
@@ -301,7 +304,7 @@ public class EntityRhodes extends Entity {
 			if (passenger2 != null)
 			{
 				float offset = 1.62f;
-				if (world.isClient)
+				if (getWorld().isClient)
 				{
 					if (MinecraftClient.getInstance().player == passenger2)
 					{
@@ -317,13 +320,18 @@ public class EntityRhodes extends Entity {
 		}
 		else
 		{
-			if (!world.isClient)
+			if (!getWorld().isClient)
 			{
 				if (health == 0) {
-                    PacketDispatcher.packetsys.send(PacketDistributor.ALL.noArg(), new TextPacket("RivalRebels.Status " + getName() + " RivalRebels.meltdown" + (rider == null ? "" : " " + rider.getName())));
+                    MutableText text = Text.empty().append(Text.translatable("RivalRebels.Status")).append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Text.literal("") : Text.empty().append(" ").append(rider.getName())));
+                    for (PlayerEntity player : getWorld().getPlayers()) {
+                        player.sendMessage(text);
+                    }
                 }
 				if (age % 5 == 0) {
-                    PacketDispatcher.packetsys.send(PacketDistributor.ALL.noArg(), new RhodesPacket(this));
+                    for (PlayerEntity player : getWorld().getPlayers()) {
+                        ServerPlayNetworking.send((ServerPlayerEntity) player, new RhodesPacket(this));
+                    }
                 }
 				if (health < -100)
 				{
@@ -333,16 +341,16 @@ public class EntityRhodes extends Entity {
 				{
 					float syaw = MathHelper.sin(bodyyaw * 0.01745329252f);
 					float cyaw = MathHelper.cos(bodyyaw * 0.01745329252f);
-					world.spawnEntity(new EntityRhodesHead(world, getX(), getY()+13*scale, getZ(), scale, colorType));
-					world.spawnEntity(new EntityRhodesTorso(world, getX(), getY()+7*scale, getZ(), scale, colorType));
-					world.spawnEntity(new EntityRhodesLeftUpperArm(world, getX()+cyaw*6.4*scale, getY()+7*scale, getZ()+syaw*6.4*scale,scale, colorType));
-					world.spawnEntity(new EntityRhodesRightUpperArm(world, getX()-cyaw*6.4*scale, getY()+7*scale, getZ()-syaw*6.4*scale,scale, colorType));
-					world.spawnEntity(new EntityRhodesLeftLowerArm(world, getX()+cyaw*6.4*scale, getY()+3*scale, getZ()+syaw*6.4*scale,scale, colorType));
-					world.spawnEntity(new EntityRhodesRightLowerArm(world, getX()-cyaw*6.4*scale, getY()+3*scale, getZ()-syaw*6.4*scale,scale, colorType));
-					world.spawnEntity(new EntityRhodesLeftUpperLeg(world, getX()+cyaw*3*scale, getY()-3*scale, getZ()+syaw*3*scale,scale, colorType));
-					world.spawnEntity(new EntityRhodesRightUpperLeg(world, getX()-cyaw*3*scale, getY()-3*scale, getZ()-syaw*3*scale,scale, colorType));
-					world.spawnEntity(new EntityRhodesLeftLowerLeg(world, getX()+cyaw*3*scale, getY()-10*scale, getZ()+syaw*3*scale,scale, colorType));
-					world.spawnEntity(new EntityRhodesRightLowerLeg(world, getX()-cyaw*3*scale, getY()-10*scale, getZ()-syaw*3*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesHead(getWorld(), getX(), getY()+13*scale, getZ(), scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesTorso(getWorld(), getX(), getY()+7*scale, getZ(), scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesLeftUpperArm(getWorld(), getX()+cyaw*6.4*scale, getY()+7*scale, getZ()+syaw*6.4*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesRightUpperArm(getWorld(), getX()-cyaw*6.4*scale, getY()+7*scale, getZ()-syaw*6.4*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesLeftLowerArm(getWorld(), getX()+cyaw*6.4*scale, getY()+3*scale, getZ()+syaw*6.4*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesRightLowerArm(getWorld(), getX()-cyaw*6.4*scale, getY()+3*scale, getZ()-syaw*6.4*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesLeftUpperLeg(getWorld(), getX()+cyaw*3*scale, getY()-3*scale, getZ()+syaw*3*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesRightUpperLeg(getWorld(), getX()-cyaw*3*scale, getY()-3*scale, getZ()-syaw*3*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesLeftLowerLeg(getWorld(), getX()+cyaw*3*scale, getY()-10*scale, getZ()+syaw*3*scale,scale, colorType));
+					getWorld().spawnEntity(new EntityRhodesRightLowerLeg(getWorld(), getX()-cyaw*3*scale, getY()-10*scale, getZ()-syaw*3*scale,scale, colorType));
 				}
 			}
 			health--;
@@ -362,7 +370,7 @@ public class EntityRhodes extends Entity {
 				if (!rider.getAbilities().creativeMode)
 				{
 					rider.getAbilities().invulnerable = false;
-					rider.damage(DamageSource.OUT_OF_WORLD, 2000000);
+					rider.damage(getWorld().getDamageSources().outOfWorld(), 2000000);
 				}
 				rider = null;
 			}
@@ -380,7 +388,7 @@ public class EntityRhodes extends Entity {
 				if (!passenger1.getAbilities().creativeMode)
 				{
 					passenger1.getAbilities().invulnerable = false;
-					passenger1.damage(DamageSource.OUT_OF_WORLD, 2000000);
+					passenger1.damage(getWorld().getDamageSources().outOfWorld(), 2000000);
 				}
 				passenger1 = null;
 			}
@@ -398,7 +406,7 @@ public class EntityRhodes extends Entity {
 				if (!passenger2.getAbilities().creativeMode)
 				{
 					passenger2.getAbilities().invulnerable = false;
-					passenger2.damage(DamageSource.OUT_OF_WORLD, 2000000);
+					passenger2.damage(getWorld().getDamageSources().outOfWorld(), 2000000);
 				}
 				passenger2 = null;
 			}
@@ -528,7 +536,7 @@ public class EntityRhodes extends Entity {
 							setBlock(px+x, py, pz+z, Blocks.AIR);
 							if (random.nextInt(333)==0)
 							{
-								new Explosion(world, px, py, pz, 3, false, true, RivalRebelsDamageSource.rocket);
+								new Explosion(getWorld(), px, py, pz, 3, false, true, RivalRebelsDamageSource.rocket(getWorld()));
 								RivalRebelsSoundPlayer.playSound(this, 23, 3, 4.5f, (float) (0.8f + random.nextDouble()*0.3f));
 							}
 						}
@@ -589,7 +597,7 @@ public class EntityRhodes extends Entity {
 	}
 
 	private void doCollisions() {
-        for (Entity e : world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB)) {
+        for (Entity e : getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox())) {
             if (e == rider || e == passenger1 || e == passenger2) continue;
             double bbd = (e.getWidth() + 10 * scale) * 0.5;
             double bbh = (e.getHeight() + 30 * scale) * 0.5;
@@ -629,56 +637,56 @@ public class EntityRhodes extends Entity {
 
                 if (e instanceof EntityRocket) {
                     e.age = RivalRebels.rpgDecay;
-                    this.damage(DamageSource.GENERIC, 20);
+                    this.damage(getWorld().getDamageSources().generic(), 20);
                 } else if (e instanceof EntitySeekB83) {
                     e.age = 800;
-                    this.damage(DamageSource.GENERIC, 24);
+                    this.damage(getWorld().getDamageSources().generic(), 24);
                 } else if (e instanceof EntityHackB83) {
                     ((EntityHackB83) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 40);
+                    this.damage(getWorld().getDamageSources().generic(), 40);
                 } else if (e instanceof EntityB83) {
                     ((EntityB83) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 40);
+                    this.damage(getWorld().getDamageSources().generic(), 40);
                 } else if (e instanceof EntityBomb) {
                     ((EntityBomb) e).explode(true);
                     for (int i = 0; i < RivalRebels.bombDamageToRhodes; i++)
-                        this.damage(DamageSource.GENERIC, 50);
+                        this.damage(getWorld().getDamageSources().generic(), 50);
                 } else if (e instanceof EntityNuke) {
                     ((EntityNuke) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 80);
+                    this.damage(getWorld().getDamageSources().generic(), 80);
                 } else if (e instanceof EntityTsar) {
                     ((EntityTsar) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 100);
+                    this.damage(getWorld().getDamageSources().generic(), 100);
                 } else if (e instanceof EntityTheoreticalTsar) {
                     ((EntityTheoreticalTsar) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 100);
+                    this.damage(getWorld().getDamageSources().generic(), 100);
                 } else if (e instanceof EntityAntimatterBomb) {
                     ((EntityAntimatterBomb) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 100);
+                    this.damage(getWorld().getDamageSources().generic(), 100);
                 } else if (e instanceof EntityTachyonBomb) {
                     ((EntityTachyonBomb) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 100);
+                    this.damage(getWorld().getDamageSources().generic(), 100);
                 } else if (e instanceof EntityHotPotato) {
                     ((EntityHotPotato) e).age = -100;
-                    this.damage(DamageSource.GENERIC, 100);
+                    this.damage(getWorld().getDamageSources().generic(), 100);
                 } else if (e instanceof EntityB83NoShroom) {
                     ((EntityB83NoShroom) e).ticksInAir = -100;
-                    this.damage(DamageSource.GENERIC, 40);
+                    this.damage(getWorld().getDamageSources().generic(), 40);
                 } else if (e instanceof EntityPlasmoid) {
                     ((EntityPlasmoid) e).explode();
-                    this.damage(DamageSource.GENERIC, 8);
+                    this.damage(getWorld().getDamageSources().generic(), 8);
                 } else if (e instanceof EntityFlameBall) {
                     e.kill();
-                    this.damage(DamageSource.GENERIC, 3);
+                    this.damage(getWorld().getDamageSources().generic(), 3);
                 } else if (e instanceof EntityFlameBall1) {
                     e.kill();
-                    this.damage(DamageSource.GENERIC, 4);
+                    this.damage(getWorld().getDamageSources().generic(), 4);
                 } else if (e instanceof EntityFlameBall2) {
                     e.kill();
-                    this.damage(DamageSource.GENERIC, 2);
+                    this.damage(getWorld().getDamageSources().generic(), 2);
                 } else if (e instanceof EntityLaserBurst) {
                     e.kill();
-                    this.damage(DamageSource.GENERIC, 4);
+                    this.damage(getWorld().getDamageSources().generic(), 4);
                 }
             }
         }
@@ -714,7 +722,7 @@ public class EntityRhodes extends Entity {
 				freeze = true;
 				nukecount--;
 				health -= 1000;
-				world.spawnEntity(new EntityB2Spirit(this));
+				getWorld().spawnEntity(new EntityB2Spirit(this));
 			}
 			if (RivalRebels.rhodesHold) return;
 			if (energy < maxenergy) energy += recharge;
@@ -746,9 +754,9 @@ public class EntityRhodes extends Entity {
 					if (b2energy <= 0)
 					{
 						b2energy = 0;
-						world.createExplosion(null, this.getX(), this.getY(), this.getZ(), 6.0F, net.minecraft.world.explosion.Explosion.DestructionType.DESTROY);
-						world.spawnEntity(new EntityB2Frag(world, this, 0));
-						world.spawnEntity(new EntityB2Frag(world, this, 1));
+						getWorld().createExplosion(null, this.getX(), this.getY(), this.getZ(), 6.0F, World.ExplosionSourceType.MOB);
+						getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 0));
+						getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 1));
 					}
 				}
 				else
@@ -825,7 +833,7 @@ public class EntityRhodes extends Entity {
 
 			if (laser)
 			{
-				laserOn = (byte)(world.random.nextInt(2)+1);
+				laserOn = (byte)(getWorld().random.nextInt(2)+1);
 				RivalRebelsSoundPlayer.playSound(this, 22, 1, 30f, 0f);
 				float x = (float) (getX() - endx);
 				float y = (float) (getY() + 13*scale - endy);
@@ -842,7 +850,7 @@ public class EntityRhodes extends Entity {
 					end = end.rotateX(-headpitch / 180.0F * (float) Math.PI);
 					end = end.rotateY(bodyyaw / 180.0F * (float) Math.PI);
 					end = end.add(getX(), getY()+13*scale, getZ());
-                    for (Entity e : world.getOtherEntities(this, new Box(
+                    for (Entity e : getWorld().getOtherEntities(this, new Box(
                         Math.min(start.x, end.x) - 5,
                             Math.min(start.y, end.y) - 5,
                             Math.min(start.z, end.z) - 5,
@@ -860,29 +868,29 @@ public class EntityRhodes extends Entity {
                             double bbx = 1;
                             if (e instanceof EntityRhodes) bbx = 20 * ((EntityRhodes) e).scale;
                             if (entity.subtract(start).crossProduct(entity.subtract(end)).squaredDistanceTo(0, 0, 0) < 10000 * bbx) {
-                                e.damage(RivalRebelsDamageSource.laserburst, 24);
+                                e.damage(RivalRebelsDamageSource.laserBurst(getWorld()), 24);
                                 if (e instanceof PlayerEntity player) {
                                     DefaultedList<ItemStack> armorSlots = player.getInventory().armor;
-                                    int i = world.random.nextInt(4);
+                                    int i = getWorld().random.nextInt(4);
                                     if (!armorSlots.get(i).isEmpty()) {
                                         armorSlots.get(i).damage(24, player, player1 -> {});
                                     }
                                     if (player.getHealth() < 3 && player.isAlive()) {
-                                        player.damage(RivalRebelsDamageSource.laserburst, 2000000);
+                                        player.damage(RivalRebelsDamageSource.laserBurst(getWorld()), 2000000);
                                         player.deathTime = 0;
-                                        world.spawnEntity(new EntityGore(world, e, 0, 0));
-                                        world.spawnEntity(new EntityGore(world, e, 1, 0));
-                                        world.spawnEntity(new EntityGore(world, e, 2, 0));
-                                        world.spawnEntity(new EntityGore(world, e, 2, 0));
-                                        world.spawnEntity(new EntityGore(world, e, 3, 0));
-                                        world.spawnEntity(new EntityGore(world, e, 3, 0));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 0, 0));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 1, 0));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 2, 0));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 2, 0));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 3, 0));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 3, 0));
                                     }
                                 } else {
                                     if (!e.isAlive() || (e instanceof LivingEntity && ((LivingEntity) e).getHealth() < 3)) {
                                         int legs = -1;
                                         int arms = -1;
                                         int mobs = -1;
-                                        RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
+                                        getWorld().playSoundFromEntity(this, RRSounds.BLASTER_FIRE, getSoundCategory(), 1, 4);
                                         if (e instanceof ZombifiedPiglinEntity) {
                                             legs = 2;
                                             arms = 2;
@@ -932,12 +940,12 @@ public class EntityRhodes extends Entity {
                                             arms = (int) (e.getBoundingBox().getAverageSideLength() * 2);
                                             mobs = 11;
                                         }
-                                        world.spawnEntity(new EntityGore(world, e, 0, mobs));
-                                        world.spawnEntity(new EntityGore(world, e, 1, mobs));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 0, mobs));
+                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 1, mobs));
                                         for (int i = 0; i < arms; i++)
-                                            world.spawnEntity(new EntityGore(world, e, 2, mobs));
+                                            getWorld().spawnEntity(new EntityGore(getWorld(), e, 2, mobs));
                                         for (int i = 0; i < legs; i++)
-                                            world.spawnEntity(new EntityGore(world, e, 3, mobs));
+                                            getWorld().spawnEntity(new EntityGore(getWorld(), e, 3, mobs));
                                         e.kill();
                                     }
                                 }
@@ -980,7 +988,7 @@ public class EntityRhodes extends Entity {
 							x*=cp;
 							y*=cp;
 							z*=cp;
-							world.spawnEntity(new EntityPlasmoid(world, px, py, pz,
+							getWorld().spawnEntity(new EntityPlasmoid(getWorld(), px, py, pz,
 									x, y, z, 8));
 							flamecount -= plasmacharge;
 							plasmacharge = 0;
@@ -1001,9 +1009,9 @@ public class EntityRhodes extends Entity {
 						x*=cp;
 						y*=cp;
 						z*=cp;
-						world.spawnEntity(new EntityFlameBall(world, px, py, pz,
+						getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
 								x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
-						world.spawnEntity(new EntityFlameBall(world, px, py, pz,
+						getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
 								x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
 					}
 				}
@@ -1033,13 +1041,13 @@ public class EntityRhodes extends Entity {
 							RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 							float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 							if (scale >= 3.0)
-								world.spawnEntity(new EntityHotPotato(world, px, py, pz,
+								getWorld().spawnEntity(new EntityHotPotato(getWorld(), px, py, pz,
 										x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
 							else if (scale >= 2.0)
-								world.spawnEntity(new EntityTsar(world, px, py, pz,
+								getWorld().spawnEntity(new EntityTsar(getWorld(), px, py, pz,
 										x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
 							else
-								world.spawnEntity(new EntityB83NoShroom(world, px, py, pz,
+								getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
 										x*cp, y*cp, z*cp));
 						}
 					}
@@ -1054,10 +1062,10 @@ public class EntityRhodes extends Entity {
 						float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 
 						if (scale >= 2.0)
-							world.spawnEntity(new EntityB83NoShroom(world, px, py, pz,
+							getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
 									x*cp, y*cp, z*cp));
 						else
-							world.spawnEntity(new EntitySeekB83(world, px, py, pz,
+							getWorld().spawnEntity(new EntitySeekB83(getWorld(), px, py, pz,
 									x*cp, y*cp, z*cp));
 					}
 				}
@@ -1285,7 +1293,7 @@ public class EntityRhodes extends Entity {
 			leftshinpitch   = approach(leftshinpitch,  60);
 			break;
 		case 10:
-			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && world.getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && world.getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RRBlocks.sigmaobj))
+			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && getWorld().getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && getWorld().getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RRBlocks.sigmaobj))
 			{
 				rightthighpitch = approach(rightthighpitch,0);
 				leftthighpitch  = approach(leftthighpitch, 0);
@@ -1316,7 +1324,7 @@ public class EntityRhodes extends Entity {
 			else
 			{
 				health = 0;
-				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
+                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
 			}
 			break;
 		case 11:
@@ -1351,7 +1359,7 @@ public class EntityRhodes extends Entity {
 	{
 		Entity target = null;
 		double priority = 0;
-        List<Entity> otherEntities = world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB);
+        List<Entity> otherEntities = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox());
         for (Entity e : otherEntities) {
             if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) && (!(e instanceof EntityRhodes) || (RivalRebels.rhodesFF && (RivalRebels.rhodesCC || ((EntityRhodes) e).colorType != colorType))) &&
                     !(e instanceof ThrownEntity
@@ -1411,7 +1419,7 @@ public class EntityRhodes extends Entity {
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) {
                     walkstate++;
-                    RivalRebelsSoundPlayer.playSound(this, 0, 2, 4.5f, 0.8f);
+                    getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_DESTROY, getSoundCategory(), 4.5f, 0.8f);
                 }
             }
             case 2 -> {
@@ -1470,7 +1478,7 @@ public class EntityRhodes extends Entity {
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) {
                     walkstate++;
-                    RivalRebelsSoundPlayer.playSound(this, 0, 2, 4.5f, 0.8f);
+                    getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_DESTROY, getSoundCategory(), 4.5f, 0.8f);
                 }
             }
             case 6 -> {
@@ -1559,7 +1567,7 @@ public class EntityRhodes extends Entity {
 				}
 			}
 			if (priority <= 0) lastRocketTarget = null;
-            for (Entity e : world.getOtherEntities(this, new Box(px - 100 * scale, py - 100 * scale, pz - 100 * scale, px + 100 * scale, py + 100 * scale, pz + 100 * scale))) {
+            for (Entity e : getWorld().getOtherEntities(this, new Box(px - 100 * scale, py - 100 * scale, pz - 100 * scale, px + 100 * scale, py + 100 * scale, pz + 100 * scale))) {
                 if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) &&
                     !(e instanceof ThrownEntity
                         || e instanceof EntityInanimate
@@ -1637,10 +1645,10 @@ public class EntityRhodes extends Entity {
 				RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 				float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 				if (scale >= 2.0)
-					world.spawnEntity(new EntityB83NoShroom(world, px, py, pz,
+					getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
 							x*cp, y*cp, z*cp));
 				else
-					world.spawnEntity(new EntitySeekB83(world, px, py, pz,
+					getWorld().spawnEntity(new EntitySeekB83(getWorld(), px, py, pz,
 							x*cp, y*cp, z*cp));
 			}
 		}
@@ -1672,10 +1680,10 @@ public class EntityRhodes extends Entity {
 					RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 					float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 					if (scale >= 2.0)
-						world.spawnEntity(new EntityTsar(world, px, py, pz,
+						getWorld().spawnEntity(new EntityTsar(getWorld(), px, py, pz,
 								x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
 					else
-						world.spawnEntity(new EntityB83NoShroom(world, px, py, pz,
+						getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
 								x*cp, y*cp, z*cp));
 				}
 			}
@@ -1690,10 +1698,10 @@ public class EntityRhodes extends Entity {
 					RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 					float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 					if (scale >= 2.0)
-						world.spawnEntity(new EntityB83NoShroom(world, px, py, pz,
+						getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
 								x*cp, y*cp, z*cp));
 					else
-						world.spawnEntity(new EntitySeekB83(world, px, py, pz,
+						getWorld().spawnEntity(new EntitySeekB83(getWorld(), px, py, pz,
 								x*cp, y*cp, z*cp));
 				}
 			}
@@ -1729,7 +1737,7 @@ public class EntityRhodes extends Entity {
 				}
 			}
 			if (priority <= 0) lastFlameTarget = null;
-            for (Entity e : world.getOtherEntities(this, new Box(px - 40 * scale, py - 40 * scale, pz - 40 * scale, px + 40 * scale, py + 40 * scale, pz + 40 * scale))) {
+            for (Entity e : getWorld().getOtherEntities(this, new Box(px - 40 * scale, py - 40 * scale, pz - 40 * scale, px + 40 * scale, py + 40 * scale, pz + 40 * scale))) {
                 if (e.isAlive() &&
                     !(e instanceof ThrownEntity
                         || e instanceof EntityInanimate
@@ -1786,9 +1794,9 @@ public class EntityRhodes extends Entity {
 				x*=cp;
 				y*=cp;
 				z*=cp;
-				world.spawnEntity(new EntityFlameBall(world, px, py, pz,
+				getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
 						x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
-				world.spawnEntity(new EntityFlameBall(world, px, py, pz,
+				getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
 						x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
 			}
 		}
@@ -1817,7 +1825,7 @@ public class EntityRhodes extends Entity {
 			}
 			if (priority <= 0) lastLaserTarget = null;
 
-            for (Entity e : world.getOtherEntities(this, new Box(getX() - 70 * scale, getY() + 13 * scale - 70 * scale, getZ() - 70 * scale, getX() + 70 * scale, getY() + 13 * scale + 70 * scale, getZ() + 70 * scale))) {
+            for (Entity e : getWorld().getOtherEntities(this, new Box(getX() - 70 * scale, getY() + 13 * scale - 70 * scale, getZ() - 70 * scale, getX() + 70 * scale, getY() + 13 * scale + 70 * scale, getZ() + 70 * scale))) {
                 if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) &&
                         !(e instanceof ThrownEntity
                                 || e instanceof EntityInanimate
@@ -1870,33 +1878,33 @@ public class EntityRhodes extends Entity {
 				if (lastLaserTarget instanceof PlayerEntity player)
 				{
                     DefaultedList<ItemStack> armorSlots = player.getInventory().armor;
-					int i = world.random.nextInt(4);
+					int i = getWorld().random.nextInt(4);
 					if (!armorSlots.get(i).isEmpty())
 					{
 						armorSlots.get(i).damage(24, player, player1 -> {});
 					}
-					lastLaserTarget.damage(RivalRebelsDamageSource.laserburst, laserOn==3?16:8);
+					lastLaserTarget.damage(RivalRebelsDamageSource.laserBurst(getWorld()), laserOn==3?16:8);
 					if (player.getHealth() < 3 && player.isAlive())
 					{
-						player.damage(RivalRebelsDamageSource.laserburst, 2000000);
+						player.damage(RivalRebelsDamageSource.laserBurst(getWorld()), 2000000);
 						player.deathTime = 0;
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 0, 0));
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 1, 0));
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 2, 0));
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 2, 0));
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 3, 0));
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 3, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 0, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 1, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 2, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 2, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 3, 0));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 3, 0));
 					}
 				}
 				else
 				{
-					lastLaserTarget.damage(RivalRebelsDamageSource.laserburst, laserOn==3?16:8);
+					lastLaserTarget.damage(RivalRebelsDamageSource.laserBurst(getWorld()), laserOn==3?16:8);
 					if (!lastLaserTarget.isAlive() || (lastLaserTarget instanceof LivingEntity && ((LivingEntity)lastLaserTarget).getHealth() < 3))
 					{
 						int legs;
 						int arms;
 						int mobs;
-						RivalRebelsSoundPlayer.playSound(this, 2, 1, 4);
+                        getWorld().playSoundFromEntity(this, RRSounds.BLASTER_FIRE, getSoundCategory(), 1, 4);
 						if (lastLaserTarget instanceof ZombifiedPiglinEntity)
 						{
 							legs = 2;
@@ -1969,12 +1977,12 @@ public class EntityRhodes extends Entity {
 							arms = (int) (lastLaserTarget.getBoundingBox().getAverageSideLength() * 2);
 							mobs = 11;
 						}
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 0, mobs));
-						world.spawnEntity(new EntityGore(world, lastLaserTarget, 1, mobs));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 0, mobs));
+						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 1, mobs));
 						for (int i = 0; i < arms; i++)
-							world.spawnEntity(new EntityGore(world, lastLaserTarget, 2, mobs));
+							getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 2, mobs));
 						for (int i = 0; i < legs; i++)
-							world.spawnEntity(new EntityGore(world, lastLaserTarget, 3, mobs));
+							getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 3, mobs));
 						lastLaserTarget.kill();
 					}
 				}
@@ -2015,7 +2023,7 @@ public class EntityRhodes extends Entity {
 		float tMaxZ = ((1+Z)-sz)*tDeltaZ;
 		while((X-x)*(X-x)+(Y-y)*(Y-y)+(Z-z)*(Z-z) < distsq)
 		{
-			if (world.getBlockState(new BlockPos(X, Y, Z)).isOpaque())
+			if (getWorld().getBlockState(new BlockPos(X, Y, Z)).isOpaque())
 			{
 				return new Vec3d(X, Y, Z);
 			}
@@ -2175,7 +2183,7 @@ public class EntityRhodes extends Entity {
 	public boolean damage(DamageSource par1DamageSource, float par2)
 	{
 		super.damage(par1DamageSource, par2);
-		if (isAlive() && !world.isClient && health > 0 && !forcefield)
+		if (isAlive() && !getWorld().isClient && health > 0 && !forcefield)
 		{
 			if (par2 > 50)
 			{
@@ -2192,7 +2200,7 @@ public class EntityRhodes extends Entity {
 			if (health <= 0)
 			{
 				health = 0;
-				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
+                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
 			}
 		}
 
@@ -2221,15 +2229,15 @@ public class EntityRhodes extends Entity {
         dataTracker.set(PLASMA, plasma);
     }
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public int getBrightnessForRender()
     {
         int i = MathHelper.floor(this.getX());
         int j = MathHelper.floor(this.getZ());
 
-        if (this.world.isChunkLoaded(this.getBlockPos()))
+        if (this.getWorld().isChunkLoaded(this.getBlockPos()))
         {
-            return this.world.getLightLevel(LightType.BLOCK, new BlockPos(i, 255, j));
+            return this.getWorld().getLightLevel(LightType.BLOCK, new BlockPos(i, 255, j));
         }
         else
         {
@@ -2241,9 +2249,9 @@ public class EntityRhodes extends Entity {
         int i = MathHelper.floor(this.getX());
         int j = MathHelper.floor(this.getZ());
 
-        if (this.world.isChunkLoaded(getBlockPos()))
+        if (this.getWorld().isChunkLoaded(getBlockPos()))
         {
-            return this.world.getBrightness(new BlockPos(i, 255, j));
+            return this.getWorld().getBrightness(new BlockPos(i, 255, j));
         } else {
             return 0.0F;
         }
@@ -2256,15 +2264,10 @@ public class EntityRhodes extends Entity {
 	}
 
     private void setBlock(int x, int y, int z, Block block) {
-        world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
+        getWorld().setBlockState(new BlockPos(x, y, z), block.getDefaultState());
     }
 
     private Block getBlock(int x, int y, int z) {
-        return world.getBlockState(new BlockPos(x, y, z)).getBlock();
-    }
-
-    @Override
-    public Packet<?> createSpawnPacket() {
-        return new EntitySpawnS2CPacket(this);
+        return getWorld().getBlockState(new BlockPos(x, y, z)).getBlock();
     }
 }

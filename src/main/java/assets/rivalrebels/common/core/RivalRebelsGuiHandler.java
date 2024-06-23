@@ -14,28 +14,28 @@ package assets.rivalrebels.common.core;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.gui.*;
 import assets.rivalrebels.common.container.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.screen.ingame.HandledScreens;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.resource.featuretoggle.FeatureFlags;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.screen.ScreenHandlerType;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-
-import java.util.HashSet;
-import java.util.Set;
+import net.minecraft.util.Identifier;
 
 public class RivalRebelsGuiHandler {
-    public static final Set<ScreenHandlerType<?>> SCREEN_HANDLER_TYPES = new HashSet<>();
-    public static final ScreenHandlerType<ContainerTsar> TSAR_SCREEN_HANDLER_TYPE = register("tsar", new ScreenHandlerType<>(ContainerTsar::new));
-    public static final ScreenHandlerType<ContainerAntimatterBomb> ANTIMATTER_SCREEN_HANDLER_TYPE = register("antimatter", new ScreenHandlerType<>(ContainerAntimatterBomb::new));
-    public static final ScreenHandlerType<ContainerReactor> REACTOR_SCREEN_HANDLER_TYPE = register("reactor", new ScreenHandlerType<>(ContainerReactor::new));
-    public static final ScreenHandlerType<ContainerLaptop> LAPTOP_SCREEN_HANDLER_TYPE = register("laptop", new ScreenHandlerType<>(ContainerLaptop::new));
-    public static final ScreenHandlerType<ContainerLoader> LOADER_SCREEN_HANDLER_TYPE = register("loader", new ScreenHandlerType<>(ContainerLoader::new));
-    public static final ScreenHandlerType<ContainerReciever> RECIEVER_SCREEN_HANDLER_TYPE = register("reciever", new ScreenHandlerType<>(ContainerReciever::new));
-    public static final ScreenHandlerType<ContainerNuclearBomb> NUCLEAR_BOMB_SCREEN_HANDLER_TYPE = register("nuclear_bomb", new ScreenHandlerType<>(ContainerNuclearBomb::new));
-    public static final ScreenHandlerType<ContainerTachyonBomb> TACHYON_SCREEN_HANDLER_TYPE = register("tachyon", new ScreenHandlerType<>(ContainerTachyonBomb::new));
-    public static final ScreenHandlerType<ContainerTheoreticalTsar> THEORETICAL_TSAR_SCREEN_HANDLER_TYPE = register("theoretical_tsar", new ScreenHandlerType<>(ContainerTheoreticalTsar::new));
+    public static final ScreenHandlerType<ContainerTsar> TSAR_SCREEN_HANDLER_TYPE = register("tsar", new ScreenHandlerType<>(ContainerTsar::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerAntimatterBomb> ANTIMATTER_SCREEN_HANDLER_TYPE = register("antimatter", new ScreenHandlerType<>(ContainerAntimatterBomb::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerReactor> REACTOR_SCREEN_HANDLER_TYPE = register("reactor", new ScreenHandlerType<>(ContainerReactor::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerLaptop> LAPTOP_SCREEN_HANDLER_TYPE = register("laptop", new ScreenHandlerType<>(ContainerLaptop::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerLoader> LOADER_SCREEN_HANDLER_TYPE = register("loader", new ScreenHandlerType<>(ContainerLoader::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerReciever> RECIEVER_SCREEN_HANDLER_TYPE = register("reciever", new ScreenHandlerType<>(ContainerReciever::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerNuclearBomb> NUCLEAR_BOMB_SCREEN_HANDLER_TYPE = register("nuclear_bomb", new ScreenHandlerType<>(ContainerNuclearBomb::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerTachyonBomb> TACHYON_SCREEN_HANDLER_TYPE = register("tachyon", new ScreenHandlerType<>(ContainerTachyonBomb::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
+    public static final ScreenHandlerType<ContainerTheoreticalTsar> THEORETICAL_TSAR_SCREEN_HANDLER_TYPE = register("theoretical_tsar", new ScreenHandlerType<>(ContainerTheoreticalTsar::new, FeatureFlags.DEFAULT_ENABLED_FEATURES));
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void registerClientGuiBinds() {
         HandledScreens.register(TSAR_SCREEN_HANDLER_TYPE, GuiTsar::new);
         HandledScreens.register(ANTIMATTER_SCREEN_HANDLER_TYPE, GuiAntimatterBomb::new);
@@ -49,8 +49,10 @@ public class RivalRebelsGuiHandler {
     }
 
     public static <U extends ScreenHandler, T extends ScreenHandlerType<U>> T register(String name, T type) {
-        type.setRegistryName(RivalRebels.MODID, name);
-        SCREEN_HANDLER_TYPES.add(type);
+        Registry.register(Registries.SCREEN_HANDLER, new Identifier(RivalRebels.MODID, name), type);
         return type;
+    }
+
+    public static void init() {
     }
 }

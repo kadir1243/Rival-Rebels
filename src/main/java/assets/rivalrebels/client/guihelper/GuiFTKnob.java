@@ -12,15 +12,14 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.GuiUtils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiFTKnob extends GuiButton
 {
 	protected int		mode;
@@ -32,19 +31,19 @@ public class GuiFTKnob extends GuiButton
 	}
 
     @Override
-    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		this.mouseDragged(mouseX, mouseY, 0, 0,  0);
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+        MatrixStack matrices = context.getMatrices();
+        this.mouseDragged(mouseX, mouseY, 0, 0,  0);
 		if (mode > 2) mode = 2;
 		if (mode < 0) mode = 0;
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.guitbutton);
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
 		matrices.push();
-		matrices.translate(this.x + (width / 2f), this.y + (height / 2f), 0);
-		matrices.multiply(new Quaternion(mode * 90 - 90, 0, 0, 1));
-		matrices.translate(-(this.x + (width / 2f)), -(this.y + (height / 2f)), 0);
-		GuiUtils.drawTexturedModalRect(matrices, this.x, this.y, 76 + state, 0, this.width, this.height, getZOffset());
+		matrices.translate(this.getX() + (width / 2f), this.getY() + (height / 2f), 0);
+		matrices.multiply(new Quaternionf(mode * 90 - 90, 0, 0, 1));
+		matrices.translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)), 0);
+		context.drawTexture(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
 		matrices.pop();
 	}
 
@@ -52,10 +51,10 @@ public class GuiFTKnob extends GuiButton
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
 		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
 			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
-			if (pressed) mode = (((((int) (Math.atan2(y - mouseY + (height / 2), x - mouseX + (width / 2)) * 180 / Math.PI)) + 450) % 360) - 45) / 90;
+			if (pressed) mode = (((((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * 180 / Math.PI)) + 450) % 360) - 45) / 90;
 		} else {
 			pressed = false;
-			int move = (int) MinecraftClient.getInstance().mouse.getYVelocity();
+			int move = (int) MinecraftClient.getInstance().mouse.getY();
 			mode += Integer.compare(0, move);
 			while (mode < 0)
 				mode += 3;
@@ -75,6 +74,6 @@ public class GuiFTKnob extends GuiButton
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return this.active && this.visible && Math.sqrt(((x - mouseX + (width / 2f)) * (x - mouseX + (width / 2f))) + ((y - mouseY + (height / 2f)) * (y - mouseY + (height / 2f)))) <= (width / 2f);
+		return this.active && this.visible && Math.sqrt(((getX() - mouseX + (width / 2f)) * (getX() - mouseX + (width / 2f))) + ((getY() - mouseY + (height / 2f)) * (getY() - mouseY + (height / 2f)))) <= (width / 2f);
 	}
 }

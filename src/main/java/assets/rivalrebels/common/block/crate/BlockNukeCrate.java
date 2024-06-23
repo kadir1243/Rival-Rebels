@@ -16,6 +16,7 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.*;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -23,26 +24,31 @@ import net.minecraft.block.Blocks;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.state.StateManager;
 import net.minecraft.state.property.DirectionProperty;
-import net.minecraft.tag.FluidTags;
-import net.minecraft.text.TranslatableText;
+import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockNukeCrate extends BlockWithEntity {
+    public static final MapCodec<BlockNukeCrate> CODEC = createCodec(BlockNukeCrate::new);
     public static final DirectionProperty DIRECTION = DirectionProperty.of("direction");
 	public BlockNukeCrate(Settings settings)
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(DIRECTION, Direction.UP));
 	}
+
+    @Override
+    protected MapCodec<BlockNukeCrate> getCodec() {
+        return CODEC;
+    }
 
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
@@ -91,7 +97,7 @@ public class BlockNukeCrate extends BlockWithEntity {
                 neighborUpdate(state, world, pos, this, offset, true);
             } else if (offsetState.getFluidState().isIn(FluidTags.LAVA)) {
                 world.setBlockState(pos, Blocks.AIR.getDefaultState());
-                world.createExplosion(null, x, y, z, 3, Explosion.DestructionType.NONE);
+                world.createExplosion(null, x, y, z, 3, World.ExplosionSourceType.NONE);
             }
         }
 	}
@@ -373,12 +379,12 @@ public class BlockNukeCrate extends BlockWithEntity {
 				}
 				else if (!world.isClient)
 				{
-                    player.sendMessage(new TranslatableText("RivalRebels.Orders").append(" ").append(new TranslatableText("RivalRebels.message")).append(" ").append(RRItems.pliers.getName()), false);
+                    player.sendMessage(Text.translatable("RivalRebels.Orders").append(" ").append(Text.translatable("RivalRebels.message.use")).append(" ").append(RRItems.pliers.getName()), false);
 				}
 			}
 			else if (!world.isClient)
 			{
-				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".use_pliars", RRItems.pliers.getName()), false);
+				player.sendMessage(Text.translatable(RivalRebels.MODID + ".use_pliars", RRItems.pliers.getName()), false);
 			}
 		}
 		return ActionResult.PASS;
@@ -401,20 +407,4 @@ public class BlockNukeCrate extends BlockWithEntity {
     public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityNukeCrate(pos, state);
 	}
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		if (this == RivalRebels.nukeCrateTop) icon = iconregister.registerIcon("RivalRebels:ay");
-		if (this == RivalRebels.nukeCrateBottom) icon = iconregister.registerIcon("RivalRebels:ax");
-	}*/
 }

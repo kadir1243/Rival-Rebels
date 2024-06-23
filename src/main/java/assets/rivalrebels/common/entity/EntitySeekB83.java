@@ -16,6 +16,7 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -30,10 +31,9 @@ import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.common.extensions.IForgeBlockEntity;
 
 import java.util.Iterator;
 import java.util.List;
@@ -47,7 +47,7 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
 	private int					soundfile		= 0;
 
     public EntitySeekB83(EntityType<? extends EntitySeekB83> type, World world) {
-        super(type, world);
+        super(type, world, ItemStack.EMPTY);
     }
 
 	public EntitySeekB83(World par1World) {
@@ -126,11 +126,11 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
 
 		if (age == 0)
 		{
-			rotation = world.random.nextInt(360);
-			slide = world.random.nextInt(21) - 10;
+			rotation = getWorld().random.nextInt(360);
+			slide = getWorld().random.nextInt(21) - 10;
 			for (int i = 0; i < 10; i++)
 			{
-				world.addParticle(ParticleTypes.EXPLOSION, getX() - getVelocity().getX() * 2, getY() - getVelocity().getY() * 2, getZ() - getVelocity().getZ() * 2, -getVelocity().getX() + (world.random.nextFloat() - 0.5f) * 0.1f, -getVelocity().getY() + (world.random.nextFloat() - 0.5) * 0.1f, -getVelocity().getZ() + (world.random.nextFloat() - 0.5f) * 0.1f);
+				getWorld().addParticle(ParticleTypes.EXPLOSION, getX() - getVelocity().getX() * 2, getY() - getVelocity().getY() * 2, getZ() - getVelocity().getZ() * 2, -getVelocity().getX() + (getWorld().random.nextFloat() - 0.5f) * 0.1f, -getVelocity().getY() + (getWorld().random.nextFloat() - 0.5) * 0.1f, -getVelocity().getZ() + (getWorld().random.nextFloat() - 0.5f) * 0.1f);
 			}
 		}
 		rotation += (int) slide;
@@ -142,23 +142,23 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
 		}
 		// world.spawnEntity(new EntityLightningLink(world, getX(), getY(), getZ(), yaw, pitch, 100));
 
-		if (world.isClient && age >= 5 && !isInsideWaterOrBubbleColumn() && age <= 100)
+		if (getWorld().isClient && age >= 5 && !isInsideWaterOrBubbleColumn() && age <= 100)
 		{
-			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX() * 0.5, -getVelocity().getY() * 0.5 - 0.1, -getVelocity().getZ() * 0.5));
+			getWorld().spawnEntity(new EntityPropulsionFX(getWorld(), getX(), getY(), getZ(), -getVelocity().getX() * 0.5, -getVelocity().getY() * 0.5 - 0.1, -getVelocity().getZ() * 0.5));
 		}
 		Vec3d vec31 = getPos();
 		Vec3d vec3 = getPos().add(getVelocity());
-		HitResult mop = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-		if (!world.isClient)
+		HitResult mop = getWorld().raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		if (!getWorld().isClient)
 		{
 			vec31 = getPos();
 			if (mop != null) vec3 = mop.getPos();
 			else vec3 = getPos().add(getVelocity());
 
-			List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> list = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
             for (Entity entity : list) {
-                if ((entity.collides() && age >= 7 && entity != getOwner()) || entity instanceof EntityHackB83 || entity instanceof EntityB83) {
+                if ((entity.isCollidable() && age >= 7 && entity != getOwner()) || entity instanceof EntityHackB83 || entity instanceof EntityB83) {
                     Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
                     if (mop1.isPresent()) {
                         double d1 = vec31.squaredDistanceTo(mop1.get());
@@ -172,7 +172,7 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
 		}
 		if (mop != null) explode(mop);
 
-		Iterator<Entity> iter = world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB).iterator();
+		Iterator<Entity> iter = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox()).iterator();
         Vec3d ddvec = getVelocity();
 		double dist = 1000000;
 		while (iter.hasNext())
@@ -214,7 +214,7 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
 		{
 			for (int var7 = 0; var7 < 4; ++var7)
 			{
-				world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
+				getWorld().addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
 			}
 			if (!inwaterprevtick)
 			{
@@ -249,7 +249,7 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
                 if (entityHit instanceof EntityHackB83)
 				{
 					entityHit.kill();
-					world.setBlockState(getBlockPos(), RRBlocks.plasmaexplosion.getDefaultState());
+					getWorld().setBlockState(getBlockPos(), RRBlocks.plasmaexplosion.getDefaultState());
 					kill();
 				}
 				else if (entityHit instanceof PlayerEntity player) {
@@ -259,28 +259,28 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
                         }
                     }
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-					new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+					new Explosion(getWorld(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(getWorld()));
 					kill();
 				}
 				else
 				{
-					new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+					new Explosion(getWorld(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(getWorld()));
 					kill();
 				}
 			}
 			else
 			{
                 BlockPos pos = ((BlockHitResult) mop).getBlockPos();
-                BlockState state = world.getBlockState(pos);
-                if (state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS_PANES) || state.isIn(Tags.Blocks.STAINED_GLASS) || state.isIn(Tags.Blocks.STAINED_GLASS_PANES))
+                BlockState state = getWorld().getBlockState(pos);
+                if (state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(ConventionalBlockTags.GLASS_PANES))
 				{
-					world.setBlockState(pos, Blocks.AIR.getDefaultState());
+					getWorld().setBlockState(pos, Blocks.AIR.getDefaultState());
 					RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
 				}
 				else
 				{
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-					new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+					new Explosion(getWorld(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(getWorld()));
 					kill();
 				}
 			}
@@ -288,7 +288,7 @@ public class EntitySeekB83 extends PersistentProjectileEntity {
 		else
 		{
 			RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-			new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+			new Explosion(getWorld(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(getWorld()));
 			kill();
 		}
 	}

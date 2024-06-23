@@ -1,6 +1,6 @@
 package assets.rivalrebels.common.util;
 
-import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.item.ArmorItem;
 import net.minecraft.item.ArmorMaterial;
 import net.minecraft.recipe.Ingredient;
 import net.minecraft.sound.SoundEvent;
@@ -28,13 +28,13 @@ public class SimpleArmorMaterial implements ArmorMaterial {
     }
 
     @Override
-    public int getDurability(EquipmentSlot equipmentSlot) {
-        return durability[equipmentSlot.getEntitySlotId()];
+    public int getDurability(ArmorItem.Type type) {
+        return durability[type.getEquipmentSlot().getEntitySlotId()];
     }
 
     @Override
-    public int getProtectionAmount(EquipmentSlot slot) {
-        return HEALTH_PER_SLOT[slot.getEntitySlotId()] * this.durabilityMultiplier;
+    public int getProtection(ArmorItem.Type type) {
+        return HEALTH_PER_SLOT[type.getEquipmentSlot().getEntitySlotId()] * this.durabilityMultiplier;
     }
 
     @Override

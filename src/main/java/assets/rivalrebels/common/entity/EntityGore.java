@@ -13,6 +13,8 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.network.AbstractClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -27,10 +29,8 @@ import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -53,7 +53,7 @@ public class EntityGore extends EntityInanimate {
 	float					motionpitch	= 0;
 	int						pitchLock	= 0;
 	float					offset		= 0;
-    // @OnlyIn(Dist.CLIENT)
+    // @Environment(EnvType.CLIENT)
 	public Identifier	playerSkin	= null;
 	private int				bounces		= -1;
 
@@ -338,11 +338,11 @@ public class EntityGore extends EntityInanimate {
 	@Override
 	public void tick()
 	{
-		if (playerSkin == null && world.isClient && getOwner() != null) {
-            for (PlayerEntity player : world.getPlayers()) {
+		if (playerSkin == null && getWorld().isClient && getOwner() != null) {
+            for (PlayerEntity player : getWorld().getPlayers()) {
                 if (player.getGameProfile().getId().equals(getOwner())) {
                     AbstractClientPlayerEntity acp = (AbstractClientPlayerEntity) player;
-                    playerSkin = acp.getSkinTexture();
+                    playerSkin = acp.getSkinTextures().texture();
                 }
             }
 		}
@@ -366,7 +366,7 @@ public class EntityGore extends EntityInanimate {
 
 		Vec3d vec3 = getPos();
 		Vec3d vec31 = getPos().add(getVelocity());
-		BlockHitResult hitResult = world.raycast(new RaycastContext(vec3, vec31, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		BlockHitResult hitResult = getWorld().raycast(new RaycastContext(vec3, vec31, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
 		if (hitResult != null)
 		{
@@ -388,14 +388,14 @@ public class EntityGore extends EntityInanimate {
 		{
             for (int k = 0; k < 4; ++k) {
                 float f4 = 0.25F;
-                world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * (double)f4, getY() - getVelocity().getY() * (double)f4, getZ() - getVelocity().getZ() * (double)f4, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
+                getWorld().addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * (double)f4, getY() - getVelocity().getY() * (double)f4, getZ() - getVelocity().getZ() * (double)f4, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
             }
 
 			f2 = 0.9F;
 		}
 		else if (!isSliding)
 		{
-			if (world.isClient && RRConfig.CLIENT.isGoreEnabled())
+			if (getWorld().isClient && RRConfig.CLIENT.isGoreEnabled())
 			{
 				spawnBlood();
 			}
@@ -412,7 +412,7 @@ public class EntityGore extends EntityInanimate {
 
 		if (isSliding)
 		{
-			if (bounces == -1) bounces = world.random.nextInt(2) + 2;
+			if (bounces == -1) bounces = getWorld().random.nextInt(2) + 2;
 			if (bounces > 0)
 			{
 				bounces--;
@@ -429,17 +429,17 @@ public class EntityGore extends EntityInanimate {
 		setPosition(getX(), getY(), getZ());
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	private void spawnBlood()
 	{
 		for (int i = 0; i < 3; ++i)
 		{
-			RivalRebels.proxy.spawnGore(world, this, !isGreen());
+			RivalRebels.proxy.spawnGore(getWorld(), this, !isGreen());
 		}
 	}
 
     @Override
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	public boolean shouldRender(double distance)
 	{
 		return true;

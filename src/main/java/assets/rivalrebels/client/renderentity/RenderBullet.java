@@ -12,7 +12,7 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -21,19 +21,14 @@ import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
-public class RenderBullet extends EntityRenderer<Entity>
-{
-	/**
-	 * Have the icon index (in items.png) that will be used to render the image. Currently, eggs and snowballs uses this classes.
-	 */
-	private final String path;
+public class RenderBullet extends EntityRenderer<Entity> {
+    private final String path;
 
-	public RenderBullet(EntityRendererFactory.Context manager, String par1)
-	{
+	public RenderBullet(EntityRendererFactory.Context manager, String path) {
         super(manager);
-		path = par1;
+		this.path = path;
 	}
 
     @Override
@@ -41,24 +36,24 @@ public class RenderBullet extends EntityRenderer<Entity>
 		if (entity.age > 1) {
 			matrices.push();
 			matrices.scale(0.5F, 0.5F, 0.5F);
-			if (path.equals("flame")) MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etflame);
-			if (path.equals("fire")) MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etfire);
             float var7 = 1.0F;
             float var8 = 0.5F;
             float var9 = 0.25F;
-            matrices.multiply(new Quaternion((float) (180.0F - this.dispatcher.camera.getPos().getY()), 0.0F, 1.0F, 0.0F));
-            matrices.multiply(new Quaternion((float) -this.dispatcher.camera.getPos().getX(), 1.0F, 0.0F, 0.0F));
-            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-            buffer.vertex((0.0F - var8), (0.0F - var9), 0.0D).texture(0, 0).normal(0, 1, 0).next();
-            buffer.vertex((var7 - var8), (0.0F - var9), 0.0D).texture(1, 0).normal(0, 1, 0).next();
-            buffer.vertex((var7 - var8), (var7 - var9), 0.0D).texture(1, 1).normal(0, 1, 0).next();
-            buffer.vertex((0.0F - var8), (var7 - var9), 0.0D).texture(0, 1).normal(0, 1, 0).next();
+            matrices.multiply(new Quaternionf((float) (180.0F - this.dispatcher.camera.getPos().getY()), 0.0F, 1.0F, 0.0F));
+            matrices.multiply(new Quaternionf((float) -this.dispatcher.camera.getPos().getX(), 1.0F, 0.0F, 0.0F));
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntitySolid(getTexture(entity)));
+            buffer.vertex((0.0F - var8), (0.0F - var9), 0, 1F, 1F, 1F, 1F, 0, 0, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
+            buffer.vertex((var7 - var8), (0.0F - var9), 0, 1F, 1F, 1F, 1F, 1, 0, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
+            buffer.vertex((var7 - var8), (var7 - var9), 0, 1F, 1F, 1F, 1F, 1, 1, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
+            buffer.vertex((0.0F - var8), (var7 - var9), 0, 1F, 1F, 1F, 1F, 0, 1, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
 			matrices.pop();
 		}
 	}
 
     @Override
     public Identifier getTexture(Entity entity) {
+        if (path.equals("flame")) return RRIdentifiers.etflame;
+        if (path.equals("fire")) return RRIdentifiers.etfire;
         return null;
     }
 }

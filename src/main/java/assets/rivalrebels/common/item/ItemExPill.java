@@ -29,7 +29,7 @@ import net.minecraft.world.World;
 public class ItemExPill extends Item
 {
 	public ItemExPill() {
-		super(new Settings().maxCount(6).group(RRItems.rralltab));
+		super(new Settings().maxCount(6));
 	}
 
     @Override
@@ -71,7 +71,7 @@ public class ItemExPill extends Item
 				player.sendMessage(Text.of("§7[§6Status§7]§e The test subject has perished."), true);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.damage(RivalRebelsDamageSource.cyanide, 2000);
+				player.damage(RivalRebelsDamageSource.cyanide(world), 2000);
 			}
 			else
 			{

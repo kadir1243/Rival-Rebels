@@ -101,9 +101,9 @@ public class EntityRaytrace extends EntityInanimate
 		par1 /= var9;
 		par3 /= var9;
 		par5 /= var9;
-		par1 += world.random.nextGaussian() * par8;
-		par3 += world.random.nextGaussian() * par8;
-		par5 += world.random.nextGaussian() * par8;
+		par1 += getWorld().random.nextGaussian() * par8;
+		par3 += getWorld().random.nextGaussian() * par8;
+		par5 += getWorld().random.nextGaussian() * par8;
 		par1 *= par7;
 		par3 *= par7;
 		par5 *= par7;
@@ -119,15 +119,15 @@ public class EntityRaytrace extends EntityInanimate
 		super.tick();
 		Vec3d vec31 = getPos();
 		Vec3d vec3 = getPos().add(getVelocity());
-		HitResult MOP = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		HitResult MOP = getWorld().raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 		vec31 = getPos();
 		if (MOP != null) vec3 = MOP.getPos();
 		else vec3 = getPos().add(getVelocity());
 
-		List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 30.0D, 1.0D));
+		List<Entity> list = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 30.0D, 1.0D));
 		double d0 = Double.MAX_VALUE;
         for (Entity entity : list) {
-            if ((entity.collides() || entity instanceof EntityRhodes) && entity != shootingEntity) {
+            if ((entity.isCollidable() || entity instanceof EntityRhodes) && entity != shootingEntity) {
                 Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
                 if (mop1.isPresent()) {
                     double d1 = vec31.squaredDistanceTo(mop1.get());
@@ -143,18 +143,18 @@ public class EntityRaytrace extends EntityInanimate
 			if (MOP.getType() == HitResult.Type.BLOCK)
 			{
                 BlockPos pos = ((BlockHitResult) MOP).getBlockPos();
-                if (!world.isClient) world.spawnEntity(new EntityLightningLink(world, this, Math.sqrt(squaredDistanceTo(MOP.getPos().x, MOP.getPos().y, MOP.getPos().z))));
+                if (!getWorld().isClient) getWorld().spawnEntity(new EntityLightningLink(getWorld(), this, Math.sqrt(squaredDistanceTo(MOP.getPos().x, MOP.getPos().y, MOP.getPos().z))));
 				// world.spawnEntity(new EntityNuclearBlast(world, MOP.blockX, pos.getY(), pos.getZ(), 5, false));
-				Block BlockHit = world.getBlockState(pos).getBlock();
-				float r = world.random.nextFloat();
+				Block BlockHit = getWorld().getBlockState(pos).getBlock();
+				float r = getWorld().random.nextFloat();
 				if (BlockHit == RRBlocks.camo1 || BlockHit == RRBlocks.camo2 || BlockHit == RRBlocks.camo3)
 				{
 					if (r * 10 <= c)
 					{
-						if (!world.isClient) world.setBlockState(pos, Blocks.AIR.getDefaultState());
+						if (!getWorld().isClient) getWorld().setBlockState(pos, Blocks.AIR.getDefaultState());
 						for (int i = 0; i < 4; i++)
 						{
-							world.addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (world.random.nextFloat() - 0.5F) * 0.1, world.random.nextFloat() * 0.05, (world.random.nextFloat() - 0.5F) * 0.1);
+							getWorld().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (getWorld().random.nextFloat() - 0.5F) * 0.1, getWorld().random.nextFloat() * 0.05, (getWorld().random.nextFloat() - 0.5F) * 0.1);
 						}
 					}
 				}
@@ -162,53 +162,53 @@ public class EntityRaytrace extends EntityInanimate
 				{
 					if (r * 15 <= c)
 					{
-						if (!world.isClient) world.setBlockState(pos, Blocks.AIR.getDefaultState());
+						if (!getWorld().isClient) getWorld().setBlockState(pos, Blocks.AIR.getDefaultState());
 						for (int i = 0; i < 4; i++)
 						{
-							world.addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (world.random.nextFloat() - 0.5F) * 0.1, world.random.nextFloat() * 0.05, (world.random.nextFloat() - 0.5F) * 0.1);
+							getWorld().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (getWorld().random.nextFloat() - 0.5F) * 0.1, getWorld().random.nextFloat() * 0.05, (getWorld().random.nextFloat() - 0.5F) * 0.1);
 						}
 					}
 				}
 				else if (!BlackList.tesla(BlockHit) && r <= c)
 				{
-					if (!world.isClient) world.setBlockState(pos, Blocks.AIR.getDefaultState());
+					if (!getWorld().isClient) getWorld().setBlockState(pos, Blocks.AIR.getDefaultState());
 					for (int i = 0; i < 4; i++)
 					{
-						world.addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (world.random.nextFloat() - 0.5F) * 0.1, world.random.nextFloat() * 0.05, (world.random.nextFloat() - 0.5F) * 0.1);
+						getWorld().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (getWorld().random.nextFloat() - 0.5F) * 0.1, getWorld().random.nextFloat() * 0.05, (getWorld().random.nextFloat() - 0.5F) * 0.1);
 					}
 				}
 			}
-			else
+			else if (MOP.getType() == HitResult.Type.ENTITY)
 			{
                 Entity entityHit = ((EntityHitResult) MOP).getEntity();
-                if (!world.isClient) world.spawnEntity(new EntityLightningLink(world, this, distanceTo(entityHit)));
+                if (!getWorld().isClient) getWorld().spawnEntity(new EntityLightningLink(getWorld(), this, distanceTo(entityHit)));
 				if (entityHit instanceof PlayerEntity entityPlayerHit)
 				{
-                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, world.random.nextInt(4));
+                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, getWorld().random.nextInt(4));
 					int i = slot.getEntitySlotId();
 					if (!entityPlayerHit.getEquippedStack(slot).isEmpty())
 					{
 						entityPlayerHit.getEquippedStack(slot).damage(14, entityPlayerHit, player -> player.sendEquipmentBreakStatus(slot));
-						entityPlayerHit.damage(RivalRebelsDamageSource.electricity, 1);
+						entityPlayerHit.damage(RivalRebelsDamageSource.electricity(getWorld()), 1);
 					}
 					else
 					{
-						entityPlayerHit.damage(RivalRebelsDamageSource.electricity, (RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
+						entityPlayerHit.damage(RivalRebelsDamageSource.electricity(getWorld()), (RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
 					}
 				}
 				else if (entityHit instanceof EntityB2Spirit)
 				{
-					entityHit.damage(RivalRebelsDamageSource.electricity, (RivalRebels.teslaDecay / 1.5f) / ((int) entityHit.distanceTo(this) + 1));
+					entityHit.damage(RivalRebelsDamageSource.electricity(getWorld()), (RivalRebels.teslaDecay / 1.5f) / ((int) entityHit.distanceTo(this) + 1));
 				}
 				else
 				{
-					entityHit.damage(RivalRebelsDamageSource.electricity, RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1));
+					entityHit.damage(RivalRebelsDamageSource.electricity(getWorld()), RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1));
 				}
 			}
 		}
 		else
 		{
-			if (!world.isClient) world.spawnEntity(new EntityLightningLink(world, this, range));
+			if (!getWorld().isClient) getWorld().spawnEntity(new EntityLightningLink(getWorld(), this, range));
 		}
 		kill();
 	}

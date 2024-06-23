@@ -12,16 +12,14 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.font.TextRenderer;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.text.Text;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiButton extends ButtonWidget {
     public GuiButton(int x, int y, int width, int height, String message) {
 		this(x, y, width, height, Text.of(message), button -> {});
@@ -32,32 +30,39 @@ public class GuiButton extends ButtonWidget {
     }
 
     public GuiButton(int x, int y, int width, int height, Text message, PressAction onPress) {
-        super(x, y, width, height, message, onPress);
+        super(x, y, width, height, message, onPress, DEFAULT_NARRATION_SUPPLIER);
     }
 
     @Override
-    public void renderButton(MatrixStack matrices, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
 		if (this.visible) {
             MinecraftClient client = MinecraftClient.getInstance();
-			TextRenderer fontrenderer = client.textRenderer;
-			client.textureManager.bindTexture(RRIdentifiers.guitbutton);
-			RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			this.hovered = mouseX >= this.x && mouseY >= this.y && mouseX < this.x + this.width && mouseY < this.y + this.height;
+			context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+			this.hovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 			int k = this.getYImage(this.hovered);
-			this.drawTexture(matrices, this.x, this.y, 5, k * 11, this.width, this.height);
+			context.drawTexture(RRIdentifiers.guitbutton, this.getX(), this.getY(), 5, k * 11, this.width, this.height);
 			this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 			int l = 0xffffff;
 
-			if (!this.active)
-			{
+			if (!this.active) {
 				l = 0xcccccc;
-			}
-			else if (this.hovered)
-			{
+			} else if (this.hovered) {
 				l = 0x88e8ff;
 			}
 
-			drawCenteredText(matrices, fontrenderer, this.getMessage(), this.x + this.width / 2, this.y + (this.height - 7) / 2, l);
+            context.drawCenteredTextWithShadow(client.textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, l);
 		}
 	}
+
+    protected int getYImage(boolean mouseOver) {
+        int i = 1;
+
+        if (!this.active) {
+            i = 0;
+        } else if (mouseOver) {
+            i = 2;
+        }
+
+        return i;
+    }
 }

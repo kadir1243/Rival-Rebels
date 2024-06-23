@@ -11,15 +11,29 @@
  *******************************************************************************/
 package assets.rivalrebels.common.noise;
 
+import com.mojang.blaze3d.platform.GlConst;
+import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.platform.TextureUtil;
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.RenderPhase;
+import net.minecraft.client.render.VertexFormat;
+import net.minecraft.client.render.VertexFormats;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.random.Random;
+import org.lwjgl.BufferUtils;
+import org.lwjgl.opengl.GL11;
 
-import java.util.Random;
+import java.nio.ByteBuffer;
 
 public class RivalRebelsCellularNoise {
-    public static int pointa3D = 32;
-	public static Vec3d[] points3D = new Vec3d[pointa3D];
+    private static final Random random = Random.create();
+    private static final int pointa3D = 32;
+	private static final Vec3d[] points3D = new Vec3d[pointa3D];
+    private static final int frames = 28;
+    private static final int[] id = genTexture(28, 28, frames);
 
-    public static void refresh3D(Random random)
+    private static void refresh3D(Random random)
 	{
 		for (int i = 0; i < pointa3D; i++)
 		{
@@ -27,7 +41,7 @@ public class RivalRebelsCellularNoise {
 		}
 	}
 
-    public static double noise(double xin, double yin, double zin)
+    private static double noise(double xin, double yin, double zin)
 	{
 		double result = 1;
 		for (int i = 0; i < pointa3D; i++)
@@ -63,4 +77,52 @@ public class RivalRebelsCellularNoise {
 		}
 		return result;
 	}
+
+    private static int[] genTexture(int xs, int zs, int ys) {
+		int[] ids = new int[ys];
+		refresh3D(random);
+		int size = xs * zs * 4;
+		byte red = (byte) 0xBB;
+		byte grn = (byte) 0x88;
+		byte blu = (byte) 0xFF;
+		for (int i = 0; i < ys; i++) {
+			ByteBuffer bb = BufferUtils.createByteBuffer(size);
+			for (int x = 0; x < xs; x++) {
+				for (int z = 0; z < zs; z++) {
+					bb.put(red);
+					bb.put(grn);
+					bb.put(blu);
+					bb.put((byte) ((noise((double) x / (double) xs, (double) z / (double) zs, (double) i / (double) ys) + 1) * 127));
+				}
+			}
+			int id = TextureUtil.generateTextureId();
+			RenderSystem.bindTexture(id);
+			RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
+			RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
+            GlStateManager._texImage2D(GlConst.GL_TEXTURE_2D, 0, GlConst.GL_RGBA8, xs, zs, 0, GlConst.GL_RGBA, GlConst.GL_UNSIGNED_BYTE, bb.asIntBuffer());
+			ids[i] = id;
+		}
+		return ids;
+	}
+
+    private static long getTime()
+	{
+		return System.currentTimeMillis();
+	}
+
+    public static int getCurrentRandomId() {
+        return RivalRebelsCellularNoise.id[(int) ((RivalRebelsCellularNoise.getTime() / 100) % RivalRebelsCellularNoise.frames)];
+    }
+
+    public static final RenderLayer CELLULAR_NOISE = RenderLayer.of(
+        "cellular_noise",
+        VertexFormats.POSITION_COLOR_TEXTURE_LIGHT,
+        VertexFormat.DrawMode.QUADS,
+        999,
+        RenderLayer.MultiPhaseParameters.builder()
+            .program(RenderPhase.ENTITY_TRANSLUCENT_PROGRAM)
+            .texture(new RenderPhase.TextureBase(() -> RenderSystem.setShaderTexture(0, getCurrentRandomId()), () -> {}))
+            .transparency(RenderPhase.LIGHTNING_TRANSPARENCY)
+            .build(false)
+    );
 }

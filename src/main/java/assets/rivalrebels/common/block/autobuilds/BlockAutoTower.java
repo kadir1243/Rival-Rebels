@@ -12,17 +12,24 @@
 package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.block.RRBlocks;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
-public class BlockAutoTower extends BlockAutoTemplate
-{
-	public BlockAutoTower(Settings settings)
+public class BlockAutoTower extends BlockAutoTemplate {
+    public static final MapCodec<BlockAutoTower> CODEC = createCodec(BlockAutoTower::new);
+
+    public BlockAutoTower(Settings settings)
 	{
 		super(settings);
 	}
 
-	@Override
+    @Override
+    protected MapCodec<BlockAutoTower> getCodec() {
+        return CODEC;
+    }
+
+    @Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
@@ -92,20 +99,20 @@ public class BlockAutoTower extends BlockAutoTemplate
 		placeBlockCarefully(world, x, y - 1, z, RRBlocks.jump);
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon6;
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -118,7 +125,7 @@ public class BlockAutoTower extends BlockAutoTemplate
 		return icon1;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

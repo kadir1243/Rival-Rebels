@@ -16,14 +16,11 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiFTKnob;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.packet.ItemUpdate;
-import assets.rivalrebels.common.packet.PacketDispatcher;
+import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.render.BufferBuilder;
-import net.minecraft.client.render.Tessellator;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.Hand;
@@ -38,7 +35,7 @@ public class GuiFlameThrower extends Screen
 	private final int start;
 
 	public GuiFlameThrower(int start) {
-        super(Text.of(""));
+        super(Text.empty());
         this.start = start;
 	}
 
@@ -46,7 +43,7 @@ public class GuiFlameThrower extends Screen
 	public void init() {
 		posX = (width - xSizeOfTexture) / 2;
 		posY = (height - ySizeOfTexture) / 2;
-		drawables.clear();
+		clearChildren();
 		knob = new GuiFTKnob(posX + 108, posY + 176, -90, 90, start, true, "Knob");
 		addDrawable(knob);
 	}
@@ -57,19 +54,22 @@ public class GuiFlameThrower extends Screen
     }
 
     @Override
-    public void render(MatrixStack matrices, int mouseX, int mouseY, float delta) {
-		Tessellator tessellator = Tessellator.getInstance();
+    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
 		float f = 0.00390625F;
 		client = MinecraftClient.getInstance();
-		client.textureManager.bindTexture(RRIdentifiers.guiflamethrower);
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
-		buffer.vertex(posX, posY + ySizeOfTexture, getZOffset()).texture(0, ySizeOfTexture * f).next();
-		buffer.vertex(posX + xSizeOfTexture, posY + ySizeOfTexture, getZOffset()).texture(xSizeOfTexture * f, ySizeOfTexture * f).next();
-		buffer.vertex(posX + xSizeOfTexture, posY, getZOffset()).texture(xSizeOfTexture * f, 0).next();
-		buffer.vertex(posX, posY, getZOffset()).texture(0, 0).next();
-		tessellator.draw();
-        super.render(matrices, mouseX, mouseY, delta);
+        ((DrawContextAccessor) context).callDrawTexturedQuad(
+            RRIdentifiers.guiflamethrower,
+            posX,
+            posX + xSizeOfTexture,
+            posY,
+            posY + ySizeOfTexture,
+            0, // z offset
+            0,
+            xSizeOfTexture * f,
+            ySizeOfTexture * f,
+            0
+        );
+        super.render(context, mouseX, mouseY, delta);
 		if (!(ClientProxy.USE_KEY.isPressed())) {
 			client.setScreen(null);
 			client.onWindowFocusChanged(true);
@@ -78,7 +78,7 @@ public class GuiFlameThrower extends Screen
                 itemstack = client.player.getStackInHand(Hand.OFF_HAND);
             }
 			itemstack.getOrCreateNbt().putInt("mode", knob.getDegree());
-			PacketDispatcher.packetsys.sendToServer(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
+            ClientPlayNetworking.send(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
 		}
 	}
 }

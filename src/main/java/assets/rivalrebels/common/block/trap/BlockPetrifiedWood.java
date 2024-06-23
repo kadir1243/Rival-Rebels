@@ -51,7 +51,7 @@ public class BlockPetrifiedWood extends Block {
     @Override
     public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
 		if (world.random.nextInt(2) == 0) {
-			entity.damage(RivalRebelsDamageSource.radioactivepoisoning, ((16 - world.getBlockState(pos).get(META)) / 2) + world.random.nextInt(3) - 1);
+			entity.damage(RivalRebelsDamageSource.radioactivePoisoning(world), ((16 - world.getBlockState(pos).get(META)) / 2) + world.random.nextInt(3) - 1);
 		}
 	}
 
@@ -62,20 +62,20 @@ public class BlockPetrifiedWood extends Block {
 		}
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon6;
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public final IIcon getIcon(int side, int meta)
 	{
@@ -88,7 +88,7 @@ public class BlockPetrifiedWood extends Block {
 		return icon1;
 	}
 
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	@Override
 	public void registerBlockIcons(IIconRegister iconregister)
 	{

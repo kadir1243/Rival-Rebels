@@ -2,7 +2,11 @@ package assets.rivalrebels.common.tileentity;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.block.entity.BlockEntityType;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.util.Identifier;
+
+import java.util.function.BiConsumer;
 
 import static assets.rivalrebels.RivalRebels.MODID;
 
@@ -27,44 +31,26 @@ public class RRTileEntities {
     public static final BlockEntityType<TileEntityTheoreticalTsarBomba> THEORETICAL_TSAR_BOMB = BlockEntityType.Builder.create(TileEntityTheoreticalTsarBomba::new, RRBlocks.theoreticaltsarbombablock).build(null);
     public static final BlockEntityType<TileEntityTsarBomba> TSAR_BOMB = BlockEntityType.Builder.create(TileEntityTsarBomba::new, RRBlocks.tsarbombablock).build(null);
 
-    public static void register(IForgeRegistry<BlockEntityType<?>> registry) {
-        ANTIMATTER_BOMB.setRegistryName(MODID, "antimatter_bomb");
-        registry.register(ANTIMATTER_BOMB);
-        NUKE_CRATE.setRegistryName(MODID, "nuke_crate");
-        registry.register(NUKE_CRATE);
-        JUMP_BLOCK.setRegistryName(MODID, "jump_block");
-        registry.register(JUMP_BLOCK);
-        NUCLEAR_BOMB.setRegistryName(MODID, "nuclear_bomb");
-        registry.register(NUCLEAR_BOMB);
-        PLASMA_EXPLOSION.setRegistryName(MODID, "plasma_explosion");
-        registry.register(PLASMA_EXPLOSION);
-        REACTOR.setRegistryName(MODID, "reactor");
-        registry.register(REACTOR);
-        LOADER.setRegistryName(MODID, "loader");
-        registry.register(LOADER);
-        OMEGA_OBJECTIVE.setRegistryName(MODID, "omega_objective");
-        registry.register(OMEGA_OBJECTIVE);
-        SIGMA_OBJECTIVE.setRegistryName(MODID, "sigma_objective");
-        registry.register(SIGMA_OBJECTIVE);
-        TSAR_BOMB.setRegistryName(MODID, "tsar_bomb");
-        registry.register(TSAR_BOMB);
-        FORCE_FIELD_NODE.setRegistryName(MODID, "force_field_node");
-        registry.register(FORCE_FIELD_NODE);
-        GORE.setRegistryName(MODID, "gore");
-        registry.register(GORE);
-        LAPTOP.setRegistryName(MODID, "laptop");
-        registry.register(LAPTOP);
-        RECIEVER.setRegistryName(MODID, "reciever");
-        registry.register(RECIEVER);
-        REACTIVE.setRegistryName(MODID, "reactive");
-        registry.register(REACTIVE);
-        MELT_DOWN.setRegistryName(MODID, "meltdown");
-        registry.register(MELT_DOWN);
-        RHODES_ACTIVATOR.setRegistryName(MODID, "rhodes_activator");
-        registry.register(RHODES_ACTIVATOR);
-        THEORETICAL_TSAR_BOMB.setRegistryName(MODID, "theoretical_tsar_bomb");
-        registry.register(THEORETICAL_TSAR_BOMB);
-        TACHYON_BOMB.setRegistryName(MODID, "tachyon_bomb");
-        registry.register(TACHYON_BOMB);
+    public static void register() {
+        BiConsumer<String, BlockEntityType<?>> consumer = (name, type) -> Registry.register(Registries.BLOCK_ENTITY_TYPE, new Identifier(MODID, name), type);
+        consumer.accept("antimatter_bomb", ANTIMATTER_BOMB);
+        consumer.accept("nuke_crate", NUKE_CRATE);
+        consumer.accept("jump_block", JUMP_BLOCK);
+        consumer.accept("nuclear_bomb", NUCLEAR_BOMB);
+        consumer.accept("plasma_explosion", PLASMA_EXPLOSION);
+        consumer.accept("reactor", REACTOR);
+        consumer.accept("loader", LOADER);
+        consumer.accept("omega_objective", OMEGA_OBJECTIVE);
+        consumer.accept("sigma_objective", SIGMA_OBJECTIVE);
+        consumer.accept("tsar_bomb", TSAR_BOMB);
+        consumer.accept("force_field_node", FORCE_FIELD_NODE);
+        consumer.accept("gore", GORE);
+        consumer.accept("laptop", LAPTOP);
+        consumer.accept("reciever", RECIEVER);
+        consumer.accept("reactive", REACTIVE);
+        consumer.accept("meltdown", MELT_DOWN);
+        consumer.accept("rhodes_activator", RHODES_ACTIVATOR);
+        consumer.accept("theoretical_tsar_bomb", THEORETICAL_TSAR_BOMB);
+        consumer.accept("tachyon_bomb", TACHYON_BOMB);
     }
 }

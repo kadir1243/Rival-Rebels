@@ -35,7 +35,7 @@ public class SlotRR extends Slot
 	}
 
     public SlotRR(Inventory inv, int id, int x, int y, int mstack, Item only) {
-        this(inv, id, x, y, mstack, stack -> stack.getItem() == only);
+        this(inv, id, x, y, mstack, stack -> stack.isOf(only));
     }
 
     public SlotRR(Inventory inv, int id, int x, int y, int mstack, Predicate<ItemStack> stackLock) {
@@ -53,8 +53,8 @@ public class SlotRR extends Slot
     public boolean canInsert(ItemStack stack) {
 		if (locked) return false;
 		if (stack.isEmpty()) return false;
-		boolean trollface = acceptsTrollFace && (stack.getItem() == RRItems.trollmask);
-		boolean timedbomb = acceptsTimedBomb && (stack.getItem() == RRBlocks.timedbomb.asItem());
+		boolean trollface = acceptsTrollFace && (stack.isOf(RRItems.trollmask));
+		boolean timedbomb = acceptsTimedBomb && (stack.isOf(RRBlocks.timedbomb.asItem()));
         return stackLock.test(stack) || trollface || timedbomb;
     }
 

@@ -13,10 +13,7 @@ package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.block.trap.BlockTimedBomb;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
-import assets.rivalrebels.common.item.ItemAntenna;
-import assets.rivalrebels.common.item.ItemChip;
-import assets.rivalrebels.common.item.ItemFuse;
-import assets.rivalrebels.common.item.ItemRodNuclear;
+import assets.rivalrebels.common.item.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -41,8 +38,8 @@ public class ContainerTheoreticalTsar extends ScreenHandler
         this.bomb = bomb;
         this.propertyDelegate = propertyDelegate;
         addSlot(new SlotRR(bomb, 0, 18, 48, 1, ItemFuse.class));
-		addSlot(new SlotRR(bomb, 1, 40, 59, 1, ItemAntenna.class));
-		addSlot(new SlotRR(bomb, 2, 40, 37, 1, ItemAntenna.class));
+		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna));
+		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna));
 		for (int i = 0; i <= 3; i++)
 		{
 			addSlot(new SlotRR(bomb, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
@@ -77,18 +74,17 @@ public class ContainerTheoreticalTsar extends ScreenHandler
 		}
 	}
 
-	@Override
-	public ItemStack transferSlot(PlayerEntity par1EntityPlayer, int par2)
-	{
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slot) {
 		ItemStack var3 = ItemStack.EMPTY;
-		Slot var4 = this.slots.get(par2);
+		Slot var4 = this.slots.get(slot);
 
 		if (var4 != null && var4.hasStack())
 		{
 			ItemStack var5 = var4.getStack();
 			var3 = var5.copy();
 
-			if (par2 <= 19)
+			if (slot <= 19)
 			{
 				if (!this.insertItem(var5, 19, this.slots.size(), true))
 				{

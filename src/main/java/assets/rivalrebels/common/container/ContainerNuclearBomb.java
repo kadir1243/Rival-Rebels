@@ -72,9 +72,8 @@ public class ContainerNuclearBomb extends ScreenHandler
 		}
 	}
 
-	@Override
-	public ItemStack transferSlot(PlayerEntity player, int index)
-	{
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slot) {
 		return ItemStack.EMPTY;
 	}
 

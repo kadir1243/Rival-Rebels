@@ -15,6 +15,7 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -30,11 +31,12 @@ import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockLaptop extends BlockWithEntity {
+    public static final MapCodec<BlockLaptop> CODEC = createCodec(BlockLaptop::new);
+
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
     public BlockLaptop(Settings settings) {
 		super(settings);
@@ -43,6 +45,11 @@ public class BlockLaptop extends BlockWithEntity {
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
+    }
+
+    @Override
+    protected MapCodec<BlockLaptop> getCodec() {
+        return CODEC;
     }
 
     @Nullable
@@ -57,19 +64,6 @@ public class BlockLaptop extends BlockWithEntity {
         };
         return super.getPlacementState(ctx).with(META, meta);
 	}
-
-    @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        BlockEntity entity = world.getBlockEntity(pos);
-        if (!(entity instanceof TileEntityLaptop)) {
-            entity = null;
-        }
-
-        world.spawnEntity(new ItemEntity(world, pos.getX(), pos.getY(), pos.getZ(), RRBlocks.controller.asItem().getDefaultStack()));
-
-        entity.markRemoved();
-        super.onBreak(world, pos, state, player);
-    }
 
     @Override
     public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
@@ -91,18 +85,4 @@ public class BlockLaptop extends BlockWithEntity {
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
-    /*@OnlyIn(Dist.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:dc");
-	}*/
 }

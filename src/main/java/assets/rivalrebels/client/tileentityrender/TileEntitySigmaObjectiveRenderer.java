@@ -14,48 +14,49 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelObjective;
 import assets.rivalrebels.common.tileentity.TileEntitySigmaObjective;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class TileEntitySigmaObjectiveRenderer implements BlockEntityRenderer<TileEntitySigmaObjective> {
-	private final ModelObjective loaderModel;
+@Environment(EnvType.CLIENT)
+public class TileEntitySigmaObjectiveRenderer implements BlockEntityRenderer<TileEntitySigmaObjective>, CustomRenderBoxExtension<TileEntitySigmaObjective> {
+	public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etsigmaobj);
 
-	public TileEntitySigmaObjectiveRenderer(BlockEntityRendererFactory.Context context) {
-		loaderModel = new ModelObjective();
+    public TileEntitySigmaObjectiveRenderer(BlockEntityRendererFactory.Context context) {
 	}
 
     @Override
     public void render(TileEntitySigmaObjective entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
         matrices.push();
 		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etsigmaobj);
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-        matrices.multiply(new Quaternion(90, 1, 0, 0));
-        loaderModel.renderA(matrices, buffer);
-        matrices.multiply(new Quaternion(-90, 1, 0, 0));
-        matrices.multiply(new Quaternion(90, 0, 0, 1));
-        loaderModel.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 44f / 128f, 0.125f, 0.84375f);
-        matrices.multiply(new Quaternion(-90, 0, 0, 1));
-        loaderModel.renderB(matrices, buffer, (float) entity.slide, 32f / 256f, 44f / 128f, 0.625f, 0.84375f);
-        matrices.multiply(new Quaternion(90, 0, 1, 0));
-        loaderModel.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 108f / 128f, 0.625f, 0.84375f);
-        matrices.multiply(new Quaternion(90, 0, 1, 0));
-        loaderModel.renderB(matrices, buffer, (float) entity.slide, 160f / 256f, 44f / 128f, 0.625f, 0.84375f);
-        matrices.multiply(new Quaternion(90, 0, 1, 0));
-        loaderModel.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 108f / 128f, 0.625f, 0.84375f);
-        matrices.multiply(new Quaternion(90, 0, 1, 0));
-        matrices.multiply(new Quaternion(-90, 0, 0, 1));
-        loaderModel.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 44f / 128f, 0.625f, 0.84375f);
+        VertexConsumer buffer = TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        matrices.multiply(new Quaternionf(90, 1, 0, 0));
+        ModelObjective.renderA(matrices, buffer, light, overlay);
+        matrices.multiply(new Quaternionf(-90, 1, 0, 0));
+        matrices.multiply(new Quaternionf(90, 0, 0, 1));
+        ModelObjective.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 44f / 128f, 0.125f, 0.84375f, light, overlay);
+        matrices.multiply(new Quaternionf(-90, 0, 0, 1));
+        ModelObjective.renderB(matrices, buffer, (float) entity.slide, 32f / 256f, 44f / 128f, 0.625f, 0.84375f, light, overlay);
+        matrices.multiply(new Quaternionf(90, 0, 1, 0));
+        ModelObjective.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 108f / 128f, 0.625f, 0.84375f, light, overlay);
+        matrices.multiply(new Quaternionf(90, 0, 1, 0));
+        ModelObjective.renderB(matrices, buffer, (float) entity.slide, 160f / 256f, 44f / 128f, 0.625f, 0.84375f, light, overlay);
+        matrices.multiply(new Quaternionf(90, 0, 1, 0));
+        ModelObjective.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 108f / 128f, 0.625f, 0.84375f, light, overlay);
+        matrices.multiply(new Quaternionf(90, 0, 1, 0));
+        matrices.multiply(new Quaternionf(-90, 0, 0, 1));
+        ModelObjective.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 44f / 128f, 0.625f, 0.84375f, light, overlay);
 		matrices.pop();
 	}
 
@@ -65,4 +66,8 @@ public class TileEntitySigmaObjectiveRenderer implements BlockEntityRenderer<Til
         return 16384;
     }
 
+    @Override
+    public Box getRenderBoundingBox(TileEntitySigmaObjective blockEntity) {
+        return Box.from(BlockBox.create(blockEntity.getPos().add(-1, -1, -1), blockEntity.getPos().add(2, 2, 2)));
+    }
 }

@@ -95,25 +95,6 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		}
 	}
 
-	@Override
-	public Box getRenderBoundingBox() {
-		float t = 0.0625f;
-		float l = 35f;
-		float h = 3.5f;
-        return switch (this.getCachedState().get(BlockForceFieldNode.META)) {
-            case 2 ->
-                    new Box(getPos().getX() + 0.5f - t, getPos().getY() + 0.5f - h, getPos().getZ() - l, getPos().getX() + 0.5f + t, getPos().getY() + 0.5f + h, getPos().getZ());
-            case 3 ->
-                    new Box(getPos().getX() + 0.5f - t, getPos().getY() + 0.5f - h, getPos().getZ() + 1f, getPos().getX() + 0.5f + t, getPos().getY() + 0.5f + h, getPos().getZ() + 1f + l);
-            case 4 ->
-                    new Box(getPos().getX() - l, getPos().getY() + 0.5f - h, getPos().getZ() + 0.5f - t, getPos().getX(), getPos().getY() + 0.5f + h, getPos().getZ() + 0.5f + t);
-            case 5 ->
-                    new Box(getPos().getX() + 1f, getPos().getY() + 0.5f - h, getPos().getZ() + 0.5f - t, getPos().getX() + 1f + l, getPos().getY() + 0.5f + h, getPos().getZ() + 0.5f + t);
-            default -> new Box(getPos(), getPos());
-        };
-	}
-
-
     @Override
     public void readNbt(NbtCompound nbt) {
         super.readNbt(nbt);

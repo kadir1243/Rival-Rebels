@@ -12,19 +12,24 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesRightUpperLeg;
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.render.OverlayTexture;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Quaternionf;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.joml.Vector3f;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderRhodesRightUpperLeg extends EntityRenderer<EntityRhodesRightUpperLeg>
 {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RenderRhodes.texture);
     public RenderRhodesRightUpperLeg(EntityRendererFactory.Context renderManager) {
         super(renderManager);
     }
@@ -33,11 +38,11 @@ public class RenderRhodesRightUpperLeg extends EntityRenderer<EntityRhodesRightU
     public void render(EntityRhodesRightUpperLeg entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		matrices.push();
 		matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
-        RenderSystem.setShaderColor(RenderRhodes.colors[entity.getColor()*3], RenderRhodes.colors[entity.getColor()*3+1], RenderRhodes.colors[entity.getColor()*3+2], 1);
-		matrices.multiply(new Quaternion(entity.getYaw(), 0, 1, 0));
-		matrices.multiply(new Quaternion(entity.getPitch(), 1, 0, 0));
+        float[] colors = RenderRhodes.colors;
+		matrices.multiply(new Quaternionf(entity.getYaw(), 0, 1, 0));
+		matrices.multiply(new Quaternionf(entity.getPitch(), 1, 0, 0));
 		matrices.translate(-3, 5f, 0);
-		//RenderRhodes.thigh.renderAll();
+		RenderRhodes.thigh.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.DEFAULT_UV);
 		matrices.pop();
 	}
 

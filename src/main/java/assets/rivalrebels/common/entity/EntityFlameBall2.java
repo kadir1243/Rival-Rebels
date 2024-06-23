@@ -14,6 +14,7 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -22,8 +23,8 @@ import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.Box;
@@ -31,8 +32,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraft.world.explosion.Explosion;
-import net.minecraftforge.common.Tags;
 
 import java.util.Iterator;
 import java.util.List;
@@ -108,22 +107,22 @@ public class EntityFlameBall2 extends EntityInanimate
 
 		Vec3d start = getPos();
 		Vec3d end = getPos().add(getVelocity());
-		HitResult mop = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		HitResult mop = getWorld().raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
 		if (mop != null) end = mop.getPos();
 
 		Entity e = null;
-		List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+		List<Entity> var5 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 		double var6 = 0.0D;
 		Iterator<Entity> var8 = var5.iterator();
 
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			while (var8.hasNext())
 			{
 				Entity var9 = var8.next();
 
-				if (var9.collides())
+				if (var9.isCollidable())
 				{
 					float var10 = 0.3F;
 					Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
@@ -170,12 +169,12 @@ public class EntityFlameBall2 extends EntityInanimate
 			{
                 Entity entityHit = ((EntityHitResult) mop).getEntity();
                 entityHit.setOnFireFor(3);
-				entityHit.damage(RivalRebelsDamageSource.cooked, 12);
+				entityHit.damage(RivalRebelsDamageSource.cooked(getWorld()), 12);
 				if (entityHit instanceof PlayerEntity player)
 				{
-					EquipmentSlot equipmentSlot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, world.random.nextInt(4));
+					EquipmentSlot equipmentSlot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, getWorld().random.nextInt(4));
                     ItemStack equippedStack = player.getEquippedStack(equipmentSlot);
-                    if (!equippedStack.isEmpty() && !world.isClient)
+                    if (!equippedStack.isEmpty() && !getWorld().isClient)
 					{
 						equippedStack.damage(8, player, player1 -> player1.sendEquipmentBreakStatus(equipmentSlot));
 					}
@@ -218,40 +217,40 @@ public class EntityFlameBall2 extends EntityInanimate
 
 	private void fire()
 	{
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
-            BlockState state = world.getBlockState(getBlockPos());
+            BlockState state = getWorld().getBlockState(getBlockPos());
             Block id = state.getBlock();
-			if (state.isAir() || id == Blocks.SNOW || state.isIn(BlockTags.ICE)) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
-			else if (state.isIn(BlockTags.SAND) && world.random.nextInt(60) == 0) world.setBlockState(getBlockPos(), Blocks.GLASS.getDefaultState());
-			else if (state.isIn(Tags.Blocks.GLASS) && world.random.nextInt(120) == 0) world.setBlockState(getBlockPos(), Blocks.OBSIDIAN.getDefaultState());
-			else if (state.isIn(Tags.Blocks.OBSIDIAN) && world.random.nextInt(90) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if ((state.isIn(BlockTags.BASE_STONE_OVERWORLD) || state.isIn(Tags.Blocks.COBBLESTONE)) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (state.isIn(Tags.Blocks.ORES_IRON) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (state.isIn(Tags.Blocks.ORES_COAL) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (state.isIn(Tags.Blocks.ORES_GOLD) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (state.isIn(Tags.Blocks.ORES_LAPIS) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (state.isIn(Tags.Blocks.GRAVEL) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (state.isIn(Tags.Blocks.SANDSTONE) && world.random.nextInt(30) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (state.isIn(Tags.Blocks.STORAGE_BLOCKS_IRON) && world.random.nextInt(50) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if (id == Blocks.BEDROCK && world.random.nextInt(500) == 0) world.setBlockState(getBlockPos(), Blocks.OBSIDIAN.getDefaultState());
-			else if (state.getFluidState().isIn(FluidTags.LAVA)) world.setBlockState(getBlockPos(), Blocks.AIR.getDefaultState());
-			else if (state.isIn(BlockTags.LEAVES)) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
-			else if (state.isIn(BlockTags.DIRT)) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
-			else if (id == RRBlocks.flare) id.onBroken(world, getBlockPos(), state);
-			else if (id == RRBlocks.timedbomb) id.onBroken(world, getBlockPos(), state);
-			else if (id == RRBlocks.remotecharge) id.onBroken(world, getBlockPos(), state);
-			else if (id == RRBlocks.landmine) id.onBroken(world, getBlockPos(), state);
-			else if (id == RRBlocks.alandmine) id.onBroken(world, getBlockPos(), state);
+			if (state.isAir() || id == Blocks.SNOW || state.isIn(BlockTags.ICE)) getWorld().setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (state.isIn(BlockTags.SAND) && getWorld().random.nextInt(60) == 0) getWorld().setBlockState(getBlockPos(), Blocks.GLASS.getDefaultState());
+			else if (state.isIn(ConventionalBlockTags.GLASS_BLOCKS) && getWorld().random.nextInt(120) == 0) getWorld().setBlockState(getBlockPos(), Blocks.OBSIDIAN.getDefaultState());
+			else if (state.isOf(Blocks.OBSIDIAN) && getWorld().random.nextInt(90) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if ((state.isIn(BlockTags.BASE_STONE_OVERWORLD) || state.isOf(Blocks.COBBLESTONE)) && getWorld().random.nextInt(30) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(BlockTags.IRON_ORES) && getWorld().random.nextInt(30) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(BlockTags.COAL_ORES) && getWorld().random.nextInt(30) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(BlockTags.GOLD_ORES) && getWorld().random.nextInt(30) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(BlockTags.LAPIS_ORES) && getWorld().random.nextInt(30) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isOf(Blocks.GRAVEL) && getWorld().random.nextInt(30) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isIn(ConventionalBlockTags.SANDSTONE_BLOCKS) && getWorld().random.nextInt(30) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (state.isOf(Blocks.IRON_BLOCK) && getWorld().random.nextInt(50) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if (id == Blocks.BEDROCK && getWorld().random.nextInt(500) == 0) getWorld().setBlockState(getBlockPos(), Blocks.OBSIDIAN.getDefaultState());
+			else if (state.getFluidState().isIn(FluidTags.LAVA)) getWorld().setBlockState(getBlockPos(), Blocks.AIR.getDefaultState());
+			else if (state.isIn(BlockTags.LEAVES)) getWorld().setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (state.isIn(BlockTags.DIRT)) getWorld().setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (id == RRBlocks.flare) id.onBroken(getWorld(), getBlockPos(), state);
+			else if (id == RRBlocks.timedbomb) id.onBroken(getWorld(), getBlockPos(), state);
+			else if (id == RRBlocks.remotecharge) id.onBroken(getWorld(), getBlockPos(), state);
+			else if (id == RRBlocks.landmine) id.onBroken(getWorld(), getBlockPos(), state);
+			else if (id == RRBlocks.alandmine) id.onBroken(getWorld(), getBlockPos(), state);
 			else if (id == Blocks.TNT)
 			{
-				world.setBlockState(getBlockPos(), Blocks.AIR.getDefaultState());
-				world.createExplosion(null, getX(), getY(), getZ(), 4, Explosion.DestructionType.NONE);
+				getWorld().setBlockState(getBlockPos(), Blocks.AIR.getDefaultState());
+				getWorld().createExplosion(null, getX(), getY(), getZ(), 4, World.ExplosionSourceType.NONE);
 			}
-			else if (id == RRBlocks.conduit) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
-			else if (id == RRBlocks.reactive && world.random.nextInt(20) == 0) world.setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
-			else if ((id == RRBlocks.camo1 || id == RRBlocks.camo2 || id == RRBlocks.camo3) && world.random.nextInt(40) == 0) world.setBlockState(getBlockPos(), RRBlocks.steel.getDefaultState());
-			else if (id == RRBlocks.steel && world.random.nextInt(40) == 0) world.setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (id == RRBlocks.conduit) getWorld().setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
+			else if (id == RRBlocks.reactive && getWorld().random.nextInt(20) == 0) getWorld().setBlockState(getBlockPos(), Blocks.LAVA.getDefaultState());
+			else if ((id == RRBlocks.camo1 || id == RRBlocks.camo2 || id == RRBlocks.camo3) && getWorld().random.nextInt(40) == 0) getWorld().setBlockState(getBlockPos(), RRBlocks.steel.getDefaultState());
+			else if (id == RRBlocks.steel && getWorld().random.nextInt(40) == 0) getWorld().setBlockState(getBlockPos(), Blocks.FIRE.getDefaultState());
 		}
 	}
 }

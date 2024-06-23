@@ -15,6 +15,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.entity.Entity;
@@ -31,7 +32,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public class EntityRocket extends PersistentProjectileEntity
 	private int					soundfile		= 0;
 
 	public EntityRocket(EntityType<? extends EntityRocket> type, World par1World) {
-		super(type, par1World);
+		super(type, par1World, ItemStack.EMPTY);
 	}
 
     public EntityRocket(World world) {
@@ -112,11 +112,11 @@ public class EntityRocket extends PersistentProjectileEntity
 
 		if (age == 0)
 		{
-			rotation = world.random.nextInt(360);
-			slide = world.random.nextInt(21) - 10;
+			rotation = getWorld().random.nextInt(360);
+			slide = getWorld().random.nextInt(21) - 10;
 			for (int i = 0; i < 10; i++)
 			{
-				world.addParticle(ParticleTypes.EXPLOSION, getX() - getVelocity().getX() * 2, getY() - getVelocity().getY() * 2, getZ() - getVelocity().getZ() * 2, -getVelocity().getX() + (world.random.nextFloat() - 0.5f) * 0.1f, -getVelocity().getY() + (world.random.nextFloat() - 0.5) * 0.1f, -getVelocity().getZ() + (world.random.nextFloat() - 0.5f) * 0.1f);
+				getWorld().addParticle(ParticleTypes.EXPLOSION, getX() - getVelocity().getX() * 2, getY() - getVelocity().getY() * 2, getZ() - getVelocity().getZ() * 2, -getVelocity().getX() + (getWorld().random.nextFloat() - 0.5f) * 0.1f, -getVelocity().getY() + (getWorld().random.nextFloat() - 0.5) * 0.1f, -getVelocity().getZ() + (getWorld().random.nextFloat() - 0.5f) * 0.1f);
 			}
 		}
 		rotation += (int) slide;
@@ -128,23 +128,23 @@ public class EntityRocket extends PersistentProjectileEntity
 		}
 		// world.spawnEntity(new EntityLightningLink(world, getX(), getY(), getZ(), yaw, pitch, 100));
 
-		if (world.isClient && age >= 5 && !isInsideWaterOrBubbleColumn() && age <= 100)
+		if (getWorld().isClient && age >= 5 && !isInsideWaterOrBubbleColumn() && age <= 100)
 		{
-			world.spawnEntity(new EntityPropulsionFX(world, getX(), getY(), getZ(), -getVelocity().getX() * 0.5, -getVelocity().getY() * 0.5 - 0.1, -getVelocity().getZ() * 0.5));
+			getWorld().spawnEntity(new EntityPropulsionFX(getWorld(), getX(), getY(), getZ(), -getVelocity().getX() * 0.5, -getVelocity().getY() * 0.5 - 0.1, -getVelocity().getZ() * 0.5));
 		}
 		Vec3d vec31 = getPos();
 		Vec3d vec3 = getPos().add(getVelocity());
-		HitResult mop = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-		if (!world.isClient)
+		HitResult mop = getWorld().raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		if (!getWorld().isClient)
 		{
 			vec31 = getPos();
 			if (mop != null) vec3 = mop.getPos();
 			else vec3 = getPos().add(getVelocity());
 
-			List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> list = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
             for (Entity entity : list) {
-                if (entity.collides() && age >= 7 && entity != thrower) {
+                if (entity.isCollidable() && age >= 7 && entity != thrower) {
                     Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
                     if (mop1.isPresent()) {
                         double d1 = vec31.squaredDistanceTo(mop1.get());
@@ -177,7 +177,7 @@ public class EntityRocket extends PersistentProjectileEntity
 		{
 			for (int var7 = 0; var7 < 4; ++var7)
 			{
-				world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
+				getWorld().addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
 			}
 			if (!inwaterprevtick)
 			{
@@ -210,17 +210,17 @@ public class EntityRocket extends PersistentProjectileEntity
     public void explode(HitResult mop)
 	{
 		if (mop != null && mop.getType() == HitResult.Type.ENTITY && ((EntityHitResult) mop).getEntity() instanceof PlayerEntity player) {
-            player.damage(RivalRebelsDamageSource.rocket, 48);
+            player.damage(RivalRebelsDamageSource.rocket(getWorld()), 48);
 		} else if (mop != null && mop.getType() == HitResult.Type.BLOCK) {
-            BlockState state = world.getBlockState(((BlockHitResult) mop).getBlockPos());
-			if (state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS_PANES) || state.isIn(Tags.Blocks.STAINED_GLASS) || state.isIn(Tags.Blocks.STAINED_GLASS_PANES)) {
-				world.setBlockState(((BlockHitResult) mop).getBlockPos(), Blocks.AIR.getDefaultState());
+            BlockState state = getWorld().getBlockState(((BlockHitResult) mop).getBlockPos());
+			if (state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(ConventionalBlockTags.GLASS_PANES)) {
+				getWorld().setBlockState(((BlockHitResult) mop).getBlockPos(), Blocks.AIR.getDefaultState());
 				RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
 				return;
 			}
 		}
 		RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-		new Explosion(world, getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket);
+		new Explosion(getWorld(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(getWorld()));
 		kill();
 	}
 

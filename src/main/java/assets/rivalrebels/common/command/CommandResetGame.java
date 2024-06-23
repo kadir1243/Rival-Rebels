@@ -13,7 +13,6 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandException;
 import net.minecraft.command.argument.EntityArgumentType;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.server.command.CommandManager;
@@ -33,15 +32,15 @@ public class CommandResetGame {
         );
     }
 
-    private static int execute(ServerCommandSource source, PlayerEntity player) throws CommandException {
+    private static int execute(ServerCommandSource source, PlayerEntity player) {
 		if (player == null) {
 			RivalRebels.round.rrplayerlist.clearTeam();
 			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
-			source.sendFeedback(Text.of("§7All players have been reset."), true);
+			source.sendFeedback(() -> Text.of("§7All players have been reset."), true);
 		} else if (RivalRebels.round.rrplayerlist.contains(player.getGameProfile())) {
 			RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).clearTeam();
 			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
-			source.sendFeedback(Text.of("§7Player successfully reset."), true);
+			source.sendFeedback(() -> Text.of("§7Player successfully reset."), true);
 		} else {
 			source.sendError(Text.of("§7No player by that name."));
 		}

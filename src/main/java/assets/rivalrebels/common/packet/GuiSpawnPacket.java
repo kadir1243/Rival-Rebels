@@ -12,28 +12,35 @@
 package assets.rivalrebels.common.packet;
 
 import assets.rivalrebels.RivalRebels;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.util.Identifier;
 
-import java.util.function.Supplier;
-
-public class GuiSpawnPacket {
-	public static GuiSpawnPacket fromBytes(PacketByteBuf buf) {
-        return new GuiSpawnPacket();
+public class GuiSpawnPacket implements FabricPacket {
+    public static final PacketType<GuiSpawnPacket> TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "gui_spawn"), GuiSpawnPacket::new);
+	public GuiSpawnPacket(PacketByteBuf buf) {
 	}
 
-	public static void toBytes(GuiSpawnPacket packet, PacketByteBuf buf) {
+    public GuiSpawnPacket() {
     }
 
-	public static void onMessage(GuiSpawnPacket m, Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context context = ctx.get();
-        context.enqueueWork(() -> {
-            if (RivalRebels.round.rrplayerlist.getForGameProfile(MinecraftClient.getInstance().player.getGameProfile()).isreset) {
-                RivalRebels.proxy.guiClass();
-            } else {
-                RivalRebels.proxy.guiSpawn();
-            }
-        });
+    @Override
+    public void write(PacketByteBuf buf) {
+    }
+
+    @Override
+    public PacketType<?> getType() {
+        return TYPE;
+    }
+
+    public static void onMessage(GuiSpawnPacket packet, PlayerEntity player, PacketSender responseHandler) {
+        if (RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).isreset) {
+            RivalRebels.proxy.guiClass();
+        } else {
+            RivalRebels.proxy.guiSpawn();
+        }
 	}
 }

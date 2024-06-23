@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": [
+    "${mod_authors}"
+  ],
+  "license": "${mod_license}",
+  "icon": "assets/rivalrebels/textures/gui/h.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "assets.rivalrebels.RivalRebels"
+    ],
+    "client": [
+      "assets.rivalrebels.RivalRebels"
+    ],
+    "fabric-datagen": [
+      "assets.rivalrebels.datagen.DataGen"
+    ]
+  },
+  "mixins": [
+    "rivalrebels.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.15.0",
+    "minecraft": "~1.20.4",
+    "java": ">=17",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "another-mod": "*"
+  }
+}

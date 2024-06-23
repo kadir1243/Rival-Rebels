@@ -98,7 +98,7 @@ public class EntityBomb extends ThrownEntity {
 		{
 			Vec3d var15 = getPos();
 			Vec3d var2 = getPos().add(getVelocity());
-			HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+			HitResult var3 = this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 			var15 = getPos();
 			var2 = getPos().add(getVelocity());
 
@@ -107,14 +107,14 @@ public class EntityBomb extends ThrownEntity {
 				var2 = var3.getPos();
 			}
 
-			if (!this.world.isClient)
+			if (!this.getWorld().isClient)
 			{
 				Entity var4 = null;
-				List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+				List<Entity> var5 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 				double var6 = 0.0D;
 
                 for (Entity var9 : var5) {
-                    if (var9.collides()) {
+                    if (var9.isCollidable()) {
                         float var10 = 0.3F;
                         Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
                         Optional<Vec3d> var12 = var11.raycast(var15, var2);
@@ -184,7 +184,7 @@ public class EntityBomb extends ThrownEntity {
     @Override
     protected void onEntityHit(EntityHitResult entityHitResult) {
         Entity entity = entityHitResult.getEntity();
-        entity.damage(RivalRebelsDamageSource.rocket, (entity instanceof PlayerEntity ? 20 : 300));
+        entity.damage(RivalRebelsDamageSource.rocket(getWorld()), (entity instanceof PlayerEntity ? 20 : 300));
         explode(true);
     }
 
@@ -205,7 +205,7 @@ public class EntityBomb extends ThrownEntity {
 		hit = b;
 		age = 0;
 		if (random.nextDouble() > 0.8f) RivalRebelsSoundPlayer.playSound(this, 23, 0, 20, 0.4f + (float)random.nextDouble() * 0.3f);
-		if (!world.isClient && !b)
+		if (!getWorld().isClient && !b)
 		{
 			int r = 2;
 			for (int x = -r; x <= r; x++)
@@ -214,7 +214,7 @@ public class EntityBomb extends ThrownEntity {
 				{
 					for (int z = -r; z <= r; z++)
 					{
-						world.setBlockState(new BlockPos((int)(getX()+x), (int)(Math.max(getY(), r+1)+y), (int)(getZ()+z)), Blocks.AIR.getDefaultState());
+						getWorld().setBlockState(new BlockPos((int)(getX()+x), (int)(Math.max(getY(), r+1)+y), (int)(getZ()+z)), Blocks.AIR.getDefaultState());
 					}
 				}
 			}

@@ -36,11 +36,9 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class TileEntityTachyonBomb extends BlockEntity implements Inventory, Tickable, NamedScreenHandlerFactory
@@ -234,8 +232,8 @@ public class TileEntityTachyonBomb extends BlockEntity implements Inventory, Tic
 			{
 				this.chestContents.set(0, ItemStack.EMPTY);
                 for (PlayerEntity player : world.getPlayers()) {
-                    player.sendMessage(new TranslatableText(RivalRebels.MODID + ".warning_to_specific_player", username), false);
-                    player.sendMessage(new TranslatableText(RivalRebels.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Text.of("NONE")), false);
+                    player.sendMessage(Text.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
+                    player.sendMessage(Text.translatable(RivalRebels.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Text.of("NONE")), false);
                 }
 			}
 		}
@@ -247,9 +245,9 @@ public class TileEntityTachyonBomb extends BlockEntity implements Inventory, Tic
 
 		if (countdown == 200 && !world.isClient && RivalRebels.nuclearBombCountdown > 10)
 		{
-            MutableText line1 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
-            MutableText line2 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
-            MutableText line3 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
+            MutableText line1 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
+            MutableText line2 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
+            MutableText line3 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
             for (PlayerEntity player : world.getPlayers()) {
                 player.sendMessage(line1, false);
                 player.sendMessage(line2, false);
@@ -279,15 +277,9 @@ public class TileEntityTachyonBomb extends BlockEntity implements Inventory, Tic
 		if (countdown == 0 && nuclear == 0 && hydrogen == 0)
 		{
 			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
-			world.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, Explosion.DestructionType.NONE);
+			world.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, World.ExplosionSourceType.NONE);
 		}
     }
-
-	@Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-5, 0, -5), getPos().add(6, 2, 6));
-	}
 
     @Override
     public Text getDisplayName() {

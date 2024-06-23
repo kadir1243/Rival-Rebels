@@ -64,13 +64,13 @@ public class EntityPropulsionFX extends ThrownEntity
 	{
 		super.tick();
 		ticksInAir++;
-		if ((ticksInAir >= 5 && world.random.nextInt(2) == 1) || this.isInsideWaterOrBubbleColumn())
+		if ((ticksInAir >= 5 && getWorld().random.nextInt(2) == 1) || this.isInsideWaterOrBubbleColumn())
 		{
 			kill();
 		}
-        setPos(getX() + getVelocity().getX() + (world.random.nextDouble() - 0.5) * 0.07,
-            getY() + getVelocity().getY() + (world.random.nextDouble() - 0.5) * 0.07 + 0.005,
-            getZ() + getVelocity().getZ() + (world.random.nextDouble() - 0.5) * 0.07);
+        setPos(getX() + getVelocity().getX() + (getWorld().random.nextDouble() - 0.5) * 0.07,
+            getY() + getVelocity().getY() + (getWorld().random.nextDouble() - 0.5) * 0.07 + 0.005,
+            getZ() + getVelocity().getZ() + (getWorld().random.nextDouble() - 0.5) * 0.07);
 		setPosition(getX(), getY(), getZ());
 	}
 

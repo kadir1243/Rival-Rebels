@@ -12,35 +12,37 @@
 package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
-import assets.rivalrebels.client.renderhelper.Vertice;
+import assets.rivalrebels.client.renderhelper.TextureVertice;
+import org.joml.Vector3f;
 import net.minecraft.client.render.VertexConsumer;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.joml.Vector4f;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class ModelJump
 {
-	float	s	= 0.501F;
-	float	t	= 0.25F;
+	private static final float	s	= 0.501F;
+	private static final float	t	= 0.25F;
 
-	Vertice	v1	= new Vertice(s, t, s);
-	Vertice	v2	= new Vertice(s, t, -s);
-	Vertice	v3	= new Vertice(-s, t, -s);
-	Vertice	v4	= new Vertice(-s, t, s);
+	private static final Vector3f	v1	= new Vector3f(s, t, s);
+	private static final Vector3f	v2	= new Vector3f(s, t, -s);
+	private static final Vector3f	v3	= new Vector3f(-s, t, -s);
+	private static final Vector3f	v4	= new Vector3f(-s, t, s);
 
-	Vertice	v5	= new Vertice(s, -t, s);
-	Vertice	v6	= new Vertice(s, -t, -s);
-	Vertice	v7	= new Vertice(-s, -t, -s);
-	Vertice	v8	= new Vertice(-s, -t, s);
+	private static final Vector3f	v5	= new Vector3f(s, -t, s);
+	private static final Vector3f	v6	= new Vector3f(s, -t, -s);
+	private static final Vector3f	v7	= new Vector3f(-s, -t, -s);
+	private static final Vector3f	v8	= new Vector3f(-s, -t, s);
 
-	public void renderModel(VertexConsumer buffer) {
-		RenderHelper.addVertice(buffer, v2, 0, 0);
-		RenderHelper.addVertice(buffer, v1, 1, 0);
-		RenderHelper.addVertice(buffer, v4, 1, 1);
-		RenderHelper.addVertice(buffer, v3, 0, 1);
-		RenderHelper.addVertice(buffer, v5, 0, 0);
-		RenderHelper.addVertice(buffer, v6, 1, 0);
-		RenderHelper.addVertice(buffer, v7, 1, 1);
-		RenderHelper.addVertice(buffer, v8, 0, 1);
+	public static void renderModel(VertexConsumer buffer, int light, int overlay) {
+		RenderHelper.addVertice(buffer, v2, new TextureVertice(0, 0), new Vector4f(1, 1, 1, 1), light, overlay);
+		RenderHelper.addVertice(buffer, v1, new TextureVertice(1, 0), new Vector4f(1, 1, 1, 1), light, overlay);
+		RenderHelper.addVertice(buffer, v4, new TextureVertice(1, 1), new Vector4f(1, 1, 1, 1), light, overlay);
+		RenderHelper.addVertice(buffer, v3, new TextureVertice(0, 1), new Vector4f(1, 1, 1, 1), light, overlay);
+		RenderHelper.addVertice(buffer, v5, new TextureVertice(0, 0), new Vector4f(1, 1, 1, 1), light, overlay);
+		RenderHelper.addVertice(buffer, v6, new TextureVertice(1, 0), new Vector4f(1, 1, 1, 1), light, overlay);
+		RenderHelper.addVertice(buffer, v7, new TextureVertice(1, 1), new Vector4f(1, 1, 1, 1), light, overlay);
+		RenderHelper.addVertice(buffer, v8, new TextureVertice(0, 1), new Vector4f(1, 1, 1, 1), light, overlay);
 	}
 }

@@ -1,20 +1,16 @@
 package assets.rivalrebels.datagen;
 
-import net.minecraft.data.DataGenerator;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 
-public class DataGen {
-    @SubscribeEvent
-    public static void onData(GatherDataEvent event) {
-        DataGenerator generator = event.getGenerator();
-        if (event.includeServer()) {
-            generator.addProvider(new RecipeDataGen(generator));
-            generator.addProvider(new LootTableDataGen(generator));
-        }
-        if (event.includeClient()) {
-            generator.addProvider(new BlockStateDataGen(generator, event.getExistingFileHelper()));
-            generator.addProvider(new ItemModelDataGen(generator, event.getExistingFileHelper()));
-        }
+public class DataGen implements DataGeneratorEntrypoint {
+    @Override
+    public void onInitializeDataGenerator(FabricDataGenerator generator) {
+        FabricDataGenerator.Pack pack = generator.createPack();
+        pack.addProvider(RecipeDataGen::new);
+        pack.addProvider(BlockStateDataGen::new);
+        pack.addProvider(ItemModelDataGen::new);
+        pack.addProvider(LootTableDataGen::new);
+        pack.addProvider(SoundDataGen::new);
     }
 }

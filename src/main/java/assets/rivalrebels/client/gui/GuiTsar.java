@@ -13,20 +13,16 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerTsar;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Util;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.GuiUtils;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiTsar extends HandledScreen<ContainerTsar> {
     public GuiTsar(ContainerTsar container, PlayerInventory inventory, Text title) {
 		super(container, inventory, title);
@@ -34,18 +30,18 @@ public class GuiTsar extends HandledScreen<ContainerTsar> {
     }
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-        RenderSystem.setShaderColor(1, 1, 1, 1);
-        MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.guittsar);
-        int x = (width - getXSize()) / 2;
-        int y = (height - getYSize()) / 2;
-        GuiUtils.drawTexturedModalRect(matrices, x, y, 0, 0, getXSize(), getYSize(), getZOffset());
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        context.setShaderColor(1, 1, 1, 1);
+        int x = (width - backgroundWidth) / 2;
+        int y = (height - backgroundHeight) / 2;
+        context.drawTexture(RRIdentifiers.guittsar, x, y, 0, 0, backgroundWidth, backgroundHeight);
     }
 
     @Override
-    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-        super.drawForeground(matrices, mouseX, mouseY);
-		int seconds = (handler.getCountdown() / 20);
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        super.drawForeground(context, mouseX, mouseY);
+        MatrixStack matrices = context.getMatrices();
+        int seconds = (handler.getCountdown() / 20);
 		int millis = (handler.getCountdown() % 20) * 3;
 		String milli;
 		if (millis < 10)
@@ -58,34 +54,34 @@ public class GuiTsar extends HandledScreen<ContainerTsar> {
 		}
 		if (handler.getCountdown() % 20 >= 10)
 		{
-			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, getYSize() - 107, 0xFFFFFF);
+			context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, backgroundHeight - 107, 0xFFFFFF, false);
 		}
 		else
 		{
-			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, getYSize() - 107, 0xFF0000);
+            context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, backgroundHeight - 107, 0xFF0000, false);
 		}
 		float scalef = 0.666f;
 		matrices.push();
 		matrices.scale(scalef, scalef, scalef);
-		textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.tsar"), 18, 16, 4210752);
+        context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.tsar"), 18, 16, 4210752, false);
 		matrices.pop();
 		if (handler.isUnbalanced())
 		{
-			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.unbalanced"), 6, getYSize() - 97, 0xFF0000);
+            context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.unbalanced"), 6, backgroundHeight - 97, 0xFF0000, false);
 		}
 		else if (handler.isArmed())
 		{
-			textRenderer.draw(matrices, new TranslatableText("RivalRebels.tsar.armed"), 6, getYSize() - 97, 0xFF0000);
+            context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.armed"), 6, backgroundHeight - 97, 0xFF0000, false);
 		}
 		else
 		{
-			textRenderer.draw(matrices, new LiteralText(handler.getMegaton() + " ").append(new TranslatableText("RivalRebels.tsar.megatons")), 6, getYSize() - 97, 0xFFFFFF);
+            context.drawText(textRenderer, Text.literal(handler.getMegaton() + " ").append(Text.translatable("RivalRebels.tsar.megatons")), 6, backgroundHeight - 97, 0xFFFFFF, false);
 		}
 
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - getXSize()) / 2;
-		int posy = (height - getYSize()) / 2;
+		int posx = (width - backgroundWidth) / 2;
+		int posy = (height - backgroundHeight) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 194;
 		int widthx = 72;
@@ -94,8 +90,8 @@ public class GuiTsar extends HandledScreen<ContainerTsar> {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			GuiUtils.drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			context.fillGradient(mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+            context.drawText(textRenderer, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
 			if (!buttondown && client.mouse.wasLeftButtonClicked())
 			{
                 Util.getOperatingSystem().open("http://rivalrebels.com");

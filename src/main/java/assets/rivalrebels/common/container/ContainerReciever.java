@@ -13,9 +13,9 @@ package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.block.crate.BlockWeapons;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
-import assets.rivalrebels.common.item.ItemBattery;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.item.ItemFuel;
+import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -41,9 +41,9 @@ public class ContainerReciever extends ScreenHandler {
         addSlot(new SlotRR(reciever, 0, 8, 76, 64, ItemFuel.class));
 		addSlot(new SlotRR(reciever, 1, 26, 76, 64, ItemFuel.class));
 		addSlot(new SlotRR(reciever, 2, 44, 76, 64, ItemFuel.class));
-		addSlot(new SlotRR(reciever, 3, 8, 94, 16, ItemBattery.class));
-		addSlot(new SlotRR(reciever, 4, 26, 94, 16, ItemBattery.class));
-		addSlot(new SlotRR(reciever, 5, 44, 94, 16, ItemBattery.class));
+		addSlot(new SlotRR(reciever, 3, 8, 94, 16, RRItems.battery));
+		addSlot(new SlotRR(reciever, 4, 26, 94, 16, RRItems.battery));
+		addSlot(new SlotRR(reciever, 5, 44, 94, 16, RRItems.battery));
 		addSlot(new SlotRR(reciever, 6, 116, 94, 1, ItemChip.class));
 		addSlot(new SlotRR(reciever, 7, 134, 94, 1, BlockWeapons.class));
 		addSlot(new SlotRR(reciever, 8, 152, 94, 1, BlockWeapons.class));
@@ -72,9 +72,8 @@ public class ContainerReciever extends ScreenHandler {
 		}
 	}
 
-	@Override
-	public ItemStack transferSlot(PlayerEntity player, int par2)
-	{
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slot) {
 		return ItemStack.EMPTY;
 	}
 

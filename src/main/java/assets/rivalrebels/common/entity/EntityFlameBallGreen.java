@@ -20,7 +20,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.tag.BlockTags;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
 import net.minecraft.util.math.BlockPos;
@@ -109,24 +109,24 @@ public class EntityFlameBallGreen extends EntityInanimate
 
 		Vec3d start = getPos();
 		Vec3d end = getPos().add(getVelocity());
-		HitResult mop = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		HitResult mop = getWorld().raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 		start = getPos();
 		end = getPos().add(getVelocity());
 
 		if (mop != null) end = mop.getPos();
 
 		Entity e = null;
-		List<Entity> var5 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+		List<Entity> var5 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 		double var6 = 0.0D;
 		Iterator<Entity> var8 = var5.iterator();
 
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			while (var8.hasNext())
 			{
 				Entity var9 = var8.next();
 
-				if (var9.collides())
+				if (var9.isCollidable())
 				{
 					float var10 = 0.3F;
 					Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
@@ -159,10 +159,10 @@ public class EntityFlameBallGreen extends EntityInanimate
 			{
                 Entity entity = ((EntityHitResult) mop).getEntity();
                 entity.setOnFireFor(3);
-				entity.damage(RivalRebelsDamageSource.cooked, 12);
+				entity.damage(RivalRebelsDamageSource.cooked(getWorld()), 12);
 				if (entity instanceof PlayerEntity player) {
-                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, world.random.nextInt(4));
-					if (!player.getEquippedStack(slot).isEmpty() && !world.isClient) {
+                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, getWorld().random.nextInt(4));
+					if (!player.getEquippedStack(slot).isEmpty() && !getWorld().isClient) {
 						player.getEquippedStack(slot).damage(8, player, player1 -> player1.sendEquipmentBreakStatus(slot));
 					}
 				}
@@ -196,7 +196,7 @@ public class EntityFlameBallGreen extends EntityInanimate
 
 	private void fire()
 	{
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			for (int x = -3; x < 4; x++)
 			{
@@ -205,9 +205,9 @@ public class EntityFlameBallGreen extends EntityInanimate
 					for (int z = -3; z < 4; z++)
 					{
                         BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
-                        BlockState state = world.getBlockState(pos);
+                        BlockState state = getWorld().getBlockState(pos);
                         Block id = state.getBlock();
-						if (world.isAir(pos) || id == Blocks.SNOW || state.isIn(BlockTags.ICE) || state.isIn(BlockTags.LEAVES)) world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+						if (getWorld().isAir(pos) || id == Blocks.SNOW || state.isIn(BlockTags.ICE) || state.isIn(BlockTags.LEAVES)) getWorld().setBlockState(pos, Blocks.FIRE.getDefaultState());
 					}
 				}
 			}

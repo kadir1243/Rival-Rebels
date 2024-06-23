@@ -21,6 +21,7 @@ import assets.rivalrebels.common.item.weapon.ItemRoda;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import net.minecraft.block.BlockState;
+import net.minecraft.block.ShapeContext;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.mob.GhastEntity;
@@ -42,10 +43,7 @@ import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.RaycastContext;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,12 +102,6 @@ public class TileEntityReciever extends TileEntityMachineBase implements Invento
 		powered(0, 0);
 		convertBatteryToEnergy();
 		if (!hasWeapon && wepSelected != 0 && hasWepReqs()) setWep(wepSelected);
-	}
-
-	@Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-1, -1, -1), getPos().add(2, 2, 2));
 	}
 
 	private boolean hasBattery()
@@ -243,7 +235,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Invento
 	{
         double ldist = 40*40;
 		Entity result = null;
-        Box box = new Box(getPos().add(40, 40, 40), getPos().add(-40, -40, -40));
+        Box box = Box.from(BlockBox.create(getPos().add(40, 40, 40), getPos().add(-40, -40, -40)));
         for (Entity e : world.getEntitiesByType(null, box, this::canTarget)) {
             double dist = e.squaredDistanceTo(getPos().getX() + 0.5 + xO, getPos().getY() + 0.5, getPos().getZ() + 0.5 + zO);
             if (dist < ldist) {
@@ -271,7 +263,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Invento
 				else if (!kTeam) return false;
 				RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(((PlayerEntity) e).getGameProfile());
 				if (rrp == null) return kTeam;
-				if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getEntityName().equals(username);
+				if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getGameProfile().getName().equals(username);
 				if (rrp.rrteam != team) return kTeam;
 				else return false;
 			}
@@ -285,7 +277,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Invento
 		if (Math.abs(yaw) > yawLimit / 2 && Math.abs(yaw) < 360 - (yawLimit / 2)) return false;
 		Vec3d start = e.getPos().add(0, e.getEyeHeight(e.getPose()), 0);
 		Vec3d end = new Vec3d(getPos().getX(), getPos().getY(), getPos().getZ()).add(0.5 + xO, 0.5, 0.5 + zO);
-		BlockHitResult mop = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, null));
+		BlockHitResult mop = world.raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.ANY, ShapeContext.absent()));
 		return mop == null || (mop.getBlockPos().equals(this.getPos()));
 	}
 

@@ -14,34 +14,30 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.common.entity.EntityLaptop;
-import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
 public class RenderLaptop extends EntityRenderer<EntityLaptop> {
-	ModelLaptop	ml;
-
-	public RenderLaptop(EntityRendererFactory.Context manager)
-	{
+    public static final SpriteIdentifier LAPTOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etlaptop);
+    public static final SpriteIdentifier SCREEN_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etubuntu);
+    public RenderLaptop(EntityRendererFactory.Context manager) {
         super(manager);
-		ml = new ModelLaptop();
 	}
 
     @Override
     public void render(EntityLaptop entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         matrices.push();
-		matrices.multiply(new Quaternion(180 - entity.getYaw(), 0, 1, 0));
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-        MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etlaptop);
-		ml.renderModel(buffer, matrices, (float) -entity.slide);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etubuntu);
-		ml.renderScreen(buffer, matrices, (float) -entity.slide);
+		matrices.multiply(new Quaternionf(180 - entity.getYaw(), 0, 1, 0));
+		ModelLaptop.renderModel(LAPTOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, OverlayTexture.DEFAULT_UV);
+		ModelLaptop.renderScreen(SCREEN_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, OverlayTexture.DEFAULT_UV);
 		matrices.pop();
 	}
 

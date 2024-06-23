@@ -13,34 +13,26 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLoader;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
-public class LoaderRenderer extends BuiltinModelItemRenderer
-{
-	ModelLoader	ml;
+import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 
-	public LoaderRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-		ml = new ModelLoader();
-	}
-
+public class LoaderRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etloader);
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate(0.0F, 0.05F, 0.0F);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etloader);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true));
-        ml.renderA(buffer, matrices);
-		ml.renderB(buffer, matrices, 0);
+        VertexConsumer buffer = TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        ModelLoader.renderA(buffer, matrices, light, overlay);
+		ModelLoader.renderB(buffer, matrices, 0, light, overlay);
 		matrices.pop();
 	}
 }

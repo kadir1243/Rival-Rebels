@@ -16,7 +16,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 public class BlockCycle extends Block
 {
@@ -26,19 +26,19 @@ public class BlockCycle extends Block
 	public float	pShiftG		= (float) (((Math.PI * 2f) / 3f) * 1f);
 	public float	pShiftB		= (float) (((Math.PI * 2f) / 3f) * 2f);
 
-	public BlockCycle()
+	public BlockCycle(Settings settings)
 	{
-		super(Settings.of(Material.METAL));
+		super(settings);
 	}
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        world.createAndScheduleBlockTick(pos, this, 1);
+        world.scheduleBlockTick(pos, this, 1);
     }
 
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        world.createAndScheduleBlockTick(pos, this, 1);
+        world.scheduleBlockTick(pos, this, 1);
         world.setBlockState(pos, Blocks.AIR.getDefaultState());
         world.setBlockState(pos, state);
     }

@@ -34,7 +34,7 @@ public class EntityLaptop extends EntityInanimate
 	}
 
     @Override
-    public boolean collides() {
+    public boolean isCollidable() {
         return this.isAlive();
     }
 
@@ -55,7 +55,7 @@ public class EntityLaptop extends EntityInanimate
 		super.tick();
 		slide = (Math.cos(test) + 1) * 45;
 
-        if (world.isPlayerInRange(getX() + 0.5F, getY() + 0.5F, getZ() + 0.5F, 9)) {
+        if (getWorld().isPlayerInRange(getX() + 0.5F, getY() + 0.5F, getZ() + 0.5F, 9)) {
 			if (slide < 89.995) test += 0.05;
 		} else {
 			if (slide > 0.004) test -= 0.05;
@@ -64,7 +64,7 @@ public class EntityLaptop extends EntityInanimate
 
     @Override
     public ActionResult interact(PlayerEntity player, Hand hand) {
-		if (player.isSneaking() && !player.world.isClient) {
+		if (player.isSneaking() && !player.getWorld().isClient) {
 			player.openHandledScreen(null);
 		}
 		if (!player.isSneaking() && player.getInventory().insertStack(RRBlocks.controller.asItem().getDefaultStack()))
@@ -72,7 +72,7 @@ public class EntityLaptop extends EntityInanimate
 			player.swingHand(hand);
 			kill();
 		}
-		return ActionResult.success(world.isClient);
+		return ActionResult.success(getWorld().isClient);
 	}
 
 }

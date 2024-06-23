@@ -23,7 +23,6 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ItemUsageContext;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.math.BlockPos;
@@ -35,23 +34,22 @@ public class ItemPliers extends Item
 
 	public ItemPliers()
 	{
-		super(new Settings().maxCount(1).group(RRItems.rralltab));
+		super(new Settings().maxCount(1));
 	}
 
     @Override
-    public ItemStack getContainerItem(ItemStack stack) {
+    public ItemStack getRecipeRemainder(ItemStack stack) {
         return this.getDefaultStack();
     }
 
     @Override
-    public ActionResult onItemUseFirst(ItemStack stack, ItemUsageContext context) {
+    public ActionResult useOnBlock(ItemUsageContext context) {
         BlockPos pos = context.getBlockPos();
         World world = context.getWorld();
         PlayerEntity player = context.getPlayer();
         Hand hand = context.getHand();
 		player.swingHand(hand);
-		if (!world.isClient)
-		{
+        if (!world.isClient) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
@@ -64,7 +62,7 @@ public class ItemPliers extends Item
 			{
 				int t = 25;
 				i = i + 1;
-				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".defuse", i * 100 / t), false);
+				player.sendMessage(Text.translatable(RivalRebels.MODID + ".defuse", i * 100 / t), false);
 				if (i >= t)
 				{
 					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.remotecharge.asItem().getDefaultStack());
@@ -78,7 +76,7 @@ public class ItemPliers extends Item
 			{
 				int t = 25;
 				i = i + 1;
-				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".defuse", i * 100 / t), false);
+				player.sendMessage(Text.translatable(RivalRebels.MODID + ".defuse", i * 100 / t), false);
 				if (i >= t)
 				{
 					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.timedbomb.asItem().getDefaultStack());
@@ -92,7 +90,7 @@ public class ItemPliers extends Item
 			if (block instanceof BlockAutoTemplate worldBlock)
 			{
                 i = i + 1;
-				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".building", i * 100 / worldBlock.time), false);
+				player.sendMessage(Text.translatable(RivalRebels.MODID + ".building", i * 100 / worldBlock.time), false);
 				if (i >= worldBlock.time)
 				{
                     world.setBlockState(pos, Blocks.AIR.getDefaultState());
@@ -104,7 +102,7 @@ public class ItemPliers extends Item
 			if (block == RRBlocks.supplies && world.getBlockState(pos.down()).getBlock() == RRBlocks.supplies)
 			{
 				i++;
-				player.sendMessage(new TranslatableText(RivalRebels.MODID + ".building.tokamak ", i * 100 / 15), false);
+				player.sendMessage(Text.translatable(RivalRebels.MODID + ".building.tokamak ", i * 100 / 15), false);
 				if (i >= 15)
 				{
                     world.setBlockState(pos, Blocks.AIR.getDefaultState());

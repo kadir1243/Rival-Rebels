@@ -13,37 +13,32 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
-public class GasRenderer extends BuiltinModelItemRenderer {
-	private final ModelFromObj ft;
+import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 
-	public GasRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-        ft = ModelFromObj.readObjFile("o.obj");
-	}
+public class GasRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etflamethrower);
+    private static final ModelFromObj ft = ModelFromObj.readObjFile("o.obj");
 
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etflamethrower);
-		matrices.push();
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+        matrices.push();
         matrices.translate(0.8f, 0.5f, -0.03f);
 		// GlStateManager.rotatef(35, 0.0F, 0.0F, 1.0F);
-        matrices.multiply(new Quaternion(-90, 1.0F, 0.0F, 0.0F));
-        matrices.multiply(new Quaternion(160, 0.0F, 0.0F, 1.0F));
+        matrices.multiply(new Quaternionf(-90, 1.0F, 0.0F, 0.0F));
+        matrices.multiply(new Quaternionf(160, 0.0F, 0.0F, 1.0F));
         matrices.scale(0.15f, 0.15f, 0.15f);
 		// matrices.translate(0.3f, 0.05f, -0.1f);
 
-		ft.render(vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true)));
+		ft.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 
 		matrices.pop();
 	}

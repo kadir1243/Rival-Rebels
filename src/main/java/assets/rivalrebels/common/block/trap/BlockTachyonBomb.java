@@ -14,6 +14,7 @@ package assets.rivalrebels.common.block.trap;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -35,9 +36,10 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockTachyonBomb extends BlockWithEntity
-{
-	public static final IntProperty META = IntProperty.of("meta", 0, 15);
+public class BlockTachyonBomb extends BlockWithEntity {
+    public static final MapCodec<BlockTachyonBomb> CODEC = createCodec(BlockTachyonBomb::new);
+
+    public static final IntProperty META = IntProperty.of("meta", 0, 15);
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
@@ -46,6 +48,11 @@ public class BlockTachyonBomb extends BlockWithEntity
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+    }
+
+    @Override
+    protected MapCodec<BlockTachyonBomb> getCodec() {
+        return CODEC;
     }
 
     @Nullable

@@ -12,83 +12,72 @@
 package assets.rivalrebels;
 
 import assets.rivalrebels.client.gui.RivalRebelsRenderOverlay;
+import assets.rivalrebels.client.itemrenders.*;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.command.*;
+import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
-import assets.rivalrebels.common.core.RivalRebelsSoundEventHandler;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.RREntities;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsRound;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
-import assets.rivalrebels.datagen.DataGen;
+import com.google.common.base.Supplier;
+import com.google.common.base.Suppliers;
 import com.mojang.logging.LogUtils;
+import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
+import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
+import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.EntityType;
 import net.minecraft.item.Item;
-import net.minecraft.screen.ScreenHandlerType;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.tag.TagKey;
-import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.event.world.WorldEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.item.ItemConvertible;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.entry.RegistryEntryList;
+import net.minecraft.registry.tag.TagKey;
+import net.minecraft.util.Identifier;
 import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.slf4j.Logger;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-@Mod(RivalRebels.MODID)
-public class RivalRebels {
+public class RivalRebels implements ModInitializer, ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
 	public static final String MODID = "rivalrebels";
-	public static final String rrname = "Rival Rebels";
-	public static CommonProxy proxy = DistExecutor.safeRunForDist(() -> ClientProxy::new, () -> CommonProxy::new);
-
-	public static RivalRebels instance;
-
+	public static CommonProxy proxy = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? new ClientProxy() : new CommonProxy();
     public static RivalRebelsRound round;
 
     // TODO: Move all config things to RRConfig
-    public static int						teleportDist;
-	public static boolean					flareExplode;
+    public static int						teleportDist = 150;
+	public static boolean					flareExplode = true;
 	public static boolean					infiniteAmmo;
 	public static boolean					infiniteNukes;
 	public static boolean					infiniteGrenades;
-	public static int						landmineExplodeSize;
-	public static int						chargeExplodeSize;
-	public static int						timedbombExplodeSize;
-	public static int						rpgExplodeSize;
-	public static int						flamethrowerDecay;
-	public static int						rpgDecay;
-	public static int						teslaDecay;
-	public static int						timedbombTimer;
-	public static int						nuclearBombCountdown;
-	public static int						nuclearBombStrength;
-	public static int						tsarBombaStrength;
-	public static int						b83Strength;
-	public static int						resetMax;
-	public static int						spawnradius;
+	public static int						landmineExplodeSize = 2;
+	public static int						chargeExplodeSize = 5;
+	public static int						timedbombExplodeSize = 6;
+	public static int						rpgExplodeSize = 4;
+	public static int						flamethrowerDecay = 64;
+	public static int						rpgDecay = 200;
+	public static int						teslaDecay = 250;
+	public static int						timedbombTimer = 25;
+	public static int						nuclearBombCountdown = 25;
+	public static int						nuclearBombStrength = 10;
+	public static int						tsarBombaStrength = 24;
+	public static int						b83Strength = 15;
+	public static int						resetMax = 2;
+	public static int						spawnradius = 20;
 	public static int						bunkerradius;
 	public static int						objectivedistance;
-	public static float						knifeThrowStrengthDecay;
 	public static int						plasmoidDecay;
 	public static int						tsarBombaSpeed;
 	public static int						b2spirithealth;
@@ -106,8 +95,8 @@ public class RivalRebels {
 	public static int						rhodesRandomSeed;
 	public static int[]						rhodesTeams;
 	public static boolean					rhodesPromode;
-	public static boolean 					rhodesFF;
-	public static boolean					rhodesAI;
+	public static boolean 					rhodesFF = true;
+	public static boolean					rhodesAI = true;
 	public static boolean					rhodesExit = true;
 	public static boolean					rhodesHold;
 	public static boolean					rhodesCC;
@@ -119,36 +108,133 @@ public class RivalRebels {
 	public static float						rhodesBlockBreak;
 	public static boolean					nukedrop = true;
 	public static boolean 					elevation = true;
-
     public static RivalRebelsRenderOverlay	rrro;
 
-    public RivalRebels() {
-        instance = this;
-        IEventBus bus = FMLJavaModLoadingContext.get().getModEventBus();
-        bus.addListener(this::setup);
-        bus.addListener(DataGen::onData);
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            bus.addListener(this::registerClientSide);
-            MinecraftForge.EVENT_BUS.addListener(RRBlocks::registerBlockColors);
-            bus.addListener(this::registerRenderers);
-        }
+    @Override
+    public void onInitialize() {
+        PacketDispatcher.registerPackets();
+        round = new RivalRebelsRound(spawnradius,teleportDist,objectivedistance);
+        round.init();
 
-        MinecraftForge.EVENT_BUS.register(this);
-        bus.addGenericListener(Block.class, this::registerBlocks);
-        bus.addGenericListener(Item.class, this::registerItems);
-        bus.addGenericListener(SoundEvent.class, RivalRebelsSoundEventHandler::onSoundLoad);
-        bus.addGenericListener(EntityType.class, this::registerEntityTypes);
-        bus.addGenericListener(BlockEntityType.class, this::registerBlockEntityTypes);
-        bus.addGenericListener(ScreenHandlerType.class, this::registerScreenHandlerTypes);
-
-        ModLoadingContext context = ModLoadingContext.get();
-        context.registerConfig(ModConfig.Type.COMMON, RRConfig.COMMON_SPEC);
-        context.registerConfig(ModConfig.Type.CLIENT, RRConfig.CLIENT_SPEC);
-        context.registerConfig(ModConfig.Type.SERVER, RRConfig.SERVER_SPEC);
+        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, RRConfig.COMMON_SPEC);
+        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.CLIENT, RRConfig.CLIENT_SPEC);
+        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, RRConfig.SERVER_SPEC);
+        RRSounds.init();
+        RivalRebelsGuiHandler.init();
+        RRTileEntities.register();
+        RivalRebelsDamageSource.RRDamageTypes.init();
+        registerCommand();
+        RRBlocks.init();
+        RRItems.init();
+        registerArmors();
+        RREntities.TYPES.forEach((name, type) -> Registry.register(Registries.ENTITY_TYPE, new Identifier(MODID, name), type));
     }
 
-	public void setup(FMLCommonSetupEvent event) {
-		/*Configuration config = new Configuration(event.getSuggestedConfigurationFile());
+    @Override
+    public void onInitializeClient() {
+        PacketDispatcher.registerClientPackets();
+        round.initClient();
+        rrro = new RivalRebelsRenderOverlay();
+        rrro.init();
+        RivalRebelsGuiHandler.registerClientGuiBinds();
+        ClientProxy.registerRenderInformation();
+        ClientProxy.registerKeyBinding();
+        RRBlocks.registerBlockColors();
+        registerCustomRenderers();
+    }
+
+    private void registerCommand() {
+        CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> {
+            CommandResetGame.register(dispatcher);
+            CommandPassword.register(dispatcher);
+            CommandStopRounds.register(dispatcher);
+            CommandContinueRound.register(dispatcher);
+            CommandMotD.register(dispatcher);
+            CommandRobot.register(dispatcher);
+            CommandHotPotato.register(dispatcher);
+        });
+    }
+
+    public void registerArmors() {
+        BiConsumer<Item, String> consumer = (item, name) -> RRItems.register(name, item);
+
+        consumer.accept(RRItems.orebelhelmet, "orebelhelmet");
+		consumer.accept(RRItems.orebelchest, "orebelchest");
+		consumer.accept(RRItems.orebelpants, "orebelpants");
+		consumer.accept(RRItems.orebelboots, "orebelboots");
+		consumer.accept(RRItems.onukerhelmet, "onukerhelmet");
+		consumer.accept(RRItems.onukerchest, "onukerchest");
+		consumer.accept(RRItems.onukerpants, "onukerpants");
+		consumer.accept(RRItems.onukerboots, "onukerboots");
+		consumer.accept(RRItems.ointelhelmet, "ointelhelmet");
+		consumer.accept(RRItems.ointelchest, "ointelchest");
+		consumer.accept(RRItems.ointelpants, "ointelpants");
+		consumer.accept(RRItems.ointelboots, "ointelboots");
+		consumer.accept(RRItems.ohackerhelmet, "ohackerhelmet");
+		consumer.accept(RRItems.ohackerchest, "ohackerchest");
+		consumer.accept(RRItems.ohackerpants, "ohackerpants");
+		consumer.accept(RRItems.ohackerboots, "ohackerboots");
+		consumer.accept(RRItems.srebelhelmet, "srebelhelmet");
+		consumer.accept(RRItems.srebelchest, "srebelchest");
+		consumer.accept(RRItems.srebelpants, "srebelpants");
+		consumer.accept(RRItems.srebelboots, "srebelboots");
+		consumer.accept(RRItems.snukerhelmet, "snukerhelmet");
+		consumer.accept(RRItems.snukerchest, "snukerchest");
+		consumer.accept(RRItems.snukerpants, "snukerpants");
+		consumer.accept(RRItems.snukerboots, "snukerboots");
+		consumer.accept(RRItems.sintelhelmet, "sintelhelmet");
+		consumer.accept(RRItems.sintelchest, "sintelchest");
+		consumer.accept(RRItems.sintelpants, "sintelpants");
+		consumer.accept(RRItems.sintelboots, "sintelboots");
+		consumer.accept(RRItems.shackerhelmet, "shackerhelmet");
+		consumer.accept(RRItems.shackerchest, "shackerchest");
+		consumer.accept(RRItems.shackerpants, "shackerpants");
+		consumer.accept(RRItems.shackerboots, "shackerboots");
+		consumer.accept(RRItems.camohat, "camohat");
+		consumer.accept(RRItems.camoshirt, "camoshirt");
+		consumer.accept(RRItems.camopants, "camopants");
+		consumer.accept(RRItems.camoshoes, "camoshoes");
+		consumer.accept(RRItems.camohat2, "camohat2");
+		consumer.accept(RRItems.camoshirt2, "camoshirt2");
+		consumer.accept(RRItems.camopants2, "camopants2");
+		consumer.accept(RRItems.camoshoes2, "camoshoes2");
+	}
+
+    public static List<Block> getBlocks(TagKey<Block> tagKey) {
+        return Registries.BLOCK.getTagCreatingWrapper().getOptional(tagKey).map(RegistryEntryList.ListBacked::stream).map(s -> s.map(RegistryEntry::value).toList()).orElse(Collections.emptyList());
+    }
+
+    private static void addItemRenderer(ItemConvertible item, Supplier<DynamicItemRenderer> renderer) {
+        renderer = Suppliers.memoize(renderer);
+        Supplier<DynamicItemRenderer> finalRenderer = renderer;
+        BuiltinItemRendererRegistry.INSTANCE.register(item, (stack, mode, matrices, vertexConsumers, light, overlay) -> finalRenderer.get().render(stack, mode, matrices, vertexConsumers, light, overlay));
+    }
+
+    private static void registerCustomRenderers() {
+        addItemRenderer(RRItems.nuclearelement, NuclearRodRenderer::new);
+        addItemRenderer(RRItems.tesla, TeslaRenderer::new);
+        addItemRenderer(RRItems.einsten, AstroBlasterRenderer::new);
+        addItemRenderer(RRItems.battery, BatteryRenderer::new);
+        addItemRenderer(RRItems.binoculars, BinocularsRenderer::new);
+        addItemRenderer(RRItems.emptyrod, EmptyRodRenderer::new);
+        addItemRenderer(RRItems.flamethrower, FlamethrowerRenderer::new);
+        addItemRenderer(RRItems.fuel, GasRenderer::new);
+        addItemRenderer(RRItems.hackm202, HackRocketLauncherRenderer::new);
+        addItemRenderer(RRItems.hydrod, HydrogenRodRenderer::new);
+        addItemRenderer(RRBlocks.controller, LaptopRenderer::new);
+        addItemRenderer(RRBlocks.loader, LoaderRenderer::new);
+        addItemRenderer(RRItems.plasmacannon, PlasmaCannonRenderer::new);
+        addItemRenderer(RRBlocks.reactor, ReactorRenderer::new);
+        addItemRenderer(RRItems.redrod, RedstoneRodRenderer::new);
+        addItemRenderer(RRItems.rpg, RocketLauncherRenderer::new);
+        addItemRenderer(RRItems.rocket, RocketRenderer::new);
+        addItemRenderer(RRItems.roda, RodaRenderer::new);
+        addItemRenderer(RRItems.roddisk, RodDiskRenderer::new);
+        addItemRenderer(RRItems.seekm202, SeekRocketLauncherRenderer::new);
+    }
+
+        /*public void setup(FMLCommonSetupEvent event) {
+		Configuration config = new Configuration(event.getSuggestedConfigurationFile());
 		config.load();
 
 		teleportDist = config.get("buildsize", "TeleportDistance", 150).getInt();
@@ -205,7 +291,6 @@ public class RivalRebels {
 		rpgDecay = config.get("decay", "RPGDecay", 200).getInt();
 		plasmoidDecay = config.get("decay", "plasmoidDecay", 70).getInt();
 		teslaDecay = config.get("decay", "TeslaDecay", 250).getInt();
-		knifeThrowStrengthDecay = (config.get("decay", "KnifeThrowStrengthDecay", 91).getInt()) / 100F;
 		config.addCustomCategoryComment("decay", "Measured in ticks of existence. Tesla is in blocks.");
 
 		timedbombTimer = config.get("timing", "TimedBombSeconds", 25).getInt();
@@ -213,33 +298,10 @@ public class RivalRebels {
 		config.addCustomCategoryComment("timing", "Measured in seconds.");
 
 		config.save();
-		if (safemode) limitConfigValues();*/
-
-		PacketDispatcher.registerPackets();
-
-		MinecraftForge.EVENT_BUS.register(round = new RivalRebelsRound(spawnradius,teleportDist,objectivedistance));
+		if (safemode) limitConfigValues();
     }
 
-    @SubscribeEvent
-    public void onWorldLoad(WorldEvent.Load event) {
-        if (event.getWorld() instanceof World)
-            round.load((World) event.getWorld());
-    }
-
-	@SubscribeEvent
-	public void onWorldUnload(WorldEvent.Unload event) {
-        if (event.getWorld() instanceof World)
-            round.save((World) event.getWorld());
-	}
-
-    @SubscribeEvent
-    public void onWorldSave(WorldEvent.Save event) {
-        if (event.getWorld() instanceof World)
-            round.save((World) event.getWorld());
-    }
-
-	public void limitConfigValues()
-	{
+	public void limitConfigValues() {
 		if (teleportDist <= 70) teleportDist = 70;
 		if (teleportDist >= 500) teleportDist = 500;
 		if (landmineExplodeSize <= 1) landmineExplodeSize = 1;
@@ -267,175 +329,8 @@ public class RivalRebels {
 		if (spawnradius <= 10) spawnradius = 10;
 		if (bunkerradius >= 15) bunkerradius = 15;
 		if (bunkerradius <= 7) bunkerradius = 7;
-		if (knifeThrowStrengthDecay <= 0.8F) knifeThrowStrengthDecay = 0.8F;
-		if (knifeThrowStrengthDecay >= 1F) knifeThrowStrengthDecay = 1F;
 		if (tsarBombaSpeed <= 4) tsarBombaSpeed = 4;
 		if (rhodesHealth < 15000) rhodesHealth = 15000;
-	}
-
-    public void registerClientSide(FMLClientSetupEvent event) {
-        ClientProxy.registerKeyBinding();
-		rrro = new RivalRebelsRenderOverlay();
-		MinecraftForge.EVENT_BUS.register(rrro);
-        RivalRebelsGuiHandler.registerClientGuiBinds();
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public void registerRenderers(EntityRenderersEvent.RegisterRenderers event) {
-        ClientProxy.registerRenderInformation(event);
-    }
-
-    @SubscribeEvent
-    public void registerCommand(RegisterCommandsEvent event) {
-        CommandResetGame.register(event.getDispatcher());
-        CommandPassword.register(event.getDispatcher());
-        CommandPlaySound.register(event.getDispatcher());
-        CommandStopRounds.register(event.getDispatcher());
-        CommandContinueRound.register(event.getDispatcher());
-        CommandMotD.register(event.getDispatcher());
-        CommandRobot.register(event.getDispatcher());
-        CommandHotPotato.register(event.getDispatcher());
-    }
-
-    public void registerBlocks(RegistryEvent.Register<Block> register) {
-        for (Block block : RRBlocks.BLOCKS) {
-            register.getRegistry().register(block);
-        }
-    }
-
-    public void registerScreenHandlerTypes(RegistryEvent.Register<ScreenHandlerType<?>> register) {
-        for (ScreenHandlerType<?> type : RivalRebelsGuiHandler.SCREEN_HANDLER_TYPES) {
-            register.getRegistry().register(type);
-        }
-    }
-
-    public void registerItems(RegistryEvent.Register<Item> event) {
-        for (Item item : RRItems.ITEMS) {
-            event.getRegistry().register(item);
-        }
-
-        for (Item item : RRBlocks.BLOCK_ITEMS) {
-            event.getRegistry().register(item);
-        }
-
-        IForgeRegistry<Item> registry = event.getRegistry();
-
-        BiConsumer<Item, String> consumer = (item, string) -> {
-            item.setRegistryName(MODID, string);
-            registry.register(item);
-        };
-
-        consumer.accept(RRItems.orebelhelmet, "orebelhelmet");
-		consumer.accept(RRItems.orebelchest, "orebelchest");
-		consumer.accept(RRItems.orebelpants, "orebelpants");
-		consumer.accept(RRItems.orebelboots, "orebelboots");
-		consumer.accept(RRItems.onukerhelmet, "onukerhelmet");
-		consumer.accept(RRItems.onukerchest, "onukerchest");
-		consumer.accept(RRItems.onukerpants, "onukerpants");
-		consumer.accept(RRItems.onukerboots, "onukerboots");
-		consumer.accept(RRItems.ointelhelmet, "ointelhelmet");
-		consumer.accept(RRItems.ointelchest, "ointelchest");
-		consumer.accept(RRItems.ointelpants, "ointelpants");
-		consumer.accept(RRItems.ointelboots, "ointelboots");
-		consumer.accept(RRItems.ohackerhelmet, "ohackerhelmet");
-		consumer.accept(RRItems.ohackerchest, "ohackerchest");
-		consumer.accept(RRItems.ohackerpants, "ohackerpants");
-		consumer.accept(RRItems.ohackerboots, "ohackerboots");
-		consumer.accept(RRItems.srebelhelmet, "srebelhelmet");
-		consumer.accept(RRItems.srebelchest, "srebelchest");
-		consumer.accept(RRItems.srebelpants, "srebelpants");
-		consumer.accept(RRItems.srebelboots, "srebelboots");
-		consumer.accept(RRItems.snukerhelmet, "snukerhelmet");
-		consumer.accept(RRItems.snukerchest, "snukerchest");
-		consumer.accept(RRItems.snukerpants, "snukerpants");
-		consumer.accept(RRItems.snukerboots, "snukerboots");
-		consumer.accept(RRItems.sintelhelmet, "sintelhelmet");
-		consumer.accept(RRItems.sintelchest, "sintelchest");
-		consumer.accept(RRItems.sintelpants, "sintelpants");
-		consumer.accept(RRItems.sintelboots, "sintelboots");
-		consumer.accept(RRItems.shackerhelmet, "shackerhelmet");
-		consumer.accept(RRItems.shackerchest, "shackerchest");
-		consumer.accept(RRItems.shackerpants, "shackerpants");
-		consumer.accept(RRItems.shackerboots, "shackerboots");
-		consumer.accept(RRItems.camohat, "camohat");
-		consumer.accept(RRItems.camoshirt, "camoshirt");
-		consumer.accept(RRItems.camopants, "camopants");
-		consumer.accept(RRItems.camoshoes, "camoshoes");
-		consumer.accept(RRItems.camohat2, "camohat2");
-		consumer.accept(RRItems.camoshirt2, "camoshirt2");
-		consumer.accept(RRItems.camopants2, "camopants2");
-		consumer.accept(RRItems.camoshoes2, "camoshoes2");
-	}
-
-    public void registerEntityTypes(RegistryEvent.Register<EntityType<?>> event) {
-        for (EntityType<?> type : RREntities.TYPES) {
-            event.getRegistry().register(type);
-        }
-    }
-
-    public void registerBlockEntityTypes(RegistryEvent.Register<BlockEntityType<?>> event) {
-        RRTileEntities.register(event.getRegistry());
-    }
-
-	/*private void registerEntities() {
-        int nextNum = -1;
-        EntityRegistry.registerModEntity(new Identifier(MODID, "gas_grenade"), EntityGasGrenade.class, "gas_grenade", ++nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "cuchillo"), EntityCuchillo.class, "cuchillo", ++nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "propulsion_fx"), EntityPropulsionFX.class, "propulsion_fx", ++nextNum, this, 250, 9, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "passive_fire"), EntityPassiveFire.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 9, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rocket"), EntityRocket.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "plasmoid"), EntityPlasmoid.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 400, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "raytrace"), EntityRaytrace.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "lightning_link"), EntityLightningLink.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "nuclear_blast"), EntityNuclearBlast.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "flameball"), EntityFlameBall.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "flameball_1"), EntityFlameBall1.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "flameball_2"), EntityFlameBall2.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "laptop"), EntityLaptop.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "roddisk_regular"), EntityRoddiskRegular.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "roddisk_rebel"), EntityRoddiskRebel.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "roddisk_officer"), EntityRoddiskOfficer.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "roddisk_leader"), EntityRoddiskLeader.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "tsar_blast"), EntityTsarBlast.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "laser_link"), EntityLaserLink.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "gore"), EntityGore.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "blood"), EntityBlood.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 4, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "goo"), EntityGoo.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 4, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "laser_burst"), EntityLaserBurst.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 400, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "b83"), EntityB83.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "b2_spirit"), EntityB2Spirit.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 400, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "b2_frag"), EntityB2Frag.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "debris"), EntityDebris.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 3, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "hack_b83"), EntityHackB83.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "seek_b83"), EntitySeekB83.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes"), EntityRhodes.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 400, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_head"), EntityRhodesHead.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_torso"), EntityRhodesTorso.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_left_upper_arm"), EntityRhodesLeftUpperArm.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_right_upper_arm"), EntityRhodesRightUpperArm.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_left_lower_arm"), EntityRhodesLeftLowerArm.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_right_lower_arm"), EntityRhodesRightLowerArm.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_left_upper_leg"), EntityRhodesLeftUpperLeg.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_right_upper_leg"), EntityRhodesRightUpperLeg.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_left_lower_leg"), EntityRhodesLeftLowerLeg.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "rhodes_right_lower_leg"), EntityRhodesRightLowerLeg.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "b83_no_shroom"), EntityB83NoShroom.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "sphere_blast"), EntitySphereBlast.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "nuke"), EntityNuke.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "tsar"), EntityTsar.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "roddiskrep"), EntityRoddiskRep.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "hot_potato"), EntityHotPotato.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "bomb"), EntityBomb.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "theoretical_tsar"), EntityTheoreticalTsar.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "theoretical_tsar_blast"), EntityTheoreticalTsarBlast.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "flame_ball_green"), EntityFlameBallGreen.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "antimatter_bomb"), EntityAntimatterBomb.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "antimatter_bomb_blast"), EntityAntimatterBombBlast.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "tachyon_bomb_blast"), EntityTachyonBombBlast.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
-		EntityRegistry.registerModEntity(new Identifier(MODID, "tachyon_bomb"), EntityTachyonBomb.class, "rivalrebelsentity" + ++nextNum, nextNum, this, 250, 1, true);
 	}*/
 
-    public static List<Block> getBlocks(TagKey<Block> tagKey) {
-        return ForgeRegistries.BLOCKS.tags().getTag(tagKey).stream().toList();
-    }
 }

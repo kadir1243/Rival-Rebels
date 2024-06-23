@@ -14,48 +14,47 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.entity.EntityB2Frag;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.render.entity.EntityRenderer;
+import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class RenderB2Frag extends EntityRenderer<EntityB2Frag>
-{
-	ModelFromObj	md1;
-	ModelFromObj	md2;
+@Environment(EnvType.CLIENT)
+public class RenderB2Frag extends EntityRenderer<EntityB2Frag> {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etb2spirit);
+    private static final ModelFromObj md1 = ModelFromObj.readObjFile("f.obj");
+	private static final ModelFromObj md2 = ModelFromObj.readObjFile("g.obj");
 
-	public RenderB2Frag(EntityRendererFactory.Context manager)
-	{
-        super(manager);
-        md1 = ModelFromObj.readObjFile("f.obj");
+    static {
         md1.scale(3, 3, 3);
-        md2 = ModelFromObj.readObjFile("g.obj");
         md2.scale(3, 3, 3);
+    }
+
+	public RenderB2Frag(EntityRendererFactory.Context manager) {
+        super(manager);
 	}
 
     @Override
     public void render(EntityB2Frag entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
 		matrices.push();
-		matrices.multiply(new Quaternion(entity.getYaw(), 0.0F, 1.0F, 0.0F));
-		matrices.multiply(new Quaternion(entity.getPitch(), 0.0F, 0.0F, 1.0F));
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etb2spirit);
+		matrices.multiply(new Quaternionf(entity.getYaw(), 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternionf(entity.getPitch(), 0.0F, 0.0F, 1.0F));
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-        if (entity.type == 0) md1.render(buffer);
-		if (entity.type == 1) md2.render(buffer);
+        if (entity.type == 0) md1.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, OverlayTexture.DEFAULT_UV);
+		else if (entity.type == 1) md2.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, OverlayTexture.DEFAULT_UV);
 		matrices.pop();
 	}
 
     @Override
     public Identifier getTexture(EntityB2Frag entity) {
-        return null;
+        return RRIdentifiers.etb2spirit;
     }
 }

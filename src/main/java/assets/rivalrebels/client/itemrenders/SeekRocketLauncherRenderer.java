@@ -15,74 +15,51 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocketLauncherBody;
 import assets.rivalrebels.client.model.ModelRocketLauncherHandle;
 import assets.rivalrebels.client.model.ModelRocketLauncherTube;
-import assets.rivalrebels.client.tileentityrender.TileEntityForceFieldNodeRenderer;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
+import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
-public class SeekRocketLauncherRenderer extends BuiltinModelItemRenderer
-{
-	private final ModelRocketLauncherHandle md2;
-	private final ModelRocketLauncherBody md3;
-	private final ModelRocketLauncherTube md4;
+import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 
-	public SeekRocketLauncherRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-		md2 = new ModelRocketLauncherHandle();
-		md3 = new ModelRocketLauncherBody();
-		md4 = new ModelRocketLauncherTube();
-	}
+public class SeekRocketLauncherRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier ROCKET_SEEK_HANDLE_202_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etrocketseekhandle202);
+    public static final SpriteIdentifier SEEK_202_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etseek202);
+    public static final SpriteIdentifier ROCKET_SEEK_TUBE_202_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etrocketseektube202);
 
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate(0.4f, 0.35f, -0.03f);
-		matrices.multiply(new Quaternion(-55, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(-55, 0.0F, 0.0F, 1.0F));
 		matrices.translate(0f, 0.05f, 0.05f);
 		if (mode.isFirstPerson()) matrices.scale(1, 1, -1);
 		matrices.push();
 		matrices.translate(0.22f, -0.025f, 0f);
-		matrices.multiply(new Quaternion(90, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(90, 0.0F, 0.0F, 1.0F));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etrocketseekhandle202);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true));
-        md2.render(matrices, buffer);
-		if (stack.hasEnchantments())
-		{
-            RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-            RenderSystem.enableBlend();
-			RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-			md2.render(matrices, buffer);
-            RenderSystem.disableBlend();
+        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
+        ModelRocketLauncherHandle.render(matrices, ROCKET_SEEK_HANDLE_202_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
+		if (stack.hasEnchantments()) {
+			ModelRocketLauncherHandle.render(matrices, cellularNoise, light, overlay);
 		}
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(-0.07f, 0.31f, 0f);
-		matrices.multiply(new Quaternion(90, 0.0F, 0.0F, 1.0F));
-		matrices.multiply(new Quaternion(90, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternionf(90, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
 		matrices.scale(0.4f, 0.4f, 0.4f);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etseek202);
-		md3.render(matrices, buffer);
-		if (stack.hasEnchantments())
-		{
-            RenderSystem.bindTexture(TileEntityForceFieldNodeRenderer.id[(int) ((TileEntityForceFieldNodeRenderer.getTime() / 100) % TileEntityForceFieldNodeRenderer.frames)]);
-            RenderSystem.enableBlend();
-			RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-			md3.render(matrices, buffer);
-			RenderSystem.disableBlend();
-		}
+		ModelRocketLauncherBody.render(matrices, SEEK_202_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
+		if (stack.hasEnchantments()) {
+			ModelRocketLauncherBody.render(matrices, cellularNoise, light, overlay);
+        }
 		matrices.pop();
 
 		float s = 0.0812f;
@@ -90,26 +67,26 @@ public class SeekRocketLauncherRenderer extends BuiltinModelItemRenderer
 		matrices.push();
 		matrices.translate(-0.07f + s, 0.71f, s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etrocketseektube202);
-		md4.render(matrices, buffer);
+        VertexConsumer rocketSeekTube202TextureVertexConsumer = ROCKET_SEEK_TUBE_202_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(-0.07f - s, 0.71f, s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
-		md4.render(matrices, buffer);
+		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(-0.07f + s, 0.71f, -s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
-		md4.render(matrices, buffer);
+		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(-0.07f - s, 0.71f, -s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
-		md4.render(matrices, buffer);
+		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		// ---
@@ -117,25 +94,25 @@ public class SeekRocketLauncherRenderer extends BuiltinModelItemRenderer
 		matrices.push();
 		matrices.translate(-0.07f + s, -0.285f, s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
-		md4.render(matrices, buffer);
+		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(-0.07f - s, -0.285f, s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
-		md4.render(matrices, buffer);
+		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(-0.07f + s, -0.285f, -s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
-		md4.render(matrices, buffer);
+		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		matrices.push();
 		matrices.translate(-0.07f - s, -0.285f, -s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
-		md4.render(matrices, buffer);
+		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
 		matrices.pop();
 
 		matrices.pop();

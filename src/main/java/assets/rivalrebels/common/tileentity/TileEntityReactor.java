@@ -36,9 +36,7 @@ import net.minecraft.screen.NamedScreenHandlerFactory;
 import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -113,199 +111,199 @@ public class TileEntityReactor extends BlockEntity implements Inventory, Tickabl
         }
     }
 
-	@Override
-	public void tick() {
-        if (world.isClient)
-		{
-			slide = (Math.cos(test) + 1) * 45;
+    @Override
+    public void clientTick() {
+            slide = (Math.cos(test) + 1) * 45;
             boolean flag = world.isPlayerInRange(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f, 9);
-			if (flag)
-			{
-				if (slide < 89.995) test += 0.05;
-			}
-			else
-			{
-				if (slide > 0.004) test -= 0.05;
-			}
-			if (core.isEmpty())
-			{
-				on = false;
-				consumed = 0;
-				lasttickconsumed = 0;
-				melt = false;
-				meltTick = 0;
-			}
+            if (flag)
+            {
+                if (slide < 89.995) test += 0.05;
+            }
+            else
+            {
+                if (slide > 0.004) test -= 0.05;
+            }
+            if (core.isEmpty())
+            {
+                on = false;
+                consumed = 0;
+                lasttickconsumed = 0;
+                melt = false;
+                meltTick = 0;
+            }
 
-			if (eject)
-			{
-				consumed = 0;
-				lasttickconsumed = 0;
-				fuel = ItemStack.EMPTY;
-				core = ItemStack.EMPTY;
-				melt = false;
-				meltTick = 0;
-				on = false;
-				eject = false;
-			}
+            if (eject)
+            {
+                consumed = 0;
+                lasttickconsumed = 0;
+                fuel = ItemStack.EMPTY;
+                core = ItemStack.EMPTY;
+                melt = false;
+                meltTick = 0;
+                on = false;
+                eject = false;
+            }
 
-			if (melt)
-			{
-				if (!core.isEmpty())
-				{
-					for (int i = 0; i < 4; i++)
-					{
-						world.addParticle(ParticleTypes.SMOKE, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5, world.random.nextDouble() - 0.5, world.random.nextDouble() / 2, world.random.nextDouble() - 0.5);
-					}
-				}
-				else
-				{
-					melt = false;
-					meltTick = 0;
-					on = false;
-				}
-			}
-        }
-		else {
-			if (eject)
-			{
-				if (!core.isEmpty())
-				{
-					consumed = 0;
-					lasttickconsumed = 0;
-					world.spawnEntity(new ItemEntity(world, getPos().getX() + 0.5, getPos().getY() + 1, getPos().getZ() + 0.5, core));
-					fuel = ItemStack.EMPTY;
-					core = ItemStack.EMPTY;
-					melt = false;
-					meltTick = 0;
-					on = false;
-				}
-			}
-
-			if (melt)
-			{
-				if (!core.isEmpty())
-				{
-					if (meltTick % 20 == 0) RivalRebelsSoundPlayer.playSound(world, 21, 1, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
-					on = true;
-					meltTick++;
-					if (meltTick == 300) meltDown(10);
-					else if (meltTick == 1) {
-                        Text text = new TranslatableText(RivalRebels.MODID + ".warning_meltdown");
-                        for (PlayerEntity player : world.getPlayers()) {
-                            player.sendMessage(text, false);
-                        }
-                    }
-				}
-				else
-				{
-					melt = false;
-					meltTick = 0;
-					on = false;
-				}
-			}
-
-			if (fuel.isEmpty() && tickssincelastrod != 0)
-			{
-				tickssincelastrod++;
-				if (tickssincelastrod >= 100)
-				{
-					if (lastrodwasredstone) on = false;
-					else melt = true;
-				}
-				if (tickssincelastrod == 20 && !lastrodwasredstone)
-				{
-					//RivalRebelsServerPacketHandler.sendChatToAll("RivalRebels.WARNING RivalRebels.overheat", 0, world);
-				}
-			}
-			else
-			{
-				tickssincelastrod = 0;
-			}
-
-			if (melt)
-			{
-				machines.clear();
-			}
-
-			if (core.isEmpty())
-			{
-				on = false;
-				consumed = 0;
-				lasttickconsumed = 0;
-				melt = false;
-				meltTick = 0;
-			}
-
-			if (on && !core.isEmpty() && !fuel.isEmpty() && core.getItem() instanceof ItemCore c && fuel.getItem() instanceof ItemRod r)
-			{
-				if (!prevOn && on) RivalRebelsSoundPlayer.playSound(world, 21, 3, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
-				else
-				{
-					tick++;
-					if (on && tick % 39 == 0) RivalRebelsSoundPlayer.playSound(world, 21, 2, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5, 0.9f, 0.77f);
-				}
-				float power = ((r.power * c.timemult) - fuel.getOrCreateNbt().getInt("fuelLeft"));
-				float temp = power;
-                for (BlockEntity te : TileEntityMachineBase.BLOCK_ENTITIES.values()) {
-                    if (te instanceof TileEntityMachineBase temb) {
-                        if (world.getBlockEntity(temb.pos) == null) {
-                            double dist = temb.getPos().getSquaredDistance(getPos());
-                            if (dist < 1024) {
-                                temb.pos = getPos();
-                                temb.edist = (float) Math.sqrt(dist);
-                                machines.add(temb);
-                            }
-                        }
-                        if (temb.pos.equals(getPos())) {
-                            machines.add(temb);
-                            temb.powerGiven = power;
-                            if (power > temb.pInM - temb.pInR) {
-                                power -= temb.pInM - temb.pInR;
-                                temb.pInR = temb.pInM;
-                            } else {
-                                temb.pInR += power;
-                                power = 0;
-                            }
-                            temb.powerGiven -= power;
-                        }
+            if (melt)
+            {
+                if (!core.isEmpty())
+                {
+                    for (int i = 0; i < 4; i++)
+                    {
+                        world.addParticle(ParticleTypes.SMOKE, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5, world.random.nextDouble() - 0.5, world.random.nextDouble() / 2, world.random.nextDouble() - 0.5);
                     }
                 }
-				lasttickconsumed = temp - power;
-				consumed += lasttickconsumed;
-				if (fuel.getNbt().contains("fuelLeft"))
-				{
-					fuel.getNbt().putInt("fuelLeft", (int) consumed);
+                else
+                {
+                    melt = false;
+                    meltTick = 0;
+                    on = false;
+                }
+            }
+        prevOn = on;
+    }
 
-					double fuelLeft = fuel.getNbt().getInt("fuelLeft");
-					double fuelPercentage = (fuelLeft / temp);
-
-					if (r instanceof ItemRodNuclear)
-					{
-						double f2 = fuelPercentage * fuelPercentage;
-						double f4 = f2 * f2;
-						double f8 = f4 * f4;
-						if (world.random.nextFloat() < f8)
-						{
-							melt = true;
-						}
-					}
-				}
-				else fuel.getNbt().putInt("fuelLeft", 0);
-				if (fuel.getNbt().getInt("fuelLeft") >= temp)
-				{
-					lastrodwasredstone = r instanceof ItemRodRedstone; // meltdown if not redrod
-					consumed = 0;
-					lasttickconsumed = 0;
-					tickssincelastrod = 1;
-					fuel = ItemStack.EMPTY;
-				}
-			}
-			else
-			{
-				machines.clear();
-			}
-			eject = false;
+    @Override
+    public void serverTick() {
+        if (eject)
+        {
+            if (!core.isEmpty())
+            {
+                consumed = 0;
+                lasttickconsumed = 0;
+                world.spawnEntity(new ItemEntity(world, getPos().getX() + 0.5, getPos().getY() + 1, getPos().getZ() + 0.5, core));
+                fuel = ItemStack.EMPTY;
+                core = ItemStack.EMPTY;
+                melt = false;
+                meltTick = 0;
+                on = false;
+            }
         }
+
+        if (melt)
+        {
+            if (!core.isEmpty())
+            {
+                if (meltTick % 20 == 0) RivalRebelsSoundPlayer.playSound(world, 21, 1, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
+                on = true;
+                meltTick++;
+                if (meltTick == 300) meltDown(10);
+                else if (meltTick == 1) {
+                    Text text = Text.translatable(RivalRebels.MODID + ".warning_meltdown");
+                    for (PlayerEntity player : world.getPlayers()) {
+                        player.sendMessage(text, false);
+                    }
+                }
+            }
+            else
+            {
+                melt = false;
+                meltTick = 0;
+                on = false;
+            }
+        }
+
+        if (fuel.isEmpty() && tickssincelastrod != 0)
+        {
+            tickssincelastrod++;
+            if (tickssincelastrod >= 100)
+            {
+                if (lastrodwasredstone) on = false;
+                else melt = true;
+            }
+            if (tickssincelastrod == 20 && !lastrodwasredstone)
+            {
+                //RivalRebelsServerPacketHandler.sendChatToAll("RivalRebels.WARNING RivalRebels.overheat", 0, world);
+            }
+        }
+        else
+        {
+            tickssincelastrod = 0;
+        }
+
+        if (melt)
+        {
+            machines.clear();
+        }
+
+        if (core.isEmpty())
+        {
+            on = false;
+            consumed = 0;
+            lasttickconsumed = 0;
+            melt = false;
+            meltTick = 0;
+        }
+
+        if (on && !core.isEmpty() && !fuel.isEmpty() && core.getItem() instanceof ItemCore c && fuel.getItem() instanceof ItemRod r)
+        {
+            if (!prevOn && on) RivalRebelsSoundPlayer.playSound(world, 21, 3, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5);
+            else
+            {
+                tick++;
+                if (on && tick % 39 == 0) RivalRebelsSoundPlayer.playSound(world, 21, 2, getPos().getX() + 0.5, getPos().getY() + 0.5, getPos().getZ() + 0.5, 0.9f, 0.77f);
+            }
+            float power = ((r.power * c.timemult) - fuel.getOrCreateNbt().getInt("fuelLeft"));
+            float temp = power;
+            for (BlockEntity te : TileEntityMachineBase.BLOCK_ENTITIES.values()) {
+                if (te instanceof TileEntityMachineBase temb) {
+                    if (world.getBlockEntity(temb.pos) == null) {
+                        double dist = temb.getPos().getSquaredDistance(getPos());
+                        if (dist < 1024) {
+                            temb.pos = getPos();
+                            temb.edist = (float) Math.sqrt(dist);
+                            machines.add(temb);
+                        }
+                    }
+                    if (temb.pos.equals(getPos())) {
+                        machines.add(temb);
+                        temb.powerGiven = power;
+                        if (power > temb.pInM - temb.pInR) {
+                            power -= temb.pInM - temb.pInR;
+                            temb.pInR = temb.pInM;
+                        } else {
+                            temb.pInR += power;
+                            power = 0;
+                        }
+                        temb.powerGiven -= power;
+                    }
+                }
+            }
+            lasttickconsumed = temp - power;
+            consumed += lasttickconsumed;
+            if (fuel.getNbt().contains("fuelLeft"))
+            {
+                fuel.getNbt().putInt("fuelLeft", (int) consumed);
+
+                double fuelLeft = fuel.getNbt().getInt("fuelLeft");
+                double fuelPercentage = (fuelLeft / temp);
+
+                if (r instanceof ItemRodNuclear)
+                {
+                    double f2 = fuelPercentage * fuelPercentage;
+                    double f4 = f2 * f2;
+                    double f8 = f4 * f4;
+                    if (world.random.nextFloat() < f8)
+                    {
+                        melt = true;
+                    }
+                }
+            }
+            else fuel.getNbt().putInt("fuelLeft", 0);
+            if (fuel.getNbt().getInt("fuelLeft") >= temp)
+            {
+                lastrodwasredstone = r instanceof ItemRodRedstone; // meltdown if not redrod
+                consumed = 0;
+                lasttickconsumed = 0;
+                tickssincelastrod = 1;
+                fuel = ItemStack.EMPTY;
+            }
+        }
+        else
+        {
+            machines.clear();
+        }
+        eject = false;
         prevOn = on;
     }
 
@@ -350,7 +348,7 @@ public class TileEntityReactor extends BlockEntity implements Inventory, Tickabl
 			}
 		}*/
 		world.setBlockState(getPos(), RRBlocks.meltdown.getDefaultState());
-		new Explosion(world, getPos().getX(), getPos().getY() - 2, getPos().getZ(), 4, false, false, RivalRebelsDamageSource.rocket);
+		new Explosion(world, getPos().getX(), getPos().getY() - 2, getPos().getZ(), 4, false, false, RivalRebelsDamageSource.rocket(getWorld()));
 	}
 
 	@Override
@@ -425,12 +423,6 @@ public class TileEntityReactor extends BlockEntity implements Inventory, Tickabl
         }
         EntityRhodes.BLOCK_ENTITIES.remove(getPos());
     }
-
-    @Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-100, -100, -100), getPos().add(100, 100, 100));
-	}
 
 	public float getPower()
 	{

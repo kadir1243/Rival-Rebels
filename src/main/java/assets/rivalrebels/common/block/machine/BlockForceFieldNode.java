@@ -18,6 +18,7 @@ import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
@@ -38,12 +39,19 @@ import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockForceFieldNode extends BlockWithEntity {
+    public static final MapCodec<BlockForceFieldNode> CODEC = createCodec(BlockForceFieldNode::new);
     public static final IntProperty META = IntProperty.of("meta", 0, 15);
 	public BlockForceFieldNode(Settings settings)
 	{
 		super(settings);
         this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
     }
+
+    @Override
+    protected MapCodec<BlockForceFieldNode> getCodec() {
+        return CODEC;
+    }
+
     @Override
     protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
         builder.add(META);
@@ -95,17 +103,17 @@ public class BlockForceFieldNode extends BlockWithEntity {
 		return new TileEntityForceFieldNode(pos, state);
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icontop1;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icontop2;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icontop3;
-	@OnlyIn(Dist.CLIENT)
+	@Environment(EnvType.CLIENT)
 	IIcon	icontop4;
 
 	@Override

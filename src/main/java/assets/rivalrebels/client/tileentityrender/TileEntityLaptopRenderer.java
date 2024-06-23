@@ -13,26 +13,26 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
-import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.block.machine.BlockLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityLaptop> {
-	private final ModelLaptop model;
+    public static final SpriteIdentifier LAPTOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etlaptop);
+    public static final SpriteIdentifier SCREEN_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etubuntu);
 
-	public TileEntityLaptopRenderer(BlockEntityRendererFactory.Context context) {
-		model = new ModelLaptop();
-	}
+    public TileEntityLaptopRenderer(BlockEntityRendererFactory.Context context) {
+    }
 
     @Override
     public void render(TileEntityLaptop entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
@@ -45,12 +45,9 @@ public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityL
             case 5 -> 90;
             default -> 0;
         };
-        matrices.multiply(new Quaternion(var11, 0.0F, 1.0F, 0.0F));
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etlaptop);
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RenderHelper.TRINGLES_POS_TEX);
-        model.renderModel(vertexConsumer, matrices, (float) -entity.slide);
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etubuntu);
-		model.renderScreen(vertexConsumer, matrices, (float) -entity.slide);
+        matrices.multiply(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+        ModelLaptop.renderModel(LAPTOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, overlay);
+		ModelLaptop.renderScreen(SCREEN_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, overlay);
 		matrices.pop();
 	}
 }

@@ -16,6 +16,7 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntitySigmaObjective;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -29,12 +30,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockSigmaObjective extends BlockWithEntity
-{
-	public BlockSigmaObjective(Settings settings)
+public class BlockSigmaObjective extends BlockWithEntity {
+    public static final MapCodec<BlockSigmaObjective> CODEC = createCodec(BlockSigmaObjective::new);
+    public BlockSigmaObjective(Settings settings)
 	{
 		super(settings);
 	}
+
+    @Override
+    protected MapCodec<? extends BlockWithEntity> getCodec() {
+        return CODEC;
+    }
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
@@ -47,10 +53,10 @@ public class BlockSigmaObjective extends BlockWithEntity
 	}
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        super.onBreak(world, pos, state, player);
+    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onStateReplaced(state, world, pos, newState, moved);
 
-		if (state.getBlock() != RRBlocks.plasmaexplosion) {
+		if (!newState.isOf(RRBlocks.plasmaexplosion)) {
 			world.setBlockState(pos, state);
 		}
 	}
@@ -72,7 +78,7 @@ public class BlockSigmaObjective extends BlockWithEntity
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
-	/*@OnlyIn(Dist.CLIENT)
+	/*@Environment(EnvType.CLIENT)
 	IIcon	icon;
 
 	@Override

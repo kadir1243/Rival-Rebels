@@ -1,18 +1,17 @@
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.SpawnGroup;
 import net.minecraft.world.World;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
 
 public class RREntities {
-    public static final Set<EntityType<?>> TYPES = new HashSet<>();
+    public static final Map<String, EntityType<?>> TYPES = new HashMap<>();
 
     public static final EntityType<EntityAntimatterBomb> ANTIMATTER_BOMB = create(EntityAntimatterBomb::new, "antimatter_bomb", 0.5F, 0.5F);
     public static final EntityType<EntityAntimatterBombBlast> ANTIMATTER_BOMB_BLAST = create(EntityAntimatterBombBlast::new, "antimatter_bomb_blast");
@@ -70,25 +69,22 @@ public class RREntities {
     public static final EntityType<EntityTsarBlast> TSAR_BLAST = create(EntityTsarBlast::new, "tsar_blast");
 
     private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, World, T> function, String id) {
-        EntityType<T> type = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().setShouldReceiveVelocityUpdates(true).build(id);
-        type.setRegistryName(RivalRebels.MODID, id);
-        TYPES.add(type);
+        EntityType<T> type = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().build(id);
+        TYPES.put(id, type);
         return type;
     }
 
     private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, World, T> function, String id, float width, float height) {
-        EntityType<T> type = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().setShouldReceiveVelocityUpdates(true).setDimensions(width, height).build(id);
-        type.setRegistryName(RivalRebels.MODID, id);
-        TYPES.add(type);
+        EntityType<T> type = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().setDimensions(width, height).build(id);
+        TYPES.put(id, type);
         return type;
     }
 
     private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, World, T> function, String id, float width, float height, Consumer<EntityType.Builder<T>> extensions) {
-        EntityType.Builder<T> builder = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().setShouldReceiveVelocityUpdates(true).setDimensions(width, height);
+        EntityType.Builder<T> builder = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().setDimensions(width, height);
         extensions.accept(builder);
         EntityType<T> type = builder.build(id);
-        type.setRegistryName(RivalRebels.MODID, id);
-        TYPES.add(type);
+        TYPES.put(id, type);
         return type;
     }
 }

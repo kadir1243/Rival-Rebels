@@ -26,8 +26,8 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
 import java.util.List;
 import java.util.Optional;
@@ -118,7 +118,7 @@ public class EntityGasGrenade extends EntityInanimate {
     }
 
     @Override
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public void setVelocity(double par1, double par3, double par5) {
         super.setVelocity(par1, par3, par5);
 
@@ -142,19 +142,19 @@ public class EntityGasGrenade extends EntityInanimate {
         ++ticksInAir;
         Vec3d var17 = getPos();
         Vec3d var3 = getPos().add(getVelocity());
-        HitResult var4 = world.raycast(new RaycastContext(var17, var3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+        HitResult var4 = getWorld().raycast(new RaycastContext(var17, var3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 
         if (var4 != null) {
             var3 = var4.getPos();
         }
 
         Entity var5 = null;
-        List<Entity> var6 = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+        List<Entity> var6 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
         double var7 = 0.0D;
 
-        if (!world.isClient) {
+        if (!getWorld().isClient) {
             for (Entity var10 : var6) {
-                if (var10.collides() && (var10 != shootingEntity || ticksInAir >= 5)) {
+                if (var10.isCollidable() && (var10 != shootingEntity || ticksInAir >= 5)) {
                     Box var12 = var10.getBoundingBox().expand(0.3f, 0.3f, 0.3f);
                     Optional<Vec3d> var13 = var12.raycast(var17, var3);
 
@@ -211,7 +211,7 @@ public class EntityGasGrenade extends EntityInanimate {
         if (isInsideWaterOrBubbleColumn()) {
             for (int var26 = 0; var26 < 4; ++var26) {
                 float var27 = 0.25F;
-                world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * var27, getY() - getVelocity().getY() * var27, getZ() - getVelocity().getZ() * var27, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
+                getWorld().addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * var27, getY() - getVelocity().getY() * var27, getZ() - getVelocity().getZ() * var27, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
             }
 
             var23 = 0.8F;
@@ -232,8 +232,8 @@ public class EntityGasGrenade extends EntityInanimate {
         for (int x = -4; x <= 4; x++) {
             for (int y = -4; y <= 4; y++) {
                 for (int z = -4; z <= 4; z++) {
-                    if (world.isAir(new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z))) {
-                        world.setBlockState(new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z), RRBlocks.toxicgas.getDefaultState());
+                    if (getWorld().isAir(new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z))) {
+                        getWorld().setBlockState(new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z), RRBlocks.toxicgas.getDefaultState());
                     }
                 }
             }

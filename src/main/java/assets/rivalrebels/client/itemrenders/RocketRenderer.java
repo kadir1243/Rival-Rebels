@@ -13,33 +13,25 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocket;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayers;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
-public class RocketRenderer extends BuiltinModelItemRenderer
-{
-	private final ModelRocket rock;
+import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 
-	public RocketRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-		rock = new ModelRocket();
-	}
-
+public class RocketRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier ROCKET_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etrocket);
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etrocket);
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate(0.8f, 0.3f, -0.03f);
 		matrices.scale(2, 2, 2);
 
-		rock.render(matrices, vertexConsumers.getBuffer(RenderLayers.getItemLayer(stack, true)), true);
+		ModelRocket.render(matrices, ROCKET_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), true, light, overlay);
 
 		matrices.pop();
 	}

@@ -11,26 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.client.itemrenders.RedstoneRodRenderer;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.function.Consumer;
-
 public class ItemRodRedstone extends ItemRod {
 	public ItemRodRedstone() {
-		super(new Settings().maxDamage(256).group(RRItems.rralltab));
+		super(new Settings().maxDamage(256));
 		power = 300000;
 	}
-
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new RedstoneRodRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
 }

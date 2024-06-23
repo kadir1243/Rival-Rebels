@@ -16,17 +16,22 @@ import assets.rivalrebels.client.guihelper.GuiCustomButton;
 import assets.rivalrebels.client.guihelper.GuiScroll;
 import assets.rivalrebels.client.guihelper.Rectangle;
 import assets.rivalrebels.client.guihelper.Vector;
+import assets.rivalrebels.common.block.BlockReactive;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.block.machine.BlockForceFieldNode;
 import assets.rivalrebels.common.container.ContainerReactor;
 import assets.rivalrebels.common.item.ItemCore;
 import assets.rivalrebels.common.item.ItemRod;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.noise.RivalRebelsSimplexNoise;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
 import net.minecraft.client.render.BufferBuilder;
 import net.minecraft.client.render.Tessellator;
@@ -38,14 +43,12 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.Util;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.gui.GuiUtils;
+import net.minecraft.util.math.random.Random;
 import org.lwjgl.opengl.GL11;
 
 import java.text.DecimalFormat;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class GuiReactor extends HandledScreen<ContainerReactor>
 {
     private static final DecimalFormat	df					= new DecimalFormat("0.0");
@@ -60,12 +63,12 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 	private GuiCustomButton			power;
 	private GuiCustomButton			eject;
 	private float					melttick			= 30;
+    private static final Random RANDOM = Random.create();
 
-	public GuiReactor(ContainerReactor containerReactor, PlayerInventory playerInventory, Text title)
-	{
+	public GuiReactor(ContainerReactor containerReactor, PlayerInventory playerInventory, Text title) {
 		super(containerReactor, playerInventory, title);
         this.backgroundHeight = 200;
-		RivalRebelsSimplexNoise.refresh(MinecraftClient.getInstance().world.random);
+		RivalRebelsSimplexNoise.refresh(RANDOM);
 	}
 
     @Override
@@ -83,22 +86,23 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 	}
 
     @Override
-    protected void drawForeground(MatrixStack matrices, int mouseX, int mouseY) {
-		matrices.push();
+    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
+        MatrixStack matrices = context.getMatrices();
+        matrices.push();
 		matrices.scale(1.25f, 1f, 1f);
 
         handler.core.locked = handler.isOn();
         handler.fuel.locked = !handler.fuel.getStack().isEmpty() && handler.isOn();
 
-		textRenderer.draw(matrices, "ToKaMaK", 10, 8, 0x444444);
+		context.drawText(textRenderer, "ToKaMaK", 10, 8, 0x444444, false);
 		matrices.pop();
-		textRenderer.draw(matrices, "Teslas: " + df.format(handler.getPower() - handler.getConsumed()), 120, 8, 0xffffff);
-		textRenderer.draw(matrices, "Output/t: " + df.format(handler.getLastTickConsumed()), 140, 18, 0xffffff);
+        context.drawText(textRenderer, "Teslas: " + df.format(handler.getPower() - handler.getConsumed()), 120, 8, 0xffffff, false);
+        context.drawText(textRenderer, "Output/t: " + df.format(handler.getLastTickConsumed()), 140, 18, 0xffffff, false);
 
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - getXSize()) / 2;
-		int posy = (height - getYSize()) / 2;
+		int posx = (width - backgroundWidth) / 2;
+		int posy = (height - backgroundHeight) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 191;
 		int widthx = 72;
@@ -107,8 +111,8 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 		{
 			mousex -= posx;
 			mousey -= posy;
-			GuiUtils.drawGradientRect(matrices.peek().getPositionMatrix(), getZOffset(), mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			textRenderer.draw(matrices, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF);
+			context.fillGradient(mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+            context.drawText(textRenderer, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
 			if (!buttondown && client.mouse.wasLeftButtonClicked())
 			{
                 Util.getOperatingSystem().open("http://rivalrebels.com");
@@ -121,10 +125,9 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 	boolean	buttondown2;
 
     @Override
-    protected void drawBackground(MatrixStack matrices, float delta, int mouseX, int mouseY) {
-		RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.guittokamak);
-		GuiUtils.drawTexturedModalRect(matrices, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208, getZOffset());
+    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
+        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.drawTexture(RRIdentifiers.guittokamak, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208);
 
 		float s = (float) scroll.scroll / (float) scroll.limit;
 		int off = (int) Math.floor((machineslist.length - 2) * s);
@@ -154,29 +157,29 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 			Y += 18;
 		}
 
-		drawDock();
+		drawDock(context);
 		long time = System.currentTimeMillis();
 		// 1f, 1f, 1f, 0.7f, 0f, 1f, HYDROGEN
 		// 1f, 0.8f, 0f, 1f, 0f, 0f REDSTONE
-        if (handler.isOn() && !handler.fuel.getStack().isEmpty() && !handler.core.getStack().isEmpty())
+        if (handler.isOn() && handler.fuel.hasStack() && handler.core.hasStack())
 		{
 			float radius = 10;
 			if (handler.fuel.getStack().hasNbt()) radius += (((((ItemRod) handler.fuel.getStack().getItem()).power * ((ItemCore) handler.core.getStack().getItem()).timemult) - handler.fuel.getStack().getNbt().getInt("fuelLeft")) / (((ItemRod) handler.fuel.getStack().getItem()).power * ((ItemCore) handler.core.getStack().getItem()).timemult)) * 30;
 			melttick = 30;
 			float brightness = 0;
-			if (handler.core.getStack().getItem() == RRItems.core1) brightness = -0.4f;
-			if (handler.core.getStack().getItem() == RRItems.core2) brightness = -0.25f;
-			if (handler.core.getStack().getItem() == RRItems.core3) brightness = -0.1f;
-			if (handler.fuel.getStack().getItem() == RRItems.nuclearelement) drawNoiseSphere(matrices, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
-			if (handler.fuel.getStack().getItem() == RRItems.hydrod) drawNoiseSphere(matrices, 1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
-			if (handler.fuel.getStack().getItem() == RRItems.redrod) drawNoiseSphere(matrices, 1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (handler.core.getStack().isOf(RRItems.core1)) brightness = -0.4f;
+			if (handler.core.getStack().isOf(RRItems.core2)) brightness = -0.25f;
+			if (handler.core.getStack().isOf(RRItems.core3)) brightness = -0.1f;
+			if (handler.fuel.getStack().isOf(RRItems.nuclearelement)) drawNoiseSphere(context, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (handler.fuel.getStack().isOf(RRItems.hydrod)) drawNoiseSphere(context, 1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (handler.fuel.getStack().isOf(RRItems.redrod)) drawNoiseSphere(context, 1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
 		}
-		else if (handler.isMelt() || (handler.isOn() && handler.fuel.getStack().isEmpty()))
+		else if (handler.isMelt() || (handler.isOn() && !handler.fuel.hasStack()))
 		{
 			if (melttick > 1) melttick -= 0.03f;
-			drawNoiseSphere(matrices, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, (int) (20 + Math.sin(frame / melttick) * 20), 10, resolution, 0.02f, 0);
+			drawNoiseSphere(context, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, (int) (20 + Math.sin(frame / melttick) * 20), 10, resolution, 0.02f, 0);
 		}
-		else if (!handler.fuel.getStack().isEmpty() && !handler.core.getStack().isEmpty())
+		else if (handler.fuel.hasStack() && handler.core.hasStack())
 		{
 			// drawInfographic(resolution, 15, 8, 5, 20, 0.666f, 0.25f, 0.32f);
 		}
@@ -205,7 +208,19 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 		buttondown2 = client.mouse.wasLeftButtonClicked();
 	}
 
-	protected void drawDock()
+    private static BlockState setState(Block block, int meta) {
+        BlockState state = block.getDefaultState();
+
+        if (block == RRBlocks.forcefieldnode) {
+            state = state.with(BlockForceFieldNode.META, meta);
+        } else if (block == RRBlocks.reactive) {
+            state = state.with(BlockReactive.META, meta);
+        }
+
+        return state;
+    }
+
+	protected void drawDock(DrawContext context)
 	{
 		int X = 89 + width / 2;
 		int Y = 0 + height / 2;
@@ -214,37 +229,36 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 			if (machines[i] == Blocks.AIR) return;
 
 			Block display = machines[i];
-            BlockState displayState = display.getDefaultState();
-            BakedModel modelForState = MinecraftClient.getInstance().getBlockRenderManager().getModels().getModel(displayState);
             int meta = 2;
-			Identifier toppath = new Identifier("textures/blocks/" + /*display.getIcon(1, meta).getIconName() +*/ ".png");
-			String lsidepath = "minecraft:textures/blocks/" + /*display.getIcon(4, meta).getIconName() +*/ ".png";
-			String rsidepath = "minecraft:textures/blocks/" + /*display.getIcon(2, meta).getIconName() +*/ ".png";
+            BlockState state = setState(display, meta);
+            BakedModel modelForState = MinecraftClient.getInstance().getBlockRenderManager().getModels().getModel(state);
+            Identifier toppath = new Identifier("textures/block/" + /*display.getIcon(1, meta).getIconName() +*/ ".png");
+			String lsidepath = "minecraft:textures/block/" + /*display.getIcon(4, meta).getIconName() +*/ ".png";
+			String rsidepath = "minecraft:textures/block/" + /*display.getIcon(2, meta).getIconName() +*/ ".png";
 
 			Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();
 
-            RenderSystem.enableBlend();
 			float alpha = 0.5f;
 			if (onmachines[i]) alpha = 1;
-			RenderSystem.setShaderColor(1F, 1F, 1F, alpha);
-			this.client.getTextureManager().bindTexture(toppath);
+			context.setShaderColor(1F, 1F, 1F, alpha);
+			RenderSystem.setShaderTexture(0, toppath);
 			buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 			buffer.vertex(X + 1, Y + 3.5, getZOffset()).texture(0, 1).next();
 			buffer.vertex(X + 8, Y + 7, getZOffset()).texture(0, 0).next();
 			buffer.vertex(X + 15, Y + 3.5, getZOffset()).texture(1, 0).next();
 			buffer.vertex(X + 8, Y, getZOffset()).texture(1, 1).next();
 			tessellator.draw();
-            RenderSystem.setShaderColor(0.666F, 0.666F, 0.666F, alpha);
-			this.client.getTextureManager().bindTexture(new Identifier(lsidepath));
+            context.setShaderColor(0.666F, 0.666F, 0.666F, alpha);
+			RenderSystem.setShaderTexture(0, new Identifier(lsidepath));
 			buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 			buffer.vertex(X + 1, Y + 3.5, getZOffset()).texture(0, 0).next();
 			buffer.vertex(X + 1, Y + 12.5, getZOffset()).texture(0, 1).next();
 			buffer.vertex(X + 8, Y + 16, getZOffset()).texture(1, 1).next();
 			buffer.vertex(X + 8, Y + 7, getZOffset()).texture(1, 0).next();
 			tessellator.draw();
-            RenderSystem.setShaderColor(0.5F, 0.5F, 0.5F, alpha);
-			this.client.getTextureManager().bindTexture(new Identifier(rsidepath));
+            context.setShaderColor(0.5F, 0.5F, 0.5F, alpha);
+			RenderSystem.setShaderTexture(0, new Identifier(rsidepath));
 			buffer.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE);
 			buffer.vertex(X + 15, Y + 12.5, getZOffset()).texture(1, 1).next();
 			buffer.vertex(X + 15, Y + 3.5, getZOffset()).texture(1, 0).next();
@@ -252,11 +266,13 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
 			buffer.vertex(X + 8, Y + 16, getZOffset()).texture(0, 1).next();
 			tessellator.draw();
 
-            RenderSystem.disableBlend();
-
 			Y += 18;
 		}
 	}
+
+    private int getZOffset() {
+        return 0;//TODO: Find replacement
+    }
 
     /**
      * Method that draws the noise sphere.
@@ -274,12 +290,12 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
      * @param resolution Resolution in pixels of Noise Sphere
      * @param sscale     Noise Scale
      */
-    protected void drawNoiseSphere(MatrixStack matrices, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
+    protected void drawNoiseSphere(DrawContext context, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
         Tessellator t = Tessellator.getInstance();
         BufferBuilder buffer = t.getBuffer();
+        MatrixStack matrices = context.getMatrices();
         matrices.push();
         GL11.glPointSize((float) (client.getWindow().getScaleFactor() / resolution));
-        RenderSystem.enableBlend();
         //FIXME: buffer.begin(GL11.GL_POINTS, VertexFormats.POSITION_COLOR);
         radius *= resolution;
         int outerR = (int) (radius + (outer * resolution));
@@ -336,7 +352,6 @@ public class GuiReactor extends HandledScreen<ContainerReactor>
         BufferBuilder buffer = t.getBuffer();
         matrices.push();
 		GL11.glPointSize(4 / resolution);
-        RenderSystem.enableBlend();
 		buffer.begin(GL11.GL_POINTS, VertexFormats.POSITION_COLOR);
 		radius *= resolution;
 		sep *= resolution;

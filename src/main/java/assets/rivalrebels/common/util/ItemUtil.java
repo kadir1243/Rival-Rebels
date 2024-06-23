@@ -21,6 +21,6 @@ public class ItemUtil {
     }
 
     public static ItemStack getItemStack(PlayerEntity player, Item item) {
-        return getItemStack(player, stack -> stack.getItem() == item);
+        return getItemStack(player, stack -> stack.isOf(item));
     }
 }

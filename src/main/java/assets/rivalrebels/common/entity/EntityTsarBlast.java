@@ -22,8 +22,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
-import net.minecraftforge.common.extensions.IForgeBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,18 +64,18 @@ public class EntityTsarBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (world.random.nextInt(10) == 0)
+		if (getWorld().random.nextInt(10) == 0)
 		{
-			world.playSound(getX(), getY(), getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.50F, true);
+			getWorld().playSound(getX(), getY(), getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.50F, true);
 		}
 		else
 		{
-			if (world.random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
+			if (getWorld().random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
 		}
 
 		age++;
 
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			if (tsar == null && age > 1200) kill();
 			if (age % 20 == 0) updateEntityList();
@@ -104,9 +104,9 @@ public class EntityTsarBlast extends EntityInanimate
 	{
 		entitylist.clear();
 		double ldist = radius*radius;
-		for (int i = 0; i < world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB).size(); i++)
+		for (int i = 0; i < getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox()).size(); i++)
 		{
-			Entity e = world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB).get(i);
+			Entity e = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox()).get(i);
 			double dist = e.squaredDistanceTo(getX(),getY(),getZ());
 			if (dist < ldist)
 			{
@@ -122,7 +122,7 @@ public class EntityTsarBlast extends EntityInanimate
 		float invrad = 1.0f / (float) radius;
 		for (Entity e : entitylist)
 		{
-			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearblast))
+			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearBlast(getWorld())))
 			{
 				remove.add(e);
 				continue;
@@ -134,11 +134,11 @@ public class EntityTsarBlast extends EntityInanimate
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
-				e.damage(RivalRebelsDamageSource.nuclearblast, (int) (radius*f*0.025f));
+				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (radius*f*0.025f));
 			}
 			else
 			{
-				e.damage(RivalRebelsDamageSource.nuclearblast, (int) (f * f * 2.0f * radius + 20.0f));
+				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (f * f * 2.0f * radius + 20.0f));
                 e.setVelocity(getVelocity().subtract(dpos.multiply(f)));
 			}
 		}

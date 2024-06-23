@@ -14,29 +14,27 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelJump;
 import assets.rivalrebels.common.tileentity.TileEntityJumpBlock;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEntityJumpBlock> {
-	private final ModelJump model;
-
-	public TileEntityJumpBlockRenderer(BlockEntityRendererFactory.Context context) {
-        model = new ModelJump();
-	}
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.btcrate);
+    public TileEntityJumpBlockRenderer(BlockEntityRendererFactory.Context context) {
+    }
 
     @Override
     public void render(TileEntityJumpBlock entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.btcrate);
-		model.renderModel(vertexConsumers.getBuffer(RenderLayer.getSolid()));
+		ModelJump.renderModel(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 		matrices.pop();
 	}
 }

@@ -13,21 +13,19 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityLightningLink;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.random.Random;
+import org.joml.Quaternionf;
 
-import java.util.Random;
-
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 {
 	static float	red		= 0.65F;
@@ -52,15 +50,13 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 
 		if (distance > 0)
 		{
-			Random random = entity.world.random;
+			Random random = entity.getWorld().random;
 			float radius = 0.07F;
-            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
 
             matrices.push();
-			RenderSystem.enableBlend();
-            RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-			matrices.multiply(new Quaternion(entity.getYaw(), 0.0F, 1.0F, 0.0F));
-			matrices.multiply(new Quaternion(-entity.getPitch(), 1.0F, 0.0F, 0.0F));
+			matrices.multiply(new Quaternionf(entity.getYaw(), 0.0F, 1.0F, 0.0F));
+			matrices.multiply(new Quaternionf(-entity.getPitch(), 1.0F, 0.0F, 0.0F));
 
 			double AddedX = 0;
 			double AddedY = 0;
@@ -97,7 +93,6 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 				}
 			}
 
-			RenderSystem.disableBlend();
 			matrices.pop();
 		}
 	}

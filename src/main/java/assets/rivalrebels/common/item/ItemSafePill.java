@@ -28,7 +28,7 @@ import net.minecraft.world.World;
 public class ItemSafePill extends Item
 {
 	public ItemSafePill() {
-		super(new Settings().maxCount(6).group(RRItems.rralltab));
+		super(new Settings().maxCount(6));
 	}
 
     @Override

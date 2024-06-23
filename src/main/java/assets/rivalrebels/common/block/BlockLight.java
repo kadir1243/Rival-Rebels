@@ -13,6 +13,7 @@ package assets.rivalrebels.common.block;
 
 import net.minecraft.block.*;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.util.math.BlockBox;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.shape.VoxelShape;
@@ -20,7 +21,7 @@ import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import java.util.Random;
+import net.minecraft.util.math.random.Random;
 
 public class BlockLight extends Block
 {
@@ -41,13 +42,13 @@ public class BlockLight extends Block
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.cuboid(new Box(pos, pos));
+        return VoxelShapes.cuboid(Box.from(BlockBox.create(pos, pos)));
     }
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
 		if (this == RRBlocks.light) {
-			world.createAndScheduleBlockTick(pos, this, 10);
+			world.scheduleBlockTick(pos, this, 10);
 		}
 	}
 

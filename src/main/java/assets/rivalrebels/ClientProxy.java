@@ -19,99 +19,99 @@ import assets.rivalrebels.common.entity.EntityGore;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.entity.RREntities;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import org.lwjgl.glfw.GLFW;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ClientProxy extends CommonProxy
 {
-    public static final KeyBinding USE_KEY = new KeyBinding("use_key", GLFW.GLFW_KEY_F, "");
+    public static final KeyBinding USE_KEY = new KeyBinding("use_key", GLFW_KEY_F, "");
 
-    @OnlyIn(Dist.CLIENT)
+    @Environment(EnvType.CLIENT)
     public static void registerKeyBinding() {
-        ClientRegistry.registerKeyBinding(USE_KEY);
+        KeyBindingHelper.registerKeyBinding(USE_KEY);
     }
 
-	@OnlyIn(Dist.CLIENT)
-	public static void registerRenderInformation(EntityRenderersEvent.RegisterRenderers event) {
-		event.registerBlockEntityRenderer(RRTileEntities.NUKE_CRATE, TileEntityNukeCrateRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.NUCLEAR_BOMB, TileEntityNuclearBombRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.PLASMA_EXPLOSION, TileEntityPlasmaExplosionRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.REACTOR, TileEntityReactorRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.JUMP_BLOCK, TileEntityJumpBlockRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.LOADER, TileEntityLoaderRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.OMEGA_OBJECTIVE, TileEntityOmegaObjectiveRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.SIGMA_OBJECTIVE, TileEntitySigmaObjectiveRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.TSAR_BOMB, TileEntityTsarBombaRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.FORCE_FIELD_NODE, TileEntityForceFieldNodeRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.GORE, TileEntityGoreRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.LAPTOP, TileEntityLaptopRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.RECIEVER, TileEntityRecieverRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.MELT_DOWN, TileEntityMeltdownRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.THEORETICAL_TSAR_BOMB, TileEntityTheoreticalTsarBombaRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.ANTIMATTER_BOMB, TileEntityAntimatterBombRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.TACHYON_BOMB, TileEntityTachyonBombRenderer::new);
-		event.registerEntityRenderer(RREntities.GAS_GRENADE, RenderGasGrenade::new);
-		event.registerEntityRenderer(RREntities.PROPULSION_FX, manager -> new RenderBullet(manager, "fire"));
-		event.registerEntityRenderer(RREntities.PASSIVE_FIRE, manager -> new RenderBullet(manager, "fire"));
-		event.registerEntityRenderer(RREntities.CUCHILLO, RenderCuchillo::new);
-		event.registerEntityRenderer(RREntities.FLAME_BALL, RenderFlame::new);
-		event.registerEntityRenderer(RREntities.FLAME_BALL1, RenderFlameRedBlue::new);
-		event.registerEntityRenderer(RREntities.FLAME_BALL2, RenderFlameBlue::new);
-		event.registerEntityRenderer(RREntities.ROCKET, RenderRocket::new);
-		event.registerEntityRenderer(RREntities.PLASMOID, RenderPlasmoid::new);
-		event.registerEntityRenderer(RREntities.LIGHTNING_LINK, RenderLightningLink::new);
-		event.registerEntityRenderer(RREntities.NUCLEAR_BLAST, RenderNuclearBlast::new);
-		event.registerEntityRenderer(RREntities.LAPTOP, RenderLaptop::new);
-		event.registerEntityRenderer(RREntities.RODDISK_REGULAR, RoddiskRenderer::new);
-		event.registerEntityRenderer(RREntities.RODDISK_REBEL, RoddiskRenderer::new);
-		event.registerEntityRenderer(RREntities.RODDISK_OFFICER, RoddiskRenderer::new);
-		event.registerEntityRenderer(RREntities.RODDISK_LEADER, RoddiskRenderer::new);
-		event.registerEntityRenderer(RREntities.TSAR_BLAST, RenderTsarBlast::new);
-		event.registerEntityRenderer(RREntities.LASER_LINK, RenderLaserLink::new);
-		event.registerEntityRenderer(RREntities.GORE, RenderGore::new);
-		event.registerEntityRenderer(RREntities.BLOOD, RenderBlood::new);
-		event.registerEntityRenderer(RREntities.GOO, RenderGoo::new);
-		event.registerEntityRenderer(RREntities.LASER_BURST, RenderLaserBurst::new);
-		event.registerEntityRenderer(RREntities.B83, RenderB83::new);
-		event.registerEntityRenderer(RREntities.B2SPIRIT, RenderB2Spirit::new);
-		event.registerEntityRenderer(RREntities.B2FRAG, RenderB2Frag::new);
-		event.registerEntityRenderer(RREntities.DEBRIS, RenderDebris::new);
-		event.registerEntityRenderer(RREntities.HACK_B83, RenderHackB83::new);
-		event.registerEntityRenderer(RREntities.SEEK_B83, RenderSeeker::new);
-		event.registerEntityRenderer(RREntities.RHODES, RenderRhodes::new);
-		event.registerEntityRenderer(RREntities.RHODES_HEAD, RenderRhodesHead::new);
-		event.registerEntityRenderer(RREntities.RHODES_TORSO, RenderRhodesTorso::new);
-		event.registerEntityRenderer(RREntities.RHODES_LEFT_UPPER_ARM, RenderRhodesLeftUpperArm::new);
-		event.registerEntityRenderer(RREntities.RHODES_RIGHT_UPPER_ARM, RenderRhodesRightUpperArm::new);
-		event.registerEntityRenderer(RREntities.RHODES_LEFT_LOWER_ARM, RenderRhodesLeftLowerArm::new);
-		event.registerEntityRenderer(RREntities.RHODES_RIGHT_LOWER_ARM, RenderRhodesRightLowerArm::new);
-		event.registerEntityRenderer(RREntities.RHODES_LEFT_UPPER_LEG, RenderRhodesLeftUpperLeg::new);
-		event.registerEntityRenderer(RREntities.RHODES_RIGHT_UPPER_LEG, RenderRhodesRightUpperLeg::new);
-		event.registerEntityRenderer(RREntities.RHODES_LEFT_LOWER_LEG, RenderRhodesLeftLowerLeg::new);
-		event.registerEntityRenderer(RREntities.RHODES_RIGHT_LOWER_LEG, RenderRhodesRightLowerLeg::new);
-		event.registerEntityRenderer(RREntities.B83_NO_SHROOM, RenderB83::new);
-		event.registerEntityRenderer(RREntities.SPHERE_BLAST, RenderSphereBlast::new);
-		event.registerEntityRenderer(RREntities.NUKE, RenderNuke::new);
-		event.registerEntityRenderer(RREntities.TSAR, RenderTsar::new);
-		event.registerEntityRenderer(RREntities.RODDISK_REP, RenderRoddiskRep::new);
-		event.registerEntityRenderer(RREntities.HOT_POTATO, RenderHotPotato::new);
-		event.registerEntityRenderer(RREntities.BOMB, RenderBomb::new);
-		event.registerEntityRenderer(RREntities.THEORETICAL_TSAR, RenderTheoreticalTsar::new);
-		event.registerEntityRenderer(RREntities.THEORETICAL_TSAR_BLAST, RenderTheoreticalTsarBlast::new);
-		event.registerEntityRenderer(RREntities.FLAME_BALL_GREEN, RenderFlameBallGreen::new);
-		event.registerEntityRenderer(RREntities.ANTIMATTER_BOMB, RenderAntimatterBomb::new);
-		event.registerEntityRenderer(RREntities.ANTIMATTER_BOMB_BLAST, RenderAntimatterBombBlast::new);
-		event.registerEntityRenderer(RREntities.TACHYON_BOMB, RenderTachyonBomb::new);
-		event.registerEntityRenderer(RREntities.TACHYON_BOMB_BLAST, RenderTachyonBombBlast::new);
+	@Environment(EnvType.CLIENT)
+	public static void registerRenderInformation() {
+		BlockEntityRendererFactories.register(RRTileEntities.NUKE_CRATE, TileEntityNukeCrateRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.NUCLEAR_BOMB, TileEntityNuclearBombRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.PLASMA_EXPLOSION, TileEntityPlasmaExplosionRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.REACTOR, TileEntityReactorRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.JUMP_BLOCK, TileEntityJumpBlockRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.LOADER, TileEntityLoaderRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.OMEGA_OBJECTIVE, TileEntityOmegaObjectiveRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.SIGMA_OBJECTIVE, TileEntitySigmaObjectiveRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.TSAR_BOMB, TileEntityTsarBombaRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.FORCE_FIELD_NODE, TileEntityForceFieldNodeRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.GORE, TileEntityGoreRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.LAPTOP, TileEntityLaptopRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.RECIEVER, TileEntityRecieverRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.MELT_DOWN, TileEntityMeltdownRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.THEORETICAL_TSAR_BOMB, TileEntityTheoreticalTsarBombaRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.ANTIMATTER_BOMB, TileEntityAntimatterBombRenderer::new);
+		BlockEntityRendererFactories.register(RRTileEntities.TACHYON_BOMB, TileEntityTachyonBombRenderer::new);
+		EntityRendererRegistry.register(RREntities.GAS_GRENADE, RenderGasGrenade::new);
+		EntityRendererRegistry.register(RREntities.PROPULSION_FX, manager -> new RenderBullet(manager, "fire"));
+		EntityRendererRegistry.register(RREntities.PASSIVE_FIRE, manager -> new RenderBullet(manager, "fire"));
+		EntityRendererRegistry.register(RREntities.CUCHILLO, RenderCuchillo::new);
+		EntityRendererRegistry.register(RREntities.FLAME_BALL, RenderFlame::new);
+		EntityRendererRegistry.register(RREntities.FLAME_BALL1, RenderFlameRedBlue::new);
+		EntityRendererRegistry.register(RREntities.FLAME_BALL2, RenderFlameBlue::new);
+		EntityRendererRegistry.register(RREntities.ROCKET, RenderRocket::new);
+		EntityRendererRegistry.register(RREntities.PLASMOID, RenderPlasmoid::new);
+		EntityRendererRegistry.register(RREntities.LIGHTNING_LINK, RenderLightningLink::new);
+		EntityRendererRegistry.register(RREntities.NUCLEAR_BLAST, RenderNuclearBlast::new);
+		EntityRendererRegistry.register(RREntities.LAPTOP, RenderLaptop::new);
+		EntityRendererRegistry.register(RREntities.RODDISK_REGULAR, RoddiskRenderer::new);
+		EntityRendererRegistry.register(RREntities.RODDISK_REBEL, RoddiskRenderer::new);
+		EntityRendererRegistry.register(RREntities.RODDISK_OFFICER, RoddiskRenderer::new);
+		EntityRendererRegistry.register(RREntities.RODDISK_LEADER, RoddiskRenderer::new);
+		EntityRendererRegistry.register(RREntities.TSAR_BLAST, RenderTsarBlast::new);
+		EntityRendererRegistry.register(RREntities.LASER_LINK, RenderLaserLink::new);
+		EntityRendererRegistry.register(RREntities.GORE, RenderGore::new);
+		EntityRendererRegistry.register(RREntities.BLOOD, RenderBlood::new);
+		EntityRendererRegistry.register(RREntities.GOO, RenderGoo::new);
+		EntityRendererRegistry.register(RREntities.LASER_BURST, RenderLaserBurst::new);
+		EntityRendererRegistry.register(RREntities.B83, RenderB83::new);
+		EntityRendererRegistry.register(RREntities.B2SPIRIT, RenderB2Spirit::new);
+		EntityRendererRegistry.register(RREntities.B2FRAG, RenderB2Frag::new);
+		EntityRendererRegistry.register(RREntities.DEBRIS, RenderDebris::new);
+		EntityRendererRegistry.register(RREntities.HACK_B83, RenderHackB83::new);
+		EntityRendererRegistry.register(RREntities.SEEK_B83, RenderSeeker::new);
+		EntityRendererRegistry.register(RREntities.RHODES, RenderRhodes::new);
+		EntityRendererRegistry.register(RREntities.RHODES_HEAD, RenderRhodesHead::new);
+		EntityRendererRegistry.register(RREntities.RHODES_TORSO, RenderRhodesTorso::new);
+		EntityRendererRegistry.register(RREntities.RHODES_LEFT_UPPER_ARM, RenderRhodesLeftUpperArm::new);
+		EntityRendererRegistry.register(RREntities.RHODES_RIGHT_UPPER_ARM, RenderRhodesRightUpperArm::new);
+		EntityRendererRegistry.register(RREntities.RHODES_LEFT_LOWER_ARM, RenderRhodesLeftLowerArm::new);
+		EntityRendererRegistry.register(RREntities.RHODES_RIGHT_LOWER_ARM, RenderRhodesRightLowerArm::new);
+		EntityRendererRegistry.register(RREntities.RHODES_LEFT_UPPER_LEG, RenderRhodesLeftUpperLeg::new);
+		EntityRendererRegistry.register(RREntities.RHODES_RIGHT_UPPER_LEG, RenderRhodesRightUpperLeg::new);
+		EntityRendererRegistry.register(RREntities.RHODES_LEFT_LOWER_LEG, RenderRhodesLeftLowerLeg::new);
+		EntityRendererRegistry.register(RREntities.RHODES_RIGHT_LOWER_LEG, RenderRhodesRightLowerLeg::new);
+		EntityRendererRegistry.register(RREntities.B83_NO_SHROOM, RenderB83::new);
+		EntityRendererRegistry.register(RREntities.SPHERE_BLAST, RenderSphereBlast::new);
+		EntityRendererRegistry.register(RREntities.NUKE, RenderNuke::new);
+		EntityRendererRegistry.register(RREntities.TSAR, RenderTsar::new);
+		EntityRendererRegistry.register(RREntities.RODDISK_REP, RenderRoddiskRep::new);
+		EntityRendererRegistry.register(RREntities.HOT_POTATO, RenderHotPotato::new);
+		EntityRendererRegistry.register(RREntities.BOMB, RenderBomb::new);
+		EntityRendererRegistry.register(RREntities.THEORETICAL_TSAR, RenderTheoreticalTsar::new);
+		EntityRendererRegistry.register(RREntities.THEORETICAL_TSAR_BLAST, RenderTheoreticalTsarBlast::new);
+		EntityRendererRegistry.register(RREntities.FLAME_BALL_GREEN, RenderFlameBallGreen::new);
+		EntityRendererRegistry.register(RREntities.ANTIMATTER_BOMB, RenderAntimatterBomb::new);
+		EntityRendererRegistry.register(RREntities.ANTIMATTER_BOMB_BLAST, RenderAntimatterBombBlast::new);
+		EntityRendererRegistry.register(RREntities.TACHYON_BOMB, RenderTachyonBomb::new);
+		EntityRendererRegistry.register(RREntities.TACHYON_BOMB_BLAST, RenderTachyonBombBlast::new);
 	}
 
     @Override
@@ -180,12 +180,12 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public boolean s()
 	{
-		return glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_X) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		return MinecraftClient.getInstance().options.backKey.wasPressed() && MinecraftClient.getInstance().currentScreen == null;
 	}
 	@Override
 	public boolean d()
 	{
-		return glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_D) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		return MinecraftClient.getInstance().options.rightKey.wasPressed() && MinecraftClient.getInstance().currentScreen == null;
 	}
 	@Override
 	public boolean f()
@@ -204,7 +204,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public boolean x()
 	{
-		boolean isdown = glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_S) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		boolean isdown = glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_X) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
 		boolean x = !prevx && isdown;
 		prevx = isdown;
 		return x;
@@ -218,7 +218,6 @@ public class ClientProxy extends CommonProxy
 	{
 		return glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_G) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
 	}
-
 
 	@Override
 	public void setOverlay(EntityRhodes rhodes)

@@ -12,7 +12,7 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
@@ -41,19 +41,19 @@ public class EntityRhodesHead extends EntityRhodesPiece
 
 	@Override
 	public boolean damage(DamageSource par1DamageSource, float par2) {
-		if (isAlive() && !world.isClient) {
+		if (isAlive() && !getWorld().isClient) {
 			health -= par2;
 			if (health <= 0)
 			{
 				kill();
-				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), new ItemStack(RRItems.nuclearelement, 4)));
-				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.core3.getDefaultStack()));
-				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.einsten.getDefaultStack()));
+				getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), new ItemStack(RRItems.nuclearelement, 4)));
+				getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), RRItems.core3.getDefaultStack()));
+				getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), RRItems.einsten.getDefaultStack()));
 				if (random.nextBoolean())
 				{
-					world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRBlocks.buildrhodes.asItem().getDefaultStack()));
+					getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), RRBlocks.buildrhodes.asItem().getDefaultStack()));
 				}
-				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
+                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
 			}
 		}
 

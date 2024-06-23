@@ -11,22 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.client.itemrenders.NuclearRodRenderer;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.world.World;
-import net.minecraftforge.client.IItemRenderProperties;
 
-import java.util.function.Consumer;
-
-public class ItemRodNuclear extends ItemRod
-{
-	public ItemRodNuclear()
-	{
+public class ItemRodNuclear extends ItemRod {
+	public ItemRodNuclear() {
 		super();
 		power = 3000000;
 	}
@@ -35,18 +27,8 @@ public class ItemRodNuclear extends ItemRod
     public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
 		if (entity instanceof PlayerEntity player) {
             if (world.random.nextInt(16) == 0 && !player.getAbilities().invulnerable) {
-                player.damage(RivalRebelsDamageSource.radioactivepoisoning, world.random.nextInt(4));
+                player.damage(RivalRebelsDamageSource.radioactivePoisoning(world), world.random.nextInt(4));
             }
         }
 	}
-
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new NuclearRodRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
 }

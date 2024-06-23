@@ -19,7 +19,7 @@ public class ItemRod extends ToolItem
 	public int power;
 
 	public ItemRod() {
-		super(ToolMaterials.DIAMOND, new Settings().maxDamage(32).group(RRItems.rralltab));
+		super(ToolMaterials.DIAMOND, new Settings().maxDamage(32));
 	}
 
     public ItemRod(Settings settings) {

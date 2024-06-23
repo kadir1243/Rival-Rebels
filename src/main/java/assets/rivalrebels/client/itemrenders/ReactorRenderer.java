@@ -14,42 +14,32 @@ package assets.rivalrebels.client.itemrenders;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.client.model.ModelReactor;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 
-public class ReactorRenderer extends BuiltinModelItemRenderer
-{
-	ModelReactor	mr;
-	ModelLaptop		ml;
+import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 
-	public ReactorRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-		mr = new ModelReactor();
-		ml = new ModelLaptop();
-	}
+public class ReactorRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier REACTOR_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etreactor);
+    public static final SpriteIdentifier LAPTOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etlaptop);
+    public static final SpriteIdentifier SCREEN_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etscreen);
+    private final ModelReactor mr = new ModelReactor();
 
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
         matrices.translate(0.5F, 1.1875F, 0.5F);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etlaptop);
-		ml.renderModel(buffer, matrices, 0);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etscreen);
-		ml.renderScreen(buffer, matrices, 0);
+		ModelLaptop.renderModel(LAPTOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, 0, light, overlay);
+		ModelLaptop.renderScreen(SCREEN_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, 0, light, overlay);
 		matrices.pop();
 		matrices.push();
 		matrices.translate(0.5F, 0.5F, 0.5F);
-		MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etreactor);
-		mr.renderModel(matrices, buffer);
+		mr.renderModel(matrices, REACTOR_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 		matrices.pop();
 	}
 }

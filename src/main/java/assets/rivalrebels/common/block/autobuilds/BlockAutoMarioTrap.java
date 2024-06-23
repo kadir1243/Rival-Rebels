@@ -12,17 +12,24 @@
 package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.block.RRBlocks;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.Blocks;
 import net.minecraft.world.World;
 
-public class BlockAutoMarioTrap extends BlockAutoTemplate
-{
-	public BlockAutoMarioTrap(Settings settings)
+public class BlockAutoMarioTrap extends BlockAutoTemplate {
+    public static final MapCodec<BlockAutoMarioTrap> CODEC = createCodec(BlockAutoMarioTrap::new);
+
+    public BlockAutoMarioTrap(Settings settings)
 	{
 		super(settings);
 	}
 
-	@Override
+    @Override
+    protected MapCodec<BlockAutoMarioTrap> getCodec() {
+        return CODEC;
+    }
+
+    @Override
 	public void build(World world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
@@ -42,41 +49,4 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate
 		}
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon6;
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:dh"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:dh"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:de"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:de"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:de"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:de"); // SIDE E
-	}*/
 }

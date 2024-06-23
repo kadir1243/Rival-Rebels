@@ -14,7 +14,6 @@ package assets.rivalrebels.common.command;
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -29,8 +28,8 @@ public class CommandMotD {
         );
     }
 
-    private static int execute(ServerCommandSource source, String motd) throws CommandException {
-        if (motd == null) source.sendFeedback(Text.of(RivalRebels.round.getMotD()), true);
+    private static int execute(ServerCommandSource source, String motd) {
+        if (motd == null) source.sendFeedback(() -> Text.of(RivalRebels.round.getMotD()), true);
         else RivalRebels.round.setMotD(motd);
 
         return 0;

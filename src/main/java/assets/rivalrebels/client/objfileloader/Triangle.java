@@ -13,10 +13,11 @@ package assets.rivalrebels.client.objfileloader;
 
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import org.joml.Vector4f;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class Triangle
 {
 	public Vertice[]	pa;
@@ -27,11 +28,22 @@ public class Triangle
 		pa = PA;
 	}
 
+    @Deprecated
 	public void render(VertexConsumer buffer) {
         for (Vertice vertice : pa) {
             vertice.render(buffer);
         }
 	}
+
+    public void render(VertexConsumer buffer, int light, int overlay) {
+        render(buffer, new Vector4f(1, 1, 1, 1), light, overlay);
+    }
+
+    public void render(VertexConsumer buffer, Vector4f color, int light, int overlay) {
+        for (Vertice vertice : pa) {
+            vertice.render(buffer, color, light, overlay);
+        }
+    }
 
     public void normalize()
 	{

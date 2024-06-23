@@ -13,7 +13,6 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.CommandException;
 import net.minecraft.server.command.CommandManager;
 import net.minecraft.server.command.ServerCommandSource;
 import net.minecraft.text.Text;
@@ -26,9 +25,9 @@ public class CommandStopRounds {
         );
     }
 
-    private static int execute(ServerCommandSource source) throws CommandException {
+    private static int execute(ServerCommandSource source) {
         RivalRebels.round.stopRounds();
-        source.sendFeedback(Text.of("The current round has been successfully stopped."), true);
+        source.sendFeedback(() -> Text.of("The current round has been successfully stopped."), true);
         return 0;
     }
 }

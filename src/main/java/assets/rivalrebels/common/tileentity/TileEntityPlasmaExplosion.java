@@ -60,7 +60,7 @@ public class TileEntityPlasmaExplosion extends BlockEntity implements Tickable
             double var19 = e.getZ() - getPos().getZ();
             double dist = 0.5f / (Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19) + 0.01f);
             if (dist <= 0.5f && !(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityTsarBlast) && !(e instanceof EntityRhodes)) {
-                e.damage(RivalRebelsDamageSource.plasmaexplosion, 2);
+                e.damage(RivalRebelsDamageSource.plasmaExplosion(world), 2);
                 e.addVelocity(
                     var15 * dist,
                     var17 * dist,
@@ -68,11 +68,4 @@ public class TileEntityPlasmaExplosion extends BlockEntity implements Tickable
             }
         }
 	}
-
-	@Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-2, -2, -2), getPos().add(3, 3, 3));
-	}
-
 }

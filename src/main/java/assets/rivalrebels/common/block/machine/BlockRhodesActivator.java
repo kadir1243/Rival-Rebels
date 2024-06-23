@@ -13,6 +13,7 @@ package assets.rivalrebels.common.block.machine;
 
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.BlockWithEntity;
 import net.minecraft.block.entity.BlockEntity;
@@ -22,12 +23,17 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockRhodesActivator extends BlockWithEntity
-{
-	public BlockRhodesActivator(Settings settings)
+public class BlockRhodesActivator extends BlockWithEntity {
+    public static final MapCodec<BlockRhodesActivator> CODEC = createCodec(BlockRhodesActivator::new);
+    public BlockRhodesActivator(Settings settings)
 	{
 		super(settings);
 	}
+
+    @Override
+    protected MapCodec<BlockRhodesActivator> getCodec() {
+        return null;
+    }
 
     @Nullable
     @Override
@@ -39,22 +45,4 @@ public class BlockRhodesActivator extends BlockWithEntity
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icontop;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0 || side == 1) return icontop;
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:ci");
-		icontop = iconregister.registerIcon("RivalRebels:ch");
-	}*/
 }

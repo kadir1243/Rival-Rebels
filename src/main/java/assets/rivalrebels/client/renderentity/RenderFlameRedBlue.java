@@ -13,10 +13,8 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityFlameBall1;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.render.OverlayTexture;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -24,8 +22,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
-import org.lwjgl.opengl.GL14;
+import org.joml.Quaternionf;
 
 public class RenderFlameRedBlue extends EntityRenderer<EntityFlameBall1>
 {
@@ -37,13 +34,6 @@ public class RenderFlameRedBlue extends EntityRenderer<EntityFlameBall1>
     public void render(EntityFlameBall1 entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         if (entity.age < 3) return;
         matrices.push();
-        RenderSystem.depthMask(false);
-        RenderSystem.disableCull();
-        RenderSystem.enableBlend();
-        RenderSystem.defaultBlendFunc();
-        RenderSystem.blendFunc(SrcFactor.SRC_ALPHA, DstFactor.ONE);
-        RenderSystem.blendEquation(GL14.GL_FUNC_ADD);
-        RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
 
         matrices.push();
         float X = (entity.sequence % 4) / 4f;
@@ -52,21 +42,18 @@ public class RenderFlameRedBlue extends EntityRenderer<EntityFlameBall1>
         size *= size;
         // if (size >= 0.5) size = 0.5f;
         size += 0.05;
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
-        matrices.multiply(new Quaternion(180 - MinecraftClient.getInstance().player.getYaw(), 0.0F, 1.0F, 0.0F));
-        matrices.multiply(new Quaternion(90 - MinecraftClient.getInstance().player.getPitch(), 1.0F, 0.0F, 0.0F));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntityTranslucentEmissive(RRIdentifiers.etflamebluered));
+        matrices.multiply(new Quaternionf(180 - MinecraftClient.getInstance().player.getYaw(), 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternionf(90 - MinecraftClient.getInstance().player.getPitch(), 1.0F, 0.0F, 0.0F));
         matrices.push();
-        matrices.multiply(new Quaternion(entity.rotation, 0.0F, 1.0F, 0.0F));
-        buffer.vertex(-size, 0, -size).texture(X, Y).normal(0, 1, 0).next();
-        buffer.vertex(size, 0, -size).texture(X + 0.25f, Y).normal(0, 1, 0).next();
-        buffer.vertex(size, 0, size).texture(X + 0.25f, Y + 0.25f).normal(0, 1, 0).next();
-        buffer.vertex(-size, 0, size).texture(X, Y + 0.25f).normal(0, 1, 0).next();
+        matrices.multiply(new Quaternionf(entity.rotation, 0.0F, 1.0F, 0.0F));
+        buffer.vertex(-size, 0, -size, 1F, 1F, 1F, 1F, X, Y, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
+        buffer.vertex( size, 0, -size, 1F, 1F, 1F, 1F, X + 0.25f, Y, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
+        buffer.vertex( size, 0,  size, 1F, 1F, 1F, 1F, X + 0.25f, Y + 0.25f, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
+        buffer.vertex(-size, 0,  size, 1F, 1F, 1F, 1F, X, Y + 0.25f, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
         matrices.pop();
         matrices.pop();
 
-        RenderSystem.enableCull();
-        RenderSystem.disableBlend();
-        RenderSystem.depthMask(true);
         matrices.pop();
     }
 

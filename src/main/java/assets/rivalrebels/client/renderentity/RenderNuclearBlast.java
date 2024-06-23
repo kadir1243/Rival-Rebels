@@ -14,9 +14,7 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelBlastRing;
-import assets.rivalrebels.client.renderhelper.Vertice;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumer;
 import net.minecraft.client.render.VertexConsumerProvider;
@@ -24,6 +22,7 @@ import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
+import org.joml.Vector3f;
 
 public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 {
@@ -31,15 +30,12 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 	private float	ring2			= 0;
 	private float	ring3			= 0;
 	private float	height			= 0;
-	static ModelBlastRing model;
 
 	private int		textureCoordx	= 0;
 	private int		textureCoordy	= 0;
 
-	public RenderNuclearBlast(EntityRendererFactory.Context manager)
-	{
+	public RenderNuclearBlast(EntityRendererFactory.Context manager) {
         super(manager);
-		 model = new ModelBlastRing();
 	}
 
     @Override
@@ -55,7 +51,7 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 			ring2 = 0;
 			ring3 = 0;
 			height = 0;
-			textureCoordx = entity.world.random.nextInt(64);
+			textureCoordx = entity.getWorld().random.nextInt(64);
 		}
 
 		ring1 += 0.02;
@@ -79,9 +75,9 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
         if (entity.age < 600) {
-            model.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring1 * 15, 64, 4, 0.5f, 0, 0, 0, (float) x, (float) y - 3, (float) z);
-			model.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring2, 32, 1, 0.5f, 0, 0, 0, (float) x, (float) y + height + ring3, (float) z);
-			model.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring3, 32, 2, 0.5f, 0, 0, 0, (float) x, (float) y + height + 7 + ring2, (float) z);
+            ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring1 * 15, 64, 4, 0.5f, 0, 0, 0, (float) x, (float) y - 3, (float) z, light);
+			ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring2, 32, 1, 0.5f, 0, 0, 0, (float) x, (float) y + height + ring3, (float) z, light);
+			ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring3, 32, 2, 0.5f, 0, 0, 0, (float) x, (float) y + height + 7 + ring2, (float) z, light);
 			if (entity.age > 550)
 			{
 				ring2 += 0.1;
@@ -111,78 +107,79 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 		matrices.translate(x, y - 10, z);
 		matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
 		matrices.scale(0.5F + (float) entity.getVelocity().getY() * 0.3F, 2.6F + (float) entity.getVelocity().getY() * 0.3F, 0.5F + (float) entity.getVelocity().getY() * 0.3F);
-		if (entity.getVelocity().getX() == 1)
-		{
-			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.ettroll);
+
+        Identifier identifier;
+        if (entity.getVelocity().getX() == 1) {
+			identifier = RRIdentifiers.ettroll;
+		} else {
+			identifier = RRIdentifiers.etradiation;
 		}
-		else
-		{
-			MinecraftClient.getInstance().getTextureManager().bindTexture(RRIdentifiers.etradiation);
-		}
+
+        buffer = vertexConsumers.getBuffer(RenderLayer.getEntitySolid(identifier));
 
 		int size = (int) (entity.getVelocity().getY());
 
-		Vertice pxv1 = new Vertice(4, 0 - size * 2.5F, 0);
-		Vertice nxv1 = new Vertice(-4, 0 - size * 2.5F, 0);
-		Vertice pzv1 = new Vertice(0, 0 - size * 2.5F, 4);
-		Vertice nzv1 = new Vertice(0, 0 - size * 2.5F, -4);
+		Vector3f pxv1 = new Vector3f(4, 0 - size * 2.5F, 0);
+		Vector3f nxv1 = new Vector3f(-4, 0 - size * 2.5F, 0);
+		Vector3f pzv1 = new Vector3f(0, 0 - size * 2.5F, 4);
+		Vector3f nzv1 = new Vector3f(0, 0 - size * 2.5F, -4);
 
-		Vertice pxv2 = new Vertice(2F, 1.5F - size * 2F, 0);
-		Vertice nxv2 = new Vertice(-2F, 1.5F - size * 2F, 0);
-		Vertice pzv2 = new Vertice(0, 1.5F - size * 2F, 2F);
-		Vertice nzv2 = new Vertice(0, 1.5F - size * 2F, -2F);
+		Vector3f pxv2 = new Vector3f(2F, 1.5F - size * 2F, 0);
+		Vector3f nxv2 = new Vector3f(-2F, 1.5F - size * 2F, 0);
+		Vector3f pzv2 = new Vector3f(0, 1.5F - size * 2F, 2F);
+		Vector3f nzv2 = new Vector3f(0, 1.5F - size * 2F, -2F);
 
-		Vertice pxv3 = new Vertice(1.5F, 3.5F - size * 1.5F, 0);
-		Vertice nxv3 = new Vertice(-1.5F, 3.5F - size * 1.5F, 0);
-		Vertice pzv3 = new Vertice(0, 3.5F - size * 1.5F, 1.5F);
-		Vertice nzv3 = new Vertice(0, 3.5F - size * 1.5F, -1.5F);
+		Vector3f pxv3 = new Vector3f(1.5F, 3.5F - size * 1.5F, 0);
+		Vector3f nxv3 = new Vector3f(-1.5F, 3.5F - size * 1.5F, 0);
+		Vector3f pzv3 = new Vector3f(0, 3.5F - size * 1.5F, 1.5F);
+		Vector3f nzv3 = new Vector3f(0, 3.5F - size * 1.5F, -1.5F);
 
-		Vertice pxv4 = new Vertice(1.5F, 6.5F - size * 1F, 0);
-		Vertice nxv4 = new Vertice(-1.5F, 6.5F - size * 1F, 0);
-		Vertice pzv4 = new Vertice(0, 6.5F - size * 1F, 1.5F);
-		Vertice nzv4 = new Vertice(0, 6.5F - size * 1F, -1.5F);
+		Vector3f pxv4 = new Vector3f(1.5F, 6.5F - size * 1F, 0);
+		Vector3f nxv4 = new Vector3f(-1.5F, 6.5F - size * 1F, 0);
+		Vector3f pzv4 = new Vector3f(0, 6.5F - size * 1F, 1.5F);
+		Vector3f nzv4 = new Vector3f(0, 6.5F - size * 1F, -1.5F);
 
-		Vertice pxv5 = new Vertice(2F, 9.5F - size * 0.5F, 0);
-		Vertice nxv5 = new Vertice(-2F, 9.5F - size * 0.5F, 0);
-		Vertice pzv5 = new Vertice(0, 9.5F - size * 0.5F, 2F);
-		Vertice nzv5 = new Vertice(0, 9.5F - size * 0.5F, -2F);
+		Vector3f pxv5 = new Vector3f(2F, 9.5F - size * 0.5F, 0);
+		Vector3f nxv5 = new Vector3f(-2F, 9.5F - size * 0.5F, 0);
+		Vector3f pzv5 = new Vector3f(0, 9.5F - size * 0.5F, 2F);
+		Vector3f nzv5 = new Vector3f(0, 9.5F - size * 0.5F, -2F);
 
-		Vertice pxv6 = new Vertice(3F, 11F, 0);
-		Vertice nxv6 = new Vertice(-3F, 11F, 0);
-		Vertice pzv6 = new Vertice(0, 11F, 3F);
-		Vertice nzv6 = new Vertice(0, 11F, -3F);
+		Vector3f pxv6 = new Vector3f(3F, 11F, 0);
+		Vector3f nxv6 = new Vector3f(-3F, 11F, 0);
+		Vector3f pzv6 = new Vector3f(0, 11F, 3F);
+		Vector3f nzv6 = new Vector3f(0, 11F, -3F);
 
-		Vertice pxv7 = new Vertice(16F, 10F, 0);
-		Vertice nxv7 = new Vertice(-16F, 10F, 0);
-		Vertice pzv7 = new Vertice(0, 10F, 16F);
-		Vertice nzv7 = new Vertice(0, 10F, -16F);
+		Vector3f pxv7 = new Vector3f(16F, 10F, 0);
+		Vector3f nxv7 = new Vector3f(-16F, 10F, 0);
+		Vector3f pzv7 = new Vector3f(0, 10F, 16F);
+		Vector3f nzv7 = new Vector3f(0, 10F, -16F);
 
-		Vertice ppv7 = new Vertice(8F, 10F, 8F);
-		Vertice npv7 = new Vertice(-8F, 10F, 8F);
-		Vertice pnv7 = new Vertice(8F, 10F, -8F);
-		Vertice nnv7 = new Vertice(-8F, 10F, -8F);
+		Vector3f ppv7 = new Vector3f(8F, 10F, 8F);
+		Vector3f npv7 = new Vector3f(-8F, 10F, 8F);
+		Vector3f pnv7 = new Vector3f(8F, 10F, -8F);
+		Vector3f nnv7 = new Vector3f(-8F, 10F, -8F);
 
-		Vertice pxv8 = new Vertice(32F, 12F, 0);
-		Vertice nxv8 = new Vertice(-32F, 12F, 0);
-		Vertice pzv8 = new Vertice(0, 12F, 32F);
-		Vertice nzv8 = new Vertice(0, 12F, -32F);
+		Vector3f pxv8 = new Vector3f(32F, 12F, 0);
+		Vector3f nxv8 = new Vector3f(-32F, 12F, 0);
+		Vector3f pzv8 = new Vector3f(0, 12F, 32F);
+		Vector3f nzv8 = new Vector3f(0, 12F, -32F);
 
-		Vertice ppv8 = new Vertice(22.5F, 12F, 22.5F);
-		Vertice npv8 = new Vertice(-22.5F, 12F, 22.5F);
-		Vertice pnv8 = new Vertice(22.5F, 12F, -22.5F);
-		Vertice nnv8 = new Vertice(-22.5F, 12F, -22.5F);
+		Vector3f ppv8 = new Vector3f(22.5F, 12F, 22.5F);
+		Vector3f npv8 = new Vector3f(-22.5F, 12F, 22.5F);
+		Vector3f pnv8 = new Vector3f(22.5F, 12F, -22.5F);
+		Vector3f nnv8 = new Vector3f(-22.5F, 12F, -22.5F);
 
-		Vertice pxv9 = new Vertice(16F, 13F, 0);
-		Vertice nxv9 = new Vertice(-16F, 13F, 0);
-		Vertice pzv9 = new Vertice(0, 13F, 16F);
-		Vertice nzv9 = new Vertice(0, 13F, -16F);
+		Vector3f pxv9 = new Vector3f(16F, 13F, 0);
+		Vector3f nxv9 = new Vector3f(-16F, 13F, 0);
+		Vector3f pzv9 = new Vector3f(0, 13F, 16F);
+		Vector3f nzv9 = new Vector3f(0, 13F, -16F);
 
-		Vertice ppv9 = new Vertice(11.5F, 13F, 11.5F);
-		Vertice npv9 = new Vertice(-11.5F, 13F, 11.5F);
-		Vertice pnv9 = new Vertice(11.5F, 13F, -11.5F);
-		Vertice nnv9 = new Vertice(-11.5F, 13F, -11.5F);
+		Vector3f ppv9 = new Vector3f(11.5F, 13F, 11.5F);
+		Vector3f npv9 = new Vector3f(-11.5F, 13F, 11.5F);
+		Vector3f pnv9 = new Vector3f(11.5F, 13F, -11.5F);
+		Vector3f nnv9 = new Vector3f(-11.5F, 13F, -11.5F);
 
-		Vertice v9 = new Vertice(0F, 13F, 0F);
+		Vector3f v9 = new Vector3f(0F, 13F, 0F);
 
 		int time = size * 10;
 
@@ -273,7 +270,7 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 		matrices.pop();
 	}
 
-	private void addFace(VertexConsumer buffer, Vertice v1, Vertice v2, Vertice v3, Vertice v4, float par5, float par6, float par7, float par8)
+	private void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float par5, float par6, float par7, float par8)
 	{
 		addVertice(buffer, v1, par5, par8);
 		addVertice(buffer, v2, par6, par8);
@@ -281,13 +278,13 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 		addVertice(buffer, v4, par5, par7);
 	}
 
-	private void addTri(VertexConsumer buffer, Vertice v1, Vertice v2, Vertice v3, float par5, float par6, float par7, float par8) {
+	private void addTri(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, float par5, float par6, float par7, float par8) {
 		addVertice(buffer, v3, par5, par8);
 		addVertice(buffer, v1, par6, par8);
 		addVertice(buffer, v2, par6, par7);
 	}
 
-	private void addVertice(VertexConsumer buffer, Vertice v, float t, float t2) {
+	private void addVertice(VertexConsumer buffer, Vector3f v, float t, float t2) {
 		buffer.vertex(v.x, v.y, v.z).texture(t, t2).next();
 	}
 

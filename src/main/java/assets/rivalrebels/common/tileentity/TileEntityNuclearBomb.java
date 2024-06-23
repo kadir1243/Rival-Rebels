@@ -32,11 +32,9 @@ import net.minecraft.screen.PropertyDelegate;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.collection.DefaultedList;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.world.World;
 import org.jetbrains.annotations.Nullable;
 
 public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tickable, NamedScreenHandlerFactory
@@ -205,8 +203,8 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 			{
 				this.chestContents.set(0, ItemStack.EMPTY);
                 for (PlayerEntity player : world.getPlayers()) {
-                    player.sendMessage(new TranslatableText(RivalRebels.MODID + ".warning_to_specific_player", username), false);
-                    player.sendMessage(new TranslatableText(RivalRebels.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Text.of("NONE")), false);
+                    player.sendMessage(Text.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
+                    player.sendMessage(Text.translatable(RivalRebels.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Text.of("NONE")), false);
                 }
 			}
 		}
@@ -216,9 +214,9 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 		}
 
 		if (Countdown == 200 && !world.isClient && RivalRebels.nuclearBombCountdown > 10) {
-            MutableText line1 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
-            MutableText line2 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
-            MutableText line3 = new TranslatableText(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
+            MutableText line1 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
+            MutableText line2 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
+            MutableText line3 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
             for (PlayerEntity player : world.getPlayers()) {
                 player.sendMessage(line1, false);
                 player.sendMessage(line2, false);
@@ -259,16 +257,10 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 
 		if (Countdown == 0 && AmountOfCharges == 0)
 		{
-			world.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, Explosion.DestructionType.DESTROY);
+			world.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, World.ExplosionSourceType.BLOCK);
 			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
 		}
     }
-
-	@Override
-	public Box getRenderBoundingBox()
-	{
-		return new Box(getPos().add(-1, -1, -1), getPos().add(2, 2, 2));
-	}
 
     @Override
     public Text getDisplayName() {

@@ -14,16 +14,14 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.explosion.TsarBomba;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -32,7 +30,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -94,14 +91,14 @@ public class EntityTheoreticalTsar extends ThrownEntity
 
 	@Override
 	public void tick() {
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			if (ticksInAir == - 100) explode();
 			++this.ticksInAir;
 
 			Vec3d var15 = getPos();
 			Vec3d var2 = getPos().add(getVelocity());
-			HitResult var3 = this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+			HitResult var3 = this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 			var15 = getPos();
 			var2 = getPos().add(getVelocity());
 
@@ -110,11 +107,11 @@ public class EntityTheoreticalTsar extends ThrownEntity
 				var2 = var3.getPos();
 			}
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.collides()) {
+                if (var9.isCollidable()) {
                     float var10 = 0.3F;
                     Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
                     Optional<Vec3d> var12 = var11.raycast(var15, var2);
@@ -202,22 +199,22 @@ public class EntityTheoreticalTsar extends ThrownEntity
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        BlockState state = world.getBlockState(blockHitResult.getBlockPos());
+        BlockState state = getWorld().getBlockState(blockHitResult.getBlockPos());
         Block b = state.getBlock();
-        Material m = state.getMaterial();
+        MapColor color = state.getMapColor(getWorld(), blockHitResult.getBlockPos());
         if (b == RRBlocks.jump || state.isIn(BlockTags.ICE))
         {
             setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
             return;
         }
-        if (hasTrollface && world.random.nextInt(10)!=0)
+        if (hasTrollface && getWorld().random.nextInt(10)!=0)
         {
             setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
             return;
         }
-        else if (!hasTrollface && (state.isIn(BlockTags.LEAVES) || m == Material.ORGANIC_PRODUCT || m == Material.SOIL || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || m == Material.CAKE || m == Material.DECORATION || state.isIn(BlockTags.WOOL) || m == Material.SNOW_BLOCK || state.isIn(Tags.Blocks.GLASS) || m == Material.SOLID_ORGANIC || state.isIn(Tags.Blocks.SAND) || m == Material.SNOW_LAYER || m == Material.WOOD || m == Material.REPLACEABLE_PLANT || state.getFluidState().isIn(FluidTags.WATER) || m == Material.SPONGE || state.isIn(BlockTags.ICE)))
+        else if (!hasTrollface && (state.isIn(BlockTags.LEAVES) || color == MapColor.GREEN || color == MapColor.DIRT_BROWN || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || state.isOf(Blocks.CAKE) || state.getBlock().getBlastResistance() < 1 || state.isIn(BlockTags.WOOL) || state.isOf(Blocks.SNOW_BLOCK) || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(BlockTags.SAND) || b instanceof SnowBlock || state.isBurnable() || state.isReplaceable() || state.getFluidState().isIn(FluidTags.WATER) || b instanceof SpongeBlock || state.isIn(BlockTags.ICE)))
         {
-            world.setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
+            getWorld().setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
             return;
         }
     }
@@ -230,11 +227,11 @@ public class EntityTheoreticalTsar extends ThrownEntity
 
     public void explode()
 	{
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
-			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), world, (int) ((RivalRebels.tsarBombaStrength + (aoc * aoc)) * 0.6f));
-			EntityTheoreticalTsarBlast tsarblast = new EntityTheoreticalTsarBlast(world, (int)getX(), (int)getY(), (int)getZ(), tsar, RivalRebels.tsarBombaStrength + (aoc * aoc));
-			world.spawnEntity(tsarblast);
+			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), getWorld(), (int) ((RivalRebels.tsarBombaStrength + (aoc * aoc)) * 0.6f));
+			EntityTheoreticalTsarBlast tsarblast = new EntityTheoreticalTsarBlast(getWorld(), (int)getX(), (int)getY(), (int)getZ(), tsar, RivalRebels.tsarBombaStrength + (aoc * aoc));
+			getWorld().spawnEntity(tsarblast);
 			this.kill();
 		}
 	}

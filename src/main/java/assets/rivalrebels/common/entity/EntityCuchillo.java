@@ -14,14 +14,15 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
+import net.minecraft.registry.tag.BlockTags;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.hit.BlockHitResult;
@@ -32,7 +33,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -86,15 +86,15 @@ public class EntityCuchillo extends EntityInanimate
 		{
 			Vec3d vec31 = getPos();
 			Vec3d vec3 = getPos().add(getVelocity());
-			HitResult mop = world.raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+			HitResult mop = getWorld().raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
 			vec31 = getPos();
 			if (mop != null) vec3 = mop.getPos();
 			else vec3 = getPos().add(getVelocity());
 
-			List<Entity> list = world.getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> list = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
             for (Entity entity : list) {
-                if (entity.collides() && (age >= 10 || entity != shootingEntity)) {
+                if (entity.isCollidable() && (age >= 10 || entity != shootingEntity)) {
                     Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
                     if (mop1.isPresent()) {
                         double d1 = vec31.squaredDistanceTo(mop1.get());
@@ -108,25 +108,24 @@ public class EntityCuchillo extends EntityInanimate
 
 			if (mop != null)
 			{
-				if (!world.isClient)
+				if (!getWorld().isClient)
 				{
 					if (mop.getType() == HitResult.Type.ENTITY)
 					{
-                        ((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cuchillo, 7);
+                        ((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cuchillo(getWorld()), 7);
 						kill();
 					}
-					else
+					else if (mop.getType() == HitResult.Type.BLOCK)
 					{
                         BlockPos pos = ((BlockHitResult) mop).getBlockPos();
-                        BlockState state = world.getBlockState(pos);
-                        Material hit = state.getMaterial();
-						if (state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS_PANES) || state.isIn(Tags.Blocks.STAINED_GLASS) || state.isIn(Tags.Blocks.STAINED_GLASS_PANES)) {
-							world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                        BlockState state = getWorld().getBlockState(pos);
+						if (state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(ConventionalBlockTags.GLASS_PANES)) {
+							getWorld().setBlockState(pos, Blocks.AIR.getDefaultState());
 							RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
                         }
-						else if (hit == Material.STONE)
+						else if (state.isIn(BlockTags.BASE_STONE_OVERWORLD))
 						{
-							world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
+							getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
 							kill();
 						}
 						else
@@ -152,7 +151,7 @@ public class EntityCuchillo extends EntityInanimate
 				if (isInsideWaterOrBubbleColumn())
 				{
 					for (int var26 = 0; var26 < 4; ++var26)
-						world.addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
+						getWorld().addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
 					friction = 0.8F;
 				}
                 setVelocity(getVelocity().multiply(friction));
@@ -166,7 +165,7 @@ public class EntityCuchillo extends EntityInanimate
 			ticksInGround++;
 			if (ticksInGround == 60)
 			{
-				world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
+				getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
 				kill();
 			}
 		}
@@ -174,9 +173,9 @@ public class EntityCuchillo extends EntityInanimate
 
 	@Override
 	public void onPlayerCollision(PlayerEntity player) {
-		if (!world.isClient && inGround) {
+		if (!getWorld().isClient && inGround) {
 			if (!player.getAbilities().invulnerable) player.getInventory().insertStack(RRItems.knife.getDefaultStack());
-			world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.NEUTRAL, 0.2F, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F, true);
+			getWorld().playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.NEUTRAL, 0.2F, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F, true);
 			kill();
 		}
 	}

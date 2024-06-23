@@ -13,19 +13,25 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.client.renderentity.RenderAntimatterBomb;
 import assets.rivalrebels.common.block.trap.BlockAntimatterBomb;
 import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.block.entity.BlockEntityRenderer;
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraft.util.math.BlockBox;
+import net.minecraft.util.math.Box;
+import org.joml.Quaternionf;
 
-@OnlyIn(Dist.CLIENT)
-public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<TileEntityAntimatterBomb> {
+@Environment(EnvType.CLIENT)
+public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<TileEntityAntimatterBomb>, CustomRenderBoxExtension<TileEntityAntimatterBomb> {
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etantimatterbomb);
     public TileEntityAntimatterBombRenderer(BlockEntityRendererFactory.Context context) {
     }
 
@@ -37,14 +43,13 @@ public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<Til
 		int metadata = entity.getCachedState().get(BlockAntimatterBomb.META);
 
 		if (metadata == 2) {
-			matrices.multiply(new Quaternion(180, 0, 1, 0));
+			matrices.multiply(new Quaternionf(180, 0, 1, 0));
 		} else if (metadata == 4) {
-            matrices.multiply(new Quaternion(-90, 0, 1, 0));
+            matrices.multiply(new Quaternionf(-90, 0, 1, 0));
 		} else if (metadata == 5) {
-            matrices.multiply(new Quaternion(90, 0, 1, 0));
+            matrices.multiply(new Quaternionf(90, 0, 1, 0));
 		}
-		MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etantimatterbomb);
-		//RenderAntimatterBomb.bomb.renderAll();
+		RenderAntimatterBomb.bomb.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 		matrices.pop();
 	}
 
@@ -54,4 +59,8 @@ public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<Til
         return 16384;
     }
 
+    @Override
+    public Box getRenderBoundingBox(TileEntityAntimatterBomb blockEntity) {
+        return Box.from(BlockBox.create(blockEntity.getPos().add(-5, 0, -5), blockEntity.getPos().add(6, 2, 6)));
+    }
 }

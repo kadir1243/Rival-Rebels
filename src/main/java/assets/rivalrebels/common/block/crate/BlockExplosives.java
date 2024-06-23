@@ -16,12 +16,10 @@ import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
@@ -42,7 +40,7 @@ public class BlockExplosives extends Block
         int z = pos.getZ();
 		if (!world.isClient)
 		{
-            player.sendMessage(new TranslatableText("RivalRebels.Inventory"), false);
+            player.sendMessage(Text.translatable("RivalRebels.Inventory"), false);
             player.sendMessage(Text.of("§a" + RRBlocks.timedbomb.getName() + ". §9(" + "1 minute countdown." + ")"), false);
             player.sendMessage(Text.of("§a" + RRItems.pliers.getName() + ". §9(" + "to defuse explosives." + ")"), false);
             player.sendMessage(Text.of("§a" + RRBlocks.remotecharge.getName() + ". §9(" + "Remote charge." + ")"), false);
@@ -66,41 +64,4 @@ public class BlockExplosives extends Block
 		return ActionResult.success(world.isClient);
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon6;
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ah"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ai"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:am"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:am"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:am"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:am"); // SIDE E
-	}*/
 }

@@ -15,14 +15,10 @@ import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
-import net.minecraft.client.resource.language.I18n;
 import net.minecraft.entity.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.text.LiteralText;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
@@ -44,13 +40,13 @@ public class BlockAmmunition extends Block
         int z = pos.getZ();
 		if (world.isClient)
 		{
-			player.sendMessage(new TranslatableText("RivalRebels.Inventory"), false);
-            player.sendMessage(RRItems.rocket.getName().copy().formatted(Formatting.GREEN).append(". ").append(RRItems.rpg.getName().copy().formatted(Formatting.BLUE)).append(" ").append(new TranslatableText("RivalRebels.ammunition")).append(")"), false);
-			player.sendMessage(Text.of("§a" + RRItems.battery.getName() + ". §9(" + RRItems.tesla.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
-			player.sendMessage(Text.of("§a" + RRItems.hydrod.getName() + ". §9(" + RRItems.plasmacannon.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
-			player.sendMessage(Text.of("§a" + RRItems.fuel.getName() + ". §9(" + RRItems.flamethrower.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
-			player.sendMessage(Text.of("§a" + RRItems.redrod.getName() + ". §9(" + RRItems.einsten.getName() + " " + new TranslatableText("RivalRebels.ammunition") + ")"), false);
-			player.sendMessage(Text.of("§a" + RRItems.gasgrenade.getName() + ". §9(" + new TranslatableText("RivalRebels.chemicalweapon") + ")"), false);
+			player.sendMessage(Text.translatable("RivalRebels.Inventory"), false);
+            player.sendMessage(RRItems.rocket.getName().copy().formatted(Formatting.GREEN).append(". ").append(RRItems.rpg.getName().copy().formatted(Formatting.BLUE)).append(" ").append(Text.translatable("RivalRebels.ammunition")).append(")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.battery.getName() + ". §9(" + RRItems.tesla.getName() + " " + Text.translatable("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.hydrod.getName() + ". §9(" + RRItems.plasmacannon.getName() + " " + Text.translatable("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.fuel.getName() + ". §9(" + RRItems.flamethrower.getName() + " " + Text.translatable("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.redrod.getName() + ". §9(" + RRItems.einsten.getName() + " " + Text.translatable("RivalRebels.ammunition") + ")"), false);
+			player.sendMessage(Text.of("§a" + RRItems.gasgrenade.getName() + ". §9(" + Text.translatable("RivalRebels.chemicalweapon") + ")"), false);
 		} else {
 			ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.rocket, 32));
 			ItemEntity ei1 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.battery, 16));
@@ -85,42 +81,4 @@ public class BlockAmmunition extends Block
 		}
 		return ActionResult.success(world.isClient);
 	}
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon6;
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ah"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ai"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:aa"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:aa"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:aa"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:aa"); // SIDE E
-	}*/
 }

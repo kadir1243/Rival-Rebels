@@ -22,8 +22,8 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.World;
-import net.minecraftforge.common.extensions.IForgeBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,18 +68,18 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (world.random.nextInt(30) == 0)
+		if (getWorld().random.nextInt(30) == 0)
 		{
-			world.playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.5F, false);
+			getWorld().playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.5F, false);
 		}
 		else
 		{
-			if (world.random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
+			if (getWorld().random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
 		}
 
 		age++;
 
-		if (!world.isClient)
+		if (!getWorld().isClient)
 		{
 			if (tsar == null && age > 1200) kill();
 			if (age % 20 == 0) updateEntityList();
@@ -108,7 +108,7 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	{
 		entitylist.clear();
 		double ldist = radius*radius;
-        List<Entity> otherEntities = world.getOtherEntities(this, IForgeBlockEntity.INFINITE_EXTENT_AABB, e -> !((e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityAntimatterBombBlast));
+        List<Entity> otherEntities = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox(), e -> !((e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityAntimatterBombBlast));
         for (Entity e : otherEntities) {
             double dist = e.squaredDistanceTo(getX(), getY(), getZ());
             if (dist < ldist) {
@@ -139,11 +139,11 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
-				e.damage(RivalRebelsDamageSource.nuclearblast, (int) (radius*f*0.025f));
+				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (radius*f*0.025f));
 			}
 			else
 			{
-				e.damage(RivalRebelsDamageSource.nuclearblast, (int) (f * f * 2.0f * radius + 20.0f));
+				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (f * f * 2.0f * radius + 20.0f));
                 e.setVelocity(e.getVelocity().subtract(
                     dx * f,
                     dy * f,

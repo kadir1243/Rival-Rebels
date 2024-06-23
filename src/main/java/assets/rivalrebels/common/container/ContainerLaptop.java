@@ -14,10 +14,7 @@ package assets.rivalrebels.common.container;
 import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
-import assets.rivalrebels.common.item.ItemAntenna;
-import assets.rivalrebels.common.item.ItemChip;
-import assets.rivalrebels.common.item.ItemRodHydrogen;
-import assets.rivalrebels.common.item.ItemRodNuclear;
+import assets.rivalrebels.common.item.*;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.Inventory;
@@ -49,7 +46,7 @@ public class ContainerLaptop extends ScreenHandler {
 		addSlot(new SlotRR(laptop, 6, 62, 76, 1, ItemRodNuclear.class).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 7, 80, 76, 1, ItemRodNuclear.class).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 8, 98, 76, 1, ItemRodNuclear.class).setAcceptsTimedBomb(true));
-		addSlot(new SlotRR(laptop, 9, 26, 94, 1, ItemAntenna.class));
+		addSlot(new SlotRR(laptop, 9, 26, 94, 1, RRItems.antenna));
 		addSlot(new SlotRR(laptop, 10, 44, 94, 1, BlockRemoteCharge.class));
 		addSlot(new SlotRR(laptop, 11, 62, 94, 1, ItemRodHydrogen.class).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 12, 80, 94, 1, ItemRodHydrogen.class).setAcceptsTimedBomb(true));
@@ -79,9 +76,8 @@ public class ContainerLaptop extends ScreenHandler {
 		}
 	}
 
-	@Override
-	public ItemStack transferSlot(PlayerEntity player, int index)
-	{
+    @Override
+    public ItemStack quickMove(PlayerEntity player, int slot) {
 		return ItemStack.EMPTY;
 	}
 

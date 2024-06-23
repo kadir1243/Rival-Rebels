@@ -13,40 +13,35 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderDispatcher;
-import net.minecraft.client.render.entity.model.EntityModelLoader;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
-import net.minecraft.client.render.model.json.ModelTransformation;
+import net.minecraft.client.render.model.json.ModelTransformationMode;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.Quaternion;
+import org.joml.Quaternionf;
 
-public class BinocularsRenderer extends BuiltinModelItemRenderer {
-	private final ModelFromObj model;
-
-	public BinocularsRenderer(BlockEntityRenderDispatcher dispatcher, EntityModelLoader loader) {
-        super(dispatcher, loader);
-        model = ModelFromObj.readObjFile("b.obj");
-	}
+public class BinocularsRenderer implements DynamicItemRenderer {
+    public static final SpriteIdentifier BINOCULAR_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etbinoculars);
+    private static final ModelFromObj model = ModelFromObj.readObjFile("b.obj");
 
     @Override
-    public void render(ItemStack stack, ModelTransformation.Mode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        MinecraftClient.getInstance().textureManager.bindTexture(RRIdentifiers.etbinoculars);
+    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
 		matrices.push();
 		matrices.translate(0.5f, 0.5f, -0.03f);
-		matrices.multiply(new Quaternion(35, 0.0F, 0.0F, 1.0F));
-		matrices.multiply(new Quaternion(90, 0.0F, 1.0F, 0.0F));
+		matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+		matrices.multiply(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
 		matrices.scale(0.35f, 0.35f, 0.35f);
-		if (mode == ModelTransformation.Mode.HEAD && (MinecraftClient.getInstance().mouse.wasRightButtonClicked())) {
+		if (mode == ModelTransformationMode.HEAD && (MinecraftClient.getInstance().mouse.wasRightButtonClicked())) {
 			matrices.pop();
 			return;
 		}
 		matrices.translate(0.6f, 0.05f, 0.3f);
 
-		model.render(vertexConsumers.getBuffer(RenderLayer.getSolid()));
+		model.render(BINOCULAR_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
 
 		matrices.pop();
 	}

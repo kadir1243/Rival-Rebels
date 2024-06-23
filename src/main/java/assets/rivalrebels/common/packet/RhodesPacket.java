@@ -11,16 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import net.minecraft.client.MinecraftClient;
+import net.fabricmc.fabric.api.networking.v1.FabricPacket;
+import net.fabricmc.fabric.api.networking.v1.PacketSender;
+import net.fabricmc.fabric.api.networking.v1.PacketType;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.PacketByteBuf;
-import net.minecraftforge.network.NetworkEvent;
+import net.minecraft.util.Identifier;
+import net.minecraft.world.World;
 
-import java.util.function.Supplier;
-
-public class RhodesPacket {
+public class RhodesPacket implements FabricPacket {
+    public static final PacketType<RhodesPacket> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "rhodes_packet"), RhodesPacket::fromBytes);
     public float bodyyaw;
     int id = 0;
     boolean forcefield = false;
@@ -120,99 +123,102 @@ public class RhodesPacket {
         return packet;
     }
 
-    public static void onMessage(RhodesPacket m, Supplier<NetworkEvent.Context> ctx) {
-        NetworkEvent.Context context = ctx.get();
-        context.enqueueWork(() -> {
-            Entity e = MinecraftClient.getInstance().world.getEntityById(m.id);
-            if (e instanceof EntityRhodes er) {
-                er.lastbodyyaw = er.bodyyaw;
-                er.lastheadyaw = er.headyaw;
-                er.lastheadpitch = er.headpitch;
-                er.lastleftarmyaw = er.leftarmyaw;
-                er.lastleftarmpitch = er.leftarmpitch;
-                er.lastrightarmyaw = er.rightarmyaw;
-                er.lastrightarmpitch = er.rightarmpitch;
-                er.lastleftthighpitch = er.leftthighpitch;
-                er.lastrightthighpitch = er.rightthighpitch;
-                er.lastleftshinpitch = er.leftshinpitch;
-                er.lastrightshinpitch = er.rightshinpitch;
-                if (Math.abs(er.bodyyaw - m.bodyyaw) > 90) {
-                    er.lastbodyyaw = m.bodyyaw;
-                }
-                if (Math.abs(er.rightarmyaw - m.rightarmyaw) > 90) {
-                    er.lastrightarmyaw = m.rightarmyaw;
-                }
-                if (Math.abs(er.leftarmyaw - m.leftarmyaw) > 90) {
-                    er.lastleftarmyaw = m.leftarmyaw;
-                }
-                er.bodyyaw = m.bodyyaw;
-                er.headyaw = m.headyaw;
-                er.headpitch = m.headpitch;
-                er.leftarmyaw = m.leftarmyaw;
-                er.leftarmpitch = m.leftarmpitch;
-                er.rightarmyaw = m.rightarmyaw;
-                er.rightarmpitch = m.rightarmpitch;
-                er.leftthighpitch = m.leftthighpitch;
-                er.rightthighpitch = m.rightthighpitch;
-                er.leftshinpitch = m.leftshinpitch;
-                er.rightshinpitch = m.rightshinpitch;
-                er.health = m.health;
-                er.laserOn = m.laserOn;
-                er.forcefield = m.forcefield;
-                er.colorType = m.colorType;
-                er.b2energy = m.b2energy;
-                er.ticksSinceLastPacket = 0;
-                er.rocketcount = m.rocketcount;
-                er.energy = m.energy;
-                er.flamecount = m.flamecount;
-                er.nukecount = m.nukecount;
-                er.itexloc = m.texloc;
-                er.itexfolder = m.texfolder;
-                er.scale = m.scale;
-                if (er.health <= 0 && er.rider != null) {
-                    er.rider.setPosition(er.getX() + 5, er.getY() - 12, er.getZ());
-                    er.rider.getAbilities().invulnerable = false;
-                    er.rider = null;
-                } else {
-                    er.rider = m.riderid == -1 ? null : (PlayerEntity) er.world.getEntityById(m.riderid);
-                    er.passenger1 = m.pass1id == -1 ? null : (PlayerEntity) er.world.getEntityById(m.pass1id);
-                    er.passenger2 = m.pass2id == -1 ? null : (PlayerEntity) er.world.getEntityById(m.pass2id);
-                }
+    public static void onMessage(RhodesPacket m, PlayerEntity player, PacketSender responseHandler) {
+        Entity e = player.getWorld().getEntityById(m.id);
+        if (e instanceof EntityRhodes er) {
+            er.lastbodyyaw = er.bodyyaw;
+            er.lastheadyaw = er.headyaw;
+            er.lastheadpitch = er.headpitch;
+            er.lastleftarmyaw = er.leftarmyaw;
+            er.lastleftarmpitch = er.leftarmpitch;
+            er.lastrightarmyaw = er.rightarmyaw;
+            er.lastrightarmpitch = er.rightarmpitch;
+            er.lastleftthighpitch = er.leftthighpitch;
+            er.lastrightthighpitch = er.rightthighpitch;
+            er.lastleftshinpitch = er.leftshinpitch;
+            er.lastrightshinpitch = er.rightshinpitch;
+            if (Math.abs(er.bodyyaw - m.bodyyaw) > 90) {
+                er.lastbodyyaw = m.bodyyaw;
             }
-        });
+            if (Math.abs(er.rightarmyaw - m.rightarmyaw) > 90) {
+                er.lastrightarmyaw = m.rightarmyaw;
+            }
+            if (Math.abs(er.leftarmyaw - m.leftarmyaw) > 90) {
+                er.lastleftarmyaw = m.leftarmyaw;
+            }
+            er.bodyyaw = m.bodyyaw;
+            er.headyaw = m.headyaw;
+            er.headpitch = m.headpitch;
+            er.leftarmyaw = m.leftarmyaw;
+            er.leftarmpitch = m.leftarmpitch;
+            er.rightarmyaw = m.rightarmyaw;
+            er.rightarmpitch = m.rightarmpitch;
+            er.leftthighpitch = m.leftthighpitch;
+            er.rightthighpitch = m.rightthighpitch;
+            er.leftshinpitch = m.leftshinpitch;
+            er.rightshinpitch = m.rightshinpitch;
+            er.health = m.health;
+            er.laserOn = m.laserOn;
+            er.forcefield = m.forcefield;
+            er.colorType = m.colorType;
+            er.b2energy = m.b2energy;
+            er.ticksSinceLastPacket = 0;
+            er.rocketcount = m.rocketcount;
+            er.energy = m.energy;
+            er.flamecount = m.flamecount;
+            er.nukecount = m.nukecount;
+            er.itexloc = m.texloc;
+            er.itexfolder = m.texfolder;
+            er.scale = m.scale;
+            if (er.health <= 0 && er.rider != null) {
+                er.rider.setPosition(er.getX() + 5, er.getY() - 12, er.getZ());
+                er.rider.getAbilities().invulnerable = false;
+                er.rider = null;
+            } else {
+                er.rider = m.riderid == -1 ? null : (PlayerEntity) er.getWorld().getEntityById(m.riderid);
+                er.passenger1 = m.pass1id == -1 ? null : (PlayerEntity) er.getWorld().getEntityById(m.pass1id);
+                er.passenger2 = m.pass2id == -1 ? null : (PlayerEntity) er.getWorld().getEntityById(m.pass2id);
+            }
+        }
     }
 
-    public static void toBytes(RhodesPacket packet, PacketByteBuf buf) {
-        buf.writeInt(packet.id);
-        buf.writeBoolean(packet.forcefield);
-        buf.writeFloat(packet.bodyyaw);
-        buf.writeFloat(packet.headyaw);
-        buf.writeFloat(packet.headpitch);
-        buf.writeFloat(packet.leftarmyaw);
-        buf.writeFloat(packet.leftarmpitch);
-        buf.writeFloat(packet.rightarmyaw);
-        buf.writeFloat(packet.rightarmpitch);
-        buf.writeFloat(packet.leftthighpitch);
-        buf.writeFloat(packet.rightthighpitch);
-        buf.writeFloat(packet.leftshinpitch);
-        buf.writeFloat(packet.rightshinpitch);
-        buf.writeInt(packet.health);
-        buf.writeByte(packet.laserOn);
-        buf.writeByte(packet.colorType);
-        buf.writeInt(packet.b2energy);
-        buf.writeInt(packet.riderid);
-        buf.writeInt(packet.pass1id);
-        buf.writeInt(packet.pass2id);
-        buf.writeFloat(packet.scale);
-        buf.writeInt(packet.rocketcount);
-        buf.writeInt(packet.energy);
-        buf.writeInt(packet.flamecount);
-        buf.writeByte(packet.nukecount);
-        if (packet.texfolder == -1) {
+    @Override
+    public PacketType<?> getType() {
+        return PACKET_TYPE;
+    }
+
+    @Override
+    public void write(PacketByteBuf buf) {
+        buf.writeInt(id);
+        buf.writeBoolean(forcefield);
+        buf.writeFloat(bodyyaw);
+        buf.writeFloat(headyaw);
+        buf.writeFloat(headpitch);
+        buf.writeFloat(leftarmyaw);
+        buf.writeFloat(leftarmpitch);
+        buf.writeFloat(rightarmyaw);
+        buf.writeFloat(rightarmpitch);
+        buf.writeFloat(leftthighpitch);
+        buf.writeFloat(rightthighpitch);
+        buf.writeFloat(leftshinpitch);
+        buf.writeFloat(rightshinpitch);
+        buf.writeInt(health);
+        buf.writeByte(laserOn);
+        buf.writeByte(colorType);
+        buf.writeInt(b2energy);
+        buf.writeInt(riderid);
+        buf.writeInt(pass1id);
+        buf.writeInt(pass2id);
+        buf.writeFloat(scale);
+        buf.writeInt(rocketcount);
+        buf.writeInt(energy);
+        buf.writeInt(flamecount);
+        buf.writeByte(nukecount);
+        if (texfolder == -1) {
             buf.writeByte(0);
         } else {
-            buf.writeByte(packet.texfolder * 10 + packet.texloc.length());
-            buf.writeString(packet.texloc);
+            buf.writeByte(texfolder * 10 + texloc.length());
+            buf.writeString(texloc);
         }
     }
 }

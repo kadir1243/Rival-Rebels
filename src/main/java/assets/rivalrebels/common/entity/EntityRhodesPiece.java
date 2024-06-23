@@ -12,8 +12,8 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
@@ -23,8 +23,6 @@ import net.minecraft.entity.data.DataTracker;
 import net.minecraft.entity.data.TrackedData;
 import net.minecraft.entity.data.TrackedDataHandlerRegistry;
 import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.Packet;
-import net.minecraft.network.packet.s2c.play.EntitySpawnS2CPacket;
 import net.minecraft.util.math.Box;
 import net.minecraft.world.World;
 
@@ -71,7 +69,7 @@ public class EntityRhodesPiece extends Entity {
     }
 
     @Override
-	public boolean collides()
+	public boolean isCollidable()
 	{
 		return true;
 	}
@@ -85,7 +83,7 @@ public class EntityRhodesPiece extends Entity {
 	public void tick() {
 		super.tick();
 		age++;
-		if (world.random.nextInt(Math.max(getMaxAge()*(RivalRebels.rhodesPromode?1:30) - age, RivalRebels.rhodesPromode?100:1))==0)
+		if (getWorld().random.nextInt(Math.max(getMaxAge()*(RivalRebels.rhodesPromode?1:30) - age, RivalRebels.rhodesPromode?100:1))==0)
 		{
 			kill();
 		}
@@ -121,14 +119,14 @@ public class EntityRhodesPiece extends Entity {
 	public boolean damage(DamageSource par1DamageSource, float par2)
 	{
 		super.damage(par1DamageSource, par2);
-		if (isAlive() && !world.isClient)
+		if (isAlive() && !getWorld().isClient)
 		{
 			health -= par2;
 			if (health <= 0)
 			{
 				kill();
-				new Explosion(world, getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket);
-				RivalRebelsSoundPlayer.playSound(this, 0, 0, 30, 1);
+				new Explosion(getWorld(), getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket(getWorld()));
+                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
 			}
 		}
 
@@ -150,9 +148,4 @@ public class EntityRhodesPiece extends Entity {
     protected void writeCustomDataToNbt(NbtCompound nbt) {
 		nbt.putDouble("health", health);
 	}
-
-    @Override
-    public Packet<?> createSpawnPacket() {
-        return new EntitySpawnS2CPacket(this);
-    }
 }

@@ -12,13 +12,10 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.itemrenders.SeekRocketLauncherRenderer;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntitySeekB83;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
@@ -28,31 +25,20 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.function.Consumer;
 
 public class ItemSeekM202 extends ToolItem
 {
 	public ItemSeekM202() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1).group(RRItems.rralltab));
+		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
 	}
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new SeekRocketLauncherRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
+
 	@Override
 	public UseAction getUseAction(ItemStack par1ItemStack)
 	{
 		return UseAction.BOW;
 	}
 
-    public int getMaxUseTime(ItemStack p_77626_1_)
+    public int getMaxUseTime(ItemStack stack)
     {
         return 90;
     }
@@ -94,10 +80,4 @@ public class ItemSeekM202 extends ToolItem
 		}
 		return TypedActionResult.success(stack, world.isClient);
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:bh");
-	}*/
 }

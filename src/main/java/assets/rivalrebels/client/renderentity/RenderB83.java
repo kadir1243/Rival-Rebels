@@ -19,29 +19,31 @@ import net.minecraft.client.render.RenderLayer;
 import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.render.entity.EntityRenderer;
 import net.minecraft.client.render.entity.EntityRendererFactory;
+import net.minecraft.client.texture.SpriteAtlasTexture;
+import net.minecraft.client.util.SpriteIdentifier;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.Quaternion;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
+import org.joml.Quaternionf;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 
-@OnlyIn(Dist.CLIENT)
+@Environment(EnvType.CLIENT)
 public class RenderB83 extends EntityRenderer<EntityB83>
 {
-	public static ModelFromObj	md;
+    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etb83);
+    public static final ModelFromObj md = ModelFromObj.readObjFile("c.obj");
 
 	public RenderB83(EntityRendererFactory.Context manager) {
         super(manager);
-        md = ModelFromObj.readObjFile("c.obj");
 	}
 
     @Override
     public void render(EntityB83 entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
         matrices.push();
         matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-        matrices.multiply(new Quaternion(yaw - 90.0f, 0.0F, 1.0F, 0.0F));
-        matrices.multiply(new Quaternion(entity.getPitch() - 180.0f, 0.0F, 0.0F, 1.0F));
-        md.render(vertexConsumers.getBuffer(RenderLayer.getEntitySolid(getTexture(entity))));
+        matrices.multiply(new Quaternionf(yaw - 90.0f, 0.0F, 1.0F, 0.0F));
+        matrices.multiply(new Quaternionf(entity.getPitch() - 180.0f, 0.0F, 0.0F, 1.0F));
+        md.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light);
         matrices.pop();
     }
 

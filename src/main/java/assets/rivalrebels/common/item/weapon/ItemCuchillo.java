@@ -29,7 +29,7 @@ public class ItemCuchillo extends ToolItem
 {
 	public ItemCuchillo()
 	{
-		super(ToolMaterials.IRON, new Settings().maxCount(5).group(RRItems.rralltab));
+		super(ToolMaterials.IRON, new Settings().maxCount(5));
 	}
 
     @Override
@@ -66,10 +66,4 @@ public class ItemCuchillo extends ToolItem
         user.setCurrentHand(hand);
         return super.use(world, user, hand);
     }
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ad");
-	}*/
 }

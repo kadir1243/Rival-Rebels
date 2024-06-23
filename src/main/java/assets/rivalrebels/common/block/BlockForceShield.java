@@ -14,7 +14,6 @@ package assets.rivalrebels.common.block;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
 import net.minecraft.block.piston.PistonBehavior;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.BlockPos;
@@ -24,19 +23,20 @@ public class BlockForceShield extends Block
 {
 	public BlockForceShield(Settings settings)
 	{
-		super(settings);
+		super(settings.pistonBehavior(PistonBehavior.BLOCK));
 	}
 
 	boolean	Destroy	= false;
 
     @Override
-    public void onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
 		Block id = state.getBlock();
 		if (!Destroy && id != RRBlocks.fshield && id != RRBlocks.omegaobj && id != RRBlocks.sigmaobj && id != RRBlocks.reactive) {
 			world.setBlockState(pos, state);
 		}
 		Destroy = false;
-	}
+        return state;
+    }
 
     //@Override
     public void onBlockHarvested(World world, BlockPos pos, BlockState state, PlayerEntity player) {
@@ -51,9 +51,4 @@ public class BlockForceShield extends Block
 			world.setBlockState(pos, state);
 		}
 	}
-
-    @Override
-    public PistonBehavior getPistonBehavior(BlockState state) {
-        return PistonBehavior.BLOCK;
-    }
 }

@@ -13,14 +13,12 @@ package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.client.itemrenders.TeslaRenderer;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRaytrace;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.item.BuiltinModelItemRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -28,28 +26,16 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.ToolItem;
 import net.minecraft.item.ToolMaterials;
 import net.minecraft.text.Text;
-import net.minecraft.text.TranslatableText;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.UseAction;
 import net.minecraft.world.World;
-import net.minecraftforge.client.IItemRenderProperties;
-
-import java.util.function.Consumer;
 
 public class ItemTesla extends ToolItem {
 	public ItemTesla() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1).group(RRItems.rralltab));
+		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
 	}
-    @Override
-    public void initializeClient(Consumer<IItemRenderProperties> consumer) {
-        consumer.accept(new IItemRenderProperties() {
-            @Override
-            public BuiltinModelItemRenderer getItemStackRenderer() {
-                return new TeslaRenderer(MinecraftClient.getInstance().getBlockEntityRenderDispatcher(), MinecraftClient.getInstance().getEntityModelLoader());
-            }
-        });
-    }
+
 	@Override
 	public int getEnchantability()
 	{
@@ -93,7 +79,7 @@ public class ItemTesla extends ToolItem {
 		}
 		if (message && world.isClient)
 		{
-			player.sendMessage(new TranslatableText("RivalRebels.Orders").append(" ").append(new TranslatableText("RivalRebels.message.use")).append(" [R]."), false);
+			player.sendMessage(Text.translatable("RivalRebels.Orders").append(" ").append(Text.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
 		return TypedActionResult.success(stack, world.isClient);
@@ -110,12 +96,11 @@ public class ItemTesla extends ToolItem {
     }
 
     @Override
-    public void onUsingTick(ItemStack stack, LivingEntity player, int count) {
-		if (player.isWet() && !player.isInvulnerableTo(RivalRebelsDamageSource.electricity)) {
-			player.damage(RivalRebelsDamageSource.electricity, 2);
+    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+		if (user.isWet() && !user.isInvulnerableTo(RivalRebelsDamageSource.electricity(world))) {
+			user.damage(RivalRebelsDamageSource.electricity(world), 2);
 		}
-		World world = player.world;
-		if (player.world.random.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(player, 25, 1);
+		if (user.getWorld().random.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);
 
 		int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
@@ -128,7 +113,7 @@ public class ItemTesla extends ToolItem {
 		int num = (degree / 25) + 1;
 
 		if (!world.isClient) for (int i = 0; i < num; i++)
-			world.spawnEntity(new EntityRaytrace(world, player, dist, randomness, chance, !stack.hasEnchantments()));
+			world.spawnEntity(new EntityRaytrace(world, user, dist, randomness, chance, !stack.hasEnchantments()));
 	}
 
 	public int getDegree(ItemStack item)
@@ -136,10 +121,4 @@ public class ItemTesla extends ToolItem {
 		if (!item.hasNbt()) return 0;
 		else return item.getNbt().getInt("dial") + 90;
 	}
-
-	/*@Override
-	public void registerIcons(IIconRegister iconregister)
-	{
-		itemIcon = iconregister.registerIcon("RivalRebels:ax");
-	}*/
 }

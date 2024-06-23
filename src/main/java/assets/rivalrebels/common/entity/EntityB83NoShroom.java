@@ -39,10 +39,10 @@ public class EntityB83NoShroom extends EntityB83
 
 	public void explode()
 	{
-		new NuclearExplosion(world, (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength/2);
-		EntitySphereBlast etb = new EntitySphereBlast(world, getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f);
+		new NuclearExplosion(getWorld(), (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength/2);
+		EntitySphereBlast etb = new EntitySphereBlast(getWorld(), getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f);
 		etb.time = -920;
-		world.spawnEntity(etb);
+		getWorld().spawnEntity(etb);
 		this.kill();
 	}
 }

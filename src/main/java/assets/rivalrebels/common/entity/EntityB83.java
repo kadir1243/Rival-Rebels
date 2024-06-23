@@ -13,14 +13,13 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.Material;
+import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
+import net.minecraft.block.*;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityType;
 import net.minecraft.entity.projectile.thrown.ThrownEntity;
-import net.minecraft.tag.BlockTags;
-import net.minecraft.tag.FluidTags;
+import net.minecraft.registry.tag.BlockTags;
+import net.minecraft.registry.tag.FluidTags;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.hit.EntityHitResult;
 import net.minecraft.util.hit.HitResult;
@@ -29,7 +28,6 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.RaycastContext;
 import net.minecraft.world.World;
-import net.minecraftforge.common.Tags;
 
 import java.util.List;
 import java.util.Optional;
@@ -83,21 +81,21 @@ public class EntityB83 extends ThrownEntity
 
 		Vec3d var15 = getPos();
 		Vec3d var2 = getPos().add(this.getVelocity());
-		HitResult var3 = (this.world.raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.ANY, null)));
+		HitResult var3 = (this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.OUTLINE, RaycastContext.FluidHandling.ANY, ShapeContext.absent())));
 
 		if (var3 != null)
 		{
 			var2 = var3.getPos();
 		}
 
-		if (!this.world.isClient)
+		if (!this.getWorld().isClient)
 		{
 			Entity var4 = null;
-			List<Entity> var5 = this.world.getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.collides()) {
+                if (var9.isCollidable()) {
                     float var10 = 0.3F;
                     Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
                     Optional<Vec3d> var12 = var11.raycast(var15, var2);
@@ -169,10 +167,10 @@ public class EntityB83 extends ThrownEntity
 
     @Override
     protected void onBlockHit(BlockHitResult blockHitResult) {
-        BlockState state = world.getBlockState(blockHitResult.getBlockPos());
-        Material m = state.getMaterial();
-        if (state.isIn(BlockTags.LEAVES) || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || m == Material.CAKE || m == Material.DECORATION || state.isIn(BlockTags.WOOL) || m == Material.SNOW_BLOCK || state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.GLASS) || state.isIn(Tags.Blocks.SAND) || m == Material.SNOW_LAYER || m == Material.WOOD || m == Material.REPLACEABLE_PLANT || state.getFluidState().isIn(FluidTags.WATER) || m == Material.SPONGE || state.isIn(BlockTags.ICE)) {
-            world.setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
+        BlockState state = getWorld().getBlockState(blockHitResult.getBlockPos());
+        Block b = state.getBlock();
+        if (state.isIn(BlockTags.LEAVES) || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || state.isOf(Blocks.CAKE) || state.getBlock().getBlastResistance() < 1 || state.isIn(BlockTags.WOOL) || state.isOf(Blocks.SNOW_BLOCK) || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(BlockTags.SAND) || b instanceof SnowBlock || state.isBurnable() || state.isReplaceable() || state.getFluidState().isIn(FluidTags.WATER) || b instanceof SpongeBlock || state.isIn(BlockTags.ICE)) {
+            getWorld().setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
             return;
         }
 		explode();
@@ -186,8 +184,8 @@ public class EntityB83 extends ThrownEntity
 
 	public void explode()
 	{
-		new NuclearExplosion(world, (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength);
-		world.spawnEntity(new EntityTsarBlast(world, getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f).setTime());
+		new NuclearExplosion(getWorld(), (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength);
+		getWorld().spawnEntity(new EntityTsarBlast(getWorld(), getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f).setTime());
 		this.kill();
 	}
 }

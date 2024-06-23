@@ -38,8 +38,8 @@ public class ContainerAntimatterBomb extends ScreenHandler
 		this.antimatter = antimatter;
         this.propertyDelegate = propertyDelegate;
         addSlot(new SlotRR(antimatter, 0, 18, 48, 1, ItemFuse.class));
-		addSlot(new SlotRR(antimatter, 1, 40, 59, 1, ItemAntenna.class));
-		addSlot(new SlotRR(antimatter, 2, 40, 37, 1, ItemAntenna.class));
+		addSlot(new SlotRR(antimatter, 1, 40, 59, 1, RRItems.antenna));
+		addSlot(new SlotRR(antimatter, 2, 40, 37, 1, RRItems.antenna));
 		for (int i = 0; i <= 3; i++)
 		{
 			addSlot(new SlotRR(antimatter, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
@@ -58,7 +58,7 @@ public class ContainerAntimatterBomb extends ScreenHandler
 		return antimatter.canPlayerUse(player);
 	}
 
-	protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
+    protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -75,17 +75,16 @@ public class ContainerAntimatterBomb extends ScreenHandler
 	}
 
     @Override
-	public ItemStack transferSlot(PlayerEntity player, int index)
-	{
-		ItemStack var3 = ItemStack.EMPTY;
-		Slot var4 = this.getSlot(index);
+    public ItemStack quickMove(PlayerEntity player, int slot) {
+		ItemStack itemStack = ItemStack.EMPTY;
+		Slot var4 = this.getSlot(slot);
 
 		if (var4 != null && var4.hasStack())
 		{
 			ItemStack var5 = var4.getStack();
-			var3 = var5.copy();
+			itemStack = var5.copy();
 
-			if (index <= 19)
+			if (slot <= 19)
 			{
 				if (!this.insertItem(var5, 19, this.slots.size(), true))
 				{
@@ -107,7 +106,7 @@ public class ContainerAntimatterBomb extends ScreenHandler
 			}
 		}
 
-		return var3;
+		return itemStack;
 	}
 
     public int getCountdown() {

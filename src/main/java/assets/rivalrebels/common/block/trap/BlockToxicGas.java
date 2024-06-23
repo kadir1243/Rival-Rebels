@@ -23,29 +23,22 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particle.ParticleTypes;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
+import net.minecraft.util.math.random.Random;
 import net.minecraft.util.shape.VoxelShape;
 import net.minecraft.util.shape.VoxelShapes;
 import net.minecraft.world.BlockView;
 import net.minecraft.world.World;
 
-import java.util.Random;
-
-public class BlockToxicGas extends Block
-{
+public class BlockToxicGas extends Block {
 	public BlockToxicGas(Settings settings) {
 		super(settings);
-	}
 
-    @Override
-    public int getFlammability(BlockState state, BlockView world, BlockPos pos, Direction face) {
-        return 300;
+        ((FireBlock) Blocks.FIRE).registerFlammableBlock(this, 60, 100);
     }
 
     @Override
     public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.cuboid(new Box(pos, pos));
+        return VoxelShapes.empty();
     }
 
     @Override
@@ -57,7 +50,7 @@ public class BlockToxicGas extends Block
 			living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));
 		}
 		if (entity instanceof PathAwareEntity || entity instanceof AnimalEntity || entity instanceof PlayerEntity) {
-			entity.damage(RivalRebelsDamageSource.gasgrenade, 1);
+			entity.damage(RivalRebelsDamageSource.gasGrenade(world), 1);
 		}
 	}
 
@@ -68,12 +61,12 @@ public class BlockToxicGas extends Block
 
     @Override
     public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-		world.createAndScheduleBlockTick(pos, this, 8);
+		world.scheduleBlockTick(pos, this, 8);
 	}
 
     @Override
     public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-		world.createAndScheduleBlockTick(pos, this, 8);
+		world.scheduleBlockTick(pos, this, 8);
 		if (random.nextInt(25) == 1) {
 			world.setBlockState(pos, Blocks.AIR.getDefaultState());
 		}
