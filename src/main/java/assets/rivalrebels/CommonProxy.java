@@ -13,7 +13,7 @@ package assets.rivalrebels;
 
 import assets.rivalrebels.common.entity.EntityGore;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
 
 public class CommonProxy {
     public void closeGui() {
@@ -37,7 +37,7 @@ public class CommonProxy {
 	public void teslaGui(int i) {
 	}
 
-	public void spawnGore(World world, EntityGore g, boolean greenblood) {
+	public void spawnGore(Level world, EntityGore g, boolean greenblood) {
 	}
 
 	public boolean spacebar()

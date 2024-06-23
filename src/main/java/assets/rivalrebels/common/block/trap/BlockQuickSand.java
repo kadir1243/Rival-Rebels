@@ -13,25 +13,25 @@ package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockQuickSand extends Block
 {
-	public BlockQuickSand(Settings settings)
+	public BlockQuickSand(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		entity.fallDistance = 0.0F;
-        entity.setVelocity(entity.getVelocity().multiply(1, 0.005, 1));
+        entity.setDeltaMovement(entity.getDeltaMovement().multiply(1, 0.005, 1));
 		if (world.random.nextFloat() > 0.95) RivalRebelsSoundPlayer.playSound(world, 20, 0, pos, 0.2f);
 	}
 
@@ -101,8 +101,8 @@ public class BlockQuickSand extends Block
 	}*/
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        return RRBlocks.aquicksand.asItem().getDefaultStack();
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+        return RRBlocks.aquicksand.asItem().getDefaultInstance();
     }
 
 	/*@Override

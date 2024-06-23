@@ -4,18 +4,22 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.data.client.*;
-import net.minecraft.item.Item;
+import net.minecraft.data.models.BlockModelGenerators;
+import net.minecraft.data.models.ItemModelGenerators;
+import net.minecraft.data.models.model.ModelLocationUtils;
+import net.minecraft.data.models.model.ModelTemplates;
+import net.minecraft.data.models.model.TextureMapping;
+import net.minecraft.world.item.Item;
 
 public class ItemModelDataGen extends FabricModelProvider {
-    private ItemModelGenerator generator;
+    private ItemModelGenerators generator;
 
     public ItemModelDataGen(FabricDataOutput output) {
         super(output);
     }
 
     @Override
-    public void generateItemModels(ItemModelGenerator generator) {
+    public void generateItemModels(ItemModelGenerators generator) {
         this.generator = generator;
         simpleItem(RRItems.trollmask, "bf");
         simpleItem(RRItems.safepill, "ak");
@@ -60,11 +64,11 @@ public class ItemModelDataGen extends FabricModelProvider {
     }
 
     @Override
-    public void generateBlockStateModels(BlockStateModelGenerator blockStateModelGenerator) {
+    public void generateBlockStateModels(BlockModelGenerators blockStateModelGenerator) {
     }
 
     private void simpleItem(Item item, String tex) {
-        Models.GENERATED.upload(ModelIds.getItemModelId(item), TextureMap.layer0(RRIdentifiers.create("item/" + tex)), generator.writer);
+        ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item), TextureMapping.layer0(RRIdentifiers.create("item/" + tex)), generator.output);
     }
 
     @Override

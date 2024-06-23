@@ -14,40 +14,40 @@ package assets.rivalrebels.common.command;
 import assets.rivalrebels.common.entity.EntityHotPotato;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.Level;
 
 public class CommandHotPotato {
-    public static BlockPos pos = BlockPos.ORIGIN;
-	public static World world = null;
+    public static BlockPos pos = BlockPos.ZERO;
+	public static Level world = null;
 	public static boolean roundinprogress = false;
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("rrhotpotato")
-            .requires(arg -> arg.hasPermissionLevel(3))
-            .then(CommandManager.argument("numberOfRounds", IntegerArgumentType.integer())
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("rrhotpotato")
+            .requires(arg -> arg.hasPermission(3))
+            .then(Commands.argument("numberOfRounds", IntegerArgumentType.integer())
                 .executes(context -> execute(context.getSource(), IntegerArgumentType.getInteger(context, "numberOfRounds"))))
-            .then(CommandManager.literal("stop")
+            .then(Commands.literal("stop")
                 .executes(context -> execute(context.getSource(), -1))
             )
         );
     }
 
-    private static int execute(ServerCommandSource source, int numberOfRounds) {
+    private static int execute(CommandSourceStack source, int numberOfRounds) {
         if (numberOfRounds == -1) {
             roundinprogress = false;
-            source.sendFeedback(() -> Text.of("§cRound stopped."), true);
+            source.sendSuccess(() -> Component.nullToEmpty("§cRound stopped."), true);
         } else {
             if (roundinprogress) {
-                source.sendError(Text.of("§cRound already in progress! Do /rrhotpotato stop to end the current round."));
+                source.sendFailure(Component.nullToEmpty("§cRound already in progress! Do /rrhotpotato stop to end the current round."));
                 return 0;
             }
-            source.sendFeedback(() -> Text.of("§cLet the Hot Potato games begin! " + numberOfRounds + " rounds."), true);
-            EntityHotPotato tsar = new EntityHotPotato(source.getWorld(),pos.getX(),pos.getY(), pos.getZ(), numberOfRounds);
-            source.getWorld().spawnEntity(tsar);
+            source.sendSuccess(() -> Component.nullToEmpty("§cLet the Hot Potato games begin! " + numberOfRounds + " rounds."), true);
+            EntityHotPotato tsar = new EntityHotPotato(source.getLevel(),pos.getX(),pos.getY(), pos.getZ(), numberOfRounds);
+            source.getLevel().addFreshEntity(tsar);
             roundinprogress = true;
         }
         return 0;

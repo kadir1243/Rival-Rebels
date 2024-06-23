@@ -12,44 +12,44 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockPetrifiedStone extends Block {
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
-	public BlockPetrifiedStone(Settings settings) {
+	public BlockPetrifiedStone(Properties settings) {
 		super(settings);
-        this.setDefaultState(this.getDefaultState().with(META, 7));
+        this.registerDefaultState(this.defaultBlockState().setValue(META, 7));
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		if (world.random.nextInt(2) == 0) {
-			entity.damage(RivalRebelsDamageSource.radioactivePoisoning(world), ((16 - world.getBlockState(pos).get(META)) / 2F) + world.random.nextInt(3) - 1);
+			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), ((16 - world.getBlockState(pos).getValue(META)) / 2F) + world.random.nextInt(3) - 1);
 		}
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 		if (player.getAbilities().invulnerable) {
-			world.setBlockState(pos, state.with(META, state.get(META) + 1), 3);
-			return ActionResult.success(world.isClient);
+			level.setBlock(pos, state.setValue(META, state.getValue(META) + 1), 3);
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		return ActionResult.FAIL;
+		return InteractionResult.FAIL;
 	}
 }

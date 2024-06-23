@@ -14,13 +14,13 @@ package assets.rivalrebels.common.block.autobuilds;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockRhodesScaffold extends BlockAutoTemplate {
-    public static final MapCodec<BlockRhodesScaffold> CODEC = createCodec(BlockRhodesScaffold::new);
+    public static final MapCodec<BlockRhodesScaffold> CODEC = simpleCodec(BlockRhodesScaffold::new);
 
     public static final byte[] binimg = {
 		0,0,0,0,0,0,0,7,7,
@@ -56,21 +56,21 @@ public class BlockRhodesScaffold extends BlockAutoTemplate {
 		0,3,0,0,0,1,0,0,0,
 		6,6,6,6,6,6,6,6,6,
 	};
-	public BlockRhodesScaffold(Settings settings)
+	public BlockRhodesScaffold(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockRhodesScaffold> getCodec() {
-        return null;
+    protected MapCodec<BlockRhodesScaffold> codec() {
+        return CODEC;
     }
 
     @Override
-	public void build(World world, int x, int y, int z)
+	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClient)
+		if (!world.isClientSide)
 		{
 			int scale = 1;
 			if (world.getBlockState(new BlockPos(x, y-1, z)).getBlock() == RRBlocks.buildrhodes && world.getBlockState(new BlockPos(x, y-2, z)).getBlock() == RRBlocks.buildrhodes)
@@ -128,19 +128,19 @@ public class BlockRhodesScaffold extends BlockAutoTemplate {
 		}
 	}
 
-	private void place(World world, int x, int y, int z, int fy, int fx1, byte b)
+	private void place(Level world, int x, int y, int z, int fy, int fx1, byte b)
 	{
 		if (b == 0)
 		{
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z-4), Blocks.AIR.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z-3), Blocks.AIR.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z-2), Blocks.AIR.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z-1), Blocks.AIR.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z), RRBlocks.steel.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z+1), Blocks.AIR.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z+2), Blocks.AIR.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z+3), Blocks.AIR.getDefaultState());
-			world.setBlockState(new BlockPos(x+fx1, y+fy, z+4), Blocks.AIR.getDefaultState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z-4), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z-3), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z-2), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z-1), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z), RRBlocks.steel.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z+1), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z+2), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z+3), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(new BlockPos(x+fx1, y+fy, z+4), Blocks.AIR.defaultBlockState());
 		}
 		if (b == 1)
 		{
@@ -229,8 +229,8 @@ public class BlockRhodesScaffold extends BlockAutoTemplate {
 		}
 	}
 
-    private static void setBlock(World world, int x, int y, int z, Block block) {
-        world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
+    private static void setBlock(Level world, int x, int y, int z, Block block) {
+        world.setBlockAndUpdate(new BlockPos(x, y, z), block.defaultBlockState());
     }
 
 	/*@Environment(EnvType.CLIENT)

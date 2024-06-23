@@ -11,19 +11,19 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
-public class RhodesPacket implements FabricPacket {
-    public static final PacketType<RhodesPacket> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "rhodes_packet"), RhodesPacket::fromBytes);
+public class RhodesPacket implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, RhodesPacket> STREAM_CODEC = StreamCodec.ofMember(RhodesPacket::write, RhodesPacket::fromBytes);
+
+    public static final Type<RhodesPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("rhodes_packet"));
     public float bodyyaw;
     int id = 0;
     boolean forcefield = false;
@@ -85,7 +85,7 @@ public class RhodesPacket implements FabricPacket {
         scale = er.scale;
     }
 
-    public static RhodesPacket fromBytes(PacketByteBuf buf) {
+    public static RhodesPacket fromBytes(FriendlyByteBuf buf) {
         RhodesPacket packet = new RhodesPacket();
         packet.id = buf.readInt();
         packet.forcefield = buf.readBoolean();
@@ -114,7 +114,7 @@ public class RhodesPacket implements FabricPacket {
         packet.nukecount = buf.readByte();
         packet.texfolder = buf.readByte();
         if (packet.texfolder != 0) {
-            packet.texloc = buf.readString();
+            packet.texloc = buf.readUtf();
             packet.texfolder -= packet.texfolder % 10;
             packet.texfolder /= 10;
         } else {
@@ -123,8 +123,8 @@ public class RhodesPacket implements FabricPacket {
         return packet;
     }
 
-    public static void onMessage(RhodesPacket m, PlayerEntity player, PacketSender responseHandler) {
-        Entity e = player.getWorld().getEntityById(m.id);
+    public static void onMessage(RhodesPacket m, ClientPlayNetworking.Context context) {
+        Entity e = context.player().level().getEntity(m.id);
         if (e instanceof EntityRhodes er) {
             er.lastbodyyaw = er.bodyyaw;
             er.lastheadyaw = er.headyaw;
@@ -171,24 +171,23 @@ public class RhodesPacket implements FabricPacket {
             er.itexfolder = m.texfolder;
             er.scale = m.scale;
             if (er.health <= 0 && er.rider != null) {
-                er.rider.setPosition(er.getX() + 5, er.getY() - 12, er.getZ());
+                er.rider.setPos(er.getX() + 5, er.getY() - 12, er.getZ());
                 er.rider.getAbilities().invulnerable = false;
                 er.rider = null;
             } else {
-                er.rider = m.riderid == -1 ? null : (PlayerEntity) er.getWorld().getEntityById(m.riderid);
-                er.passenger1 = m.pass1id == -1 ? null : (PlayerEntity) er.getWorld().getEntityById(m.pass1id);
-                er.passenger2 = m.pass2id == -1 ? null : (PlayerEntity) er.getWorld().getEntityById(m.pass2id);
+                er.rider = m.riderid == -1 ? null : (Player) er.level().getEntity(m.riderid);
+                er.passenger1 = m.pass1id == -1 ? null : (Player) er.level().getEntity(m.pass1id);
+                er.passenger2 = m.pass2id == -1 ? null : (Player) er.level().getEntity(m.pass2id);
             }
         }
     }
 
     @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
     }
 
-    @Override
-    public void write(PacketByteBuf buf) {
+    public void write(FriendlyByteBuf buf) {
         buf.writeInt(id);
         buf.writeBoolean(forcefield);
         buf.writeFloat(bodyyaw);
@@ -218,7 +217,7 @@ public class RhodesPacket implements FabricPacket {
             buf.writeByte(0);
         } else {
             buf.writeByte(texfolder * 10 + texloc.length());
-            buf.writeString(texloc);
+            buf.writeUtf(texloc);
         }
     }
 }

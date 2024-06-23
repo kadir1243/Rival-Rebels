@@ -12,9 +12,9 @@
 package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -45,8 +45,8 @@ public class ModelRocketLauncherTube
 	private static final float	ty1		= 0;
 	private static final float	ty2		= 0.09375f;
 
-	public static void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay) {
-		matrices.push();
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+		matrices.pushPose();
 
 		RenderHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2, light, overlay);
 		RenderHelper.addFace(buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2, light, overlay);
@@ -62,6 +62,6 @@ public class ModelRocketLauncherTube
 		RenderHelper.addFace(buffer, vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2, light, overlay);
 		RenderHelper.addFace(buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2, light, overlay);
 
-		matrices.pop();
+		matrices.popPose();
 	}
 }

@@ -11,17 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
 
 public class EntityRhodesRightLowerLeg extends EntityRhodesPiece
 {
-	public EntityRhodesRightLowerLeg(EntityType<? extends EntityRhodesRightLowerLeg> type, World w)
+	public EntityRhodesRightLowerLeg(EntityType<? extends EntityRhodesRightLowerLeg> type, Level w)
 	{
 		super(type, w);
 	}
 
-	public EntityRhodesRightLowerLeg(World w, double x, double y, double z, float scale, int color)
+	public EntityRhodesRightLowerLeg(Level w, double x, double y, double z, float scale, int color)
 	{
 		super(RREntities.RHODES_RIGHT_LOWER_LEG, w, x, y, z, scale, color);
 		health = 800;

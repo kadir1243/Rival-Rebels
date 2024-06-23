@@ -12,11 +12,11 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
@@ -39,25 +39,25 @@ public class GuiKnob extends GuiButton
 	}
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 		if (degree > maxdegreelimit) degree = maxdegreelimit;
 		if (degree < mindegreelimit) degree = mindegreelimit;
-		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
-        MatrixStack matrices = context.getMatrices();
-        matrices.push();
+        PoseStack matrices = context.pose();
+        matrices.pushPose();
 		matrices.translate(this.getX() + (width / 2f), this.getY() + (height / 2f), 0);
-		matrices.multiply(new Quaternionf(degree, 0, 0, 1));
+		matrices.mulPose(new Quaternionf(degree, 0, 0, 1));
 		matrices.translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)), 0);
-		context.drawTexture(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
-		matrices.pop();
+		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
+		matrices.popPose();
 	}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
+		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
 			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
 			if (pressed) degree = ((((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * 180 / Math.PI)) + 450) % 360) - 180;
 		} else {

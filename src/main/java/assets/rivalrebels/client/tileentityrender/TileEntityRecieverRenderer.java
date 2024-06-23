@@ -15,36 +15,36 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.block.machine.BlockReciever;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever>, CustomRenderBoxExtension<TileEntityReciever> {
-    public static final SpriteIdentifier RECIEVER_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etreciever);
-    public static final SpriteIdentifier ETS_DRAGON = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etadsdragon);
+    public static final Material RECIEVER_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etreciever);
+    public static final Material ETS_DRAGON = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etadsdragon);
     public static final ModelFromObj base = ModelFromObj.readObjFile("p.obj");
 	public static final ModelFromObj arm = ModelFromObj.readObjFile("q.obj");
 	public static final ModelFromObj adsdragon = ModelFromObj.readObjFile("r.obj");
 
-	public TileEntityRecieverRenderer(BlockEntityRendererFactory.Context context) {
+	public TileEntityRecieverRenderer(BlockEntityRendererProvider.Context context) {
 	}
 
     @Override
-    public void render(TileEntityReciever entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		matrices.push();
-		matrices.translate(entity.getPos().getX() + 0.5, entity.getPos().getY(), entity.getPos().getZ() + 0.5);
-		int m = entity.getCachedState().get(BlockReciever.META);
+    public void render(TileEntityReciever entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
+		matrices.translate(entity.getBlockPos().getX() + 0.5, entity.getBlockPos().getY(), entity.getBlockPos().getZ() + 0.5);
+		int m = entity.getBlockState().getValue(BlockReciever.META);
 		int r = 0;
 
 		if (m == 2) r = 0;
@@ -52,30 +52,30 @@ public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntit
 		if (m == 4) r = 90;
 		if (m == 5) r = -90;
 
-		matrices.push();
-		matrices.multiply(new Quaternionf(r, 0, 1, 0));
+		matrices.pushPose();
+		matrices.mulPose(new Quaternionf(r, 0, 1, 0));
         matrices.translate(0, 0, 0.5);
-        VertexConsumer recieverTextureVertexConsumer = RECIEVER_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        VertexConsumer recieverTextureVertexConsumer = RECIEVER_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
         base.render(recieverTextureVertexConsumer, light, overlay);
 		if (entity.hasWeapon) {
             matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			matrices.multiply(new Quaternionf((float) (entity.yaw - r), 0, 1, 0));
+			matrices.mulPose(new Quaternionf((float) (entity.yaw - r), 0, 1, 0));
 			arm.render(recieverTextureVertexConsumer, light, overlay);
-            matrices.multiply(new Quaternionf((float) entity.pitch, 1, 0, 0));
-			adsdragon.render(ETS_DRAGON.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
+            matrices.mulPose(new Quaternionf((float) entity.pitch, 1, 0, 0));
+			adsdragon.render(ETS_DRAGON.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		}
-		matrices.pop();
-		matrices.pop();
+		matrices.popPose();
+		matrices.popPose();
 	}
 
     @Override
-    public int getRenderDistance()
+    public int getViewDistance()
     {
         return 16384;
     }
 
     @Override
-    public Box getRenderBoundingBox(TileEntityReciever blockEntity) {
-        return Box.from(BlockBox.create(blockEntity.getPos().add(-1, -1, -1), blockEntity.getPos().add(2, 2, 2)));
+    public AABB getRenderBoundingBox(TileEntityReciever blockEntity) {
+        return AABB.of(BoundingBox.fromCorners(blockEntity.getBlockPos().offset(-1, -1, -1), blockEntity.getBlockPos().offset(2, 2, 2)));
     }
 }

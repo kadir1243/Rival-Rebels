@@ -15,16 +15,15 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import com.google.common.hash.Hashing;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.Vec3d;
-
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.phys.Vec3;
 
 public class CommandRobot {
     private static final String[] names =
@@ -49,42 +48,42 @@ public class CommandRobot {
         };
     public static byte[] hash = {27, 26, -85, -32, -10, 40, 0, 60, 13, 127, -10, -95, 119, -128, 126, 99, -104, -113, -106, -24, 77, 90, -97, 18, 27, -109, -28, -14, -22, 111, -63, 35,};
 
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("rrrobot")
-            .requires(arg -> arg.hasPermissionLevel(3))
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("rrrobot")
+            .requires(arg -> arg.hasPermission(3))
             .executes(context -> 0)
         );
     }
 //TODO
-    private static void execute(ServerCommandSource source, String[] args) {
+    private static void execute(CommandSourceStack source, String[] args) {
         if (args.length == 2) {
             String str = args[0];
-            if (str.equals("spawn") && !source.getWorld().isClient) {
+            if (str.equals("spawn") && !source.getLevel().isClientSide) {
                 String str2 = args[1];
                 try {
                     float scale = Float.parseFloat(str2);
-                    Vec3d cc = source.getPosition();
-                    EntityRhodes er = new EntityRhodes(source.getWorld(), cc.x, cc.y, cc.z, scale / 30.0f);
-                    source.getWorld().spawnEntity(er);
+                    Vec3 cc = source.getPosition();
+                    EntityRhodes er = new EntityRhodes(source.getLevel(), cc.x, cc.y, cc.z, scale / 30.0f);
+                    source.getLevel().addFreshEntity(er);
                 } catch (Exception e) {
-                    source.sendError(Text.of("§cUsage: /rrrobot spawn <blocks high>"));
+                    source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot spawn <blocks high>"));
                 }
                 return;
             } else if (str.equals("speedscale")) {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesScaleSpeed = true;
-                    source.sendFeedback(() -> Text.of("§cRhodes Speed Scaling Enabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Speed Scaling Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesScaleSpeed = false;
-                    source.sendFeedback(() -> Text.of("§cRhodes Speed Scaling Disabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Speed Scaling Disabled"), true);
                 } else {
                     float scale;
                     try {
                         scale = Float.parseFloat(str2);
                         RivalRebels.rhodesSpeedScale = scale;
                     } catch (Exception e) {
-                        source.sendError(Text.of("§cUsage: /rrrobot speedscale [on|off|number]"));
+                        source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot speedscale [on|off|number]"));
                     }
                 }
                 return;
@@ -92,24 +91,24 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesBlockBreak = 1.0f;
-                    source.sendFeedback(() -> Text.of("§cRhodes Rekt Enabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Rekt Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesBlockBreak = 0.0f;
-                    source.sendFeedback(() -> Text.of("§cRhodes Rekt Disabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Rekt Disabled"), true);
                 } else {
-                    source.sendError(Text.of("§cUsage: /rrrobot rekt [on|off]"));
+                    source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot rekt [on|off]"));
                 }
                 return;
             } else if (str.equals("exit")) {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesExit = true;
-                    source.sendFeedback(() -> Text.of("§cRhodes Exitting Enabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Exitting Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesExit = false;
-                    source.sendFeedback(() -> Text.of("§cRhodes Exitting Disabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Exitting Disabled"), true);
                 } else {
-                    source.sendError(Text.of("§cUsage: /rrrobot exit [on|off]"));
+                    source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot exit [on|off]"));
                 }
                 return;
             } else if (str.equals("stop")) {
@@ -127,46 +126,46 @@ public class CommandRobot {
                 }
                 if (good) {
                     RivalRebels.rhodesHold = !RivalRebels.rhodesHold;
-                    source.sendFeedback(() -> Text.of("§cRhodes Stop " + RivalRebels.rhodesHold), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Stop " + RivalRebels.rhodesHold), true);
                     return;
                 }
 
-                source.sendError(Text.of("§cUsage: /rrrobot stop [password]"));
+                source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot stop [password]"));
                 return;
             } else if (str.equals("ai")) {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesAI = true;
-                    source.sendFeedback(() -> Text.of("§cRhodes AI Enabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes AI Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesAI = false;
-                    source.sendFeedback(() -> Text.of("§cRhodes AI Disabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes AI Disabled"), true);
                 } else {
-                    source.sendError(Text.of("§cUsage: /rrrobot ai [on|off]"));
+                    source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot ai [on|off]"));
                 }
                 return;
             } else if (str.equals("tff")) {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesCC = true;
-                    source.sendFeedback(() -> Text.of("§cRhodes Team Friendly Fire Enabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Team Friendly Fire Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesCC = false;
-                    source.sendFeedback(() -> Text.of("§cRhodes Team Friendly Fire Disabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Team Friendly Fire Disabled"), true);
                 } else {
-                    source.sendError(Text.of("§cUsage: /rrrobot tff [on|off]"));
+                    source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot tff [on|off]"));
                 }
                 return;
             } else if (str.equals("ff")) {
                 String str2 = args[1];
                 if (str2.equals("on")) {
                     RivalRebels.rhodesFF = true;
-                    source.sendFeedback(() -> Text.of("§cRhodes Friendly Fire Enabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Friendly Fire Enabled"), true);
                 } else if (str2.equals("off")) {
                     RivalRebels.rhodesFF = false;
-                    source.sendFeedback(() -> Text.of("§cRhodes Friendly Fire Disabled"), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cRhodes Friendly Fire Disabled"), true);
                 } else {
-                    source.sendError(Text.of("§cUsage: /rrrobot ff [on|off]"));
+                    source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot ff [on|off]"));
                 }
                 return;
             } else if (str.equals("logo")) {
@@ -180,15 +179,15 @@ public class CommandRobot {
                 if (!str2.contains("/") && str2.length() < 11) {
                     EntityRhodes.texfolder = i;
                     EntityRhodes.texloc = str2;
-                    source.sendFeedback(() -> Text.of("§cNext Rhodes Flag is " + str2), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes Flag is " + str2), true);
                 } else {
                     String str3 = str2.substring(str2.indexOf("/") + 1);
                     if (!str3.contains("/") && str3.length() < 11) {
                         EntityRhodes.texfolder = i;
                         EntityRhodes.texloc = str3;
-                        source.sendFeedback(() -> Text.of("§cNext Rhodes Flag is " + str2), true);
+                        source.sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes Flag is " + str2), true);
                     } else {
-                        source.sendError(Text.of("§cUsage: /rrrobot logo [flags|blocks|items|entity]/{texturename}"));
+                        source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot logo [flags|blocks|items|entity]/{texturename}"));
                     }
                 }
                 return;
@@ -196,7 +195,7 @@ public class CommandRobot {
                 String str2 = args[1];
                 if (str2.equals("none")) {
                     EntityRhodes.forcecolor = -1;
-                    source.sendFeedback(() -> Text.of("§cNext Rhodes: " + EntityRhodes.names[EntityRhodes.lastct]), true);
+                    source.sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes: " + EntityRhodes.names[EntityRhodes.lastct]), true);
                     return;
                 } else {
                     int which;
@@ -218,13 +217,13 @@ public class CommandRobot {
                     if (which > -1 && which < names.length) {
                         EntityRhodes.forcecolor = which;
                         int finalWhich = which;
-                        source.sendFeedback(() -> Text.of("§cNext Rhodes: " + EntityRhodes.names[finalWhich]), true);
+                        source.sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes: " + EntityRhodes.names[finalWhich]), true);
                         return;
                     }
                 }
             }
         }
-        source.sendError(Text.of("§cUsage: /rrrobot [model|logo|ai|ff|tff|exit|stop|rekt|speedscale|spawn]"));
+        source.sendFailure(Component.nullToEmpty("§cUsage: /rrrobot [model|logo|ai|ff|tff|exit|stop|rekt|speedscale|spawn]"));
     }
 
     //Thanks to RosettaCode Java Levenshtein Distance: http://rosettacode.org/wiki/Levenshtein_distance#Java

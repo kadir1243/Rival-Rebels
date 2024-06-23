@@ -11,50 +11,50 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockBreadBox extends Block
 {
-	public BlockBreadBox(Settings settings)
+	public BlockBreadBox(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (!player.isSneaking())
+        if (!player.isShiftKeyDown())
         {
-            ItemEntity ei = new ItemEntity(world, x + .5, y + 1, z + .5, Items.BREAD.getDefaultStack());
-            if (!world.isClient)
+            ItemEntity ei = new ItemEntity(level, x + .5, y + 1, z + .5, Items.BREAD.getDefaultInstance());
+            if (!level.isClientSide)
             {
-                world.spawnEntity(ei);
-                if (world.random.nextInt(64) == 0) player.sendMessage(Text.of("§7[§4Orders§7] §cShift-click (Sneak) to pack up toaster."), false);
+                level.addFreshEntity(ei);
+                if (level.random.nextInt(64) == 0) player.displayClientMessage(Component.nullToEmpty("§7[§4Orders§7] §cShift-click (Sneak) to pack up toaster."), false);
             }
         }
         else
         {
-            world.setBlockState(pos, Blocks.AIR.getDefaultState());
-            ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, this.asItem().getDefaultStack());
-            if (!world.isClient)
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, this.asItem().getDefaultInstance());
+            if (!level.isClientSide)
             {
-                world.spawnEntity(ei);
+                level.addFreshEntity(ei);
             }
         }
-        return ActionResult.success(world.isClient);
+        return InteractionResult.sidedSuccess(level.isClientSide);
     }
 
     /*@Environment(EnvType.CLIENT)

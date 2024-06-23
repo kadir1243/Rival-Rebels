@@ -13,14 +13,13 @@ package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.slot.Slot;
-
 import java.util.function.Predicate;
+import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class SlotRR extends Slot
 {
@@ -30,36 +29,36 @@ public class SlotRR extends Slot
 	boolean acceptsTimedBomb = false;
 	public boolean locked = false;
 
-	public SlotRR(Inventory inv, int id, int x, int y, int mstack, Class<?> only) {
+	public SlotRR(Container inv, int id, int x, int y, int mstack, Class<?> only) {
 		this(inv, id, x, y, mstack, stack -> only.isAssignableFrom(stack.getItem().getClass()) || (stack.getItem() instanceof BlockItem itemBlock && only.isAssignableFrom(itemBlock.getBlock().getClass())));
 	}
 
-    public SlotRR(Inventory inv, int id, int x, int y, int mstack, Item only) {
-        this(inv, id, x, y, mstack, stack -> stack.isOf(only));
+    public SlotRR(Container inv, int id, int x, int y, int mstack, Item only) {
+        this(inv, id, x, y, mstack, stack -> stack.is(only));
     }
 
-    public SlotRR(Inventory inv, int id, int x, int y, int mstack, Predicate<ItemStack> stackLock) {
+    public SlotRR(Container inv, int id, int x, int y, int mstack, Predicate<ItemStack> stackLock) {
         super(inv, id, x, y);
         this.maxStack = mstack;
         this.stackLock = stackLock;
     }
 
     @Override
-    public boolean canTakeItems(PlayerEntity player) {
+    public boolean mayPickup(Player player) {
         return !locked;
     }
 
     @Override
-    public boolean canInsert(ItemStack stack) {
+    public boolean mayPlace(ItemStack stack) {
 		if (locked) return false;
 		if (stack.isEmpty()) return false;
-		boolean trollface = acceptsTrollFace && (stack.isOf(RRItems.trollmask));
-		boolean timedbomb = acceptsTimedBomb && (stack.isOf(RRBlocks.timedbomb.asItem()));
+		boolean trollface = acceptsTrollFace && (stack.is(RRItems.trollmask));
+		boolean timedbomb = acceptsTimedBomb && (stack.is(RRBlocks.timedbomb.asItem()));
         return stackLock.test(stack) || trollface || timedbomb;
     }
 
     @Override
-    public int getMaxItemCount() {
+    public int getMaxStackSize() {
         return maxStack;
     }
 

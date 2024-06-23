@@ -15,7 +15,7 @@ public class ItemCoreTungsten extends ItemCore
 {
 	public ItemCoreTungsten()
 	{
-		super(new Settings());
+		super(new Properties());
 		timemult = 0.75f;
 	}
 }

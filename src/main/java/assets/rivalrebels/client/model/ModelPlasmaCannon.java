@@ -14,9 +14,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureFace;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelPlasmaCannon
 {
@@ -209,9 +209,9 @@ public class ModelPlasmaCannon
 	Vector3f		vbb3				= new Vector3f(20f, 0f, -2f);
 	Vector3f		vbb4				= new Vector3f(8f, 0f, -2f);
 
-	public void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay)
+	public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		// body
         RenderHelper.addFace(buffer, vt1, vt2, vt3, vt4, bodytop, light, overlay);
 		RenderHelper.addFace(buffer, vs1, vt1, vt2, vs4, bodytopside, light, overlay);
@@ -257,6 +257,6 @@ public class ModelPlasmaCannon
 		RenderHelper.addFace(buffer, vht1, vhb1, vhb2, vht2, handleside, light, overlay);
 		RenderHelper.addFace(buffer, vht3, vhb3, vhb4, vht4, handleside, light, overlay);
 		RenderHelper.addFace(buffer, vhb2, vhb1, vhb4, vhb3, handlebottom, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 	}
 }

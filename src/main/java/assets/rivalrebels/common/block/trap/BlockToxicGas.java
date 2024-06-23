@@ -12,68 +12,73 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import net.minecraft.block.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.mob.PathAwareEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockToxicGas extends Block {
-	public BlockToxicGas(Settings settings) {
+	public BlockToxicGas(Properties settings) {
 		super(settings);
 
-        ((FireBlock) Blocks.FIRE).registerFlammableBlock(this, 60, 100);
+        ((FireBlock) Blocks.FIRE).setFlammable(this, 60, 100);
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.empty();
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return Shapes.empty();
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (entity instanceof LivingEntity living) {
-			living.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 200, 0));
-			living.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
-			living.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 80, 0));
-			living.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));
+			living.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0));
+			living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
+			living.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 0));
+			living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
 		}
-		if (entity instanceof PathAwareEntity || entity instanceof AnimalEntity || entity instanceof PlayerEntity) {
-			entity.damage(RivalRebelsDamageSource.gasGrenade(world), 1);
+		if (entity instanceof PathfinderMob || entity instanceof Animal || entity instanceof Player) {
+			entity.hurt(RivalRebelsDamageSource.gasGrenade(world), 1);
 		}
 	}
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.INVISIBLE;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-		world.scheduleBlockTick(pos, this, 8);
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+		world.scheduleTick(pos, this, 8);
 	}
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-		world.scheduleBlockTick(pos, this, 8);
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+		world.scheduleTick(pos, this, 8);
 		if (random.nextInt(25) == 1) {
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		}
 	}
 
     @Override
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+    public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();

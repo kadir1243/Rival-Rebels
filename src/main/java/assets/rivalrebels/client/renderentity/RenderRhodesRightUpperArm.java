@@ -12,41 +12,42 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesRightUpperArm;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Quaternionf;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
 @Environment(EnvType.CLIENT)
 public class RenderRhodesRightUpperArm extends EntityRenderer<EntityRhodesRightUpperArm>
 {
-    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RenderRhodes.texture);
-    public RenderRhodesRightUpperArm(EntityRendererFactory.Context renderManager) {
+    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RenderRhodes.texture);
+    public RenderRhodesRightUpperArm(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void render(EntityRhodesRightUpperArm entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-		matrices.push();
+    public void render(EntityRhodesRightUpperArm entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+		matrices.pushPose();
 		matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
         float[] colors = RenderRhodes.colors;
-		matrices.multiply(new Quaternionf(entity.getYaw(), 0, 1, 0));
-		matrices.multiply(new Quaternionf(entity.getPitch(), 1, 0, 0));
-		RenderRhodes.upperarm.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.DEFAULT_UV);
-		matrices.pop();
+		matrices.mulPose(new Quaternionf(entity.getYRot(), 0, 1, 0));
+		matrices.mulPose(new Quaternionf(entity.getXRot(), 1, 0, 0));
+		RenderRhodes.upperarm.render(TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.NO_OVERLAY);
+		matrices.popPose();
 	}
 
     @Override
-    public Identifier getTexture(EntityRhodesRightUpperArm entity) {
+    public ResourceLocation getTextureLocation(EntityRhodesRightUpperArm entity) {
         return RenderRhodes.texture;
     }
 }

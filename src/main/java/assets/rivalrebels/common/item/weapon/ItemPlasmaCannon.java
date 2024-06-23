@@ -16,85 +16,85 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
-public class ItemPlasmaCannon extends ToolItem
+public class ItemPlasmaCannon extends TieredItem
 {
 	public ItemPlasmaCannon() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
+		super(Tiers.DIAMOND, new Properties().stacksTo(1));
 	}
 
 	@Override
-	public int getEnchantability()
+	public int getEnchantmentValue()
 	{
 		return 100;
 	}
 
 	@Override
-	public UseAction getUseAction(ItemStack stack)
+	public UseAnim getUseAnimation(ItemStack stack)
 	{
-		return UseAction.BOW;
+		return UseAnim.BOW;
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack stack)
-	{
+    @Override
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 64;
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack stack = user.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        ItemStack stack = user.getItemInHand(hand);
         ItemStack hydrodStack = ItemUtil.getItemStack(user, RRItems.hydrod);
         if (user.getAbilities().invulnerable || !hydrodStack.isEmpty() || RivalRebels.infiniteAmmo) {
-			user.setCurrentHand(hand);
+			user.startUsingItem(hand);
 			if (!user.getAbilities().invulnerable && !RivalRebels.infiniteAmmo) {
 				if (!hydrodStack.isEmpty())
 				{
-					hydrodStack.damage(1, user, player -> player.sendToolBreakStatus(hand));
-					if (hydrodStack.getDamage() == hydrodStack.getMaxDamage())
+					hydrodStack.hurtAndBreak(1, user, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
+					if (hydrodStack.getDamageValue() == hydrodStack.getMaxDamage())
 					{
-						hydrodStack.decrement(1);
+						hydrodStack.shrink(1);
                         if (hydrodStack.isEmpty())
-                            user.getInventory().removeOne(hydrodStack);
-						user.getInventory().insertStack(RRItems.emptyrod.getDefaultStack());
+                            user.getInventory().removeItem(hydrodStack);
+						user.getInventory().add(RRItems.emptyrod.getDefaultInstance());
 					}
-					user.setCurrentHand(hand);
+					user.startUsingItem(hand);
 				}
 				else
 				{
-					return TypedActionResult.success(stack, world.isClient);
+					return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 				}
 			}
 			RivalRebelsSoundPlayer.playSound(user, 16, 1, 0.25f);
 		}
-		else if (!world.isClient)
+		else if (!world.isClientSide)
 		{
-			user.sendMessage(Text.of("§cOut of Hydrogen"), true);
+			user.displayClientMessage(Component.nullToEmpty("§cOut of Hydrogen"), true);
 		}
-		return TypedActionResult.success(stack, world.isClient);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 	}
 
     @Override
-    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-		if (!world.isClient) {
-            float f = (getMaxUseTime(stack) - remainingUseTicks) / 20.0F;
+    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+		if (!world.isClientSide) {
+            float f = (getUseDuration(stack, user) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
 			f+=0.2f;
 			RivalRebelsSoundPlayer.playSound(user, 16, 2);
-			Entity entity = new EntityPlasmoid(world, user, f+0.5f, stack.hasEnchantments());
-			world.spawnEntity(entity);
+			Entity entity = new EntityPlasmoid(world, user, f+0.5f, stack.isEnchanted());
+			world.addFreshEntity(entity);
 		}
 	}
 }

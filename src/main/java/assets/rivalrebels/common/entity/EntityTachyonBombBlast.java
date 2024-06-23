@@ -15,18 +15,17 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TachyonBomb;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.Shapes;
 
 public class EntityTachyonBombBlast extends EntityInanimate
 {
@@ -34,28 +33,28 @@ public class EntityTachyonBombBlast extends EntityInanimate
 	public double		radius;
 	public int			time		= 0;
 
-    public EntityTachyonBombBlast(EntityType<? extends EntityTachyonBombBlast> type, World par1World) {
+    public EntityTachyonBombBlast(EntityType<? extends EntityTachyonBombBlast> type, Level par1World) {
         super(type, par1World);
     }
 
-	public EntityTachyonBombBlast(World par1World) {
+	public EntityTachyonBombBlast(Level par1World) {
 		this(RREntities.TACHYON_BOMB_BLAST, par1World);
-		ignoreCameraFrustum = true;
+		noCulling = true;
 	}
 
-	public EntityTachyonBombBlast(World par1World, float x, float y, float z, TachyonBomb tsarBomba, int rad) {
+	public EntityTachyonBombBlast(Level par1World, float x, float y, float z, TachyonBomb tsarBomba, int rad) {
 		this(par1World);
 		tsar = tsarBomba;
 		radius = rad;
-		setVelocity(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-		setPosition(x, y, z);
+		setDeltaMovement(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setPos(x, y, z);
 	}
 
-	public EntityTachyonBombBlast(World par1World, double x, double y, double z, float rad) {
+	public EntityTachyonBombBlast(Level par1World, double x, double y, double z, float rad) {
 		this(par1World);
 		radius = rad;
-		setVelocity(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-		setPosition(x, y, z);
+		setDeltaMovement(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setPos(x, y, z);
 	}
 
 	@Override
@@ -63,22 +62,22 @@ public class EntityTachyonBombBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (getWorld().random.nextInt(30) == 0)
+		if (level().random.nextInt(30) == 0)
 		{
-			getWorld().playSound(getX(), getY(), getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 10.0F, 0.5F, true);
+			level().playLocalSound(getX(), getY(), getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 10.0F, 0.5F, true);
 		}
 		else
 		{
-			if (getWorld().random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
+			if (level().random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
 		}
 
-		age++;
+		tickCount++;
 
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
-			if (tsar == null && age > 1200) kill();
-			if (age % 20 == 0) updateEntityList();
-			if (age < 1200 && age % 5 == 0) pushAndHurtEntities();
+			if (tsar == null && tickCount > 1200) kill();
+			if (tickCount % 20 == 0) updateEntityList();
+			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RivalRebels.tsarBombaSpeed * 2; i++)
 			{
 				if (tsar != null)
@@ -103,13 +102,13 @@ public class EntityTachyonBombBlast extends EntityInanimate
 	{
 		entitylist.clear();
 		double ldist = radius*radius;
-		for (int i = 0; i < getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox()).size(); i++)
+		for (int i = 0; i < level().getEntities(this, Shapes.INFINITY.bounds()).size(); i++)
 		{
-			Entity e = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox()).get(i);
-			double dist = e.squaredDistanceTo(getX(),getY(),getZ());
+			Entity e = level().getEntities(this, Shapes.INFINITY.bounds()).get(i);
+			double dist = e.distanceToSqr(getX(),getY(),getZ());
 			if (dist < ldist)
 			{
-				if ((e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityTachyonBombBlast || e == this) continue;
+				if ((e instanceof Player && ((Player) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityTachyonBombBlast || e == this) continue;
 				entitylist.add(e);
 			}
 		}
@@ -121,7 +120,7 @@ public class EntityTachyonBombBlast extends EntityInanimate
 		float invrad = 1.0f / (float) radius;
 		for (Entity e : entitylist)
 		{
-			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearBlast(getWorld())))
+			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearBlast(level())))
 			{
 				remove.add(e);
 				continue;
@@ -129,7 +128,7 @@ public class EntityTachyonBombBlast extends EntityInanimate
 			float dx = (float) (e.getX() - getX());
 			float dy = (float) (e.getY() - getY());
 			float dz = (float) (e.getZ() - getZ());
-			float dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+			float dist = Mth.sqrt(dx * dx + dy * dy + dz * dz);
 			float rsqrt = 1.0f / (dist + 0.0001f);
 			dx *= rsqrt;
 			dy *= rsqrt;
@@ -137,12 +136,12 @@ public class EntityTachyonBombBlast extends EntityInanimate
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
-				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (radius*f*0.025f));
+				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (radius*f*0.025f));
 			}
 			else
 			{
-				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (f * f * 2.0f * radius + 20.0f));
-                e.setVelocity(e.getVelocity().subtract(
+				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (f * f * 2.0f * radius + 20.0f));
+                e.setDeltaMovement(e.getDeltaMovement().subtract(
                     dx * f,
                     dy * f,
                     dz * f
@@ -156,30 +155,30 @@ public class EntityTachyonBombBlast extends EntityInanimate
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt) {
+	public void readAdditionalSaveData(CompoundTag nbt) {
 		radius = nbt.getFloat("radius");
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt) {
+	public void addAdditionalSaveData(CompoundTag nbt) {
 		nbt.putFloat("radius", (float) radius);
 	}
 
 	@Override
-	public float getBrightnessAtEyes()
+	public float getLightLevelDependentMagicValue()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
     public EntityTachyonBombBlast setTime()
 	{
-		age = 920;
+		tickCount = 920;
 		return this;
 	}
 }

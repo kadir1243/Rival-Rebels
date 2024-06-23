@@ -13,76 +13,76 @@ package assets.rivalrebels.common.block.crate;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockSupplies extends Block
 {
-	public BlockSupplies(Settings settings)
+	public BlockSupplies(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
-		if (world.isClient)
+		if (level.isClientSide)
 		{
-			player.sendMessage(Text.translatable("RivalRebels.Inventory"), false);
-			player.sendMessage(Text.of("§a" + RRItems.armyshovel.getName() + ". §9(" + "Ideal for special blocks." + ")"), false);
-			player.sendMessage(Text.of("§a" + RRBlocks.jump.getName() + ". §9(" + "Use at your own risk." + ")"), false);
-			player.sendMessage(Text.of("§a" + RRBlocks.quicksand.getName() + ". §9(" + "Sand that is quick" + ")"), false);
-			player.sendMessage(Text.of("§a" + RRBlocks.mario.getName() + ". §9(" + "For trap making." + ")"), false);
-			player.sendMessage(Text.of("§a" + RRBlocks.loader.getName() + ". §9(" + "Modular item container." + ")"), false);
-			player.sendMessage(Text.of("§a" + RRBlocks.steel.getName() + ". §9(" + "Climbable and blast resistant." + ")"), false);
-			player.sendMessage(Text.of("§a" + RRItems.expill.getName() + ". §9(" + "Take at your own risk." + ")"), false);
-			player.sendMessage(Text.of("§a" + RRItems.safepill.getName() + ". §9(" + "Restores health." + ")"), false);
-			player.sendMessage(Text.of("§a" + RRBlocks.breadbox.getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"), false);
+			player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.armyshovel.getDescription() + ". §9(" + "Ideal for special blocks." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.jump.getName() + ". §9(" + "Use at your own risk." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.quicksand.getName() + ". §9(" + "Sand that is quick" + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.mario.getName() + ". §9(" + "For trap making." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.loader.getName() + ". §9(" + "Modular item container." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.steel.getName() + ". §9(" + "Climbable and blast resistant." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.expill.getDescription() + ". §9(" + "Take at your own risk." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.safepill.getDescription() + ". §9(" + "Restores health." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.breadbox.getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"), false);
 		}
-		if (!world.isClient)
+		if (!level.isClientSide)
 		{
-			ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.breadbox));
-			ItemEntity ei1 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.armyshovel));
-			ItemEntity ei2 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.jump, 4));
-			ItemEntity ei3 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.quicksandtrap, 4));
-			ItemEntity ei4 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.steel, 32));
-			ItemEntity ei5 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.loader, 2));
-			ItemEntity ei6 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(Items.BUCKET, 2));
-			ItemEntity ei7 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.mariotrap, 4));
-			ItemEntity ei8 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.expill, 6));
-			ItemEntity ei9 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.safepill, 3));
-			world.spawnEntity(ei);
-			world.spawnEntity(ei1);
-			world.spawnEntity(ei2);
-			world.spawnEntity(ei3);
-			world.spawnEntity(ei4);
-			world.spawnEntity(ei5);
-			world.spawnEntity(ei6);
-			world.spawnEntity(ei7);
-			world.spawnEntity(ei8);
-			world.spawnEntity(ei9);
-            world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
-			if (world.random.nextInt(5) == 0)
+			ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.breadbox));
+			ItemEntity ei1 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.armyshovel));
+			ItemEntity ei2 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.jump, 4));
+			ItemEntity ei3 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.quicksandtrap, 4));
+			ItemEntity ei4 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.steel, 32));
+			ItemEntity ei5 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.loader, 2));
+			ItemEntity ei6 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(Items.BUCKET, 2));
+			ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.mariotrap, 4));
+			ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.expill, 6));
+			ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.safepill, 3));
+			level.addFreshEntity(ei);
+			level.addFreshEntity(ei1);
+			level.addFreshEntity(ei2);
+			level.addFreshEntity(ei3);
+			level.addFreshEntity(ei4);
+			level.addFreshEntity(ei5);
+			level.addFreshEntity(ei6);
+			level.addFreshEntity(ei7);
+			level.addFreshEntity(ei8);
+			level.addFreshEntity(ei9);
+            level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+			if (level.random.nextInt(5) == 0)
 			{
-				world.spawnEntity(new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.nuclearelement.getDefaultStack()));
-				player.sendMessage(Text.of("§a" + RRItems.nuclearelement.getName() + ". §9" + "(Used in nuclear weapons)"), false);
+				level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.nuclearelement.getDefaultInstance()));
+				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.nuclearelement.getDescription() + ". §9" + "(Used in nuclear weapons)"), false);
 			}
-			return ActionResult.success(world.isClient);
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		return ActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 }

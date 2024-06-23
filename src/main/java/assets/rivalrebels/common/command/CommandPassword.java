@@ -18,16 +18,15 @@ import assets.rivalrebels.common.round.RivalRebelsRank;
 import com.google.common.hash.Hashing;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
-
 import java.nio.charset.StandardCharsets;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
 public class CommandPassword {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("rr")
-            .then(CommandManager.argument("code", StringArgumentType.greedyString())
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("rr")
+            .then(Commands.argument("code", StringArgumentType.greedyString())
                 .executes(commandContext -> execute(commandContext.getSource(), StringArgumentType.getString(commandContext, "code")))
             )
         );
@@ -50,41 +49,41 @@ public class CommandPassword {
 			"107170188164102246158207236028166217204217177"
 	};
 
-    private static int execute(ServerCommandSource source, String code) {
-		Text message;
+    private static int execute(CommandSourceStack source, String code) {
+		Component message;
         String encrypted = encrypt(code);
 
 		RivalRebelsRank rank;
         if (rhashes[0].equals(encrypted)||rhashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.REBEL;
-			message = Text.of("Welcome, rebel!");
+			message = Component.nullToEmpty("Welcome, rebel!");
 		}
 		else if (ohashes[0].equals(encrypted)||ohashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.OFFICER;
-			message = Text.of("Welcome, officer!");
+			message = Component.nullToEmpty("Welcome, officer!");
 		}
 		else if (lhashes[0].equals(encrypted)||lhashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.LEADER;
-			message = Text.of("Welcome, leader!");
+			message = Component.nullToEmpty("Welcome, leader!");
 		}
 		else if (shashes[0].equals(encrypted)||shashes[1].equals(encrypted))
 		{
 			rank = RivalRebelsRank.REP;
-			message = Text.of("Welcome, representative!");
+			message = Component.nullToEmpty("Welcome, representative!");
 		} else {
             rank = RivalRebelsRank.REGULAR;
-            message = Text.of("nope.");
+            message = Component.nullToEmpty("nope.");
         }
 		RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(source.getPlayer().getGameProfile());
 		if (p.rrrank != rank || rank == RivalRebelsRank.REGULAR)
 		{
 			p.rrrank = rank;
-			RivalRebelsSoundPlayer.playSound(source.getWorld(), 28, rank.snf, source.getPosition());
-			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
-			source.sendFeedback(() -> message, true);
+			RivalRebelsSoundPlayer.playSound(source.getLevel(), 28, rank.snf, source.getPosition());
+			RivalRebels.round.rrplayerlist.refreshForWorld(source.getLevel());
+			source.sendSuccess(() -> message, true);
 		}
         return 0;
 	}

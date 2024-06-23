@@ -11,24 +11,17 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
 
-public class ItemRod extends ToolItem
-{
+public class ItemRod extends TieredItem {
 	public int power;
 
 	public ItemRod() {
-		super(ToolMaterials.DIAMOND, new Settings().maxDamage(32));
+		this(new Properties().durability(32));
 	}
 
-    public ItemRod(Settings settings) {
-        super(ToolMaterials.DIAMOND, settings);
+    public ItemRod(Properties settings) {
+        super(Tiers.DIAMOND, settings);
     }
-
-	@Override
-	public boolean isDamageable()
-	{
-		return true;
-	}
 }

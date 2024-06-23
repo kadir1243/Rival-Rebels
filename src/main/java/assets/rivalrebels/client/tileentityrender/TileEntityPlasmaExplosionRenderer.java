@@ -13,50 +13,50 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<TileEntityPlasmaExplosion>, CustomRenderBoxExtension<TileEntityPlasmaExplosion> {
 
-    public TileEntityPlasmaExplosionRenderer(BlockEntityRendererFactory.Context context) {
+    public TileEntityPlasmaExplosionRenderer(BlockEntityRendererProvider.Context context) {
 	}
 
     @Override
-    public void render(TileEntityPlasmaExplosion entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(TileEntityPlasmaExplosion entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		float fsize = (float) Math.sin(entity.size);
-		matrices.push();
-		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+		matrices.pushPose();
+		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
 
-		matrices.push();
-		matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+		matrices.pushPose();
+		matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
         ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.5f, 0.45f, 0.45f, 0.65f, 0.4f);
-        matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+        matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.6f, 0.45f, 0.35f, 0.65f, 0.4f);
-        matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+        matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.7f, 0.45f, 0.35f, 0.95f, 0.4f);
-        matrices.multiply(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+        matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.8f, 0.45f, 0.35f, 0.65f, 0.4f);
-		matrices.pop();
+		matrices.popPose();
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.9f, 0.45f, 0.35f, 0.65f, 0.4f);
-		matrices.pop();
+		matrices.popPose();
 	}
 
     @Override
-    public int getRenderDistance()
+    public int getViewDistance()
     {
         return 16384;
     }
 
     @Override
-    public Box getRenderBoundingBox(TileEntityPlasmaExplosion blockEntity) {
-        return Box.from(BlockBox.create(blockEntity.getPos().add(-2, -2, -2), blockEntity.getPos().add(3, 3, 3)));
+    public AABB getRenderBoundingBox(TileEntityPlasmaExplosion blockEntity) {
+        return AABB.of(BoundingBox.fromCorners(blockEntity.getBlockPos().offset(-2, -2, -2), blockEntity.getBlockPos().offset(3, 3, 3)));
     }
 }

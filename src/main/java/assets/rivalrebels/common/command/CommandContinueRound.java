@@ -13,22 +13,22 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
 public class CommandContinueRound {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("rrstartround")
-            .requires(arg -> arg.hasPermissionLevel(3))
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("rrstartround")
+            .requires(arg -> arg.hasPermission(3))
             .executes(commandContext -> execute(commandContext.getSource()))
         );
     }
 
-    private static int execute(ServerCommandSource source) {
+    private static int execute(CommandSourceStack source) {
 		RivalRebels.round.stopRounds();
 		RivalRebels.round.newRound();
-		source.sendFeedback(() -> Text.of("The current round has been restarted."), true);
+		source.sendSuccess(() -> Component.nullToEmpty("The current round has been restarted."), true);
         return 0;
 	}
 }

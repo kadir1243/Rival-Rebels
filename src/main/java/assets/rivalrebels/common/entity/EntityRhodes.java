@@ -28,43 +28,56 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.*;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.data.DataTracker;
-import net.minecraft.entity.data.TrackedData;
-import net.minecraft.entity.data.TrackedDataHandlerRegistry;
-import net.minecraft.entity.mob.*;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.passive.BatEntity;
-import net.minecraft.entity.passive.SquidEntity;
-import net.minecraft.entity.passive.VillagerEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.thrown.ThrownEntity;
-import net.minecraft.entity.vehicle.BoatEntity;
-import net.minecraft.entity.vehicle.MinecartEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.LightType;
-import net.minecraft.world.World;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.animal.Squid;
+import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.CaveSpider;
+import net.minecraft.world.entity.monster.Creeper;
+import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Ghast;
+import net.minecraft.world.entity.monster.MagmaCube;
+import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.Slime;
+import net.minecraft.world.entity.monster.Spider;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.entity.vehicle.Boat;
+import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 import java.util.*;
 
 public class EntityRhodes extends Entity {
-    public static final TrackedData<Boolean> FIRE = DataTracker.registerData(EntityRhodes.class, TrackedDataHandlerRegistry.BOOLEAN);
-    public static final TrackedData<Boolean> PLASMA = DataTracker.registerData(EntityRhodes.class, TrackedDataHandlerRegistry.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> FIRE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<Boolean> PLASMA = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
 
     public int health = RivalRebels.rhodesHealth;
 	public float scale = 1;
@@ -139,9 +152,9 @@ public class EntityRhodes extends Entity {
 	public byte colorType = 0;
 	public static byte lastct = 0;
 	public static int forcecolor = -1;
-	public PlayerEntity rider;
-	public PlayerEntity passenger1;
-	public PlayerEntity passenger2;
+	public Player rider;
+	public Player passenger1;
+	public Player passenger2;
 	public static final int recharge = 3;
 	public static final int ecjet = 10+recharge;
 	public static final int eclaser = 6+recharge;
@@ -174,18 +187,18 @@ public class EntityRhodes extends Entity {
 	public int wakeY = -1;
 	public int wakeZ = -1;
 
-    public EntityRhodes(EntityType<? extends EntityRhodes> type, World world) {
+    public EntityRhodes(EntityType<? extends EntityRhodes> type, Level world) {
         super(type, world);
     }
 
-	public EntityRhodes(World w)
+	public EntityRhodes(Level w)
 	{
 		this(RREntities.RHODES, w);
-		ignoreCameraFrustum = true;
-		setBoundingBox(new Box(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
-		noClip = true;
+		noCulling = true;
+		setBoundingBox(new AABB(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
+		noPhysics = true;
 		//pushSpeedReduction = 100;
-		setStepHeight(0);
+		//setMaxUpStep(0);
 		actionqueue.add(new RhodesAction(0, 1));
 		RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
 		itexfolder = texfolder;
@@ -196,7 +209,7 @@ public class EntityRhodes extends Entity {
 		if (forcecolor == -1)
 		{
 			colorType = (byte) RivalRebels.rhodesTeams[lastct];
-			if (!w.isClient)
+			if (!w.isClientSide)
 			{
 				lastct++;
 				if (lastct == RivalRebels.rhodesTeams.length) lastct = 0;
@@ -213,7 +226,7 @@ public class EntityRhodes extends Entity {
 		flamecount += flamecount * random.nextFloat() * RivalRebels.rhodesRandom;
 	}
 
-	public EntityRhodes(World w, double x, double y, double z, float s)
+	public EntityRhodes(Level w, double x, double y, double z, float s)
 	{
 		this(w);
 		scale = s;
@@ -223,11 +236,11 @@ public class EntityRhodes extends Entity {
 			rocketcount *= 0.004;
 		}
 		health = health - 5000 + (int)(5000 * Math.min(scale,4));
-		setBoundingBox(new Box(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
-		setPosition(x, y, z);
-		if (!getWorld().isClient) {
-            for (PlayerEntity player : getWorld().getPlayers()) {
-                player.sendMessage(Text.translatable(RivalRebels.MODID + ".warning_tsar_is_armed", getName()), false);
+		setBoundingBox(new AABB(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
+		setPos(x, y, z);
+		if (!level().isClientSide) {
+            for (Player player : level().players()) {
+                player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".warning_tsar_is_armed", getName()), false);
             }
         }
 	}
@@ -243,94 +256,94 @@ public class EntityRhodes extends Entity {
 			kill();
 			return;
 		}
-        slowMovement(Blocks.COBWEB.getDefaultState(), new Vec3d(0.25, 0.05F, 0.25));
+        makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
         fallDistance = 0.0F;
 		if (health > 0) {
 			float headY = 0;
-			float syaw = MathHelper.sin(bodyyaw * 0.01745329252f);
-			float cyaw = MathHelper.cos(bodyyaw * 0.01745329252f);
+			float syaw = Mth.sin(bodyyaw * 0.01745329252f);
+			float cyaw = Mth.cos(bodyyaw * 0.01745329252f);
 			float leftlegheight = 7.26756f
-					+ (MathHelper.cos((leftthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-					+ (MathHelper.cos((leftthighpitch+leftshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
+					+ (Mth.cos((leftthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
+					+ (Mth.cos((leftthighpitch+leftshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
 			float rightlegheight = 7.26756f
-					+ (MathHelper.cos((rightthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-					+ (MathHelper.cos((rightthighpitch+rightshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
+					+ (Mth.cos((rightthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
+					+ (Mth.cos((rightthighpitch+rightshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
 			leftlegheight *= scale;
 			rightlegheight *= scale;
 			float bodyY = Math.max(leftlegheight, rightlegheight);
-			if (!getWorld().isClient)
+			if (!level().isClientSide)
 			{
 				doAITick(syaw, cyaw);
 				breakBlocks(syaw, cyaw, leftlegheight, rightlegheight, bodyY);
-				if (age % 5 == 0) {
-                    for (PlayerEntity player : getWorld().getPlayers()) {
-                        ServerPlayNetworking.send((ServerPlayerEntity) player, new RhodesPacket(this));
+				if (tickCount % 5 == 0) {
+                    for (Player player : level().players()) {
+                        ServerPlayNetworking.send((ServerPlayer) player, new RhodesPacket(this));
                     }
                 }
 			}
-            Vec3d add = getVelocity().add(getPos());
-            setPos(add.getX(), add.getY(), add.getZ());
-			if (age % 3 == 0) doCollisions();
+            Vec3 add = getDeltaMovement().add(position());
+            setPosRaw(add.x(), add.y(), add.z());
+			if (tickCount % 3 == 0) doCollisions();
 			ticksSinceLastPacket++;
-			setPosition(getX(), getY(), getZ());
+			setPos(getX(), getY(), getZ());
 
 			RivalRebels.proxy.setOverlay(this);
 
 			if (rider!=null)
 			{
-				rider.setPosition(((getX()+syaw*5.5*scale) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*scale - (getWorld().isClient?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*scale) - rider.getZ()) * 0.33f + rider.getZ());
+				rider.setPos(((getX()+syaw*5.5*scale) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*scale - (level().isClientSide?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*scale) - rider.getZ()) * 0.33f + rider.getZ());
 				rider.setOnGround(true);
-				if (getWorld().isClient) RivalRebels.round.setInvisible(rider);
-				rider.slowMovement(Blocks.COBWEB.getDefaultState(), new Vec3d(0.25, 0.05F, 0.25));
+				if (level().isClientSide) RivalRebels.round.setInvisible(rider);
+				rider.makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
 				rider.getAbilities().invulnerable = true;
-				if (getWorld().isClient && rider == MinecraftClient.getInstance().player) ClientPlayNetworking.send(new RhodesJumpPacket(this.getId(), RivalRebels.proxy.spacebar(), RivalRebels.proxy.a(), RivalRebels.proxy.w(), RivalRebels.proxy.d(), RivalRebels.proxy.c(), RivalRebels.proxy.f(), RivalRebels.proxy.s(), RivalRebels.proxy.x(), RivalRebels.proxy.z(), RivalRebels.proxy.g()));
+				if (level().isClientSide && rider == Minecraft.getInstance().player) ClientPlayNetworking.send(new RhodesJumpPacket(this.getId(), RivalRebels.proxy.spacebar(), RivalRebels.proxy.a(), RivalRebels.proxy.w(), RivalRebels.proxy.d(), RivalRebels.proxy.c(), RivalRebels.proxy.f(), RivalRebels.proxy.s(), RivalRebels.proxy.x(), RivalRebels.proxy.z(), RivalRebels.proxy.g()));
 			}
 			if (passenger1 != null)
 			{
 				float offset = 1.62f;
-				if (getWorld().isClient)
+				if (level().isClientSide)
 				{
-					if (MinecraftClient.getInstance().player == passenger1)
+					if (Minecraft.getInstance().player == passenger1)
 					{
 						offset = 0;
 					}
 				}
-				passenger1.setPosition(getX()+cyaw*6.5f*scale,
+				passenger1.setPos(getX()+cyaw*6.5f*scale,
 										getY() + bodyY - 6.38f*scale - offset,
 										getZ()-syaw*6.5f*scale);
 				passenger1.setOnGround(true);
-				passenger1.slowMovement(Blocks.COBWEB.getDefaultState(), new Vec3d(0.25, 0.05F, 0.25));
+				passenger1.makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
 			}
 			if (passenger2 != null)
 			{
 				float offset = 1.62f;
-				if (getWorld().isClient)
+				if (level().isClientSide)
 				{
-					if (MinecraftClient.getInstance().player == passenger2)
+					if (Minecraft.getInstance().player == passenger2)
 					{
 						offset = 0;
 					}
 				}
-				passenger2.setPosition(getX()-cyaw*6.5f*scale,
+				passenger2.setPos(getX()-cyaw*6.5f*scale,
 										getY() + bodyY - 6.38f*scale - offset,
 										getZ()+syaw*6.5f*scale);
 				passenger2.setOnGround(true);
-				passenger2.slowMovement(Blocks.COBWEB.getDefaultState(), new Vec3d(0.25, 0.05F, 0.25));
+				passenger2.makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
 			}
 		}
 		else
 		{
-			if (!getWorld().isClient)
+			if (!level().isClientSide)
 			{
 				if (health == 0) {
-                    MutableText text = Text.empty().append(Text.translatable("RivalRebels.Status")).append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Text.literal("") : Text.empty().append(" ").append(rider.getName())));
-                    for (PlayerEntity player : getWorld().getPlayers()) {
-                        player.sendMessage(text);
+                    MutableComponent text = Component.empty().append(Component.translatable("RivalRebels.Status")).append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Component.literal("") : Component.empty().append(" ").append(rider.getName())));
+                    for (Player player : level().players()) {
+                        player.sendSystemMessage(text);
                     }
                 }
-				if (age % 5 == 0) {
-                    for (PlayerEntity player : getWorld().getPlayers()) {
-                        ServerPlayNetworking.send((ServerPlayerEntity) player, new RhodesPacket(this));
+				if (tickCount % 5 == 0) {
+                    for (Player player : level().players()) {
+                        ServerPlayNetworking.send((ServerPlayer) player, new RhodesPacket(this));
                     }
                 }
 				if (health < -100)
@@ -339,18 +352,18 @@ public class EntityRhodes extends Entity {
 				}
 				if (health == 0)
 				{
-					float syaw = MathHelper.sin(bodyyaw * 0.01745329252f);
-					float cyaw = MathHelper.cos(bodyyaw * 0.01745329252f);
-					getWorld().spawnEntity(new EntityRhodesHead(getWorld(), getX(), getY()+13*scale, getZ(), scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesTorso(getWorld(), getX(), getY()+7*scale, getZ(), scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesLeftUpperArm(getWorld(), getX()+cyaw*6.4*scale, getY()+7*scale, getZ()+syaw*6.4*scale,scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesRightUpperArm(getWorld(), getX()-cyaw*6.4*scale, getY()+7*scale, getZ()-syaw*6.4*scale,scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesLeftLowerArm(getWorld(), getX()+cyaw*6.4*scale, getY()+3*scale, getZ()+syaw*6.4*scale,scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesRightLowerArm(getWorld(), getX()-cyaw*6.4*scale, getY()+3*scale, getZ()-syaw*6.4*scale,scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesLeftUpperLeg(getWorld(), getX()+cyaw*3*scale, getY()-3*scale, getZ()+syaw*3*scale,scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesRightUpperLeg(getWorld(), getX()-cyaw*3*scale, getY()-3*scale, getZ()-syaw*3*scale,scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesLeftLowerLeg(getWorld(), getX()+cyaw*3*scale, getY()-10*scale, getZ()+syaw*3*scale,scale, colorType));
-					getWorld().spawnEntity(new EntityRhodesRightLowerLeg(getWorld(), getX()-cyaw*3*scale, getY()-10*scale, getZ()-syaw*3*scale,scale, colorType));
+					float syaw = Mth.sin(bodyyaw * 0.01745329252f);
+					float cyaw = Mth.cos(bodyyaw * 0.01745329252f);
+					level().addFreshEntity(new EntityRhodesHead(level(), getX(), getY()+13*scale, getZ(), scale, colorType));
+					level().addFreshEntity(new EntityRhodesTorso(level(), getX(), getY()+7*scale, getZ(), scale, colorType));
+					level().addFreshEntity(new EntityRhodesLeftUpperArm(level(), getX()+cyaw*6.4*scale, getY()+7*scale, getZ()+syaw*6.4*scale,scale, colorType));
+					level().addFreshEntity(new EntityRhodesRightUpperArm(level(), getX()-cyaw*6.4*scale, getY()+7*scale, getZ()-syaw*6.4*scale,scale, colorType));
+					level().addFreshEntity(new EntityRhodesLeftLowerArm(level(), getX()+cyaw*6.4*scale, getY()+3*scale, getZ()+syaw*6.4*scale,scale, colorType));
+					level().addFreshEntity(new EntityRhodesRightLowerArm(level(), getX()-cyaw*6.4*scale, getY()+3*scale, getZ()-syaw*6.4*scale,scale, colorType));
+					level().addFreshEntity(new EntityRhodesLeftUpperLeg(level(), getX()+cyaw*3*scale, getY()-3*scale, getZ()+syaw*3*scale,scale, colorType));
+					level().addFreshEntity(new EntityRhodesRightUpperLeg(level(), getX()-cyaw*3*scale, getY()-3*scale, getZ()-syaw*3*scale,scale, colorType));
+					level().addFreshEntity(new EntityRhodesLeftLowerLeg(level(), getX()+cyaw*3*scale, getY()-10*scale, getZ()+syaw*3*scale,scale, colorType));
+					level().addFreshEntity(new EntityRhodesRightLowerLeg(level(), getX()-cyaw*3*scale, getY()-10*scale, getZ()-syaw*3*scale,scale, colorType));
 				}
 			}
 			health--;
@@ -358,19 +371,19 @@ public class EntityRhodes extends Entity {
 
 		if (rider != null)
 		{
-			if ((rider.isSneaking() || !rider.isAlive()) && RivalRebels.rhodesExit)
+			if ((rider.isShiftKeyDown() || !rider.isAlive()) && RivalRebels.rhodesExit)
 			{
 				freeze = false;
-				if (!rider.getAbilities().creativeMode) rider.getAbilities().invulnerable = false;
+				if (!rider.getAbilities().instabuild) rider.getAbilities().invulnerable = false;
 				rider = null;
 			}
 			if (health <= 0 && rider != null)
 			{
 				freeze = false;
-				if (!rider.getAbilities().creativeMode)
+				if (!rider.getAbilities().instabuild)
 				{
 					rider.getAbilities().invulnerable = false;
-					rider.damage(getWorld().getDamageSources().outOfWorld(), 2000000);
+					rider.hurt(level().damageSources().fellOutOfWorld(), 2000000);
 				}
 				rider = null;
 			}
@@ -378,17 +391,17 @@ public class EntityRhodes extends Entity {
 
 		if (passenger1 != null)
 		{
-			if ((passenger1.isSneaking() || !passenger1.isAlive()) && RivalRebels.rhodesExit)
+			if ((passenger1.isShiftKeyDown() || !passenger1.isAlive()) && RivalRebels.rhodesExit)
 			{
-				if (!passenger1.getAbilities().creativeMode) passenger1.getAbilities().invulnerable = false;
+				if (!passenger1.getAbilities().instabuild) passenger1.getAbilities().invulnerable = false;
 				passenger1 = null;
 			}
 			if (health <= 0 && passenger1 != null)
 			{
-				if (!passenger1.getAbilities().creativeMode)
+				if (!passenger1.getAbilities().instabuild)
 				{
 					passenger1.getAbilities().invulnerable = false;
-					passenger1.damage(getWorld().getDamageSources().outOfWorld(), 2000000);
+					passenger1.hurt(level().damageSources().fellOutOfWorld(), 2000000);
 				}
 				passenger1 = null;
 			}
@@ -396,17 +409,17 @@ public class EntityRhodes extends Entity {
 
 		if (passenger2 != null)
 		{
-			if ((passenger2.isSneaking() || !passenger2.isAlive()) && RivalRebels.rhodesExit)
+			if ((passenger2.isShiftKeyDown() || !passenger2.isAlive()) && RivalRebels.rhodesExit)
 			{
-				if (!passenger2.getAbilities().creativeMode) passenger2.getAbilities().invulnerable = false;
+				if (!passenger2.getAbilities().instabuild) passenger2.getAbilities().invulnerable = false;
 				passenger2 = null;
 			}
 			if (health <= 0 && passenger2 != null)
 			{
-				if (!passenger2.getAbilities().creativeMode)
+				if (!passenger2.getAbilities().instabuild)
 				{
 					passenger2.getAbilities().invulnerable = false;
-					passenger2.damage(getWorld().getDamageSources().outOfWorld(), 2000000);
+					passenger2.hurt(level().damageSources().fellOutOfWorld(), 2000000);
 				}
 				passenger2 = null;
 			}
@@ -417,10 +430,10 @@ public class EntityRhodes extends Entity {
 
 	private void breakBlocks(float syaw, float cyaw, float leftlegheight, float rightlegheight, float bodyY)
 	{
-		float leftlegstride = (MathHelper.sin((leftthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-				+ (MathHelper.sin((leftthighpitch+leftshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
-		float rightlegstride = (MathHelper.sin((rightthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-				+ (MathHelper.sin((rightthighpitch+rightshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
+		float leftlegstride = (Mth.sin((leftthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
+				+ (Mth.sin((leftthighpitch+leftshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
+		float rightlegstride = (Mth.sin((rightthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
+				+ (Mth.sin((rightthighpitch+rightshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
 		leftlegstride *= scale;
 		rightlegstride *= scale;
 
@@ -449,7 +462,7 @@ public class EntityRhodes extends Entity {
 				int ez = (int) (getZ() + 5.0f * scale);
 				for (int y = sy; y < ey; y++)
 				{
-					if ((y + age) % 8 == 0)
+					if ((y + tickCount) % 8 == 0)
 					{
 						for (int x = sx; x < ex; x++)
 						{
@@ -463,8 +476,8 @@ public class EntityRhodes extends Entity {
 			}
 			else
 			{
-				int irpyyoff = irpy + (age % 6);
-				int ilpyyoff = ilpy + (age % 6);
+				int irpyyoff = irpy + (tickCount % 6);
+				int ilpyyoff = ilpy + (tickCount % 6);
 				Block b = getBlock(irpx, irpyyoff, irpz);
 				if (b != Blocks.WATER && b != Blocks.AIR)
 				{
@@ -524,7 +537,7 @@ public class EntityRhodes extends Entity {
 					setBlock(ilpx+2, ilpyyoff, ilpz+2, Blocks.AIR);
 				}
 				int px = (int) getX();
-				int py = (int) (getY()-5*scale + (age%20)*scale);
+				int py = (int) (getY()-5*scale + (tickCount%20)*scale);
 				int pz = (int) getZ();
 				for (int x = -4; x < 5; x++)
 				{
@@ -536,7 +549,7 @@ public class EntityRhodes extends Entity {
 							setBlock(px+x, py, pz+z, Blocks.AIR);
 							if (random.nextInt(333)==0)
 							{
-								new Explosion(getWorld(), px, py, pz, 3, false, true, RivalRebelsDamageSource.rocket(getWorld()));
+								new Explosion(level(), px, py, pz, 3, false, true, RivalRebelsDamageSource.rocket(level()));
 								RivalRebelsSoundPlayer.playSound(this, 23, 3, 4.5f, (float) (0.8f + random.nextDouble()*0.3f));
 							}
 						}
@@ -554,23 +567,23 @@ public class EntityRhodes extends Entity {
 		{
 			if (ol||or)
 			{
-				if (getVelocity().getY() < 0.125)
+				if (getDeltaMovement().y() < 0.125)
 				{
-                    setVelocity(getVelocity().getX(), 0.125, getVelocity().getZ());
+                    setDeltaMovement(getDeltaMovement().x(), 0.125, getDeltaMovement().z());
 					if (!isFire() && random.nextInt(32)==0)
 					{
 						RivalRebelsSoundPlayer.playSound(this, 23, 1, 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
 						setFire(true);
 					}
 				}
-			} else if (getVelocity().getY() < 0) {
-                setVelocity(getVelocity().getX(), 0, getVelocity().getZ());
+			} else if (getDeltaMovement().y() < 0) {
+                setDeltaMovement(getDeltaMovement().x(), 0, getDeltaMovement().z());
                 setFire(false);
-                setPos(getX(), (int) getY(), getZ());
+                setPosRaw(getX(), (int) getY(), getZ());
 			}
 		}
 		else if (flying == 0) {
-            addVelocity(0, -0.03f, 0);
+            push(0, -0.03f, 0);
 			if (!isFire() && random.nextInt(32)==0)
 			{
 				RivalRebelsSoundPlayer.playSound(this, 23, 1, 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
@@ -582,11 +595,11 @@ public class EntityRhodes extends Entity {
 			flying--;
 			if (b2spirit)
 			{
-                setVelocity(getVelocity().getX(), 0.03, getVelocity().getZ());
+                setDeltaMovement(getDeltaMovement().x(), 0.03, getDeltaMovement().z());
 			}
 			else
 			{
-                addVelocity(0, 0.03f, 0);
+                push(0, 0.03f, 0);
 			}
 			if (random.nextInt(32)==0)
 			{
@@ -597,96 +610,96 @@ public class EntityRhodes extends Entity {
 	}
 
 	private void doCollisions() {
-        for (Entity e : getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox())) {
+        for (Entity e : level().getEntities(this, Shapes.INFINITY.bounds())) {
             if (e == rider || e == passenger1 || e == passenger2) continue;
-            double bbd = (e.getWidth() + 10 * scale) * 0.5;
-            double bbh = (e.getHeight() + 30 * scale) * 0.5;
+            double bbd = (e.getBbWidth() + 10 * scale) * 0.5;
+            double bbh = (e.getBbHeight() + 30 * scale) * 0.5;
             if (e instanceof EntityRhodes) {
                 bbd = 10 * (((EntityRhodes) e).scale + scale) * 0.5;
                 bbh = 30 * (((EntityRhodes) e).scale + scale) * 0.5;
             }
             double dist = (e.getX() - getX()) * (e.getX() - getX()) + (e.getZ() - getZ()) * (e.getZ() - getZ());
-            if ((ac == 0 || ac == 1 || ac == 11 || !RivalRebels.rhodesAI) && e instanceof PlayerEntity && dist < bbd * bbd * 0.25f && e.getY() < getY() + bbh + 1 && e.getY() > getY() - bbh + 1) {
+            if ((ac == 0 || ac == 1 || ac == 11 || !RivalRebels.rhodesAI) && e instanceof Player && dist < bbd * bbd * 0.25f && e.getY() < getY() + bbh + 1 && e.getY() > getY() - bbh + 1) {
                 if (rider == null) {
-                    rider = (PlayerEntity) e;
+                    rider = (Player) e;
                     RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
                 } else if (passenger1 == null) {
-                    passenger1 = (PlayerEntity) e;
+                    passenger1 = (Player) e;
                     RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
                 } else if (passenger2 == null) {
-                    passenger2 = (PlayerEntity) e;
+                    passenger2 = (Player) e;
                     RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
                 }
             } else if (dist < bbd * bbd && e.getY() > getY() - bbh && e.getY() < getY() + bbh) {
                 if (e != this && !(e instanceof FallingBlockEntity) && !(e instanceof EntityDebris)) {
                     if (e.getY() > getY() + 15) {
-                        e.setVelocity(getVelocity().multiply(1, -0.5, 1));
-                        e.setPos(getX(), getY() + bbh, getZ());
+                        e.setDeltaMovement(getDeltaMovement().multiply(1, -0.5, 1));
+                        e.setPosRaw(getX(), getY() + bbh, getZ());
                     } else if (e.getY() < getY() - 15) {
-                        e.setVelocity(getVelocity().multiply(1, -0.5, 1));
-                        e.setPos(getX(), getY() - bbh, getZ());
+                        e.setDeltaMovement(getDeltaMovement().multiply(1, -0.5, 1));
+                        e.setPosRaw(getX(), getY() - bbh, getZ());
                     } else {
-                        e.setVelocity(getVelocity().multiply(-1, 1, -1));
+                        e.setDeltaMovement(getDeltaMovement().multiply(-1, 1, -1));
                         double d3 = bbd / Math.sqrt(dist);
-                        e.setPos(getX() + (e.getX() - getX()) * d3,
+                        e.setPosRaw(getX() + (e.getX() - getX()) * d3,
                              e.getY(),
                             getZ() + (e.getZ() - getZ()) * d3);
                     }
-                    e.setPosition(e.getX(), e.getY(), e.getZ());
+                    e.setPos(e.getX(), e.getY(), e.getZ());
                 }
 
                 if (e instanceof EntityRocket) {
-                    e.age = RivalRebels.rpgDecay;
-                    this.damage(getWorld().getDamageSources().generic(), 20);
+                    e.tickCount = RivalRebels.rpgDecay;
+                    this.hurt(level().damageSources().generic(), 20);
                 } else if (e instanceof EntitySeekB83) {
-                    e.age = 800;
-                    this.damage(getWorld().getDamageSources().generic(), 24);
+                    e.tickCount = 800;
+                    this.hurt(level().damageSources().generic(), 24);
                 } else if (e instanceof EntityHackB83) {
                     ((EntityHackB83) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 40);
+                    this.hurt(level().damageSources().generic(), 40);
                 } else if (e instanceof EntityB83) {
                     ((EntityB83) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 40);
+                    this.hurt(level().damageSources().generic(), 40);
                 } else if (e instanceof EntityBomb) {
                     ((EntityBomb) e).explode(true);
                     for (int i = 0; i < RivalRebels.bombDamageToRhodes; i++)
-                        this.damage(getWorld().getDamageSources().generic(), 50);
+                        this.hurt(level().damageSources().generic(), 50);
                 } else if (e instanceof EntityNuke) {
                     ((EntityNuke) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 80);
+                    this.hurt(level().damageSources().generic(), 80);
                 } else if (e instanceof EntityTsar) {
                     ((EntityTsar) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 100);
+                    this.hurt(level().damageSources().generic(), 100);
                 } else if (e instanceof EntityTheoreticalTsar) {
                     ((EntityTheoreticalTsar) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 100);
+                    this.hurt(level().damageSources().generic(), 100);
                 } else if (e instanceof EntityAntimatterBomb) {
                     ((EntityAntimatterBomb) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 100);
+                    this.hurt(level().damageSources().generic(), 100);
                 } else if (e instanceof EntityTachyonBomb) {
                     ((EntityTachyonBomb) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 100);
+                    this.hurt(level().damageSources().generic(), 100);
                 } else if (e instanceof EntityHotPotato) {
-                    ((EntityHotPotato) e).age = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 100);
+                    ((EntityHotPotato) e).tickCount = -100;
+                    this.hurt(level().damageSources().generic(), 100);
                 } else if (e instanceof EntityB83NoShroom) {
                     ((EntityB83NoShroom) e).ticksInAir = -100;
-                    this.damage(getWorld().getDamageSources().generic(), 40);
+                    this.hurt(level().damageSources().generic(), 40);
                 } else if (e instanceof EntityPlasmoid) {
                     ((EntityPlasmoid) e).explode();
-                    this.damage(getWorld().getDamageSources().generic(), 8);
+                    this.hurt(level().damageSources().generic(), 8);
                 } else if (e instanceof EntityFlameBall) {
                     e.kill();
-                    this.damage(getWorld().getDamageSources().generic(), 3);
+                    this.hurt(level().damageSources().generic(), 3);
                 } else if (e instanceof EntityFlameBall1) {
                     e.kill();
-                    this.damage(getWorld().getDamageSources().generic(), 4);
+                    this.hurt(level().damageSources().generic(), 4);
                 } else if (e instanceof EntityFlameBall2) {
                     e.kill();
-                    this.damage(getWorld().getDamageSources().generic(), 2);
+                    this.hurt(level().damageSources().generic(), 2);
                 } else if (e instanceof EntityLaserBurst) {
                     e.kill();
-                    this.damage(getWorld().getDamageSources().generic(), 4);
+                    this.hurt(level().damageSources().generic(), 4);
                 }
             }
         }
@@ -713,7 +726,7 @@ public class EntityRhodes extends Entity {
 	{
 		if (health*2 < RivalRebels.rhodesHealth) endangered = true;
 		if (!b2spirit) {
-            setVelocity(0, getVelocity().getY(), 0);
+            setDeltaMovement(0, getDeltaMovement().y(), 0);
 		}
 		if (rider != null)
 		{
@@ -722,7 +735,7 @@ public class EntityRhodes extends Entity {
 				freeze = true;
 				nukecount--;
 				health -= 1000;
-				getWorld().spawnEntity(new EntityB2Spirit(this));
+				level().addFreshEntity(new EntityB2Spirit(this));
 			}
 			if (RivalRebels.rhodesHold) return;
 			if (energy < maxenergy) energy += recharge;
@@ -743,7 +756,7 @@ public class EntityRhodes extends Entity {
 			if (forcefield)
 			{
 				energy -= ecshield;
-				if (age%8==0)	RivalRebelsSoundPlayer.playSound(this, 5, 0, 10f, 1f);
+				if (tickCount%8==0)	RivalRebelsSoundPlayer.playSound(this, 5, 0, 10f, 1f);
 			}
 			if (laser) energy -= eclaser;
 			if (jet || b2spirit)
@@ -754,9 +767,9 @@ public class EntityRhodes extends Entity {
 					if (b2energy <= 0)
 					{
 						b2energy = 0;
-						getWorld().createExplosion(null, this.getX(), this.getY(), this.getZ(), 6.0F, World.ExplosionSourceType.MOB);
-						getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 0));
-						getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 1));
+						level().explode(null, this.getX(), this.getY(), this.getZ(), 6.0F, Level.ExplosionInteraction.MOB);
+						level().addFreshEntity(new EntityB2Frag(level(), this, 0));
+						level().addFreshEntity(new EntityB2Frag(level(), this, 1));
 					}
 				}
 				else
@@ -772,22 +785,22 @@ public class EntityRhodes extends Entity {
 			laserOn = 0;
 			if (!stop)
 			{
-				float goal = ((((rider.headYaw+bodyyaw)%360)+360+360)%360)-180;
+				float goal = ((((rider.yHeadRot+bodyyaw)%360)+360+360)%360)-180;
 				bodyyaw += Math.max(Math.min(goal, 2), -2);
 				if (flying > 0)
 				{
 					if (b2spirit)
 					{
-                        setVelocity(getVelocity().add(syaw * 0.1f, 0, cyaw * 0.1f));
-						double speed = Math.sqrt(getVelocity().getX() * getVelocity().getX() + getVelocity().getZ() * getVelocity().getZ());
+                        setDeltaMovement(getDeltaMovement().add(syaw * 0.1f, 0, cyaw * 0.1f));
+						double speed = Math.sqrt(getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z());
 						if (speed > 0.7) {
-                            Vec3d vec3d = getVelocity().multiply(1 / speed).multiply(0.7);
-                            setVelocity(vec3d.getX(), getVelocity().getY(), vec3d.getZ());
+                            Vec3 vec3d = getDeltaMovement().scale(1 / speed).scale(0.7);
+                            setDeltaMovement(vec3d.x(), getDeltaMovement().y(), vec3d.z());
 						}
 					}
 					else
 					{
-                        setVelocity(syaw * 0.5f, getVelocity().getY(), cyaw * 0.5f);
+                        setDeltaMovement(syaw * 0.5f, getDeltaMovement().y(), cyaw * 0.5f);
 					}
 					rightthighpitch = approach(rightthighpitch,-30);
 					leftthighpitch  = approach(leftthighpitch, -30);
@@ -811,11 +824,11 @@ public class EntityRhodes extends Entity {
 			double starty = rider.getY() + rider.getEyeHeight(rider.getPose());
 			double startz = rider.getZ();
 			double range = 100;
-			double endx = startx + range * (-MathHelper.sin(rider.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(rider.getPitch() / 180.0F * (float) Math.PI));
-			double endy = starty + range * (-MathHelper.sin(rider.getPitch() / 180.0F * (float) Math.PI));
-			double endz = startz + range * (MathHelper.cos(rider.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(rider.getPitch() / 180.0F * (float) Math.PI));
+			double endx = startx + range * (-Mth.sin(rider.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(rider.getXRot() / 180.0F * (float) Math.PI));
+			double endy = starty + range * (-Mth.sin(rider.getXRot() / 180.0F * (float) Math.PI));
+			double endz = startz + range * (Mth.cos(rider.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(rider.getXRot() / 180.0F * (float) Math.PI));
 
-			Vec3d hit = rayTraceBlocks((float)startx, (float)starty, (float)startz, (float)endx, (float)endy, (float)endz);
+			Vec3 hit = rayTraceBlocks((float)startx, (float)starty, (float)startz, (float)endx, (float)endy, (float)endz);
 
 			if (hit != null)
 			{
@@ -833,7 +846,7 @@ public class EntityRhodes extends Entity {
 
 			if (laser)
 			{
-				laserOn = (byte)(getWorld().random.nextInt(2)+1);
+				laserOn = (byte)(level().random.nextInt(2)+1);
 				RivalRebelsSoundPlayer.playSound(this, 22, 1, 30f, 0f);
 				float x = (float) (getX() - endx);
 				float y = (float) (getY() + 13*scale - endy);
@@ -842,15 +855,15 @@ public class EntityRhodes extends Entity {
 
 				headpitch += Math.max(-20, Math.min(20, (pitch-headpitch)));
 
-				if (Math.abs(headpitch-pitch) < 10f && age % 3 == 0)
+				if (Math.abs(headpitch-pitch) < 10f && tickCount % 3 == 0)
 				{
 					range = 70*scale;
-					Vec3d start = new Vec3d(getX(), getY()+13*scale, getZ());
-					Vec3d end = new Vec3d(0, 0, range);
-					end = end.rotateX(-headpitch / 180.0F * (float) Math.PI);
-					end = end.rotateY(bodyyaw / 180.0F * (float) Math.PI);
+					Vec3 start = new Vec3(getX(), getY()+13*scale, getZ());
+					Vec3 end = new Vec3(0, 0, range);
+					end = end.xRot(-headpitch / 180.0F * (float) Math.PI);
+					end = end.yRot(bodyyaw / 180.0F * (float) Math.PI);
 					end = end.add(getX(), getY()+13*scale, getZ());
-                    for (Entity e : getWorld().getOtherEntities(this, new Box(
+                    for (Entity e : level().getEntities(this, new AABB(
                         Math.min(start.x, end.x) - 5,
                             Math.min(start.y, end.y) - 5,
                             Math.min(start.z, end.z) - 5,
@@ -858,76 +871,75 @@ public class EntityRhodes extends Entity {
                             Math.max(start.y, end.y) + 5,
                             Math.max(start.z, end.z) + 5))) {
                         if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) &&
-                                !(e instanceof ThrownEntity
+                                !(e instanceof ThrowableProjectile
                                         || e instanceof EntityInanimate
                                         || e instanceof ItemEntity
-                                        || e instanceof BoatEntity
-                                        || e instanceof MinecartEntity)
+                                        || e instanceof Boat
+                                        || e instanceof Minecart)
                                 && e != rider) {
-                            Vec3d entity = new Vec3d(e.getX(), e.getY(), e.getZ());
+                            Vec3 entity = new Vec3(e.getX(), e.getY(), e.getZ());
                             double bbx = 1;
                             if (e instanceof EntityRhodes) bbx = 20 * ((EntityRhodes) e).scale;
-                            if (entity.subtract(start).crossProduct(entity.subtract(end)).squaredDistanceTo(0, 0, 0) < 10000 * bbx) {
-                                e.damage(RivalRebelsDamageSource.laserBurst(getWorld()), 24);
-                                if (e instanceof PlayerEntity player) {
-                                    DefaultedList<ItemStack> armorSlots = player.getInventory().armor;
-                                    int i = getWorld().random.nextInt(4);
-                                    if (!armorSlots.get(i).isEmpty()) {
-                                        armorSlots.get(i).damage(24, player, player1 -> {});
+                            if (entity.subtract(start).cross(entity.subtract(end)).distanceToSqr(0, 0, 0) < 10000 * bbx) {
+                                e.hurt(RivalRebelsDamageSource.laserBurst(level()), 24);
+                                if (e instanceof Player player) {
+                                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
+                                    if (!player.getItemBySlot(slot).isEmpty()) {
+                                        player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
                                     }
                                     if (player.getHealth() < 3 && player.isAlive()) {
-                                        player.damage(RivalRebelsDamageSource.laserBurst(getWorld()), 2000000);
+                                        player.hurt(RivalRebelsDamageSource.laserBurst(level()), 2000000);
                                         player.deathTime = 0;
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 0, 0));
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 1, 0));
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 2, 0));
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 2, 0));
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 3, 0));
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 3, 0));
+                                        level().addFreshEntity(new EntityGore(level(), e, 0, 0));
+                                        level().addFreshEntity(new EntityGore(level(), e, 1, 0));
+                                        level().addFreshEntity(new EntityGore(level(), e, 2, 0));
+                                        level().addFreshEntity(new EntityGore(level(), e, 2, 0));
+                                        level().addFreshEntity(new EntityGore(level(), e, 3, 0));
+                                        level().addFreshEntity(new EntityGore(level(), e, 3, 0));
                                     }
                                 } else {
                                     if (!e.isAlive() || (e instanceof LivingEntity && ((LivingEntity) e).getHealth() < 3)) {
                                         int legs = -1;
                                         int arms = -1;
                                         int mobs = -1;
-                                        getWorld().playSoundFromEntity(this, RRSounds.BLASTER_FIRE, getSoundCategory(), 1, 4);
-                                        if (e instanceof ZombifiedPiglinEntity) {
+                                        level().playLocalSound(this, RRSounds.BLASTER_FIRE, getSoundSource(), 1, 4);
+                                        if (e instanceof ZombifiedPiglin) {
                                             legs = 2;
                                             arms = 2;
                                             mobs = 2;
-                                        } else if (e instanceof ZombieEntity) {
+                                        } else if (e instanceof Zombie) {
                                             legs = 2;
                                             arms = 2;
                                             mobs = 1;
-                                        } else if (e instanceof SkeletonEntity) {
+                                        } else if (e instanceof Skeleton) {
                                             legs = 2;
                                             arms = 2;
                                             mobs = 3;
-                                        } else if (e instanceof EndermanEntity) {
+                                        } else if (e instanceof EnderMan) {
                                             legs = 2;
                                             arms = 2;
                                             mobs = 4;
-                                        } else if (e instanceof CreeperEntity) {
+                                        } else if (e instanceof Creeper) {
                                             legs = 4;
                                             arms = 0;
                                             mobs = 5;
-                                        } else if (e instanceof MagmaCubeEntity) {
+                                        } else if (e instanceof MagmaCube) {
                                             legs = 0;
                                             arms = 0;
                                             mobs = 7;
-                                        } else if (e instanceof SlimeEntity) {
+                                        } else if (e instanceof Slime) {
                                             legs = 0;
                                             arms = 0;
                                             mobs = 6;
-                                        } else if (e instanceof CaveSpiderEntity) {
+                                        } else if (e instanceof CaveSpider) {
                                             legs = 8;
                                             arms = 0;
                                             mobs = 9;
-                                        } else if (e instanceof SpiderEntity) {
+                                        } else if (e instanceof Spider) {
                                             legs = 8;
                                             arms = 0;
                                             mobs = 8;
-                                        } else if (e instanceof GhastEntity) {
+                                        } else if (e instanceof Ghast) {
                                             legs = 9;
                                             arms = 0;
                                             mobs = 10;
@@ -936,16 +948,16 @@ public class EntityRhodes extends Entity {
                                                 || e instanceof EntityRhodesPiece) {
                                             return;
                                         } else {
-                                            legs = (int) (e.getBoundingBox().getAverageSideLength() * 2);
-                                            arms = (int) (e.getBoundingBox().getAverageSideLength() * 2);
+                                            legs = (int) (e.getBoundingBox().getSize() * 2);
+                                            arms = (int) (e.getBoundingBox().getSize() * 2);
                                             mobs = 11;
                                         }
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 0, mobs));
-                                        getWorld().spawnEntity(new EntityGore(getWorld(), e, 1, mobs));
+                                        level().addFreshEntity(new EntityGore(level(), e, 0, mobs));
+                                        level().addFreshEntity(new EntityGore(level(), e, 1, mobs));
                                         for (int i = 0; i < arms; i++)
-                                            getWorld().spawnEntity(new EntityGore(getWorld(), e, 2, mobs));
+                                            level().addFreshEntity(new EntityGore(level(), e, 2, mobs));
                                         for (int i = 0; i < legs; i++)
-                                            getWorld().spawnEntity(new EntityGore(getWorld(), e, 3, mobs));
+                                            level().addFreshEntity(new EntityGore(level(), e, 3, mobs));
                                         e.kill();
                                     }
                                 }
@@ -956,7 +968,7 @@ public class EntityRhodes extends Entity {
 			}
 			else
 			{
-				headpitch = rider.getPitch();
+				headpitch = rider.getXRot();
 			}
 
 			if (flame || prevflame)
@@ -988,7 +1000,7 @@ public class EntityRhodes extends Entity {
 							x*=cp;
 							y*=cp;
 							z*=cp;
-							getWorld().spawnEntity(new EntityPlasmoid(getWorld(), px, py, pz,
+							level().addFreshEntity(new EntityPlasmoid(level(), px, py, pz,
 									x, y, z, 8));
 							flamecount -= plasmacharge;
 							plasmacharge = 0;
@@ -1009,9 +1021,9 @@ public class EntityRhodes extends Entity {
 						x*=cp;
 						y*=cp;
 						z*=cp;
-						getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
+						level().addFreshEntity(new EntityFlameBall(level(), px, py, pz,
 								x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
-						getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
+						level().addFreshEntity(new EntityFlameBall(level(), px, py, pz,
 								x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
 					}
 				}
@@ -1041,31 +1053,31 @@ public class EntityRhodes extends Entity {
 							RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 							float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 							if (scale >= 3.0)
-								getWorld().spawnEntity(new EntityHotPotato(getWorld(), px, py, pz,
+								level().addFreshEntity(new EntityHotPotato(level(), px, py, pz,
 										x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
 							else if (scale >= 2.0)
-								getWorld().spawnEntity(new EntityTsar(getWorld(), px, py, pz,
+								level().addFreshEntity(new EntityTsar(level(), px, py, pz,
 										x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
 							else
-								getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
+								level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
 										x*cp, y*cp, z*cp));
 						}
 					}
 
-					if (rocket && age-lastshot > ((scale >= 2.0)?30:((shotstaken == 21)?80:5)))
+					if (rocket && tickCount-lastshot > ((scale >= 2.0)?30:((shotstaken == 21)?80:5)))
 					{
 						rocketcount--;
-						lastshot = age;
+						lastshot = tickCount;
 						if (shotstaken == 21) shotstaken = 0;
 						shotstaken++;
 						RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 						float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 
 						if (scale >= 2.0)
-							getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
+							level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
 									x*cp, y*cp, z*cp));
 						else
-							getWorld().spawnEntity(new EntitySeekB83(getWorld(), px, py, pz,
+							level().addFreshEntity(new EntitySeekB83(level(), px, py, pz,
 									x*cp, y*cp, z*cp));
 					}
 				}
@@ -1284,8 +1296,8 @@ public class EntityRhodes extends Entity {
 			shootRocketsAtBestTarget(-syaw, cyaw);
 			shootFlameAtBestTarget(-syaw, cyaw);
 			shootLaserAtBestTarget(-syaw, cyaw);
-			setVelocity(syaw * 0.5f * movescale,
-                getVelocity().getY(),
+			setDeltaMovement(syaw * 0.5f * movescale,
+                getDeltaMovement().y(),
                 cyaw * 0.5f * movescale);
 			rightthighpitch = approach(rightthighpitch,-30);
 			leftthighpitch  = approach(leftthighpitch, -30);
@@ -1293,7 +1305,7 @@ public class EntityRhodes extends Entity {
 			leftshinpitch   = approach(leftshinpitch,  60);
 			break;
 		case 10:
-			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && getWorld().getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && getWorld().getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RRBlocks.sigmaobj))
+			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && level().getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && level().getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RRBlocks.sigmaobj))
 			{
 				rightthighpitch = approach(rightthighpitch,0);
 				leftthighpitch  = approach(leftthighpitch, 0);
@@ -1324,7 +1336,7 @@ public class EntityRhodes extends Entity {
 			else
 			{
 				health = 0;
-                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
+                level().playLocalSound(this, RRSounds.ARTILLERY_EXPLODE, getSoundSource(), 30, 1);
 			}
 			break;
 		case 11:
@@ -1359,18 +1371,18 @@ public class EntityRhodes extends Entity {
 	{
 		Entity target = null;
 		double priority = 0;
-        List<Entity> otherEntities = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox());
+        List<Entity> otherEntities = level().getEntities(this, Shapes.INFINITY.bounds());
         for (Entity e : otherEntities) {
             if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) && (!(e instanceof EntityRhodes) || (RivalRebels.rhodesFF && (RivalRebels.rhodesCC || ((EntityRhodes) e).colorType != colorType))) &&
-                    !(e instanceof ThrownEntity
+                    !(e instanceof ThrowableProjectile
                             || e instanceof EntityInanimate
                             || e instanceof ItemEntity
-                            || e instanceof AnimalEntity
-                            || e instanceof VillagerEntity
-                            || e instanceof BatEntity
-                            || e instanceof SquidEntity
-                            || e instanceof BoatEntity
-                            || e instanceof MinecartEntity)) {
+                            || e instanceof Animal
+                            || e instanceof Villager
+                            || e instanceof Bat
+                            || e instanceof Squid
+                            || e instanceof Boat
+                            || e instanceof Minecart)) {
                 double prio = getPriority(e) - distanceTo(e);
                 if (prio > priority) {
                     target = e;
@@ -1387,8 +1399,8 @@ public class EntityRhodes extends Entity {
 		float movescale = scale;
 		if (RivalRebels.rhodesScaleSpeed) movescale *= RivalRebels.rhodesSpeedScale;
 		else movescale = RivalRebels.rhodesSpeedScale;
-		setVelocity(syaw * 0.125f*movescale,
-            getVelocity().getY(),
+		setDeltaMovement(syaw * 0.125f*movescale,
+            getDeltaMovement().y(),
             cyaw * 0.125f*movescale);
         switch (walkstate) {
             case 0 -> {
@@ -1419,7 +1431,7 @@ public class EntityRhodes extends Entity {
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) {
                     walkstate++;
-                    getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_DESTROY, getSoundCategory(), 4.5f, 0.8f);
+                    level().playLocalSound(this, RRSounds.ARTILLERY_DESTROY, getSoundSource(), 4.5f, 0.8f);
                 }
             }
             case 2 -> {
@@ -1478,7 +1490,7 @@ public class EntityRhodes extends Entity {
                     && (int) (rightshinpitch) == rsg
                     && (int) (leftshinpitch) == lsg) {
                     walkstate++;
-                    getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_DESTROY, getSoundCategory(), 4.5f, 0.8f);
+                    level().playLocalSound(this, RRSounds.ARTILLERY_DESTROY, getSoundSource(), 4.5f, 0.8f);
                 }
             }
             case 6 -> {
@@ -1560,24 +1572,24 @@ public class EntityRhodes extends Entity {
 				{
 					float dy = ((float)lastRocketTarget.getY()-(float)getY()-6.2f*scale);
 					float dist = dx*dx+dy*dy+dz*dz;
-					if (dist < 100*100*scale*scale && rayTraceBlocks(px, py, pz, (float)lastRocketTarget.getX(), (float)lastRocketTarget.getY()+lastRocketTarget.getHeight()/2f, (float)lastRocketTarget.getZ()) == null)
+					if (dist < 100*100*scale*scale && rayTraceBlocks(px, py, pz, (float)lastRocketTarget.getX(), (float)lastRocketTarget.getY()+lastRocketTarget.getBbHeight()/2f, (float)lastRocketTarget.getZ()) == null)
 					{
 						priority = getPriority(lastRocketTarget)-(float)Math.sqrt(dist)+10;
 					}
 				}
 			}
 			if (priority <= 0) lastRocketTarget = null;
-            for (Entity e : getWorld().getOtherEntities(this, new Box(px - 100 * scale, py - 100 * scale, pz - 100 * scale, px + 100 * scale, py + 100 * scale, pz + 100 * scale))) {
+            for (Entity e : level().getEntities(this, new AABB(px - 100 * scale, py - 100 * scale, pz - 100 * scale, px + 100 * scale, py + 100 * scale, pz + 100 * scale))) {
                 if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) &&
-                    !(e instanceof ThrownEntity
+                    !(e instanceof ThrowableProjectile
                         || e instanceof EntityInanimate
                         || e instanceof ItemEntity
-                        || e instanceof AnimalEntity
-                        || e instanceof VillagerEntity
-                        || e instanceof BatEntity
-                        || e instanceof SquidEntity
-                        || e instanceof BoatEntity
-                        || e instanceof MinecartEntity)) {
+                        || e instanceof Animal
+                        || e instanceof Villager
+                        || e instanceof Bat
+                        || e instanceof Squid
+                        || e instanceof Boat
+                        || e instanceof Minecart)) {
                     float dx = (float) e.getX() - px;
                     float dz = (float) e.getZ() - pz;
                     float dot = (cyaw * dx + syaw * dz);
@@ -1586,7 +1598,7 @@ public class EntityRhodes extends Entity {
                         float dist = dx * dx + dy * dy + dz * dz;
                         if (dist < 100 * 100 * scale * scale) {
                             float prio = getPriority(e) - (float) Math.sqrt(dist);
-                            if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getX(), (float) e.getY() + e.getHeight() / 2f, (float) e.getZ()) == null) {
+                            if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getX(), (float) e.getY() + e.getBbHeight() / 2f, (float) e.getZ()) == null) {
                                 lastRocketTarget = e;
                                 priority = prio;
                             }
@@ -1597,15 +1609,15 @@ public class EntityRhodes extends Entity {
 
             for (BlockEntity e : BLOCK_ENTITIES.values()) {
                 if (e instanceof TileEntityRhodesActivator || e instanceof TileEntityNukeCrate || e instanceof TileEntityReactor) {
-                    float dx = (float) e.getPos().getX() - px;
-                    float dz = (float) e.getPos().getZ() - pz;
+                    float dx = (float) e.getBlockPos().getX() - px;
+                    float dz = (float) e.getBlockPos().getZ() - pz;
                     float dot = (cyaw * dx + syaw * dz);
                     if (dot * Math.abs(dot) > -0.25 * (dx * dx + dz * dz)) {
-                        float dy = (float) e.getPos().getY() - py;
+                        float dy = (float) e.getBlockPos().getY() - py;
                         float dist = dx * dx + dy * dy + dz * dz;
                         if (dist < 100 * 100) {
                             float prio = 300 - (float) Math.sqrt(dist);
-                            if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getPos().getX(), (float) e.getPos().getY(), (float) e.getPos().getZ()) == null) {
+                            if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getBlockPos().getX(), (float) e.getBlockPos().getY(), (float) e.getBlockPos().getZ()) == null) {
                                 te = e;
                                 lastRocketTarget = null;
                                 priority = prio;
@@ -1617,9 +1629,9 @@ public class EntityRhodes extends Entity {
 		}
 		if (te != null && !nuke)
 		{
-			float x = px - (float)te.getPos().getX();
-			float y = py - (float)te.getPos().getY();
-			float z = pz - (float)te.getPos().getZ();
+			float x = px - (float)te.getBlockPos().getX();
+			float y = py - (float)te.getBlockPos().getY();
+			float z = pz - (float)te.getBlockPos().getZ();
 			float yaw = ((atan2(x, z)-bodyyaw+630)%360)-90;
 			float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
 			boolean pointing = true;
@@ -1636,19 +1648,19 @@ public class EntityRhodes extends Entity {
 				else pointing = false;
 			}
 
-			if (pointing && age-lastshot > ((scale >= 2.0)?30:((shotstaken == 21)?80:5)))
+			if (pointing && tickCount-lastshot > ((scale >= 2.0)?30:((shotstaken == 21)?80:5)))
 			{
 				rocketcount--;
-				lastshot = age;
+				lastshot = tickCount;
 				if (shotstaken == 21) shotstaken = 0;
 				shotstaken++;
 				RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 				float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 				if (scale >= 2.0)
-					getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
+					level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
 							x*cp, y*cp, z*cp));
 				else
-					getWorld().spawnEntity(new EntitySeekB83(getWorld(), px, py, pz,
+					level().addFreshEntity(new EntitySeekB83(level(), px, py, pz,
 							x*cp, y*cp, z*cp));
 			}
 		}
@@ -1675,33 +1687,33 @@ public class EntityRhodes extends Entity {
 
 			if (lastRocketTarget instanceof LivingEntity && ((LivingEntity)lastRocketTarget).getMaxHealth() > 1000)
 			{
-				if (pointing && age % 100 == 0)
+				if (pointing && tickCount % 100 == 0)
 				{
 					RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 					float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 					if (scale >= 2.0)
-						getWorld().spawnEntity(new EntityTsar(getWorld(), px, py, pz,
+						level().addFreshEntity(new EntityTsar(level(), px, py, pz,
 								x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
 					else
-						getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
+						level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
 								x*cp, y*cp, z*cp));
 				}
 			}
 			else
 			{
-				if (pointing && age-lastshot > ((scale >= 2.0)?30:((shotstaken == 21)?80:5)))
+				if (pointing && tickCount-lastshot > ((scale >= 2.0)?30:((shotstaken == 21)?80:5)))
 				{
 					rocketcount--;
-					lastshot = age;
+					lastshot = tickCount;
 					if (shotstaken == 21) shotstaken = 0;
 					shotstaken++;
 					RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 					float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
 					if (scale >= 2.0)
-						getWorld().spawnEntity(new EntityB83NoShroom(getWorld(), px, py, pz,
+						level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
 								x*cp, y*cp, z*cp));
 					else
-						getWorld().spawnEntity(new EntitySeekB83(getWorld(), px, py, pz,
+						level().addFreshEntity(new EntitySeekB83(level(), px, py, pz,
 								x*cp, y*cp, z*cp));
 				}
 			}
@@ -1730,24 +1742,24 @@ public class EntityRhodes extends Entity {
 				{
 					float dy = ((float)lastFlameTarget.getY()-(float)getY()-6.2f);
 					float dist = dx*dx+dy*dy+dz*dz;
-					if (dist < 40*40*scale*scale && rayTraceBlocks(px, py, pz, (float)lastFlameTarget.getX(), (float)lastFlameTarget.getY()+lastFlameTarget.getHeight(), (float)lastFlameTarget.getZ()) == null)
+					if (dist < 40*40*scale*scale && rayTraceBlocks(px, py, pz, (float)lastFlameTarget.getX(), (float)lastFlameTarget.getY()+lastFlameTarget.getBbHeight(), (float)lastFlameTarget.getZ()) == null)
 					{
 						priority = getPriority(lastFlameTarget)-(float)Math.sqrt(dist)+10;
 					}
 				}
 			}
 			if (priority <= 0) lastFlameTarget = null;
-            for (Entity e : getWorld().getOtherEntities(this, new Box(px - 40 * scale, py - 40 * scale, pz - 40 * scale, px + 40 * scale, py + 40 * scale, pz + 40 * scale))) {
+            for (Entity e : level().getEntities(this, new AABB(px - 40 * scale, py - 40 * scale, pz - 40 * scale, px + 40 * scale, py + 40 * scale, pz + 40 * scale))) {
                 if (e.isAlive() &&
-                    !(e instanceof ThrownEntity
+                    !(e instanceof ThrowableProjectile
                         || e instanceof EntityInanimate
                         || e instanceof ItemEntity
-                        || e instanceof AnimalEntity
-                        || e instanceof VillagerEntity
-                        || e instanceof BatEntity
-                        || e instanceof SquidEntity
-                        || e instanceof BoatEntity
-                        || e instanceof MinecartEntity)) {
+                        || e instanceof Animal
+                        || e instanceof Villager
+                        || e instanceof Bat
+                        || e instanceof Squid
+                        || e instanceof Boat
+                        || e instanceof Minecart)) {
                     float dx = (float) e.getX() - px;
                     float dz = (float) e.getZ() - pz;
                     float dot = (-cyaw * dx + -syaw * dz);
@@ -1756,7 +1768,7 @@ public class EntityRhodes extends Entity {
                         float dist = dx * dx + dy * dy + dz * dz;
                         if (dist < 40 * 40 * scale * scale) {
                             float prio = getPriority(e) - (float) Math.sqrt(dist);
-                            if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getX(), (float) e.getY() + e.getHeight(), (float) e.getZ()) == null) {
+                            if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getX(), (float) e.getY() + e.getBbHeight(), (float) e.getZ()) == null) {
                                 lastFlameTarget = e;
                                 priority = prio;
                             }
@@ -1769,7 +1781,7 @@ public class EntityRhodes extends Entity {
 		if (lastFlameTarget != null && lastFlameTarget.isAlive())
 		{
 			float x = px - (float)lastFlameTarget.getX();
-			float y = py - (float)lastFlameTarget.getY() - (lastFlameTarget.getHeight()*0.5f);
+			float y = py - (float)lastFlameTarget.getY() - (lastFlameTarget.getBbHeight()*0.5f);
 			float z = pz - (float)lastFlameTarget.getZ();
 			float yaw = ((atan2(x, z)-bodyyaw+810)%360)-270;
 			float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
@@ -1794,9 +1806,9 @@ public class EntityRhodes extends Entity {
 				x*=cp;
 				y*=cp;
 				z*=cp;
-				getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
+				level().addFreshEntity(new EntityFlameBall(level(), px, py, pz,
 						x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
-				getWorld().spawnEntity(new EntityFlameBall(getWorld(), px, py, pz,
+				level().addFreshEntity(new EntityFlameBall(level(), px, py, pz,
 						x, y, z, (8+random.nextDouble()*8)*scale, 0.4f));
 			}
 		}
@@ -1817,7 +1829,7 @@ public class EntityRhodes extends Entity {
 						+(lastLaserTarget.getY()-13-getY())*(lastLaserTarget.getY()-13-getY())
 						+(lastLaserTarget.getZ()-getZ())*(lastLaserTarget.getZ()-getZ()));
 				if (Math.abs(cyaw*(lastLaserTarget.getX()-getX())+syaw*(lastLaserTarget.getZ()-getZ()))<2&&tempdi<70*70
-						&&rayTraceBlocks((float)getX(), (float)getY() + 13, (float)getZ(), (float)lastLaserTarget.getX(), (float)lastLaserTarget.getY()+lastLaserTarget.getHeight()/2f, (float)lastLaserTarget.getZ()) == null)
+						&&rayTraceBlocks((float)getX(), (float)getY() + 13, (float)getZ(), (float)lastLaserTarget.getX(), (float)lastLaserTarget.getY()+lastLaserTarget.getBbHeight()/2f, (float)lastLaserTarget.getZ()) == null)
 				{
 					priority = getPriority(lastLaserTarget)-(float)Math.sqrt(tempdi);
 					if (priority > 0) priority += 10;
@@ -1825,17 +1837,17 @@ public class EntityRhodes extends Entity {
 			}
 			if (priority <= 0) lastLaserTarget = null;
 
-            for (Entity e : getWorld().getOtherEntities(this, new Box(getX() - 70 * scale, getY() + 13 * scale - 70 * scale, getZ() - 70 * scale, getX() + 70 * scale, getY() + 13 * scale + 70 * scale, getZ() + 70 * scale))) {
+            for (Entity e : level().getEntities(this, new AABB(getX() - 70 * scale, getY() + 13 * scale - 70 * scale, getZ() - 70 * scale, getX() + 70 * scale, getY() + 13 * scale + 70 * scale, getZ() + 70 * scale))) {
                 if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) &&
-                        !(e instanceof ThrownEntity
+                        !(e instanceof ThrowableProjectile
                                 || e instanceof EntityInanimate
                                 || e instanceof ItemEntity
-                                || e instanceof AnimalEntity
-                                || e instanceof VillagerEntity
-                                || e instanceof BatEntity
-                                || e instanceof SquidEntity
-                                || e instanceof BoatEntity
-                                || e instanceof MinecartEntity)) {
+                                || e instanceof Animal
+                                || e instanceof Villager
+                                || e instanceof Bat
+                                || e instanceof Squid
+                                || e instanceof Boat
+                                || e instanceof Minecart)) {
                     float x = (float) (e.getX() - getX());
                     float z = (float) (e.getZ() - getZ());
                     if (Math.abs(cyaw * x + syaw * z) < 2) {
@@ -1844,7 +1856,7 @@ public class EntityRhodes extends Entity {
                         if (dist < 70 * 70 * scale * scale) {
                             if (y * Math.abs(y) > -0.64f * dist) {
                                 float prio = getPriority(e) - (float) Math.sqrt(dist);
-                                if (prio > priority && rayTraceBlocks((float) getX(), (float) getY() + 13, (float) getZ(), (float) e.getX(), (float) e.getY() + e.getHeight() / 2f, (float) e.getZ()) == null) {
+                                if (prio > priority && rayTraceBlocks((float) getX(), (float) getY() + 13, (float) getZ(), (float) e.getX(), (float) e.getY() + e.getBbHeight() / 2f, (float) e.getZ()) == null) {
                                     lastLaserTarget = e;
                                     priority = prio;
                                 }
@@ -1875,91 +1887,87 @@ public class EntityRhodes extends Entity {
 			{
 				laserOn = (byte) (endangered?3:random.nextInt(2)+1);
 				RivalRebelsSoundPlayer.playSound(this, 22, 1, 30f, 0f);
-				if (lastLaserTarget instanceof PlayerEntity player)
-				{
-                    DefaultedList<ItemStack> armorSlots = player.getInventory().armor;
-					int i = getWorld().random.nextInt(4);
-					if (!armorSlots.get(i).isEmpty())
-					{
-						armorSlots.get(i).damage(24, player, player1 -> {});
+				if (lastLaserTarget instanceof Player player) {
+					EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
+					if (!player.getItemBySlot(slot).isEmpty()) {
+                        player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
 					}
-					lastLaserTarget.damage(RivalRebelsDamageSource.laserBurst(getWorld()), laserOn==3?16:8);
-					if (player.getHealth() < 3 && player.isAlive())
-					{
-						player.damage(RivalRebelsDamageSource.laserBurst(getWorld()), 2000000);
+					lastLaserTarget.hurt(RivalRebelsDamageSource.laserBurst(level()), laserOn==3?16:8);
+					if (player.getHealth() < 3 && player.isAlive()) {
+						player.hurt(RivalRebelsDamageSource.laserBurst(level()), 2000000);
 						player.deathTime = 0;
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 0, 0));
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 1, 0));
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 2, 0));
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 2, 0));
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 3, 0));
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 3, 0));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 0, 0));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 1, 0));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 2, 0));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 2, 0));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 3, 0));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 3, 0));
 					}
 				}
 				else
 				{
-					lastLaserTarget.damage(RivalRebelsDamageSource.laserBurst(getWorld()), laserOn==3?16:8);
+					lastLaserTarget.hurt(RivalRebelsDamageSource.laserBurst(level()), laserOn==3?16:8);
 					if (!lastLaserTarget.isAlive() || (lastLaserTarget instanceof LivingEntity && ((LivingEntity)lastLaserTarget).getHealth() < 3))
 					{
 						int legs;
 						int arms;
 						int mobs;
-                        getWorld().playSoundFromEntity(this, RRSounds.BLASTER_FIRE, getSoundCategory(), 1, 4);
-						if (lastLaserTarget instanceof ZombifiedPiglinEntity)
+                        level().playLocalSound(this, RRSounds.BLASTER_FIRE, getSoundSource(), 1, 4);
+						if (lastLaserTarget instanceof ZombifiedPiglin)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 2;
 						}
-						else if (lastLaserTarget instanceof ZombieEntity)
+						else if (lastLaserTarget instanceof Zombie)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 1;
 						}
-						else if (lastLaserTarget instanceof SkeletonEntity)
+						else if (lastLaserTarget instanceof Skeleton)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 3;
 						}
-						else if (lastLaserTarget instanceof EndermanEntity)
+						else if (lastLaserTarget instanceof EnderMan)
 						{
 							legs = 2;
 							arms = 2;
 							mobs = 4;
 						}
-						else if (lastLaserTarget instanceof CreeperEntity)
+						else if (lastLaserTarget instanceof Creeper)
 						{
 							legs = 4;
 							arms = 0;
 							mobs = 5;
 						}
-						else if (lastLaserTarget instanceof MagmaCubeEntity)
+						else if (lastLaserTarget instanceof MagmaCube)
 						{
 							legs = 0;
 							arms = 0;
 							mobs = 7;
 						}
-						else if (lastLaserTarget instanceof SlimeEntity)
+						else if (lastLaserTarget instanceof Slime)
 						{
 							legs = 0;
 							arms = 0;
 							mobs = 6;
 						}
-						else if (lastLaserTarget instanceof CaveSpiderEntity)
+						else if (lastLaserTarget instanceof CaveSpider)
 						{
 							legs = 8;
 							arms = 0;
 							mobs = 9;
 						}
-						else if (lastLaserTarget instanceof SpiderEntity)
+						else if (lastLaserTarget instanceof Spider)
 						{
 							legs = 8;
 							arms = 0;
 							mobs = 8;
 						}
-						else if (lastLaserTarget instanceof GhastEntity)
+						else if (lastLaserTarget instanceof Ghast)
 						{
 							legs = 9;
 							arms = 0;
@@ -1973,16 +1981,16 @@ public class EntityRhodes extends Entity {
 						}
 						else
 						{
-							legs = (int) (lastLaserTarget.getBoundingBox().getAverageSideLength() * 2);
-							arms = (int) (lastLaserTarget.getBoundingBox().getAverageSideLength() * 2);
+							legs = (int) (lastLaserTarget.getBoundingBox().getSize() * 2);
+							arms = (int) (lastLaserTarget.getBoundingBox().getSize() * 2);
 							mobs = 11;
 						}
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 0, mobs));
-						getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 1, mobs));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 0, mobs));
+						level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 1, mobs));
 						for (int i = 0; i < arms; i++)
-							getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 2, mobs));
+							level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 2, mobs));
 						for (int i = 0; i < legs; i++)
-							getWorld().spawnEntity(new EntityGore(getWorld(), lastLaserTarget, 3, mobs));
+							level().addFreshEntity(new EntityGore(level(), lastLaserTarget, 3, mobs));
 						lastLaserTarget.kill();
 					}
 				}
@@ -1993,14 +2001,14 @@ public class EntityRhodes extends Entity {
 	//lower is less prior
 	private float getPriority(Entity e)
 	{
-		if (e instanceof PlayerEntity) return  ((PlayerEntity) e).getAbilities().invulnerable?-100:600;
+		if (e instanceof Player) return  ((Player) e).getAbilities().invulnerable?-100:600;
 		if (e instanceof LivingEntity) return ((LivingEntity)e).getMaxHealth()+100;
 		if ((e instanceof EntityRhodes && (RivalRebels.rhodesFF && (RivalRebels.rhodesCC || ((EntityRhodes)e).colorType != colorType))) || e instanceof EntityB2Spirit) return 800;
-		if (e.getBoundingBox().getAverageSideLength() > 3) return (float) (e.getBoundingBox().getAverageSideLength()*3 + 500 + e.getHeight());
+		if (e.getBoundingBox().getSize() > 3) return (float) (e.getBoundingBox().getSize()*3 + 500 + e.getBbHeight());
 		return 0;
 	}
 
-	private Vec3d rayTraceBlocks(float sx, float sy, float sz, float ex, float ey, float ez)
+	private Vec3 rayTraceBlocks(float sx, float sy, float sz, float ex, float ey, float ez)
 	{
 		int X = (int) sx;
 		int Y = (int) sy;
@@ -2023,9 +2031,9 @@ public class EntityRhodes extends Entity {
 		float tMaxZ = ((1+Z)-sz)*tDeltaZ;
 		while((X-x)*(X-x)+(Y-y)*(Y-y)+(Z-z)*(Z-z) < distsq)
 		{
-			if (getWorld().getBlockState(new BlockPos(X, Y, Z)).isOpaque())
+			if (level().getBlockState(new BlockPos(X, Y, Z)).canOcclude())
 			{
-				return new Vec3d(X, Y, Z);
+				return new Vec3(X, Y, Z);
 			}
 			if(tMaxX < tMaxY)
 			{
@@ -2112,13 +2120,13 @@ public class EntityRhodes extends Entity {
 		return lastrightshinpitch + (rightshinpitch - lastrightshinpitch) * f;
 	}
 
-	public Text getName()
+	public Component getName()
 	{
-        return Text.of(names[colorType]);
+        return Component.nullToEmpty(names[colorType]);
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt)
+	public void addAdditionalSaveData(CompoundTag nbt)
 	{
 		nbt.putFloat("bodyyaw", bodyyaw);
 		nbt.putFloat("headyaw", headyaw);
@@ -2149,7 +2157,7 @@ public class EntityRhodes extends Entity {
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt)
+	public void readAdditionalSaveData(CompoundTag nbt)
 	{
 		bodyyaw = nbt.getFloat("bodyyaw");
 		headyaw = nbt.getFloat("headyaw");
@@ -2180,10 +2188,10 @@ public class EntityRhodes extends Entity {
 	}
 
 	@Override
-	public boolean damage(DamageSource par1DamageSource, float par2)
+	public boolean hurt(DamageSource par1DamageSource, float par2)
 	{
-		super.damage(par1DamageSource, par2);
-		if (isAlive() && !getWorld().isClient && health > 0 && !forcefield)
+		super.hurt(par1DamageSource, par2);
+		if (isAlive() && !level().isClientSide && health > 0 && !forcefield)
 		{
 			if (par2 > 50)
 			{
@@ -2200,7 +2208,7 @@ public class EntityRhodes extends Entity {
 			if (health <= 0)
 			{
 				health = 0;
-                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
+                level().playLocalSound(this, RRSounds.ARTILLERY_EXPLODE, getSoundSource(), 30, 1);
 			}
 		}
 
@@ -2208,36 +2216,36 @@ public class EntityRhodes extends Entity {
 	}
 
     @Override
-    protected void initDataTracker() {
-        dataTracker.startTracking(FIRE, false);
-        dataTracker.startTracking(PLASMA, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        builder.define(FIRE, false);
+        builder.define(PLASMA, false);
     }
 
     public boolean isFire() {
-        return dataTracker.get(FIRE);
+        return entityData.get(FIRE);
     }
 
     public void setFire(boolean fire) {
-        dataTracker.set(FIRE, fire);
+        entityData.set(FIRE, fire);
     }
 
     public boolean isPlasma() {
-        return dataTracker.get(PLASMA);
+        return entityData.get(PLASMA);
     }
 
     public void setPlasma(boolean plasma) {
-        dataTracker.set(PLASMA, plasma);
+        entityData.set(PLASMA, plasma);
     }
 
     @Environment(EnvType.CLIENT)
     public int getBrightnessForRender()
     {
-        int i = MathHelper.floor(this.getX());
-        int j = MathHelper.floor(this.getZ());
+        int i = Mth.floor(this.getX());
+        int j = Mth.floor(this.getZ());
 
-        if (this.getWorld().isChunkLoaded(this.getBlockPos()))
+        if (this.level().hasChunkAt(this.blockPosition()))
         {
-            return this.getWorld().getLightLevel(LightType.BLOCK, new BlockPos(i, 255, j));
+            return this.level().getBrightness(LightLayer.BLOCK, new BlockPos(i, 255, j));
         }
         else
         {
@@ -2245,29 +2253,29 @@ public class EntityRhodes extends Entity {
         }
     }
 
-    public float getBrightnessAtEyes() {
-        int i = MathHelper.floor(this.getX());
-        int j = MathHelper.floor(this.getZ());
+    public float getLightLevelDependentMagicValue() {
+        int i = Mth.floor(this.getX());
+        int j = Mth.floor(this.getZ());
 
-        if (this.getWorld().isChunkLoaded(getBlockPos()))
+        if (this.level().hasChunkAt(blockPosition()))
         {
-            return this.getWorld().getBrightness(new BlockPos(i, 255, j));
+            return this.level().getLightLevelDependentMagicValue(new BlockPos(i, 255, j));
         } else {
             return 0.0F;
         }
     }
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
     private void setBlock(int x, int y, int z, Block block) {
-        getWorld().setBlockState(new BlockPos(x, y, z), block.getDefaultState());
+        level().setBlockAndUpdate(new BlockPos(x, y, z), block.defaultBlockState());
     }
 
     private Block getBlock(int x, int y, int z) {
-        return getWorld().getBlockState(new BlockPos(x, y, z)).getBlock();
+        return level().getBlockState(new BlockPos(x, y, z)).getBlock();
     }
 }

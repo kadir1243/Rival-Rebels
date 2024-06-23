@@ -12,49 +12,50 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityDebris;
-import net.minecraft.block.BlockRenderType;
-import net.minecraft.block.BlockState;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayers;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.BlockRenderManager;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.random.Random;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.ItemBlockRenderTypes;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class RenderDebris extends EntityRenderer<EntityDebris> {
 
-    private final BlockRenderManager blockRenderManager;
+    private final BlockRenderDispatcher blockRenderManager;
 
-    public RenderDebris(EntityRendererFactory.Context manager)
+    public RenderDebris(EntityRendererProvider.Context manager)
 	{
         super(manager);
         this.shadowRadius = 0.5F;
-        blockRenderManager = manager.getBlockRenderManager();
+        blockRenderManager = manager.getBlockRenderDispatcher();
     }
 
     @Override
-    public void render(EntityDebris entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(EntityDebris entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
 		if (!entity.isAlive()) return;
         BlockState state = entity.getState();
-        if (state == null || state.getRenderType() != BlockRenderType.MODEL) return; // Why ???
-        matrices.push();
+        if (state == null || state.getRenderShape() != RenderShape.MODEL) return; // Why ???
+        matrices.pushPose();
 
-        BlockPos blockpos = new BlockPos(MathHelper.floor(entity.getX()), MathHelper.floor(entity.getBoundingBox().maxY), MathHelper.floor(entity.getZ()));
+        BlockPos blockpos = new BlockPos(Mth.floor(entity.getX()), Mth.floor(entity.getBoundingBox().maxY), Mth.floor(entity.getZ()));
 
-        blockRenderManager.getModelRenderer().render(entity.getWorld(), blockRenderManager.getModel(state), state, blockpos, matrices, vertexConsumers.getBuffer(RenderLayers.getMovingBlockLayer(state)), false, Random.create(), state.getRenderingSeed(blockpos), OverlayTexture.DEFAULT_UV);
+        blockRenderManager.getModelRenderer().tesselateBlock(entity.level(), blockRenderManager.getBlockModel(state), state, blockpos, matrices, vertexConsumers.getBuffer(ItemBlockRenderTypes.getMovingBlockRenderType(state)), false, RandomSource.create(), state.getSeed(blockpos), OverlayTexture.NO_OVERLAY);
 
-        matrices.pop();
+        matrices.popPose();
     }
 
 	@Override
-	public Identifier getTexture(EntityDebris entity)
+	public ResourceLocation getTextureLocation(EntityDebris entity)
 	{
-		return SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE;
+		return InventoryMenu.BLOCK_ATLAS;
 	}
 }

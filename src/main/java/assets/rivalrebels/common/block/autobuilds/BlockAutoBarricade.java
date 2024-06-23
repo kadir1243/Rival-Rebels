@@ -14,24 +14,24 @@ package assets.rivalrebels.common.block.autobuilds;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.machine.BlockReciever;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoBarricade extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoBarricade> CODEC = createCodec(BlockAutoBarricade::new);
+    public static final MapCodec<BlockAutoBarricade> CODEC = simpleCodec(BlockAutoBarricade::new);
 
-    public BlockAutoBarricade(Settings settings)
+    public BlockAutoBarricade(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockAutoBarricade> getCodec() {
+    protected MapCodec<BlockAutoBarricade> codec() {
         return CODEC;
     }
 
     @Override
-	public void build(World par1World, int x, int y, int z)
+	public void build(Level par1World, int x, int y, int z)
 	{
 		super.build(par1World, x, y, z);
 
@@ -67,10 +67,10 @@ public class BlockAutoBarricade extends BlockAutoTemplate {
 		placeBlockCarefully(par1World, x + 1, y + 3, z, RRBlocks.steel);
 		placeBlockCarefully(par1World, x, y + 3, z - 1, RRBlocks.steel);
 		placeBlockCarefully(par1World, x - 1, y + 3, z, RRBlocks.steel);
-		placeBlockCarefully(par1World, x, y + 3, z - 2, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 2));
-		placeBlockCarefully(par1World, x, y + 3, z + 2, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 3));
-		placeBlockCarefully(par1World, x - 2, y + 3, z, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 4));
-		placeBlockCarefully(par1World, x + 2, y + 3, z, RRBlocks.ffreciever.getDefaultState().with(BlockReciever.META, 5));
+		placeBlockCarefully(par1World, x, y + 3, z - 2, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 2));
+		placeBlockCarefully(par1World, x, y + 3, z + 2, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 3));
+		placeBlockCarefully(par1World, x - 2, y + 3, z, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 4));
+		placeBlockCarefully(par1World, x + 2, y + 3, z, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 5));
 
 		// int h = 1;
 		// int s = 1;

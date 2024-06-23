@@ -19,92 +19,94 @@ import assets.rivalrebels.common.entity.EntityFlameBall1;
 import assets.rivalrebels.common.entity.EntityFlameBall2;
 import assets.rivalrebels.common.entity.EntityFlameBallGreen;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.item.components.FlameThrowerMode;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
-public class ItemFlameThrower extends ToolItem {
+public class ItemFlameThrower extends TieredItem {
 	public ItemFlameThrower() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
+		super(Tiers.DIAMOND, new Properties().stacksTo(1).component(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT));
 	}
 
     @Override
-    public UseAction getUseAction(ItemStack stack) {
-		return UseAction.BOW;
+    public UseAnim getUseAnimation(ItemStack stack) {
+		return UseAnim.BOW;
 	}
 
     @Override
-    public int getMaxUseTime(ItemStack stack) {
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 64;
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack stack = user.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        ItemStack stack = user.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(user, RRItems.fuel);
-        if (user.getAbilities().creativeMode || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
+        if (user.getAbilities().instabuild || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
 		{
-			user.setCurrentHand(hand);
+			user.startUsingItem(hand);
 			if (!user.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
 			{
-				itemStack.decrement(1);
-				if (getMode(stack) != 2) itemStack.decrement(1);
-				if (getMode(stack) != 2) itemStack.decrement(1);
-				if (getMode(stack) == 0) itemStack.decrement(1);
-				if (getMode(stack) == 0) itemStack.decrement(1);
+				itemStack.shrink(1);
+				if (getMode(stack) != 2) itemStack.shrink(1);
+				if (getMode(stack) != 2) itemStack.shrink(1);
+				if (getMode(stack) == 0) itemStack.shrink(1);
+				if (getMode(stack) == 0) itemStack.shrink(1);
                 if (itemStack.isEmpty())
-                    user.getInventory().removeOne(itemStack);
+                    user.getInventory().removeItem(itemStack);
 			}
-			if (stack.hasEnchantments() && !world.isClient)
+			if (stack.isEnchanted() && !world.isClientSide)
 			{
-				world.spawnEntity(new EntityFlameBallGreen(world, user, world.random.nextFloat() + 1.0f));
+				world.addFreshEntity(new EntityFlameBallGreen(world, user, world.random.nextFloat() + 1.0f));
 			}
 		}
-		else if (!world.isClient)
+		else if (!world.isClientSide)
 		{
-			user.sendMessage(Text.of("§cOut of fuel"), false);
+			user.displayClientMessage(Component.nullToEmpty("§cOut of fuel"), false);
 		}
-		if (message && world.isClient)
+		if (message && world.isClientSide)
 		{
-			user.sendMessage(Text.of(I18n.translate("RivalRebels.Orders")+" "+I18n.translate("RivalRebels.message.use")+" [R]."), false);
+			user.displayClientMessage(Component.nullToEmpty(I18n.get("RivalRebels.Orders")+" "+I18n.get("RivalRebels.message.use")+" [R]."), false);
 			message = false;
 		}
-		return TypedActionResult.pass(stack);
+		return InteractionResultHolder.pass(stack);
 	}
 	boolean message = true;
 
     @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-		if (!world.isClient) {
-            if (world.random.nextInt(10) == 0 && !user.isInsideWaterOrBubbleColumn()) {
+    public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+		if (!world.isClientSide) {
+            if (world.random.nextInt(10) == 0 && !user.isInWaterOrBubble()) {
                 RivalRebelsSoundPlayer.playSound(user, 8, 0, 0.03f);
-                if (world.random.nextInt(3) == 0 && !user.isInsideWaterOrBubbleColumn()) {
+                if (world.random.nextInt(3) == 0 && !user.isInWaterOrBubble()) {
                     RivalRebelsSoundPlayer.playSound(user, 8, 1, 0.1f);
                 }
             }
-            if (!stack.hasEnchantments()) {
+            if (!stack.isEnchanted()) {
                 switch (getMode(stack)) {
                     case 0:
                         for (int i = 0; i < 4; i++)
-                            world.spawnEntity(new EntityFlameBall2(world, user, world.random.nextFloat() + 0.5f));
+                            world.addFreshEntity(new EntityFlameBall2(world, user, world.random.nextFloat() + 0.5f));
                         break;
                     case 1:
-                        world.spawnEntity(new EntityFlameBall1(world, user, 1));
+                        world.addFreshEntity(new EntityFlameBall1(world, user, 1));
                         break;
                     case 2:
-                        world.spawnEntity(new EntityFlameBall(world, user, 1));
+                        world.addFreshEntity(new EntityFlameBall(world, user, 1));
                         break;
                 }
             }
@@ -112,30 +114,28 @@ public class ItemFlameThrower extends ToolItem {
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-		if (!stack.getOrCreateNbt().getBoolean("isReady"))
-		{
-			stack.getNbt().putBoolean("isReady", true);
-			stack.getNbt().putInt("mode", 2);
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+		if (!stack.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).isReady()) {
+			stack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(2, true));
 		}
-		if (entity instanceof PlayerEntity) {
-            if (selected && world.random.nextInt(10) == 0 && !entity.isInsideWaterOrBubbleColumn()) {
+		if (entity instanceof Player) {
+            if (selected && world.random.nextInt(10) == 0 && !entity.isInWaterOrBubble()) {
                 RivalRebelsSoundPlayer.playSound(entity, 8, 0, 0.03f);
             }
         }
-        if (world.isClient) {
+        if (world.isClientSide) {
             openGui(stack);
         }
 	}
 
 	public void openGui(ItemStack item) {
-		if (ClientProxy.USE_KEY.isPressed() && MinecraftClient.getInstance().currentScreen == null)
+		if (ClientProxy.USE_KEY.isDown() && Minecraft.getInstance().screen == null)
 		{
 			RivalRebels.proxy.flamethrowerGui(getMode(item));
 		}
 	}
 
 	public int getMode(ItemStack item) {
-        return item.getOrCreateNbt().getInt("mode");
+        return item.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).mode();
 	}
 }

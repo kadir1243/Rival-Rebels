@@ -19,27 +19,26 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityDebris;
 import assets.rivalrebels.common.entity.EntityFlameBall;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class Explosion
 {
-	public Explosion(World world, double x, double y, double z, int strength, boolean fire, boolean crater, DamageSource dmgsrc)
+	public Explosion(Level world, double x, double y, double z, int strength, boolean fire, boolean crater, DamageSource dmgsrc)
 	{
 		world.addParticle(ParticleTypes.EXPLOSION, x, y, z, 0, 0, 0);
-		if (!world.isClient)
+		if (!world.isClientSide)
 		{
 			if (fire)
 			{
@@ -53,7 +52,7 @@ public class Explosion
 		}
 	}
 
-	private void fireSpread(World world, double x, double y, double z, int radius)
+	private void fireSpread(Level world, double x, double y, double z, int radius)
 	{
         int halfradius = radius / 2;
 		int tworadius = radius * 2;
@@ -67,7 +66,7 @@ public class Explosion
 					int yy = (int) y + Y;
 					int zz = (int) z + Z;
                     BlockPos pos = new BlockPos(xx, yy, zz);
-					if (world.isAir(pos))
+					if (world.isEmptyBlock(pos))
 					{
 						int dist = (int) Math.sqrt(X * X + Y * Y + Z * Z);
 						if (dist < radius)
@@ -75,13 +74,13 @@ public class Explosion
 							int varrand = 1 + dist - halfradius;
 							if (dist < halfradius)
 							{
-								world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+								world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 							}
 							else if (varrand > 0)
 							{
 								if (world.random.nextInt(varrand) == 0 || world.random.nextInt(varrand / 2 + 1) == 0)
 								{
-									world.setBlockState(pos, Blocks.FIRE.getDefaultState());
+									world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 								}
 							}
 						}
@@ -91,7 +90,7 @@ public class Explosion
 		}
 	}
 
-	private void createHole(World world, double x, double y, double z, int radius, boolean crater, int delete)
+	private void createHole(Level world, double x, double y, double z, int radius, boolean crater, int delete)
 	{
         int halfradius = radius >> 2;
 		int tworadius = radius << 2;
@@ -111,7 +110,7 @@ public class Explosion
 						int dist = X * X + Y * Y + Z * Z;
 						if (dist <= delete && block == RRBlocks.camo1 && block == RRBlocks.camo2 && block == RRBlocks.camo3)
 						{
-                            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						}
 						else if (dist < radius)
 						{
@@ -141,24 +140,24 @@ public class Explosion
 		}
 	}
 
-	private void breakBlock(World world, int xx, int yy, int zz, int strength, double x, double y, double z)
+	private void breakBlock(Level world, int xx, int yy, int zz, int strength, double x, double y, double z)
 	{
         BlockPos pos = new BlockPos(xx, yy, zz);
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
 		if (block == RRBlocks.remotecharge)
 		{
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			RivalRebelsSoundPlayer.playSound(world, 22, 0, xx, yy, zz, 0.5f, 0.3f);
 			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge(world));
 			return;
 		}
 		if (block == RRBlocks.toxicgas || block == Blocks.CHEST || block == Blocks.VINE || block == Blocks.TALL_GRASS || block == RRBlocks.flare || block == RRBlocks.light || block == RRBlocks.light2 || block == RRBlocks.reactive || block == RRBlocks.timedbomb)
 		{
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			return;
 		}
-		if (state.isIn(BlockTags.WOODEN_STAIRS)) world.setBlockState(pos, Blocks.AIR.getDefaultState());
+		if (state.is(BlockTags.WOODEN_STAIRS)) world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		if (block == RRBlocks.camo1 || block == RRBlocks.camo2 || block == RRBlocks.camo3 || block == RRBlocks.conduit)
 		{
 			if (world.random.nextInt(20) != 0) return;
@@ -172,26 +171,26 @@ public class Explosion
 		double xmo = x - xx;
 		double ymo = y - yy;
 		double zmo = z - zz;
-		e.addVelocity(xmo * 0.2f, ymo * 0.2f, zmo * 0.2f);
-		world.spawnEntity(e);
+		e.push(xmo * 0.2f, ymo * 0.2f, zmo * 0.2f);
+		world.addFreshEntity(e);
 	}
 
-	private void pushAndHurtEntities(World world, double x, double y, double z, int radius, DamageSource dmgsrc)
+	private void pushAndHurtEntities(Level world, double x, double y, double z, int radius, DamageSource dmgsrc)
 	{
-		int var3 = MathHelper.floor(x - radius - 1.0D);
-		int var4 = MathHelper.floor(x + radius + 1.0D);
-		int var5 = MathHelper.floor(y - radius - 1.0D);
-		int var28 = MathHelper.floor(y + radius + 1.0D);
-		int var7 = MathHelper.floor(z - radius - 1.0D);
-		int var29 = MathHelper.floor(z + radius + 1.0D);
-		List<Entity> var9 = world.getOtherEntities(null, new Box(var3, var5, var7, var4, var28, var29));
-		Vec3d var30 = new Vec3d(x, y, z);
+		int var3 = Mth.floor(x - radius - 1.0D);
+		int var4 = Mth.floor(x + radius + 1.0D);
+		int var5 = Mth.floor(y - radius - 1.0D);
+		int var28 = Mth.floor(y + radius + 1.0D);
+		int var7 = Mth.floor(z - radius - 1.0D);
+		int var29 = Mth.floor(z + radius + 1.0D);
+		List<Entity> var9 = world.getEntities(null, new AABB(var3, var5, var7, var4, var28, var29));
+		Vec3 var30 = new Vec3(x, y, z);
 
 		radius *= 4;
 
         for (Entity entity : var9) {
             if (!(entity instanceof EntityDebris) && !(entity instanceof EntityFlameBall) && !(entity instanceof EntityRhodes)) {
-                double var13 = Math.sqrt(entity.squaredDistanceTo(x, y, z)) / radius;
+                double var13 = Math.sqrt(entity.distanceToSqr(x, y, z)) / radius;
 
                 if (var13 <= 1.0D) {
                     double var15 = entity.getX() - x;
@@ -203,10 +202,10 @@ public class Explosion
                         var15 /= var33;
                         var17 /= var33;
                         var19 /= var33;
-                        double var32 = net.minecraft.world.explosion.Explosion.getExposure(var30, entity);
+                        double var32 = net.minecraft.world.level.Explosion.getSeenPercent(var30, entity);
                         double var34 = (1.0D - var13) * var32;
-                        entity.damage(dmgsrc, (int) ((var34 * var34 + var34) / 2.0D * radius + 1.0D));
-                        entity.addVelocity(
+                        entity.hurt(dmgsrc, (int) ((var34 * var34 + var34) / 2.0D * radius + 1.0D));
+                        entity.push(
                             var15 * var34,
                             var17 * var34,
                             var19 * var34);

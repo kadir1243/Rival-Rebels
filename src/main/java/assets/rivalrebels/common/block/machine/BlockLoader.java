@@ -16,48 +16,48 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockLoader extends BlockWithEntity {
-    public static final MapCodec<BlockLoader> CODEC = createCodec(BlockLoader::new);
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
-    public BlockLoader(Settings settings) {
+public class BlockLoader extends BaseEntityBlock {
+    public static final MapCodec<BlockLoader> CODEC = simpleCodec(BlockLoader::new);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+    public BlockLoader(Properties settings) {
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockLoader> getCodec() {
+    protected MapCodec<BlockLoader> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        int l = MathHelper.floor((ctx.getPlayerYaw() * 4.0F / 360.0F) + 0.5D) & 3;
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        int l = Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3;
 
         int meta = 0;
         if (l == 0) {
@@ -69,11 +69,11 @@ public class BlockLoader extends BlockWithEntity {
         } else if (l == 3) {
             meta = 4;
         }
-        return super.getPlacementState(ctx).with(META, meta);
+        return super.getStateForPlacement(ctx).setValue(META, meta);
     }
 
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         TileEntityLoader var7 = null;
         try {
             var7 = (TileEntityLoader) world.getBlockEntity(pos);
@@ -84,12 +84,12 @@ public class BlockLoader extends BlockWithEntity {
         int x = pos.getX();
         int y = pos.getY();
         int z =pos.getZ();
-        world.spawnEntity(new ItemEntity(world, x, y, z, new ItemStack(RRBlocks.loader)));
+        world.addFreshEntity(new ItemEntity(world, x, y, z, new ItemStack(RRBlocks.loader)));
         if (var7 != null)
         {
-            for (int var8 = 0; var8 < var7.size(); ++var8)
+            for (int var8 = 0; var8 < var7.getContainerSize(); ++var8)
             {
-                ItemStack var9 = var7.getStack(var8);
+                ItemStack var9 = var7.getItem(var8);
 
                 if (!var9.isEmpty())
                 {
@@ -97,7 +97,7 @@ public class BlockLoader extends BlockWithEntity {
                     float var11 = world.random.nextFloat() * 0.8F + 0.1F;
                     ItemEntity var14;
 
-                    for (float var12 = world.random.nextFloat() * 0.8F + 0.1F; var9.getCount() > 0; world.spawnEntity(var14))
+                    for (float var12 = world.random.nextFloat() * 0.8F + 0.1F; var9.getCount() > 0; world.addFreshEntity(var14))
                     {
                         int var13 = world.random.nextInt(21) + 10;
 
@@ -106,41 +106,40 @@ public class BlockLoader extends BlockWithEntity {
                             var13 = var9.getCount();
                         }
 
-                        var9.decrement(var13);
+                        var9.shrink(var13);
                         ItemStack copy = var9.copyWithCount(var13);
                         var14 = new ItemEntity(world, (x + var10), (y + var11), (z + var12), copy);
                         float var15 = 0.05F;
-                        var14.setVelocity(((float) world.random.nextGaussian() * var15),
+                        var14.setDeltaMovement(((float) world.random.nextGaussian() * var15),
                             ((float) world.random.nextGaussian() * var15 + 0.2F),
                             ((float) world.random.nextGaussian() * var15));
                     }
                 }
             }
-            var7.markRemoved();
+            var7.setRemoved();
         }
-        super.onBreak(world, pos, state, player);
+        super.playerWillDestroy(world, pos, state, player);
         return state;
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (!world.isClient) {
-            player.openHandledScreen((NamedScreenHandlerFactory) world.getBlockEntity(pos));
-        }
-		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+        player.openMenu((MenuProvider) level.getBlockEntity(pos));
 
-		return ActionResult.success(world.isClient);
+		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
+
+		return InteractionResult.sidedSuccess(level.isClientSide);
 	}
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityLoader(pos, state);
 	}
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 }

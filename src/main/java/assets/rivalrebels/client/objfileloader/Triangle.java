@@ -11,10 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.util.math.Vec3d;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector4f;
 
 @Environment(EnvType.CLIENT)
@@ -26,13 +26,6 @@ public class Triangle
 	{
 		if (PA.length != 3) throw new IllegalArgumentException("Invalid Triangle! Specified Vec3d Array must have 3 Vec3s");
 		pa = PA;
-	}
-
-    @Deprecated
-	public void render(VertexConsumer buffer) {
-        for (Vertice vertice : pa) {
-            vertice.render(buffer);
-        }
 	}
 
     public void render(VertexConsumer buffer, int light, int overlay) {
@@ -52,7 +45,7 @@ public class Triangle
         }
 	}
 
-	public void scale(Vec3d v)
+	public void scale(Vec3 v)
 	{
         for (Vertice vertice : pa) {
             vertice.scale(v);

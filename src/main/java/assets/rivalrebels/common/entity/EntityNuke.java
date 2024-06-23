@@ -13,45 +13,50 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
-import net.minecraft.block.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.projectile.thrown.ThrownEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.SnowLayerBlock;
+import net.minecraft.world.level.block.SpongeBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import java.util.List;
 import java.util.Optional;
 
-public class EntityNuke extends ThrownEntity {
+public class EntityNuke extends ThrowableProjectile {
 	public int	ticksInAir	= 0;
 	public int aoc = 0;
 	public boolean troll = false;
 
-    public EntityNuke(EntityType<? extends EntityNuke> type, World world) {
+    public EntityNuke(EntityType<? extends EntityNuke> type, Level world) {
         super(type, world);
     }
 
-	public EntityNuke(World par1World) {
+	public EntityNuke(Level par1World) {
 		this(RREntities.NUKE, par1World);
 	}
 
-	public EntityNuke(World par1World, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
+	public EntityNuke(Level par1World, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
 	{
 		this(par1World);
-		refreshPositionAndAngles(x, y, z, yaw, pitch);
-		this.setYaw(prevYaw = yaw);
-		this.setPitch(prevPitch = pitch);
+		moveTo(x, y, z, yaw, pitch);
+		this.setYRot(yRotO = yaw);
+		this.setXRot(xRotO = pitch);
 		aoc = charges;
 		this.troll = troll;
 		if (!RivalRebels.nukedrop)
@@ -59,51 +64,51 @@ public class EntityNuke extends ThrownEntity {
 			explode();
 		}
 	}
-	public EntityNuke(World par1World, double x, double y,double z, double mx, double my, double mz)
+	public EntityNuke(Level par1World, double x, double y,double z, double mx, double my, double mz)
 	{
 		this(par1World);
-		setPosition(x,y,z);
+		setPos(x,y,z);
 		aoc = 1;
 		setAnglesMotion(mx, my, mz);
 	}
 
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
-        setVelocity(mx, my, mz);
-		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+        setDeltaMovement(mx, my, mz);
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
     @Override
-    protected void initDataTracker() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
 	@Override
 	public void tick() {
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
 			if (ticksInAir == - 100) explode();
 			++this.ticksInAir;
 
-			Vec3d var15 = getPos();
-			Vec3d var2 = getPos().add(getVelocity());
-			HitResult var3 = this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-			var15 = getPos();
-			var2 = getPos().add(getVelocity());
+			Vec3 var15 = position();
+			Vec3 var2 = position().add(getDeltaMovement());
+			HitResult var3 = this.level().clip(new ClipContext(var15, var2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+			var15 = position();
+			var2 = position().add(getDeltaMovement());
 
 			if (var3 != null)
 			{
-				var2 = var3.getPos();
+				var2 = var3.getLocation();
 			}
 			Entity var4 = null;
-			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.isCollidable()) {
+                if (var9.canBeCollidedWith()) {
                     float var10 = 0.3F;
-                    Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
-                    Optional<Vec3d> var12 = var11.raycast(var15, var2);
+                    AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
+                    Optional<Vec3> var12 = var11.clip(var15, var2);
 
                     if (var12.isPresent()) {
                         double var13 = var15.distanceTo(var12.get());
@@ -123,89 +128,89 @@ public class EntityNuke extends ThrownEntity {
 
 			if (var3 != null)
 			{
-				this.onCollision(var3);
+				this.onHit(var3);
 			}
 		}
 
-        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		if (getY() < 0) kill();
 
-		if (this.hasVehicle())
+		if (this.isPassenger())
 		{
-		float var16 = MathHelper.sqrt((float) (this.getVelocity().getX() * this.getVelocity().getX() + this.getVelocity().getZ() * this.getVelocity().getZ()));
-		this.setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
+		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
+		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
 
-		for (this.setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); this.getPitch() - this.prevPitch < -180.0F; this.prevPitch -= 360.0F)
+		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 		{
         }
 
-		while (this.getPitch() - this.prevPitch >= 180.0F)
+		while (this.getXRot() - this.xRotO >= 180.0F)
 		{
-			this.prevPitch += 360.0F;
+			this.xRotO += 360.0F;
 		}
 
-		while (this.getYaw() - this.prevYaw < -180.0F)
+		while (this.getYRot() - this.yRotO < -180.0F)
 		{
-			this.prevYaw -= 360.0F;
+			this.yRotO -= 360.0F;
 		}
 
-		while (this.getYaw() - this.prevYaw >= 180.0F)
+		while (this.getYRot() - this.yRotO >= 180.0F)
 		{
-			this.prevYaw += 360.0F;
+			this.yRotO += 360.0F;
 		}
 
-		this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.05F);
-		this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.05F);
+		this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.05F);
+		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.05F);
 		}
 		float var17 = 0.98f;
-		float var18 = this.getGravity();
+		float var18 = (float) this.getGravity();
 
-        setVelocity(getVelocity().multiply(var17));
-        setVelocity(getVelocity().subtract(0, var18, 0));
-		this.setPosition(this.getX(), this.getY(), this.getZ());
+        setDeltaMovement(getDeltaMovement().scale(var17));
+        setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
+		this.setPos(this.getX(), this.getY(), this.getZ());
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt) {
+	public void addAdditionalSaveData(CompoundTag nbt) {
 		nbt.putInt("charge", aoc);
 		nbt.putBoolean("troll", troll);
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt) {
+	public void readAdditionalSaveData(CompoundTag nbt) {
 		aoc = nbt.getInt("charge");
 		troll = nbt.getBoolean("troll");
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
     @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
-        BlockState state = getWorld().getBlockState(blockHitResult.getBlockPos());
+    protected void onHitBlock(BlockHitResult blockHitResult) {
+        BlockState state = level().getBlockState(blockHitResult.getBlockPos());
         Block b = state.getBlock();
-        MapColor color = state.getMapColor(getWorld(), blockHitResult.getBlockPos());
-        if (b == RRBlocks.jump || state.isIn(BlockTags.ICE)) {
-            setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
-        } else if (state.isIn(BlockTags.LEAVES) || color == MapColor.GREEN || color == MapColor.DIRT_BROWN || state.isIn(BlockTags.FLOWERS) || state.isIn(BlockTags.CROPS) || state.isOf(Blocks.CAKE) || state.getBlock().getBlastResistance() < 1 || state.isIn(BlockTags.WOOL) || state.isOf(Blocks.SNOW_BLOCK) || state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(BlockTags.SAND) || b instanceof SnowBlock || state.isBurnable() || state.isReplaceable() || state.getFluidState().isIn(FluidTags.WATER) || b instanceof SpongeBlock || state.isIn(BlockTags.ICE)) {
-            getWorld().setBlockState(blockHitResult.getBlockPos(), Blocks.AIR.getDefaultState());
+        MapColor color = state.getMapColor(level(), blockHitResult.getBlockPos());
+        if (b == RRBlocks.jump || state.is(BlockTags.ICE)) {
+            setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
+        } else if (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || b instanceof SnowLayerBlock || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || b instanceof SpongeBlock || state.is(BlockTags.ICE)) {
+            level().setBlockAndUpdate(blockHitResult.getBlockPos(), Blocks.AIR.defaultBlockState());
         }
     }
 
     @Override
-    protected void onCollision(HitResult hitResult) {
-        super.onCollision(hitResult);
+    protected void onHit(HitResult hitResult) {
+        super.onHit(hitResult);
 		explode();
 	}
 
     public void explode()
 	{
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
-			getWorld().spawnEntity(new EntityNuclearBlast(getWorld(), getX(), getY(), getZ(), aoc, troll));
+			level().addFreshEntity(new EntityNuclearBlast(level(), getX(), getY(), getZ(), aoc, troll));
 			this.kill();
 		}
 	}

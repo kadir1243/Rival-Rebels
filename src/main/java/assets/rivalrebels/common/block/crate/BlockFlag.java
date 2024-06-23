@@ -12,86 +12,90 @@
 package assets.rivalrebels.common.block.crate;
 
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.block.*;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.BlockMirror;
-import net.minecraft.util.BlockRotation;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.WorldAccess;
-import net.minecraft.world.WorldView;
-
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.PipeBlock;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.block.VineBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class BlockFlag extends Block {
-    public static final BooleanProperty UP = ConnectingBlock.UP;
-    public static final BooleanProperty NORTH = ConnectingBlock.NORTH;
-    public static final BooleanProperty EAST = ConnectingBlock.EAST;
-    public static final BooleanProperty SOUTH = ConnectingBlock.SOUTH;
-    public static final BooleanProperty WEST = ConnectingBlock.WEST;
-    private static final VoxelShape UP_SHAPE = Block.createCuboidShape(0.0, 15.0, 0.0, 16.0, 16.0, 16.0);
-    private static final VoxelShape EAST_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 1.0, 16.0, 16.0);
-    private static final VoxelShape WEST_SHAPE = Block.createCuboidShape(15.0, 0.0, 0.0, 16.0, 16.0, 16.0);
-    private static final VoxelShape SOUTH_SHAPE = Block.createCuboidShape(0.0, 0.0, 0.0, 16.0, 16.0, 1.0);
-    private static final VoxelShape NORTH_SHAPE = Block.createCuboidShape(0.0, 0.0, 15.0, 16.0, 16.0, 16.0);
+    public static final BooleanProperty UP = PipeBlock.UP;
+    public static final BooleanProperty NORTH = PipeBlock.NORTH;
+    public static final BooleanProperty EAST = PipeBlock.EAST;
+    public static final BooleanProperty SOUTH = PipeBlock.SOUTH;
+    public static final BooleanProperty WEST = PipeBlock.WEST;
+    private static final VoxelShape UP_SHAPE = Block.box(0.0, 15.0, 0.0, 16.0, 16.0, 16.0);
+    private static final VoxelShape EAST_SHAPE = Block.box(0.0, 0.0, 0.0, 1.0, 16.0, 16.0);
+    private static final VoxelShape WEST_SHAPE = Block.box(15.0, 0.0, 0.0, 16.0, 16.0, 16.0);
+    private static final VoxelShape SOUTH_SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 1.0);
+    private static final VoxelShape NORTH_SHAPE = Block.box(0.0, 0.0, 15.0, 16.0, 16.0, 16.0);
     private final Map<BlockState, VoxelShape> field_26659;
     String texpath = "rivalrebels:";
 
-    public BlockFlag(Settings settings, String name) {
+    public BlockFlag(Properties settings, String name) {
         super(settings);
         texpath += name;
-        this.setDefaultState(
-            this.stateManager
-                .getDefaultState()
-                .with(UP, false)
-                .with(NORTH, false)
-                .with(EAST, false)
-                .with(SOUTH, false)
-                .with(WEST, false)
+        this.registerDefaultState(
+            this.stateDefinition
+                .any()
+                .setValue(UP, false)
+                .setValue(NORTH, false)
+                .setValue(EAST, false)
+                .setValue(SOUTH, false)
+                .setValue(WEST, false)
         );
         this.field_26659 = ImmutableMap.copyOf(
-            this.stateManager
-                .getStates()
+            this.stateDefinition
+                .getPossibleStates()
                 .stream()
                 .collect(Collectors.toMap(Function.identity(), BlockFlag::method_31018))
         );
     }
 
     private static VoxelShape method_31018(BlockState arg) {
-        VoxelShape voxelshape = VoxelShapes.empty();
-        if (arg.get(UP)) {
+        VoxelShape voxelshape = Shapes.empty();
+        if (arg.getValue(UP)) {
             voxelshape = UP_SHAPE;
         }
 
-        if (arg.get(NORTH)) {
-            voxelshape = VoxelShapes.union(voxelshape, SOUTH_SHAPE);
+        if (arg.getValue(NORTH)) {
+            voxelshape = Shapes.or(voxelshape, SOUTH_SHAPE);
         }
 
-        if (arg.get(SOUTH)) {
-            voxelshape = VoxelShapes.union(voxelshape, NORTH_SHAPE);
+        if (arg.getValue(SOUTH)) {
+            voxelshape = Shapes.or(voxelshape, NORTH_SHAPE);
         }
 
-        if (arg.get(EAST)) {
-            voxelshape = VoxelShapes.union(voxelshape, WEST_SHAPE);
+        if (arg.getValue(EAST)) {
+            voxelshape = Shapes.or(voxelshape, WEST_SHAPE);
         }
 
-        if (arg.get(WEST)) {
-            voxelshape = VoxelShapes.union(voxelshape, EAST_SHAPE);
+        if (arg.getValue(WEST)) {
+            voxelshape = Shapes.or(voxelshape, EAST_SHAPE);
         }
 
         return voxelshape;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(UP, NORTH, EAST, SOUTH, WEST);
     }
 
@@ -171,7 +175,7 @@ public class BlockFlag extends Block {
     }*/
 
     @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
         return this.hasAdjacentBlocks(this.getPlacementShape(state, world, pos));
     }
 
@@ -179,48 +183,48 @@ public class BlockFlag extends Block {
         return p_150093_1_.isFullBlock();
     }*/
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         return this.field_26659.get(state);
     }
 
-    private boolean shouldHaveSide(BlockView world, BlockPos pos, Direction side) {
+    private boolean shouldHaveSide(BlockGetter world, BlockPos pos, Direction side) {
         if (side == Direction.DOWN) {
             return false;
         } else {
-            BlockPos blockpos = pos.offset(side);
-            if (VineBlock.shouldConnectTo(world, blockpos, side)) {
+            BlockPos blockpos = pos.relative(side);
+            if (VineBlock.isAcceptableNeighbour(world, blockpos, side)) {
                 return true;
             } else if (side.getAxis() == Direction.Axis.Y) {
                 return false;
             } else {
-                BooleanProperty booleanproperty = VineBlock.FACING_PROPERTIES.get(side);
-                BlockState blockstate = world.getBlockState(pos.up());
-                return blockstate.isOf(this) && blockstate.get(booleanproperty);
+                BooleanProperty booleanproperty = VineBlock.PROPERTY_BY_DIRECTION.get(side);
+                BlockState blockstate = world.getBlockState(pos.above());
+                return blockstate.is(this) && blockstate.getValue(booleanproperty);
             }
         }
     }
 
-    private BlockState getPlacementShape(BlockState state, BlockView world, BlockPos pos) {
-        BlockPos blockpos = pos.up();
-        if (state.get(UP)) {
-            state = state.with(UP, VineBlock.shouldConnectTo(world, blockpos, Direction.DOWN));
+    private BlockState getPlacementShape(BlockState state, BlockGetter world, BlockPos pos) {
+        BlockPos blockpos = pos.above();
+        if (state.getValue(UP)) {
+            state = state.setValue(UP, VineBlock.isAcceptableNeighbour(world, blockpos, Direction.DOWN));
         }
 
         BlockState blockstate = null;
 
-        for (Direction direction : Direction.Type.HORIZONTAL) {
-            BooleanProperty booleanproperty = VineBlock.getFacingProperty(direction);
-            if (state.get(booleanproperty)) {
+        for (Direction direction : Direction.Plane.HORIZONTAL) {
+            BooleanProperty booleanproperty = VineBlock.getPropertyForFace(direction);
+            if (state.getValue(booleanproperty)) {
                 boolean flag = this.shouldHaveSide(world, pos, direction);
                 if (!flag) {
                     if (blockstate == null) {
                         blockstate = world.getBlockState(blockpos);
                     }
 
-                    flag = blockstate.isOf(this) && blockstate.get(booleanproperty);
+                    flag = blockstate.is(this) && blockstate.getValue(booleanproperty);
                 }
 
-                state = state.with(booleanproperty, flag);
+                state = state.setValue(booleanproperty, flag);
             }
         }
 
@@ -228,14 +232,14 @@ public class BlockFlag extends Block {
     }
 
     @Override
-    public BlockState getStateForNeighborUpdate(
-        BlockState state, Direction direction, BlockState neighborState, WorldAccess world, BlockPos pos, BlockPos neighborPos
+    public BlockState updateShape(
+        BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos
     ) {
         if (direction == Direction.DOWN) {
-            return super.getStateForNeighborUpdate(state, direction, neighborState, world, pos, neighborPos);
+            return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
         } else {
             BlockState blockstate = this.getPlacementShape(state, world, pos);
-            return !this.hasAdjacentBlocks(blockstate) ? Blocks.AIR.getDefaultState() : blockstate;
+            return !this.hasAdjacentBlocks(blockstate) ? Blocks.AIR.defaultBlockState() : blockstate;
         }
     }
 
@@ -246,8 +250,8 @@ public class BlockFlag extends Block {
     private int getAdjacentBlockCount(BlockState state) {
         int i = 0;
 
-        for (BooleanProperty booleanproperty : VineBlock.FACING_PROPERTIES.values()) {
-            if (state.get(booleanproperty)) {
+        for (BooleanProperty booleanproperty : VineBlock.PROPERTY_BY_DIRECTION.values()) {
+            if (state.getValue(booleanproperty)) {
                 ++i;
             }
         }
@@ -257,17 +261,17 @@ public class BlockFlag extends Block {
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        BlockState blockstate = ctx.getWorld().getBlockState(ctx.getBlockPos());
-        boolean flag = blockstate.isOf(this);
-        BlockState blockstate1 = flag ? blockstate : this.getDefaultState();
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        BlockState blockstate = ctx.getLevel().getBlockState(ctx.getClickedPos());
+        boolean flag = blockstate.is(this);
+        BlockState blockstate1 = flag ? blockstate : this.defaultBlockState();
 
-        for(Direction direction : ctx.getPlacementDirections()) {
+        for(Direction direction : ctx.getNearestLookingDirections()) {
             if (direction != Direction.DOWN) {
-                BooleanProperty booleanproperty = VineBlock.getFacingProperty(direction);
-                boolean flag1 = flag && blockstate.get(booleanproperty);
-                if (!flag1 && this.shouldHaveSide(ctx.getWorld(), ctx.getBlockPos(), direction)) {
-                    return blockstate1.with(booleanproperty, true);
+                BooleanProperty booleanproperty = VineBlock.getPropertyForFace(direction);
+                boolean flag1 = flag && blockstate.getValue(booleanproperty);
+                if (!flag1 && this.shouldHaveSide(ctx.getLevel(), ctx.getClickedPos(), direction)) {
+                    return blockstate1.setValue(booleanproperty, true);
                 }
             }
         }
@@ -291,26 +295,26 @@ public class BlockFlag extends Block {
 	}*/
 
     @Override
-    public BlockState rotate(BlockState state, BlockRotation rotation) {
+    public BlockState rotate(BlockState state, Rotation rotation) {
         switch (rotation) {
             case CLOCKWISE_180:
-                return state.with(NORTH, state.get(SOUTH)).with(EAST, state.get(WEST)).with(SOUTH, state.get(NORTH)).with(WEST, state.get(EAST));
+                return state.setValue(NORTH, state.getValue(SOUTH)).setValue(EAST, state.getValue(WEST)).setValue(SOUTH, state.getValue(NORTH)).setValue(WEST, state.getValue(EAST));
             case COUNTERCLOCKWISE_90:
-                return state.with(NORTH, state.get(EAST)).with(EAST, state.get(SOUTH)).with(SOUTH, state.get(WEST)).with(WEST, state.get(NORTH));
+                return state.setValue(NORTH, state.getValue(EAST)).setValue(EAST, state.getValue(SOUTH)).setValue(SOUTH, state.getValue(WEST)).setValue(WEST, state.getValue(NORTH));
             case CLOCKWISE_90:
-                return state.with(NORTH, state.get(WEST)).with(EAST, state.get(NORTH)).with(SOUTH, state.get(EAST)).with(WEST, state.get(SOUTH));
+                return state.setValue(NORTH, state.getValue(WEST)).setValue(EAST, state.getValue(NORTH)).setValue(SOUTH, state.getValue(EAST)).setValue(WEST, state.getValue(SOUTH));
             default:
                 return state;
         }
     }
 
     @Override
-    public BlockState mirror(BlockState state, BlockMirror mirror) {
+    public BlockState mirror(BlockState state, Mirror mirror) {
         switch (mirror) {
             case LEFT_RIGHT:
-                return state.with(NORTH, state.get(SOUTH)).with(SOUTH, state.get(NORTH));
+                return state.setValue(NORTH, state.getValue(SOUTH)).setValue(SOUTH, state.getValue(NORTH));
             case FRONT_BACK:
-                return state.with(EAST, state.get(WEST)).with(WEST, state.get(EAST));
+                return state.setValue(EAST, state.getValue(WEST)).setValue(WEST, state.getValue(EAST));
             default:
                 return super.mirror(state, mirror);
         }

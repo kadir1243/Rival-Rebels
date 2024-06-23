@@ -13,23 +13,23 @@ package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoEaster extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoEaster> CODEC = createCodec(BlockAutoEaster::new);
+    public static final MapCodec<BlockAutoEaster> CODEC = simpleCodec(BlockAutoEaster::new);
 
-    public BlockAutoEaster(Settings settings) {
+    public BlockAutoEaster(Properties settings) {
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockAutoEaster> getCodec() {
+    protected MapCodec<BlockAutoEaster> codec() {
         return CODEC;
     }
 
     @Override
-	public void build(World par1World, int x, int y, int z)
+	public void build(Level par1World, int x, int y, int z)
 	{
 		super.build(par1World, x, y, z);
 		int h = 0;

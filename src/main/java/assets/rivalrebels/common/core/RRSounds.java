@@ -12,13 +12,12 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 
 public class RRSounds {
     public static final Map<String, SoundEvent> SOUNDS = new HashMap<>();
@@ -223,8 +222,8 @@ public class RRSounds {
 	}
 
     private static SoundEvent register(String sound) {
-        Identifier identifier = RRIdentifiers.create("sounds/" + sound);
-        SoundEvent soundEvent = SoundEvent.of(identifier);
-        return Registry.register(Registries.SOUND_EVENT, identifier, soundEvent);
+        ResourceLocation identifier = RRIdentifiers.create("sounds/" + sound);
+        SoundEvent soundEvent = SoundEvent.createVariableRangeEvent(identifier);
+        return Registry.register(BuiltInRegistries.SOUND_EVENT, identifier, soundEvent);
     }
 }

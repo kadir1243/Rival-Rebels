@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.round;
 
 import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.EntityRhodes;
@@ -20,42 +21,50 @@ import assets.rivalrebels.common.packet.GuiSpawnPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.event.v1.ServerPlayerEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerTickEvents;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.*;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.scoreboard.*;
-import net.minecraft.scoreboard.number.StyledNumberFormat;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.GameRules;
-import net.minecraft.world.PersistentState;
-import net.minecraft.world.World;
-import net.minecraft.world.chunk.Chunk;
-
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.numbers.StyledFormat;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.saveddata.SavedData;
+import net.minecraft.world.scores.DisplaySlot;
+import net.minecraft.world.scores.Objective;
+import net.minecraft.world.scores.PlayerTeam;
+import net.minecraft.world.scores.ScoreAccess;
+import net.minecraft.world.scores.Scoreboard;
+import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import java.util.ArrayList;
 import java.util.List;
 
-public class RivalRebelsRound extends PersistentState implements FabricPacket {
-    private static final PersistentState.Type<RivalRebelsRound> WORLD_DATA_TYPE = new PersistentState.Type<>(RivalRebelsRound::new, RivalRebelsRound::fromNbt, null);
-    public static final PacketType<RivalRebelsRound> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "rivalrebelsrounddata"), RivalRebelsRound::fromBytes);
+public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
+    private static final SavedData.Factory<RivalRebelsRound> WORLD_DATA_TYPE = new SavedData.Factory<>(RivalRebelsRound::new, RivalRebelsRound::fromNbt, null);
+    public static final StreamCodec<FriendlyByteBuf, RivalRebelsRound> STREAM_CODEC = StreamCodec.ofMember(RivalRebelsRound::toBytes, RivalRebelsRound::fromBytes);
+    public static final Type<RivalRebelsRound> PACKET_TYPE = new Type<>(RRIdentifiers.create("rivalrebelsrounddata"));
     private int						cSpawnx			= -1, cSpawnz = -1;
     public BlockPos omegaObjPos = new BlockPos(-1, -1, -1);
     public BlockPos sigmaObjPos = new BlockPos(-1, -1, -1);
 	private String					MotD			= "Select your class and nuke the enemy team's objective to win.";
 	public RivalRebelsPlayerList	rrplayerlist	= new RivalRebelsPlayerList();
-	public World					world;
+	public Level					world;
 	private int						winCountdown	= 0;
 	private int						omegaWins		= 0;
 	private int						sigmaWins		= 0;
@@ -83,7 +92,7 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 		this.objDist = objDist;
 	}
 
-	public static RivalRebelsRound fromBytes(PacketByteBuf buf) {
+	public static RivalRebelsRound fromBytes(FriendlyByteBuf buf) {
         RivalRebelsRound packet = new RivalRebelsRound();
         packet.roundstarted = buf.readBoolean();
         packet.cSpawnx = buf.readInt();
@@ -95,7 +104,7 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
         packet.sigmaWins = buf.readInt();
         packet.lastwinomega = buf.readBoolean();
         packet.fatnuke = buf.readBoolean();
-        packet.MotD = buf.readString();
+        packet.MotD = buf.readUtf();
         packet.rrplayerlist = RivalRebelsPlayerList.fromBytes(buf);
         return packet;
     }
@@ -117,32 +126,32 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             if (!roundstarted) return;
-            newPlayer.setPos(cSpawnx, 200, cSpawnz);
-            ServerPlayNetworking.send(newPlayer, new GuiSpawnPacket());
+            newPlayer.setPosRaw(cSpawnx, 200, cSpawnz);
+            ServerPlayNetworking.send(newPlayer, GuiSpawnPacket.INSTANCE);
         });
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
-            ServerPlayerEntity player = handler.getPlayer();
+            ServerPlayer player = handler.getPlayer();
             if (!roundstarted) return;
             if (!rrplayerlist.contains(player.getGameProfile()))
             {
-                player.getInventory().clear();
-                player.setPos(cSpawnx, 200, cSpawnz);
+                player.getInventory().clearContent();
+                player.setPosRaw(cSpawnx, 200, cSpawnz);
                 //rrplayerlist.add(new RivalRebelsPlayer(player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RivalRebels.resetMax));
             }
             ServerPlayNetworking.send(player, rrplayerlist);
-            if (isInSpawn(player)) ServerPlayNetworking.send(player, new GuiSpawnPacket());
+            if (isInSpawn(player)) ServerPlayNetworking.send(player, GuiSpawnPacket.INSTANCE);
         });
         ServerWorldEvents.LOAD.register((server, world) -> load(world));
         ServerWorldEvents.UNLOAD.register((server, world) -> save(world));
     }
 
-    public static RivalRebelsRound fromNbt(NbtCompound nbt) {
+    public static RivalRebelsRound fromNbt(CompoundTag nbt, HolderLookup.Provider registries) {
         RivalRebelsRound packet = new RivalRebelsRound();
         packet.roundstarted = nbt.getBoolean("roundstarted");
         packet.cSpawnx = nbt.getInt("cSpawnx");
         packet.cSpawnz = nbt.getInt("cSpawnz");
-        packet.omegaObjPos = BlockPos.fromLong(nbt.getLong("omegaObjPos"));
-        packet.sigmaObjPos = BlockPos.fromLong(nbt.getLong("sigmaObjPos"));
+        packet.omegaObjPos = BlockPos.of(nbt.getLong("omegaObjPos"));
+        packet.sigmaObjPos = BlockPos.of(nbt.getLong("sigmaObjPos"));
         packet.winCountdown = nbt.getInt("winCountdown");
         packet.omegaWins = nbt.getInt("omegaWins");
         packet.sigmaWins = nbt.getInt("sigmaWins");
@@ -153,12 +162,11 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
         return packet;
     }
 
-    @Override
-    public void write(PacketByteBuf buf) {
+    public void write(FriendlyByteBuf buf) {
         toBytes(this, buf);
     }
 
-    public static void toBytes(RivalRebelsRound packet, PacketByteBuf buf) {
+    public static void toBytes(RivalRebelsRound packet, FriendlyByteBuf buf) {
         buf.writeBoolean(packet.roundstarted);
 		buf.writeInt(packet.cSpawnx);
 		buf.writeInt(packet.cSpawnz);
@@ -169,35 +177,35 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 		buf.writeInt(packet.sigmaWins);
 		buf.writeBoolean(packet.lastwinomega);
 		buf.writeBoolean(packet.fatnuke);
-		buf.writeString(packet.MotD);
+		buf.writeUtf(packet.MotD);
 		RivalRebelsPlayerList.toBytes(packet.rrplayerlist, buf);
 	}
 
     @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
     }
 
     @Override
-    public NbtCompound writeNbt(NbtCompound nbt) {
-        nbt.putBoolean("roundstarted", roundstarted);
-        nbt.putInt("cSpawnx", cSpawnx);
-        nbt.putInt("cSpawnz", cSpawnz);
-        nbt.putLong("omegaObjPos", omegaObjPos.asLong());
-        nbt.putLong("sigmaObjPos", sigmaObjPos.asLong());
-        nbt.putInt("winCountdown", winCountdown);
-        nbt.putInt("omegaWins", omegaWins);
-        nbt.putInt("sigmaWins", sigmaWins);
-        nbt.putBoolean("lastwinomega", lastwinomega);
-        nbt.putBoolean("fatnuke", fatnuke);
-        nbt.putString("MotD", MotD);
-        NbtCompound compound = new NbtCompound();
+    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
+        tag.putBoolean("roundstarted", roundstarted);
+        tag.putInt("cSpawnx", cSpawnx);
+        tag.putInt("cSpawnz", cSpawnz);
+        tag.putLong("omegaObjPos", omegaObjPos.asLong());
+        tag.putLong("sigmaObjPos", sigmaObjPos.asLong());
+        tag.putInt("winCountdown", winCountdown);
+        tag.putInt("omegaWins", omegaWins);
+        tag.putInt("sigmaWins", sigmaWins);
+        tag.putBoolean("lastwinomega", lastwinomega);
+        tag.putBoolean("fatnuke", fatnuke);
+        tag.putString("MotD", MotD);
+        CompoundTag compound = new CompoundTag();
         rrplayerlist.toNbt(compound);
-        nbt.put("rrplayerlist", compound);
-        return nbt;
+        tag.put("rrplayerlist", compound);
+        return tag;
     }
 
-    public static void onMessage(RivalRebelsRound m, PlayerEntity player, PacketSender responseHandler) {
+    public static void onMessage(RivalRebelsRound m, ClientPlayNetworking.Context context) {
         RivalRebels.round.copy(m);
     }
 
@@ -225,21 +233,21 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 			return;
 		}
 		rrplayerlist = new RivalRebelsPlayerList();
-        for (PlayerEntity player : world.getPlayers()) {
-            player.damage(world.getDamageSources().outOfWorld(), 20000);
-            player.getInventory().clear();
+        for (Player player : world.players()) {
+            player.hurt(world.damageSources().fellOutOfWorld(), 20000);
+            player.getInventory().clearContent();
         }
 		cSpawnz += spawnDist;
-        if (!world.isClient) {
-            ((ServerWorld) world).setSpawnPos(new BlockPos(cSpawnx, 200, cSpawnz), 0);
+        if (!world.isClientSide) {
+            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawnx, 200, cSpawnz), 0);
         }
 		float f = RivalRebels.rhodesChance;
 		while (f >= 1)
 		{
 			f--;
-			world.spawnEntity(new EntityRhodes(world, cSpawnx+world.random.nextDouble()-0.5f, 170, cSpawnz+world.random.nextDouble()-0.5f,1));
+			world.addFreshEntity(new EntityRhodes(world, cSpawnx+world.random.nextDouble()-0.5f, 170, cSpawnz+world.random.nextDouble()-0.5f,1));
 		}
-		if (f > world.random.nextDouble()) world.spawnEntity(new EntityRhodes(world, cSpawnx+world.random.nextDouble()-0.5f, 170, cSpawnz+world.random.nextDouble()-0.5f,1));
+		if (f > world.random.nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawnx+world.random.nextDouble()-0.5f, 170, cSpawnz+world.random.nextDouble()-0.5f,1));
 		buildSpawn();
 		omegaHealth=RivalRebels.objectiveHealth;
 		sigmaHealth=RivalRebels.objectiveHealth;
@@ -264,7 +272,7 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 			rrplayerlist = new RivalRebelsPlayerList();
 			cSpawnx = (omegaObjPos.getX()+sigmaObjPos.getX())/2;
 			cSpawnz = (omegaObjPos.getZ()+sigmaObjPos.getZ())/2;
-            ((ServerWorld) world).setSpawnPos(new BlockPos(cSpawnx, world.getChunk(new BlockPos(cSpawnx, 0, cSpawnz)).getHeight(), cSpawnz), 0F);
+            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawnx, world.getChunk(new BlockPos(cSpawnx, 0, cSpawnz)).getHeight(), cSpawnz), 0F);
 			omegaHealth=RivalRebels.objectiveHealth;
 			sigmaHealth=RivalRebels.objectiveHealth;
 			sendUpdatePacket();
@@ -273,18 +281,18 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 
 	public static class PlayerInvisibility
 	{
-		public PlayerInvisibility(PlayerEntity p, int i)
+		public PlayerInvisibility(Player p, int i)
 		{
 			player = p;
 			durationleft = i;
 		}
-		public PlayerEntity player;
+		public Player player;
 		public int durationleft;
 	}
 
 	private final List<PlayerInvisibility> players = new ArrayList<>();
 
-	public void setInvisible(PlayerEntity player)
+	public void setInvisible(Player player)
 	{
 		if (player != null)
 		{
@@ -330,9 +338,9 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 
 	@Environment(EnvType.CLIENT)
 	public void updateInvisible() {
-		if (MinecraftClient.getInstance().world == null) return;
-        for (PlayerEntity player : MinecraftClient.getInstance().world.getPlayers()) {
-            if (player.getEquippedStack(EquipmentSlot.HEAD).getItem() == RRItems.camera)
+		if (Minecraft.getInstance().level == null) return;
+        for (Player player : Minecraft.getInstance().level.players()) {
+            if (player.getItemBySlot(EquipmentSlot.HEAD).getItem() == RRItems.camera)
                 setInvisible(player);
         }
 		for (int i = players.size()-1; i >= 0; i--)
@@ -341,12 +349,12 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 			t.durationleft--;
 			if (t.durationleft <= 0)
 			{
-                Entity.setRenderDistanceMultiplier(1);
+                Entity.setViewScale(1);
 				players.remove(i);
 			}
 			else
 			{
-                Entity.setRenderDistanceMultiplier(0);
+                Entity.setViewScale(0);
 			}
 		}
 	}
@@ -361,42 +369,42 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 		else if (winCountdown == 1200) RivalRebels.proxy.teamWin(lastwinomega);//open winner gui
 	}
 
-	public void load(World world)
+	public void load(Level world)
 	{
         this.world = world;
 
         Scoreboard scrb = this.world.getScoreboard();
         try {
-            Team omega = scrb.getTeam(RivalRebelsTeam.OMEGA.toString());
-            Team sigma = scrb.getTeam(RivalRebelsTeam.SIGMA.toString());
-            if (omega == null) omega = scrb.addTeam(RivalRebelsTeam.OMEGA.toString());
-            if (sigma == null) sigma = scrb.addTeam(RivalRebelsTeam.SIGMA.toString());
-            omega.setPrefix(Text.literal("Ω").formatted(Formatting.GREEN));
-            sigma.setPrefix(Text.literal("Σ").formatted(Formatting.BLUE));
-            omega.setFriendlyFireAllowed(false);
-            sigma.setFriendlyFireAllowed(false);
-            ScoreboardObjective killObjective = new ScoreboardObjective(scrb, "kills", ScoreboardCriterion.PLAYER_KILL_COUNT, Text.of(ScoreboardCriterion.PLAYER_KILL_COUNT.getName()), ScoreboardCriterion.PLAYER_KILL_COUNT.getDefaultRenderType(), true, StyledNumberFormat.EMPTY);
-            ScoreboardObjective deathObjective = new ScoreboardObjective(scrb, "deaths", ScoreboardCriterion.DEATH_COUNT, Text.of(ScoreboardCriterion.DEATH_COUNT.getName()), ScoreboardCriterion.DEATH_COUNT.getDefaultRenderType(), true, StyledNumberFormat.EMPTY);
-            scrb.setObjectiveSlot(ScoreboardDisplaySlot.LIST, killObjective);
-            for (PlayerEntity player : world.getPlayers()) {
-                scrb.getOrCreateScore(player, killObjective);
-                ScoreAccess deaths = scrb.getOrCreateScore(player, deathObjective);
-                deaths.setDisplayText(Text.of("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S"));
+            PlayerTeam omega = scrb.getPlayerTeam(RivalRebelsTeam.OMEGA.toString());
+            PlayerTeam sigma = scrb.getPlayerTeam(RivalRebelsTeam.SIGMA.toString());
+            if (omega == null) omega = scrb.addPlayerTeam(RivalRebelsTeam.OMEGA.toString());
+            if (sigma == null) sigma = scrb.addPlayerTeam(RivalRebelsTeam.SIGMA.toString());
+            omega.setPlayerPrefix(Component.literal("Ω").withStyle(ChatFormatting.GREEN));
+            sigma.setPlayerPrefix(Component.literal("Σ").withStyle(ChatFormatting.BLUE));
+            omega.setAllowFriendlyFire(false);
+            sigma.setAllowFriendlyFire(false);
+            Objective killObjective = new Objective(scrb, "kills", ObjectiveCriteria.KILL_COUNT_PLAYERS, Component.nullToEmpty(ObjectiveCriteria.KILL_COUNT_PLAYERS.getName()), ObjectiveCriteria.KILL_COUNT_PLAYERS.getDefaultRenderType(), true, StyledFormat.NO_STYLE);
+            Objective deathObjective = new Objective(scrb, "deaths", ObjectiveCriteria.DEATH_COUNT, Component.nullToEmpty(ObjectiveCriteria.DEATH_COUNT.getName()), ObjectiveCriteria.DEATH_COUNT.getDefaultRenderType(), true, StyledFormat.NO_STYLE);
+            scrb.setDisplayObjective(DisplaySlot.LIST, killObjective);
+            for (Player player : world.players()) {
+                scrb.getOrCreatePlayerScore(player, killObjective);
+                ScoreAccess deaths = scrb.getOrCreatePlayerScore(player, deathObjective);
+                deaths.display(Component.nullToEmpty("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S"));
             }
             if (RivalRebels.scoreboardenabled) {
-                scrb.setObjectiveSlot(ScoreboardDisplaySlot.SIDEBAR, deathObjective);
+                scrb.setDisplayObjective(DisplaySlot.SIDEBAR, deathObjective);
             }
         } catch(Exception ignored) {} //just in case teams already exist etc
 
-        if (world.isClient()) return;
-        this.world.getGameRules().get(GameRules.KEEP_INVENTORY).set(true, world.getServer());
-        ((ServerWorld) world).getPersistentStateManager().get(WORLD_DATA_TYPE, "rivalrebelsgamedata");
+        if (world.isClientSide()) return;
+        this.world.getGameRules().getRule(GameRules.RULE_KEEPINVENTORY).set(true, world.getServer());
+        ((ServerLevel) world).getDataStorage().get(WORLD_DATA_TYPE, "rivalrebelsgamedata");
     }
 
-    public void save(World world) {
+    public void save(Level world) {
         this.world = world;
-        if (world.isClient()) return;
-        ((ServerWorld) world).getPersistentStateManager().set("rivalrebelsgamedata", this);
+        if (world.isClientSide()) return;
+        ((ServerLevel) world).getDataStorage().set("rivalrebelsgamedata", this);
 	}
 
 	private void buildSpawn()
@@ -413,7 +421,7 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 				for (int y1 = -5; y1 < hrs; y1++)
 				{
 					int YY = y1 * y1 + ZZ;
-					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlockState(new BlockPos(cSpawnx + x1, 200 + y1, cSpawnz + z1), RRBlocks.fshield.getDefaultState());
+					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlockAndUpdate(new BlockPos(cSpawnx + x1, 200 + y1, cSpawnz + z1), RRBlocks.fshield.defaultBlockState());
 				}
 			}
 		}
@@ -421,8 +429,8 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
         omegaObjPos = new BlockPos(cSpawnx + objDist, omegaObjPos.getY(), cSpawnz);
         sigmaObjPos = new BlockPos(cSpawnx - objDist, sigmaObjPos.getY(), cSpawnz);
 
-		Chunk chunk = world.getChunk(omegaObjPos);
-        for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestNonEmptySection() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > 0; omegaObjPos.down())
+		ChunkAccess chunk = world.getChunk(omegaObjPos);
+        for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > 0; omegaObjPos.below())
         {
             if (chunk.getBlockState(omegaObjPos).getBlock() != Blocks.AIR)
             {
@@ -430,8 +438,8 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
             }
         }
         chunk = world.getChunk(sigmaObjPos);
-        sigmaObjPos = new BlockPos(sigmaObjPos.getX(), chunk.getHighestNonEmptySection() + 15, sigmaObjPos.getZ());
-        for (; sigmaObjPos.getY() > 0; sigmaObjPos = sigmaObjPos.down())
+        sigmaObjPos = new BlockPos(sigmaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, sigmaObjPos.getZ());
+        for (; sigmaObjPos.getY() > 0; sigmaObjPos = sigmaObjPos.below())
         {
             if (chunk.getBlockState(sigmaObjPos).getBlock() != Blocks.AIR)
             {
@@ -449,55 +457,55 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 				{
 					if (Math.abs(xx) == 15 && Math.abs(zz) == 15)
 					{
-						world.setBlockState(omegaObjPos.add(xx, 0, zz), RRBlocks.fshield.getDefaultState());
-						world.setBlockState(sigmaObjPos.add(xx, 0, zz), RRBlocks.fshield.getDefaultState());
+						world.setBlockAndUpdate(omegaObjPos.offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
+						world.setBlockAndUpdate(sigmaObjPos.offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
 					}
 					else
 					{
-						world.setBlockState(omegaObjPos.add(xx, 0, zz), RRBlocks.reactive.getDefaultState());
-						world.setBlockState(sigmaObjPos.add(xx, 0, zz), RRBlocks.reactive.getDefaultState());
+						world.setBlockAndUpdate(omegaObjPos.offset(xx, 0, zz), RRBlocks.reactive.defaultBlockState());
+						world.setBlockAndUpdate(sigmaObjPos.offset(xx, 0, zz), RRBlocks.reactive.defaultBlockState());
 					}
 					for (int yy = 1; yy <= 7; yy++)
 					{
-						world.setBlockState(omegaObjPos.add(xx, yy, zz), Blocks.AIR.getDefaultState());
-						world.setBlockState(sigmaObjPos.add(xx, yy, zz), Blocks.AIR.getDefaultState());
+						world.setBlockAndUpdate(omegaObjPos.offset(xx, yy, zz), Blocks.AIR.defaultBlockState());
+						world.setBlockAndUpdate(sigmaObjPos.offset(xx, yy, zz), Blocks.AIR.defaultBlockState());
 					}
 				}
 			}
 		}
 
-		world.setBlockState(omegaObjPos.add(21, 0, 21),   RRBlocks.conduit.getDefaultState());
-		world.setBlockState(omegaObjPos.add(21, 0, -21),  RRBlocks.conduit.getDefaultState());
-		world.setBlockState(omegaObjPos.add(-21, 0, 21),  RRBlocks.conduit.getDefaultState());
-		world.setBlockState(omegaObjPos.add(-21, 0, -21), RRBlocks.conduit.getDefaultState());
-		world.setBlockState(sigmaObjPos.add(21, 0, 21),   RRBlocks.conduit.getDefaultState());
-		world.setBlockState(sigmaObjPos.add(21, 0, -21),  RRBlocks.conduit.getDefaultState());
-		world.setBlockState(sigmaObjPos.add(-21, 0, 21),  RRBlocks.conduit.getDefaultState());
-		world.setBlockState(sigmaObjPos.add(-21, 0, -21), RRBlocks.conduit.getDefaultState());
+		world.setBlockAndUpdate(omegaObjPos.offset(21, 0, 21),   RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(omegaObjPos.offset(21, 0, -21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(omegaObjPos.offset(-21, 0, 21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(omegaObjPos.offset(-21, 0, -21), RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos.offset(21, 0, 21),   RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos.offset(21, 0, -21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos.offset(-21, 0, 21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos.offset(-21, 0, -21), RRBlocks.conduit.defaultBlockState());
 
 		for (int i = 0; i < 4; i++)
 		{
-			world.setBlockState(omegaObjPos.add(21, 1 + i, 21), Blocks.AIR.getDefaultState());
-			world.setBlockState(omegaObjPos.add(21, 1 + i, -21), Blocks.AIR.getDefaultState());
-			world.setBlockState(omegaObjPos.add(-21, 1 + i, 21), Blocks.AIR.getDefaultState());
-			world.setBlockState(omegaObjPos.add(-21, 1 + i, -21), Blocks.AIR.getDefaultState());
-			world.setBlockState(sigmaObjPos.add(21, 1 + i, 21), Blocks.AIR.getDefaultState());
-			world.setBlockState(sigmaObjPos.add(21, 1 + i, -21), Blocks.AIR.getDefaultState());
-			world.setBlockState(sigmaObjPos.add(-21, 1 + i, 21), Blocks.AIR.getDefaultState());
-			world.setBlockState(sigmaObjPos.add(-21, 1 + i, -21), Blocks.AIR.getDefaultState());
+			world.setBlockAndUpdate(omegaObjPos.offset(21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(omegaObjPos.offset(21, 1 + i, -21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(omegaObjPos.offset(-21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(omegaObjPos.offset(-21, 1 + i, -21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaObjPos.offset(21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaObjPos.offset(21, 1 + i, -21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaObjPos.offset(-21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaObjPos.offset(-21, 1 + i, -21), Blocks.AIR.defaultBlockState());
 		}
 
-		world.setBlockState(omegaObjPos.up(), RRBlocks.omegaobj.getDefaultState());
-		world.setBlockState(sigmaObjPos.up(), RRBlocks.sigmaobj.getDefaultState());
+		world.setBlockAndUpdate(omegaObjPos.above(), RRBlocks.omegaobj.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos.above(), RRBlocks.sigmaobj.defaultBlockState());
 		if (RRConfig.SERVER.isRhodesRoundsBase()) {
-			world.setBlockState(omegaObjPos.up(2), RRBlocks.buildrhodes.getDefaultState());
-			world.setBlockState(sigmaObjPos.up(2), RRBlocks.buildrhodes.getDefaultState());
+			world.setBlockAndUpdate(omegaObjPos.above(2), RRBlocks.buildrhodes.defaultBlockState());
+			world.setBlockAndUpdate(sigmaObjPos.above(2), RRBlocks.buildrhodes.defaultBlockState());
 		}
 	}
 
-	private boolean isInSpawn(PlayerEntity player)
+	private boolean isInSpawn(Player player)
 	{
-		return player.getPos().getY() < 203 && player.getPos().getY() > 198 && player.squaredDistanceTo(cSpawnx, 200, cSpawnz) < spawnRadius2;
+		return player.position().y() < 203 && player.position().y() > 198 && player.distanceToSqr(cSpawnx, 200, cSpawnz) < spawnRadius2;
 	}
 
 	public void winSigma()
@@ -506,8 +514,8 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 		winCountdown = 1400;
 		sigmaWins++;
 		lastwinomega = false;
-		world.setBlockState(omegaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
-		world.setBlockState(sigmaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
+		world.setBlockAndUpdate(omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++) {
 			int xxpl = xpl * xpl;
 			for (int zpl = -objRadius; zpl < objRadius; zpl++) {
@@ -516,7 +524,7 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
                     for (int ypl = -1; ypl < 7; ypl++) {
                         for (int i = 0; i < 16; i++)
                         {
-                            world.setBlockState(omegaObjPos.add(xpl, ypl, zpl), Blocks.AIR.getDefaultState());
+                            world.setBlockAndUpdate(omegaObjPos.offset(xpl, ypl, zpl), Blocks.AIR.defaultBlockState());
                         }
                     }
                 }
@@ -531,8 +539,8 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 		winCountdown = 1400;
 		omegaWins++;
 		lastwinomega = true;
-		world.setBlockState(omegaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
-		world.setBlockState(sigmaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
+		world.setBlockAndUpdate(omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++)
 		{
 			int xxpl = xpl * xpl;
@@ -543,7 +551,7 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						world.setBlockState(sigmaObjPos.add(xpl, ypl, zpl), Blocks.AIR.getDefaultState());
+						world.setBlockAndUpdate(sigmaObjPos.offset(xpl, ypl, zpl), Blocks.AIR.defaultBlockState());
 					}
 				}
 			}
@@ -554,8 +562,8 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
 	public void stopRounds()
 	{
 		if (!roundstarted) return;
-		world.setBlockState(omegaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
-		world.setBlockState(sigmaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
+		world.setBlockAndUpdate(omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
+		world.setBlockAndUpdate(sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
 		winCountdown = 0;
 		roundstarted = false;
 		rrplayerlist.clearTeam();
@@ -615,11 +623,11 @@ public class RivalRebelsRound extends PersistentState implements FabricPacket {
     }
 
     private void sendUpdatePacket() {
-        if (world.isClient) {
+        if (world.isClientSide) {
             return;
         }
-        for (PlayerEntity player : world.getPlayers()) {
-            ServerPlayNetworking.send((ServerPlayerEntity) player, this);
+        for (Player player : world.players()) {
+            ServerPlayNetworking.send((ServerPlayer) player, this);
         }
     }
 

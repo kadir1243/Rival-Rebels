@@ -13,43 +13,43 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerLoader;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
-public class GuiLoader extends HandledScreen<ContainerLoader> {
+public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
     /**
 	 * window height is calculated with this values, the more rows, the heigher
 	 */
 	private final int inventoryRows;
 
-	public GuiLoader(ContainerLoader containerLoader, PlayerInventory playerInv, Text title)
+	public GuiLoader(ContainerLoader containerLoader, Inventory playerInv, Component title)
 	{
 		super(containerLoader, playerInv, title);
         int var4 = 114;
 		this.inventoryRows = containerLoader.size() / 9;
-		this.backgroundHeight = var4 + this.inventoryRows * 18;
-		this.backgroundWidth = 256;
+		this.imageHeight = var4 + this.inventoryRows * 18;
+		this.imageWidth = 256;
 	}
 
     @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-        MatrixStack matrices = context.getMatrices();
-        matrices.push();
-		matrices.multiply(new Quaternionf(-13, 0, 0, 1));
-		context.drawText(textRenderer, "Loader", 165, 237, 0x444444, false);
-		matrices.pop();
+    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
+        PoseStack matrices = context.pose();
+        matrices.pushPose();
+		matrices.mulPose(new Quaternionf(-13, 0, 0, 1));
+		context.drawString(font, "Loader", 165, 237, 0x444444, false);
+		matrices.popPose();
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - backgroundWidth) / 2;
-		int posy = (height - backgroundHeight) / 2;
+		int posx = (width - imageWidth) / 2;
+		int posy = (height - imageHeight) / 2;
 		int coordx = posx + 92;
 		int coordy = posy + 202;
 		int widthx = 72;
@@ -58,21 +58,21 @@ public class GuiLoader extends HandledScreen<ContainerLoader> {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			context.fillGradient(mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			context.drawText(textRenderer, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
-			if (!buttondown && client.mouse.wasLeftButtonClicked())
+			context.fillGradient(mousex, mousey, mousex + font.width("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			context.drawString(font, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
+			if (!buttondown && minecraft.mouseHandler.isLeftPressed())
 			{
-                Util.getOperatingSystem().open("http://rivalrebels.com");
+                Util.getPlatform().openUri("http://rivalrebels.com");
             }
 		}
-		buttondown = client.mouse.wasLeftButtonClicked();
+		buttondown = minecraft.mouseHandler.isLeftPressed();
 	}
 
 	boolean	buttondown;
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		context.drawTexture(RRIdentifiers.guitloader, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+        context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.blit(RRIdentifiers.guitloader, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
 	}
 }

@@ -4,117 +4,120 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
-import net.minecraft.data.server.recipe.RecipeExporter;
-import net.minecraft.data.server.recipe.ShapedRecipeJsonBuilder;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.item.Items;
-import net.minecraft.recipe.book.RecipeCategory;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.ItemTags;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.ItemLike;
+
+import java.util.concurrent.CompletableFuture;
 
 public class RecipeDataGen extends FabricRecipeProvider {
-    public RecipeDataGen(FabricDataOutput arg) {
-        super(arg);
+    public RecipeDataGen(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+        super(output, registriesFuture);
     }
 
     @Override
-    public void generate(RecipeExporter exporter) {
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.fuel, 16)
-            .input('C', Items.COBBLESTONE)
-            .input('S', Items.SAND)
-            .input('G', Items.GRAVEL)
-            .input('D', Items.DIRT)
+    public void buildRecipes(RecipeOutput exporter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.fuel, 16)
+            .define('C', Items.COBBLESTONE)
+            .define('S', Items.SAND)
+            .define('G', Items.GRAVEL)
+            .define('D', Items.DIRT)
             .pattern("DS")
             .pattern("GC")
             .showNotification(false)
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.COMBAT, RRItems.rocket, 16)
-            .input('C', Items.COBBLESTONE)
-            .input('S', Items.SAND)
-            .input('G', Items.GRAVEL)
-            .input('D', Items.DIRT)
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, RRItems.rocket, 16)
+            .define('C', Items.COBBLESTONE)
+            .define('S', Items.SAND)
+            .define('G', Items.GRAVEL)
+            .define('D', Items.DIRT)
             .pattern("SC")
             .pattern("DG")
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.battery, 4)
-            .input('C', Items.COBBLESTONE)
-            .input('S', Items.SAND)
-            .input('G', Items.GRAVEL)
-            .input('D', ItemTags.DIRT)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.battery, 4)
+            .define('C', Items.COBBLESTONE)
+            .define('S', Items.SAND)
+            .define('G', Items.GRAVEL)
+            .define('D', ItemTags.DIRT)
             .pattern("CG")
             .pattern("SD")
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.gasgrenade, 6)
-            .input('C', Items.COBBLESTONE)
-            .input('S', Items.SAND)
-            .input('G', Items.GRAVEL)
-            .input('D', ItemTags.DIRT)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.gasgrenade, 6)
+            .define('C', Items.COBBLESTONE)
+            .define('S', Items.SAND)
+            .define('G', Items.GRAVEL)
+            .define('D', ItemTags.DIRT)
             .pattern("GD")
             .pattern("CS")
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.easteregg)
-            .input('C', Items.COBBLESTONE)
-            .input('D', ItemTags.DIRT)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.easteregg)
+            .define('C', Items.COBBLESTONE)
+            .define('D', ItemTags.DIRT)
             .pattern("DD")
             .pattern("CC")
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.sigmaarmor)
-            .input('C', Items.COBBLESTONE)
-            .input('S', RRBlocks.steel)
-            .input('P', RRItems.pliers)
-            .input('D', ItemTags.DIRT)
-            .input('B', Items.BONE)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.sigmaarmor)
+            .define('C', Items.COBBLESTONE)
+            .define('S', RRBlocks.steel)
+            .define('P', RRItems.pliers)
+            .define('D', ItemTags.DIRT)
+            .define('B', Items.BONE)
             .pattern("SSC")
             .pattern("SPB")
             .pattern("SSD")
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.omegaarmor)
-            .input('C', Items.COBBLESTONE)
-            .input('S', RRBlocks.steel)
-            .input('P', RRItems.pliers)
-            .input('D', ItemTags.DIRT)
-            .input('B', Items.BONE)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.omegaarmor)
+            .define('C', Items.COBBLESTONE)
+            .define('S', RRBlocks.steel)
+            .define('P', RRItems.pliers)
+            .define('D', ItemTags.DIRT)
+            .define('B', Items.BONE)
             .pattern("SSD")
             .pattern("SPB")
             .pattern("SSC")
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.flagbox1)
-            .input('W', ItemTags.WOOL)
-            .input('P', RRItems.pliers)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.flagbox1)
+            .define('W', ItemTags.WOOL)
+            .define('P', RRItems.pliers)
             .pattern("WP")
-            .criterion("has_wool", conditionsFromTag(ItemTags.WOOL))
-            .offerTo(exporter);
+            .unlockedBy("has_wool", has(ItemTags.WOOL))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRBlocks.flagbox3)
-            .input('W', ItemTags.WOOL)
-            .input('P', RRItems.pliers)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.flagbox3)
+            .define('W', ItemTags.WOOL)
+            .define('P', RRItems.pliers)
             .pattern("PW")
-            .criterion("has_wool", conditionsFromTag(ItemTags.WOOL))
-            .offerTo(exporter);
+            .unlockedBy("has_wool", has(ItemTags.WOOL))
+            .save(exporter);
 
-        ShapedRecipeJsonBuilder.create(RecipeCategory.MISC, RRItems.armyshovel)
-            .input('C', Items.COBBLESTONE)
-            .input('S', Items.SAND)
-            .input('G', Items.GRAVEL)
-            .input('D', ItemTags.DIRT)
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.armyshovel)
+            .define('C', Items.COBBLESTONE)
+            .define('S', Items.SAND)
+            .define('G', Items.GRAVEL)
+            .define('D', ItemTags.DIRT)
             .pattern("CD")
             .pattern("SG")
-            .criterion("has_cobblestone", conditionsFromItem(Items.COBBLESTONE))
-            .offerTo(exporter);
+            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .save(exporter);
 
         // Supplies
         addRecipe(RRBlocks.amario, 16, "SS", "GG", 'S', Items.SAND, 'G', Items.GRAVEL);
@@ -244,10 +247,10 @@ public class RecipeDataGen extends FabricRecipeProvider {
         addRecipe(RRBlocks.buildrhodes, 2, "SAS", "CPT", "RLB", 'B', RRItems.binoculars, 'P', RRItems.pliers, 'S', RRBlocks.supplies, 'A', RRItems.antenna, 'C', RRItems.chip, 'T', RRItems.core3, 'R', RRBlocks.controller, 'L', RRBlocks.loader);
     }
 
-    private static void addRecipee(ItemConvertible output, Object... input) {
+    private static void addRecipee(ItemLike output, Object... input) {
     }
 
-    private static void addRecipe(ItemConvertible output, int count, Object... input) {
+    private static void addRecipe(ItemLike output, int count, Object... input) {
     }
 
     @Override

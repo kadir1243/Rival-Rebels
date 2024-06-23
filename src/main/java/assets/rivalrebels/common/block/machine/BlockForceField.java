@@ -11,75 +11,78 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import net.minecraft.block.*;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockForceField extends Block {
-    public static final IntProperty META = IntProperty.of("meta", 0, 6);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 6);
 
-    public BlockForceField(Settings settings) {
+    public BlockForceField(Properties settings) {
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
 	}
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     //@Override
-    public Box getBoundingBox(BlockState state, BlockView source, BlockPos pos) {
-		int var5 = state.get(META);
+    public AABB getBoundingBox(BlockState state, BlockGetter source, BlockPos pos) {
+		int var5 = state.getValue(META);
 		float var6 = 0.4375f;
 
 		if (var5 == 4) {
-			return new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+			return new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		} else if (var5 == 5) {
-			return new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+			return new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
 		} else if (var5 == 2) {
-			return new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+			return new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		} else if (var5 == 3) {
-			return new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+			return new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
 		}
 
-        return new Box(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
+        return new AABB(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
 	}
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         float var6 = 0.4375f;
 
-        return switch (state.get(META)) {
-            case 4 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 5 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 2 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
-            case 3 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+        return switch (state.getValue(META)) {
+            case 4 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 5 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 2 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            case 3 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
             default -> super.getCollisionShape(state, world, pos, context);
         };
     }
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-		int var5 = state.get(META);
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+		int var5 = state.getValue(META);
 		float var6 = 0.4375f;
 
         return switch (var5) {
-            case 4 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 5 -> VoxelShapes.cuboid(new Box(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 2 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
-            case 3 -> VoxelShapes.cuboid(new Box(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
-            default -> super.getOutlineShape(state, world, pos, context);
+            case 4 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 5 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
+            case 2 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            case 3 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            default -> super.getShape(state, world, pos, context);
         };
     }
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
-        return BlockRenderType.INVISIBLE;
+    public RenderShape getRenderShape(BlockState state) {
+        return RenderShape.INVISIBLE;
     }
 }

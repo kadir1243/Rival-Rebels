@@ -1,26 +1,25 @@
 package assets.rivalrebels.common.util;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-
 import java.util.function.Predicate;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemUtil {
-    public static ItemStack getItemStack(PlayerEntity player, Predicate<ItemStack> predicate) {
+    public static ItemStack getItemStack(Player player, Predicate<ItemStack> predicate) {
         if (player == null) return ItemStack.EMPTY;
-        ItemStack mainhand = player.getMainHandStack();
+        ItemStack mainhand = player.getMainHandItem();
         if (predicate.test(mainhand)) return mainhand;
-        ItemStack offhand = player.getOffHandStack();
+        ItemStack offhand = player.getOffhandItem();
         if (predicate.test(offhand)) return offhand;
-        for (ItemStack stack : player.getInventory().main) {
+        for (ItemStack stack : player.getInventory().items) {
             if (predicate.test(stack))
                 return stack;
         }
         return ItemStack.EMPTY;
     }
 
-    public static ItemStack getItemStack(PlayerEntity player, Item item) {
-        return getItemStack(player, stack -> stack.isOf(item));
+    public static ItemStack getItemStack(Player player, Item item) {
+        return getItemStack(player, stack -> stack.is(item));
     }
 }

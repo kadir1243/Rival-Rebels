@@ -11,53 +11,53 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 public class EntityLaserLink extends EntityInanimate {
-	public PlayerEntity	shooter;
+	public Player	shooter;
 
-    public EntityLaserLink(EntityType<? extends EntityLaserLink> type, World world) {
+    public EntityLaserLink(EntityType<? extends EntityLaserLink> type, Level world) {
         super(type, world);
     }
 
-	public EntityLaserLink(World par1World) {
+	public EntityLaserLink(Level par1World) {
 		this(RREntities.LASER_LINK, par1World);
-		ignoreCameraFrustum = true;
+		noCulling = true;
 	}
 
-	public EntityLaserLink(World par1World, PlayerEntity player, double distance)
+	public EntityLaserLink(Level par1World, Player player, double distance)
 	{
 		this(par1World);
 		shooter = player;
-		age = 0;
-        setVelocity(distance / 100f, getVelocity().getY(), getVelocity().getZ());
-		refreshPositionAndAngles(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYaw(), shooter.getPitch());
-        setPos(getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.2F),
+		tickCount = 0;
+        setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
+		moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYRot(), shooter.getXRot());
+        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
 		getY() - 0.08,
-		getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.2F));
-		setPosition(getX(), getY(), getZ());
+		getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.2F));
+		setPos(getX(), getY(), getZ());
 	}
 
-	public EntityLaserLink(World par1World, double x, double y, double z, float yaw, float pitch, double distance)
+	public EntityLaserLink(Level par1World, double x, double y, double z, float yaw, float pitch, double distance)
 	{
 		this(par1World);
-		refreshPositionAndAngles(x, y, z, yaw, pitch);
-        setVelocity(distance / 100f, getVelocity().getY(), getVelocity().getZ());
-		age = 0;
-		setPosition(getX(), getY(), getZ());
+		moveTo(x, y, z, yaw, pitch);
+        setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
+		tickCount = 0;
+		setPos(getX(), getY(), getZ());
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public float getBrightnessAtEyes()
+	public float getLightLevelDependentMagicValue()
 	{
 		return 1000F;
 	}
@@ -65,7 +65,7 @@ public class EntityLaserLink extends EntityInanimate {
 	@Override
 	public void tick() {
         super.tick();
-        if (age == 1) kill();
-        age++;
+        if (tickCount == 1) kill();
+        tickCount++;
     }
 }

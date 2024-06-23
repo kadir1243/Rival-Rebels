@@ -15,21 +15,21 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRod;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
-import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
-
 public class PlasmaCannonRenderer implements DynamicItemRenderer {
-    public static final SpriteIdentifier PLASMA_CANNON = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etplasmacannon);
-    public static final SpriteIdentifier HYDROD = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ethydrod);
+    public static final Material PLASMA_CANNON = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etplasmacannon);
+    public static final Material HYDROD = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ethydrod);
 	private final ModelRod md2;
 	private final ModelRod md3 = new ModelRod();
 	private static final ModelFromObj model = ModelFromObj.readObjFile("m.obj");
@@ -40,54 +40,54 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
     }
 
     @Override
-    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		matrices.push();
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
 		matrices.translate(-0.1f, 0f, 0f);
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
-		matrices.push();
+		matrices.pushPose();
 
-        VertexConsumer plasmaCannonVertexConsumer = PLASMA_CANNON.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        VertexConsumer plasmaCannonVertexConsumer = PLASMA_CANNON.buffer(vertexConsumers, RenderType::entitySolid);
         model.render(plasmaCannonVertexConsumer, light, overlay);
         VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-        if (stack.hasEnchantments()) {
+        if (stack.isEnchanted()) {
 			model.render(cellularNoise, light, overlay);
 		}
 
-		matrices.pop();
-		matrices.pop();
+		matrices.popPose();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
-		matrices.push();
-		matrices.multiply(new Quaternionf(225, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+		matrices.pushPose();
+		matrices.mulPose(new Quaternionf(225, 0.0F, 0.0F, 1.0F));
 		matrices.translate(-0.5f, 0.5f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
-        VertexConsumer hydrodVertexConsumer = HYDROD.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        VertexConsumer hydrodVertexConsumer = HYDROD.buffer(vertexConsumers, RenderType::entitySolid);
         md2.render(matrices, hydrodVertexConsumer, light, overlay);
-		if (stack.hasEnchantments()) {
+		if (stack.isEnchanted()) {
 			md2.render(matrices, cellularNoise, light, overlay);
 		}
-		matrices.pop();
-		matrices.pop();
+		matrices.popPose();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
-		matrices.push();
-		matrices.multiply(new Quaternionf(247.5f, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+		matrices.pushPose();
+		matrices.mulPose(new Quaternionf(247.5f, 0.0F, 0.0F, 1.0F));
 		matrices.translate(-0.175f, 0.1f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
 		md3.render(matrices, hydrodVertexConsumer, light, overlay);
-		if (stack.hasEnchantments()) {
+		if (stack.isEnchanted()) {
 			md3.render(matrices, cellularNoise, light, overlay);
 		}
-		matrices.pop();
-		matrices.pop();
-		matrices.pop();
+		matrices.popPose();
+		matrices.popPose();
+		matrices.popPose();
 	}
 }
 

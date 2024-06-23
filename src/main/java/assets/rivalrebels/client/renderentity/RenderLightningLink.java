@@ -13,16 +13,17 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityLightningLink;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.random.Random;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
@@ -32,14 +33,14 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 	static float	green	= 0.75F;
 	static float	blue	= 1F;
 
-    public RenderLightningLink(EntityRendererFactory.Context renderManager) {
+    public RenderLightningLink(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void render(EntityLightningLink entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(EntityLightningLink entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
 		float segmentDistance = RivalRebels.teslasegments;
-		float distance = (float) entity.getVelocity().getX() * 100;
+		float distance = (float) entity.getDeltaMovement().x() * 100;
 		distance = 100;
 
 		// RenderLibrary.instance.renderModel((float) x, (float) y, (float) z,
@@ -50,29 +51,29 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 
 		if (distance > 0)
 		{
-			Random random = entity.getWorld().random;
+			RandomSource random = entity.level().random;
 			float radius = 0.07F;
-            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
 
-            matrices.push();
-			matrices.multiply(new Quaternionf(entity.getYaw(), 0.0F, 1.0F, 0.0F));
-			matrices.multiply(new Quaternionf(-entity.getPitch(), 1.0F, 0.0F, 0.0F));
+            matrices.pushPose();
+			matrices.mulPose(new Quaternionf(entity.getYRot(), 0.0F, 1.0F, 0.0F));
+			matrices.mulPose(new Quaternionf(-entity.getXRot(), 1.0F, 0.0F, 0.0F));
 
-			double AddedX = 0;
-			double AddedY = 0;
-			double prevAddedX = 0;
-			double prevAddedY = 0;
+			float AddedX = 0;
+			float AddedY = 0;
+			float prevAddedX = 0;
+			float prevAddedY = 0;
 			for (int addedZ = (int) distance; addedZ >= 0; addedZ -= segmentDistance)
 			{
 				prevAddedX = AddedX;
 				prevAddedY = AddedY;
 				AddedX += (random.nextFloat() - 0.5) * 2;
 				AddedY += (random.nextFloat() - 0.5) * 2;
-				double dist = Math.sqrt(AddedX * AddedX + AddedY * AddedY) / 1.5;
+				float dist = Mth.sqrt(AddedX * AddedX + AddedY * AddedY) / 1.5F;
 				if (dist != 0)
 				{
-					double tempAddedX = AddedX / dist;
-					double tempAddedY = AddedY / dist;
+                    float tempAddedX = AddedX / dist;
+                    float tempAddedY = AddedY / dist;
 					if (Math.abs(tempAddedX) < Math.abs(AddedX)) AddedX = tempAddedX;
 					if (Math.abs(tempAddedY) < Math.abs(AddedY)) AddedY = tempAddedY;
 				}
@@ -82,23 +83,24 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 				}
 
 				for (float o = 0; o <= radius; o += radius / 8) {
-					buffer.vertex(AddedX + o, AddedY - o, addedZ).color(red, green, blue, 0.95f).next();
-					buffer.vertex(AddedX + o, AddedY + o, addedZ).color(red, green, blue, 0.95f).next();
-					buffer.vertex(prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
-					buffer.vertex(prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
-					buffer.vertex(AddedX - o, AddedY - o, addedZ).color(red, green, blue, 0.95f).next();
-					buffer.vertex(prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
-					buffer.vertex(AddedX - o, AddedY + o, addedZ).color(red, green, blue, 0.95f).next();
-					buffer.vertex(prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).color(red, green, blue, 0.95f).next();
+					buffer.addVertex(matrices.last(), AddedX + o, AddedY - o, addedZ).setColor(red, green, blue, 0.95f);
+					buffer.addVertex(matrices.last(), AddedX + o, AddedY + o, addedZ).setColor(red, green, blue, 0.95f);
+					buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
+					buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
+
+                    buffer.addVertex(matrices.last(), AddedX - o, AddedY - o, addedZ).setColor(red, green, blue, 0.95f);
+					buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
+					buffer.addVertex(matrices.last(), AddedX - o, AddedY + o, addedZ).setColor(red, green, blue, 0.95f);
+					buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
 				}
 			}
 
-			matrices.pop();
+			matrices.popPose();
 		}
 	}
 
     @Override
-    public Identifier getTexture(EntityLightningLink entity) {
+    public ResourceLocation getTextureLocation(EntityLightningLink entity) {
         return null;
     }
 }

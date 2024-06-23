@@ -12,11 +12,11 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 
 @Environment(EnvType.CLIENT)
 public class GuiRotor extends GuiButton
@@ -31,23 +31,23 @@ public class GuiRotor extends GuiButton
 	}
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        MatrixStack matrices = context.getMatrices();
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        PoseStack matrices = context.pose();
         this.mouseDragged(mouseX, mouseY, 0, 0, 0);
-		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-		matrices.push();
+		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+		matrices.pushPose();
 		int deg = (degree % 180);
 		if (degree >= 180) deg = 180 - deg;
 		if (deg < 22) deg = 22;
 		degree = deg;
-		context.drawTexture(RRIdentifiers.guitray, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180));
-        context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
-		matrices.pop();
+		context.blit(RRIdentifiers.guitray, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180));
+        context.drawCenteredString(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
+		matrices.popPose();
 	}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
+		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
 			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
 			if (pressed) degree = ((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * 180 / Math.PI) + 270) % 360;
 		} else {

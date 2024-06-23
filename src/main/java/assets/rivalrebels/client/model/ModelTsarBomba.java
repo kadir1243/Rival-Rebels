@@ -16,18 +16,19 @@ import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class ModelTsarBomba {
-    private static final SpriteIdentifier TSAR_SHELL_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ettsarshell);
-    private static final SpriteIdentifier TSAR_FINS_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ettsarfins);
+    private static final Material TSAR_SHELL_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettsarshell);
+    private static final Material TSAR_FINS_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettsarfins);
     private static final float[]	tsarx		= { 0.5f, 0.5f, 0.875f, 1f, 1f, 0.875f, 0.5f, 0f };
 	private static final float[]	tsary		= { -5f, -3.5f, -2f, -1f, 1f, 2f, 2.75f, 3f };
 	private static final float[]	tsart		= { 1f, 0.8125f, 0.625f, 0.5f, 0.25f, 0.125f, 0.03125f, 0f };
@@ -37,17 +38,17 @@ public class ModelTsarBomba {
 	private static final float	cos			= (float) Math.cos(deg);
 	private static final float	add			= 360 / segments;
 
-	public static void render(MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay)
+	public static void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-		matrices.push();
+		matrices.pushPose();
 
-        VertexConsumer tsarShellTextureVertexConsumer = TSAR_SHELL_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        VertexConsumer tsarShellTextureVertexConsumer = TSAR_SHELL_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
         for (float i = 0; i < segments; i++)
 		{
-			matrices.push();
-			matrices.multiply(new Quaternionf(add * i, 0, 1, 0));
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
 			for (int f = 1; f < tsarx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
@@ -59,13 +60,13 @@ public class ModelTsarBomba {
 						new Vector3f(tsarx[f - 1] * sin, tsary[f - 1], tsarx[f - 1] * cos),
 						new Vector3f(tsarx[f] * sin, tsary[f], tsarx[f] * cos), t1, t2, t3, t4, light, overlay);
 			}
-			matrices.pop();
+			matrices.popPose();
 		}
-		matrices.pop();
+		matrices.popPose();
 
-        VertexConsumer tsarFinsTextureVertexConsumer = TSAR_FINS_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        VertexConsumer tsarFinsTextureVertexConsumer = TSAR_FINS_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
 
-        matrices.push();
+        matrices.pushPose();
 
 		TextureVertice t5 = new TextureVertice(70f / 256f, 0f);
 		TextureVertice t6 = new TextureVertice(134f / 256f, 0f);
@@ -77,9 +78,9 @@ public class ModelTsarBomba {
 				new Vector3f(-0.5f, -5f, -0.5f),
 				new Vector3f(0.5f, -5f, -0.5f), t5, t6, t7, t8, light, overlay);
 
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 
 		TextureVertice t1 = new TextureVertice(0f, 0f);
 		TextureVertice t2 = new TextureVertice(70f / 256f, 0f);
@@ -91,19 +92,19 @@ public class ModelTsarBomba {
 				new Vector3f(0f, -3.5f, -0.5f),
 				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		matrices.multiply(new Quaternionf(120, 0, 1, 0));
+		matrices.mulPose(new Quaternionf(120, 0, 1, 0));
 		RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
 				new Vector3f(0f, -5f, -0.5f),
 				new Vector3f(0f, -3.5f, -0.5f),
 				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		matrices.multiply(new Quaternionf(120, 0, 1, 0));
+		matrices.mulPose(new Quaternionf(120, 0, 1, 0));
 		RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
 				new Vector3f(0f, -5f, -0.5f),
 				new Vector3f(0f, -3.5f, -0.5f),
 				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		matrices.pop();
-		matrices.pop();
+		matrices.popPose();
+		matrices.popPose();
 	}
 }

@@ -14,9 +14,9 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.random.Random;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.util.RandomSource;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -40,7 +40,7 @@ public class ModelAntimatterBombBlast {
     private int index = 0;
 
     public ModelAntimatterBombBlast() {
-        Random random = Random.create();
+        RandomSource random = RandomSource.create();
         for (int f = 0; f < tsarx.length; f++) {
             for (int i = 0; i < tsarx[f].length; i++) {
                 tsarx[f][i] += (random.nextFloat() - 0.5f) * 1f;
@@ -51,7 +51,7 @@ public class ModelAntimatterBombBlast {
         }
     }
 
-    public void render(MatrixStack matrices, VertexConsumer buffer, int light) {
+    public void render(PoseStack matrices, VertexConsumer buffer, int light) {
         if (timer == 0) {
             timer += time[index];
             index++;
@@ -59,10 +59,10 @@ public class ModelAntimatterBombBlast {
         index %= time.length;
         if (timer > 0) timer--;
         texanim += texadd;
-        matrices.push();
+        matrices.pushPose();
         for (float i = 0; i < segments; i++) {
-            matrices.push();
-            matrices.multiply(new Quaternionf(add * i, 0, 1, 0));
+            matrices.pushPose();
+            matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
             for (int f = 1; f < tsart; f++) {
                 int ind0 = (time.length + index - 1) % time.length;
                 float x0 = tsarx[ind0][f - 1] + (((tsarx[index][f - 1] - tsarx[ind0][f - 1]) / time[ind0]) * timer);
@@ -78,8 +78,8 @@ public class ModelAntimatterBombBlast {
                     new Vector3f(x0 * sin, y0, x0 * cos),
                     new Vector3f(x1 * sin, y1, x1 * cos), t1, t2, t3, t4, light);
             }
-            matrices.pop();
+            matrices.popPose();
         }
-        matrices.pop();
+        matrices.popPose();
     }
 }

@@ -14,59 +14,58 @@ package assets.rivalrebels.common.item.weapon;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
 public class ItemRodDisk extends Item
 {
 	public ItemRodDisk() {
-		super(new Settings().maxCount(1));
+		super(new Properties().stacksTo(1));
 	}
 
     @Override
-	public UseAction getUseAction(ItemStack par1ItemStack)
+	public UseAnim getUseAnimation(ItemStack par1ItemStack)
 	{
-		return UseAction.BOW;
+		return UseAnim.BOW;
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack stack)
-	{
+    @Override
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 300;
 	}
 
 	boolean pass = false;
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack stack = user.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        ItemStack stack = user.getItemInHand(hand);
 
 		if (!pass)
 		{
-			user.sendMessage(Text.of("Password?"), true);
+			user.displayClientMessage(Component.nullToEmpty("Password?"), true);
 			pass = true;
 		}
-		user.setCurrentHand(hand);
+		user.startUsingItem(hand);
 		if (RivalRebels.round.rrplayerlist.getForGameProfile(user.getGameProfile()).rrrank.id > 1) RivalRebelsSoundPlayer.playSound(user, 6, 2);
 		else RivalRebelsSoundPlayer.playSound(user, 7, 2);
-		return TypedActionResult.success(stack, world.isClient());
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 
     @Override
-    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-		PlayerEntity player;
-        if (user instanceof PlayerEntity) player = (PlayerEntity) user;
+    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+		Player player;
+        if (user instanceof Player) player = (Player) user;
         else return;
-        if (!world.isClient) {
-			if (!player.getAbilities().invulnerable) player.getInventory().removeOne(stack);
+        if (!world.isClientSide) {
+			if (!player.getAbilities().invulnerable) player.getInventory().removeItem(stack);
 			int rank = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank.id;
 			//float f = (getMaxUseTime(item) - i) / 20.0F;
 			//f = (f * f + f * 2) * 0.33333f;
@@ -76,31 +75,31 @@ public class ItemRodDisk extends Item
 			if (rank == 0)
 			{
 				Entity entity = new EntityRoddiskRegular(world, player, 1);
-				world.spawnEntity(entity);
+				world.addFreshEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 7, 3);
 			}
 			else if (rank == 1)
 			{
 				Entity entity = new EntityRoddiskRebel(world, player, 1.1f);
-				world.spawnEntity(entity);
+				world.addFreshEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 7, 3);
 			}
 			else if (rank == 2)
 			{
 				Entity entity = new EntityRoddiskOfficer(world, player, 1.2f);
-				world.spawnEntity(entity);
+				world.addFreshEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 6, 3);
 			}
 			else if (rank == 3)
 			{
 				Entity entity = new EntityRoddiskLeader(world, player, 4f);
-				world.spawnEntity(entity);
+				world.addFreshEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 6, 3);
 			}
 			else if (rank == 4)
 			{
 				Entity entity = new EntityRoddiskRep(world, player, 4f);
-				world.spawnEntity(entity);
+				world.addFreshEntity(entity);
 				RivalRebelsSoundPlayer.playSound(player, 6, 3);
 			}
 		}

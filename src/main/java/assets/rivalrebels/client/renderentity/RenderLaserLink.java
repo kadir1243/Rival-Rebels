@@ -12,16 +12,16 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityLaserLink;
-import com.mojang.blaze3d.platform.GlStateManager.DstFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
+import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
+import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 
 public class RenderLaserLink extends EntityRenderer<EntityLaserLink> {
@@ -29,41 +29,42 @@ public class RenderLaserLink extends EntityRenderer<EntityLaserLink> {
     static float green = 0.1F;
     static float blue = 0.1F;
 
-    public RenderLaserLink(EntityRendererFactory.Context renderManager) {
+    public RenderLaserLink(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void render(EntityLaserLink entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        double distance = entity.getVelocity().getX() * 100;
+    public void render(EntityLaserLink entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+        float distance = (float) (entity.getDeltaMovement().x() * 100F);
         if (distance > 0) {
             float radius = 0.7F;
-            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getSolid());
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.solid());
 
-            matrices.push();
+            matrices.pushPose();
             RenderSystem.enableBlend();
-            RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
-            matrices.multiply(new Quaternionf(-entity.getYaw(), 0.0F, 1.0F, 0.0F));
-            matrices.multiply(new Quaternionf(entity.getPitch(), 1.0F, 0.0F, 0.0F));
+            RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE);
+            matrices.mulPose(new Quaternionf(-entity.getYRot(), 0.0F, 1.0F, 0.0F));
+            matrices.mulPose(new Quaternionf(entity.getXRot(), 1.0F, 0.0F, 0.0F));
 
             for (float o = 0; o <= radius; o += radius / 16) {
-                buffer.vertex(0 + o, 0 - o, 0).color(red, green, blue, 1).next();
-                buffer.vertex(0 + o, 0 + o, 0).color(red, green, blue, 1).next();
-                buffer.vertex(0 + o, 0 + o, 0 + distance).color(red, green, blue, 1).next();
-                buffer.vertex(0 + o, 0 - o, 0 + distance).color(red, green, blue, 1).next();
-                buffer.vertex(0 - o, 0 - o, 0).color(red, green, blue, 1).next();
-                buffer.vertex(0 - o, 0 - o, 0 + distance).color(red, green, blue, 1).next();
-                buffer.vertex(0 - o, 0 + o, 0).color(red, green, blue, 1).next();
-                buffer.vertex(0 - o, 0 + o, 0 + distance).color(red, green, blue, 1).next();
+                buffer.addVertex(0 + o, 0 - o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(0 + o, 0 + o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(0 + o, 0 + o, 0 + distance).setColor(red, green, blue, 1);
+                buffer.addVertex(0 + o, 0 - o, 0 + distance).setColor(red, green, blue, 1);
+
+                buffer.addVertex(0 - o, 0 - o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(0 - o, 0 - o, 0 + distance).setColor(red, green, blue, 1);
+                buffer.addVertex(0 - o, 0 + o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(0 - o, 0 + o, 0 + distance).setColor(red, green, blue, 1);
             }
 
             RenderSystem.disableBlend();
-            matrices.pop();
+            matrices.popPose();
         }
     }
 
     @Override
-    public Identifier getTexture(EntityLaserLink entity) {
+    public ResourceLocation getTextureLocation(EntityLaserLink entity) {
         return null;
     }
 }

@@ -14,19 +14,19 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.machine.BlockForceField;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.Block;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.world.World;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import org.joml.Vector3f;
 
 @Environment(EnvType.CLIENT)
@@ -41,28 +41,28 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
 	private static final Vector3f v7	= new Vector3f(-s, -s, -s);
 	private static final Vector3f v8	= new Vector3f(-s, -s, s);
 
-    public TileEntityGoreRenderer(BlockEntityRendererFactory.Context context) {
+    public TileEntityGoreRenderer(BlockEntityRendererProvider.Context context) {
     }
 
-    private static boolean isFaceFull(World world, BlockPos pos, Direction direction) {
-        return Block.isFaceFullSquare(world.getBlockState(pos.offset(direction)).getCollisionShape(world, pos.offset(direction)), direction.getOpposite());
+    private static boolean isFaceFull(Level world, BlockPos pos, Direction direction) {
+        return Block.isFaceFull(world.getBlockState(pos.relative(direction)).getCollisionShape(world, pos.relative(direction)), direction.getOpposite());
     }
 
     @Override
-    public void render(TileEntityGore entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        World world = entity.getWorld();
+    public void render(TileEntityGore entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        Level world = entity.getLevel();
 
-		boolean ceil = isFaceFull(world, entity.getPos(), Direction.UP);
-		boolean floor = isFaceFull(world, entity.getPos(), Direction.DOWN);
-		boolean side1 = isFaceFull(world, entity.getPos(), Direction.SOUTH);
-		boolean side2 = isFaceFull(world, entity.getPos(), Direction.WEST);
-		boolean side3 = isFaceFull(world, entity.getPos(), Direction.NORTH);
-		boolean side4 = isFaceFull(world, entity.getPos(), Direction.EAST);
-		int meta = entity.getCachedState().get(BlockForceField.META);
+		boolean ceil = isFaceFull(world, entity.getBlockPos(), Direction.UP);
+		boolean floor = isFaceFull(world, entity.getBlockPos(), Direction.DOWN);
+		boolean side1 = isFaceFull(world, entity.getBlockPos(), Direction.SOUTH);
+		boolean side2 = isFaceFull(world, entity.getBlockPos(), Direction.WEST);
+		boolean side3 = isFaceFull(world, entity.getBlockPos(), Direction.NORTH);
+		boolean side4 = isFaceFull(world, entity.getBlockPos(), Direction.EAST);
+		int meta = entity.getBlockState().getValue(BlockForceField.META);
 
-		matrices.push();
-		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
-        Identifier texture = switch (meta) {
+		matrices.pushPose();
+		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+        ResourceLocation texture = switch (meta) {
             case 0 -> RRIdentifiers.btsplash1;
             case 1 -> RRIdentifiers.btsplash2;
             case 2 -> RRIdentifiers.btsplash3;
@@ -72,54 +72,54 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
             default -> RRIdentifiers.btsplash1;
         };
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntitySolid(texture));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
         if (side1)
 		{
-			addVertex(buffer, v1, 0, 0, light, overlay);
-			addVertex(buffer, v5, 1, 0, light, overlay);
-			addVertex(buffer, v8, 1, 1, light, overlay);
-			addVertex(buffer, v4, 0, 1, light, overlay);
+			addVertex(matrices, buffer, v1, 0, 0, light, overlay);
+			addVertex(matrices, buffer, v5, 1, 0, light, overlay);
+			addVertex(matrices, buffer, v8, 1, 1, light, overlay);
+			addVertex(matrices, buffer, v4, 0, 1, light, overlay);
 		}
 
 		if (side2) {
-			addVertex(buffer, v4, 0, 0, light, overlay);
-			addVertex(buffer, v8, 1, 0, light, overlay);
-			addVertex(buffer, v7, 1, 1, light, overlay);
-			addVertex(buffer, v3, 0, 1, light, overlay);
+			addVertex(matrices, buffer, v4, 0, 0, light, overlay);
+			addVertex(matrices, buffer, v8, 1, 0, light, overlay);
+			addVertex(matrices, buffer, v7, 1, 1, light, overlay);
+			addVertex(matrices, buffer, v3, 0, 1, light, overlay);
 		}
 
 		if (side3) {
-			addVertex(buffer, v3, 0, 0, light, overlay);
-			addVertex(buffer, v7, 1, 0, light, overlay);
-			addVertex(buffer, v6, 1, 1, light, overlay);
-			addVertex(buffer, v2, 0, 1, light, overlay);
+			addVertex(matrices, buffer, v3, 0, 0, light, overlay);
+			addVertex(matrices, buffer, v7, 1, 0, light, overlay);
+			addVertex(matrices, buffer, v6, 1, 1, light, overlay);
+			addVertex(matrices, buffer, v2, 0, 1, light, overlay);
 		}
 
 		if (side4) {
-			addVertex(buffer, v2, 0, 0, light, overlay);
-			addVertex(buffer, v6, 1, 0, light, overlay);
-			addVertex(buffer, v5, 1, 1, light, overlay);
-			addVertex(buffer, v1, 0, 1, light, overlay);
+			addVertex(matrices, buffer, v2, 0, 0, light, overlay);
+			addVertex(matrices, buffer, v6, 1, 0, light, overlay);
+			addVertex(matrices, buffer, v5, 1, 1, light, overlay);
+			addVertex(matrices, buffer, v1, 0, 1, light, overlay);
 		}
 
 		if (ceil) {
-			addVertex(buffer, v4, 0, 0, light, overlay);
-			addVertex(buffer, v3, 1, 0, light, overlay);
-			addVertex(buffer, v2, 1, 1, light, overlay);
-			addVertex(buffer, v1, 0, 1, light, overlay);
+			addVertex(matrices, buffer, v4, 0, 0, light, overlay);
+			addVertex(matrices, buffer, v3, 1, 0, light, overlay);
+			addVertex(matrices, buffer, v2, 1, 1, light, overlay);
+			addVertex(matrices, buffer, v1, 0, 1, light, overlay);
 		}
 
 		if (floor) {
-			addVertex(buffer, v5, 0, 0, light, overlay);
-			addVertex(buffer, v6, 1, 0, light, overlay);
-			addVertex(buffer, v7, 1, 1, light, overlay);
-			addVertex(buffer, v8, 0, 1, light, overlay);
+			addVertex(matrices, buffer, v5, 0, 0, light, overlay);
+			addVertex(matrices, buffer, v6, 1, 0, light, overlay);
+			addVertex(matrices, buffer, v7, 1, 1, light, overlay);
+			addVertex(matrices, buffer, v8, 0, 1, light, overlay);
 		}
 
-		matrices.pop();
+		matrices.popPose();
 	}
 
-	private void addVertex(VertexConsumer buffer, Vector3f v, float t, float t2, int light, int overlay) {
-		buffer.vertex(v.x * 0.999, v.y * 0.999, v.z * 0.999).texture(t, t2).light(light).next();
+	private void addVertex(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2, int light, int overlay) {
+		buffer.addVertex(poseStack.last(), v.mul(0.999F, new Vector3f())).setUv(t, t2).setLight(light);
 	}
 }

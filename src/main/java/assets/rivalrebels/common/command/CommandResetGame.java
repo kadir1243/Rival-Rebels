@@ -13,36 +13,36 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.command.argument.EntityArgumentType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.commands.arguments.EntityArgument;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 
 public class CommandResetGame {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("rrreset")
-            .requires(arg -> arg.hasPermissionLevel(3))
-            .then(CommandManager.literal("all")
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("rrreset")
+            .requires(arg -> arg.hasPermission(3))
+            .then(Commands.literal("all")
                     .executes(context -> execute(context.getSource(), null))
             )
-            .then(CommandManager.argument("player", EntityArgumentType.player())
-                    .executes(context -> execute(context.getSource(), EntityArgumentType.getPlayer(context, "player")))
+            .then(Commands.argument("player", EntityArgument.player())
+                    .executes(context -> execute(context.getSource(), EntityArgument.getPlayer(context, "player")))
             )
         );
     }
 
-    private static int execute(ServerCommandSource source, PlayerEntity player) {
+    private static int execute(CommandSourceStack source, Player player) {
 		if (player == null) {
 			RivalRebels.round.rrplayerlist.clearTeam();
-			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
-			source.sendFeedback(() -> Text.of("§7All players have been reset."), true);
+			RivalRebels.round.rrplayerlist.refreshForWorld(source.getLevel());
+			source.sendSuccess(() -> Component.nullToEmpty("§7All players have been reset."), true);
 		} else if (RivalRebels.round.rrplayerlist.contains(player.getGameProfile())) {
 			RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).clearTeam();
-			RivalRebels.round.rrplayerlist.refreshForWorld(source.getWorld());
-			source.sendFeedback(() -> Text.of("§7Player successfully reset."), true);
+			RivalRebels.round.rrplayerlist.refreshForWorld(source.getLevel());
+			source.sendSuccess(() -> Component.nullToEmpty("§7Player successfully reset."), true);
 		} else {
-			source.sendError(Text.of("§7No player by that name."));
+			source.sendFailure(Component.nullToEmpty("§7No player by that name."));
 		}
         return 0;
 	}

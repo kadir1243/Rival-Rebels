@@ -11,27 +11,28 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
 
 public class EntityInanimate extends Entity
 {
-	public EntityInanimate(EntityType<? extends EntityInanimate> type, World world)
+	public EntityInanimate(EntityType<? extends EntityInanimate> type, Level world)
 	{
 		super(type, world);
 	}
 
     @Override
-    protected void initDataTracker() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
     @Override
-    protected void readCustomDataFromNbt(NbtCompound nbt) {
+    protected void readAdditionalSaveData(CompoundTag nbt) {
     }
 
     @Override
-    protected void writeCustomDataToNbt(NbtCompound nbt) {
+    protected void addAdditionalSaveData(CompoundTag nbt) {
     }
 }

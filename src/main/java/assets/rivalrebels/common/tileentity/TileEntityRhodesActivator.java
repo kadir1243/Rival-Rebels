@@ -14,10 +14,10 @@ package assets.rivalrebels.common.tileentity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.autobuilds.BlockRhodesScaffold;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityRhodesActivator extends TileEntityMachineBase {
 	private int charge = 0;
@@ -31,7 +31,7 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 	@Override
 	public float powered(float power, float distance)
 	{
-		if (!world.isClient)
+		if (!level.isClientSide)
 		{
 			if (charge == 100)
 			{
@@ -39,7 +39,7 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 				boolean buildrhodes = true;
 				boolean buildrhodes1 = true;
 				boolean buildrhodes2 = true;
-                BlockPos pos = getPos();
+                BlockPos pos = getBlockPos();
                 int x = pos.getX();
 				int y = pos.getY();
 				int z = pos.getZ();
@@ -49,8 +49,8 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 					int fy = 2-(i/9);
 					int fx1 = -10+(i%9);
 					int fx2 = 7-(i%9);
-					Block s1 = world.getBlockState(pos.add(fx1, fy, 0)).getBlock();
-					Block s2 = world.getBlockState(pos.add(fx2, fy, 0)).getBlock();
+					Block s1 = level.getBlockState(pos.offset(fx1, fy, 0)).getBlock();
+					Block s2 = level.getBlockState(pos.offset(fx2, fy, 0)).getBlock();
 					if (b == 1 && (s1 != RRBlocks.conduit || s2 != RRBlocks.conduit))
 					{
 						buildrhodes = false;
@@ -72,8 +72,8 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 					fy *= 2;
 					fx1 *= 2;
 					fx2 *= 2;
-					Block s1 = world.getBlockState(pos.add(fx1, fy, 0)).getBlock();
-					Block s2 = world.getBlockState(pos.add(fx2, fy, 0)).getBlock();
+					Block s1 = level.getBlockState(pos.offset(fx1, fy, 0)).getBlock();
+					Block s2 = level.getBlockState(pos.offset(fx2, fy, 0)).getBlock();
 					if (b == 1 && (s1 != RRBlocks.conduit || s2 != RRBlocks.conduit))
 					{
 						buildrhodes1 = false;
@@ -95,8 +95,8 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 					fy *= 3;
 					fx1 *= 3;
 					fx2 *= 3;
-					Block s1 = world.getBlockState(pos.add(fx1, fy, 0)).getBlock();
-					Block s2 = world.getBlockState(pos.add(fx2, fy, 0)).getBlock();
+					Block s1 = level.getBlockState(pos.offset(fx1, fy, 0)).getBlock();
+					Block s2 = level.getBlockState(pos.offset(fx2, fy, 0)).getBlock();
 					if (b == 1 && (s1 != RRBlocks.conduit || s2 != RRBlocks.conduit))
 					{
 						buildrhodes2 = false;
@@ -118,13 +118,13 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 							int fy = 2-(i/9);
 							int fx1 = -10+(i%9);
 							int fx2 = 7 -(i%9);
-							setBlockToAir(pos.add(fx1, fy, 0));
-							setBlockToAir(pos.add(fx2, fy, 0));
+							setBlockToAir(pos.offset(fx1, fy, 0));
+							setBlockToAir(pos.offset(fx2, fy, 0));
 						}
 					}
-					EntityRhodes er = new EntityRhodes(world, x-1f, y-13, z, 1);
-					if (getPos().getZ() > this.pos.getZ()) er.bodyyaw = 180;
-					world.spawnEntity(er);
+					EntityRhodes er = new EntityRhodes(level, x-1f, y-13, z, 1);
+					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
+					level.addFreshEntity(er);
 				}
 				else if (buildrhodes1)
 				{
@@ -139,19 +139,19 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 							fy *= 2;
 							fx1 *= 2;
 							fx2 *= 2;
-							setBlockToAir(pos.add(fx1, fy, 0));
-							setBlockToAir(pos.add(fx2, fy, 0));
-							setBlockToAir(pos.add(fx1, fy, 0).east());
-							setBlockToAir(pos.add(fx2, fy, 0).east());
-							setBlockToAir(pos.add(fx1, fy, 0).up());
-							setBlockToAir(pos.add(fx2, fy, 0).up());
-							setBlockToAir(pos.add(fx1, fy, 0).east().up());
-							setBlockToAir(pos.add(fx2, fy, 0).east().up());
+							setBlockToAir(pos.offset(fx1, fy, 0));
+							setBlockToAir(pos.offset(fx2, fy, 0));
+							setBlockToAir(pos.offset(fx1, fy, 0).east());
+							setBlockToAir(pos.offset(fx2, fy, 0).east());
+							setBlockToAir(pos.offset(fx1, fy, 0).above());
+							setBlockToAir(pos.offset(fx2, fy, 0).above());
+							setBlockToAir(pos.offset(fx1, fy, 0).east().above());
+							setBlockToAir(pos.offset(fx2, fy, 0).east().above());
 						}
 					}
-					EntityRhodes er = new EntityRhodes(world, x-2f, y-26, z, 2);
-					if (getPos().getZ() > this.pos.getZ()) er.bodyyaw = 180;
-					world.spawnEntity(er);
+					EntityRhodes er = new EntityRhodes(level, x-2f, y-26, z, 2);
+					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
+					level.addFreshEntity(er);
 				}
 				else if (buildrhodes2)
 				{
@@ -166,69 +166,69 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 							fy *= 3;
 							fx1 *= 3;
 							fx2 *= 3;
-							setBlockToAir(pos.add(fx1, fy, 0));
-							setBlockToAir(pos.add(fx2, fy, 0));
-							setBlockToAir(pos.add(fx1, fy, 0).east());
-							setBlockToAir(pos.add(fx2, fy, 0).east());
-							setBlockToAir(pos.add(fx1, fy, 0).east(2));
-							setBlockToAir(pos.add(fx2, fy, 0).east(2));
-							setBlockToAir(pos.add(fx1, fy, 0).up());
-							setBlockToAir(pos.add(fx2, fy, 0).up());
-							setBlockToAir(pos.add(fx1, fy, 0).east().up());
-							setBlockToAir(pos.add(fx2, fy, 0).east().up());
-							setBlockToAir(pos.add(fx1, fy, 0).east(2).up());
-							setBlockToAir(pos.add(fx2, fy, 0).east(2).up());
-							setBlockToAir(pos.add(fx1, fy, 0).up(2));
-							setBlockToAir(pos.add(fx2, fy, 0).up(2));
-							setBlockToAir(pos.add(fx1, fy, 0).east().up(2));
-							setBlockToAir(pos.add(fx2, fy, 0).east().up(2));
-							setBlockToAir(pos.add(fx1, fy, 0).east(2).up(2));
-							setBlockToAir(pos.add(fx2, fy, 0).east(2).up(2));
+							setBlockToAir(pos.offset(fx1, fy, 0));
+							setBlockToAir(pos.offset(fx2, fy, 0));
+							setBlockToAir(pos.offset(fx1, fy, 0).east());
+							setBlockToAir(pos.offset(fx2, fy, 0).east());
+							setBlockToAir(pos.offset(fx1, fy, 0).east(2));
+							setBlockToAir(pos.offset(fx2, fy, 0).east(2));
+							setBlockToAir(pos.offset(fx1, fy, 0).above());
+							setBlockToAir(pos.offset(fx2, fy, 0).above());
+							setBlockToAir(pos.offset(fx1, fy, 0).east().above());
+							setBlockToAir(pos.offset(fx2, fy, 0).east().above());
+							setBlockToAir(pos.offset(fx1, fy, 0).east(2).above());
+							setBlockToAir(pos.offset(fx2, fy, 0).east(2).above());
+							setBlockToAir(pos.offset(fx1, fy, 0).above(2));
+							setBlockToAir(pos.offset(fx2, fy, 0).above(2));
+							setBlockToAir(pos.offset(fx1, fy, 0).east().above(2));
+							setBlockToAir(pos.offset(fx2, fy, 0).east().above(2));
+							setBlockToAir(pos.offset(fx1, fy, 0).east(2).above(2));
+							setBlockToAir(pos.offset(fx2, fy, 0).east(2).above(2));
 						}
 					}
-					EntityRhodes er = new EntityRhodes(world, x-3f, y-39, z, 3);
-					if (getPos().getZ() > this.pos.getZ()) er.bodyyaw = 180;
-					world.spawnEntity(er);
+					EntityRhodes er = new EntityRhodes(level, x-3f, y-39, z, 3);
+					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
+					level.addFreshEntity(er);
 				}
-				else if (world.getBlockState(pos.up()).getBlock() == RRBlocks.conduit
-					&& world.getBlockState(pos.west()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.east()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.west().up()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.east().up()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.west().up(3)).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.east().up(3)).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.up(3)).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.up(2)).getBlock() == RRBlocks.conduit
-					&& world.getBlockState(pos.west().up(2)).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.east().up(2)).getBlock() == RRBlocks.steel)
+				else if (level.getBlockState(pos.above()).getBlock() == RRBlocks.conduit
+					&& level.getBlockState(pos.west()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.east()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.west().above()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.east().above()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.west().above(3)).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.east().above(3)).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.above(3)).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.above(2)).getBlock() == RRBlocks.conduit
+					&& level.getBlockState(pos.west().above(2)).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.east().above(2)).getBlock() == RRBlocks.steel)
 				{
-					setBlockToAir(pos.up());
-					setBlockToAir(pos.up(2));
-					setBlockToAir(pos.up(3));
-					EntityRhodes er = new EntityRhodes(world, x+0.5f, y+2.5f, z+0.5f, 0.0666666666666f);
+					setBlockToAir(pos.above());
+					setBlockToAir(pos.above(2));
+					setBlockToAir(pos.above(3));
+					EntityRhodes er = new EntityRhodes(level, x+0.5f, y+2.5f, z+0.5f, 0.0666666666666f);
 					er.wakeX = x;
 					er.wakeY = y;
 					er.wakeZ = z;
-					if (getPos().getZ() > this.pos.getZ()) er.bodyyaw = 180;
-					world.spawnEntity(er);
+					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
+					level.addFreshEntity(er);
 				}
-				else if (world.getBlockState(pos.up()).getBlock() == RRBlocks.conduit
-					&& world.getBlockState(pos.west()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.east()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.west().up()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.east().up()).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.west().up(2)).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.east().up(2)).getBlock() == RRBlocks.steel
-					&& world.getBlockState(pos.up(2)).getBlock() == RRBlocks.steel)
+				else if (level.getBlockState(pos.above()).getBlock() == RRBlocks.conduit
+					&& level.getBlockState(pos.west()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.east()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.west().above()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.east().above()).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.west().above(2)).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.east().above(2)).getBlock() == RRBlocks.steel
+					&& level.getBlockState(pos.above(2)).getBlock() == RRBlocks.steel)
 				{
-					setBlockToAir(pos.up());
-					setBlockToAir(pos.up(2));
-					EntityRhodes er = new EntityRhodes(world, x+0.5f, y+1.5f, z+0.5f, 0.0333333333333f);
+					setBlockToAir(pos.above());
+					setBlockToAir(pos.above(2));
+					EntityRhodes er = new EntityRhodes(level, x+0.5f, y+1.5f, z+0.5f, 0.0333333333333f);
 					er.wakeX = x;
 					er.wakeY = y;
 					er.wakeZ = z;
-					if (getPos().getZ() > this.pos.getZ()) er.bodyyaw = 180;
-					world.spawnEntity(er);
+					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
+					level.addFreshEntity(er);
 				}
 				return power*0.5f;
 			}
@@ -242,12 +242,12 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 	}
 
     private void setBlockToAir(BlockPos pos) {
-        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+        level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
     }
 
     @Override
-    public void markRemoved() {
-        super.markRemoved();
-        EntityRhodes.BLOCK_ENTITIES.remove(getPos());
+    public void setRemoved() {
+        super.setRemoved();
+        EntityRhodes.BLOCK_ENTITIES.remove(getBlockPos());
     }
 }

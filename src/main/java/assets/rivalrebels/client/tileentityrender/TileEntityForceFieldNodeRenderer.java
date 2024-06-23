@@ -14,83 +14,84 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.common.block.machine.BlockForceFieldNode;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<TileEntityForceFieldNode>, CustomRenderBoxExtension<TileEntityForceFieldNode> {
-    public TileEntityForceFieldNodeRenderer(BlockEntityRendererFactory.Context context) {
+    public TileEntityForceFieldNodeRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityForceFieldNode entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
+    public void render(TileEntityForceFieldNode entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         if (entity.pInR <= 0) return;
 
-		matrices.push();
-		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+		matrices.pushPose();
+		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
 
-        int meta = entity.getCachedState().get(BlockForceFieldNode.META);
+        int meta = entity.getBlockState().getValue(BlockForceFieldNode.META);
         if (meta == 2)
 		{
-			matrices.multiply(new Quaternionf(90, 0, 1, 0));
+			matrices.mulPose(new Quaternionf(90, 0, 1, 0));
 		}
 
 		if (meta == 3)
 		{
-			matrices.multiply(new Quaternionf(-90, 0, 1, 0));
+			matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
 		}
 
 		if (meta == 4)
 		{
-			matrices.multiply(new Quaternionf(180, 0, 1, 0));
+			matrices.mulPose(new Quaternionf(180, 0, 1, 0));
 		}
 
-		matrices.multiply(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
 		matrices.translate(0, 0, 0.5f);
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-		vertexConsumer.vertex(-0.0625f, 3.5f, 0f).color(1, 1, 1, 1).texture(0, 0).overlay(overlay).light(light).next();
-		vertexConsumer.vertex(-0.0625f, -3.5f, 0f).color(1, 1, 1, 1).texture(0, 1).overlay(overlay).light(light).next();
-		vertexConsumer.vertex(-0.0625f, -3.5f, 35f).color(1, 1, 1, 1).texture(5, 1).overlay(overlay).light(light).next();
-		vertexConsumer.vertex(-0.0625f, 3.5f, 35f).color(1, 1, 1, 1).texture(5, 0).overlay(overlay).light(light).next();
-		vertexConsumer.vertex(0.0625f, -3.5f, 0f).color(1, 1, 1, 1).texture(0, 1).overlay(overlay).light(light).next();
-		vertexConsumer.vertex(0.0625f, 3.5f, 0f).color(1, 1, 1, 1).texture(0, 0).overlay(overlay).light(light).next();
-		vertexConsumer.vertex(0.0625f, 3.5f, 35f).color(1, 1, 1, 1).texture(5, 0).overlay(overlay).light(light).next();
-		vertexConsumer.vertex(0.0625f, -3.5f, 35f).color(1, 1, 1, 1).texture(5, 1).overlay(overlay).light(light).next();
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 0).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 1).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 1).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 0).setOverlay(overlay).setLight(light);
 
-		matrices.pop();
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 1).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 0).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 0).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 1).setOverlay(overlay).setLight(light);
+
+		matrices.popPose();
 	}
 
     @Override
-    public int getRenderDistance()
+    public int getViewDistance()
     {
         return 16384;
     }
 
     @Override
-    public Box getRenderBoundingBox(TileEntityForceFieldNode entity) {
+    public AABB getRenderBoundingBox(TileEntityForceFieldNode entity) {
         float t = 0.0625f;
         float l = 35f;
         float h = 3.5f;
-        BlockPos pos = entity.getPos();
-        return switch (entity.getCachedState().get(BlockForceFieldNode.META)) {
+        BlockPos pos = entity.getBlockPos();
+        return switch (entity.getBlockState().getValue(BlockForceFieldNode.META)) {
             case 2 ->
-                new Box(pos.getX() + 0.5f - t, pos.getY() + 0.5f - h, pos.getZ() - l, pos.getX() + 0.5f + t, pos.getY() + 0.5f + h, pos.getZ());
+                new AABB(pos.getX() + 0.5f - t, pos.getY() + 0.5f - h, pos.getZ() - l, pos.getX() + 0.5f + t, pos.getY() + 0.5f + h, pos.getZ());
             case 3 ->
-                new Box(pos.getX() + 0.5f - t, pos.getY() + 0.5f - h, pos.getZ() + 1f, pos.getX() + 0.5f + t, pos.getY() + 0.5f + h, pos.getZ() + 1f + l);
+                new AABB(pos.getX() + 0.5f - t, pos.getY() + 0.5f - h, pos.getZ() + 1f, pos.getX() + 0.5f + t, pos.getY() + 0.5f + h, pos.getZ() + 1f + l);
             case 4 ->
-                new Box(pos.getX() - l, pos.getY() + 0.5f - h, pos.getZ() + 0.5f - t, pos.getX(), pos.getY() + 0.5f + h, pos.getZ() + 0.5f + t);
+                new AABB(pos.getX() - l, pos.getY() + 0.5f - h, pos.getZ() + 0.5f - t, pos.getX(), pos.getY() + 0.5f + h, pos.getZ() + 0.5f + t);
             case 5 ->
-                new Box(pos.getX() + 1f, pos.getY() + 0.5f - h, pos.getZ() + 0.5f - t, pos.getX() + 1f + l, pos.getY() + 0.5f + h, pos.getZ() + 0.5f + t);
-            default -> new Box(Vec3d.ZERO, Vec3d.ZERO);
+                new AABB(pos.getX() + 1f, pos.getY() + 0.5f - h, pos.getZ() + 0.5f - t, pos.getX() + 1f + l, pos.getY() + 0.5f + h, pos.getZ() + 0.5f + t);
+            default -> new AABB(Vec3.ZERO, Vec3.ZERO);
         };
     }
 }

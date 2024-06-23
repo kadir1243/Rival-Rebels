@@ -17,35 +17,35 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntitySigmaObjective;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockSigmaObjective extends BlockWithEntity {
-    public static final MapCodec<BlockSigmaObjective> CODEC = createCodec(BlockSigmaObjective::new);
-    public BlockSigmaObjective(Settings settings)
+public class BlockSigmaObjective extends BaseEntityBlock {
+    public static final MapCodec<BlockSigmaObjective> CODEC = simpleCodec(BlockSigmaObjective::new);
+    public BlockSigmaObjective(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<? extends BlockWithEntity> getCodec() {
+    protected MapCodec<? extends BaseEntityBlock> codec() {
         return CODEC;
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
 		if (!pos.equals(RivalRebels.round.sigmaObjPos)) {
-			world.setBlockState(RivalRebels.round.sigmaObjPos, RRBlocks.plasmaexplosion.getDefaultState());
+			world.setBlockAndUpdate(RivalRebels.round.sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
 			RivalRebels.round.sigmaObjPos = pos;
 			if (world.getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj)
 				RivalRebels.round.roundManualStart();
@@ -53,29 +53,29 @@ public class BlockSigmaObjective extends BlockWithEntity {
 	}
 
     @Override
-    public void onStateReplaced(BlockState state, World world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onStateReplaced(state, world, pos, newState, moved);
+    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+        super.onRemove(state, world, pos, newState, moved);
 
-		if (!newState.isOf(RRBlocks.plasmaexplosion)) {
-			world.setBlockState(pos, state);
+		if (!newState.is(RRBlocks.plasmaexplosion)) {
+			world.setBlockAndUpdate(pos, state);
 		}
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		RivalRebelsSoundPlayer.playSound(world, 10, 3, pos);
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 
-		return ActionResult.success(world.isClient);
+		return InteractionResult.sidedSuccess(level.isClientSide);
 	}
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new TileEntitySigmaObjective(pos, state);
     }
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 	/*@Environment(EnvType.CLIENT)

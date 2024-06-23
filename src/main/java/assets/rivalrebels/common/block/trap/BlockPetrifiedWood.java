@@ -12,53 +12,53 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockPetrifiedWood extends Block {
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
-	public BlockPetrifiedWood(Settings settings)
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+	public BlockPetrifiedWood(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
     }
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (player.getAbilities().creativeMode) {
-			world.setBlockState(pos, state.with(META, state.get(META) + 1), 3);
-			return ActionResult.success(world.isClient);
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+		if (player.getAbilities().instabuild) {
+			level.setBlock(pos, state.setValue(META, state.getValue(META) + 1), 3);
+			return InteractionResult.sidedSuccess(level.isClientSide);
 		}
-		return ActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		if (world.random.nextInt(2) == 0) {
-			entity.damage(RivalRebelsDamageSource.radioactivePoisoning(world), ((16 - world.getBlockState(pos).get(META)) / 2) + world.random.nextInt(3) - 1);
+			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), ((16 - world.getBlockState(pos).getValue(META)) / 2) + world.random.nextInt(3) - 1);
 		}
 	}
 
     @Override
-    public void onPlaced(World world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
-		if (placer instanceof PlayerEntity) {
-			world.setBlockState(pos, state.with(META, 7));
+    public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack itemStack) {
+		if (placer instanceof Player) {
+			world.setBlockAndUpdate(pos, state.setValue(META, 7));
 		}
 	}
 

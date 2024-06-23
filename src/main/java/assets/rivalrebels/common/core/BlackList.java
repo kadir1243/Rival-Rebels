@@ -12,10 +12,9 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import java.util.HashSet;
 import java.util.Set;
 

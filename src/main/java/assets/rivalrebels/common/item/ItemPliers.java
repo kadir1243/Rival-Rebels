@@ -15,18 +15,18 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.command.CommandHotPotato;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class ItemPliers extends Item
 {
@@ -34,85 +34,85 @@ public class ItemPliers extends Item
 
 	public ItemPliers()
 	{
-		super(new Settings().maxCount(1));
+		super(new Properties().stacksTo(1));
 	}
 
     @Override
     public ItemStack getRecipeRemainder(ItemStack stack) {
-        return this.getDefaultStack();
+        return this.getDefaultInstance();
     }
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        BlockPos pos = context.getBlockPos();
-        World world = context.getWorld();
-        PlayerEntity player = context.getPlayer();
-        Hand hand = context.getHand();
-		player.swingHand(hand);
-        if (!world.isClient) {
+    public InteractionResult useOn(UseOnContext context) {
+        BlockPos pos = context.getClickedPos();
+        Level world = context.getLevel();
+        Player player = context.getPlayer();
+        InteractionHand hand = context.getHand();
+		player.swing(hand);
+        if (!world.isClientSide) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
             Block block = world.getBlockState(pos).getBlock();
             if (block == RRBlocks.jump && player.getAbilities().invulnerable) {
-                CommandHotPotato.pos = pos.up(400);
-				player.sendMessage(Text.of("Hot Potato drop point set. Use /rrhotpotato to start a round."), false);
+                CommandHotPotato.pos = pos.above(400);
+				player.displayClientMessage(Component.nullToEmpty("Hot Potato drop point set. Use /rrhotpotato to start a round."), false);
 			}
 			if (block == RRBlocks.remotecharge)
 			{
 				int t = 25;
 				i = i + 1;
-				player.sendMessage(Text.translatable(RivalRebels.MODID + ".defuse", i * 100 / t), false);
+				player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".defuse", i * 100 / t), false);
 				if (i >= t)
 				{
-					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.remotecharge.asItem().getDefaultStack());
-					world.spawnEntity(ei);
-					world.setBlockState(pos, Blocks.AIR.getDefaultState());
+					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.remotecharge.asItem().getDefaultInstance());
+					world.addFreshEntity(ei);
+					world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					i = 0;
-					return ActionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 			if (block == RRBlocks.timedbomb)
 			{
 				int t = 25;
 				i = i + 1;
-				player.sendMessage(Text.translatable(RivalRebels.MODID + ".defuse", i * 100 / t), false);
+				player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".defuse", i * 100 / t), false);
 				if (i >= t)
 				{
-					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.timedbomb.asItem().getDefaultStack());
-					world.spawnEntity(ei);
-					world.setBlockState(pos, Blocks.AIR.getDefaultState());
-					world.setBlockState(pos.up(), Blocks.AIR.getDefaultState());
+					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.timedbomb.asItem().getDefaultInstance());
+					world.addFreshEntity(ei);
+					world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+					world.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());
 					i = 0;
-					return ActionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 			if (block instanceof BlockAutoTemplate worldBlock)
 			{
                 i = i + 1;
-				player.sendMessage(Text.translatable(RivalRebels.MODID + ".building", i * 100 / worldBlock.time), false);
+				player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".building", i * 100 / worldBlock.time), false);
 				if (i >= worldBlock.time)
 				{
-                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                    world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					worldBlock.build(world, x, y, z);
 					i = 0;
-					return ActionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
-			if (block == RRBlocks.supplies && world.getBlockState(pos.down()).getBlock() == RRBlocks.supplies)
+			if (block == RRBlocks.supplies && world.getBlockState(pos.below()).getBlock() == RRBlocks.supplies)
 			{
 				i++;
-				player.sendMessage(Text.translatable(RivalRebels.MODID + ".building.tokamak ", i * 100 / 15), false);
+				player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".building.tokamak ", i * 100 / 15), false);
 				if (i >= 15)
 				{
-                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
-					world.setBlockState(pos.down(), RRBlocks.reactor.getDefaultState());
+                    world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+					world.setBlockAndUpdate(pos.below(), RRBlocks.reactor.defaultBlockState());
 					i = 0;
-					return ActionResult.SUCCESS;
+					return InteractionResult.SUCCESS;
 				}
 			}
 		}
-		return ActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 
 }

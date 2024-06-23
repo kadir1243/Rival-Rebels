@@ -11,49 +11,52 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import net.minecraft.block.*;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockLight extends Block
 {
 	public int rendertype;
 
-	public BlockLight(Settings settings, int EntityRenderer)
+	public BlockLight(Properties settings, int EntityRenderer)
 	{
 		super(settings);
 		rendertype = EntityRenderer;
 	}
 
     @Override
-    public BlockRenderType getRenderType(BlockState state) {
+    public RenderShape getRenderShape(BlockState state) {
         if (this == RRBlocks.light2)
-            return BlockRenderType.INVISIBLE;
-		return (BlockRenderType) (Object) rendertype;
+            return RenderShape.INVISIBLE;
+		return super.getRenderShape(state);
 	}
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.cuboid(Box.from(BlockBox.create(pos, pos)));
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return Shapes.create(AABB.of(BoundingBox.fromCorners(pos, pos)));
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
 		if (this == RRBlocks.light) {
-			world.scheduleBlockTick(pos, this, 10);
+			world.scheduleTick(pos, this, 10);
 		}
 	}
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
     }
 }

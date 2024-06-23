@@ -14,27 +14,27 @@ package assets.rivalrebels.common.block.autobuilds;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoBunker extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoBunker> CODEC = createCodec(BlockAutoBunker::new);
+    public static final MapCodec<BlockAutoBunker> CODEC = simpleCodec(BlockAutoBunker::new);
 
-    public BlockAutoBunker(Settings settings)
+    public BlockAutoBunker(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockAutoBunker> getCodec() {
+    protected MapCodec<BlockAutoBunker> codec() {
         return CODEC;
     }
 
     @Override
-	public void build(World world, int x, int y, int z)
+	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClient)
+		if (!world.isClientSide)
 		{
 			int r = RivalRebels.bunkerradius;
 

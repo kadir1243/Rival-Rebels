@@ -15,12 +15,12 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.common.packet.VotePacket;
 import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.font.MultilineText;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.text.Text;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.MultiLineLabel;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
 
 public class GuiNextBattle extends Screen
 {
@@ -35,29 +35,29 @@ public class GuiNextBattle extends Screen
 	private boolean		prevclick;
 
 	public GuiNextBattle() {
-        super(Text.empty());
+        super(Component.empty());
 	}
 
 	@Override
 	public void init() {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-		this.clearChildren();
+		this.clearWidgets();
 
-		nextBattleButton = new GuiButton(posX + 66, posY + 203, 60, 11, Text.translatable("RivalRebels.nextbattle.yes"));
-		waitButton = new GuiButton(posX + 128, posY + 203, 60, 11, Text.translatable("RivalRebels.nextbattle.no"));
-		this.addDrawable(nextBattleButton);
-		this.addDrawable(waitButton);
+		nextBattleButton = new GuiButton(posX + 66, posY + 203, 60, 11, Component.translatable("RivalRebels.nextbattle.yes"));
+		waitButton = new GuiButton(posX + 128, posY + 203, 60, 11, Component.translatable("RivalRebels.nextbattle.no"));
+		this.addRenderableOnly(nextBattleButton);
+		this.addRenderableOnly(waitButton);
 	}
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
-        MatrixStack matrices = context.getMatrices();
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        PoseStack matrices = context.pose();
         count++;
 		if (count == 60)
 		{
@@ -77,24 +77,24 @@ public class GuiNextBattle extends Screen
             ySizeOfTexture * f,
             0
         );
-        context.drawCenteredTextWithShadow(textRenderer, Text.translatable("RivalRebels.nextbattle.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
+        context.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
 		float scalefactor = 4f;
 		matrices.scale(scalefactor, scalefactor, scalefactor);
-        context.drawCenteredTextWithShadow(textRenderer, Text.translatable("RivalRebels.nextbattle.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
+        context.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
 		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
-        MultilineText.create(textRenderer, Text.translatable("RivalRebels.nextbattle.question"), 128).draw(context, posX + 64, posY + 160, this.textRenderer.fontHeight, 0xffffff);
+        MultiLineLabel.create(font, Component.translatable("RivalRebels.nextbattle.question"), 128).renderLeftAlignedNoShadow(context, posX + 64, posY + 160, this.font.lineHeight, 0xffffff);
         super.render(context, mouseX, mouseY, delta);
 
-		if (client.mouse.wasLeftButtonClicked() && !prevclick) {
+		if (minecraft.mouseHandler.isLeftPressed() && !prevclick) {
 			if (nextBattleButton.mouseClicked(mouseX, mouseY, 0)) {
                 ClientPlayNetworking.send(new VotePacket(true));
-				this.client.setScreen(null);
+				this.minecraft.setScreen(null);
 			}
 			if (waitButton.mouseClicked(mouseX, mouseY, 0)) {
                 ClientPlayNetworking.send(new VotePacket(false));
-				this.client.setScreen(null);
+				this.minecraft.setScreen(null);
 			}
 		}
-		prevclick = client.mouse.wasLeftButtonClicked();
+		prevclick = minecraft.mouseHandler.isLeftPressed();
 	}
 }

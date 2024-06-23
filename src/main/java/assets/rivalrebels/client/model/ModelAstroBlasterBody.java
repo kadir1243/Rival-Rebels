@@ -12,8 +12,8 @@
 package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -35,14 +35,14 @@ public class ModelAstroBlasterBody {
 	private static final Vector3f vz2 = new Vector3f(0.25f, 0.25f, 0.5f).normalize();
 	private static final Vector3f vz3 = new Vector3f(0, 0.25f, 0.75f).normalize();
 
-	public static void render(MatrixStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
-		matrices.push();
+	public static void render(PoseStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
+		matrices.pushPose();
         Vector4f color = new Vector4f(red, green, blue, alpha);
 
 		matrices.scale(size, size, size);
         for (int p = 0; p < 4; p++) {
-			matrices.push();
-			matrices.multiply(new Quaternionf(p * 90, 0, 1, 0));
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf(p * 90, 0, 1, 0));
 
 			RenderHelper.addTri(buffer, vy, vy1, vy3, color);
 			RenderHelper.addTri(buffer, vy1, vyz, vy2, color);
@@ -61,8 +61,8 @@ public class ModelAstroBlasterBody {
 			RenderHelper.addTri(buffer, vxz, vx2, vz2, color);
 			RenderHelper.addTri(buffer, vx2, vy2, vz2, color);
 
-			matrices.pop();
+			matrices.popPose();
 		}
-		matrices.pop();
+		matrices.popPose();
 	}
 }

@@ -16,105 +16,105 @@ import assets.rivalrebels.client.model.ModelRocketLauncherBody;
 import assets.rivalrebels.client.model.ModelRocketLauncherHandle;
 import assets.rivalrebels.client.model.ModelRocketLauncherTube;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
-import static net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
-
 public class SeekRocketLauncherRenderer implements DynamicItemRenderer {
-    public static final SpriteIdentifier ROCKET_SEEK_HANDLE_202_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etrocketseekhandle202);
-    public static final SpriteIdentifier SEEK_202_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etseek202);
-    public static final SpriteIdentifier ROCKET_SEEK_TUBE_202_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etrocketseektube202);
+    public static final Material ROCKET_SEEK_HANDLE_202_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrocketseekhandle202);
+    public static final Material SEEK_202_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etseek202);
+    public static final Material ROCKET_SEEK_TUBE_202_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrocketseektube202);
 
     @Override
-    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		matrices.push();
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
 		matrices.translate(0.4f, 0.35f, -0.03f);
-		matrices.multiply(new Quaternionf(-55, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(new Quaternionf(-55, 0.0F, 0.0F, 1.0F));
 		matrices.translate(0f, 0.05f, 0.05f);
-		if (mode.isFirstPerson()) matrices.scale(1, 1, -1);
-		matrices.push();
+		if (mode.firstPerson()) matrices.scale(1, 1, -1);
+		matrices.pushPose();
 		matrices.translate(0.22f, -0.025f, 0f);
-		matrices.multiply(new Quaternionf(90, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(new Quaternionf(90, 0.0F, 0.0F, 1.0F));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
         VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-        ModelRocketLauncherHandle.render(matrices, ROCKET_SEEK_HANDLE_202_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
-		if (stack.hasEnchantments()) {
+        ModelRocketLauncherHandle.render(matrices, ROCKET_SEEK_HANDLE_202_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		if (stack.isEnchanted()) {
 			ModelRocketLauncherHandle.render(matrices, cellularNoise, light, overlay);
 		}
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f, 0.31f, 0f);
-		matrices.multiply(new Quaternionf(90, 0.0F, 0.0F, 1.0F));
-		matrices.multiply(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(new Quaternionf(90, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
 		matrices.scale(0.4f, 0.4f, 0.4f);
-		ModelRocketLauncherBody.render(matrices, SEEK_202_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
-		if (stack.hasEnchantments()) {
+		ModelRocketLauncherBody.render(matrices, SEEK_202_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		if (stack.isEnchanted()) {
 			ModelRocketLauncherBody.render(matrices, cellularNoise, light, overlay);
         }
-		matrices.pop();
+		matrices.popPose();
 
 		float s = 0.0812f;
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f + s, 0.71f, s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
-        VertexConsumer rocketSeekTube202TextureVertexConsumer = ROCKET_SEEK_TUBE_202_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        VertexConsumer rocketSeekTube202TextureVertexConsumer = ROCKET_SEEK_TUBE_202_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
         ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f - s, 0.71f, s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
 		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f + s, 0.71f, -s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
 		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f - s, 0.71f, -s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
 		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
 		// ---
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f + s, -0.285f, s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
 		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f - s, -0.285f, s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
 		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f + s, -0.285f, -s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
 		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(-0.07f - s, -0.285f, -s);
 		matrices.scale(0.15f, -0.1f, 0.15f);
 		ModelRocketLauncherTube.render(matrices, rocketSeekTube202TextureVertexConsumer, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
-		matrices.pop();
+		matrices.popPose();
 	}
 }

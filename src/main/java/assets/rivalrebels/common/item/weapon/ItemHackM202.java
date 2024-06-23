@@ -15,37 +15,37 @@ import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityHackB83;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.level.Level;
 
-public class ItemHackM202 extends ToolItem
+public class ItemHackM202 extends TieredItem
 {
 	public ItemHackM202()
 	{
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
+		super(Tiers.DIAMOND, new Properties().stacksTo(1));
 	}
 
 	@Override
-	public int getEnchantability()
+	public int getEnchantmentValue()
 	{
 		return 100;
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        ItemStack stack = user.getStackInHand(hand);
-		user.setStackInHand(hand, ItemStack.EMPTY);
-		if (!world.isClient)
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        ItemStack stack = user.getItemInHand(hand);
+		user.setItemInHand(hand, ItemStack.EMPTY);
+		if (!world.isClientSide)
 		{
-			world.spawnEntity(new EntityHackB83(world, user.getX(), user.getY(), user.getZ(), -user.headYaw, user.getPitch(), stack.hasEnchantments()));
+			world.addFreshEntity(new EntityHackB83(world, user.getX(), user.getY(), user.getZ(), -user.yHeadRot, user.getXRot(), stack.isEnchanted()));
 		}
 		RivalRebelsSoundPlayer.playSound(user, 23, 2, 0.4f);
 		new Explosion(world, user.getX(), user.getY(), user.getZ(), 2, true, false, RivalRebelsDamageSource.flare(world));
-		return TypedActionResult.success(stack, world.isClient);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 	}
 }

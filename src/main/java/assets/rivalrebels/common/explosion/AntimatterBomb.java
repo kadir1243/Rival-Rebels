@@ -15,22 +15,22 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import assets.rivalrebels.common.entity.EntityAntimatterBombBlast;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class AntimatterBomb {
 	public int		posX;
 	public int		posY;
 	public int		posZ;
-    public BlockPos pos = BlockPos.ORIGIN;
+    public BlockPos pos = BlockPos.ZERO;
 	public int		lastposX = 0;
 	public int		lastposZ = 0;
 	public int		radius;
-	public World	world;
+	public Level	world;
 	private int		n = 1;
 	private int		nlimit;
 	private int		shell;
@@ -41,7 +41,7 @@ public class AntimatterBomb {
 	private int 	treeHeight;
 	public int processedchunks = 0;
 
-	public AntimatterBomb(int x, int y, int z, World world, int rad)
+	public AntimatterBomb(int x, int y, int z, Level world, int rad)
 	{
 		posX = x;
 		posY = y;
@@ -52,7 +52,7 @@ public class AntimatterBomb {
 		//if (radiussmaller < radius) radius = radiussmaller;
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
 		rad = rad*rad/2;
-		if (world.isClient) return;
+		if (world.isClientSide) return;
 		int clamprad = radius;
 		//if (clamprad > 50) clamprad = 50;
 		for (int X = -clamprad; X < clamprad; X++)
@@ -63,11 +63,11 @@ public class AntimatterBomb {
 				if (x2 + Z * Z < rad)
 				{
                     BlockPos pos1 = new BlockPos(X + pos.getX(), 70,Z + pos.getZ());
-					for (; pos1.getY() > 0; pos1 = pos1.down())
+					for (; pos1.getY() > 0; pos1 = pos1.below())
 					{
                         BlockState state = world.getBlockState(pos1);
 						if (!state.getFluidState().isEmpty()) {
-							world.setBlockState(pos1, Blocks.AIR.getDefaultState());
+							world.setBlockAndUpdate(pos1, Blocks.AIR.defaultBlockState());
 						}
 					}
 				}
@@ -123,7 +123,7 @@ public class AntimatterBomb {
 				Block block = world.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
 				if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
 				else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
-				world.setBlockState(new BlockPos(x + posX, Y, z + posZ), Blocks.AIR.getDefaultState());
+				world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.AIR.defaultBlockState());
 			}
 
 			double limit = (radius / 2) + world.random.nextInt(radius / 4) + 7.5;
@@ -135,7 +135,7 @@ public class AntimatterBomb {
 					Block block = world.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
 					if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
 					else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
-					world.setBlockState(new BlockPos(x + posX, Y, z + posZ), Blocks.OBSIDIAN.getDefaultState());
+					world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.OBSIDIAN.defaultBlockState());
 				}
 			}
 
@@ -162,14 +162,14 @@ public class AntimatterBomb {
 					else if (!isTree)
 					{
 						BlockState state = world.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ));
-						world.setBlockState(new BlockPos(x + posX, yy, z + posZ), state);
+						world.setBlockAndUpdate(new BlockPos(x + posX, yy, z + posZ), state);
 					}
 					else
 					{
 						isTree = false;
 						for (int Yy = 0; Yy >= -treeHeight; Yy--)
 						{
-							world.setBlockState(new BlockPos(x + posX, yy + Yy, z + posZ), RRBlocks.petrifiedwood.getDefaultState().with(BlockPetrifiedWood.META, metadata));
+							world.setBlockAndUpdate(new BlockPos(x + posX, yy + Yy, z + posZ), RRBlocks.petrifiedwood.defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 						}
 						break;
 					}
@@ -178,7 +178,7 @@ public class AntimatterBomb {
 			else
 			{
                 BlockState state = world.getBlockState(new BlockPos(x + posX, y, z + posZ));
-				if (!state.isOpaque()) world.setBlockState(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.getDefaultState());
+				if (!state.canOcclude()) world.setBlockAndUpdate(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.defaultBlockState());
 			}
 			return true;
 		}
@@ -201,13 +201,13 @@ public class AntimatterBomb {
                 {
                     for (int i = 0; i < (1 - (dist / radius)) * 16 + world.random.nextDouble() * 2; i++)
                     {
-                        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+                        world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                     }
                 }
-                if (!state.isOpaque() || state.isIn(BlockTags.LOGS))
+                if (!state.canOcclude() || state.is(BlockTags.LOGS))
                 {
-                    world.setBlockState(pos, Blocks.AIR.getDefaultState());
-                    if (dist > radius / 2 && state.isIn(BlockTags.LOGS) && world.getBlockState(pos.down()).isIn(BlockTags.LOGS)) isTree = true;
+                    world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                    if (dist > radius / 2 && state.is(BlockTags.LOGS) && world.getBlockState(pos.below()).is(BlockTags.LOGS)) isTree = true;
                     if (!found && isTree)
                     {
                         foundY = pos.getY();
@@ -224,7 +224,7 @@ public class AntimatterBomb {
                     }
                 }
             }
-            pos = pos.down();
+            pos = pos.below();
         }
         return foundY;
 	}

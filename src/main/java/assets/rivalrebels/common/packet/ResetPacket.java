@@ -11,36 +11,32 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.player.Player;
 
-public class ResetPacket implements FabricPacket {
-    public static final PacketType<ResetPacket> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "reset"), ResetPacket::fromBytes);
-    public static ResetPacket fromBytes(PacketByteBuf buf) {
-        return new ResetPacket();
-    }
+public class ResetPacket implements CustomPacketPayload {
+    public static final ResetPacket INSTANCE = new ResetPacket();
+    public static final StreamCodec<FriendlyByteBuf, ResetPacket> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final Type<ResetPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("reset"));
 
-    @Override
-    public void write(PacketByteBuf buf) {
-    }
 
     @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
     }
 
-    public static void onMessage(PlayerEntity player) {
+    public static void onMessage(Player player) {
         RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
         if (!p.isreset && p.resets > 0) {
             p.isreset = true;
             p.resets--;
-            player.getInventory().clear();
-            RivalRebels.round.rrplayerlist.refreshForWorld(player.getWorld());
+            player.getInventory().clearContent();
+            RivalRebels.round.rrplayerlist.refreshForWorld(player.level());
         }
     }
 }

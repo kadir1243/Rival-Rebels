@@ -13,9 +13,9 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -36,20 +36,20 @@ public class ModelNukeCrate
 	private static final TextureVertice	t3	= new TextureVertice(1, 1);
 	private static final TextureVertice	t4	= new TextureVertice(0, 1);
 
-	public static void renderModelA(MatrixStack matrices, VertexConsumer buffer, int light, int overlay)
+	public static void renderModelA(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		RenderHelper.addFace(buffer, v4, v8, v5, v1, t1, t2, t3, t4, light, overlay);
 		RenderHelper.addFace(buffer, v3, v7, v8, v4, t1, t2, t3, t4, light, overlay);
 		RenderHelper.addFace(buffer, v2, v6, v7, v3, t1, t2, t3, t4, light, overlay);
 		RenderHelper.addFace(buffer, v1, v5, v6, v2, t1, t2, t3, t4, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 	}
 
-	public static void renderModelB(MatrixStack matrices, VertexConsumer buffer, int light, int overlay) {
-		matrices.push();
+	public static void renderModelB(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+		matrices.pushPose();
 		RenderHelper.addFace(buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, overlay);
 		RenderHelper.addFace(buffer, v8, v7, v6, v5, t1, t2, t3, t4, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 	}
 }

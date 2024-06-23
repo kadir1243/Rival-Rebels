@@ -17,31 +17,34 @@ import assets.rivalrebels.common.block.trap.BlockNuclearBomb;
 import assets.rivalrebels.common.container.ContainerNuclearBomb;
 import assets.rivalrebels.common.entity.EntityNuke;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.item.components.ChipData;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tickable, NamedScreenHandlerFactory
+public class TileEntityNuclearBomb extends BlockEntity implements Container, Tickable, MenuProvider
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
-	private final DefaultedList<ItemStack> chestContents	= DefaultedList.ofSize(36, ItemStack.EMPTY);
+	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
 
     public int				Countdown		= RivalRebels.nuclearBombCountdown * 20;
 
@@ -56,19 +59,19 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
     }
 
     @Override
-	public int size()
+	public int getContainerSize()
 	{
 		return 13;
 	}
 
     @Override
-	public ItemStack getStack(int par1)
+	public ItemStack getItem(int par1)
 	{
 		return this.chestContents.get(par1);
 	}
 
     @Override
-	public ItemStack removeStack(int slot, int amount)
+	public ItemStack removeItem(int slot, int amount)
 	{
 		if (!this.chestContents.get(slot).isEmpty())
 		{
@@ -95,7 +98,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
     }
 
     @Override
-    public ItemStack removeStack(int index) {
+    public ItemStack removeItemNoUpdate(int index) {
 		if (!this.chestContents.get(index).isEmpty()) {
 			ItemStack var2 = this.chestContents.get(index);
 			this.chestContents.set(index, ItemStack.EMPTY);
@@ -105,39 +108,39 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 	}
 
 	@Override
-	public void setStack(int index, ItemStack stack)
+	public void setItem(int index, ItemStack stack)
 	{
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack())
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
 		{
-			stack.setCount(this.getMaxCountPerStack());
+			stack.setCount(this.getMaxStackSize());
 		}
 	}
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+        super.loadAdditional(nbt, provider);
 
-        Inventories.readNbt(nbt, this.chestContents);
+        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
 	}
 
     @Override
-    public void writeNbt(NbtCompound nbt) {
-        super.writeNbt(nbt);
-        Inventories.writeNbt(nbt, this.chestContents);
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+        super.saveAdditional(nbt, provider);
+        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
     }
 
     @Override
-	public int getMaxCountPerStack()
+	public int getMaxStackSize()
 	{
 		return 1;
 	}
 
     @Override
-	public boolean canPlayerUse(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
-		return this.world.getBlockEntity(this.getPos()) == this && player.squaredDistanceTo(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
+		return this.level.getBlockEntity(this.getBlockPos()) == this && player.distanceToSqr(this.getBlockPos().getX() + 0.5D, this.getBlockPos().getY() + 0.5D, this.getBlockPos().getZ() + 0.5D) <= 64.0D;
 	}
 
     @Override
@@ -145,27 +148,27 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 		AmountOfCharges = 0;
 		hasTrollface = false;
 		for (int i = 1; i <= 10; i++) {
-			if (!getStack(i).isEmpty() && getStack(i).getItem() == RRItems.nuclearelement) {
+			if (!getItem(i).isEmpty() && getItem(i).getItem() == RRItems.nuclearelement) {
 				AmountOfCharges++;
 			}
-			if (!getStack(i).isEmpty() && getStack(i).getItem() == RRItems.trollmask) {
+			if (!getItem(i).isEmpty() && getItem(i).getItem() == RRItems.trollmask) {
 				hasTrollface = true;
 			}
 		}
 
-		if (!getStack(0).isEmpty()) {
-			hasFuse = getStack(0).getItem() == RRItems.fuse;
+		if (!getItem(0).isEmpty()) {
+			hasFuse = getItem(0).getItem() == RRItems.fuse;
 		} else {
 			hasFuse = false;
 		}
 
-		if (!getStack(12).isEmpty())
+		if (!getItem(12).isEmpty())
 		{
-			hasChip = getStack(12).getItem() == RRItems.chip;
-			if (hasChip)
-			{
-				rrteam = RivalRebelsTeam.getForID(getStack(12).getNbt().getInt("team"));
-				username = getStack(12).getNbt().getString("username");
+			hasChip = getItem(12).getItem() == RRItems.chip;
+			if (hasChip) {
+                ChipData chipData = getItem(12).get(RRComponents.CHIP_DATA);
+                rrteam = chipData.team();
+				username = chipData.username();
 			}
 		}
 		else
@@ -173,13 +176,13 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 			hasChip = false;
 		}
 
-		if (!getStack(11).isEmpty()) {
+		if (!getItem(11).isEmpty()) {
 			hasExplosive = true;// getStack(11).func_150998_b(RivalRebels.timedbomb);
 		} else {
 			hasExplosive = false;
 		}
 
-        boolean sp = world.isClient || (!world.isClient && (world.getServer().isSingleplayer() || world.getServer().getCurrentPlayerCount() == 1));
+        boolean sp = level.isClientSide || (!level.isClientSide && (level.getServer().isSingleplayer() || level.getServer().getPlayerCount() == 1));
 
 		if (hasFuse && hasExplosive && hasChip)
 		{
@@ -188,23 +191,23 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
 				{
-					dist = getPos().getSquaredDistance(RivalRebels.round.omegaObjPos.getX(), getPos().getY(), RivalRebels.round.omegaObjPos.getZ());
+					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.omegaObjPos.getZ());
 				}
 				if (rrteam == RivalRebelsTeam.SIGMA)
 				{
-					dist = getPos().getSquaredDistance(RivalRebels.round.sigmaObjPos.getX(), getPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
+					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
 				}
 			}
 			if (dist > (RivalRebels.nuclearBombStrength + (AmountOfCharges * AmountOfCharges) + 29) * (RivalRebels.nuclearBombStrength + (AmountOfCharges * AmountOfCharges) + 29))
 			{
 				if (Countdown > 0) Countdown--;
 			}
-			else if (!world.isClient)
+			else if (!level.isClientSide)
 			{
 				this.chestContents.set(0, ItemStack.EMPTY);
-                for (PlayerEntity player : world.getPlayers()) {
-                    player.sendMessage(Text.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
-                    player.sendMessage(Text.translatable(RivalRebels.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Text.of("NONE")), false);
+                for (Player player : level.players()) {
+                    player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
+                    player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
 		}
@@ -213,23 +216,23 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 			Countdown = RivalRebels.nuclearBombCountdown * 20;
 		}
 
-		if (Countdown == 200 && !world.isClient && RivalRebels.nuclearBombCountdown > 10) {
-            MutableText line1 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
-            MutableText line2 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
-            MutableText line3 = Text.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
-            for (PlayerEntity player : world.getPlayers()) {
-                player.sendMessage(line1, false);
-                player.sendMessage(line2, false);
-                player.sendMessage(line3, false);
+		if (Countdown == 200 && !level.isClientSide && RivalRebels.nuclearBombCountdown > 10) {
+            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
+            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
+            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
+            for (Player player : level.players()) {
+                player.displayClientMessage(line1, false);
+                player.displayClientMessage(line2, false);
+                player.displayClientMessage(line3, false);
             }
 		}
 
-		if (Countdown == 0 && AmountOfCharges != 0 && !world.isClient)
+		if (Countdown == 0 && AmountOfCharges != 0 && !level.isClientSide)
 		{
-			world.setLightningTicksLeft(2);
+			level.setSkyFlashTime(2);
 			float pitch = 0;
 			float yaw = 0;
-			switch(this.getCachedState().get(BlockNuclearBomb.META))
+			switch(this.getBlockState().getValue(BlockNuclearBomb.META))
 			{
 			default:
 				pitch = -90;
@@ -251,20 +254,20 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
 				break;
 			}
 
-			world.spawnEntity(new EntityNuke(world, getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f, yaw, pitch, AmountOfCharges, hasTrollface));
-			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
+			level.addFreshEntity(new EntityNuke(level, getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, yaw, pitch, AmountOfCharges, hasTrollface));
+			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 		}
 
 		if (Countdown == 0 && AmountOfCharges == 0)
 		{
-			world.createExplosion(null, getPos().getX(), getPos().getY(), getPos().getZ(), 4, World.ExplosionSourceType.BLOCK);
-			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
+			level.explode(null, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 4, Level.ExplosionInteraction.BLOCK);
+			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 		}
     }
 
     @Override
-    public Text getDisplayName() {
-        return Text.of("Nuclear Bomb");
+    public Component getDisplayName() {
+        return Component.nullToEmpty("Nuclear Bomb");
     }
 
     @Override
@@ -279,17 +282,17 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
     }
 
     @Override
-    public void clear() {
+    public void clearContent() {
         this.chestContents.clear();
     }
 
     @Nullable
     @Override
-    public ScreenHandler createMenu(int syncId, PlayerInventory inv, PlayerEntity player) {
+    public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
         return new ContainerNuclearBomb(syncId, inv, this, propertyDelegate);
     }
 
-    private final PropertyDelegate propertyDelegate = new PropertyDelegate() {
+    private final ContainerData propertyDelegate = new ContainerData() {
         @Override
         public int get(int index) {
             return switch (index) {
@@ -307,7 +310,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Inventory, Tic
         }
 
         @Override
-        public int size() {
+        public int getCount() {
             return 4;
         }
     };

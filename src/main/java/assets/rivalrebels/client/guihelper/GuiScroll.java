@@ -12,9 +12,9 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 public class GuiScroll extends GuiButton
 {
@@ -29,25 +29,25 @@ public class GuiScroll extends GuiButton
 
 	public GuiScroll(int par2, int par3, int par4)
 	{
-		super(par2, par3, 5, 11, Text.empty());
+		super(par2, par3, 5, 11, Component.empty());
 		this.limit = par4;
 		pressed = false;
 	}
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 		if (scroll > limit) scroll = limit;
 		if (scroll < 0) scroll = 0;
-		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 11;
-		context.drawTexture(RRIdentifiers.guitbutton, this.getX(), this.getY() + scroll, 0, state, this.width, this.height);
+		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY() + scroll, 0, state, this.width, this.height);
 	}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
+		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
 			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
 			if (pressed) scroll = (int) (mouseY - getY() - 5);
 		} else {

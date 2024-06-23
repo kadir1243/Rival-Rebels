@@ -16,39 +16,39 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.WavefrontObject;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityAntimatterBomb;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb> {
-    public static final RenderLayer RENDER_LAYER = RenderLayer.getEntitySolid(RRIdentifiers.etantimatterbomb);
+    public static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etantimatterbomb);
     public static final WavefrontObject bomb = RenderHelper.getModel("t");
 
-    public RenderAntimatterBomb(EntityRendererFactory.Context manager) {
+    public RenderAntimatterBomb(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
     @Override
-    public void render(EntityAntimatterBomb entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        matrices.push();
+    public void render(EntityAntimatterBomb entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+        matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
-        matrices.multiply(new Quaternionf(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
         // matrices.multiply(new Quaternionf(90.0f, 1.0F, 0.0F, 0.0F));
-        matrices.multiply(new Quaternionf(entity.getPitch(), 0.0F, 0.0F, 1.0F));
-        bomb.render(vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.DEFAULT_UV);
-        matrices.pop();
+        matrices.mulPose(new Quaternionf(entity.getXRot(), 0.0F, 0.0F, 1.0F));
+        bomb.render(vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        matrices.popPose();
     }
 
     @Override
-    public Identifier getTexture(EntityAntimatterBomb entity) {
+    public ResourceLocation getTextureLocation(EntityAntimatterBomb entity) {
         return RRIdentifiers.etantimatterbomb;
     }
 }

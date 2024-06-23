@@ -11,21 +11,21 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterials;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-
 import static org.lwjgl.glfw.GLFW.*;
+
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public class ItemCamera extends ArmorItem
 {
 	public ItemCamera() {
-		super(ArmorMaterials.CHAIN, Type.HELMET, new Settings().maxCount(1));
+		super(ArmorMaterials.CHAIN, Type.HELMET, new Properties().stacksTo(1));
 	}
 
 	float	zoom		= 30f;
@@ -36,38 +36,38 @@ public class ItemCamera extends ArmorItem
 	public static boolean zoomed = false;
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (entity instanceof LivingEntity living) {
-            ItemStack equippedStack = living.getEquippedStack(getSlotType());
+            ItemStack equippedStack = living.getItemBySlot(getEquipmentSlot());
             if (equippedStack == stack) {
-                if (world.isClient) {
-                    MinecraftClient client = MinecraftClient.getInstance();
+                if (world.isClientSide) {
+                    Minecraft client = Minecraft.getInstance();
                     if (entity == client.player) {
-                        boolean key = glfwGetKey(client.getWindow().getHandle(), GLFW_KEY_B) == GLFW_PRESS && client.currentScreen == null;
+                        boolean key = glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_B) == GLFW_PRESS && client.screen == null;
                         if (key != bkey && key) zoomed = !zoomed;
                         bkey = key;
                         if (zoomed) {
                             if (!prevheld)
                             {
-                                fovset = (float) client.options.getFov().getValue();
-                                senset = client.options.getMouseSensitivity().getValue().floatValue();
-                                client.options.smoothCameraEnabled = true;
+                                fovset = (float) client.options.fov().get();
+                                senset = client.options.sensitivity().get().floatValue();
+                                client.options.smoothCamera = true;
                             }
-                            zoom += (client.mouse.getY() * 0.01f);
+                            zoom += (client.mouseHandler.ypos() * 0.01f);
                             if (zoom < 10) zoom = 10;
                             if (zoom > 67) zoom = 67;
-                            client.options.hudHidden = true;
-                            client.options.getFov().setValue((int) (zoom + (client.options.getFov().getValue() - zoom) * 0.85f));
-                            client.options.getMouseSensitivity().setValue((double) (senset * MathHelper.sqrt(zoom) * 0.1f));
+                            client.options.hideGui = true;
+                            client.options.fov().set((int) (zoom + (client.options.fov().get() - zoom) * 0.85f));
+                            client.options.sensitivity().set((double) (senset * Mth.sqrt(zoom) * 0.1f));
                         }
                         else
                         {
                             if (prevheld)
                             {
-                                client.options.getFov().setValue((int) fovset);
-                                client.options.getMouseSensitivity().setValue((double) senset);
-                                client.options.hudHidden = false;
-                                client.options.smoothCameraEnabled = false;
+                                client.options.fov().set((int) fovset);
+                                client.options.sensitivity().set((double) senset);
+                                client.options.hideGui = false;
+                                client.options.smoothCamera = false;
                             }
                         }
                         prevheld = zoomed;

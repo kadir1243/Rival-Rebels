@@ -14,39 +14,39 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.client.model.ModelDisk;
 import assets.rivalrebels.common.entity.EntityRoddiskRep;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 
 public class RenderRoddiskRep extends EntityRenderer<EntityRoddiskRep>
 {
 	private int	er	= 0;
 
-	public RenderRoddiskRep(EntityRendererFactory.Context manager) {
+	public RenderRoddiskRep(EntityRendererProvider.Context manager) {
         super(manager);
 	}
 
     @Override
-    public void render(EntityRoddiskRep entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(EntityRoddiskRep entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
 		er += 13.46;
-        matrices.push();
+        matrices.pushPose();
         matrices.scale(0.4f, 0.4f, 0.4f);
-        matrices.push();
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(entity.getPitch()));
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.getYaw() - 90.0f + er));
+        matrices.pushPose();
+        matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f + er));
 
-		ModelDisk.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, OverlayTexture.DEFAULT_UV);
+		ModelDisk.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, OverlayTexture.NO_OVERLAY);
 
-        matrices.pop();
-        matrices.pop();
+        matrices.popPose();
+        matrices.popPose();
 	}
 
     @Override
-    public Identifier getTexture(EntityRoddiskRep entity) {
+    public ResourceLocation getTextureLocation(EntityRoddiskRep entity) {
         return null;
     }
 }

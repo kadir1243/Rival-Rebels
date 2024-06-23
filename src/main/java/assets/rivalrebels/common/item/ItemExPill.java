@@ -13,90 +13,91 @@ package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
 public class ItemExPill extends Item
 {
 	public ItemExPill() {
-		super(new Settings().maxCount(6));
+		super(new Properties().stacksTo(6));
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 		RivalRebelsSoundPlayer.playSound(player, 15, 0);
 		RivalRebelsSoundPlayer.playSound(player, 28, 18, 1.0f, 0.6f);
-		player.setCurrentHand(hand);
-		if (!world.isClient)
+		player.startUsingItem(hand);
+		if (!world.isClientSide)
 		{
 			int random = world.random.nextInt(100);
 			if (random >= 40)
 			{
-				player.sendMessage(Text.of("§7[§6Status§7]§e The experiment turned out a success."), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 30, 20));
-				player.getHungerManager().add(20, 200);
+				player.displayClientMessage(Component.nullToEmpty("§7[§6Status§7]§e The experiment turned out a success."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
+				player.getFoodData().eat(20, 200);
 				player.heal(20);
 			}
 			else if (random >= 30)
 			{
-				player.sendMessage(Text.of("§7[§6Status§7]§e Begrüßen Sie den Uber-Soldat."), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 30, 20));
-				player.getHungerManager().add(20, 200);
+				player.displayClientMessage(Component.nullToEmpty("§7[§6Status§7]§e Begrüßen Sie den Uber-Soldat."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
+				player.getFoodData().eat(20, 200);
 				player.heal(20);
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.RESISTANCE, 450, 20));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.STRENGTH, 500, 20));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.JUMP_BOOST, 300, 2));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.HASTE, 500, 2));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.SPEED, 550, 2));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.WATER_BREATHING, 800, 20));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.FIRE_RESISTANCE, 800, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 450, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.JUMP, 300, 2));
+				player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 500, 2));
+				player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 550, 2));
+				player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 800, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 20));
 			}
 			else if (random >= 20)
 			{
-				player.sendMessage(Text.of("§7[§6Status§7]§e The test subject has perished."), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.damage(RivalRebelsDamageSource.cyanide(world), 2000);
+				player.displayClientMessage(Component.nullToEmpty("§7[§6Status§7]§e The test subject has perished."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+				player.hurt(RivalRebelsDamageSource.cyanide(world), 2000);
 			}
 			else
 			{
-				player.sendMessage(Text.of("§7[§6Status§7]§e Unexpected results have occurred."), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_MAGMA_CUBE_JUMP, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.ENTITY_GHAST_SCREAM, SoundCategory.PLAYERS, 1.0F, 1.0F);
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 1500, 20));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 1500, 20));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 1500, 20));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.MINING_FATIGUE, 1500, 20));
-				player.addStatusEffect(new StatusEffectInstance(StatusEffects.WEAKNESS, 1500, 20));
+				player.displayClientMessage(Component.nullToEmpty("§7[§6Status§7]§e Unexpected results have occurred."), true);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
+				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+				player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 1500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 1500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 1500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 1500, 20));
 			}
-			stack.decrement(1);
+			stack.shrink(1);
         }
-		return TypedActionResult.success(stack, world.isClient);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 	}
 
 	@Override
-	public UseAction getUseAction(ItemStack stack)
+	public UseAnim getUseAnimation(ItemStack stack)
 	{
-		return UseAction.EAT;
+		return UseAnim.EAT;
 	}
 
     @Override
-    public int getMaxUseTime(ItemStack stack) {
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 32;
 	}
 }

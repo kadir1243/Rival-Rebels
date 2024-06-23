@@ -11,28 +11,28 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
-import net.minecraft.util.Identifier;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
-public class GuiCustomButton extends ButtonWidget
+public class GuiCustomButton extends Button
 {
 	Rectangle			bbox;
 	Vector				tbox;
-	Identifier	resloc;
+	ResourceLocation	resloc;
 	boolean				toggleable;
 	public boolean		isPressed	= false;
 	public boolean		wasPressed	= false;
 	public boolean		mouseDown	= false;
 
-	public GuiCustomButton(Rectangle rec, Identifier rl, Vector uv, boolean isToggle)
+	public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector uv, boolean isToggle)
 	{
-		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Text.empty(), button -> {}, DEFAULT_NARRATION_SUPPLIER);
+		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Component.empty(), button -> {}, DEFAULT_NARRATION);
 		bbox = rec;
 		tbox = uv;
 		resloc = rl;
@@ -40,8 +40,8 @@ public class GuiCustomButton extends ButtonWidget
 	}
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-		boolean current = MinecraftClient.getInstance().mouse.wasLeftButtonClicked() && bbox.isVecInside(new Vector(mouseX, mouseY));
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && bbox.isVecInside(new Vector(mouseX, mouseY));
 		wasPressed = false;
 		if (toggleable && current && !mouseDown)
 		{
@@ -63,8 +63,8 @@ public class GuiCustomButton extends ButtonWidget
 		}
 
 		if (isPressed) {
-			context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-            context.drawTexture(resloc, bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin);
+			context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+            context.blit(resloc, bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin);
 		}
 	}
 }

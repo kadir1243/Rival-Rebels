@@ -15,18 +15,17 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TsarBomba;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
 
 public class EntityTsarBlast extends EntityInanimate
 {
@@ -34,29 +33,29 @@ public class EntityTsarBlast extends EntityInanimate
 	public double		radius;
 	public int			time		= 0;
 
-    public EntityTsarBlast(EntityType<? extends EntityTsarBlast> type, World world) {
+    public EntityTsarBlast(EntityType<? extends EntityTsarBlast> type, Level world) {
         super(type, world);
     }
 
-	public EntityTsarBlast(World par1World)
+	public EntityTsarBlast(Level par1World)
 	{
 		this(RREntities.TSAR_BLAST, par1World);
-		ignoreCameraFrustum = true;
+		noCulling = true;
 	}
 
-	public EntityTsarBlast(World par1World, float x, float y, float z, TsarBomba tsarBomba, int rad) {
+	public EntityTsarBlast(Level par1World, float x, float y, float z, TsarBomba tsarBomba, int rad) {
 		this(par1World);
 		tsar = tsarBomba;
 		radius = rad;
-		setVelocity(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-		setPosition(x, y, z);
+		setDeltaMovement(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setPos(x, y, z);
 	}
 
-	public EntityTsarBlast(World par1World, double x, double y, double z, float rad) {
+	public EntityTsarBlast(Level par1World, double x, double y, double z, float rad) {
 		this(par1World);
 		radius = rad;
-		setVelocity(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-        setPosition(x, y, z);
+		setDeltaMovement(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+        setPos(x, y, z);
 	}
 
 	@Override
@@ -64,22 +63,22 @@ public class EntityTsarBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (getWorld().random.nextInt(10) == 0)
+		if (level().random.nextInt(10) == 0)
 		{
-			getWorld().playSound(getX(), getY(), getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.50F, true);
+			level().playLocalSound(getX(), getY(), getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.AMBIENT, 10.0F, 0.50F, true);
 		}
 		else
 		{
-			if (getWorld().random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
+			if (level().random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
 		}
 
-		age++;
+		tickCount++;
 
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
-			if (tsar == null && age > 1200) kill();
-			if (age % 20 == 0) updateEntityList();
-			if (age < 1200 && age % 5 == 0) pushAndHurtEntities();
+			if (tsar == null && tickCount > 1200) kill();
+			if (tickCount % 20 == 0) updateEntityList();
+			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RivalRebels.tsarBombaSpeed * 2; i++)
 			{
 				if (tsar != null)
@@ -104,13 +103,13 @@ public class EntityTsarBlast extends EntityInanimate
 	{
 		entitylist.clear();
 		double ldist = radius*radius;
-		for (int i = 0; i < getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox()).size(); i++)
+		for (int i = 0; i < level().getEntities(this, Shapes.INFINITY.bounds()).size(); i++)
 		{
-			Entity e = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox()).get(i);
-			double dist = e.squaredDistanceTo(getX(),getY(),getZ());
+			Entity e = level().getEntities(this, Shapes.INFINITY.bounds()).get(i);
+			double dist = e.distanceToSqr(getX(),getY(),getZ());
 			if (dist < ldist)
 			{
-				if ((e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityTsarBlast || e == this) continue;
+				if ((e instanceof Player && ((Player) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityTsarBlast || e == this) continue;
 				entitylist.add(e);
 			}
 		}
@@ -122,24 +121,24 @@ public class EntityTsarBlast extends EntityInanimate
 		float invrad = 1.0f / (float) radius;
 		for (Entity e : entitylist)
 		{
-			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearBlast(getWorld())))
+			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearBlast(level())))
 			{
 				remove.add(e);
 				continue;
 			}
-            Vec3d dpos = e.getPos().subtract(getPos());
+            Vec3 dpos = e.position().subtract(position());
 			float dist = (float) dpos.length();
 			float rsqrt = 1.0f / (dist + 0.0001f);
-            dpos = dpos.multiply(rsqrt);
+            dpos = dpos.scale(rsqrt);
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
-				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (radius*f*0.025f));
+				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (radius*f*0.025f));
 			}
 			else
 			{
-				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (f * f * 2.0f * radius + 20.0f));
-                e.setVelocity(getVelocity().subtract(dpos.multiply(f)));
+				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (f * f * 2.0f * radius + 20.0f));
+                e.setDeltaMovement(getDeltaMovement().subtract(dpos.scale(f)));
 			}
 		}
 		for (Entity e : remove)
@@ -149,32 +148,32 @@ public class EntityTsarBlast extends EntityInanimate
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt)
+	public void readAdditionalSaveData(CompoundTag nbt)
 	{
 		radius = nbt.getFloat("radius");
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt)
+	public void addAdditionalSaveData(CompoundTag nbt)
 	{
 		nbt.putFloat("radius", (float) radius);
 	}
 
 	@Override
-	public float getBrightnessAtEyes()
+	public float getLightLevelDependentMagicValue()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
     public EntityTsarBlast setTime()
 	{
-		age = 920;
+		tickCount = 920;
 		return this;
 	}
 }

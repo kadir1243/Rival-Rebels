@@ -14,9 +14,9 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Quaternionf;
 
 public class ModelNukeCloud
@@ -32,12 +32,12 @@ public class ModelNukeCloud
 	private float	cos			= (float) Math.cos(deg);
 	private float	add			= 360 / segments;
 
-	public void renderTop(MatrixStack matrices, VertexConsumer buffer, int light, int overlay)
+	public void renderTop(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
 		for (float i = 0; i < segments; i++)
 		{
-			matrices.push();
-			matrices.multiply(new Quaternionf(add * i, 0, 1, 0));
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
 			for (int f = 1; f < topx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / topx.length) * f);
@@ -49,16 +49,16 @@ public class ModelNukeCloud
 						new Vector3f(topx[f - 1] * sin, topy[f - 1], topx[f - 1] * cos),
 						new Vector3f(topx[f] * sin, topy[f], topx[f] * cos), t1, t2, t3, t4, light, overlay);
 			}
-			matrices.pop();
+			matrices.popPose();
 		}
 	}
 
-	public void renderBottom(MatrixStack matrices, VertexConsumer buffer, int light, int overlay)
+	public void renderBottom(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
 		for (float i = 0; i < segments; i++)
 		{
-			matrices.push();
-			matrices.multiply(new Quaternionf(add * i, 0, 1, 0));
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
 			for (int f = 1; f < bottomx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / bottomx.length) * f);
@@ -70,7 +70,7 @@ public class ModelNukeCloud
 						new Vector3f(bottomx[f - 1] * sin, bottomy[f - 1], bottomx[f - 1] * cos),
 						new Vector3f(bottomx[f] * sin, bottomy[f], bottomx[f] * cos), t1, t2, t3, t4, light, overlay);
 			}
-			matrices.pop();
+			matrices.popPose();
 		}
 	}
 }

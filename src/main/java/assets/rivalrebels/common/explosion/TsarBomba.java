@@ -16,12 +16,12 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockPetrifiedStone;
 import assets.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class TsarBomba
 {
@@ -31,7 +31,7 @@ public class TsarBomba
 	public int		lastposX = 0;
 	public int		lastposZ = 0;
 	public int		radius;
-	public World	world;
+	public Level	world;
 	private int		n = 1;
 	private int		nlimit;
 	private int		shell;
@@ -42,7 +42,7 @@ public class TsarBomba
 	private int 	treeHeight;
 	public int processedchunks = 0;
 
-	public TsarBomba(int x, int y, int z, World world, int rad)
+	public TsarBomba(int x, int y, int z, Level world, int rad)
 	{
 		posX = x;
 		posY = y;
@@ -53,7 +53,7 @@ public class TsarBomba
 		//if (radiussmaller < radius) radius = radiussmaller;
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
 		rad = rad*rad;
-		if (world.isClient) return;
+		if (world.isClientSide) return;
 		int clamprad = radius;
 		//if (clamprad > 50) clamprad = 50;
 		for (int X = -clamprad; X < clamprad; X++)
@@ -67,7 +67,7 @@ public class TsarBomba
 					{
                         BlockState state = world.getBlockState(new BlockPos(X + posX, Y, Z + posZ));
 						if (!state.getFluidState().isEmpty()) {
-							world.setBlockState(new BlockPos(X + posX, Y, Z + posZ), Blocks.AIR.getDefaultState());
+							world.setBlockAndUpdate(new BlockPos(X + posX, Y, Z + posZ), Blocks.AIR.defaultBlockState());
 						}
 					}
 				}
@@ -125,7 +125,7 @@ public class TsarBomba
                 Block block = world.getBlockState(pos).getBlock();
 				if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
 				else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
-				world.setBlockState(pos, Blocks.AIR.getDefaultState());
+				world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			}
 
 			double limit = (radius / 2) + world.random.nextInt(radius / 4) + 7.5;
@@ -148,10 +148,10 @@ public class TsarBomba
                     Block block = world.getBlockState(pos).getBlock();
 					if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
 					else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
-					if (blockType == 1) world.setBlockState(pos, RRBlocks.petrifiedstone1.getDefaultState().with(BlockPetrifiedStone.META, metadata));
-					else if (blockType == 2) world.setBlockState(pos, RRBlocks.petrifiedstone2.getDefaultState().with(BlockPetrifiedStone.META, metadata));
-					else if (blockType == 3) world.setBlockState(pos, RRBlocks.petrifiedstone3.getDefaultState().with(BlockPetrifiedStone.META, metadata));
-					else world.setBlockState(pos, RRBlocks.petrifiedstone4.getDefaultState().with(BlockPetrifiedStone.META, metadata));
+					if (blockType == 1) world.setBlockAndUpdate(pos, RRBlocks.petrifiedstone1.defaultBlockState().setValue(BlockPetrifiedStone.META, metadata));
+					else if (blockType == 2) world.setBlockAndUpdate(pos, RRBlocks.petrifiedstone2.defaultBlockState().setValue(BlockPetrifiedStone.META, metadata));
+					else if (blockType == 3) world.setBlockAndUpdate(pos, RRBlocks.petrifiedstone3.defaultBlockState().setValue(BlockPetrifiedStone.META, metadata));
+					else world.setBlockAndUpdate(pos, RRBlocks.petrifiedstone4.defaultBlockState().setValue(BlockPetrifiedStone.META, metadata));
 				}
 			}
 
@@ -165,7 +165,7 @@ public class TsarBomba
 				for (int Y = ylimit; Y > ylimit - treeHeight; Y--)
 				{
 					if (Y == 0) break;
-					world.setBlockState(new BlockPos(x + posX, Y, z + posZ), RRBlocks.petrifiedwood.getDefaultState().with(BlockPetrifiedWood.META, metadata));
+					world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), RRBlocks.petrifiedwood.defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 				}
 			}
 
@@ -192,14 +192,14 @@ public class TsarBomba
 					else if (!isTree)
 					{
 						BlockState state = world.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ));
-						world.setBlockState(new BlockPos(x + posX, yy, z + posZ), state);
+						world.setBlockAndUpdate(new BlockPos(x + posX, yy, z + posZ), state);
 					}
 					else
 					{
 						isTree = false;
 						for (int Yy = 0; Yy >= -treeHeight; Yy--)
 						{
-							world.setBlockState(new BlockPos(x + posX, yy + Yy, z + posZ), RRBlocks.petrifiedwood.getDefaultState().with(BlockPetrifiedWood.META, metadata));
+							world.setBlockAndUpdate(new BlockPos(x + posX, yy + Yy, z + posZ), RRBlocks.petrifiedwood.defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 						}
 						break;
 					}
@@ -210,7 +210,7 @@ public class TsarBomba
 				BlockState state = world.getBlockState(new BlockPos(x + posX, y, z + posZ));
 				if (state.getBlock() == Blocks.BEDROCK)
 				;
-				else if (!state.isOpaque()) world.setBlockState(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.getDefaultState());
+				else if (!state.canOcclude()) world.setBlockAndUpdate(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.defaultBlockState());
 				if (isTree)
 				{
 					isTree = false;
@@ -220,7 +220,7 @@ public class TsarBomba
 					if (metadata > 15) metadata = 15;
 					for (int Y = ylimit; Y > ylimit - treeHeight; Y--)
 					{
-						world.setBlockState(new BlockPos(x + posX, Y, z + posZ), RRBlocks.petrifiedwood.getDefaultState().with(BlockPetrifiedWood.META, metadata));
+						world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), RRBlocks.petrifiedwood.defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 					}
 				}
 			}
@@ -245,13 +245,13 @@ public class TsarBomba
 				{
 					for (int i = 0; i < (1 - (dist / radius)) * 16 + world.random.nextDouble() * 2; i++)
 					{
-						world.setBlockState(pos, Blocks.AIR.getDefaultState());
+						world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					}
 				}
-				if (!state.isOpaque() || state.isIn(BlockTags.LOGS))
+				if (!state.canOcclude() || state.is(BlockTags.LOGS))
 				{
-					world.setBlockState(pos, Blocks.AIR.getDefaultState());
-					if (dist > radius / 2 && state.isIn(BlockTags.LOGS) && world.getBlockState(pos.down()).isIn(BlockTags.LOGS)) isTree = true;
+					world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+					if (dist > radius / 2 && state.is(BlockTags.LOGS) && world.getBlockState(pos.below()).is(BlockTags.LOGS)) isTree = true;
 					if (!found && isTree)
 					{
 						foundY = y;

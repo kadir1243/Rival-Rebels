@@ -14,8 +14,8 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -30,13 +30,13 @@ public class ModelAstroBlasterBarrel {
 	private static final float	cos			= (float) Math.cos(deg);
 	private static final float	add			= 360 / segments;
 
-	public static void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay)
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		for (float i = 0; i < segments; i++)
 		{
-			matrices.push();
-			matrices.multiply(new Quaternionf(add * i, 0, 1, 0));
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
 			for (int f = 1; f < barrelx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
@@ -48,8 +48,8 @@ public class ModelAstroBlasterBarrel {
 						new Vector3f(barrelx[f - 1] * sin, barrely[f - 1], barrelx[f - 1] * cos),
 						new Vector3f(barrelx[f] * sin, barrely[f], barrelx[f] * cos), t1, t2, t3, t4, light, overlay);
 			}
-			matrices.pop();
+			matrices.popPose();
 		}
-		matrices.pop();
+		matrices.popPose();
 	}
 }

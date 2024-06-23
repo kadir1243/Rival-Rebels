@@ -12,42 +12,36 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.MiningToolItem;
-import net.minecraft.item.ToolMaterials;
-
 import java.util.HashSet;
 import java.util.Set;
 
-public class ItemArmyShovel extends MiningToolItem {
-	private static final Set<Block> blocksEffectiveAgainst;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.DiggerItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.component.Unbreakable;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+
+public class ItemArmyShovel extends DiggerItem {
+	private static final Set<Block> blocksEffectiveAgainst = new HashSet<>();
 
 	public ItemArmyShovel() {
-		super(1, 1, ToolMaterials.DIAMOND, null, new Settings());
+		super(Tiers.DIAMOND, null, new Properties().component(DataComponents.UNBREAKABLE, new Unbreakable(true)));
     }
 
-	@Override
-	public boolean isDamageable()
-	{
-		return false;
-	}
-
     @Override
-    public boolean isSuitableFor(BlockState state) {
+    public boolean isCorrectToolForDrops(ItemStack stack, BlockState state) {
         return blocksEffectiveAgainst.contains(state.getBlock());
     }
 
     @Override
-    public float getMiningSpeedMultiplier(ItemStack stack, BlockState state) {
-        return blocksEffectiveAgainst.contains(state.getBlock()) ? this.miningSpeed : 1.0f;
+    public float getDestroySpeed(ItemStack stack, BlockState state) {
+        return blocksEffectiveAgainst.contains(state.getBlock()) ? Tiers.DIAMOND.getSpeed() : 1.0f;
     }
 
-    static
-	{
-		blocksEffectiveAgainst = new HashSet<>();
-		blocksEffectiveAgainst.add(RRBlocks.barricade);
+    static {
+        blocksEffectiveAgainst.add(RRBlocks.barricade);
 		blocksEffectiveAgainst.add(RRBlocks.reactive);
 		blocksEffectiveAgainst.add(RRBlocks.conduit);
 		blocksEffectiveAgainst.add(RRBlocks.tower);

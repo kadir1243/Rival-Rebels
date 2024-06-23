@@ -11,48 +11,40 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.item.components.FlameThrowerMode;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.item.weapon.ItemFlameThrower;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 
-public class ItemUpdate implements FabricPacket {
-    public static final PacketType<ItemUpdate> TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "item_update"), ItemUpdate::new);
-    private final int item;
-	private final int value;
-
-	public ItemUpdate(int currentItem, int i) {
-		item = currentItem;
-		value = i;
-	}
-
-	public ItemUpdate(PacketByteBuf buf) {
-        this(buf.readInt(), buf.readInt());
-	}
+public record ItemUpdate(int item, int value) implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, ItemUpdate> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.INT,
+        ItemUpdate::item,
+        ByteBufCodecs.INT,
+        ItemUpdate::value,
+        ItemUpdate::new
+    );
+    public static final Type<ItemUpdate> TYPE = new Type<>(RRIdentifiers.create("item_update"));
 
     @Override
-    public void write(PacketByteBuf buf) {
-		buf.writeInt(item);
-		buf.writeInt(value);
-	}
-
-    @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
-    public static void onMessage(ItemUpdate message, PlayerEntity player) {
-        ItemStack itemstack = player.getInventory().getStack(message.item);
+    public static void onMessage(ItemUpdate message, Player player) {
+        ItemStack itemstack = player.getInventory().getItem(message.item);
         if (itemstack.getItem() instanceof ItemTesla) {
-            itemstack.getOrCreateNbt().putInt("dial", message.value);
+            itemstack.set(RRComponents.TESLA_DIAL, message.value());
         }
         if (itemstack.getItem() instanceof ItemFlameThrower) {
-            itemstack.getOrCreateNbt().putInt("mode", message.value);
+            itemstack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(message.value(), itemstack.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).isReady()));
         }
     }
 }

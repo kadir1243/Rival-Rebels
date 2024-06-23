@@ -23,17 +23,16 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.option.KeyBinding;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactories;
-import net.minecraft.client.world.ClientWorld;
-import net.minecraft.world.World;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.world.level.Level;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class ClientProxy extends CommonProxy
-{
-    public static final KeyBinding USE_KEY = new KeyBinding("use_key", GLFW_KEY_F, "");
+public class ClientProxy extends CommonProxy {
+    public static final KeyMapping USE_KEY = new KeyMapping("use_key", GLFW_KEY_F, "");
 
     @Environment(EnvType.CLIENT)
     public static void registerKeyBinding() {
@@ -42,23 +41,23 @@ public class ClientProxy extends CommonProxy
 
 	@Environment(EnvType.CLIENT)
 	public static void registerRenderInformation() {
-		BlockEntityRendererFactories.register(RRTileEntities.NUKE_CRATE, TileEntityNukeCrateRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.NUCLEAR_BOMB, TileEntityNuclearBombRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.PLASMA_EXPLOSION, TileEntityPlasmaExplosionRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.REACTOR, TileEntityReactorRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.JUMP_BLOCK, TileEntityJumpBlockRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.LOADER, TileEntityLoaderRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.OMEGA_OBJECTIVE, TileEntityOmegaObjectiveRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.SIGMA_OBJECTIVE, TileEntitySigmaObjectiveRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.TSAR_BOMB, TileEntityTsarBombaRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.FORCE_FIELD_NODE, TileEntityForceFieldNodeRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.GORE, TileEntityGoreRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.LAPTOP, TileEntityLaptopRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.RECIEVER, TileEntityRecieverRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.MELT_DOWN, TileEntityMeltdownRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.THEORETICAL_TSAR_BOMB, TileEntityTheoreticalTsarBombaRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.ANTIMATTER_BOMB, TileEntityAntimatterBombRenderer::new);
-		BlockEntityRendererFactories.register(RRTileEntities.TACHYON_BOMB, TileEntityTachyonBombRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.NUKE_CRATE, TileEntityNukeCrateRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.NUCLEAR_BOMB, TileEntityNuclearBombRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.PLASMA_EXPLOSION, TileEntityPlasmaExplosionRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.REACTOR, TileEntityReactorRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.JUMP_BLOCK, TileEntityJumpBlockRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.LOADER, TileEntityLoaderRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.OMEGA_OBJECTIVE, TileEntityOmegaObjectiveRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.SIGMA_OBJECTIVE, TileEntitySigmaObjectiveRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.TSAR_BOMB, TileEntityTsarBombaRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.FORCE_FIELD_NODE, TileEntityForceFieldNodeRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.GORE, TileEntityGoreRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.LAPTOP, TileEntityLaptopRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.RECIEVER, TileEntityRecieverRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.MELT_DOWN, TileEntityMeltdownRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.THEORETICAL_TSAR_BOMB, TileEntityTheoreticalTsarBombaRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.ANTIMATTER_BOMB, TileEntityAntimatterBombRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.TACHYON_BOMB, TileEntityTachyonBombRenderer::new);
 		EntityRendererRegistry.register(RREntities.GAS_GRENADE, RenderGasGrenade::new);
 		EntityRendererRegistry.register(RREntities.PROPULSION_FX, manager -> new RenderBullet(manager, "fire"));
 		EntityRendererRegistry.register(RREntities.PASSIVE_FIRE, manager -> new RenderBullet(manager, "fire"));
@@ -117,85 +116,85 @@ public class ClientProxy extends CommonProxy
     @Override
 	public void closeGui()
 	{
-		MinecraftClient.getInstance().setScreen(null);
+		Minecraft.getInstance().setScreen(null);
 	}
 
 	@Override
 	public void nextBattle()
 	{
-		MinecraftClient.getInstance().setScreen(new GuiNextBattle());
+		Minecraft.getInstance().setScreen(new GuiNextBattle());
 	}
 
 	@Override
 	public void teamWin(boolean winner)
 	{
-		MinecraftClient.getInstance().setScreen(winner?new GuiOmegaWin():new GuiSigmaWin());
+		Minecraft.getInstance().setScreen(winner?new GuiOmegaWin():new GuiSigmaWin());
 	}
 
 	@Override
 	public void guiClass()
 	{
-		MinecraftClient.getInstance().setScreen(new GuiClass(RivalRebels.round.rrplayerlist.getForGameProfile(MinecraftClient.getInstance().player.getGameProfile()).rrclass));
+		Minecraft.getInstance().setScreen(new GuiClass(RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getInstance().player.getGameProfile()).rrclass));
 	}
 
 	@Override
 	public void guiSpawn()
 	{
-		MinecraftClient.getInstance().setScreen(new GuiSpawn(RivalRebels.round.rrplayerlist.getForGameProfile(MinecraftClient.getInstance().player.getGameProfile()).rrclass));
+		Minecraft.getInstance().setScreen(new GuiSpawn(RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getInstance().player.getGameProfile()).rrclass));
 	}
 
 	@Override
 	public void flamethrowerGui(int i)
 	{
-		MinecraftClient.getInstance().setScreen(new GuiFlameThrower(i));
+		Minecraft.getInstance().setScreen(new GuiFlameThrower(i));
 	}
 
 	@Override
 	public void teslaGui(int i)
 	{
-		MinecraftClient.getInstance().setScreen(new GuiTesla(i));
+		Minecraft.getInstance().setScreen(new GuiTesla(i));
 	}
 
 	@Override
-	public void spawnGore(World world, EntityGore g, boolean greenblood)
+	public void spawnGore(Level world, EntityGore g, boolean greenblood)
 	{
-		MinecraftClient.getInstance().particleManager.addParticle(new EntityBloodFX((ClientWorld) world, g, !greenblood));
+		Minecraft.getInstance().particleEngine.add(new EntityBloodFX((ClientLevel) world, g, !greenblood));
 	}
 
 	@Override
 	public boolean spacebar()
 	{
-		return MinecraftClient.getInstance().options.jumpKey.wasPressed() && MinecraftClient.getInstance().currentScreen == null;
+		return Minecraft.getInstance().options.keyJump.consumeClick() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean w()
 	{
-		return MinecraftClient.getInstance().options.forwardKey.wasPressed() && MinecraftClient.getInstance().currentScreen == null;
+		return Minecraft.getInstance().options.keyUp.consumeClick() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean a()
 	{
-		return MinecraftClient.getInstance().options.leftKey.wasPressed() && MinecraftClient.getInstance().currentScreen == null;
+		return Minecraft.getInstance().options.keyLeft.consumeClick() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean s()
 	{
-		return MinecraftClient.getInstance().options.backKey.wasPressed() && MinecraftClient.getInstance().currentScreen == null;
+		return Minecraft.getInstance().options.keyDown.consumeClick() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean d()
 	{
-		return MinecraftClient.getInstance().options.rightKey.wasPressed() && MinecraftClient.getInstance().currentScreen == null;
+		return Minecraft.getInstance().options.keyRight.consumeClick() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean f()
 	{
-		return glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_F) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		return glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_F) == GLFW_PRESS && Minecraft.getInstance().screen == null;
 	}
 	boolean prevc = false;
 	public boolean c()
 	{
-		boolean isdown = glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_C) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		boolean isdown = glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_C) == GLFW_PRESS && Minecraft.getInstance().screen == null;
 		boolean x = !prevc && isdown;
 		prevc = isdown;
 		return x;
@@ -204,7 +203,7 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public boolean x()
 	{
-		boolean isdown = glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_X) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		boolean isdown = glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_X) == GLFW_PRESS && Minecraft.getInstance().screen == null;
 		boolean x = !prevx && isdown;
 		prevx = isdown;
 		return x;
@@ -212,17 +211,17 @@ public class ClientProxy extends CommonProxy
 	@Override
 	public boolean z()
 	{
-		return glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_Z) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		return glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_Z) == GLFW_PRESS && Minecraft.getInstance().screen == null;
 	}
 	public boolean g()
 	{
-		return glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW_KEY_G) == GLFW_PRESS && MinecraftClient.getInstance().currentScreen == null;
+		return glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_G) == GLFW_PRESS && Minecraft.getInstance().screen == null;
 	}
 
 	@Override
 	public void setOverlay(EntityRhodes rhodes)
 	{
-		if (rhodes.rider == MinecraftClient.getInstance().player)
+		if (rhodes.rider == Minecraft.getInstance().player)
 		{
 			RivalRebels.rrro.counter = 10;
 			RivalRebels.rrro.rhodes = rhodes;

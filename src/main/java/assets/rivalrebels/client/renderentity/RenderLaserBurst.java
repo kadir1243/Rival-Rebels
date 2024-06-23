@@ -12,51 +12,52 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityLaserBurst;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 
 public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst>
 {
 	private static final float red = 1F;
 
-    public RenderLaserBurst(EntityRendererFactory.Context renderManager) {
+    public RenderLaserBurst(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void render(EntityLaserBurst entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(EntityLaserBurst entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         float radius = 0.12F;
         int distance = 4;
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
-        matrices.push();
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
+        matrices.pushPose();
         matrices.translate(entity.getX(), entity.getY(), entity.getZ());
 
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.getYaw()));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees(-entity.getPitch()));
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
+        matrices.mulPose(Axis.XP.rotationDegrees(-entity.getXRot()));
 
         for (float o = 0; o <= radius; o += radius / 8) {
             float color = 1f - (o * 8.333f);
             if (color < 0) color = 0;
-            buffer.vertex(0 + o, 0 - o, 0).color(red, color, color, 1).next();
-            buffer.vertex(0 + o, 0 + o, 0).color(red, color, color, 1).next();
-            buffer.vertex(0 + o, 0 + o, distance).color(red, color, color, 1).next();
-            buffer.vertex(0 + o, 0 - o, distance).color(red, color, color, 1).next();
-            buffer.vertex(0 - o, 0 - o, 0).color(red, color, color, 1).next();
-            buffer.vertex(0 - o, 0 - o, distance).color(red, color, color, 1).next();
-            buffer.vertex(0 - o, 0 + o, 0).color(red, color, color, 1).next();
-            buffer.vertex(0 - o, 0 + o, distance).color(red, color, color, 1).next();
+            buffer.addVertex(matrices.last(), 0 + o, 0 - o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(matrices.last(), 0 + o, 0 + o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(matrices.last(), 0 + o, 0 + o, distance).setColor(red, color, color, 1);
+            buffer.addVertex(matrices.last(), 0 + o, 0 - o, distance).setColor(red, color, color, 1);
+
+            buffer.addVertex(matrices.last(), 0 - o, 0 - o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(matrices.last(), 0 - o, 0 - o, distance).setColor(red, color, color, 1);
+            buffer.addVertex(matrices.last(), 0 - o, 0 + o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(matrices.last(), 0 - o, 0 + o, distance).setColor(red, color, color, 1);
         }
-        matrices.pop();
+        matrices.popPose();
     }
 
     @Override
-    public Identifier getTexture(EntityLaserBurst entity) {
+    public ResourceLocation getTextureLocation(EntityLaserBurst entity) {
         return null;
     }
 

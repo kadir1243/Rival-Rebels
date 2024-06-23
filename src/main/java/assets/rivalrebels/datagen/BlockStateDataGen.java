@@ -4,9 +4,14 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricModelProvider;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.data.client.*;
+import net.minecraft.data.models.BlockModelGenerators;
+import net.minecraft.data.models.ItemModelGenerators;
+import net.minecraft.data.models.model.ModelTemplates;
+import net.minecraft.data.models.model.TextureMapping;
+import net.minecraft.data.models.model.TextureSlot;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockStateDataGen extends FabricModelProvider {
     public BlockStateDataGen(FabricDataOutput gen) {
@@ -14,24 +19,28 @@ public class BlockStateDataGen extends FabricModelProvider {
     }
 
     private void simpleBlock(Block block, String textureLoc) {
-        generator.registerSingleton(block, TextureMap.all(RRIdentifiers.create("block/" + textureLoc)), Models.CUBE_ALL);
+        generator.createTrivialBlock(block, TextureMapping.cube(idBlock(textureLoc)), ModelTemplates.CUBE_ALL);
     }
 
     private void simpleBlock(Block block, Block textureBlock) {
-        generator.registerSingleton(block, TextureMap.all(textureBlock), Models.CUBE_ALL);
+        generator.createTrivialBlock(block, TextureMapping.cube(textureBlock), ModelTemplates.CUBE_ALL);
     }
 
     private void simpleBlock(Block block, String sides, String down, String up) {
-        generator.registerSingleton(block, new TextureMap().put(TextureKey.TOP, RRIdentifiers.create(up)).put(TextureKey.BOTTOM, RRIdentifiers.create(down)).put(TextureKey.SIDE, RRIdentifiers.create(sides)), Models.CUBE_BOTTOM_TOP);
+        generator.createTrivialBlock(block, new TextureMapping().put(TextureSlot.TOP, idBlock(up)).put(TextureSlot.BOTTOM, idBlock(down)).put(TextureSlot.SIDE, idBlock(sides)), ModelTemplates.CUBE_BOTTOM_TOP);
     }
 
     private void simpleBlock(Block block, String sides, String up_and_down) {
-        generator.registerSingleton(block, new TextureMap().put(TextureKey.TOP, RRIdentifiers.create(up_and_down)).put(TextureKey.BOTTOM, RRIdentifiers.create(up_and_down)).put(TextureKey.SIDE, RRIdentifiers.create(sides)), Models.CUBE_BOTTOM_TOP);
+        generator.createTrivialBlock(block, new TextureMapping().put(TextureSlot.TOP, idBlock(up_and_down)).put(TextureSlot.BOTTOM, idBlock(up_and_down)).put(TextureSlot.SIDE, idBlock(sides)), ModelTemplates.CUBE_BOTTOM_TOP);
     }
 
-    private BlockStateModelGenerator generator;
+    private static ResourceLocation idBlock(String name) {
+        return RRIdentifiers.create(name).withPrefix("block/");
+    }
+
+    private BlockModelGenerators generator;
     @Override
-    public void generateBlockStateModels(BlockStateModelGenerator generator) {
+    public void generateBlockStateModels(BlockModelGenerators generator) {
         this.generator = generator;
         simpleBlock(RRBlocks.steel, "bx");
         simpleBlock(RRBlocks.smartcamo, "bq");
@@ -81,7 +90,7 @@ public class BlockStateDataGen extends FabricModelProvider {
     }
 
     @Override
-    public void generateItemModels(ItemModelGenerator generator) {
+    public void generateItemModels(ItemModelGenerators generator) {
     }
 
     @Override

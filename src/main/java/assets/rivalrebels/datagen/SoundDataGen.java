@@ -5,8 +5,7 @@ import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.datagen.internal.FabricSoundProvider;
 import assets.rivalrebels.datagen.internal.SoundBuilder;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.resources.ResourceLocation;
 import java.util.Arrays;
 
 public class SoundDataGen extends FabricSoundProvider {
@@ -35,7 +34,7 @@ public class SoundDataGen extends FabricSoundProvider {
         return Arrays.stream(sounds).map(SoundDataGen::id).map(SoundBuilder::sound).toArray(SoundBuilder[]::new);
     }
 
-    private static Identifier id(String s) {
+    private static ResourceLocation id(String s) {
         return RRIdentifiers.create(s);
     }
 }

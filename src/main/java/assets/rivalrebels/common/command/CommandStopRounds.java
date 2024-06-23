@@ -13,21 +13,21 @@ package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
 public class CommandStopRounds {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("rrstopround")
-            .requires(arg -> arg.hasPermissionLevel(3))
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("rrstopround")
+            .requires(arg -> arg.hasPermission(3))
             .executes(context -> execute(context.getSource()))
         );
     }
 
-    private static int execute(ServerCommandSource source) {
+    private static int execute(CommandSourceStack source) {
         RivalRebels.round.stopRounds();
-        source.sendFeedback(() -> Text.of("The current round has been successfully stopped."), true);
+        source.sendSuccess(() -> Component.nullToEmpty("The current round has been successfully stopped."), true);
         return 0;
     }
 }

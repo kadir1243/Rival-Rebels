@@ -12,47 +12,47 @@
 package assets.rivalrebels.common.block.crate;
 
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockOmegaArmor extends Block
 {
-	public BlockOmegaArmor(Settings settings)
+	public BlockOmegaArmor(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
-		if (!world.isClient) {
-			player.sendMessage(Text.of("§7[§2Inventory§7]"), false);
-			player.sendMessage(Text.of("§aArmor. §9(Omega's color armor.)"), false);
-			player.sendMessage(Text.of("§7[§4Orders§7] §cEquipt your set of armor."), false);
-			ItemEntity ei7 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camohat));
-			ItemEntity ei8 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshirt));
-			ItemEntity ei9 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camopants));
-			ItemEntity ei10 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshoes));
-			world.spawnEntity(ei7);
-			world.spawnEntity(ei8);
-			world.spawnEntity(ei9);
-			world.spawnEntity(ei10);
-			world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
+		if (!level.isClientSide) {
+			player.displayClientMessage(Component.nullToEmpty("§7[§2Inventory§7]"), false);
+			player.displayClientMessage(Component.nullToEmpty("§aArmor. §9(Omega's color armor.)"), false);
+			player.displayClientMessage(Component.nullToEmpty("§7[§4Orders§7] §cEquipt your set of armor."), false);
+			ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camohat));
+			ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshirt));
+			ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camopants));
+			ItemEntity ei10 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshoes));
+			level.addFreshEntity(ei7);
+			level.addFreshEntity(ei8);
+			level.addFreshEntity(ei9);
+			level.addFreshEntity(ei10);
+			level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 		}
-		return ActionResult.success(world.isClient);
+		return InteractionResult.sidedSuccess(level.isClientSide);
 	}
 
 	/*@Environment(EnvType.CLIENT)

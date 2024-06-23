@@ -13,27 +13,28 @@ package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.item.components.BinocularData;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.LaptopEngagePacket;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.CollisionContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +54,7 @@ public class ItemBinoculars extends Item {
     boolean prevzoomed = false;
     boolean prevmclick;
     public ItemBinoculars() {
-        super(new Settings().maxCount(1));
+        super(new Properties().stacksTo(1).component(RRComponents.BINOCULAR_DATA, BinocularData.DEFAULT));
     }
 
     public static void add(TileEntityLaptop tel) {
@@ -67,63 +68,64 @@ public class ItemBinoculars extends Item {
     }
 
     @Override
-    public UseAction getUseAction(ItemStack par1ItemStack) {
-        return UseAction.BOW;
+    public UseAnim getUseAnimation(ItemStack par1ItemStack) {
+        return UseAnim.BOW;
     }
 
     @Override
-    public int getMaxUseTime(ItemStack par1ItemStack) {
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
         return 200;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        user.setCurrentHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        user.startUsingItem(hand);
         return super.use(world, user, hand);
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof PlayerEntity player && world.isClient && entity == MinecraftClient.getInstance().player) {
-            NbtCompound nbt = stack.getOrCreateNbt();
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+        if (entity instanceof Player player && world.isClientSide && entity == Minecraft.getInstance().player) {
             boolean strike = isMousePressed() && !prevmclick;
             c ^= RivalRebels.proxy.c() && !sc;
             sc = RivalRebels.proxy.c();
             prevzoomed = zoomed;
-            zoomed = ((MinecraftClient.getInstance().mouse.wasRightButtonClicked() && (selected || zoomed))) && !MinecraftClient.getInstance().options.dropKey.isPressed() && MinecraftClient.getInstance().currentScreen == null;
+            zoomed = ((Minecraft.getInstance().mouseHandler.isRightPressed() && (selected || zoomed))) && !Minecraft.getInstance().options.keyDrop.isDown() && Minecraft.getInstance().screen == null;
             if (zoomed) {
                 if (!prevzoomed) {
-                    fovset = (float) MinecraftClient.getInstance().options.getFov().getValue();
-                    senset = MinecraftClient.getInstance().options.getMouseSensitivity().getValue().floatValue();
+                    fovset = (float) Minecraft.getInstance().options.fov().get();
+                    senset = Minecraft.getInstance().options.sensitivity().get().floatValue();
                 }
-                nbt.putLong("lpos", new BlockPos(-1, -1, -1).asLong());
+                stack.set(RRComponents.BINOCULAR_DATA, new BinocularData(
+                    new BlockPos(-1, -1, -1),
+                    0,
+                    0,
+                    6,
+                    new BlockPos(-1, -1, -1)
+                ));
                 distblock = 130;
                 hasLaptop = false;
-                nbt.putInt("tasks", 0);
-                nbt.putInt("carpet", 0);
-                nbt.putDouble("dist", 6);
                 tooFar = true;
                 tooClose = false;
-                nbt.putLong("tpos", new BlockPos(-1, -1, -1).asLong());
                 ready = false;
-                zoom += (MinecraftClient.getInstance().mouse.getY() * 0.01f);
+                zoom += (Minecraft.getInstance().mouseHandler.ypos() * 0.01f);
                 if (zoom < 10) zoom = 10;
                 if (zoom > 67) zoom = 67;
-                MinecraftClient.getInstance().options.getFov().setValue((int) (zoom + (MinecraftClient.getInstance().options.getFov().getValue() - zoom) * 0.85f));
-                MinecraftClient.getInstance().options.getMouseSensitivity().setValue((double) (senset * MathHelper.sqrt(zoom) * 0.1f));
+                Minecraft.getInstance().options.fov().set((int) (zoom + (Minecraft.getInstance().options.fov().get() - zoom) * 0.85f));
+                Minecraft.getInstance().options.sensitivity().set((double) (senset * Mth.sqrt(zoom) * 0.1f));
 
-                if (MinecraftClient.getInstance().mouse.wasRightButtonClicked()) {
-                    double cospitch = MathHelper.cos(player.getPitch() / 180.0F * (float) Math.PI);
-                    double sinpitch = MathHelper.sin(player.getPitch() / 180.0F * (float) Math.PI);
-                    double cosyaw = MathHelper.cos(player.getYaw() / 180.0F * (float) Math.PI);
-                    double sinyaw = MathHelper.sin(player.getYaw() / 180.0F * (float) Math.PI);
+                if (Minecraft.getInstance().mouseHandler.isRightPressed()) {
+                    double cospitch = Mth.cos(player.getXRot() / 180.0F * (float) Math.PI);
+                    double sinpitch = Mth.sin(player.getXRot() / 180.0F * (float) Math.PI);
+                    double cosyaw = Mth.cos(player.getYRot() / 180.0F * (float) Math.PI);
+                    double sinyaw = Mth.sin(player.getYRot() / 180.0F * (float) Math.PI);
 
                     double dx = (-sinyaw * cospitch) * 130;
                     double dz = (cosyaw * cospitch) * 130;
                     double dy = (-sinpitch) * 130;
 
-                    Vec3d var3 = player.getPos().add(dx, dy, dz);
-                    BlockHitResult MOP = world.raycast(new RaycastContext(player.getPos(), var3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, ShapeContext.absent()));
+                    Vec3 var3 = player.position().add(dx, dy, dz);
+                    BlockHitResult MOP = world.clip(new ClipContext(player.position(), var3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
 
                     TileEntityLaptop t = null;
                     double d = 100;
@@ -131,23 +133,27 @@ public class ItemBinoculars extends Item {
                         t = tileEntityLaptop;
                         if (t.b2spirit > 0 || t.b2carpet > 0) {
                             hasLaptop = true;
-                            double temp = player.squaredDistanceTo(t.getPos().getX() + 0.5, t.getPos().getY() + 0.5, t.getPos().getZ() + 0.5);
+                            double temp = player.distanceToSqr(t.getBlockPos().getX() + 0.5, t.getBlockPos().getY() + 0.5, t.getBlockPos().getZ() + 0.5);
                             if (temp < d) {
                                 d = temp;
-                                nbt.putLong("lpos", t.getPos().asLong());
+                                stack.set(RRComponents.BINOCULAR_DATA, stack.get(RRComponents.BINOCULAR_DATA).withLPos(t.getBlockPos()));
                             }
                         }
                     }
                     if (MOP != null) {
                         BlockPos pos = MOP.getBlockPos();
-                        nbt.putLong("tpos", pos.asLong());
-                        BlockPos lpos = BlockPos.fromLong(nbt.getLong("lpos"));
-                        distblock = MathHelper.sqrt((float) player.squaredDistanceTo(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f));
+                        stack.set(RRComponents.BINOCULAR_DATA, stack.get(RRComponents.BINOCULAR_DATA).withTPos(pos));
+                        BlockPos lpos = stack.get(RRComponents.BINOCULAR_DATA).lpos();
+                        distblock = Mth.sqrt((float) player.distanceToSqr(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f));
                         tooFar = false;
                         if (t != null) {
-                            nbt.putInt("tasks", t.b2spirit);
-                            nbt.putInt("carpet", t.b2carpet);
-                            nbt.putDouble("dist", Math.sqrt(d));
+                            stack.set(RRComponents.BINOCULAR_DATA,
+                                stack.get(RRComponents.BINOCULAR_DATA).withData(
+                                    t.b2spirit,
+                                    t.b2carpet,
+                                    Math.sqrt(d)
+                                )
+                            );
                             int XX = 11;
                             int ZZ = 10;
                             if (t.rrteam == RivalRebelsTeam.OMEGA) {
@@ -169,26 +175,14 @@ public class ItemBinoculars extends Item {
                     }
                 }
             } else if (prevzoomed) {
-                MinecraftClient.getInstance().options.getFov().setValue((int) fovset);
-                MinecraftClient.getInstance().options.getMouseSensitivity().setValue((double) senset);
+                Minecraft.getInstance().options.fov().set((int) fovset);
+                Minecraft.getInstance().options.sensitivity().set((double) senset);
             }
             prevmclick = isMousePressed();
         }
     }
 
     public boolean isMousePressed() {
-        return (ClientProxy.USE_KEY.isPressed() && RivalRebels.rtarget) || (MinecraftClient.getInstance().mouse.wasLeftButtonClicked() && RivalRebels.lctarget);
-    }
-
-    @Override
-    public ItemStack getDefaultStack() {
-        ItemStack stack = super.getDefaultStack();
-        NbtCompound nbt = stack.getOrCreateNbt();
-        nbt.putLong("tpos", BlockPos.ORIGIN.asLong());
-        nbt.putLong("lpos", BlockPos.ORIGIN.asLong());
-        nbt.putInt("tasks", 0);
-        nbt.putInt("carpet", 0);
-        nbt.putDouble("dist", 0);
-        return stack;
+        return (ClientProxy.USE_KEY.isDown() && RivalRebels.rtarget) || (Minecraft.getInstance().mouseHandler.isLeftPressed() && RivalRebels.lctarget);
     }
 }

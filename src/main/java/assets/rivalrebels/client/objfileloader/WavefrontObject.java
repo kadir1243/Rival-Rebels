@@ -1,12 +1,14 @@
 package assets.rivalrebels.client.objfileloader;
 
 import assets.rivalrebels.RivalRebels;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.*;
-import net.minecraft.resource.Resource;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.Minecraft;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.util.FastColor;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -41,13 +43,13 @@ public class WavefrontObject {
     public List<GroupObject> groupObjects = new ArrayList<>();
     private GroupObject currentGroupObject;
 
-    public WavefrontObject(Identifier resource) throws ModelFormatException {
+    public WavefrontObject(ResourceLocation resource) throws ModelFormatException {
         this.fileName = resource.toString();
 
         isEmpty = false;
         try {
-            Resource res = MinecraftClient.getInstance().getResourceManager().getResource(resource).orElseThrow(IOException::new);
-            loadObjModel(res.getReader());
+            Resource res = Minecraft.getInstance().getResourceManager().getResource(resource).orElseThrow(IOException::new);
+            loadObjModel(res.openAsReader());
         } catch (IOException e) {
             throw new UncheckedIOException("IO Exception reading model format", e);
         }
@@ -58,7 +60,7 @@ public class WavefrontObject {
         fileName = "";
     }
 
-    public static WavefrontObject loadModel(Identifier resource) {
+    public static WavefrontObject loadModel(ResourceLocation resource) {
         try {
             return new WavefrontObject(resource);
         } catch (ModelFormatException e) {
@@ -330,14 +332,14 @@ public class WavefrontObject {
 
             if (tokens.length == 3) {
                 if (currentGroupObject.glDrawingMode == null) {
-                    currentGroupObject.glDrawingMode = VertexFormat.DrawMode.TRIANGLES;
-                } else if (currentGroupObject.glDrawingMode != VertexFormat.DrawMode.TRIANGLES) {
+                    currentGroupObject.glDrawingMode = VertexFormat.Mode.TRIANGLES;
+                } else if (currentGroupObject.glDrawingMode != VertexFormat.Mode.TRIANGLES) {
                     throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName + "' - Invalid number of points for face (expected 4, found " + tokens.length + ")");
                 }
             } else if (tokens.length == 4) {
                 if (currentGroupObject.glDrawingMode == null) {
-                    currentGroupObject.glDrawingMode = VertexFormat.DrawMode.QUADS;
-                } else if (currentGroupObject.glDrawingMode != VertexFormat.DrawMode.QUADS) {
+                    currentGroupObject.glDrawingMode = VertexFormat.Mode.QUADS;
+                } else if (currentGroupObject.glDrawingMode != VertexFormat.Mode.QUADS) {
                     throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName + "' - Invalid number of points for face (expected 3, found " + tokens.length + ")");
                 }
             }
@@ -425,7 +427,7 @@ public class WavefrontObject {
     public static class GroupObject {
         public String name;
         public List<Face> faces = new ArrayList<>();
-        public VertexFormat.DrawMode glDrawingMode;
+        public VertexFormat.Mode glDrawingMode;
 
         public GroupObject() {
             this("");
@@ -435,7 +437,7 @@ public class WavefrontObject {
             this(name, null);
         }
 
-        public GroupObject(String name, VertexFormat.DrawMode glDrawingMode) {
+        public GroupObject(String name, VertexFormat.Mode glDrawingMode) {
             this.name = name;
             this.glDrawingMode = glDrawingMode;
         }
@@ -493,9 +495,9 @@ public class WavefrontObject {
                         offsetV = -offsetV;
                     }
 
-                    buffer.vertex(vertices[i].x, vertices[i].y, vertices[i].z, color.x, color.y, color.z, color.w, textureCoordinates[i].x + offsetU, textureCoordinates[i].y + offsetV, overlay, light, faceNormal.x, faceNormal.y, faceNormal.z);
+                    buffer.addVertex(vertices[i].x, vertices[i].y, vertices[i].z, FastColor.ARGB32.colorFromFloat(color.x, color.y, color.z, color.w), textureCoordinates[i].x + offsetU, textureCoordinates[i].y + offsetV, overlay, light, faceNormal.x, faceNormal.y, faceNormal.z);
                 } else {
-                    buffer.vertex(vertices[i].x, vertices[i].y, vertices[i].z).color(color.x, color.y, color.z, color.w).overlay(overlay).light(light).normal(faceNormal.x, faceNormal.y, faceNormal.z).next();
+                    buffer.addVertex(vertices[i].x, vertices[i].y, vertices[i].z).setColor(color.x, color.y, color.z, color.w).setOverlay(overlay).setLight(light).setNormal(faceNormal.x, faceNormal.y, faceNormal.z);
                 }
             }
         }

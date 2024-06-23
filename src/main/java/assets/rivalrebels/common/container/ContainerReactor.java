@@ -12,31 +12,31 @@
 package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.ItemStack;
 import assets.rivalrebels.common.item.ItemCore;
 import assets.rivalrebels.common.item.ItemRod;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class ContainerReactor extends ScreenHandler
+public class ContainerReactor extends AbstractContainerMenu
 {
-	protected Inventory reactor;
+	protected Container reactor;
 	public SlotRR fuel;
 	public SlotRR core;
-    private final PropertyDelegate propertyDelegate;
+    private final ContainerData propertyDelegate;
 
-    public ContainerReactor(int syncId, PlayerInventory playerInv) {
-        this(syncId, playerInv, new SimpleInventory(2), new ArrayPropertyDelegate(7));
+    public ContainerReactor(int syncId, Inventory playerInv) {
+        this(syncId, playerInv, new SimpleContainer(2), new SimpleContainerData(7));
     }
 
-    public ContainerReactor(int syncId, PlayerInventory inv, Inventory reactor, PropertyDelegate propertyDelegate)
+    public ContainerReactor(int syncId, Inventory inv, Container reactor, ContainerData propertyDelegate)
 	{
         super(RivalRebelsGuiHandler.REACTOR_SCREEN_HANDLER_TYPE, syncId);
         this.reactor = reactor;
@@ -49,19 +49,19 @@ public class ContainerReactor extends ScreenHandler
 	}
 
 	@Override
-	public boolean canUse(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
-		return reactor.canPlayerUse(player);
+		return reactor.stillValid(player);
 	}
 
-	protected void bindPlayerInventory(Inventory inventoryPlayer) {
+	protected void bindPlayerInventory(Container inventoryPlayer) {
 		for (int i = 0; i < 9; i++) {
 			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 172));
 		}
 	}
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack quickMoveStack(Player player, int slot) {
 		return ItemStack.EMPTY;
 	}
 

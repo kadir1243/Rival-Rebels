@@ -12,45 +12,45 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
-public class GuiButton extends ButtonWidget {
+public class GuiButton extends Button {
     public GuiButton(int x, int y, int width, int height, String message) {
-		this(x, y, width, height, Text.of(message), button -> {});
+		this(x, y, width, height, Component.nullToEmpty(message), button -> {});
 	}
 
-    public GuiButton(int x, int y, int width, int height, Text message) {
+    public GuiButton(int x, int y, int width, int height, Component message) {
         this(x, y, width, height, message, button -> {});
     }
 
-    public GuiButton(int x, int y, int width, int height, Text message, PressAction onPress) {
-        super(x, y, width, height, message, onPress, DEFAULT_NARRATION_SUPPLIER);
+    public GuiButton(int x, int y, int width, int height, Component message, OnPress onPress) {
+        super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
     }
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		if (this.visible) {
-            MinecraftClient client = MinecraftClient.getInstance();
-			context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-			this.hovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
-			int k = this.getYImage(this.hovered);
-			context.drawTexture(RRIdentifiers.guitbutton, this.getX(), this.getY(), 5, k * 11, this.width, this.height);
+            Minecraft client = Minecraft.getInstance();
+			context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
+			this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
+			int k = this.getYImage(this.isHovered);
+			context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 5, k * 11, this.width, this.height);
 			this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 			int l = 0xffffff;
 
 			if (!this.active) {
 				l = 0xcccccc;
-			} else if (this.hovered) {
+			} else if (this.isHovered) {
 				l = 0x88e8ff;
 			}
 
-            context.drawCenteredTextWithShadow(client.textRenderer, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, l);
+            context.drawCenteredString(client.font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, l);
 		}
 	}
 

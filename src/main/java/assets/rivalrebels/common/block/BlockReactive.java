@@ -14,45 +14,45 @@ package assets.rivalrebels.common.block;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityReactive;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockReactive extends BlockWithEntity {
-    public static final MapCodec<BlockReactive> CODEC = createCodec(BlockReactive::new);
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
-	public BlockReactive(Settings settings)
+public class BlockReactive extends BaseEntityBlock {
+    public static final MapCodec<BlockReactive> CODEC = simpleCodec(BlockReactive::new);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+	public BlockReactive(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockReactive> getCodec() {
+    protected MapCodec<BlockReactive> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityReactive(pos, state);
 	}
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 }

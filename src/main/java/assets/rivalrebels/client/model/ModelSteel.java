@@ -12,8 +12,8 @@
 package assets.rivalrebels.client.model;
 
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -32,35 +32,35 @@ public class ModelSteel
 	Vector3f		v7			= new Vector3f(-s, -s, -s);
 	Vector3f		v8			= new Vector3f(-s, -s, s);
 
-	public void renderModel(MatrixStack matrices, VertexConsumer buffer)
+	public void renderModel(PoseStack matrices, VertexConsumer buffer)
 	{
-		matrices.push();
+		matrices.pushPose();
 
-		addVertex(buffer, v1, 0, 0);
-		addVertex(buffer, v5, 1, 0);
-		addVertex(buffer, v8, 1, 1);
-		addVertex(buffer, v4, 0, 1);
-		addVertex(buffer, v4, 0, 0);
-		addVertex(buffer, v8, 1, 0);
-		addVertex(buffer, v7, 1, 1);
-		addVertex(buffer, v3, 0, 1);
-		addVertex(buffer, v3, 0, 0);
-		addVertex(buffer, v7, 1, 0);
-		addVertex(buffer, v6, 1, 1);
-		addVertex(buffer, v2, 0, 1);
-		addVertex(buffer, v2, 0, 0);
-		addVertex(buffer, v6, 1, 0);
-		addVertex(buffer, v5, 1, 1);
-		addVertex(buffer, v1, 0, 1);
-		addVertex(buffer, v3, 1, 0);
-		addVertex(buffer, v2, 1, 1);
-		addVertex(buffer, v5, 0, 0);
-		addVertex(buffer, v8, 0, 1);
+		addVertex(matrices, buffer, v1, 0, 0);
+		addVertex(matrices, buffer, v5, 1, 0);
+		addVertex(matrices, buffer, v8, 1, 1);
+		addVertex(matrices, buffer, v4, 0, 1);
+		addVertex(matrices, buffer, v4, 0, 0);
+		addVertex(matrices, buffer, v8, 1, 0);
+		addVertex(matrices, buffer, v7, 1, 1);
+		addVertex(matrices, buffer, v3, 0, 1);
+		addVertex(matrices, buffer, v3, 0, 0);
+		addVertex(matrices, buffer, v7, 1, 0);
+		addVertex(matrices, buffer, v6, 1, 1);
+		addVertex(matrices, buffer, v2, 0, 1);
+		addVertex(matrices, buffer, v2, 0, 0);
+		addVertex(matrices, buffer, v6, 1, 0);
+		addVertex(matrices, buffer, v5, 1, 1);
+		addVertex(matrices, buffer, v1, 0, 1);
+		addVertex(matrices, buffer, v3, 1, 0);
+		addVertex(matrices, buffer, v2, 1, 1);
+		addVertex(matrices, buffer, v5, 0, 0);
+		addVertex(matrices, buffer, v8, 0, 1);
 
-		matrices.pop();
+		matrices.popPose();
 	}
 
-	private void addVertex(VertexConsumer buffer, Vector3f v, float t, float t2) {
-		buffer.vertex(v.x * 0.999, v.y * 0.999, v.z * 0.999).texture(t, t2).next();
+	private void addVertex(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2) {
+		buffer.addVertex(poseStack.last(), v.mul(0.999F, new Vector3f())).setUv(t, t2);
 	}
 }

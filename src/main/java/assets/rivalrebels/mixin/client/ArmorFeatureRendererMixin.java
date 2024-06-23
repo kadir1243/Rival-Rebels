@@ -2,21 +2,25 @@ package assets.rivalrebels.mixin.client;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
+import com.llamalad7.mixinextras.sugar.Local;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.entity.feature.ArmorFeatureRenderer;
-import net.minecraft.item.ArmorItem;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.Redirect;
 
-@Mixin(ArmorFeatureRenderer.class)
+import java.util.List;
+
+@Mixin(HumanoidArmorLayer.class)
 @Environment(EnvType.CLIENT)
 public class ArmorFeatureRendererMixin {
-    @Inject(method = "getArmorTexture", at = @At("HEAD"), cancellable = true)
-    private void getArmorTexture(ArmorItem item, boolean secondLayer, String overlay, CallbackInfoReturnable<Identifier> cir) {
+    @Redirect(method = "renderArmorPiece", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ArmorMaterial;layers()Ljava/util/List;"))
+    private List<ArmorMaterial.Layer> getArmorTexture(ArmorMaterial instance, @Local ItemStack stack) {
+        Item item = stack.getItem();
         String name;
         if (item == RRItems.camohat || item == RRItems.camoshirt || item == RRItems.camoshoes)
             name = "textures/armors/c.png";
@@ -62,7 +66,8 @@ public class ArmorFeatureRendererMixin {
         else name = null;
 
         if (name != null) {
-            cir.setReturnValue(RRIdentifiers.create(name));
+            return List.of(new ArmorMaterial.Layer(RRIdentifiers.create(name)));
         }
+        return instance.layers();
     }
 }

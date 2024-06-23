@@ -14,60 +14,60 @@ package assets.rivalrebels.common.block;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityMeltDown;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockMeltDown extends BlockWithEntity {
-    public static final MapCodec<BlockMeltDown> CODEC = createCodec(BlockMeltDown::new);
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
-	public BlockMeltDown(Settings settings)
+public class BlockMeltDown extends BaseEntityBlock {
+    public static final MapCodec<BlockMeltDown> CODEC = simpleCodec(BlockMeltDown::new);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+	public BlockMeltDown(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
     }
 
     @Override
-    protected MapCodec<BlockMeltDown> getCodec() {
+    protected MapCodec<BlockMeltDown> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityMeltDown(pos, state);
 	}
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        world.scheduleBlockTick(pos, this, 1);
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.scheduleTick(pos, this, 1);
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-		int meta = state.get(META);
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+		int meta = state.getValue(META);
 		if (meta < 14) {
-			world.setBlockState(pos.up(2), state.with(META, meta + 1), 2);
+			world.setBlock(pos.above(2), state.setValue(META, meta + 1), 2);
 		}
 	}
 }

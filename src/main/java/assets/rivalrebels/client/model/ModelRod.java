@@ -13,8 +13,8 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
@@ -46,10 +46,10 @@ public class ModelRod {
     private static final Vector3f v7 = new Vector3f(0f, 0.03125f * -10, 0f);
     public boolean rendersecondcap = true;
 
-    public void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay) {
+    public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
         for (float i = 0; i < 360; i += 360 / numOfSegs) {
-            matrices.push();
-            matrices.multiply(new Quaternionf(i, 0, 1, 0));
+            matrices.pushPose();
+            matrices.mulPose(new Quaternionf(i, 0, 1, 0));
             RenderHelper.addFace(buffer, v0, vd1, v1, v0, t1, t3, t2, t1, light, overlay);
             RenderHelper.addFace(buffer, vd1, vd2, v2, v1, t2, t4, t5, t3, light, overlay);
             RenderHelper.addFace(buffer, vd2, vd3, v3, v2, t4, t6, t7, t5, light, overlay);
@@ -60,7 +60,7 @@ public class ModelRod {
                 RenderHelper.addFace(buffer, v5, v4, vd4, vd5, t4, t6, t7, t5, light, overlay);
             }
 
-            matrices.pop();
+            matrices.popPose();
         }
     }
 }

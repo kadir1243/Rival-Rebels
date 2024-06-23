@@ -13,62 +13,60 @@ package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RRSounds;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.FallingBlock;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class BlockAutoTemplate extends FallingBlock {
 	public int		time	= 15;
 	public String	name	= "building";
 
-    public BlockAutoTemplate(Settings settings) {
+    public BlockAutoTemplate(Properties settings) {
         super(settings);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (!world.isClient) {
-            ItemStack stack = player.getStackInHand(hand);
-            if (!stack.isOf(RRItems.pliers)){
-                player.sendMessage(Text.of("§4[§cWarning§4]§c Use pliers to build."), true);
-                return ActionResult.PASS;
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!level.isClientSide()) {
+            if (!stack.is(RRItems.pliers)){
+                player.displayClientMessage(Component.literal("§4[§cWarning§4]§c Use pliers to build."), true);
+                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
-            return ActionResult.success(world.isClient);
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
 		}
-        return ActionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 	}
 
-	public void build(World world, int x, int y, int z) {
-        world.playSound(x, y, z, RRSounds.AUTO_BUILD, SoundCategory.BLOCKS, 10, 1, false);
+	public void build(Level world, int x, int y, int z) {
+        world.playLocalSound(x, y, z, RRSounds.AUTO_BUILD, SoundSource.BLOCKS, 10, 1, false);
 	}
 
-	public void placeBlockCarefully(World world, int x, int y, int z, Block block) {
+	public void placeBlockCarefully(Level world, int x, int y, int z, Block block) {
 		if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
-			world.setBlockState(new BlockPos(x, y, z), block.getDefaultState());
+			world.setBlockAndUpdate(new BlockPos(x, y, z), block.defaultBlockState());
 		}
 	}
 
-    public void placeBlockCarefully(World world, int x, int y, int z, BlockState state) {
+    public void placeBlockCarefully(Level world, int x, int y, int z, BlockState state) {
         if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
-            world.setBlockState(new BlockPos(x, y, z), state);
+            world.setBlockAndUpdate(new BlockPos(x, y, z), state);
         }
     }
 
     @Override
-    public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
-		if (!world.isClient) build(world, pos.getX(), pos.getY(), pos.getZ());
+    public void onLand(Level world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
+		if (!world.isClientSide) build(world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
 }

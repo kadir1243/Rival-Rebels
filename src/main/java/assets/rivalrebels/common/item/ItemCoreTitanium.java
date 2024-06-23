@@ -15,7 +15,7 @@ public class ItemCoreTitanium extends ItemCore
 {
 	public ItemCoreTitanium()
 	{
-		super(new Settings());
+		super(new Properties());
 		timemult = 1.0f;
 	}
 }

@@ -14,15 +14,16 @@ package assets.rivalrebels.client.gui;
 import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiKnob;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.mixin.client.DrawContextAccessor;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 public class GuiTesla extends Screen
 {
@@ -35,7 +36,7 @@ public class GuiTesla extends Screen
 
 	public GuiTesla(int start)
 	{
-        super(Text.empty());
+        super(Component.empty());
         s = start - 90;
 	}
 
@@ -43,20 +44,20 @@ public class GuiTesla extends Screen
     protected void init() {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-        this.clearChildren();
+        this.clearWidgets();
 		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, "Knob");
-		this.addDrawable(knob);
+		this.addRenderableOnly(knob);
 	}
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         float f = 0.00390625F;
-		client = MinecraftClient.getInstance();
+		minecraft = Minecraft.getInstance();
         ((DrawContextAccessor) context).callDrawTexturedQuad(
             RRIdentifiers.guitesla,
             posX,
@@ -70,14 +71,14 @@ public class GuiTesla extends Screen
             ySizeOfTexture * f
         );
         super.render(context, mouseX, mouseY, delta);
-		if (!(ClientProxy.USE_KEY.isPressed()))
+		if (!(ClientProxy.USE_KEY.isDown()))
 		{
-			this.client.setScreen(null);
-			this.client.onWindowFocusChanged(true);
-            ClientPlayNetworking.send(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
-			ItemStack stack = client.player.getInventory().getStack(client.player.getInventory().selectedSlot);
+			this.minecraft.setScreen(null);
+			this.minecraft.setWindowActive(true);
+            ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
+			ItemStack stack = minecraft.player.getInventory().getItem(minecraft.player.getInventory().selected);
 			if (stack.getItem() instanceof ItemTesla) {
-				stack.getOrCreateNbt().putInt("dial", knob.getDegree());
+                stack.set(RRComponents.TESLA_DIAL, knob.getDegree());
 			}
 		}
 	}

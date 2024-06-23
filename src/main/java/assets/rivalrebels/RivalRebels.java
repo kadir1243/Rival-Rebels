@@ -20,6 +20,7 @@ import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.RREntities;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsRound;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
@@ -34,15 +35,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.block.Block;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemConvertible;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.registry.entry.RegistryEntryList;
-import net.minecraft.registry.tag.TagKey;
-import net.minecraft.util.Identifier;
+import net.minecraft.core.Holder;
+import net.minecraft.core.HolderSet;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fml.config.ModConfig;
 import org.slf4j.Logger;
 
@@ -125,9 +125,10 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
         RivalRebelsDamageSource.RRDamageTypes.init();
         registerCommand();
         RRBlocks.init();
+        RRComponents.init();
         RRItems.init();
         registerArmors();
-        RREntities.TYPES.forEach((name, type) -> Registry.register(Registries.ENTITY_TYPE, new Identifier(MODID, name), type));
+        RREntities.TYPES.forEach((name, type) -> Registry.register(BuiltInRegistries.ENTITY_TYPE, RRIdentifiers.create(name), type));
     }
 
     @Override
@@ -156,55 +157,53 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
     }
 
     public void registerArmors() {
-        BiConsumer<Item, String> consumer = (item, name) -> RRItems.register(name, item);
-
-        consumer.accept(RRItems.orebelhelmet, "orebelhelmet");
-		consumer.accept(RRItems.orebelchest, "orebelchest");
-		consumer.accept(RRItems.orebelpants, "orebelpants");
-		consumer.accept(RRItems.orebelboots, "orebelboots");
-		consumer.accept(RRItems.onukerhelmet, "onukerhelmet");
-		consumer.accept(RRItems.onukerchest, "onukerchest");
-		consumer.accept(RRItems.onukerpants, "onukerpants");
-		consumer.accept(RRItems.onukerboots, "onukerboots");
-		consumer.accept(RRItems.ointelhelmet, "ointelhelmet");
-		consumer.accept(RRItems.ointelchest, "ointelchest");
-		consumer.accept(RRItems.ointelpants, "ointelpants");
-		consumer.accept(RRItems.ointelboots, "ointelboots");
-		consumer.accept(RRItems.ohackerhelmet, "ohackerhelmet");
-		consumer.accept(RRItems.ohackerchest, "ohackerchest");
-		consumer.accept(RRItems.ohackerpants, "ohackerpants");
-		consumer.accept(RRItems.ohackerboots, "ohackerboots");
-		consumer.accept(RRItems.srebelhelmet, "srebelhelmet");
-		consumer.accept(RRItems.srebelchest, "srebelchest");
-		consumer.accept(RRItems.srebelpants, "srebelpants");
-		consumer.accept(RRItems.srebelboots, "srebelboots");
-		consumer.accept(RRItems.snukerhelmet, "snukerhelmet");
-		consumer.accept(RRItems.snukerchest, "snukerchest");
-		consumer.accept(RRItems.snukerpants, "snukerpants");
-		consumer.accept(RRItems.snukerboots, "snukerboots");
-		consumer.accept(RRItems.sintelhelmet, "sintelhelmet");
-		consumer.accept(RRItems.sintelchest, "sintelchest");
-		consumer.accept(RRItems.sintelpants, "sintelpants");
-		consumer.accept(RRItems.sintelboots, "sintelboots");
-		consumer.accept(RRItems.shackerhelmet, "shackerhelmet");
-		consumer.accept(RRItems.shackerchest, "shackerchest");
-		consumer.accept(RRItems.shackerpants, "shackerpants");
-		consumer.accept(RRItems.shackerboots, "shackerboots");
-		consumer.accept(RRItems.camohat, "camohat");
-		consumer.accept(RRItems.camoshirt, "camoshirt");
-		consumer.accept(RRItems.camopants, "camopants");
-		consumer.accept(RRItems.camoshoes, "camoshoes");
-		consumer.accept(RRItems.camohat2, "camohat2");
-		consumer.accept(RRItems.camoshirt2, "camoshirt2");
-		consumer.accept(RRItems.camopants2, "camopants2");
-		consumer.accept(RRItems.camoshoes2, "camoshoes2");
+        RRItems.register("orebelhelmet", RRItems.orebelhelmet);
+		RRItems.register("orebelchest", RRItems.orebelchest);
+		RRItems.register("orebelpants", RRItems.orebelpants);
+		RRItems.register("orebelboots", RRItems.orebelboots);
+		RRItems.register("onukerhelmet", RRItems.onukerhelmet);
+		RRItems.register("onukerchest", RRItems.onukerchest);
+		RRItems.register("onukerpants", RRItems.onukerpants);
+		RRItems.register("onukerboots", RRItems.onukerboots);
+		RRItems.register("ointelhelmet", RRItems.ointelhelmet);
+		RRItems.register("ointelchest", RRItems.ointelchest);
+		RRItems.register("ointelpants", RRItems.ointelpants);
+		RRItems.register("ointelboots", RRItems.ointelboots);
+		RRItems.register("ohackerhelmet", RRItems.ohackerhelmet);
+		RRItems.register("ohackerchest", RRItems.ohackerchest);
+		RRItems.register("ohackerpants", RRItems.ohackerpants);
+		RRItems.register("ohackerboots", RRItems.ohackerboots);
+		RRItems.register("srebelhelmet", RRItems.srebelhelmet);
+		RRItems.register("srebelchest", RRItems.srebelchest);
+		RRItems.register("srebelpants", RRItems.srebelpants);
+		RRItems.register("srebelboots", RRItems.srebelboots);
+		RRItems.register("snukerhelmet", RRItems.snukerhelmet);
+		RRItems.register("snukerchest", RRItems.snukerchest);
+		RRItems.register("snukerpants", RRItems.snukerpants);
+		RRItems.register("snukerboots", RRItems.snukerboots);
+		RRItems.register("sintelhelmet", RRItems.sintelhelmet);
+		RRItems.register("sintelchest", RRItems.sintelchest);
+		RRItems.register("sintelpants", RRItems.sintelpants);
+		RRItems.register("sintelboots", RRItems.sintelboots);
+		RRItems.register("shackerhelmet", RRItems.shackerhelmet);
+		RRItems.register("shackerchest", RRItems.shackerchest);
+		RRItems.register("shackerpants", RRItems.shackerpants);
+		RRItems.register("shackerboots", RRItems.shackerboots);
+		RRItems.register("camohat", RRItems.camohat);
+		RRItems.register("camoshirt", RRItems.camoshirt);
+		RRItems.register("camopants", RRItems.camopants);
+		RRItems.register("camoshoes", RRItems.camoshoes);
+		RRItems.register("camohat2", RRItems.camohat2);
+		RRItems.register("camoshirt2", RRItems.camoshirt2);
+		RRItems.register("camopants2", RRItems.camopants2);
+		RRItems.register("camoshoes2", RRItems.camoshoes2);
 	}
 
     public static List<Block> getBlocks(TagKey<Block> tagKey) {
-        return Registries.BLOCK.getTagCreatingWrapper().getOptional(tagKey).map(RegistryEntryList.ListBacked::stream).map(s -> s.map(RegistryEntry::value).toList()).orElse(Collections.emptyList());
+        return BuiltInRegistries.BLOCK.asTagAddingLookup().get(tagKey).map(HolderSet.ListBacked::stream).map(s -> s.map(Holder::value).toList()).orElse(Collections.emptyList());
     }
 
-    private static void addItemRenderer(ItemConvertible item, Supplier<DynamicItemRenderer> renderer) {
+    private static void addItemRenderer(ItemLike item, Supplier<DynamicItemRenderer> renderer) {
         renderer = Suppliers.memoize(renderer);
         Supplier<DynamicItemRenderer> finalRenderer = renderer;
         BuiltinItemRendererRegistry.INSTANCE.register(item, (stack, mode, matrices, vertexConsumers, light, overlay) -> finalRenderer.get().render(stack, mode, matrices, vertexConsumers, light, overlay));

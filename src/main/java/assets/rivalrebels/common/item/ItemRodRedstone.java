@@ -13,7 +13,7 @@ package assets.rivalrebels.common.item;
 
 public class ItemRodRedstone extends ItemRod {
 	public ItemRodRedstone() {
-		super(new Settings().maxDamage(256));
+		super(new Properties().durability(256));
 		power = 300000;
 	}
 }

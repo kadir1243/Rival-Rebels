@@ -13,9 +13,9 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelLoader
 {
@@ -127,9 +127,9 @@ public class ModelLoader
 	private static final TextureVertice	rs11		= new TextureVertice(u + q, k + q * 2);
 	private static final TextureVertice	rs12		= new TextureVertice(u + r, k + p * 2);
 
-	public static void renderA(VertexConsumer buffer, MatrixStack matrices, int light, int overlay)
+	public static void renderA(VertexConsumer buffer, PoseStack matrices, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		RenderHelper.addFace(buffer, lloader1, lloader12, rloader12, rloader1, l1f, l12s, r12s, r1f, light, overlay);
 		RenderHelper.addFace(buffer, lloader2, lloader1, rloader1, rloader2, l2, l1s, r1s, r2, light, overlay);
 		RenderHelper.addFace(buffer, lloader3, lloader2, rloader2, rloader3, l3f, l2, r2, r3f, light, overlay);
@@ -152,7 +152,7 @@ public class ModelLoader
 		RenderHelper.addFace(buffer, rloader4, rloader3, rloader10, rloader9, rs10, rs9, rs4, rs3, light, overlay);
 		RenderHelper.addFace(buffer, rloader5, rloader4, rloader9, rloader8, rs11, rs10, rs3, rs2, light, overlay);
 		RenderHelper.addFace(buffer, rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 	}
 
 	private static final TextureVertice	front1	= new TextureVertice(70f / 256f, 24f / 128f);
@@ -206,9 +206,9 @@ public class ModelLoader
 	private static final Vector3f			vcside5	= new Vector3f(-0.4375f, 0.3125f, -0.40625f);
 	private static final Vector3f			vcside6	= new Vector3f(-0.4375f, 0.4375f, -0.40625f);
 
-	public static void renderB(VertexConsumer buffer, MatrixStack matrices, float slide, int light, int overlay)
+	public static void renderB(VertexConsumer buffer, PoseStack matrices, float slide, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(slide * 0.9f, 0, 0);
 		RenderHelper.addFace(buffer, vfront1, vfront2, vfront3, vfront4, front1, front2, front3, front4, light, overlay);
 		RenderHelper.addFace(buffer, vfront5, vfront1, vfront4, vfront6, front5, front1, front4, front6, light, overlay);
@@ -223,6 +223,6 @@ public class ModelLoader
 		RenderHelper.addFace(buffer, vfront4, vfront3, vcside4, vcside5, cside2, cside3, cside4, cside5, light, overlay);
 		RenderHelper.addFace(buffer, vcside1, vfront5, vfront6, vcside6, ctop4, ctop1, ctop2, ctop3, light, overlay);
 		RenderHelper.addFace(buffer, vfront2, vcside3, vcside4, vfront3, ctop2, ctop3, ctop4, ctop1, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 	}
 }

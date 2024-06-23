@@ -11,50 +11,40 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityB2Spirit;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 
-public class LaptopEngagePacket implements FabricPacket {
-    public static final PacketType<LaptopEngagePacket> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "laptopengage"), LaptopEngagePacket::fromBytes);
-    private final BlockPos tpos;
-    private final BlockPos lpos;
-	private final boolean carpet;
-
-	public LaptopEngagePacket(BlockPos tpos, BlockPos lpos, boolean carpet) {
-        this.tpos = tpos;
-        this.lpos = lpos;
-		this.carpet = carpet;
-	}
-
-	public static LaptopEngagePacket fromBytes(PacketByteBuf buf) {
-        return new LaptopEngagePacket(buf.readBlockPos(), buf.readBlockPos(), buf.readBoolean());
-	}
+public record LaptopEngagePacket(BlockPos tpos, BlockPos lpos, boolean carpet) implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, LaptopEngagePacket> STREAM_CODEC = StreamCodec.composite(
+        BlockPos.STREAM_CODEC,
+        LaptopEngagePacket::tpos,
+        BlockPos.STREAM_CODEC,
+        LaptopEngagePacket::lpos,
+        ByteBufCodecs.BOOL,
+        LaptopEngagePacket::carpet,
+        LaptopEngagePacket::new
+    );
+    public static final Type<LaptopEngagePacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("laptopengage"));
 
     @Override
-    public void write(PacketByteBuf buf) {
-        buf.writeBlockPos(tpos);
-		buf.writeBlockPos(lpos);
-		buf.writeBoolean(carpet);
-	}
-
-    @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
     }
 
-    public static void onMessage(LaptopEngagePacket m, PlayerEntity player) {
-        World world = player.getWorld();
-        if (player.squaredDistanceTo(m.lpos.getX(), m.lpos.getY(), m.lpos.getZ()) < 100) {
+    public static void onMessage(LaptopEngagePacket m, Player player) {
+        Level world = player.level();
+        if (player.distanceToSqr(m.lpos.getX(), m.lpos.getY(), m.lpos.getZ()) < 100) {
             BlockEntity te = world.getBlockEntity(m.lpos);
             if (te instanceof TileEntityLaptop tel) {
                 if (!m.carpet && tel.b2spirit > 0) {
@@ -72,7 +62,7 @@ public class LaptopEngagePacket implements FabricPacket {
                     int zz = m.tpos.getZ() - m.lpos.getZ();
                     if (xx * xx + zz * zz > 625 && XX * XX + ZZ * ZZ > 200) {
                         tel.b2spirit--;
-                        world.spawnEntity(new EntityB2Spirit(world, m.tpos.getX(), m.tpos.getY(), m.tpos.getZ(), player.getX(), player.getY(), player.getZ(), false, player.isSneaking()));
+                        world.addFreshEntity(new EntityB2Spirit(world, m.tpos.getX(), m.tpos.getY(), m.tpos.getZ(), player.getX(), player.getY(), player.getZ(), false, player.isShiftKeyDown()));
                     }
                 }
                 if (m.carpet && tel.b2carpet > 0) {
@@ -82,7 +72,7 @@ public class LaptopEngagePacket implements FabricPacket {
                     int zz = m.tpos.getZ() - m.lpos.getZ();
                     if (xx * xx + zz * zz > 625 && XX * XX + ZZ * ZZ > 200) {
                         tel.b2carpet--;
-                        world.spawnEntity(new EntityB2Spirit(world, m.tpos.getX(), m.tpos.getY(), m.tpos.getZ(), player.getX(), player.getY(), player.getZ(), true, false));
+                        world.addFreshEntity(new EntityB2Spirit(world, m.tpos.getX(), m.tpos.getY(), m.tpos.getZ(), player.getX(), player.getY(), player.getZ(), true, false));
                     }
                 }
             }

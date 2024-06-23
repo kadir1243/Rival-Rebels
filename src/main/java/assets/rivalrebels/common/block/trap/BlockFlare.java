@@ -16,36 +16,36 @@ import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.Explosion;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.WallTorchBlock;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.Registries;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Util;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.Util;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.WallTorchBlock;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockFlare extends WallTorchBlock {
-	public BlockFlare(Settings settings) {
+	public BlockFlare(Properties settings) {
 		super(ParticleTypes.LAVA, settings);
 	}
 
     @Override
-    public boolean canPlaceAt(BlockState state, WorldView world, BlockPos pos) {
-		return sideCoversSmallSquare(world, pos.down(), Direction.UP);
+    public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+		return canSupportCenter(world, pos.below(), Direction.UP);
 	}
 
     @Environment(EnvType.CLIENT)
     @Override
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
+    public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
@@ -55,35 +55,35 @@ public class BlockFlare extends WallTorchBlock {
 		world.addParticle(ParticleTypes.FLAME, x + .5, y + 1.2, z + .5, (-0.5 + random.nextFloat()) * 0.1, 0.5 + random.nextFloat() * 0.5, (-0.5 + random.nextFloat()) * 0.1);
 		world.addParticle(ParticleTypes.FLAME, x + .5, y + 1.4, z + .5, (-0.5 + random.nextFloat()) * 0.1, 0.5 + random.nextFloat() * 0.5, (-0.5 + random.nextFloat()) * 0.1);
 		world.addParticle(ParticleTypes.SMOKE, x + .5, y + 1.6, z + .5, (-0.5 + random.nextFloat()) * 0.1, 0.5 + random.nextFloat() * 0.5, (-0.5 + random.nextFloat()) * 0.1);
-		world.playSound(x, y, z, SoundEvents.BLOCK_LAVA_EXTINGUISH, SoundCategory.BLOCKS, 3F, 2, true);
+		world.playLocalSound(x, y, z, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 3F, 2, true);
 	}
 
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
-        super.onBreak(world, pos, state, player);
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
+        super.playerWillDestroy(world, pos, state, player);
 		if (RivalRebels.flareExplode) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
-            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+            world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			new Explosion(world, x, y, z, 3, true, false, RivalRebelsDamageSource.flare(world));
-			world.playSound(x, y, z, SoundEvents.ENTITY_GENERIC_EXPLODE, SoundCategory.BLOCKS, 0.5f, 0.3f, true);
+			world.playLocalSound(x, y, z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.5f, 0.3f, true);
 		}
         return state;
     }
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-		entity.damage(RivalRebelsDamageSource.flare(world), 1);
-		entity.setOnFireFor(5);
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+		entity.hurt(RivalRebelsDamageSource.flare(world), 1);
+		entity.igniteForSeconds(5);
 	}
     @Nullable
     private String translationKey;
 
     @Override
-    public String getTranslationKey() {
+    public String getDescriptionId() {
         if (this.translationKey == null) {
-            this.translationKey = Util.createTranslationKey("block", Registries.BLOCK.getId(this));
+            this.translationKey = Util.makeDescriptionId("block", BuiltInRegistries.BLOCK.getKey(this));
         }
 
         return this.translationKey; // Direct copy of Block.getTranslationKey

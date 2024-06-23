@@ -13,9 +13,9 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelReactor
 {
@@ -83,8 +83,8 @@ public class ModelReactor
 	private static final Vector3f			v15		= new Vector3f(-0.5f, 0.8125f, -0.5f);
 	private static final Vector3f			v16		= new Vector3f(-0.5f, 0.8125f, 0.5f);
 
-	public void renderModel(MatrixStack matrices, VertexConsumer buffer, int light, int overlay) {
-		matrices.push();
+	public void renderModel(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+		matrices.pushPose();
 		addFace(buffer, v13, v14, v15, v16, t14, t2, t3, t17, light, overlay);
 		addFace(buffer, v9, v5, v6, v10, t7, t4, t18, t12, light, overlay);
 		addFace(buffer, v10, v6, v7, v11, t15, t19, t22, t16, light, overlay);
@@ -124,7 +124,7 @@ public class ModelReactor
 		addFace(buffer, v8, v4, v1, v5, t9v, t10v, t12v, t11v, light, overlay);
 		addFace(buffer, v5, v6, v7, v8, t9v, t10v, t12v, t11v, light, overlay);
 		xoff = yoff = zoff = 1F;
-		matrices.pop();
+		matrices.popPose();
 	}
 
 	private void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {

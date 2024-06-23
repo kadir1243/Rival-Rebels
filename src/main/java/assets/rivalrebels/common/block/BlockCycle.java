@@ -11,12 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import net.minecraft.block.*;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockCycle extends Block
 {
@@ -26,20 +27,20 @@ public class BlockCycle extends Block
 	public float	pShiftG		= (float) (((Math.PI * 2f) / 3f) * 1f);
 	public float	pShiftB		= (float) (((Math.PI * 2f) / 3f) * 2f);
 
-	public BlockCycle(Settings settings)
+	public BlockCycle(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-        world.scheduleBlockTick(pos, this, 1);
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+        world.scheduleTick(pos, this, 1);
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        world.scheduleBlockTick(pos, this, 1);
-        world.setBlockState(pos, Blocks.AIR.getDefaultState());
-        world.setBlockState(pos, state);
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        world.scheduleTick(pos, this, 1);
+        world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+        world.setBlockAndUpdate(pos, state);
     }
 }

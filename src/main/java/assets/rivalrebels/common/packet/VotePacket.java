@@ -11,42 +11,34 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.player.Player;
 
-public class VotePacket implements FabricPacket {
-   public static final PacketType<VotePacket> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "vote_packet"), VotePacket::fromBytes);
-    private final boolean newround;
+public record VotePacket(boolean newRound) implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, VotePacket> STREAM_CODEC = StreamCodec.composite(
+        ByteBufCodecs.BOOL,
+        VotePacket::newRound,
+        VotePacket::new
+    );
+    public static final Type<VotePacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("vote_packet"));
 
-    public VotePacket(boolean vote) {
-        newround = vote;
-    }
-
-    public static VotePacket fromBytes(PacketByteBuf buf) {
-        return new VotePacket(buf.readBoolean());
-    }
-
-    public static void onMessage(VotePacket m, PlayerEntity player) {
+    public static void onMessage(VotePacket m, Player player) {
         RivalRebelsPlayer p = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
         if (!p.voted) {
             p.voted = true;
-            if (m.newround) RivalRebels.round.newBattleVotes++;
+            if (m.newRound) RivalRebels.round.newBattleVotes++;
             else RivalRebels.round.waitVotes++;
         }
     }
 
     @Override
-    public void write(PacketByteBuf buf) {
-        buf.writeBoolean(newround);
-    }
-
-    @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
     }
 }

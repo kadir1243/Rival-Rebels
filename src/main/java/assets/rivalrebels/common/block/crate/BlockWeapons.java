@@ -12,73 +12,73 @@
 package assets.rivalrebels.common.block.crate;
 
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.resource.language.I18n;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.client.resources.language.I18n;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockWeapons extends Block
 {
-	public BlockWeapons(Settings settings)
+	public BlockWeapons(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (world.isClient) {
-            player.sendMessage(Text.translatable("RivalRebels.Inventory"), false);
-            player.sendMessage(Text.literal("§a" + RRItems.rpg.getName() + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.rocket.getName()) + ")"), false);
-            player.sendMessage(Text.literal("§a" + RRItems.tesla.getName() + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.hydrod.getName()) + ")"), false);
-            player.sendMessage(Text.literal("§a" + (RRItems.flamethrower.getName()) + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.fuel.getName()) + ")"), false);
-            player.sendMessage(Text.literal("§a" + (RRItems.plasmacannon.getName()) + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.battery.getName()) + ")"), false);
-            player.sendMessage(Text.literal("§a" + (RRItems.einsten.getName()) + ". §9(" + I18n.translate("RivalRebels.consume") + " " + (RRItems.redrod.getName()) + ")"), false);
-            player.sendMessage(Text.literal("§a" + (RRItems.roddisk.getName()) + ". §9(" + I18n.translate("RivalRebels.message.use") + " /rr)"), false);
+        if (level.isClientSide) {
+            player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
+            player.displayClientMessage(Component.literal("§a" + RRItems.rpg.getDescription() + ". §9(" + I18n.get("RivalRebels.consume") + " " + (RRItems.rocket.getDescription()) + ")"), false);
+            player.displayClientMessage(Component.literal("§a" + RRItems.tesla.getDescription() + ". §9(" + I18n.get("RivalRebels.consume") + " " + (RRItems.hydrod.getDescription()) + ")"), false);
+            player.displayClientMessage(Component.literal("§a" + (RRItems.flamethrower.getDescription()) + ". §9(" + I18n.get("RivalRebels.consume") + " " + (RRItems.fuel.getDescription()) + ")"), false);
+            player.displayClientMessage(Component.literal("§a" + (RRItems.plasmacannon.getDescription()) + ". §9(" + I18n.get("RivalRebels.consume") + " " + (RRItems.battery.getDescription()) + ")"), false);
+            player.displayClientMessage(Component.literal("§a" + (RRItems.einsten.getDescription()) + ". §9(" + I18n.get("RivalRebels.consume") + " " + (RRItems.redrod.getDescription()) + ")"), false);
+            player.displayClientMessage(Component.literal("§a" + (RRItems.roddisk.getDescription()) + ". §9(" + I18n.get("RivalRebels.message.use") + " /rr)"), false);
             // player.sendMessage(Text.literal("§a" + I18n.translate(RivalRebels.bastion.getTranslationKey() + ".name") + ". §9(" +
             // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.barricade.getTranslationKey() + ".name") + ")");
             // player.sendMessage(Text.literal("§a" + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ". §9(" +
             // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ")");
-            player.sendMessage(Text.literal("§a" + (RRItems.knife.getName()) + ". §9(" + I18n.translate("RivalRebels.opknife") + ")"), false);
-            player.sendMessage(Text.literal("§a" + (RRItems.gasgrenade.getName()) + ". §9(" + I18n.translate("RivalRebels.chemicalweapon") + ")"), false);
-            player.sendMessage(Text.literal(I18n.translate("RivalRebels.Orders") + " " + I18n.translate("RivalRebels.equipweapons")), false);
+            player.displayClientMessage(Component.literal("§a" + (RRItems.knife.getDescription()) + ". §9(" + I18n.get("RivalRebels.opknife") + ")"), false);
+            player.displayClientMessage(Component.literal("§a" + (RRItems.gasgrenade.getDescription()) + ". §9(" + I18n.get("RivalRebels.chemicalweapon") + ")"), false);
+            player.displayClientMessage(Component.literal(I18n.get("RivalRebels.Orders") + " " + I18n.get("RivalRebels.equipweapons")), false);
         }
-        if (!world.isClient)
+        if (!level.isClientSide)
         {
-            ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.rpg.getDefaultStack());
-            ItemEntity ei1 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.tesla.getDefaultStack());
-            ItemEntity ei2 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.plasmacannon.getDefaultStack());
-            ItemEntity ei3 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.flamethrower.getDefaultStack());
-            ItemEntity ei4 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.roddisk.getDefaultStack());
-            // ItemEntity ei5 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.barricade, 6));
-            // ItemEntity ei6 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.tower, 3));
-            ItemEntity ei7 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.knife, 10));
-            ItemEntity ei8 = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRItems.gasgrenade, 6));
-            ItemEntity ei9 = new ItemEntity(world, x + .5, y + .5, z + .5, RRItems.einsten.getDefaultStack());
-            world.spawnEntity(ei);
-            world.spawnEntity(ei1);
-            world.spawnEntity(ei2);
-            world.spawnEntity(ei3);
-            world.spawnEntity(ei4);
-            // world.spawnEntity(ei5);
-            // world.spawnEntity(ei6);
-            world.spawnEntity(ei7);
-            world.spawnEntity(ei8);
-            world.spawnEntity(ei9);
-            world.setBlockState(pos, Blocks.AIR.getDefaultState());
+            ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.rpg.getDefaultInstance());
+            ItemEntity ei1 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.tesla.getDefaultInstance());
+            ItemEntity ei2 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.plasmacannon.getDefaultInstance());
+            ItemEntity ei3 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.flamethrower.getDefaultInstance());
+            ItemEntity ei4 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.roddisk.getDefaultInstance());
+            // ItemEntity ei5 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.barricade, 6));
+            // ItemEntity ei6 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.tower, 3));
+            ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.knife, 10));
+            ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.gasgrenade, 6));
+            ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.einsten.getDefaultInstance());
+            level.addFreshEntity(ei);
+            level.addFreshEntity(ei1);
+            level.addFreshEntity(ei2);
+            level.addFreshEntity(ei3);
+            level.addFreshEntity(ei4);
+            // level.spawnEntity(ei5);
+            // level.spawnEntity(ei6);
+            level.addFreshEntity(ei7);
+            level.addFreshEntity(ei8);
+            level.addFreshEntity(ei9);
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
-        return ActionResult.PASS;
+        return InteractionResult.PASS;
     }
 
 }

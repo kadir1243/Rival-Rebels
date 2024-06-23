@@ -15,17 +15,16 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.mob.ZombieEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityB2Spirit extends EntityInanimate
 {
@@ -46,18 +45,18 @@ public class EntityB2Spirit extends EntityInanimate
 
 	public int mode = 0; //0=straight 1=left 2=right
 
-	public EntityB2Spirit(EntityType<? extends EntityB2Spirit> entityType, World par1World) {
+	public EntityB2Spirit(EntityType<? extends EntityB2Spirit> entityType, Level par1World) {
 		super(entityType, par1World);
-		ignoreCameraFrustum = true;
-		setBoundingBox(new Box(-10, -3, -10, 10, 4, 10));
+		noCulling = true;
+		setBoundingBox(new AABB(-10, -3, -10, 10, 4, 10));
 		health = RivalRebels.b2spirithealth;
 	}
 
-    public EntityB2Spirit(World par1World) {
+    public EntityB2Spirit(Level par1World) {
         this(RREntities.B2SPIRIT, par1World);
     }
 
-	public EntityB2Spirit(World par1World, double x, double y, double z, double x1, double y1, double z1, boolean c, boolean da)
+	public EntityB2Spirit(Level par1World, double x, double y, double z, double x1, double y1, double z1, boolean c, boolean da)
 	{
 		this(par1World);
 		carpet = c;
@@ -81,22 +80,22 @@ public class EntityB2Spirit extends EntityInanimate
 				entityIndex = staticEntityIndex;
 			}
 		}
-		if (!getWorld().isClient) startBombRun(tz-z1, x1-tx); //perpendicular to view
+		if (!level().isClientSide) startBombRun(tz-z1, x1-tx); //perpendicular to view
 	}
 
 	public EntityB2Spirit(EntityRhodes r)
 	{
-		this(r.getWorld());
+		this(r.level());
 		rhodeswing = r;
-		setPos(
-            r.getX() - r.getVelocity().getX() * 500,
+		setPosRaw(
+            r.getX() - r.getDeltaMovement().x() * 500,
             120,
-            r.getZ() - r.getVelocity().getZ() * 500
+            r.getZ() - r.getDeltaMovement().z() * 500
         );
 	}
 
 	@Override
-	public boolean isCollidable()
+	public boolean canBeCollidedWith()
 	{
 		return true;
 	}
@@ -109,12 +108,12 @@ public class EntityB2Spirit extends EntityInanimate
 		if (random.nextDouble() > 0.8f) RivalRebelsSoundPlayer.playSound(this, 8, 0, 4.5f, 1.3f);
 
 		if (rhodeswing != null) {
-            setVelocity(rhodeswing.getPos().subtract(getPos()));
-			double t = Math.sqrt(getVelocity().lengthSquared());
-            setVelocity(getVelocity().multiply(1/t));
-            setYaw(rhodeswing.getYaw());
-			setPitch((float) (Math.min(t, 90.0)));
-			if (t < 25.0 || age > 100)
+            setDeltaMovement(rhodeswing.position().subtract(position()));
+			double t = Math.sqrt(getDeltaMovement().lengthSqr());
+            setDeltaMovement(getDeltaMovement().scale(1/t));
+            setYRot(rhodeswing.getYRot());
+			setXRot((float) (Math.min(t, 90.0)));
+			if (t < 25.0 || tickCount > 100)
 			{
 				rhodeswing.b2energy = 8000;
 				rhodeswing.freeze = false;
@@ -122,7 +121,7 @@ public class EntityB2Spirit extends EntityInanimate
 			}
 		}
 
-		if (!this.getWorld().isClient)
+		if (!this.level().isClientSide)
 		{
 			double distfromtarget = Math.sqrt((tx-getX())*(tx-getX())+(tz-getZ())*(tz-getZ()));
 			ticksSinceStart++;
@@ -134,21 +133,21 @@ public class EntityB2Spirit extends EntityInanimate
 
 				if (distfromtarget > 80.0f)
 				{
-					mode = getWorld().random.nextBoolean() ? 1 : 2;
+					mode = level().random.nextBoolean() ? 1 : 2;
 					if (trash)
 					{
 						carpet = true;
-						entityIndex = getWorld().random.nextInt(ItemRoda.rodaindex);
+						entityIndex = level().random.nextInt(ItemRoda.rodaindex);
 					}
 					if (leave)
 					{
-						if (ticksSinceStart > 1000 && getWorld().random.nextInt(4) == 1)
+						if (ticksSinceStart > 1000 && level().random.nextInt(4) == 1)
 						{
-                            setVelocity(getVelocity().getX(), 2F, getVelocity().getZ());
+                            setDeltaMovement(getDeltaMovement().x(), 2F, getDeltaMovement().z());
 						}
 						if (!trash && dropOnlyOne)
 						{
-                            setVelocity(getVelocity().getX(), 2F, getVelocity().getZ());
+                            setDeltaMovement(getDeltaMovement().x(), 2F, getDeltaMovement().z());
 						}
 					}
 				}
@@ -156,18 +155,18 @@ public class EntityB2Spirit extends EntityInanimate
 			if (mode > 0)
 			{
 				if (mode == 1)
-                    setYaw(getYaw() + 10.0f);
+                    setYRot(getYRot() + 10.0f);
 				else if (mode == 2)
-                    setYaw(getYaw() - 10.0f);
-				setVelocity(MathHelper.sin(getYaw() / 180.0F * (float) Math.PI),
-                    getVelocity().getY(),
-                    MathHelper.cos(getYaw() / 180.0F * (float) Math.PI)
+                    setYRot(getYRot() - 10.0f);
+				setDeltaMovement(Mth.sin(getYRot() / 180.0F * (float) Math.PI),
+                    getDeltaMovement().y(),
+                    Mth.cos(getYRot() / 180.0F * (float) Math.PI)
                 );
 				if (distfromtarget < 80.0f)
 					mode = 0;
 			}
 
-			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D, 1.0D, 1.0D));
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
@@ -180,14 +179,14 @@ public class EntityB2Spirit extends EntityInanimate
 
                 if (var9 instanceof EntityLaserBurst) {
                     var9.kill();
-                    this.damage(getDamageSources().generic(), 6);
+                    this.hurt(damageSources().generic(), 6);
                 }
             }
 
 			timeLeft--;
 			if (timeLeft == 0)
 			{
-                setVelocity(getVelocity().getX(), 2F, getVelocity().getZ());
+                setDeltaMovement(getDeltaMovement().x(), 2F, getDeltaMovement().z());
 			}
 			if (getY() > 256.0f)
 			{
@@ -195,41 +194,41 @@ public class EntityB2Spirit extends EntityInanimate
 			}
 		}
 
-        Vec3d vec3d = getPos().add(getVelocity());
-        setPos(vec3d.getX(), vec3d.getY(), vec3d.getZ());
+        Vec3 vec3d = position().add(getDeltaMovement());
+        setPosRaw(vec3d.x(), vec3d.y(), vec3d.z());
 		if (rhodeswing == null)
 		{
-			double var16 = Math.sqrt(this.getVelocity().getX() * this.getVelocity().getX() + this.getVelocity().getZ() * this.getVelocity().getZ());
-			this.setYaw((float) (Math.atan2(this.getVelocity().getX(), this.getVelocity().getZ()) * 180.0D / Math.PI));
+			double var16 = Math.sqrt(this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z());
+			this.setYRot((float) (Math.atan2(this.getDeltaMovement().x(), this.getDeltaMovement().z()) * 180.0D / Math.PI));
 
-			for (this.setPitch((float) (Math.atan2(-this.getVelocity().getY(), var16) * 180.0D / Math.PI)); this.getPitch() - this.prevPitch < -180.0F; this.prevPitch -= 360.0F)
+			for (this.setXRot((float) (Math.atan2(-this.getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 			{
             }
 
-			while (this.getPitch() - this.prevPitch >= 180.0F)
+			while (this.getXRot() - this.xRotO >= 180.0F)
 			{
-				this.prevPitch += 360.0F;
+				this.xRotO += 360.0F;
 			}
 
-			while (this.getYaw() - this.prevYaw < -180.0F)
+			while (this.getYRot() - this.yRotO < -180.0F)
 			{
-				this.prevYaw -= 360.0F;
+				this.yRotO -= 360.0F;
 			}
 
-			while (this.getYaw() - this.prevYaw >= 180.0F)
+			while (this.getYRot() - this.yRotO >= 180.0F)
 			{
-				this.prevYaw += 360.0F;
+				this.yRotO += 360.0F;
 			}
 
-			this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.2F);
-			this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.2F);
+			this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.2F);
+			this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.2F);
 		}
-		this.setPosition(this.getX(), this.getY(), this.getZ());
+		this.setPos(this.getX(), this.getY(), this.getZ());
 	}
 
 	public void dropNuke()
 	{
-		if (dropAnything) ItemRoda.spawn(entityIndex, getWorld(), getX()+random.nextDouble()*4-2, getY() - 3.5f, getZ()+random.nextDouble()*4-2, getVelocity().getX() * 0.1f, -1.0f, getVelocity().getZ() * 0.1f, 1.0f, 0.0f);
+		if (dropAnything) ItemRoda.spawn(entityIndex, level(), getX()+random.nextDouble()*4-2, getY() - 3.5f, getZ()+random.nextDouble()*4-2, getDeltaMovement().x() * 0.1f, -1.0f, getDeltaMovement().z() * 0.1f, 1.0f, 0.0f);
 	}
 	Entity rhodes = null;
 	public void startBombRun(double x, double z)
@@ -239,19 +238,19 @@ public class EntityB2Spirit extends EntityInanimate
 			tx = rhodes.getX();
 			ty = rhodes.getY();
 			tz = rhodes.getZ();
-			x = -rhodes.getVelocity().getX();
-			z = -rhodes.getVelocity().getZ();
+			x = -rhodes.getDeltaMovement().x();
+			z = -rhodes.getDeltaMovement().z();
 		}
 		double dist = 1.0/Math.sqrt(x*x + z*z);
 		x *= dist;
 		z *= dist;
-        setVelocity(-x, getVelocity().getY(), -z);
-		setPosition(tx + x*80, ty+60, tz + z*80);
-        setYaw(prevYaw = (float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
+        setDeltaMovement(-x, getDeltaMovement().y(), -z);
+		setPos(tx + x*80, ty+60, tz + z*80);
+        setYRot(yRotO = (float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt)
+	public void addAdditionalSaveData(CompoundTag nbt)
 	{
 		nbt.putInt("drop", entityIndex);
 		nbt.putFloat("tx", (float) tx);
@@ -263,7 +262,7 @@ public class EntityB2Spirit extends EntityInanimate
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt)
+	public void readAdditionalSaveData(CompoundTag nbt)
 	{
 		entityIndex = nbt.getInt("drop");
 		carpet = entityIndex < ItemRoda.rodaindex;
@@ -282,25 +281,25 @@ public class EntityB2Spirit extends EntityInanimate
 	}
 
     @Override
-    public boolean shouldRender(double distance) {
+    public boolean shouldRenderAtSqrDistance(double distance) {
         return true;
     }
 
     @Override
-	public boolean damage(DamageSource par1DamageSource, float par2)
+	public boolean hurt(DamageSource par1DamageSource, float par2)
 	{
-		super.damage(par1DamageSource, par2);
-		if (this.isAlive() && !this.getWorld().isClient) {
+		super.hurt(par1DamageSource, par2);
+		if (this.isAlive() && !this.level().isClientSide) {
 			this.health -= par2;
 			if (this.health <= 0) {
 				this.kill();
-				this.getWorld().createExplosion(null, this.getX(), this.getY(), this.getZ(), 6.0F, World.ExplosionSourceType.MOB);
-				getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 0));
-				getWorld().spawnEntity(new EntityB2Frag(getWorld(), this, 1));
-				ZombieEntity pz = new ZombieEntity(getWorld());
-				pz.setPosition(getX(), getY(), getZ());
-				getWorld().spawnEntity(pz);
-                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
+				this.level().explode(null, this.getX(), this.getY(), this.getZ(), 6.0F, Level.ExplosionInteraction.MOB);
+				level().addFreshEntity(new EntityB2Frag(level(), this, 0));
+				level().addFreshEntity(new EntityB2Frag(level(), this, 1));
+				Zombie pz = new Zombie(level());
+				pz.setPos(getX(), getY(), getZ());
+				level().addFreshEntity(pz);
+                level().playLocalSound(this, RRSounds.ARTILLERY_EXPLODE, getSoundSource(), 30, 1);
 			}
 		}
 

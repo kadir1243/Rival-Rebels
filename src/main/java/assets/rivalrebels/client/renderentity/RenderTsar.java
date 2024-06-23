@@ -13,34 +13,34 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.entity.EntityTsar;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class RenderTsar extends EntityRenderer<EntityTsar> {
-	public RenderTsar(EntityRendererFactory.Context manager) {
+	public RenderTsar(EntityRendererProvider.Context manager) {
         super(manager);
 	}
 
     @Override
-    public void render(EntityTsar entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-		matrices.push();
-		matrices.multiply(new Quaternionf(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+    public void render(EntityTsar entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+		matrices.pushPose();
+		matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
 		//GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
-		matrices.multiply(new Quaternionf(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
-		ModelTsarBomba.render(matrices, vertexConsumers, light, OverlayTexture.DEFAULT_UV);
-		matrices.pop();
+		matrices.mulPose(new Quaternionf(entity.getXRot() - 90.0f, 0.0F, 0.0F, 1.0F));
+		ModelTsarBomba.render(matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+		matrices.popPose();
 	}
 
     @Override
-    public Identifier getTexture(EntityTsar entity) {
+    public ResourceLocation getTextureLocation(EntityTsar entity) {
         return null;
     }
 }

@@ -14,51 +14,51 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityGore;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Quaternionf;
 
 import java.util.Objects;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 
 public class RenderGore extends EntityRenderer<EntityGore>
 {
-	private static final Identifier	player			= new Identifier("textures/entity/steve.png");
-	private static final Identifier	creeper			= new Identifier("textures/entity/creeper/creeper.png");
-	private static final Identifier	enderman		= new Identifier("textures/entity/enderman/enderman.png");
-	private static final Identifier	ghast			= new Identifier("textures/entity/ghast/ghast.png");
-	private static final Identifier	skeleton		= new Identifier("textures/entity/skeleton/skeleton.png");
-	private static final Identifier	slime			= new Identifier("textures/entity/slime/slime.png");
-	private static final Identifier	magmacube		= new Identifier("textures/entity/slime/magmacube.png");
-	private static final Identifier	spider			= new Identifier("textures/entity/spider/spider.png");
-	private static final Identifier	cavespider		= new Identifier("textures/entity/spider/cave_spider.png");
-	private static final Identifier	zombiepigman	= new Identifier("textures/entity/zombie_pigman.png");
-	private static final Identifier	zombie			= new Identifier("textures/entity/zombie/zombie.png");
+	private static final ResourceLocation	player			= ResourceLocation.withDefaultNamespace("textures/entity/steve.png");
+	private static final ResourceLocation	creeper			= ResourceLocation.withDefaultNamespace("textures/entity/creeper/creeper.png");
+	private static final ResourceLocation	enderman		= ResourceLocation.withDefaultNamespace("textures/entity/enderman/enderman.png");
+	private static final ResourceLocation	ghast			= ResourceLocation.withDefaultNamespace("textures/entity/ghast/ghast.png");
+	private static final ResourceLocation	skeleton		= ResourceLocation.withDefaultNamespace("textures/entity/skeleton/skeleton.png");
+	private static final ResourceLocation	slime			= ResourceLocation.withDefaultNamespace("textures/entity/slime/slime.png");
+	private static final ResourceLocation	magmacube		= ResourceLocation.withDefaultNamespace("textures/entity/slime/magmacube.png");
+	private static final ResourceLocation	spider			= ResourceLocation.withDefaultNamespace("textures/entity/spider/spider.png");
+	private static final ResourceLocation	cavespider		= ResourceLocation.withDefaultNamespace("textures/entity/spider/cave_spider.png");
+	private static final ResourceLocation	zombiepigman	= ResourceLocation.withDefaultNamespace("textures/entity/zombie_pigman.png");
+	private static final ResourceLocation	zombie			= ResourceLocation.withDefaultNamespace("textures/entity/zombie/zombie.png");
 
-    public RenderGore(EntityRendererFactory.Context renderManager) {
+    public RenderGore(EntityRendererProvider.Context renderManager) {
         super(renderManager);
         this.shadowRadius = 0F;
     }
 
     @Override
-    public void render(EntityGore entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(EntityGore entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         double x = entity.getX();
         double y = entity.getY();
         double z = entity.getZ();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(x, y, z);
-		matrices.multiply(new Quaternionf(-entity.getYaw() + 180, 0.0F, 1.0F, 0.0F));
-		matrices.multiply(new Quaternionf(entity.getPitch(), 1.0F, 0.0F, 0.0F));
+		matrices.mulPose(new Quaternionf(-entity.getYRot() + 180, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(new Quaternionf(entity.getXRot(), 1.0F, 0.0F, 0.0F));
         int mob = entity.getMob();
 		int type = entity.getTypeOfGore();
 		float size = entity.getSize();
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getItemEntityTranslucentCull(getTexture(entity)));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.itemEntityTranslucentCull(getTextureLocation(entity)));
         if (mob == 0) {
 			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
 			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16, light);
@@ -108,9 +108,9 @@ public class RenderGore extends EntityRenderer<EntityGore>
 		else if (mob == 6)
 		{
 			if (type == 0) {
-				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(getTexture(entity))), 8, 8, 8, 0, 0, 64, 32, 16, light);
+				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(getTextureLocation(entity))), 8, 8, 8, 0, 0, 64, 32, 16, light);
 			} else if (type == 1) {
-				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderLayer.getEntityTranslucent(getTexture(entity))), 6, 6, 6, 0, 16, 64, 32, 16, light);
+				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(getTextureLocation(entity))), 6, 6, 6, 0, 16, 64, 32, 16, light);
 			}
 		}
 		else if (mob == 7)
@@ -123,7 +123,7 @@ public class RenderGore extends EntityRenderer<EntityGore>
 			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
 			else if (type == 1)
 			{
-                matrices.multiply(new Quaternionf(90, 0, 1, 0));
+                matrices.mulPose(new Quaternionf(90, 0, 1, 0));
 				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
 			}
 			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);
@@ -134,7 +134,7 @@ public class RenderGore extends EntityRenderer<EntityGore>
 			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
 			else if (type == 1)
 			{
-                matrices.multiply(new Quaternionf(90, 0, 1, 0));
+                matrices.mulPose(new Quaternionf(90, 0, 1, 0));
 				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
 			}
 			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);
@@ -151,11 +151,11 @@ public class RenderGore extends EntityRenderer<EntityGore>
 			else if (type == 2) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, light);
 			else if (type == 3) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, light);
 		}
-		matrices.pop();
+		matrices.popPose();
 	}
 
 	@Override
-    public Identifier getTexture(EntityGore entity) {
+    public ResourceLocation getTextureLocation(EntityGore entity) {
         return switch (entity.getMob()) {
             case 0 -> Objects.requireNonNullElse(entity.playerSkin, player);
             case 1 -> zombie;

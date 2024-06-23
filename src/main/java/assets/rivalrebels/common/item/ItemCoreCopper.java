@@ -15,7 +15,7 @@ public class ItemCoreCopper extends ItemCore
 {
 	public ItemCoreCopper()
 	{
-		super(new Settings());
+		super(new Properties());
 		timemult = 0.25f;
 	}
 }

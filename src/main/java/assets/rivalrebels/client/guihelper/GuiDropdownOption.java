@@ -12,48 +12,50 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.client.gui.GuiTray;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.widget.ButtonWidget;
-import net.minecraft.text.Text;
+import assets.rivalrebels.common.item.components.RRComponents;
+import assets.rivalrebels.common.round.RivalRebelsTeam;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
-public class GuiDropdownOption extends ButtonWidget
+public class GuiDropdownOption extends Button
 {
 	Rectangle		bbox;
 	public boolean	isPressed	= false;
 	public boolean	mouseDown	= false;
 	public GuiTray	t;
 
-	public GuiDropdownOption(Vector p, int l, int n, Text text, GuiTray tray)
+	public GuiDropdownOption(Vector p, int l, int n, Component text, GuiTray tray)
 	{
-		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {}, DEFAULT_NARRATION_SUPPLIER);
+		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {}, DEFAULT_NARRATION);
 		bbox = new Rectangle(p.x, p.y + n * 10, l, (n + 1) * 10);
 		t = tray;
 	}
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		boolean inside = bbox.isVecInside(new Vector(mouseX, mouseY));
-		boolean current = MinecraftClient.getInstance().mouse.wasLeftButtonClicked() && inside;
-		boolean on = t.getScreenHandler().hasWepReqs();
+		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && inside;
+		boolean on = t.getMenu().hasWepReqs();
 		if (current && !mouseDown && on) isPressed = !isPressed;
 		int color = 0x999999;
 		if (on)
 		{
-			int team = 0;
-			if (t.getScreenHandler().getSlot(6).hasStack() && t.getScreenHandler().getSlot(6).getStack().hasNbt())
+			RivalRebelsTeam team = RivalRebelsTeam.NONE;
+			if (t.getMenu().getSlot(6).hasItem() && t.getMenu().getSlot(6).getItem().has(RRComponents.CHIP_DATA))
 			{
-				team = t.getScreenHandler().getSlot(6).getStack().getNbt().getInt("team");
+				team = t.getMenu().getSlot(6).getItem().get(RRComponents.CHIP_DATA).team();
 			}
-			if (team == 0) color = 0xffff55;
-			if (team == 1) color = 0x55ff55;
-			if (team == 2) color = 0x5555ff;
+			if (team == RivalRebelsTeam.NONE) color = 0xffff55;
+			if (team == RivalRebelsTeam.OMEGA) color = 0x55ff55;
+			if (team == RivalRebelsTeam.SIGMA) color = 0x5555ff;
 		}
 		if (inside && on) color = 0xffffff;
-        context.drawCenteredTextWithShadow(MinecraftClient.getInstance().textRenderer, getMessage(), bbox.xMin + 1, bbox.yMin + 1, color);
+        context.drawCenteredString(Minecraft.getInstance().font, getMessage(), bbox.xMin + 1, bbox.yMin + 1, color);
 		mouseDown = current;
 	}
 }

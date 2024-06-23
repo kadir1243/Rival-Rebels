@@ -12,29 +12,29 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.Box;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 public class EntityLaptop extends EntityInanimate
 {
 	public double	slide	= 0;
 	double			test	= Math.PI;
 
-    public EntityLaptop(EntityType<? extends EntityLaptop> type, World world) {
+    public EntityLaptop(EntityType<? extends EntityLaptop> type, Level world) {
         super(type, world);
     }
 
-	public EntityLaptop(World par1World) {
+	public EntityLaptop(Level par1World) {
 		this(RREntities.LAPTOP, par1World);
-		setBoundingBox(new Box(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
+		setBoundingBox(new AABB(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
 	}
 
     @Override
-    public boolean isCollidable() {
+    public boolean canBeCollidedWith() {
         return this.isAlive();
     }
 
@@ -43,10 +43,10 @@ public class EntityLaptop extends EntityInanimate
         return true;
     }
 
-    public EntityLaptop(World par1World, float x, float y, float z, float yaw) {
+    public EntityLaptop(Level par1World, float x, float y, float z, float yaw) {
 		this(par1World);
-		setPosition(x, y, z);
-        this.setYaw(yaw);
+		setPos(x, y, z);
+        this.setYRot(yaw);
 	}
 
 	@Override
@@ -55,7 +55,7 @@ public class EntityLaptop extends EntityInanimate
 		super.tick();
 		slide = (Math.cos(test) + 1) * 45;
 
-        if (getWorld().isPlayerInRange(getX() + 0.5F, getY() + 0.5F, getZ() + 0.5F, 9)) {
+        if (level().hasNearbyAlivePlayer(getX() + 0.5F, getY() + 0.5F, getZ() + 0.5F, 9)) {
 			if (slide < 89.995) test += 0.05;
 		} else {
 			if (slide > 0.004) test -= 0.05;
@@ -63,16 +63,16 @@ public class EntityLaptop extends EntityInanimate
 	}
 
     @Override
-    public ActionResult interact(PlayerEntity player, Hand hand) {
-		if (player.isSneaking() && !player.getWorld().isClient) {
-			player.openHandledScreen(null);
+    public InteractionResult interact(Player player, InteractionHand hand) {
+		if (player.isShiftKeyDown() && !player.level().isClientSide) {
+			player.openMenu(null);
 		}
-		if (!player.isSneaking() && player.getInventory().insertStack(RRBlocks.controller.asItem().getDefaultStack()))
+		if (!player.isShiftKeyDown() && player.getInventory().add(RRBlocks.controller.asItem().getDefaultInstance()))
 		{
-			player.swingHand(hand);
+			player.swing(hand);
 			kill();
 		}
-		return ActionResult.success(getWorld().isClient);
+		return InteractionResult.sidedSuccess(level().isClientSide);
 	}
 
 }

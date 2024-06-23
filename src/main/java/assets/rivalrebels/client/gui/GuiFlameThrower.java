@@ -15,15 +15,17 @@ import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiFTKnob;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.item.components.FlameThrowerMode;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.mixin.client.DrawContextAccessor;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.item.ItemStack;
 
 public class GuiFlameThrower extends Screen
 {
@@ -35,7 +37,7 @@ public class GuiFlameThrower extends Screen
 	private final int start;
 
 	public GuiFlameThrower(int start) {
-        super(Text.empty());
+        super(Component.empty());
         this.start = start;
 	}
 
@@ -43,20 +45,20 @@ public class GuiFlameThrower extends Screen
 	public void init() {
 		posX = (width - xSizeOfTexture) / 2;
 		posY = (height - ySizeOfTexture) / 2;
-		clearChildren();
+		clearWidgets();
 		knob = new GuiFTKnob(posX + 108, posY + 176, -90, 90, start, true, "Knob");
-		addDrawable(knob);
+		addRenderableOnly(knob);
 	}
 
     @Override
-    public boolean shouldPause() {
+    public boolean isPauseScreen() {
         return false;
     }
 
     @Override
-    public void render(DrawContext context, int mouseX, int mouseY, float delta) {
+    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		float f = 0.00390625F;
-		client = MinecraftClient.getInstance();
+		minecraft = Minecraft.getInstance();
         ((DrawContextAccessor) context).callDrawTexturedQuad(
             RRIdentifiers.guiflamethrower,
             posX,
@@ -70,15 +72,15 @@ public class GuiFlameThrower extends Screen
             0
         );
         super.render(context, mouseX, mouseY, delta);
-		if (!(ClientProxy.USE_KEY.isPressed())) {
-			client.setScreen(null);
-			client.onWindowFocusChanged(true);
-			ItemStack itemstack = client.player.getStackInHand(Hand.MAIN_HAND);
+		if (!(ClientProxy.USE_KEY.isDown())) {
+			minecraft.setScreen(null);
+			minecraft.setWindowActive(true);
+			ItemStack itemstack = minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
             if (itemstack.getItem() != RRItems.flamethrower) {
-                itemstack = client.player.getStackInHand(Hand.OFF_HAND);
+                itemstack = minecraft.player.getItemInHand(InteractionHand.OFF_HAND);
             }
-			itemstack.getOrCreateNbt().putInt("mode", knob.getDegree());
-            ClientPlayNetworking.send(new ItemUpdate(client.player.getInventory().selectedSlot, knob.getDegree()));
+            itemstack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(knob.getDegree(), itemstack.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).isReady()));
+            ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
 		}
 	}
 }

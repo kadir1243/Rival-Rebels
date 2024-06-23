@@ -17,93 +17,95 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityLaserBurst;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
-public class ItemAstroBlaster extends ToolItem {
+public class ItemAstroBlaster extends TieredItem {
 	boolean	isA	= true;
 
 	public ItemAstroBlaster() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
+		super(Tiers.DIAMOND, new Properties().stacksTo(1));
 	}
 
 	@Override
-	public int getEnchantability()
+	public int getEnchantmentValue()
 	{
 		return 100;
 	}
 
 	@Override
-	public UseAction getUseAction(ItemStack par1ItemStack)
+	public UseAnim getUseAnimation(ItemStack par1ItemStack)
 	{
-		return UseAction.BOW;
+		return UseAnim.BOW;
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack par1ItemStack)
-	{
+    @Override
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 2000;
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.redrod);
         if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteAmmo) {
-			if (world.isClient) stack.setRepairCost(1);
-			player.setCurrentHand(hand);
+			if (world.isClientSide) stack.set(DataComponents.REPAIR_COST, 1);
+			player.startUsingItem(hand);
 			RivalRebelsSoundPlayer.playSound(player, 12, 0, 0.7f, 0.7f);
-		} else if (!world.isClient) {
-			player.sendMessage(Text.of("§cNot enough redstone rods"), false);
+		} else if (!world.isClientSide) {
+			player.displayClientMessage(Component.nullToEmpty("§cNot enough redstone rods"), false);
 		}
-		return TypedActionResult.success(stack, world.isClient);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 	}
 
     @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-        if (!(user instanceof PlayerEntity player)) return;
+    public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+        if (!(user instanceof Player player)) return;
 
-        if (remainingUseTicks < 1980 && !world.isClient) {
+        if (remainingUseTicks < 1980 && !world.isClientSide) {
 			if (!player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo) {
                 ItemStack redrodStack = ItemUtil.getItemStack(player, RRItems.redrod);
                 if (!redrodStack.isEmpty()) {
-					redrodStack.damage(1, player, player1 -> {});
-					if (redrodStack.getDamage() == redrodStack.getMaxDamage()) {
-						redrodStack.decrement(1);
+					redrodStack.hurtAndBreak(1, (ServerLevel) world, (ServerPlayer) player, item -> {});
+					if (redrodStack.getDamageValue() == redrodStack.getMaxDamage()) {
+						redrodStack.shrink(1);
                         if (redrodStack.isEmpty()) {
-                            player.getInventory().removeOne(redrodStack);
+                            player.getInventory().removeItem(redrodStack);
                         }
-						player.getInventory().insertStack(RRItems.emptyrod.getDefaultStack());
+						player.getInventory().add(RRItems.emptyrod.getDefaultInstance());
 					}
 				} else {
 					return;
 				}
 			}
 
-			if (isA) world.playSoundFromEntity(player, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS, SoundCategory.PLAYERS, 0.5f, 0.3f);
-			else world.playSoundFromEntity(player, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS2, SoundCategory.PLAYERS, 0.4f, 1.7f);
+			if (isA) world.playLocalSound(player, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS, SoundSource.PLAYERS, 0.5f, 0.3f);
+			else world.playLocalSound(player, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS2, SoundSource.PLAYERS, 0.4f, 1.7f);
 
 			isA = !isA;
-			world.spawnEntity(new EntityLaserBurst(world, player, stack.hasEnchantments()));
+			world.addFreshEntity(new EntityLaserBurst(world, player, stack.isEnchanted()));
 		}
-		else if (world.isClient)
+		else if (world.isClientSide)
 		{
-			stack.setRepairCost((2000 - remainingUseTicks) + 1);
+			stack.set(DataComponents.REPAIR_COST, (2000 - remainingUseTicks) + 1);
 		}
 	}
 
     @Override
-    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-		if (world.isClient) stack.setRepairCost(0);
+    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+		if (world.isClientSide) stack.set(DataComponents.REPAIR_COST, 0);
 	}
 }

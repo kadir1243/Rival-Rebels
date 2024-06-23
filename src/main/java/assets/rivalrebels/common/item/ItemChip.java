@@ -13,81 +13,78 @@ package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.round.RivalRebelsTeam;
-import net.minecraft.client.item.TooltipContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUsageContext;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-import org.jetbrains.annotations.Nullable;
+import assets.rivalrebels.common.item.components.ChipData;
+import assets.rivalrebels.common.item.components.RRComponents;
 
 import java.util.List;
-import java.util.UUID;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 public class ItemChip extends Item {
 	public ItemChip()
 	{
-		super(new Settings().maxCount(1));
+		super(new Properties().stacksTo(1).component(RRComponents.CHIP_DATA, ChipData.DEFAULT));
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-		if (RivalRebels.round.isStarted() && !stack.getOrCreateNbt().getBoolean("isReady") && entity instanceof PlayerEntity player) {
-            stack.getNbt().putUuid("player", player.getUuid());
-            stack.getNbt().putString("username", player.getName().getString());
-			stack.getNbt().putInt("team", RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam.ordinal());
-			stack.getNbt().putBoolean("isReady", true);
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+		if (RivalRebels.round.isStarted() && !stack.get(RRComponents.CHIP_DATA).isReady() && entity instanceof Player player) {
+            stack.set(RRComponents.CHIP_DATA, new ChipData(player.getUUID(), player.getGameProfile().getName(), RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam, true));
 		}
 	}
 
     @Override
-    public ActionResult useOnBlock(ItemUsageContext context) {
-        PlayerEntity player = context.getPlayer();
-        BlockPos pos = context.getBlockPos();
-        World world = context.getWorld();
-        Hand hand = context.getHand();
-		player.swingHand(hand);
-		if (!world.isClient)
+    public InteractionResult useOn(UseOnContext context) {
+        Player player = context.getPlayer();
+        BlockPos pos = context.getClickedPos();
+        Level world = context.getLevel();
+        InteractionHand hand = context.getHand();
+		player.swing(hand);
+		if (!world.isClientSide)
 		{
 			if (world.getBlockState(pos).getBlock() == RRBlocks.buildrhodes)
 			{
-				world.setBlockState(pos.west(), RRBlocks.steel.getDefaultState());
-				world.setBlockState(pos.east(), RRBlocks.steel.getDefaultState());
-				world.setBlockState(pos.up(), RRBlocks.conduit.getDefaultState());
-				world.setBlockState(pos.west().up(), RRBlocks.steel.getDefaultState());
-				world.setBlockState(pos.east().up(), RRBlocks.steel.getDefaultState());
-				world.setBlockState(pos.up(2), RRBlocks.steel.getDefaultState());
-				world.setBlockState(pos.west().up(2), RRBlocks.steel.getDefaultState());
-				world.setBlockState(pos.east().up(2), RRBlocks.steel.getDefaultState());
-				if (world.getBlockState(pos.down()).getBlock() == RRBlocks.buildrhodes)
+				world.setBlockAndUpdate(pos.west(), RRBlocks.steel.defaultBlockState());
+				world.setBlockAndUpdate(pos.east(), RRBlocks.steel.defaultBlockState());
+				world.setBlockAndUpdate(pos.above(), RRBlocks.conduit.defaultBlockState());
+				world.setBlockAndUpdate(pos.west().above(), RRBlocks.steel.defaultBlockState());
+				world.setBlockAndUpdate(pos.east().above(), RRBlocks.steel.defaultBlockState());
+				world.setBlockAndUpdate(pos.above(2), RRBlocks.steel.defaultBlockState());
+				world.setBlockAndUpdate(pos.west().above(2), RRBlocks.steel.defaultBlockState());
+				world.setBlockAndUpdate(pos.east().above(2), RRBlocks.steel.defaultBlockState());
+				if (world.getBlockState(pos.below()).getBlock() == RRBlocks.buildrhodes)
 				{
-					world.setBlockState(pos, RRBlocks.conduit.getDefaultState());
-					world.setBlockState(pos.down(), RRBlocks.rhodesactivator.getDefaultState());
-					world.setBlockState(pos.west().down(), RRBlocks.steel.getDefaultState());
-					world.setBlockState(pos.east().down(), RRBlocks.steel.getDefaultState());
+					world.setBlockAndUpdate(pos, RRBlocks.conduit.defaultBlockState());
+					world.setBlockAndUpdate(pos.below(), RRBlocks.rhodesactivator.defaultBlockState());
+					world.setBlockAndUpdate(pos.west().below(), RRBlocks.steel.defaultBlockState());
+					world.setBlockAndUpdate(pos.east().below(), RRBlocks.steel.defaultBlockState());
 				}
 				else
 				{
-					world.setBlockState(pos, RRBlocks.rhodesactivator.getDefaultState());
+					world.setBlockAndUpdate(pos, RRBlocks.rhodesactivator.defaultBlockState());
 				}
-				return ActionResult.PASS;
+				return InteractionResult.PASS;
 			}
 		}
-		return ActionResult.success(world.isClient);
+		return InteractionResult.sidedSuccess(world.isClientSide);
 	}
 
     @Override
-    public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
-		if (stack.hasNbt()) {
-			tooltip.add(Text.of(RivalRebelsTeam.getForID(stack.getNbt().getInt("team")).name()));
-            UUID player = stack.getNbt().getUuid("player");
-            tooltip.add(Text.of("Player Of UUID: " + player.toString()));
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+        ChipData chipData = stack.get(RRComponents.CHIP_DATA);
+        if (chipData.isReady()) {
+			tooltipComponents.add(Component.nullToEmpty(chipData.team().name()));
+            tooltipComponents.add(Component.nullToEmpty("Player Of UUID: " + chipData.player().toString()));
 		}
 	}
 }

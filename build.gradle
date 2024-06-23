@@ -1,4 +1,5 @@
 plugins {
+    id 'idea'
     id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
 }
@@ -50,18 +51,22 @@ repositories {
         }
     }
     maven { url 'https://jitpack.io' }
+    maven { url 'https://maven.parchmentmc.org' }
 }
 
 dependencies {
     // to change the versions see the gradle.properties file
     minecraft "com.mojang:minecraft:${project.minecraft_version}"
 
-    // uncomment this if you want to use yarn mappings
-    mappings "net.fabricmc:yarn:${project.minecraft_version}+build.${project.mapping_version}:v2"
+    mappings loom.layered() {
+        officialMojangMappings()
+
+        parchment("org.parchmentmc.data:parchment-1.20.6:${project.mapping_version}@zip")
+    }
 
     modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
     modImplementation "net.fabricmc.fabric-api:fabric-api:${project.fabric_version}"
-    modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:20.4.3"
+    modImplementation "fuzs.forgeconfigapiport:forgeconfigapiport-fabric:21.0.0"
 }
 
 tasks.named('processResources', ProcessResources).configure {
@@ -78,7 +83,7 @@ tasks.named('processResources', ProcessResources).configure {
 }
 
 tasks.withType(JavaCompile).configureEach {
-    options.release = 17
+    options.release = 21
 }
 
 
@@ -93,5 +98,6 @@ sourceSets {
 }
 
 java {
-    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+    compileJava.options.deprecation true
+    sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 }

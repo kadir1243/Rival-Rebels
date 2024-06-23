@@ -11,10 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public class ItemRocket extends Item {
 	public ItemRocket() {
-        super(new Settings().maxCount(32));
+        super(new Properties().stacksTo(32));
 	}
 }

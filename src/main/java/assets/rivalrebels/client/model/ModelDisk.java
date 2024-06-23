@@ -13,9 +13,9 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import org.joml.Quaternionf;
 
 public class ModelDisk
@@ -47,10 +47,10 @@ public class ModelDisk
 	private static final Vector3f			v9			= new Vector3f(1.00f * cosdeg, 0f, 1.00f * sindeg);
 	private static final Vector3f			v10			= new Vector3f(0.65f * cosdeg, -0.0625f, 0.65f * sindeg);
 
-	public static void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay) {
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
 		for (float i = 0; i < 360; i += 360 / numOfSegs) {
-			matrices.push();
-			matrices.multiply(new Quaternionf(i, 0, 1, 0));
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf(i, 0, 1, 0));
 			RenderHelper.addFace(buffer, v2, v1, v6, v7, t4, t9, t10, t5, light, overlay);
 			if (i == 0 || i == 16) {
 				RenderHelper.addFace(buffer, v3, v2, v7, v8, t2, t7, t8, t3, light, overlay);
@@ -63,7 +63,7 @@ public class ModelDisk
 				RenderHelper.addFace(buffer, v5, v4, v9, v10, t1, t6, t7, t2, light, overlay);
 				RenderHelper.addFace(buffer, v1, v5, v10, v6, t1, t6, t7, t2, light, overlay);
 			}
-			matrices.pop();
+			matrices.popPose();
 		}
 	}
 }

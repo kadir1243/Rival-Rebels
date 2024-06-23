@@ -3,39 +3,39 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelDisk;
 import assets.rivalrebels.common.entity.*;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 
 public class RoddiskRenderer extends EntityRenderer<RoddiskBase> {
     private float er = 0;
 
-    public RoddiskRenderer(EntityRendererFactory.Context dispatcher) {
+    public RoddiskRenderer(EntityRendererProvider.Context dispatcher) {
         super(dispatcher);
     }
 
     @Override
-    public void render(RoddiskBase entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(RoddiskBase entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         er += 13.46F;
-        matrices.push();
-        matrices.multiply(new Quaternionf(entity.getPitch(), 0.0F, 0.0F, 1.0F));
-        matrices.multiply(new Quaternionf(entity.getYaw() - 90.0f + er, 0.0F, 1.0F, 0.0F));
+        matrices.pushPose();
+        matrices.mulPose(new Quaternionf(entity.getXRot(), 0.0F, 0.0F, 1.0F));
+        matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f + er, 0.0F, 1.0F, 0.0F));
         matrices.scale(0.4f, 0.4f, 0.4f);
-        matrices.push();
+        matrices.pushPose();
 
-        ModelDisk.render(matrices, vertexConsumers.getBuffer(RenderLayer.getEntitySolid(getTexture(entity))), light, OverlayTexture.DEFAULT_UV);
+        ModelDisk.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(getTextureLocation(entity))), light, OverlayTexture.NO_OVERLAY);
 
-        matrices.pop();
-        matrices.pop();
+        matrices.popPose();
+        matrices.popPose();
     }
 
     @Override
-    public Identifier getTexture(RoddiskBase entity) {
+    public ResourceLocation getTextureLocation(RoddiskBase entity) {
         if (entity instanceof EntityRoddiskRegular)
             return RRIdentifiers.etdisk0;
         if (entity instanceof EntityRoddiskRebel)

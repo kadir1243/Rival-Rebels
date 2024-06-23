@@ -16,51 +16,52 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderentity.RenderAntimatterBomb;
 import assets.rivalrebels.common.block.trap.BlockAntimatterBomb;
 import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<TileEntityAntimatterBomb>, CustomRenderBoxExtension<TileEntityAntimatterBomb> {
-    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etantimatterbomb);
-    public TileEntityAntimatterBombRenderer(BlockEntityRendererFactory.Context context) {
+    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etantimatterbomb);
+    public TileEntityAntimatterBombRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityAntimatterBomb entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		matrices.push();
-		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 1.0F, (float) entity.getPos().getZ() + 0.5F);
+    public void render(TileEntityAntimatterBomb entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
+		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1.0F, (float) entity.getBlockPos().getZ() + 0.5F);
 		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-		int metadata = entity.getCachedState().get(BlockAntimatterBomb.META);
+		int metadata = entity.getBlockState().getValue(BlockAntimatterBomb.META);
 
 		if (metadata == 2) {
-			matrices.multiply(new Quaternionf(180, 0, 1, 0));
+			matrices.mulPose(new Quaternionf(180, 0, 1, 0));
 		} else if (metadata == 4) {
-            matrices.multiply(new Quaternionf(-90, 0, 1, 0));
+            matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
 		} else if (metadata == 5) {
-            matrices.multiply(new Quaternionf(90, 0, 1, 0));
+            matrices.mulPose(new Quaternionf(90, 0, 1, 0));
 		}
-		RenderAntimatterBomb.bomb.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
-		matrices.pop();
+		RenderAntimatterBomb.bomb.render(TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		matrices.popPose();
 	}
 
     @Override
-    public int getRenderDistance()
+    public int getViewDistance()
     {
         return 16384;
     }
 
     @Override
-    public Box getRenderBoundingBox(TileEntityAntimatterBomb blockEntity) {
-        return Box.from(BlockBox.create(blockEntity.getPos().add(-5, 0, -5), blockEntity.getPos().add(6, 2, 6)));
+    public AABB getRenderBoundingBox(TileEntityAntimatterBomb blockEntity) {
+        return AABB.of(BoundingBox.fromCorners(blockEntity.getBlockPos().offset(-5, 0, -5), blockEntity.getBlockPos().offset(6, 2, 6)));
     }
 }

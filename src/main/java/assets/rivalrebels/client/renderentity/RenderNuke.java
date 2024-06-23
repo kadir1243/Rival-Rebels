@@ -16,38 +16,38 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.WavefrontObject;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityNuke;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class RenderNuke extends EntityRenderer<EntityNuke> {
-    public static final RenderLayer RENDER_LAYER = RenderLayer.getEntitySolid(RRIdentifiers.etwacknuke);
+    public static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etwacknuke);
     public static WavefrontObject model = RenderHelper.getModel("wacknuke");
 
-	public RenderNuke(EntityRendererFactory.Context manager) {
+	public RenderNuke(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
     @Override
-    public void render(EntityNuke entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        matrices.push();
+    public void render(EntityNuke entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+        matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
-        matrices.multiply(new Quaternionf(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
-        matrices.multiply(new Quaternionf(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
-        model.render(vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.DEFAULT_UV);
-        matrices.pop();
+        matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(new Quaternionf(entity.getXRot() - 90.0f, 0.0F, 0.0F, 1.0F));
+        model.render(vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        matrices.popPose();
     }
 
     @Override
-    public Identifier getTexture(EntityNuke entity) {
+    public ResourceLocation getTextureLocation(EntityNuke entity) {
         return RRIdentifiers.etwacknuke;
     }
 }

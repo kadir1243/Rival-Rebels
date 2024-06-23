@@ -11,10 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public class ItemFuel extends Item {
 	public ItemFuel() {
-		super(new Settings());
+		super(new Properties());
 	}
 }

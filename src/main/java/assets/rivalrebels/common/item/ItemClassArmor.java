@@ -11,15 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
 
 public class ItemClassArmor extends ArmorItem {
 	public int team;
 	public int stateclass;
 
-	public ItemClassArmor(ArmorMaterial material, Type type, int team, int stateclass) {
-		super(material, type, new Settings().maxDamage(material.getDurability(type)));
+	public ItemClassArmor(Holder<ArmorMaterial> material, Type type, int team, int stateclass) {
+		super(material, type, new Properties().durability(material.value().getDefense(type)));
 		this.team = team;
 		this.stateclass = stateclass;
 	}

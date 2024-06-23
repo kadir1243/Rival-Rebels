@@ -14,70 +14,69 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
 
 public class EntitySphereBlast extends EntityTsarBlast {
-    public EntitySphereBlast(EntityType<? extends EntitySphereBlast> type, World world) {
+    public EntitySphereBlast(EntityType<? extends EntitySphereBlast> type, Level world) {
         super(type, world);
     }
 
-	public EntitySphereBlast(World par1World) {
+	public EntitySphereBlast(Level par1World) {
 		this(RREntities.SPHERE_BLAST, par1World);
-		ignoreCameraFrustum = true;
+		noCulling = true;
 	}
 
-	public EntitySphereBlast(World par1World, double x, double y, double z, float rad) {
+	public EntitySphereBlast(Level par1World, double x, double y, double z, float rad) {
 		this(par1World);
 		radius = rad;
-		setVelocity(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-		setPosition(x, y, z);
+		setDeltaMovement(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setPos(x, y, z);
 	}
 
 	@Override
 	public void tick()
 	{
-		if (getWorld().random.nextInt(10) == 0)
+		if (level().random.nextInt(10) == 0)
 		{
-			getWorld().playSound(this.getX(), getY(), getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.MASTER, 10.0F, 0.50F, true);
+			level().playLocalSound(this.getX(), getY(), getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 10.0F, 0.50F, true);
 		}
 		else
 		{
-			if (getWorld().random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
+			if (level().random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
 		}
 
 		if (random.nextBoolean()&&random.nextBoolean()) pushAndHurtEntities();
 
-		age++;
+		tickCount++;
 
-		if (age > 400) kill();
+		if (tickCount > 400) kill();
 	}
 
 	@Override
 	public void pushAndHurtEntities()
 	{
-		int var3 = MathHelper.floor(getX() - radius - 1.0D);
-		int var4 = MathHelper.floor(getX() + radius + 1.0D);
-		int var5 = MathHelper.floor(getY() - radius - 1.0D);
-		int var28 = MathHelper.floor(getY() + radius + 1.0D);
-		int var7 = MathHelper.floor(getZ() - radius - 1.0D);
-		int var29 = MathHelper.floor(getZ() + radius + 1.0D);
-		List<Entity> var9 = getWorld().getOtherEntities(this, new Box(var3, var5, var7, var4, var28, var29));
+		int var3 = Mth.floor(getX() - radius - 1.0D);
+		int var4 = Mth.floor(getX() + radius + 1.0D);
+		int var5 = Mth.floor(getY() - radius - 1.0D);
+		int var28 = Mth.floor(getY() + radius + 1.0D);
+		int var7 = Mth.floor(getZ() - radius - 1.0D);
+		int var29 = Mth.floor(getZ() + radius + 1.0D);
+		List<Entity> var9 = level().getEntities(this, new AABB(var3, var5, var7, var4, var28, var29));
 
         for (Entity var31 : var9) {
             if (var31 instanceof LivingEntity) {
-                if (var31 instanceof PlayerEntity && ((PlayerEntity) var31).getAbilities().creativeMode) continue;
+                if (var31 instanceof Player && ((Player) var31).getAbilities().instabuild) continue;
 
-                double var13 = Math.sqrt(var31.squaredDistanceTo(getX(), getY(), getZ())) / radius;
+                double var13 = Math.sqrt(var31.distanceToSqr(getX(), getY(), getZ())) / radius;
 
                 if (var13 <= 1.0D) {
                     double var15 = var31.getX() - getX();
@@ -90,9 +89,9 @@ public class EntitySphereBlast extends EntityTsarBlast {
                         var17 /= var33;
                         var19 /= var33;
                         double var34 = (1.0D - var13);
-                        var31.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) ((var34 * var34 + var34) * 20 * radius + 20) * 200);
-                        var31.setVelocity(
-                            var31.getVelocity().subtract(
+                        var31.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) ((var34 * var34 + var34) * 20 * radius + 20) * 200);
+                        var31.setDeltaMovement(
+                            var31.getDeltaMovement().subtract(
                                 var15 * var34 * 8,
                                 var17 * var34 * 8,
                                 var19 * var34 * 8
@@ -102,7 +101,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
                 }
             }
             if (var31 instanceof EntityRhodes) {
-                var31.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), 30);
+                var31.hurt(RivalRebelsDamageSource.nuclearBlast(level()), 30);
             }
         }
 	}

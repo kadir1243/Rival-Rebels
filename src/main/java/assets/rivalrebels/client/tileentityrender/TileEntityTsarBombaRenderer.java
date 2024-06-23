@@ -14,50 +14,50 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.block.trap.BlockTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEntityTsarBomba>, CustomRenderBoxExtension<TileEntityTsarBomba> {
-    public TileEntityTsarBombaRenderer(BlockEntityRendererFactory.Context context) {
+    public TileEntityTsarBombaRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityTsarBomba entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        matrices.push();
-        matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 1F, (float) entity.getPos().getZ() + 0.5F);
-        int metadata = entity.getCachedState().get(BlockTsarBomba.META);
+    public void render(TileEntityTsarBomba entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        matrices.pushPose();
+        matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1F, (float) entity.getBlockPos().getZ() + 0.5F);
+        int metadata = entity.getBlockState().getValue(BlockTsarBomba.META);
 
         if (metadata == 2) {
-            matrices.multiply(new Quaternionf(180, 0, 1, 0));
-            matrices.multiply(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(new Quaternionf(180, 0, 1, 0));
+            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
         } else if (metadata == 3) {
-            matrices.multiply(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
         } else if (metadata == 4) {
-            matrices.multiply(new Quaternionf(-90, 0, 1, 0));
-            matrices.multiply(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
+            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
         } else if (metadata == 5) {
-            matrices.multiply(new Quaternionf(90, 0, 1, 0));
-            matrices.multiply(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
         }
         ModelTsarBomba.render(matrices, vertexConsumers, light, overlay);
-        matrices.pop();
+        matrices.popPose();
     }
 
     @Override
-    public int getRenderDistance() {
+    public int getViewDistance() {
         return 16384;
     }
 
     @Override
-    public Box getRenderBoundingBox(TileEntityTsarBomba blockEntity) {
-        return Box.from(BlockBox.create(blockEntity.getPos().add(-5, 0, -5), blockEntity.getPos().add(6, 2, 6)));
+    public AABB getRenderBoundingBox(TileEntityTsarBomba blockEntity) {
+        return AABB.of(BoundingBox.fromCorners(blockEntity.getBlockPos().offset(-5, 0, -5), blockEntity.getBlockPos().offset(6, 2, 6)));
     }
 }

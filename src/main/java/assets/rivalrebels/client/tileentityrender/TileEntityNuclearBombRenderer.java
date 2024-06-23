@@ -16,51 +16,52 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderentity.RenderNuke;
 import assets.rivalrebels.common.block.trap.BlockNuclearBomb;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.BlockBox;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityNuclearBombRenderer implements BlockEntityRenderer<TileEntityNuclearBomb>, CustomRenderBoxExtension<TileEntityNuclearBomb> {
-    public static final SpriteIdentifier TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etwacknuke);
-    public TileEntityNuclearBombRenderer(BlockEntityRendererFactory.Context context) {
+    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etwacknuke);
+    public TileEntityNuclearBombRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityNuclearBomb entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		matrices.push();
-		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
+    public void render(TileEntityNuclearBomb entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
+		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
 		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-		int metadata = entity.getCachedState().get(BlockNuclearBomb.META);
+		int metadata = entity.getBlockState().getValue(BlockNuclearBomb.META);
         switch (metadata) {
-            case 0 -> matrices.multiply(new Quaternionf(90, 1, 0, 0));
-            case 1 -> matrices.multiply(new Quaternionf(-90, 1, 0, 0));
-            case 2 -> matrices.multiply(new Quaternionf(180, 0, 1, 0));
-            case 3 -> matrices.multiply(new Quaternionf(0, 0, 1, 0));
-            case 4 -> matrices.multiply(new Quaternionf(-90, 0, 1, 0));
-            case 5 -> matrices.multiply(new Quaternionf(90, 0, 1, 0));
+            case 0 -> matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            case 1 -> matrices.mulPose(new Quaternionf(-90, 1, 0, 0));
+            case 2 -> matrices.mulPose(new Quaternionf(180, 0, 1, 0));
+            case 3 -> matrices.mulPose(new Quaternionf(0, 0, 1, 0));
+            case 4 -> matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
+            case 5 -> matrices.mulPose(new Quaternionf(90, 0, 1, 0));
         }
-		RenderNuke.model.render(TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
-		matrices.pop();
+		RenderNuke.model.render(TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		matrices.popPose();
 	}
 
     @Override
-    public int getRenderDistance()
+    public int getViewDistance()
     {
         return 65536;
     }
 
     @Override
-    public Box getRenderBoundingBox(TileEntityNuclearBomb blockEntity) {
-        return Box.from(BlockBox.create(blockEntity.getPos().add(-1, -1, -1), blockEntity.getPos().add(2, 2, 2)));
+    public AABB getRenderBoundingBox(TileEntityNuclearBomb blockEntity) {
+        return AABB.of(BoundingBox.fromCorners(blockEntity.getBlockPos().offset(-1, -1, -1), blockEntity.getBlockPos().offset(2, 2, 2)));
     }
 }

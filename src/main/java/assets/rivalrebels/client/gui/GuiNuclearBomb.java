@@ -15,24 +15,24 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerNuclearBomb;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
 @Environment(EnvType.CLIENT)
-public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
+public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb> {
 
-	public GuiNuclearBomb(ContainerNuclearBomb containerNuclearBomb, PlayerInventory inventoryPlayer, Text title) {
+	public GuiNuclearBomb(ContainerNuclearBomb containerNuclearBomb, Inventory inventoryPlayer, Component title) {
 		super(containerNuclearBomb, inventoryPlayer, title);
 	}
 
     @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-        super.drawForeground(context, mouseX, mouseY);
-		int seconds = (handler.getCountDown() / 20);
-		int millis = (handler.getCountDown() % 20) * 3;
+    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
+        super.renderLabels(context, mouseX, mouseY);
+		int seconds = (menu.getCountDown() / 20);
+		int millis = (menu.getCountDown() % 20) * 3;
 		String milli;
 		if (millis < 10)
 		{
@@ -42,36 +42,36 @@ public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
 		{
 			milli = "" + millis;
 		}
-		if (handler.getCountDown() % 20 >= 10)
+		if (menu.getCountDown() % 20 >= 10)
 		{
-			context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
+			context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
 		}
 		else
 		{
-            context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 80, 6, 0xFF0000, false);
+            context.drawString(font, Component.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 80, 6, 0xFF0000, false);
 		}
-		context.drawText(textRenderer, Text.translatable("RivalRebels.nuke.name"), 8, 6, 0xffffff, false);
-		context.drawText(textRenderer, Text.translatable("container.inventory"), 8, backgroundHeight - 96 + 2, 0xffffff, false);
-		if (handler.isArmed())
+		context.drawString(font, Component.translatable("RivalRebels.nuke.name"), 8, 6, 0xffffff, false);
+		context.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
+		if (menu.isArmed())
 		{
-            context.drawText(textRenderer, Text.translatable("RivalRebels.tsar.armed"), 80, backgroundHeight - 96 + 2, 0xffffff, false);
+            context.drawString(font, Component.translatable("RivalRebels.tsar.armed"), 80, imageHeight - 96 + 2, 0xffffff, false);
 		}
 		else
 		{
-			if (!handler.hasTrollFace())
+			if (!menu.hasTrollFace())
 			{
-                context.drawText(textRenderer, Text.literal(handler.getAmountOfCharges() * 2.5 + " ").append(Text.translatable("RivalRebels.tsar.megatons")), 80, backgroundHeight - 96 + 2, 0xffffff, false);
+                context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable("RivalRebels.tsar.megatons")), 80, imageHeight - 96 + 2, 0xffffff, false);
 			}
 			else
 			{
-                context.drawText(textRenderer, "Umad bro?", 80, backgroundHeight - 96 + 2, 0xffffff, false);
+                context.drawString(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
 			}
 		}
 
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - backgroundWidth) / 2;
-		int posy = (height - backgroundHeight) / 2;
+		int posx = (width - imageWidth) / 2;
+		int posy = (height - imageHeight) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 158;
 		int widthx = 72;
@@ -80,26 +80,26 @@ public class GuiNuclearBomb extends HandledScreen<ContainerNuclearBomb> {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			context.fillGradient(mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			context.drawText(textRenderer, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
-			if (!buttondown && client.mouse.wasLeftButtonClicked())
+			context.fillGradient(mousex, mousey, mousex + font.width("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			context.drawString(font, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
+			if (!buttondown && minecraft.mouseHandler.isLeftPressed())
 			{
-                Util.getOperatingSystem().open("http://rivalrebels.com");
+                Util.getPlatform().openUri("http://rivalrebels.com");
 			}
 		}
-		buttondown = client.mouse.wasLeftButtonClicked();
+		buttondown = minecraft.mouseHandler.isLeftPressed();
 	}
 
 	boolean	buttondown;
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        context.setShaderColor(1, 1, 1, 1);
-		if (handler.getAmountOfCharges() != 0) context.setShaderColor((handler.getAmountOfCharges() * 0.1F), 1 - (handler.getAmountOfCharges() * 0.1F), 0, 1);
-		int x = (width - backgroundWidth) / 2;
-		int y = (height - backgroundHeight) / 2;
-		context.drawTexture(RRIdentifiers.guitnuke, x, y, 0, 0, backgroundWidth, 81);
-		context.setShaderColor(1, 1, 1, 1);
-        context.drawTexture(RRIdentifiers.guitnuke, x, y + 81, 0, 81, backgroundWidth, backgroundHeight - 81);
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+        context.setColor(1, 1, 1, 1);
+		if (menu.getAmountOfCharges() != 0) context.setColor((menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0, 1);
+		int x = (width - imageWidth) / 2;
+		int y = (height - imageHeight) / 2;
+		context.blit(RRIdentifiers.guitnuke, x, y, 0, 0, imageWidth, 81);
+		context.setColor(1, 1, 1, 1);
+        context.blit(RRIdentifiers.guitnuke, x, y + 81, 0, 81, imageWidth, imageHeight - 81);
 	}
 }

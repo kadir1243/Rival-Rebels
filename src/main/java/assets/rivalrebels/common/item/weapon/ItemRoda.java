@@ -15,23 +15,24 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.*;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.TntEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.PrimedTnt;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 public class ItemRoda extends Item
 {
@@ -179,7 +180,7 @@ public class ItemRoda extends Item
 		};
 	public static int rodaindex = 23;
 
-	public static void spawn(int index, World world, double x, double y, double z, double mx, double my, double mz, double speed, double random) {
+	public static void spawn(int index, Level world, double x, double y, double z, double mx, double my, double mz, double speed, double random) {
 		if ("roda".equals(entities[index]))
 		{
 			int newindex = world.random.nextInt(index);
@@ -191,10 +192,10 @@ public class ItemRoda extends Item
 		double rx = world.random.nextGaussian() * random;
 		double ry = world.random.nextGaussian() * random;
 		double rz = world.random.nextGaussian() * random;
-        Vec3d velocity = new Vec3d(mx, my, mz).multiply(speed).add(rx, ry, rz);
-        mx = velocity.getX();
-        my = velocity.getY();
-        mz = velocity.getZ();
+        Vec3 velocity = new Vec3(mx, my, mz).scale(speed).add(rx, ry, rz);
+        mx = velocity.x();
+        my = velocity.y();
+        mz = velocity.z();
 		Entity e = null;
 		switch(index)
 		{
@@ -233,51 +234,51 @@ public class ItemRoda extends Item
 		break;
 		case 11:
 			e = EntityType.CREEPER.create(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 		break;
 		case 12:
 			e = EntityType.SNOW_GOLEM.create(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 		break;
 		case 13:
 			e = new EntityRoddiskRebel(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 		break;
 		case 14:
 			e = new EntitySeekB83(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 		break;
 		case 15:
 			e = EntityType.ZOMBIFIED_PIGLIN.create(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 		break;
 		case 16:
 			e = EntityType.ZOMBIE.create(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 		break;
 		case 17:
-			e = new TntEntity(world, x, y, z, null);
-            e.setVelocity(velocity);
+			e = new PrimedTnt(world, x, y, z, null);
+            e.setDeltaMovement(velocity);
 		break;
 		case 18:
 			e = EntityType.IRON_GOLEM.create(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 		break;
 		case 19:
 			Entity zomb = EntityType.ZOMBIFIED_PIGLIN.create(world);
-			zomb.setPosition(x,y,z);
-            zomb.setVelocity(velocity);
-			world.spawnEntity(zomb);
+			zomb.setPos(x,y,z);
+            zomb.setDeltaMovement(velocity);
+			world.addFreshEntity(zomb);
 			e = EntityType.CHICKEN.create(world);
-			e.setPosition(x,y,z);
-            e.setVelocity(velocity);
+			e.setPos(x,y,z);
+            e.setDeltaMovement(velocity);
 			zomb.startRiding(e);
 		break;
 		case 20:
@@ -325,57 +326,57 @@ public class ItemRoda extends Item
 			e = new EntityTachyonBomb(world, x,y,z,mx,my,mz,1);
 		break;
 		}
-		if (world.isClient) return;
+		if (world.isClientSide) return;
 		if (e != null)
 		{
-			world.spawnEntity(e);
+			world.addFreshEntity(e);
 		}
 	}
 
 	boolean pass = false;
 	public ItemRoda() {
-		super(new Settings().maxCount(1));
+		super(new Properties().stacksTo(1).component(RRComponents.HAPPY_NEW_YEAR, 0));
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
         if (!pass) {
-			player.sendMessage(Text.of("Password?"), true);
+			player.displayClientMessage(Component.nullToEmpty("Password?"), true);
 			pass = true;
 		}
-		player.swingHand(hand);
+		player.swing(hand);
 		RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
-		if ((!world.isClient && world.getServer().isSingleplayer())
+		if ((!world.isClientSide && world.getServer().isSingleplayer())
 		 || (rrp != null && (rrp.rrrank == RivalRebelsRank.LEADER || rrp.rrrank == RivalRebelsRank.OFFICER || rrp.rrrank == RivalRebelsRank.REP))) {
-			player.setCurrentHand(hand);
-			stack.getNbt().putInt("happynewyear",stack.getNbt().getInt("happynewyear")+10);
-			if (stack.getNbt().getInt("happynewyear") > 1400 && !world.isClient) //EXPLODE
+			player.startUsingItem(hand);
+			stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)+10);
+			if (stack.get(RRComponents.HAPPY_NEW_YEAR) > 1400 && !world.isClientSide) //EXPLODE
 			{
-				world.spawnEntity(new EntityNuclearBlast(world, player.getX(), player.getY(), player.getZ(), 6, true));
-				player.setStackInHand(hand, ItemStack.EMPTY);
-				return TypedActionResult.success(stack, world.isClient);
+				world.addFreshEntity(new EntityNuclearBlast(world, player.getX(), player.getY(), player.getZ(), 6, true));
+				player.setItemInHand(hand, ItemStack.EMPTY);
+				return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 			}
-			double motionX = (-MathHelper.sin(player.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(player.getPitch() / 180.0F * (float) Math.PI));
-			double motionZ = (MathHelper.cos(player.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(player.getPitch() / 180.0F * (float) Math.PI));
-			double motionY = (-MathHelper.sin(player.getPitch() / 180.0F * (float) Math.PI));
+			double motionX = (-Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI));
+			double motionZ = (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI));
+			double motionY = (-Mth.sin(player.getXRot() / 180.0F * (float) Math.PI));
 			spawn(rodaindex, world, player.getX(), player.getY() + 3.0, player.getZ(),motionX,motionY,motionZ, 1.0,0.0);
 		}
-		return TypedActionResult.pass(stack);
+		return InteractionResultHolder.pass(stack);
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-		if (world.isClient) return;
-		if (stack.getOrCreateNbt().getInt("happynewyear")>0)stack.getNbt().putInt("happynewyear",stack.getNbt().getInt("happynewyear")-1);
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+		if (world.isClientSide) return;
+		if (stack.get(RRComponents.HAPPY_NEW_YEAR)>0)stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)-1);
 	}
 
     //@Override
-	public boolean onLeftClickEntity(ItemStack stack, PlayerEntity player, Entity entity)
+	public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity)
 	{
-		if (player.getWorld().isClient) return true;
-		Random r = player.getWorld().random;
+		if (player.level().isClientSide) return true;
+		RandomSource r = player.level().random;
 		double x = entity.getX() - player.getX();
 		double y = entity.getY() - player.getY();
 		double z = entity.getZ() - player.getZ();
@@ -389,7 +390,7 @@ public class ItemRoda extends Item
 				y /= -dist;
 				z /= -dist;
 
-				entity.setVelocity(
+				entity.setDeltaMovement(
                     x * 3 + (r.nextFloat() - 0.5f) * 0.1,
                     y * 3 + (r.nextFloat() - 0.5f) * 0.1,
                     z * 3 + (r.nextFloat() - 0.5f) * 0.1);
@@ -399,7 +400,7 @@ public class ItemRoda extends Item
 				y /= dist;
 				z /= dist;
 
-				entity.setVelocity(
+				entity.setDeltaMovement(
                     x * 2 + (r.nextFloat() - 0.5f) * 0.1,
                     y * 2 + (r.nextFloat() - 0.5f) * 0.1,
                     z * 2 + (r.nextFloat() - 0.5f) * 0.1);

@@ -13,53 +13,53 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.RotationAxis;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 
 public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid>
 {
 
-    public RenderPlasmoid(EntityRendererFactory.Context renderManager) {
+    public RenderPlasmoid(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void render(EntityPlasmoid entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-		matrices.push();
-        matrices.multiply(new Quaternionf(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
-		matrices.multiply(new Quaternionf(entity.getPitch() - 90.0f, 0.0F, 0.0F, 1.0F));
+    public void render(EntityPlasmoid entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+		matrices.pushPose();
+        matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(new Quaternionf(entity.getXRot() - 90.0f, 0.0F, 0.0F, 1.0F));
 		matrices.scale(0.4f, 2.5f, 0.4f);
-		matrices.push();
+		matrices.pushPose();
 
-		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.rotation));
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.4f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.push();
-		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.rotation));
+		matrices.pushPose();
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.6f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.push();
-		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.rotation));
+		matrices.pushPose();
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.8f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.push();
-		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.rotation));
+		matrices.pushPose();
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, 1f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.push();
-		matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees(entity.rotation));
+		matrices.pushPose();
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, 1.2f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.pop();
-		matrices.pop();
-		matrices.pop();
-		matrices.pop();
-		matrices.pop();
-		matrices.pop();
+		matrices.popPose();
+		matrices.popPose();
+		matrices.popPose();
+		matrices.popPose();
+		matrices.popPose();
+		matrices.popPose();
 	}
 
     @Override
-    public Identifier getTexture(EntityPlasmoid entity) {
+    public ResourceLocation getTextureLocation(EntityPlasmoid entity) {
         return null;
     }
 }

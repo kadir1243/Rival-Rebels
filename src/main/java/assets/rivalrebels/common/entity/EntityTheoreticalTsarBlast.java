@@ -13,24 +13,24 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.explosion.TsarBomba;
-import net.minecraft.entity.EntityType;
-import net.minecraft.world.World;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
 
 public class EntityTheoreticalTsarBlast extends EntityTsarBlast {
-    public EntityTheoreticalTsarBlast(EntityType<? extends EntityTheoreticalTsarBlast> type, World world) {
+    public EntityTheoreticalTsarBlast(EntityType<? extends EntityTheoreticalTsarBlast> type, Level world) {
         super(type, world);
     }
 
-    public EntityTheoreticalTsarBlast(World par1World) {
+    public EntityTheoreticalTsarBlast(Level par1World) {
         this(RREntities.THEORETICAL_TSAR_BLAST, par1World);
-        ignoreCameraFrustum = true;
+        noCulling = true;
     }
 
-    public EntityTheoreticalTsarBlast(World par1World, float x, float y, float z, TsarBomba tsarBomba, int rad) {
+    public EntityTheoreticalTsarBlast(Level par1World, float x, float y, float z, TsarBomba tsarBomba, int rad) {
         this(par1World);
         tsar = tsarBomba;
         radius = rad;
-        setVelocity(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-        setPosition(x, y, z);
+        setDeltaMovement(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+        setPos(x, y, z);
     }
 }

@@ -16,25 +16,25 @@ import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.item.ItemFuel;
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class ContainerReciever extends ScreenHandler {
-	protected Inventory reciever;
-    private final PropertyDelegate propertyDelegate;
+public class ContainerReciever extends AbstractContainerMenu {
+	protected Container reciever;
+    private final ContainerData propertyDelegate;
 
-    public ContainerReciever(int syncId, PlayerInventory playerInv) {
-        this(syncId, playerInv, new SimpleInventory(9), new ArrayPropertyDelegate(7));
+    public ContainerReciever(int syncId, Inventory playerInv) {
+        this(syncId, playerInv, new SimpleContainer(9), new SimpleContainerData(7));
     }
 
-	public ContainerReciever(int syncId, PlayerInventory inventoryPlayer, Inventory reciever, PropertyDelegate propertyDelegate) {
+	public ContainerReciever(int syncId, Inventory inventoryPlayer, Container reciever, ContainerData propertyDelegate) {
         super(RivalRebelsGuiHandler.RECIEVER_SCREEN_HANDLER_TYPE, syncId);
         this.reciever = reciever;
         this.propertyDelegate = propertyDelegate;
@@ -51,12 +51,12 @@ public class ContainerReciever extends ScreenHandler {
 	}
 
 	@Override
-	public boolean canUse(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
-		return reciever.canPlayerUse(player);
+		return reciever.stillValid(player);
 	}
 
-	protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
+	protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -73,7 +73,7 @@ public class ContainerReciever extends ScreenHandler {
 	}
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack quickMoveStack(Player player, int slot) {
 		return ItemStack.EMPTY;
 	}
 

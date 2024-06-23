@@ -15,39 +15,40 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.common.block.machine.BlockLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityLaptop> {
-    public static final SpriteIdentifier LAPTOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etlaptop);
-    public static final SpriteIdentifier SCREEN_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etubuntu);
+    public static final Material LAPTOP_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etlaptop);
+    public static final Material SCREEN_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etubuntu);
 
-    public TileEntityLaptopRenderer(BlockEntityRendererFactory.Context context) {
+    public TileEntityLaptopRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityLaptop entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		matrices.push();
-		matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY(), (float) entity.getPos().getZ() + 0.5F);
-        short var11 = switch (entity.getCachedState().get(BlockLaptop.META)) {
+    public void render(TileEntityLaptop entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
+		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY(), (float) entity.getBlockPos().getZ() + 0.5F);
+        short var11 = switch (entity.getBlockState().getValue(BlockLaptop.META)) {
             case 2 -> 180;
             case 3 -> 0;
             case 4 -> -90;
             case 5 -> 90;
             default -> 0;
         };
-        matrices.multiply(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
-        ModelLaptop.renderModel(LAPTOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, overlay);
-		ModelLaptop.renderScreen(SCREEN_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, (float) -entity.slide, light, overlay);
-		matrices.pop();
+        matrices.mulPose(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+        ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
+		ModelLaptop.renderScreen(SCREEN_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
+		matrices.popPose();
 	}
 }

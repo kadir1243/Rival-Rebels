@@ -11,32 +11,37 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderhelper;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.WavefrontObject;
-import net.minecraft.client.render.*;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.FastColor;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
 public class RenderHelper {
-    public static final RenderLayer TRINGLES_POS_TEX = create("tringles_pos_tex", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.TRIANGLES);
-    public static final RenderLayer TRINGLES_POS_TEX_COLOR = create("tringles_pos_tex_color", VertexFormats.POSITION_TEXTURE_COLOR, VertexFormat.DrawMode.TRIANGLES);
-    public static final RenderLayer TRINGLES_POS_COLOR = create("tringles_pos_color", VertexFormats.POSITION_COLOR, VertexFormat.DrawMode.TRIANGLES);
-    public static final RenderLayer POS_TEX = create("pos_tex", VertexFormats.POSITION_TEXTURE, VertexFormat.DrawMode.QUADS);
+    public static final RenderType TRINGLES_POS_TEX = create("tringles_pos_tex", DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.TRIANGLES);
+    public static final RenderType TRINGLES_POS_TEX_COLOR = create("tringles_pos_tex_color", DefaultVertexFormat.POSITION_TEX_COLOR, VertexFormat.Mode.TRIANGLES);
+    public static final RenderType TRINGLES_POS_COLOR = create("tringles_pos_color", DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES);
+    public static final RenderType POS_TEX = create("pos_tex", DefaultVertexFormat.POSITION_TEX, VertexFormat.Mode.QUADS);
 
-    private static RenderLayer create(String name, VertexFormat format, VertexFormat.DrawMode gl) {
-        return RenderLayer.of(name, format, gl, 2097152, false, false, RenderLayer.MultiPhaseParameters.builder().program(RenderPhase.CUTOUT_PROGRAM).build(true));
+    private static RenderType create(String name, VertexFormat format, VertexFormat.Mode gl) {
+        return RenderType.create(name, format, gl, 2097152, false, false, RenderType.CompositeState.builder().setShaderState(RenderStateShard.RENDERTYPE_CUTOUT_SHADER).createCompositeState(true));
     }
 
     public static WavefrontObject getModel(String modelName) {
-        return WavefrontObject.loadModel(new Identifier(RivalRebels.MODID, "models/" + modelName + ".obj"));
+        return WavefrontObject.loadModel(RRIdentifiers.create("models/" + modelName + ".obj"));
     }
 
-    public static void renderBox(MatrixStack matrices, VertexConsumer buffer, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light)
+    public static void renderBox(PoseStack matrices, VertexConsumer buffer, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light)
 	{
-		matrices.multiply(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
 		texLocX /= texXsize;
 		texLocY /= texYsize;
 		float hl = (length / 2f) / resolution;
@@ -79,7 +84,7 @@ public class RenderHelper {
 	}
 
     public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light) {
-        addFace(buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, OverlayTexture.DEFAULT_UV);
+        addFace(buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, OverlayTexture.NO_OVERLAY);
     }
 
     public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
@@ -91,11 +96,11 @@ public class RenderHelper {
         addVertice(buffer, mv, mt, light, overlay);
     }
 
-    public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, Vector4f color, int light, int overlay) {
-        addVertice(buffer, v1, color, light, overlay);
-        addVertice(buffer, v2, color, light, overlay);
-        addVertice(buffer, v3, color, light, overlay);
-        addVertice(buffer, v4, color, light, overlay);
+    public static void addFace(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, Vector4f color, int light, int overlay) {
+        addVertice(poseStack, buffer, v1, color, light, overlay);
+        addVertice(poseStack, buffer, v2, color, light, overlay);
+        addVertice(poseStack, buffer, v3, color, light, overlay);
+        addVertice(poseStack, buffer, v4, color, light, overlay);
     }
 
     public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureFace t, int light, int overlay) {
@@ -113,20 +118,20 @@ public class RenderHelper {
     }
 
     public static void addTri(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector4f color) {
-        buffer.vertex(v3.x, v3.y, v3.z).color(color.x(), color.y(), color.z(), color.w()).next();
-        buffer.vertex(v1.x, v1.y, v1.z).color(color.x(), color.y(), color.z(), color.w()).next();
-        buffer.vertex(v2.x, v2.y, v2.z).color(color.x(), color.y(), color.z(), color.w()).next();
+        buffer.addVertex(v3).setColor(color.x(), color.y(), color.z(), color.w());
+        buffer.addVertex(v1).setColor(color.x(), color.y(), color.z(), color.w());
+        buffer.addVertex(v2).setColor(color.x(), color.y(), color.z(), color.w());
     }
 
     public static void addVertice(VertexConsumer buffer, Vector3f v, TextureVertice t, Vector4f color, int light, int overlay) {
-        buffer.vertex(v.x, v.y, v.z, color.x(), color.y(), color.z(), color.w(), t.x, t.y, overlay, light, 0, 0, 1);
+        buffer.addVertex(v.x, v.y, v.z, FastColor.ARGB32.colorFromFloat(color.x(), color.y(), color.z(), color.w()), t.x, t.y, overlay, light, 0, 0, 1);
     }
 
     public static void addVertice(VertexConsumer buffer, Vector3f v, TextureVertice t, int light, int overlay) {
         addVertice(buffer, v, t, new Vector4f(1, 1, 1, 1), light, overlay);
     }
 
-    public static void addVertice(VertexConsumer buffer, Vector3f v, Vector4f color, int light, int overlay) {
-        buffer.vertex(v.x, v.y, v.z).color(color.x(), color.y(), color.z(), color.w()).overlay(overlay).light(light).next();
+    public static void addVertice(PoseStack poseStack, VertexConsumer buffer, Vector3f v, Vector4f color, int light, int overlay) {
+        buffer.addVertex(poseStack.last(), v).setColor(color.x(), color.y(), color.z(), color.w()).setOverlay(overlay).setLight(light);
     }
 }

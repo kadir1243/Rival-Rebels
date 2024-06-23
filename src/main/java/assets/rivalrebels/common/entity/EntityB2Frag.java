@@ -14,18 +14,17 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityB2Frag extends EntityInanimate
 {
@@ -38,23 +37,23 @@ public class EntityB2Frag extends EntityInanimate
 	float				offset		= 0;
     public int			health;
 
-    public EntityB2Frag(EntityType<? extends EntityB2Frag> type, World world) {
+    public EntityB2Frag(EntityType<? extends EntityB2Frag> type, Level world) {
         super(type, world);
     }
 
-	public EntityB2Frag(World par1World) {
+	public EntityB2Frag(Level par1World) {
 		this(RREntities.B2FRAG, par1World);
 		health = 300;
-		setBoundingBox(new Box(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
-		ignoreCameraFrustum = true;
+		setBoundingBox(new AABB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
+		noCulling = true;
 	}
 
-	public EntityB2Frag(World par1World, Entity toBeGibbed, int Type)
+	public EntityB2Frag(Level par1World, Entity toBeGibbed, int Type)
 	{
 		this(par1World);
 		health = 300;
-		setBoundingBox(new Box(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
-		ignoreCameraFrustum = true;
+		setBoundingBox(new AABB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
+		noCulling = true;
 
 		isSliding = false;
 		type = Type;
@@ -62,35 +61,35 @@ public class EntityB2Frag extends EntityInanimate
 		motionyaw = (float) ((random.nextDouble() - 0.5) * 35);
 		motionpitch = (float) ((random.nextDouble() - 0.5) * 25);
 
-		refreshPositionAndAngles(toBeGibbed.getX(), toBeGibbed.getY(), toBeGibbed.getZ(), toBeGibbed.getYaw(), toBeGibbed.getPitch());
+		moveTo(toBeGibbed.getX(), toBeGibbed.getY(), toBeGibbed.getZ(), toBeGibbed.getYRot(), toBeGibbed.getXRot());
 
 		double ox = getX();
 		double oz = getZ();
 
 		if (Type == 1)
 		{
-            setPos(getX() - (MathHelper.cos(((-getYaw()) / 180.0F) * (float) Math.PI) * 7.5F),
+            setPosRaw(getX() - (Mth.cos(((-getYRot()) / 180.0F) * (float) Math.PI) * 7.5F),
                 getY(),
-                getZ() - (MathHelper.sin(((-getYaw()) / 180.0F) * (float) Math.PI) * 7.5F));
+                getZ() - (Mth.sin(((-getYRot()) / 180.0F) * (float) Math.PI) * 7.5F));
 		}
 		else if (Type == 0)
 		{
-            setPos(getX() - (MathHelper.cos(((-getYaw() + 180) / 180.0F) * (float) Math.PI) * 7.5F),
+            setPosRaw(getX() - (Mth.cos(((-getYRot() + 180) / 180.0F) * (float) Math.PI) * 7.5F),
                 getY(),
-                getZ() - (MathHelper.sin(((-getYaw() + 180) / 180.0F) * (float) Math.PI) * 7.5F));
+                getZ() - (Mth.sin(((-getYRot() + 180) / 180.0F) * (float) Math.PI) * 7.5F));
 		}
 
-		setPosition(getX(), getY(), getZ());
+		setPos(getX(), getY(), getZ());
 
-        setVelocity(toBeGibbed.getVelocity());
+        setDeltaMovement(toBeGibbed.getDeltaMovement());
 
-        setVelocity(getVelocity().add((-ox + getX()) * 0.1, 0, (-oz + getZ()) * 0.1));
+        setDeltaMovement(getDeltaMovement().add((-ox + getX()) * 0.1, 0, (-oz + getZ()) * 0.1));
 
-		setOnFireFor(10);
+		igniteForSeconds(10);
 	}
 
 	@Override
-	public boolean isCollidable()
+	public boolean canBeCollidedWith()
 	{
 		return true;
 	}
@@ -132,25 +131,25 @@ public class EntityB2Frag extends EntityInanimate
 			}
 
 			inGround = false;
-			setVelocity(getVelocity().multiply((random.nextFloat() * 0.2F),
+			setDeltaMovement(getDeltaMovement().multiply((random.nextFloat() * 0.2F),
                 (random.nextFloat() * 0.2F),
                 (random.nextFloat() * 0.2F)));
 			ticksInGround = 0;
         }
 
-		Vec3d vec3 = getPos();
-		Vec3d vec31 = getPos().add(getVelocity());
-		BlockHitResult hitResult = getWorld().raycast(new RaycastContext(vec3, vec31, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+		Vec3 vec3 = position();
+		Vec3 vec31 = position().add(getDeltaMovement());
+		BlockHitResult hitResult = level().clip(new ClipContext(vec3, vec31, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
 
 		if (hitResult != null)
 		{
 			isSliding = true;
-            setPos(getX(), hitResult.getPos().getY() + offset, getZ());
+            setPosRaw(getX(), hitResult.getLocation().y() + offset, getZ());
 		}
 
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
-			List<Entity> var5 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
@@ -163,17 +162,17 @@ public class EntityB2Frag extends EntityInanimate
 
                 if (var9 instanceof EntityLaserBurst) {
                     var9.kill();
-                    damage(getDamageSources().generic(), 6);
+                    hurt(damageSources().generic(), 6);
                 }
             }
 		}
 
-        setPitch(getPitch() + motionpitch);
-		setYaw(getYaw() + motionyaw);
-        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+        setXRot(getXRot() + motionpitch);
+		setYRot(getYRot() + motionyaw);
+        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 
-		setPitch(prevPitch + (getPitch() - prevPitch) * 0.5F);
-		setYaw(prevYaw + (getYaw() - prevYaw) * 0.5F);
+		setXRot(xRotO + (getXRot() - xRotO) * 0.5F);
+		setYRot(yRotO + (getYRot() - yRotO) * 0.5F);
 
 		float f2 = 0.99F;
 		float f3 = 0.05F;
@@ -182,48 +181,48 @@ public class EntityB2Frag extends EntityInanimate
 		{
 			motionpitch = 0;
 			motionyaw = 0;
-            setVelocity(getVelocity().getX(), 0, getVelocity().getZ());
+            setDeltaMovement(getDeltaMovement().x(), 0, getDeltaMovement().z());
 			f2 = 0.7f;
 			f3 = 0.0f;
 		}
 
 		motionpitch *= (double) f2;
 		motionyaw *= (double) f2;
-        setVelocity(getVelocity().multiply(f2));
-        setVelocity(getVelocity().subtract(0, f3, 0));
+        setDeltaMovement(getDeltaMovement().scale(f2));
+        setDeltaMovement(getDeltaMovement().subtract(0, f3, 0));
 
-		setPosition(getX(), getY(), getZ());
+		setPos(getX(), getY(), getZ());
 	}
 
     @Override
-	public void writeCustomDataToNbt(NbtCompound par1NBTTagCompound)
+	public void addAdditionalSaveData(CompoundTag par1NBTTagCompound)
 	{
 		par1NBTTagCompound.putInt("Type", type);
 		par1NBTTagCompound.putBoolean("inGround", inGround);
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound par1NBTTagCompound)
+	public void readAdditionalSaveData(CompoundTag par1NBTTagCompound)
 	{
 		type = par1NBTTagCompound.getInt("Type");
 		inGround = par1NBTTagCompound.getBoolean("inGround");
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
 	@Override
-	public boolean damage(DamageSource source, float amount) {
+	public boolean hurt(DamageSource source, float amount) {
 		if (isAlive()) {
 			health -= amount;
 
 			if (health <= 0) {
 				kill();
-				new Explosion(getWorld(), getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket(getWorld()));
-                getWorld().playSoundFromEntity(this, RRSounds.ARTILLERY_EXPLODE, getSoundCategory(), 30, 1);
+				new Explosion(level(), getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket(level()));
+                level().playLocalSound(this, RRSounds.ARTILLERY_EXPLODE, getSoundSource(), 30, 1);
 			}
 		}
 

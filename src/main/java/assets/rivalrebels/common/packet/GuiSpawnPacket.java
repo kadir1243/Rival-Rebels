@@ -11,33 +11,25 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import io.netty.buffer.ByteBuf;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
-public class GuiSpawnPacket implements FabricPacket {
-    public static final PacketType<GuiSpawnPacket> TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "gui_spawn"), GuiSpawnPacket::new);
-	public GuiSpawnPacket(PacketByteBuf buf) {
-	}
-
-    public GuiSpawnPacket() {
-    }
+public record GuiSpawnPacket() implements CustomPacketPayload {
+    public static final GuiSpawnPacket INSTANCE = new GuiSpawnPacket();
+    public static final StreamCodec<ByteBuf, GuiSpawnPacket> STREAM_CODEC = StreamCodec.unit(INSTANCE);
+    public static final Type<GuiSpawnPacket> TYPE = new Type<>(RRIdentifiers.create("gui_spawn"));
 
     @Override
-    public void write(PacketByteBuf buf) {
-    }
-
-    @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return TYPE;
     }
 
-    public static void onMessage(GuiSpawnPacket packet, PlayerEntity player, PacketSender responseHandler) {
-        if (RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).isreset) {
+    public static void onMessage(GuiSpawnPacket packet, ClientPlayNetworking.Context context) {
+        if (RivalRebels.round.rrplayerlist.getForGameProfile(context.player().getGameProfile()).isreset) {
             RivalRebels.proxy.guiClass();
         } else {
             RivalRebels.proxy.guiSpawn();

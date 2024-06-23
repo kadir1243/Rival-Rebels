@@ -12,46 +12,47 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
+import net.minecraft.world.entity.Entity;
 import org.joml.Quaternionf;
 
 public class RenderBullet extends EntityRenderer<Entity> {
     private final String path;
 
-	public RenderBullet(EntityRendererFactory.Context manager, String path) {
+	public RenderBullet(EntityRendererProvider.Context manager, String path) {
         super(manager);
 		this.path = path;
 	}
 
     @Override
-    public void render(Entity entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-		if (entity.age > 1) {
-			matrices.push();
+    public void render(Entity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+		if (entity.tickCount > 1) {
+			matrices.pushPose();
 			matrices.scale(0.5F, 0.5F, 0.5F);
             float var7 = 1.0F;
             float var8 = 0.5F;
             float var9 = 0.25F;
-            matrices.multiply(new Quaternionf((float) (180.0F - this.dispatcher.camera.getPos().getY()), 0.0F, 1.0F, 0.0F));
-            matrices.multiply(new Quaternionf((float) -this.dispatcher.camera.getPos().getX(), 1.0F, 0.0F, 0.0F));
-            VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getEntitySolid(getTexture(entity)));
-            buffer.vertex((0.0F - var8), (0.0F - var9), 0, 1F, 1F, 1F, 1F, 0, 0, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
-            buffer.vertex((var7 - var8), (0.0F - var9), 0, 1F, 1F, 1F, 1F, 1, 0, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
-            buffer.vertex((var7 - var8), (var7 - var9), 0, 1F, 1F, 1F, 1F, 1, 1, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
-            buffer.vertex((0.0F - var8), (var7 - var9), 0, 1F, 1F, 1F, 1F, 0, 1, OverlayTexture.DEFAULT_UV, light, 0, 1, 0);
-			matrices.pop();
+            matrices.mulPose(new Quaternionf((float) (180.0F - this.entityRenderDispatcher.camera.getPosition().y()), 0.0F, 1.0F, 0.0F));
+            matrices.mulPose(new Quaternionf((float) -this.entityRenderDispatcher.camera.getPosition().x(), 1.0F, 0.0F, 0.0F));
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(getTextureLocation(entity)));
+            buffer.addVertex((0.0F - var8), (0.0F - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 0, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+            buffer.addVertex((var7 - var8), (0.0F - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 1, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+            buffer.addVertex((var7 - var8), (var7 - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 1, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+            buffer.addVertex((0.0F - var8), (var7 - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 0, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+			matrices.popPose();
 		}
 	}
 
     @Override
-    public Identifier getTexture(Entity entity) {
+    public ResourceLocation getTextureLocation(Entity entity) {
         if (path.equals("flame")) return RRIdentifiers.etflame;
         if (path.equals("fire")) return RRIdentifiers.etfire;
         return null;

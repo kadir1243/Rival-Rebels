@@ -12,50 +12,50 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.tileentity.TileEntityJumpBlock;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockEntityProvider;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockJump extends Block implements BlockEntityProvider
+public class BlockJump extends Block implements EntityBlock
 {
-	public BlockJump(Settings settings)
+	public BlockJump(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (entity instanceof LivingEntity) {
-            entity.addVelocity(0, 2, 0);
-			world.playSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ENTITY_ARROW_HIT, SoundCategory.BLOCKS, 3F, 2, true);
+            entity.push(0, 2, 0);
+			world.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ARROW_HIT, SoundSource.BLOCKS, 3F, 2, true);
 		}
 	}
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
         float f = 0.0625F;
-		return VoxelShapes.cuboid(new Box(x, y, z, x + 1, y + 1 - f, z + 1));
+		return Shapes.create(new AABB(x, y, z, x + 1, y + 1 - f, z + 1));
 	}
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new TileEntityJumpBlock(pos, state);
     }
 

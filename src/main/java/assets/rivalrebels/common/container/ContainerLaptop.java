@@ -15,25 +15,25 @@ import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class ContainerLaptop extends ScreenHandler {
-	protected Inventory laptop;
-    private final PropertyDelegate propertyDelegate;
+public class ContainerLaptop extends AbstractContainerMenu {
+	protected Container laptop;
+    private final ContainerData propertyDelegate;
 
-    public ContainerLaptop(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(14), new ArrayPropertyDelegate(4));
+    public ContainerLaptop(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, new SimpleContainer(14), new SimpleContainerData(4));
     }
 
-    public ContainerLaptop(int syncId, PlayerInventory inventoryPlayer, Inventory laptop, PropertyDelegate propertyDelegate) {
+    public ContainerLaptop(int syncId, Inventory inventoryPlayer, Container laptop, ContainerData propertyDelegate) {
         super(RivalRebelsGuiHandler.LAPTOP_SCREEN_HANDLER_TYPE, syncId);
         this.laptop = laptop;
         this.propertyDelegate = propertyDelegate;
@@ -55,12 +55,12 @@ public class ContainerLaptop extends ScreenHandler {
 	}
 
 	@Override
-	public boolean canUse(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
-		return laptop.canPlayerUse(player);
+		return laptop.stillValid(player);
 	}
 
-	protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
+	protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -77,7 +77,7 @@ public class ContainerLaptop extends ScreenHandler {
 	}
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack quickMoveStack(Player player, int slot) {
 		return ItemStack.EMPTY;
 	}
 

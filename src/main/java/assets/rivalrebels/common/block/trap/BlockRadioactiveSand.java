@@ -12,31 +12,30 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.particle.DustParticleEffect;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
-
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockRadioactiveSand extends Block
 {
-	public BlockRadioactiveSand(Settings settings)
+	public BlockRadioactiveSand(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		if (world.random.nextInt(2) == 0) {
-			entity.damage(RivalRebelsDamageSource.radioactivePoisoning(world), world.random.nextInt(2));
+			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), world.random.nextInt(2));
 		}
 	}
 
     @Override
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-		world.addParticle(DustParticleEffect.DEFAULT, pos.getX() + random.nextFloat(), pos.getY() + 1.1 + random.nextFloat() * 0.1, pos.getZ() + random.nextFloat(), 0.3F, 6F, 0.5F);
+    public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
+		world.addParticle(DustParticleOptions.REDSTONE, pos.getX() + random.nextFloat(), pos.getY() + 1.1 + random.nextFloat() * 0.1, pos.getZ() + random.nextFloat(), 0.3F, 6F, 0.5F);
 	}
 }

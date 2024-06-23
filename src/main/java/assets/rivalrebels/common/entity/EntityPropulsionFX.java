@@ -11,52 +11,54 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.projectile.thrown.ThrownEntity;
-import net.minecraft.world.World;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.level.Level;
 
-public class EntityPropulsionFX extends ThrownEntity
+public class EntityPropulsionFX extends ThrowableProjectile
 {
 	private int	ticksInAir;
 
-    public EntityPropulsionFX(EntityType<? extends EntityPropulsionFX> type, World world) {
+    public EntityPropulsionFX(EntityType<? extends EntityPropulsionFX> type, Level world) {
         super(type, world);
+        setNoGravity(true);
     }
 
-	public EntityPropulsionFX(World par1World)
+	public EntityPropulsionFX(Level par1World)
 	{
 		this(RREntities.PROPULSION_FX, par1World);
 		ticksInAir = 0;
 	}
 
-	public EntityPropulsionFX(World par1World, double par2, double par4, double par6)
+	public EntityPropulsionFX(Level par1World, double par2, double par4, double par6)
 	{
 		this(par1World);
         par4 -= 0.2;
-		setPosition(par2, par4, par6);
+		setPos(par2, par4, par6);
 	}
 
-	public EntityPropulsionFX(World world2, double x, double y, double z, double mX, double mY, double mZ)
+	public EntityPropulsionFX(Level world2, double x, double y, double z, double mX, double mY, double mZ)
 	{
 		this(world2);
-		setPosition(x, y, z);
-		setVelocity(mX, mY, mZ);
+		setPos(x, y, z);
+		setDeltaMovement(mX, mY, mZ);
 	}
 
 	@Override
-	public float getBrightnessAtEyes()
+	public float getLightLevelDependentMagicValue()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
     @Override
-    protected void initDataTracker() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
     @Override
@@ -64,19 +66,13 @@ public class EntityPropulsionFX extends ThrownEntity
 	{
 		super.tick();
 		ticksInAir++;
-		if ((ticksInAir >= 5 && getWorld().random.nextInt(2) == 1) || this.isInsideWaterOrBubbleColumn())
+		if ((ticksInAir >= 5 && level().random.nextInt(2) == 1) || this.isInWaterOrBubble())
 		{
 			kill();
 		}
-        setPos(getX() + getVelocity().getX() + (getWorld().random.nextDouble() - 0.5) * 0.07,
-            getY() + getVelocity().getY() + (getWorld().random.nextDouble() - 0.5) * 0.07 + 0.005,
-            getZ() + getVelocity().getZ() + (getWorld().random.nextDouble() - 0.5) * 0.07);
-		setPosition(getX(), getY(), getZ());
-	}
-
-	@Override
-	protected float getGravity()
-	{
-		return 0F;
+        setPosRaw(getX() + getDeltaMovement().x() + (level().random.nextDouble() - 0.5) * 0.07,
+            getY() + getDeltaMovement().y() + (level().random.nextDouble() - 0.5) * 0.07 + 0.005,
+            getZ() + getDeltaMovement().z() + (level().random.nextDouble() - 0.5) * 0.07);
+		setPos(getX(), getY(), getZ());
 	}
 }

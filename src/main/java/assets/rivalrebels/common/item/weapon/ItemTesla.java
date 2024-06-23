@@ -17,46 +17,46 @@ import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRaytrace;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
-public class ItemTesla extends ToolItem {
+public class ItemTesla extends TieredItem {
 	public ItemTesla() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
+		super(Tiers.DIAMOND, new Properties().stacksTo(1).component(RRComponents.TESLA_DIAL, 0));
 	}
 
 	@Override
-	public int getEnchantability()
+	public int getEnchantmentValue()
 	{
 		return 100;
 	}
 
 	@Override
-	public UseAction getUseAction(ItemStack stack)
+	public UseAnim getUseAnimation(ItemStack stack)
 	{
-		return UseAction.BOW;
+		return UseAnim.BOW;
 	}
 
-	@Override
-	public int getMaxUseTime(ItemStack stack)
-	{
+    @Override
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 20;
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-		ItemStack stack = player.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+		ItemStack stack = player.getItemInHand(hand);
         int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
         ItemStack battery = ItemUtil.getItemStack(player, RRItems.battery);
@@ -64,43 +64,43 @@ public class ItemTesla extends ToolItem {
 		{
 			if (!player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
 			{
-                battery.decrement(1);
-				if (chance > 0.33333) battery.decrement(1);
-				if (chance > 0.66666) battery.decrement(1);
+                battery.shrink(1);
+				if (chance > 0.33333) battery.shrink(1);
+				if (chance > 0.66666) battery.shrink(1);
                 if (battery.isEmpty()) {
-                    player.getInventory().removeOne(battery);
+                    player.getInventory().removeItem(battery);
                 }
             }
-			player.setCurrentHand(hand);
+			player.startUsingItem(hand);
 		}
-		else if (!world.isClient)
+		else if (!world.isClientSide)
 		{
-			player.sendMessage(Text.of("§cOut of batteries"), false);
+			player.displayClientMessage(Component.nullToEmpty("§cOut of batteries"), false);
 		}
-		if (message && world.isClient)
+		if (message && world.isClientSide)
 		{
-			player.sendMessage(Text.translatable("RivalRebels.Orders").append(" ").append(Text.translatable("RivalRebels.message.use")).append(" [R]."), false);
+			player.displayClientMessage(Component.translatable("RivalRebels.Orders").append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
-		return TypedActionResult.success(stack, world.isClient);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 	}
 	boolean message = true;
 
     @Override
-    public void inventoryTick(ItemStack stack, World world, Entity entity, int slot, boolean selected) {
-        if (world.isClient) {
-            if (ClientProxy.USE_KEY.isPressed() && selected && MinecraftClient.getInstance().currentScreen == null) {
+    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+        if (world.isClientSide) {
+            if (ClientProxy.USE_KEY.isDown() && selected && Minecraft.getInstance().screen == null) {
                 RivalRebels.proxy.teslaGui(getDegree(stack));
             }
         }
     }
 
     @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-		if (user.isWet() && !user.isInvulnerableTo(RivalRebelsDamageSource.electricity(world))) {
-			user.damage(RivalRebelsDamageSource.electricity(world), 2);
+    public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+		if (user.isInWaterRainOrBubble() && !user.isInvulnerableTo(RivalRebelsDamageSource.electricity(world))) {
+			user.hurt(RivalRebelsDamageSource.electricity(world), 2);
 		}
-		if (user.getWorld().random.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);
+		if (user.level().random.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);
 
 		int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
@@ -112,13 +112,13 @@ public class ItemTesla extends ToolItem {
 
 		int num = (degree / 25) + 1;
 
-		if (!world.isClient) for (int i = 0; i < num; i++)
-			world.spawnEntity(new EntityRaytrace(world, user, dist, randomness, chance, !stack.hasEnchantments()));
+		if (!world.isClientSide) for (int i = 0; i < num; i++)
+			world.addFreshEntity(new EntityRaytrace(world, user, dist, randomness, chance, !stack.isEnchanted()));
 	}
 
-	public int getDegree(ItemStack item)
+	public static int getDegree(ItemStack item)
 	{
-		if (!item.hasNbt()) return 0;
-		else return item.getNbt().getInt("dial") + 90;
+		if (!item.has(RRComponents.TESLA_DIAL)) return 0;
+		else return item.get(RRComponents.TESLA_DIAL) + 90;
 	}
 }

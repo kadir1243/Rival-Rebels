@@ -16,15 +16,14 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Vec3d;
-
 import java.util.List;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class TileEntityMeltDown extends BlockEntity implements Tickable
 {
@@ -43,36 +42,36 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable
 		size += increment;
 		if (prevsize == 0)
 		{
-			RivalRebelsSoundPlayer.playSound(world, 16, 0, getPos(), 4);
+			RivalRebelsSoundPlayer.playSound(level, 16, 0, getBlockPos(), 4);
 		}
 		if (size > 9.3f)
 		{
 			size = 0f;
-			world.setBlockState(getPos(), Blocks.AIR.getDefaultState());
-			this.markRemoved();
+			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
+			this.setRemoved();
 		}
 
 		double fsize = Math.sin(size) * 5.9;
 		fsize *= 2;
-		List<Entity> l = this.world.getOtherEntities(null, new Box(getPos().getX() - fsize + 0.5, getPos().getY() - fsize + 0.5, getPos().getZ() - fsize + 0.5, getPos().getX() + fsize + 0.5, getPos().getY() + fsize + 0.5, getPos().getZ() + fsize + 0.5));
+		List<Entity> l = this.level.getEntities(null, new AABB(getBlockPos().getX() - fsize + 0.5, getBlockPos().getY() - fsize + 0.5, getBlockPos().getZ() - fsize + 0.5, getBlockPos().getX() + fsize + 0.5, getBlockPos().getY() + fsize + 0.5, getBlockPos().getZ() + fsize + 0.5));
         for (Entity e : l) {
-            double var13 = Math.sqrt(e.squaredDistanceTo(getPos().getX(), getPos().getY(), getPos().getZ())) / fsize;
+            double var13 = Math.sqrt(e.distanceToSqr(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ())) / fsize;
 
             if (var13 <= 1.0D) {
-                double var15 = e.getX() - getPos().getX();
-                double var17 = e.getY() + e.getEyeHeight(e.getPose()) - getPos().getY();
-                double var19 = e.getZ() - getPos().getZ();
+                double var15 = e.getX() - getBlockPos().getX();
+                double var17 = e.getY() + e.getEyeHeight(e.getPose()) - getBlockPos().getY();
+                double var19 = e.getZ() - getBlockPos().getZ();
                 double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
 
                 if (var33 != 0.0D) {
                     var15 /= var33;
                     var17 /= var33;
                     var19 /= var33;
-                    double var32 = net.minecraft.world.explosion.Explosion.getExposure(Vec3d.of(getPos()), e);
+                    double var32 = net.minecraft.world.level.Explosion.getSeenPercent(Vec3.atLowerCornerOf(getBlockPos()), e);
                     double var34 = (1.0D - var13) * var32;
                     if (!(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityRhodes)) {
-                        e.damage(RivalRebelsDamageSource.plasmaExplosion(world), (int) ((var34 * var34 + var34) / 16.0D * fsize + 1.0D));
-                        e.addVelocity(
+                        e.hurt(RivalRebelsDamageSource.plasmaExplosion(level), (int) ((var34 * var34 + var34) / 16.0D * fsize + 1.0D));
+                        e.push(
                             var15 * var34 * 4,
                             var17 * var34 * 4,
                             var19 * var34 * 4

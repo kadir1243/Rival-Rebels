@@ -11,13 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public class ItemCore extends Item
 {
 	public float timemult = 0;
 
-	public ItemCore(Settings settings) {
-		super(settings.maxCount(1));
+	public ItemCore(Properties settings) {
+		super(settings.stacksTo(1));
 	}
 }

@@ -20,14 +20,13 @@ import com.google.common.base.Preconditions;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-
-import net.minecraft.util.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 /**
  * Utility class for building a sound entry with a given set of properties, without necessarily passing them all as parameters.
  */
 public class SoundBuilder {
-    private final Identifier name;
+    private final ResourceLocation name;
     private final boolean event;
 
     private float volume = 1;
@@ -37,12 +36,12 @@ public class SoundBuilder {
     private int attenuationDistance = 16;
     private boolean preload = false;
 
-    private SoundBuilder(Identifier name, boolean event) {
+    private SoundBuilder(ResourceLocation name, boolean event) {
         this.name = name;
         this.event = event;
     }
 
-    public Identifier getName() {
+    public ResourceLocation getName() {
         return name;
     }
 
@@ -51,16 +50,16 @@ public class SoundBuilder {
      *
      * @param name The name of the sound as a namespaced ID with relative folder path.
      */
-    public static SoundBuilder sound(Identifier name) {
+    public static SoundBuilder sound(ResourceLocation name) {
         return new SoundBuilder(name, false);
     }
 
     /**
-     * Build an entry corresponding to an existing {@link net.minecraft.sound.SoundEvent}.
+     * Build an entry corresponding to an existing {@link net.minecraft.sounds.SoundEvent}.
      *
      * @param name The ID of the sound event.
      */
-    public static SoundBuilder event(Identifier name) {
+    public static SoundBuilder event(ResourceLocation name) {
         return new SoundBuilder(name, true);
     }
 

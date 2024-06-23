@@ -14,26 +14,26 @@ package assets.rivalrebels.common.container;
 import assets.rivalrebels.common.block.trap.BlockTimedBomb;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.*;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class ContainerAntimatterBomb extends ScreenHandler
+public class ContainerAntimatterBomb extends AbstractContainerMenu
 {
-	protected Inventory antimatter;
-    private final PropertyDelegate propertyDelegate;
+	protected Container antimatter;
+    private final ContainerData propertyDelegate;
 
-    public ContainerAntimatterBomb(int syncId, PlayerInventory inv) {
-        this(syncId, inv, new SimpleInventory(36), new ArrayPropertyDelegate(4));
+    public ContainerAntimatterBomb(int syncId, Inventory inv) {
+        this(syncId, inv, new SimpleContainer(36), new SimpleContainerData(4));
     }
 
-    public ContainerAntimatterBomb(int syncId, PlayerInventory inv, Inventory antimatter, PropertyDelegate propertyDelegate) {
+    public ContainerAntimatterBomb(int syncId, Inventory inv, Container antimatter, ContainerData propertyDelegate) {
         super(RivalRebelsGuiHandler.ANTIMATTER_SCREEN_HANDLER_TYPE, syncId);
 		this.antimatter = antimatter;
         this.propertyDelegate = propertyDelegate;
@@ -53,12 +53,12 @@ public class ContainerAntimatterBomb extends ScreenHandler
 	}
 
 	@Override
-	public boolean canUse(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
-		return antimatter.canPlayerUse(player);
+		return antimatter.stillValid(player);
 	}
 
-    protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
+    protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -75,34 +75,34 @@ public class ContainerAntimatterBomb extends ScreenHandler
 	}
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack quickMoveStack(Player player, int slot) {
 		ItemStack itemStack = ItemStack.EMPTY;
 		Slot var4 = this.getSlot(slot);
 
-		if (var4 != null && var4.hasStack())
+		if (var4 != null && var4.hasItem())
 		{
-			ItemStack var5 = var4.getStack();
+			ItemStack var5 = var4.getItem();
 			itemStack = var5.copy();
 
 			if (slot <= 19)
 			{
-				if (!this.insertItem(var5, 19, this.slots.size(), true))
+				if (!this.moveItemStackTo(var5, 19, this.slots.size(), true))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (!this.insertItem(var5, 0, 19, false))
+			else if (!this.moveItemStackTo(var5, 0, 19, false))
 			{
 				return ItemStack.EMPTY;
 			}
 
 			if (var5.isEmpty())
 			{
-				var4.setStack(ItemStack.EMPTY);
+				var4.setByPlayer(ItemStack.EMPTY);
 			}
 			else
 			{
-				var4.markDirty();
+				var4.setChanged();
 			}
 		}
 

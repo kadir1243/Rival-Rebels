@@ -11,23 +11,23 @@
  *******************************************************************************/
 package assets.rivalrebels.common.round;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketSender;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.util.Identifier;
-import net.minecraft.world.World;
-
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 import java.util.Arrays;
 
-public class RivalRebelsPlayerList implements FabricPacket {
-    public static final PacketType<RivalRebelsPlayerList> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "rivalrebelsplayerlist"), RivalRebelsPlayerList::fromBytes);
+public class RivalRebelsPlayerList implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, RivalRebelsPlayerList> STREAM_CODEC = StreamCodec.ofMember(RivalRebelsPlayerList::toBytes, RivalRebelsPlayerList::fromBytes);
+    public static final Type<RivalRebelsPlayerList> PACKET_TYPE = new Type<>(RRIdentifiers.create("rivalrebelsplayerlist"));
 	private int	size = 0;
 	private RivalRebelsPlayer[]	list = new RivalRebelsPlayer[0];
 
@@ -53,12 +53,7 @@ public class RivalRebelsPlayerList implements FabricPacket {
 	}
 
     @Override
-    public void write(PacketByteBuf buf) {
-        toBytes(this, buf);
-    }
-
-    @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
     }
 
@@ -91,7 +86,7 @@ public class RivalRebelsPlayerList implements FabricPacket {
 		}
 	}
 
-	public static RivalRebelsPlayerList fromBytes(PacketByteBuf buf) {
+	public static RivalRebelsPlayerList fromBytes(FriendlyByteBuf buf) {
         RivalRebelsPlayerList rivalRebelsPlayerList = new RivalRebelsPlayerList();
         rivalRebelsPlayerList.size = buf.readInt();
         rivalRebelsPlayerList.list = new RivalRebelsPlayer[rivalRebelsPlayerList.size];
@@ -99,7 +94,7 @@ public class RivalRebelsPlayerList implements FabricPacket {
         return rivalRebelsPlayerList;
 	}
 
-    public static RivalRebelsPlayerList fromNbt(NbtCompound nbt) {
+    public static RivalRebelsPlayerList fromNbt(CompoundTag nbt) {
         RivalRebelsPlayerList rivalRebelsPlayerList = new RivalRebelsPlayerList();
         rivalRebelsPlayerList.size = nbt.getInt("size");
         rivalRebelsPlayerList.list = new RivalRebelsPlayer[rivalRebelsPlayerList.size];
@@ -109,21 +104,21 @@ public class RivalRebelsPlayerList implements FabricPacket {
         return rivalRebelsPlayerList;
     }
 
-	public static void toBytes(RivalRebelsPlayerList playerList, PacketByteBuf buf) {
+	public static void toBytes(RivalRebelsPlayerList playerList, FriendlyByteBuf buf) {
 		buf.writeInt(playerList.size);
 		for (int i = 0; i < playerList.size; i++) playerList.list[i].toBytes(buf);
 	}
 
-    public void toNbt(NbtCompound nbt) {
+    public void toNbt(CompoundTag nbt) {
         nbt.putInt("size", size);
         for (int i = 0; i < size; i++) {
-            NbtCompound compound = new NbtCompound();
+            CompoundTag compound = new CompoundTag();
             list[i].toNbt(compound);
             nbt.put("list_" + i, compound);
         }
     }
 
-	public static void onMessage(RivalRebelsPlayerList m, PlayerEntity player, PacketSender responseHandler) {
+	public static void onMessage(RivalRebelsPlayerList m, ClientPlayNetworking.Context context) {
 		RivalRebels.round.rrplayerlist = m;
 	}
 
@@ -132,10 +127,10 @@ public class RivalRebelsPlayerList implements FabricPacket {
 		return list;
 	}
 
-    public void refreshForWorld(World world) {
-        if (world.isClient) return;
-        for (PlayerEntity player : world.getPlayers()) {
-            ServerPlayNetworking.send((ServerPlayerEntity) player, this);
+    public void refreshForWorld(Level world) {
+        if (world.isClientSide) return;
+        for (Player player : world.players()) {
+            ServerPlayNetworking.send((ServerPlayer) player, this);
         }
     }
 }

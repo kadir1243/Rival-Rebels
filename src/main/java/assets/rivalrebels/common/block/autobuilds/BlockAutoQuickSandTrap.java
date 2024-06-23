@@ -13,27 +13,27 @@ package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoQuickSandTrap extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoQuickSandTrap> CODEC = createCodec(BlockAutoQuickSandTrap::new);
+    public static final MapCodec<BlockAutoQuickSandTrap> CODEC = simpleCodec(BlockAutoQuickSandTrap::new);
 
-    public BlockAutoQuickSandTrap(Settings settings)
+    public BlockAutoQuickSandTrap(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockAutoQuickSandTrap> getCodec() {
+    protected MapCodec<BlockAutoQuickSandTrap> codec() {
         return CODEC;
     }
 
     @Override
-	public void build(World world, int x, int y, int z)
+	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClient)
+		if (!world.isClientSide)
 		{
 			placeBlockCarefully(world, x, y, z, Blocks.AIR);
 			int r = 2;

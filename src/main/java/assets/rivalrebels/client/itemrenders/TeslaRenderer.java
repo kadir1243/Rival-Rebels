@@ -13,104 +13,106 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
 public class TeslaRenderer implements DynamicItemRenderer {
-    public static final SpriteIdentifier TESLA_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ettesla);
+    public static final Material TESLA_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettesla);
     private static final ModelFromObj tesla = ModelFromObj.readObjFile("i.obj");
 	private static final ModelFromObj dynamo = ModelFromObj.readObjFile("j.obj");
 	private int spin;
 
 	private static int getDegree(ItemStack item) {
-        return item.getOrCreateNbt().getInt("dial");
+        return item.getOrDefault(RRComponents.TESLA_DIAL, 0);
 	}
 
-    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        if (!stack.hasEnchantments()) {
-            VertexConsumer buffer = TESLA_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        if (!stack.isEnchanted()) {
+            VertexConsumer buffer = TESLA_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
             int degree = getDegree(stack);
 			spin += 5 + (degree / 36f);
-			matrices.push();
+			matrices.pushPose();
 			matrices.translate(0.8f, 0.5f, -0.03f);
-			matrices.multiply(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
-			matrices.multiply(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
+			matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+			matrices.mulPose(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
 			matrices.scale(0.12f, 0.12f, 0.12f);
 			// matrices.translate(0.3f, 0.05f, -0.1f);
 
 			tesla.render(buffer, light, overlay);
-			matrices.multiply(new Quaternionf(spin, 1.0F, 0.0F, 0.0F));
+			matrices.mulPose(new Quaternionf(spin, 1.0F, 0.0F, 0.0F));
 			dynamo.render(buffer, light, overlay);
 
-			matrices.pop();
+			matrices.popPose();
 		} else {
-			if (mode != ModelTransformationMode.FIRST_PERSON_RIGHT_HAND) matrices.pop();
-			matrices.push();
+			if (mode != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) matrices.popPose();
+			matrices.pushPose();
             VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
 			matrices.scale(1.01f, 1.01f, 1.01f);
-			matrices.multiply(new Quaternionf(45.0f, 0, 1, 0));
-			matrices.multiply(new Quaternionf(10.0f, 0, 0, 1));
+			matrices.mulPose(new Quaternionf(45.0f, 0, 1, 0));
+			matrices.mulPose(new Quaternionf(10.0f, 0, 0, 1));
 			matrices.scale(0.6f, 0.2f, 0.2f);
 			matrices.translate(-0.99f, 0.5f, 0.0f);
-            cellularNoise.vertex(-1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex(-1,  1, -1).color(1, 1, 1, 1).texture(1, 0).light(light).next();
-            cellularNoise.vertex(-1,  1, 1).color(1, 1, 1, 1).texture(1, 1).light(light).next();
-            cellularNoise.vertex(-1, -1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex( 1, -1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1,  1, 1).color(1, 1, 1, 1).texture(1, 1).light(light).next();
-            cellularNoise.vertex( 1,  1, -1).color(1, 1, 1, 1).texture(1, 0).light(light).next();
-            cellularNoise.vertex(-1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex(-1, -1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1, -1, 1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex( 1, -1, -1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-            cellularNoise.vertex(-1,  1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex( 1,  1, -1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-            cellularNoise.vertex( 1,  1, 1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex(-1,  1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex(-1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex( 1, -1, -1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-            cellularNoise.vertex( 1,  1, -1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex(-1,  1, -1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex(-1, -1, 1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex(-1,  1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1,  1, 1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex( 1, -1, 1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-            cellularNoise.vertex(-1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex(-1,  1, -1).color(1, 1, 1, 1).texture(1, 0).light(light).next();
-            cellularNoise.vertex(-1,  1, 1).color(1, 1, 1, 1).texture(1, 1).light(light).next();
-            cellularNoise.vertex(-1, -1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex( 1, -1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1,  1, 1).color(1, 1, 1, 1).texture(1, 1).light(light).next();
-            cellularNoise.vertex( 1,  1, -1).color(1, 1, 1, 1).texture(1, 0).light(light).next();
-            cellularNoise.vertex(-1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex(-1, -1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1, -1, 1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex( 1, -1, -1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-            cellularNoise.vertex(-1,  1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex( 1,  1, -1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-            cellularNoise.vertex( 1,  1, 1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex(-1,  1, 1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex(-1, -1, -1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex( 1, -1, -1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-            cellularNoise.vertex( 1,  1, -1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex(-1,  1, -1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex(-1, -1,  1).color(1, 1, 1, 1).texture(0, 0).light(light).next();
-            cellularNoise.vertex(-1,  1,  1).color(1, 1, 1, 1).texture(0, 1).light(light).next();
-            cellularNoise.vertex( 1,  1,  1).color(1, 1, 1, 1).texture(3, 1).light(light).next();
-            cellularNoise.vertex( 1, -1,  1).color(1, 1, 1, 1).texture(3, 0).light(light).next();
-			matrices.pop();
-			if (mode != ModelTransformationMode.FIRST_PERSON_RIGHT_HAND) matrices.push();
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(1, 1, 1, 1).setUv1(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(1, 1, 1, 1).setUv1(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(1, 1, 1, 1).setUv1(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(1, 1, 1, 1).setUv1(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(1, 1, 1, 1).setUv1(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(1, 1, 1, 1).setUv1(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(1, 1, 1, 1).setUv1(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(1, 1, 1, 1).setUv1(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1,  1).setColor(1, 1, 1, 1).setUv1(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1,  1).setColor(1, 1, 1, 1).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1,  1).setColor(1, 1, 1, 1).setUv1(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1,  1).setColor(1, 1, 1, 1).setUv1(3, 0).setLight(light);
+			matrices.popPose();
+			if (mode != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) matrices.pushPose();
 		}
 	}
 

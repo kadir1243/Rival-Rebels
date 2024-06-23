@@ -13,9 +13,9 @@ package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelRocketLauncherBody
 {
@@ -127,9 +127,9 @@ public class ModelRocketLauncherBody
 	private static final TextureVertice	rs11		= new TextureVertice((u + q) / 2f + 0.25f, k + q * 2);
 	private static final TextureVertice	rs12		= new TextureVertice((u + r) / 2f + 0.25f, k + p * 2);
 
-	public static void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay)
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		RenderHelper.addFace(buffer, llauncher1, llauncher12, rlauncher12, rlauncher1, l1f, l12s, r12s, r1f, light, overlay);
 		RenderHelper.addFace(buffer, llauncher2, llauncher1, rlauncher1, rlauncher2, l2, l1s, r1s, r2, light, overlay);
 		RenderHelper.addFace(buffer, llauncher3, llauncher2, rlauncher2, rlauncher3, l3f, l2, r2, r3f, light, overlay);
@@ -154,6 +154,6 @@ public class ModelRocketLauncherBody
 		RenderHelper.addFace(buffer, rlauncher4, rlauncher3, rlauncher10, rlauncher9, rs10, rs9, rs4, rs3, light, overlay);
 		RenderHelper.addFace(buffer, rlauncher5, rlauncher4, rlauncher9, rlauncher8, rs11, rs10, rs3, rs2, light, overlay);
 		RenderHelper.addFace(buffer, rlauncher6, rlauncher5, rlauncher8, rlauncher7, rs12, rs11, rs2, rs1, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 	}
 }

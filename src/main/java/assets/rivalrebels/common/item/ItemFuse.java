@@ -11,11 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.Item;
+import net.minecraft.world.item.Item;
 
 public class ItemFuse extends Item {
 	public ItemFuse()
 	{
-		super(new Settings().maxCount(1));
+		super(new Properties().stacksTo(1));
 	}
 }

@@ -14,26 +14,25 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
-import net.fabricmc.fabric.api.tag.convention.v1.ConventionalBlockTags;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.particle.ParticleTypes;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-
+import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,61 +42,61 @@ public class EntityCuchillo extends EntityInanimate
 	private boolean	inGround;
 	private int		ticksInGround;
 
-    public EntityCuchillo(EntityType<? extends EntityCuchillo> type, World par1World) {
+    public EntityCuchillo(EntityType<? extends EntityCuchillo> type, Level par1World) {
         super(type, par1World);
     }
 
-	public EntityCuchillo(World par1World) {
+	public EntityCuchillo(Level par1World) {
 		this(RREntities.CUCHILLO, par1World);
 	}
 
-	public EntityCuchillo(World par1World, PlayerEntity player, float par3)
+	public EntityCuchillo(Level par1World, Player player, float par3)
 	{
 		this(par1World);
 		shootingEntity = player;
-		refreshPositionAndAngles(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYaw(), player.getPitch());
-        setPos(getX() - (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * 0.16F),
+		moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
+        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F),
             getY() - 0.1f,
-            getZ() - (MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * 0.16F));
-		setPosition(getX(), getY(), getZ());
-		setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)) * par3,
-            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)) * par3,
-            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)) * par3);
+            getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F));
+		setPos(getX(), getY(), getZ());
+		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)) * par3,
+            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)) * par3,
+            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)) * par3);
 	}
-	public EntityCuchillo(World par1World, double x, double y,double z, double mx, double my, double mz)
+	public EntityCuchillo(Level par1World, double x, double y,double z, double mx, double my, double mz)
 	{
 		this(par1World);
-		setPosition(x,y,z);
+		setPos(x,y,z);
 		setAnglesMotion(mx, my, mz);
 	}
 
 	public void setAnglesMotion(double mx, double my, double mz) {
-        setVelocity(mx, my, mz);
-		setYaw(prevYaw = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setPitch(prevPitch = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+        setDeltaMovement(mx, my, mz);
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
 	}
 
     @Override
 	public void tick()
 	{
 		super.tick();
-		age++;
+		tickCount++;
 		if (!inGround)
 		{
-			Vec3d vec31 = getPos();
-			Vec3d vec3 = getPos().add(getVelocity());
-			HitResult mop = getWorld().raycast(new RaycastContext(vec31, vec3, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-			vec31 = getPos();
-			if (mop != null) vec3 = mop.getPos();
-			else vec3 = getPos().add(getVelocity());
+			Vec3 vec31 = position();
+			Vec3 vec3 = position().add(getDeltaMovement());
+			HitResult mop = level().clip(new ClipContext(vec31, vec3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+			vec31 = position();
+			if (mop != null) vec3 = mop.getLocation();
+			else vec3 = position().add(getDeltaMovement());
 
-			List<Entity> list = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> list = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
 			double d0 = Double.MAX_VALUE;
             for (Entity entity : list) {
-                if (entity.isCollidable() && (age >= 10 || entity != shootingEntity)) {
-                    Optional<Vec3d> mop1 = entity.getBoundingBox().expand(0.5f, 0.5f, 0.5f).raycast(vec31, vec3);
+                if (entity.canBeCollidedWith() && (tickCount >= 10 || entity != shootingEntity)) {
+                    Optional<Vec3> mop1 = entity.getBoundingBox().inflate(0.5f, 0.5f, 0.5f).clip(vec31, vec3);
                     if (mop1.isPresent()) {
-                        double d1 = vec31.squaredDistanceTo(mop1.get());
+                        double d1 = vec31.distanceToSqr(mop1.get());
                         if (d1 < d0) {
                             mop = new EntityHitResult(entity, mop1.get());
                             d0 = d1;
@@ -108,24 +107,24 @@ public class EntityCuchillo extends EntityInanimate
 
 			if (mop != null)
 			{
-				if (!getWorld().isClient)
+				if (!level().isClientSide)
 				{
 					if (mop.getType() == HitResult.Type.ENTITY)
 					{
-                        ((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cuchillo(getWorld()), 7);
+                        ((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cuchillo(level()), 7);
 						kill();
 					}
 					else if (mop.getType() == HitResult.Type.BLOCK)
 					{
                         BlockPos pos = ((BlockHitResult) mop).getBlockPos();
-                        BlockState state = getWorld().getBlockState(pos);
-						if (state.isIn(ConventionalBlockTags.GLASS_BLOCKS) || state.isIn(ConventionalBlockTags.GLASS_PANES)) {
-							getWorld().setBlockState(pos, Blocks.AIR.getDefaultState());
+                        BlockState state = level().getBlockState(pos);
+						if (state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_PANES)) {
+							level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 							RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
                         }
-						else if (state.isIn(BlockTags.BASE_STONE_OVERWORLD))
+						else if (state.is(BlockTags.BASE_STONE_OVERWORLD))
 						{
-							getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
+							level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.knife.getDefaultInstance()));
 							kill();
 						}
 						else
@@ -137,45 +136,45 @@ public class EntityCuchillo extends EntityInanimate
 			}
 			else
 			{
-                setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
-				setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
-				while (getYaw() - prevYaw < -180.0F)
-					prevYaw -= 360.0F;
-				while (getYaw() - prevYaw >= 180.0F)
-					prevYaw += 360.0F;
-                setPitch(getPitch() - 30);
-				setYaw(prevYaw + (getYaw() - prevYaw) * 0.2F);
+                setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
+				setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+				while (getYRot() - yRotO < -180.0F)
+					yRotO -= 360.0F;
+				while (getYRot() - yRotO >= 180.0F)
+					yRotO += 360.0F;
+                setXRot(getXRot() - 30);
+				setYRot(yRotO + (getYRot() - yRotO) * 0.2F);
 
 				float friction = 0.98f;
 
-				if (isInsideWaterOrBubbleColumn())
+				if (isInWaterOrBubble())
 				{
 					for (int var26 = 0; var26 < 4; ++var26)
-						getWorld().addParticle(ParticleTypes.BUBBLE, getX() - getVelocity().getX() * 0.25F, getY() - getVelocity().getY() * 0.25F, getZ() - getVelocity().getZ() * 0.25F, getVelocity().getX(), getVelocity().getY(), getVelocity().getZ());
+						level().addParticle(ParticleTypes.BUBBLE, getX() - getDeltaMovement().x() * 0.25F, getY() - getDeltaMovement().y() * 0.25F, getZ() - getDeltaMovement().z() * 0.25F, getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z());
 					friction = 0.8F;
 				}
-                setVelocity(getVelocity().multiply(friction));
-                setVelocity(getVelocity().subtract(0, 0.026F, 0));
-				setPosition(getX(), getY(), getZ());
+                setDeltaMovement(getDeltaMovement().scale(friction));
+                setDeltaMovement(getDeltaMovement().subtract(0, 0.026F, 0));
+				setPos(getX(), getY(), getZ());
 			}
 		}
 		else
 		{
-            setVelocity(getVelocity().multiply(0.2));
+            setDeltaMovement(getDeltaMovement().scale(0.2));
 			ticksInGround++;
 			if (ticksInGround == 60)
 			{
-				getWorld().spawnEntity(new ItemEntity(getWorld(), getX(), getY(), getZ(), RRItems.knife.getDefaultStack()));
+				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.knife.getDefaultInstance()));
 				kill();
 			}
 		}
 	}
 
 	@Override
-	public void onPlayerCollision(PlayerEntity player) {
-		if (!getWorld().isClient && inGround) {
-			if (!player.getAbilities().invulnerable) player.getInventory().insertStack(RRItems.knife.getDefaultStack());
-			getWorld().playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.BLOCK_LAVA_POP, SoundCategory.NEUTRAL, 0.2F, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F, true);
+	public void playerTouch(Player player) {
+		if (!level().isClientSide && inGround) {
+			if (!player.getAbilities().invulnerable) player.getInventory().add(RRItems.knife.getDefaultInstance());
+			level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.LAVA_POP, SoundSource.NEUTRAL, 0.2F, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F, true);
 			kill();
 		}
 	}

@@ -16,68 +16,69 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntitySeekB83;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.text.Text;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
-public class ItemSeekM202 extends ToolItem
+public class ItemSeekM202 extends TieredItem
 {
 	public ItemSeekM202() {
-		super(ToolMaterials.DIAMOND, new Settings().maxCount(1));
+		super(Tiers.DIAMOND, new Properties().stacksTo(1));
 	}
 
 	@Override
-	public UseAction getUseAction(ItemStack par1ItemStack)
+	public UseAnim getUseAnimation(ItemStack par1ItemStack)
 	{
-		return UseAction.BOW;
+		return UseAnim.BOW;
 	}
 
-    public int getMaxUseTime(ItemStack stack)
-    {
+    @Override
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
         return 90;
     }
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand) {
-        ItemStack stack = player.getStackInHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.rocket);
         if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
 		{
-			player.setCurrentHand(hand);
+			player.startUsingItem(hand);
 			if (!player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
 			{
-                itemStack.decrement(1);
+                itemStack.shrink(1);
 				if (itemStack.isEmpty())
-                    player.getInventory().removeOne(itemStack);
+                    player.getInventory().removeItem(itemStack);
 			}
 			RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
-			if (!world.isClient)
+			if (!world.isClientSide)
 			{
-				if (!stack.hasEnchantments())
+				if (!stack.isEnchanted())
 				{
-					world.spawnEntity(new EntitySeekB83(world, player, 0.1F));
+					world.addFreshEntity(new EntitySeekB83(world, player, 0.1F));
 				}
 				else
 				{
-					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, 15.0f));
-					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, 7.5f));
-					world.spawnEntity(new EntitySeekB83(world, player, 0.1F));
-					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, -7.5f));
-					world.spawnEntity(new EntitySeekB83(world, player, 0.1F, -15.0f));
+					world.addFreshEntity(new EntitySeekB83(world, player, 0.1F, 15.0f));
+					world.addFreshEntity(new EntitySeekB83(world, player, 0.1F, 7.5f));
+					world.addFreshEntity(new EntitySeekB83(world, player, 0.1F));
+					world.addFreshEntity(new EntitySeekB83(world, player, 0.1F, -7.5f));
+					world.addFreshEntity(new EntitySeekB83(world, player, 0.1F, -15.0f));
 				}
 			}
 		}
-		else if (!world.isClient)
+		else if (!world.isClientSide)
 		{
-			player.sendMessage(Text.of("§cOut of ammunition"), false);
+			player.displayClientMessage(Component.nullToEmpty("§cOut of ammunition"), false);
 		}
-		return TypedActionResult.success(stack, world.isClient);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
 	}
 }

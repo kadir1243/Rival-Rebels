@@ -16,45 +16,46 @@ import assets.rivalrebels.client.model.ModelNukeCrate;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.block.entity.BlockEntityRenderer;
-import net.minecraft.client.render.block.entity.BlockEntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.Direction;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
+import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.core.Direction;
+import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Quaternionf;
 
 public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEntityNukeCrate> {
-    public static final SpriteIdentifier NUKE_CRATE_TOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.btnuketop);
-    public static final SpriteIdentifier NUKE_CRATE_BOTTOM_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.btnukebottom);
-    public static final SpriteIdentifier CRATE_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.btcrate);
+    public static final Material NUKE_CRATE_TOP_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btnuketop);
+    public static final Material NUKE_CRATE_BOTTOM_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btnukebottom);
+    public static final Material CRATE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btcrate);
 
-    public TileEntityNukeCrateRenderer(BlockEntityRendererFactory.Context context) {
+    public TileEntityNukeCrateRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityNukeCrate entity, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-        matrices.push();
-        matrices.translate((float) entity.getPos().getX() + 0.5F, (float) entity.getPos().getY() + 0.5F, (float) entity.getPos().getZ() + 0.5F);
-        Direction metadata = entity.getCachedState().get(BlockNukeCrate.DIRECTION);
+    public void render(TileEntityNukeCrate entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        matrices.pushPose();
+        matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+        Direction metadata = entity.getBlockState().getValue(BlockNukeCrate.DIRECTION);
         switch (metadata) {
-            case DOWN -> matrices.multiply(new Quaternionf(180, 1, 0, 0));
-            case NORTH -> matrices.multiply(new Quaternionf(-90, 1, 0, 0));
-            case SOUTH -> matrices.multiply(new Quaternionf(90, 1, 0, 0));
-            case WEST -> matrices.multiply(new Quaternionf(90, 0, 0, 1));
-            case EAST -> matrices.multiply(new Quaternionf(-90, 0, 0, 1));
+            case DOWN -> matrices.mulPose(new Quaternionf(180, 1, 0, 0));
+            case NORTH -> matrices.mulPose(new Quaternionf(-90, 1, 0, 0));
+            case SOUTH -> matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            case WEST -> matrices.mulPose(new Quaternionf(90, 0, 0, 1));
+            case EAST -> matrices.mulPose(new Quaternionf(-90, 0, 0, 1));
         }
         VertexConsumer buffer;
-        if (entity.getCachedState().isOf(RRBlocks.nukeCrateBottom))
-            buffer = NUKE_CRATE_BOTTOM_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
-        else if (entity.getCachedState().isOf(RRBlocks.nukeCrateTop))
-            buffer = NUKE_CRATE_TOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid);
+        if (entity.getBlockState().is(RRBlocks.nukeCrateBottom))
+            buffer = NUKE_CRATE_BOTTOM_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+        else if (entity.getBlockState().is(RRBlocks.nukeCrateTop))
+            buffer = NUKE_CRATE_TOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
         else throw new UnsupportedOperationException("Unknown block to render");
         ModelNukeCrate.renderModelA(matrices, buffer, light, overlay);
-        ModelNukeCrate.renderModelB(matrices, CRATE_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, overlay);
-        matrices.pop();
+        ModelNukeCrate.renderModelB(matrices, CRATE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        matrices.popPose();
     }
 }

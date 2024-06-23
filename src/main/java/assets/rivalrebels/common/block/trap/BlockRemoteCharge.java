@@ -20,98 +20,101 @@ import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
 import assets.rivalrebels.common.explosion.Explosion;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-
-import net.minecraft.util.math.random.Random;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockRemoteCharge extends FallingBlock {
-    public static final MapCodec<BlockRemoteCharge> CODEC = createCodec(BlockRemoteCharge::new);
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
-	public BlockRemoteCharge(Settings settings)
+    public static final MapCodec<BlockRemoteCharge> CODEC = simpleCodec(BlockRemoteCharge::new);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+	public BlockRemoteCharge(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
     }
 
     @Override
-    protected MapCodec<BlockRemoteCharge> getCodec() {
+    protected MapCodec<BlockRemoteCharge> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Override
-    public VoxelShape getRaycastShape(BlockState state, BlockView world, BlockPos pos) {
-		int i = state.get(META);
+    public VoxelShape getInteractionShape(BlockState state, BlockGetter world, BlockPos pos) {
+		int i = state.getValue(META);
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return VoxelShapes.cuboid(new Box(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f));
+		return Shapes.create(new AABB(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f));
 	}
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-		int meta = state.get(META);
+		int meta = state.getValue(META);
 		float f = 0.0625F;
 		float f1 = (1 + meta * 2) / 16F;
 		float f2 = 0.5F;
-		return VoxelShapes.cuboid(new Box(x + f1, y, z + f, (x + 1) - f, (y + f2) - f, (z + 1) - f));
+		return Shapes.create(new AABB(x + f1, y, z + f, (x + 1) - f, (y + f2) - f, (z + 1) - f));
 	}
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        int i = state.get(META);
+        int i = state.getValue(META);
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return VoxelShapes.cuboid(new Box(x + f1, y, z + f, (x + 1) - f, y + f2, (z + 1) - f));
+		return Shapes.create(new AABB(x + f1, y, z + f, (x + 1) - f, y + f2, (z + 1) - f));
 	}
 
     @Override
-    public BlockState onBreak(World world, BlockPos pos, BlockState state, PlayerEntity player) {
+    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         explode(world, pos);
         return state;
     }
 
     @Override
-    public void onDestroyedByExplosion(World world, BlockPos pos, net.minecraft.world.explosion.Explosion explosion) {
+    public void wasExploded(Level world, BlockPos pos, net.minecraft.world.level.Explosion explosion) {
 		explode(world, pos);
 	}
 
 	public boolean boom = false;
 
     @Override
-    public void onBlockAdded(BlockState state, World world, BlockPos pos, BlockState oldState, boolean notify) {
-		world.scheduleBlockTick(pos, this, 1);
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+		world.scheduleTick(pos, this, 1);
 	}
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
         for (Direction facing : Direction.values()) {
-            if (world.getBlockState(pos.offset(facing)).isIn(BlockTags.FIRE)) {
+            if (world.getBlockState(pos.relative(facing)).is(BlockTags.FIRE)) {
                 explode(world, pos);
             }
         }
@@ -121,29 +124,29 @@ public class BlockRemoteCharge extends FallingBlock {
 			explode(world, pos);
 			boom = false;
 		}
-		world.scheduleBlockTick(pos, this, 1);
+		world.scheduleTick(pos, this, 1);
 	}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		if (entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
 			explode(world, pos);
 		}
 	}
 
-	public static void explode(World world, BlockPos pos)
+	public static void explode(Level world, BlockPos pos)
 	{
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
-        world.setBlockState(pos, Blocks.AIR.getDefaultState());
+        world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge(world));
 		RivalRebelsSoundPlayer.playSound(world, 22, 0, x, y, z, 1f, 0.3f);
 	}
 
     @Override
-    public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
+    public void onLand(Level world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
         explode(world, pos);
     }
 }

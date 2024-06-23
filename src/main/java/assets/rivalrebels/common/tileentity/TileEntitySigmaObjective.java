@@ -13,68 +13,69 @@ package assets.rivalrebels.common.tileentity;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.Inventories;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.util.collection.DefaultedList;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.CommandBlockExecutor;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.Container;
+import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BaseCommandBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 
-public class TileEntitySigmaObjective extends BlockEntity implements Inventory, Tickable
+public class TileEntitySigmaObjective extends BlockEntity implements Container, Tickable
 {
-	private final DefaultedList<ItemStack> chestContents = DefaultedList.ofSize(16, ItemStack.EMPTY);
+	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(16, ItemStack.EMPTY);
 
 	public double slide	= 0;
 	private double test	= Math.PI - 0.05;
-    private final CommandBlockExecutor commandExecutor = new CommandBlockExecutor() {
+    private final BaseCommandBlock commandExecutor = new BaseCommandBlock() {
         @Override
         public void setCommand(String command) {
             super.setCommand(command);
-            TileEntitySigmaObjective.this.markDirty();
+            TileEntitySigmaObjective.this.setChanged();
         }
 
         @Override
-        public ServerWorld getWorld() {
-            return (ServerWorld)world;
+        public ServerLevel getLevel() {
+            return (ServerLevel)level;
         }
 
         @Override
-        public void markDirty() {
-            BlockState lv = world.getBlockState(pos);
-            this.getWorld().updateListeners(pos, lv, lv, 3);
+        public void onUpdated() {
+            BlockState lv = level.getBlockState(worldPosition);
+            this.getLevel().sendBlockUpdated(worldPosition, lv, lv, 3);
         }
 
         @Environment(EnvType.CLIENT)
         @Override
-        public Vec3d getPos() {
-            return Vec3d.ofCenter(pos);
+        public Vec3 getPosition() {
+            return Vec3.atCenterOf(worldPosition);
         }
 
         @Override
-        public ServerCommandSource getSource() {
-            return new ServerCommandSource(
+        public CommandSourceStack createCommandSourceStack() {
+            return new CommandSourceStack(
                 this,
-                getPos(),
-                Vec2f.ZERO,
-                this.getWorld(),
+                getPosition(),
+                Vec2.ZERO,
+                this.getLevel(),
                 2,
-                this.getCustomName().getString(),
-                this.getCustomName(),
-                this.getWorld().getServer(),
+                this.getName().getString(),
+                this.getName(),
+                this.getLevel().getServer(),
                 null
             );
         }
 
         @Override
-        public boolean isEditable() {
+        public boolean isValid() {
             return !isRemoved();
         }
     };
@@ -84,19 +85,19 @@ public class TileEntitySigmaObjective extends BlockEntity implements Inventory, 
     }
 
     @Override
-	public int size()
+	public int getContainerSize()
 	{
 		return 16;
 	}
 
     @Override
-	public ItemStack getStack(int slot)
+	public ItemStack getItem(int slot)
 	{
 		return this.chestContents.get(slot);
 	}
 
     @Override
-	public ItemStack removeStack(int slot, int amount)
+	public ItemStack removeItem(int slot, int amount)
 	{
 		if (!this.chestContents.get(slot).isEmpty())
 		{
@@ -122,7 +123,7 @@ public class TileEntitySigmaObjective extends BlockEntity implements Inventory, 
 	}
 
     @Override
-    public ItemStack removeStack(int index) {
+    public ItemStack removeItemNoUpdate(int index) {
 		if (!this.chestContents.get(index).isEmpty())
 		{
 			ItemStack var2 = this.chestContents.get(index);
@@ -133,42 +134,42 @@ public class TileEntitySigmaObjective extends BlockEntity implements Inventory, 
 	}
 
     @Override
-	public void setStack(int index, ItemStack stack)
+	public void setItem(int index, ItemStack stack)
 	{
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxCountPerStack())
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
 		{
-			stack.setCount(this.getMaxCountPerStack());
+			stack.setCount(this.getMaxStackSize());
 		}
 	}
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+        super.loadAdditional(nbt, provider);
 
-        Inventories.readNbt(nbt, this.chestContents);
-        commandExecutor.readNbt(nbt);
+        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
+        commandExecutor.load(nbt, provider);
     }
 
     @Override
-    public void writeNbt(NbtCompound nbt) {
-		super.writeNbt(nbt);
-        Inventories.writeNbt(nbt, this.chestContents);
-        commandExecutor.writeNbt(nbt);
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+		super.saveAdditional(nbt, provider);
+        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
+        commandExecutor.save(nbt, provider);
     }
 
     @Override
-	public boolean canPlayerUse(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
-		return this.world.getBlockEntity(this.getPos()) == this && player.squaredDistanceTo(this.getPos().getX() + 0.5D, this.getPos().getY() + 0.5D, this.getPos().getZ() + 0.5D) <= 64.0D;
+		return this.level.getBlockEntity(this.getBlockPos()) == this && player.distanceToSqr(this.getBlockPos().getX() + 0.5D, this.getBlockPos().getY() + 0.5D, this.getBlockPos().getZ() + 0.5D) <= 64.0D;
 	}
 
     @Override
 	public void tick() {
 		slide = (Math.cos(test) + 1) / 32 * 10;
 
-        boolean i = world.isPlayerInRange(getPos().getX() + 0.5f, getPos().getY() + 0.5f, getPos().getZ() + 0.5f, 9);
+        boolean i = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
 		if (i)
 		{
 			if (slide < 0.621) test += 0.05;
@@ -180,7 +181,7 @@ public class TileEntitySigmaObjective extends BlockEntity implements Inventory, 
 	}
 
     @Override
-    public void clear() {
+    public void clearContent() {
         this.chestContents.clear();
     }
 

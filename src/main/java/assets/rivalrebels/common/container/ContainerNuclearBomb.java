@@ -16,26 +16,26 @@ import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.item.ItemFuse;
 import assets.rivalrebels.common.item.ItemRodNuclear;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ArrayPropertyDelegate;
-import net.minecraft.screen.PropertyDelegate;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.Slot;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class ContainerNuclearBomb extends ScreenHandler
+public class ContainerNuclearBomb extends AbstractContainerMenu
 {
-	protected Inventory nuclearBomb;
-    private final PropertyDelegate propertyDelegate;
+	protected Container nuclearBomb;
+    private final ContainerData propertyDelegate;
 
-    public ContainerNuclearBomb(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(36), new ArrayPropertyDelegate(4));
+    public ContainerNuclearBomb(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, new SimpleContainer(36), new SimpleContainerData(4));
     }
 
-    public ContainerNuclearBomb(int syncId, PlayerInventory inventoryPlayer, Inventory nuclearBomb, PropertyDelegate propertyDelegate) {
+    public ContainerNuclearBomb(int syncId, Inventory inventoryPlayer, Container nuclearBomb, ContainerData propertyDelegate) {
         super(RivalRebelsGuiHandler.NUCLEAR_BOMB_SCREEN_HANDLER_TYPE, syncId);
 		this.nuclearBomb = nuclearBomb;
         this.propertyDelegate = propertyDelegate;
@@ -51,12 +51,12 @@ public class ContainerNuclearBomb extends ScreenHandler
 	}
 
 	@Override
-	public boolean canUse(PlayerEntity player)
+	public boolean stillValid(Player player)
 	{
-		return nuclearBomb.canPlayerUse(player);
+		return nuclearBomb.stillValid(player);
 	}
 
-	protected void bindPlayerInventory(PlayerInventory inventoryPlayer)
+	protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
 		for (int i = 0; i < 3; i++)
 		{
@@ -73,7 +73,7 @@ public class ContainerNuclearBomb extends ScreenHandler
 	}
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack quickMoveStack(Player player, int slot) {
 		return ItemStack.EMPTY;
 	}
 

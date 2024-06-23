@@ -14,53 +14,57 @@ package assets.rivalrebels.common.round;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.Identifier;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.ItemStack;
 
-public enum RivalRebelsClass
-{
+public enum RivalRebelsClass implements StringRepresentable {
 	NONE(0, 0xFFFFFF, "NONE", RRIdentifiers.guitrivalrebels, new ItemStack[0]),
 
 	REBEL(1, 0xFF0000, "REBEL", RRIdentifiers.guitrebel,
 			new ItemStack[] {
-					RRItems.rpg.getDefaultStack(),
-					RRItems.einsten.getDefaultStack(),
+					RRItems.rpg.getDefaultInstance(),
+					RRItems.einsten.getDefaultInstance(),
 					new ItemStack(RRItems.expill, 3),
-					RRItems.roddisk.getDefaultStack(),
+					RRItems.roddisk.getDefaultInstance(),
 					//new ItemStack(RivalRebels.binoculars),
-					RRItems.pliers.getDefaultStack(),
-					RRItems.armyshovel.getDefaultStack(),
+					RRItems.pliers.getDefaultInstance(),
+					RRItems.armyshovel.getDefaultInstance(),
 					new ItemStack(RRItems.knife, 5),
 					new ItemStack(RRItems.gasgrenade, 6),
-					RRItems.chip.getDefaultStack(),
+					RRItems.chip.getDefaultInstance(),
 					//new ItemStack(RivalRebels.bastion, 2),
 					new ItemStack(RRBlocks.tower, 2),
 					new ItemStack(RRBlocks.barricade, 2),
 					new ItemStack(RRBlocks.quicksandtrap, 2),
-					RRBlocks.explosives.asItem().getDefaultStack(),
+					RRBlocks.explosives.asItem().getDefaultInstance(),
 					//new ItemStack(RivalRebels.ammunition),
-					RRBlocks.bunker.asItem().getDefaultStack(),
+					RRBlocks.bunker.asItem().getDefaultInstance(),
 					new ItemStack(RRItems.rocket, 64),
-					RRItems.redrod.getDefaultStack(),
-					RRItems.redrod.getDefaultStack(),
+					RRItems.redrod.getDefaultInstance(),
+					RRItems.redrod.getDefaultInstance(),
 					new ItemStack(RRBlocks.jump, 4),
 			}),
 
 	NUKER(2, 0xFFFF00, "NUKER", RRIdentifiers.guitnuker,
 			new ItemStack[] {
-					RRItems.flamethrower.getDefaultStack(),
+					RRItems.flamethrower.getDefaultInstance(),
 					new ItemStack(RRItems.safepill, 3),
-					RRItems.roddisk.getDefaultStack(),
+					RRItems.roddisk.getDefaultInstance(),
 					//new ItemStack(RivalRebels.binoculars),
-					RRItems.pliers.getDefaultStack(),
-					RRItems.armyshovel.getDefaultStack(),
-					RRItems.chip.getDefaultStack(),
-					RRBlocks.loader.asItem().getDefaultStack(),
+					RRItems.pliers.getDefaultInstance(),
+					RRItems.armyshovel.getDefaultInstance(),
+					RRItems.chip.getDefaultInstance(),
+					RRBlocks.loader.asItem().getDefaultInstance(),
 					new ItemStack(RRBlocks.bunker, 2),
 					new ItemStack(RRBlocks.minetrap, 2),
-					RRBlocks.nukeCrateTop.asItem().getDefaultStack(),
-					RRBlocks.nukeCrateBottom.asItem().getDefaultStack(),
-					RRItems.nuclearelement.getDefaultStack(),
+					RRBlocks.nukeCrateTop.asItem().getDefaultInstance(),
+					RRBlocks.nukeCrateBottom.asItem().getDefaultInstance(),
+					RRItems.nuclearelement.getDefaultInstance(),
 					new ItemStack(RRBlocks.explosives, 2),
 					new ItemStack(RRBlocks.tower, 2),
 					//new ItemStack(RivalRebels.ammunition),
@@ -71,17 +75,17 @@ public enum RivalRebelsClass
 
 	INTEL(3, 0x00FFBB, "INTEL", RRIdentifiers.guitintel,
 			new ItemStack[] {
-					RRItems.tesla.getDefaultStack(),
+					RRItems.tesla.getDefaultInstance(),
 					new ItemStack(RRItems.safepill, 3),
-					RRItems.roddisk.getDefaultStack(),
+					RRItems.roddisk.getDefaultInstance(),
 					//new ItemStack(RivalRebels.binoculars),
-					RRItems.pliers.getDefaultStack(),
-					RRItems.armyshovel.getDefaultStack(),
+					RRItems.pliers.getDefaultInstance(),
+					RRItems.armyshovel.getDefaultInstance(),
 					new ItemStack(RRItems.knife, 5),
 					new ItemStack(RRItems.gasgrenade, 6),
-					RRItems.chip.getDefaultStack(),
+					RRItems.chip.getDefaultInstance(),
 					//new ItemStack(RivalRebels.controller),
-					RRItems.remote.getDefaultStack(),
+					RRItems.remote.getDefaultInstance(),
 					new ItemStack(RRBlocks.remotecharge, 8),
 					//new ItemStack(RivalRebels.core1),
 					new ItemStack(RRBlocks.barricade, 2),
@@ -98,19 +102,19 @@ public enum RivalRebelsClass
 
 	HACKER(4, 0x00FF00, "HACKER", RRIdentifiers.guithacker,
 			new ItemStack[] {
-					RRItems.plasmacannon.getDefaultStack(),
+					RRItems.plasmacannon.getDefaultInstance(),
 					new ItemStack(RRItems.expill, 3),
-					RRItems.roddisk.getDefaultStack(),
+					RRItems.roddisk.getDefaultInstance(),
 					//new ItemStack(RivalRebels.binoculars),
-					RRItems.pliers.getDefaultStack(),
-					RRItems.armyshovel.getDefaultStack(),
-					RRItems.chip.getDefaultStack(),
+					RRItems.pliers.getDefaultInstance(),
+					RRItems.armyshovel.getDefaultInstance(),
+					RRItems.chip.getDefaultInstance(),
 					//new ItemStack(RivalRebels.controller),
-					RRBlocks.loader.asItem().getDefaultStack(),
-					RRBlocks.breadbox.asItem().getDefaultStack(),
+					RRBlocks.loader.asItem().getDefaultInstance(),
+					RRBlocks.breadbox.asItem().getDefaultInstance(),
 					//new ItemStack(RivalRebels.remote),
-					RRItems.fuse.getDefaultStack(),
-					RRItems.antenna.getDefaultStack(),
+					RRItems.fuse.getDefaultInstance(),
+					RRItems.antenna.getDefaultInstance(),
 					//new ItemStack(RivalRebels.forcefieldnode, 2),
 					//new ItemStack(RivalRebels.ffreciever, 2),
 					new ItemStack(RRBlocks.bastion, 4),
@@ -118,30 +122,36 @@ public enum RivalRebelsClass
 					new ItemStack(RRBlocks.bunker, 4),
 					//new ItemStack(RivalRebels.mariotrap, 2),
 					new ItemStack(RRBlocks.ammunition, 3),
-					RRItems.hydrod.getDefaultStack(),
+					RRItems.hydrod.getDefaultInstance(),
 					new ItemStack(RRBlocks.quicksandtrap, 4),
 					new ItemStack(RRBlocks.mariotrap, 4),
 					new ItemStack(RRBlocks.steel, 32),
 					new ItemStack(RRBlocks.jump, 8),
 			});
 
+    public static final Codec<RivalRebelsClass> CODEC = StringRepresentable.fromValues(RivalRebelsClass::values);
+    public static final StreamCodec<ByteBuf, RivalRebelsClass> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
+
 	public final ItemStack[] inventory;
-	public final Identifier resource;
+	public final ResourceLocation resource;
 	public final String name;
 	public final int color;
 	public final int id;
 
-	RivalRebelsClass(int i, int c, String n, Identifier r, ItemStack[] inv)
-	{
-		id = i;
-		color = c;
-		name = n;
-		resource = r;
-		inventory = inv;
+	RivalRebelsClass(int id, int color, String name, ResourceLocation resource, ItemStack[] inventory) {
+		this.id = id;
+		this.color = color;
+		this.name = name;
+		this.resource = resource;
+		this.inventory = inventory;
 	}
 
-	public static RivalRebelsClass getForID(int i)
-	{
+    @Override
+    public String getSerializedName() {
+        return name;
+    }
+
+    public static RivalRebelsClass getForID(int i) {
         return switch (i) {
             case 1 -> REBEL;
             case 2 -> NUKER;

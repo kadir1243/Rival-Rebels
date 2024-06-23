@@ -29,13 +29,11 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.jetbrains.annotations.ApiStatus;
 import org.jetbrains.annotations.Nullable;
-
-import net.minecraft.data.DataOutput;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.DataProvider;
-import net.minecraft.data.DataWriter;
-import net.minecraft.sound.SoundEvent;
-import net.minecraft.util.Identifier;
-
+import net.minecraft.data.PackOutput;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 
@@ -60,17 +58,17 @@ public abstract class FabricSoundProvider implements DataProvider { //TODO:Remov
     public abstract void generateSounds(SoundGenerator soundGenerator);
 
     @Override
-    public CompletableFuture<?> run(DataWriter writer) {
-        HashMap<String, JsonObject> soundEvents = new HashMap<>();
+    public CompletableFuture<?> run(CachedOutput writer) {
+        Map<String, JsonObject> soundEvents = new HashMap<>();
 
         generateSounds(((sound, replace, subtitle, entries) -> {
             Objects.requireNonNull(sound);
             Objects.requireNonNull(entries);
 
-            List<Identifier> keys = Arrays.stream(entries).map(SoundBuilder::getName).toList();
+            List<ResourceLocation> keys = Arrays.stream(entries).map(SoundBuilder::getName).toList();
 
             if (!keys.stream().filter(i -> Collections.frequency(keys, i) > 1).toList().isEmpty()) {
-                throw new RuntimeException("Entries for sound event " + sound.getId() + " contain duplicate sound names. Event will be omitted.");
+                throw new RuntimeException("Entries for sound event " + sound.getLocation() + " contain duplicate sound names. Event will be omitted.");
             }
 
             JsonObject soundEventData = new JsonObject();
@@ -87,7 +85,7 @@ public abstract class FabricSoundProvider implements DataProvider { //TODO:Remov
                 soundEventData.addProperty("subtitle", subtitle);
             }
 
-            soundEvents.put(sound.getId().toString(), soundEventData);
+            soundEvents.put(sound.getLocation().getPath().toString(), soundEventData);
         }));
 
         JsonObject soundsJson = new JsonObject();
@@ -97,9 +95,9 @@ public abstract class FabricSoundProvider implements DataProvider { //TODO:Remov
         }
 
         Path soundsPath = dataOutput
-            .getResolver(DataOutput.OutputType.RESOURCE_PACK, ".")
-            .resolveJson(new Identifier(dataOutput.getModId(), "sounds"));
-        return DataProvider.writeToPath(writer, soundsJson, soundsPath.normalize());
+            .createPathProvider(PackOutput.Target.RESOURCE_PACK, ".")
+            .json(ResourceLocation.fromNamespaceAndPath(dataOutput.getModId(), "sounds"));
+        return DataProvider.saveStable(writer, soundsJson, soundsPath.normalize());
     }
 
     @Override

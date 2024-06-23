@@ -13,27 +13,27 @@ package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoForceField extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoForceField> CODEC = createCodec(BlockAutoForceField::new);
+    public static final MapCodec<BlockAutoForceField> CODEC = simpleCodec(BlockAutoForceField::new);
 
-    public BlockAutoForceField(Settings settings)
+    public BlockAutoForceField(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockAutoForceField> getCodec() {
+    protected MapCodec<BlockAutoForceField> codec() {
         return CODEC;
     }
 
     @Override
-	public void build(World world, int x, int y, int z)
+	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClient)
+		if (!world.isClientSide)
 		{
 			int r = 2;
 			int h = 6;

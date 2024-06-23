@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.noise;
 
-import net.minecraft.util.math.random.Random;
+import net.minecraft.util.RandomSource;
 
 public class RivalRebelsSimplexNoise
 {
@@ -30,7 +30,7 @@ public class RivalRebelsSimplexNoise
 	private static final double	F4			= (Math.sqrt(5.0) - 1.0) / 4.0;
 	private static final double	G4			= (5.0 - Math.sqrt(5.0)) / 20.0;
 
-	public static void refresh(Random random)
+	public static void refresh(RandomSource random)
 	{
 		for (int i = 0; i < 512; i++)
 		{

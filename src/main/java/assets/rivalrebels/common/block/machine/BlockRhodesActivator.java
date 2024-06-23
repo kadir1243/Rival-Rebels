@@ -14,35 +14,35 @@ package assets.rivalrebels.common.block.machine;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockRhodesActivator extends BlockWithEntity {
-    public static final MapCodec<BlockRhodesActivator> CODEC = createCodec(BlockRhodesActivator::new);
-    public BlockRhodesActivator(Settings settings)
+public class BlockRhodesActivator extends BaseEntityBlock {
+    public static final MapCodec<BlockRhodesActivator> CODEC = simpleCodec(BlockRhodesActivator::new);
+    public BlockRhodesActivator(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockRhodesActivator> getCodec() {
-        return null;
+    protected MapCodec<BlockRhodesActivator> codec() {
+        return CODEC;
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityRhodesActivator(pos, state);
 	}
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 }

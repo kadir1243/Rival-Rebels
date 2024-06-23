@@ -11,17 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import net.fabricmc.fabric.api.networking.v1.FabricPacket;
-import net.fabricmc.fabric.api.networking.v1.PacketType;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.PacketByteBuf;
-import net.minecraft.util.Identifier;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 
-public class RhodesJumpPacket implements FabricPacket {
-    public static final PacketType<RhodesJumpPacket> PACKET_TYPE = PacketType.create(new Identifier(RivalRebels.MODID, "rhodesjump"), RhodesJumpPacket::fromBytes);
+public class RhodesJumpPacket implements CustomPacketPayload {
+    public static final StreamCodec<FriendlyByteBuf, RhodesJumpPacket> STREAM_CODEC = StreamCodec.ofMember(RhodesJumpPacket::toBytes, RhodesJumpPacket::fromBytes);
+    public static final Type<RhodesJumpPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("rhodesjump"));
     private final int id;
     private final boolean jump;
     private final boolean rocket;
@@ -48,32 +49,31 @@ public class RhodesJumpPacket implements FabricPacket {
         this.guard = guard;
     }
 
-    public static RhodesJumpPacket fromBytes(PacketByteBuf buf) {
+    public static RhodesJumpPacket fromBytes(FriendlyByteBuf buf) {
         return new RhodesJumpPacket(buf.readInt(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean());
     }
 
-    @Override
-    public void write(PacketByteBuf buf) {
-        buf.writeInt(id);
-        buf.writeBoolean(jump);
-        buf.writeBoolean(rocket);
-        buf.writeBoolean(laser);
-        buf.writeBoolean(fire);
-        buf.writeBoolean(forcefield);
-        buf.writeBoolean(plasma);
-        buf.writeBoolean(nuke);
-        buf.writeBoolean(stop);
-        buf.writeBoolean(b2spirit);
-        buf.writeBoolean(guard);
+    public static void toBytes(RhodesJumpPacket packet, FriendlyByteBuf buf) {
+        buf.writeInt(packet.id);
+        buf.writeBoolean(packet.jump);
+        buf.writeBoolean(packet.rocket);
+        buf.writeBoolean(packet.laser);
+        buf.writeBoolean(packet.fire);
+        buf.writeBoolean(packet.forcefield);
+        buf.writeBoolean(packet.plasma);
+        buf.writeBoolean(packet.nuke);
+        buf.writeBoolean(packet.stop);
+        buf.writeBoolean(packet.b2spirit);
+        buf.writeBoolean(packet.guard);
     }
 
     @Override
-    public PacketType<?> getType() {
+    public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
     }
 
-    public static void onMessage(RhodesJumpPacket m, PlayerEntity player) {
-        Entity e = player.getWorld().getEntityById(m.id);
+    public static void onMessage(RhodesJumpPacket m, Player player) {
+        Entity e = player.level().getEntity(m.id);
         if (e instanceof EntityRhodes er) {
             er.stop ^= m.stop;
             er.rocket = m.rocket;

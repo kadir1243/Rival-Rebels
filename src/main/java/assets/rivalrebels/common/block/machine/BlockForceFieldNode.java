@@ -19,50 +19,49 @@ import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockForceFieldNode extends BlockWithEntity {
-    public static final MapCodec<BlockForceFieldNode> CODEC = createCodec(BlockForceFieldNode::new);
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
-	public BlockForceFieldNode(Settings settings)
+public class BlockForceFieldNode extends BaseEntityBlock {
+    public static final MapCodec<BlockForceFieldNode> CODEC = simpleCodec(BlockForceFieldNode::new);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+	public BlockForceFieldNode(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
     }
 
     @Override
-    protected MapCodec<BlockForceFieldNode> getCodec() {
+    protected MapCodec<BlockForceFieldNode> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		BlockEntity te = world.getBlockEntity(pos);
-		if (te instanceof TileEntityForceFieldNode teffn && !world.isClient)
-		{
-            ItemStack stack = player.getStackInHand(hand);
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+		BlockEntity te = level.getBlockEntity(pos);
+		if (te instanceof TileEntityForceFieldNode teffn && !level.isClientSide) {
 			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.uuid == null && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
@@ -71,35 +70,35 @@ public class BlockForceFieldNode extends BlockWithEntity {
 					teffn.uuid = player.getGameProfile().getId();
 					teffn.rrteam = null;
 				}
-				RivalRebelsSoundPlayer.playSound(world, 10, 5, pos);
+				RivalRebelsSoundPlayer.playSound(level, 10, 5, pos);
 			}
 		}
-		return ActionResult.PASS;
+		return ItemInteractionResult.sidedSuccess(level.isClientSide());
 	}
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        BlockState state = super.getPlacementState(ctx);
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        BlockState state = super.getStateForPlacement(ctx);
 
-        return switch (MathHelper.floor((ctx.getPlayerYaw() * 4.0F / 360.0F) + 0.5D) & 3) {
-            case 0 -> state.with(META, 2);
-            case 1 -> state.with(META, 5);
-            case 2 -> state.with(META, 3);
-            case 3 -> state.with(META, 4);
+        return switch (Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3) {
+            case 0 -> state.setValue(META, 2);
+            case 1 -> state.setValue(META, 5);
+            case 2 -> state.setValue(META, 3);
+            case 3 -> state.setValue(META, 4);
             default -> state;
         };
     }
 
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityForceFieldNode(pos, state);
 	}
 

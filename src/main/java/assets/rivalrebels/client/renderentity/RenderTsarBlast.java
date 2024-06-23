@@ -17,34 +17,35 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ModelTsarBlast;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Quaternionf;
 
 public class RenderTsarBlast extends EntityRenderer<EntityTsarBlast> {
-    public static final SpriteIdentifier TSAR_FLAME_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.ettsarflame);
+    public static final Material TSAR_FLAME_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettsarflame);
 	private final ModelTsarBlast model;
 
-    public RenderTsarBlast(EntityRendererFactory.Context manager) {
+    public RenderTsarBlast(EntityRendererProvider.Context manager) {
         super(manager);
 		model = new ModelTsarBlast();
 	}
 
     @Override
-    public void render(EntityTsarBlast entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(EntityTsarBlast entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
 		double x = entity.getX();
         double y = entity.getY();
         double z = entity.getZ();
         entity.time++;
-        double radius = (((entity.getVelocity().getX() * 10) - 1) * ((entity.getVelocity().getX() * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;
-		matrices.push();
+        double radius = (((entity.getDeltaMovement().x() * 10) - 1) * ((entity.getDeltaMovement().x() * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;
+		matrices.pushPose();
 		if (entity.time < 60)
 		{
 			double elev = entity.time / 5f;
@@ -56,38 +57,38 @@ public class RenderTsarBlast extends EntityRenderer<EntityTsarBlast> {
 			double elev = (entity.time - 60f) / 4f;
 			matrices.translate(x, y + elev, z);
 			matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
-			matrices.push();
-			matrices.multiply(new Quaternionf((float) (elev * 2), 0, 1, 0));
-			matrices.multiply(new Quaternionf((float) (elev * 3), 1, 0, 0));
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf((float) (elev * 2), 0, 1, 0));
+			matrices.mulPose(new Quaternionf((float) (elev * 3), 1, 0, 0));
 			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) elev, 1, 0.25f, 0, 1f);
-			matrices.pop();
-			matrices.push();
-			matrices.multiply(new Quaternionf((float) (elev * -2), 0, 1, 0));
-			matrices.multiply(new Quaternionf((float) (elev * 4), 0, 0, 1));
+			matrices.popPose();
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf((float) (elev * -2), 0, 1, 0));
+			matrices.mulPose(new Quaternionf((float) (elev * 4), 0, 0, 1));
 			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
-			matrices.pop();
-			matrices.push();
-			matrices.multiply(new Quaternionf((float) (elev * -3), 1, 0, 0));
-			matrices.multiply(new Quaternionf((float) (elev * 2), 0, 0, 1));
+			matrices.popPose();
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf((float) (elev * -3), 1, 0, 0));
+			matrices.mulPose(new Quaternionf((float) (elev * 2), 0, 0, 1));
 			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.4f), 1, 0, 0, 1f);
-			matrices.pop();
-			matrices.push();
-			matrices.multiply(new Quaternionf((float) (elev * -1), 0, 1, 0));
-			matrices.multiply(new Quaternionf((float) (elev * 3), 0, 0, 1));
+			matrices.popPose();
+			matrices.pushPose();
+			matrices.mulPose(new Quaternionf((float) (elev * -1), 0, 1, 0));
+			matrices.mulPose(new Quaternionf((float) (elev * 3), 0, 0, 1));
 			ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.6f), 1, 1, 0, 1);
-			matrices.pop();
+			matrices.popPose();
 		}
 		else {
-			matrices.translate(x, y + 10 + ((entity.getVelocity().getX() - 0.1d) * 14.14213562), z);
+			matrices.translate(x, y + 10 + ((entity.getDeltaMovement().x() - 0.1d) * 14.14213562), z);
 			matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
 			matrices.scale((float) (radius * 0.116f), (float) (radius * 0.065f), (float) (radius * 0.116f));
-			model.render(matrices, TSAR_FLAME_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), light, OverlayTexture.DEFAULT_UV);
+			model.render(matrices, TSAR_FLAME_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
 		}
-		matrices.pop();
+		matrices.popPose();
 	}
 
     @Override
-    public Identifier getTexture(EntityTsarBlast entity) {
+    public ResourceLocation getTextureLocation(EntityTsarBlast entity) {
         return null;
     }
 }

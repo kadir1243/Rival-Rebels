@@ -15,74 +15,73 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.BlockWithEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityTicker;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.NamedScreenHandlerFactory;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockTachyonBomb extends BlockWithEntity {
-    public static final MapCodec<BlockTachyonBomb> CODEC = createCodec(BlockTachyonBomb::new);
+public class BlockTachyonBomb extends BaseEntityBlock {
+    public static final MapCodec<BlockTachyonBomb> CODEC = simpleCodec(BlockTachyonBomb::new);
 
-    public static final IntProperty META = IntProperty.of("meta", 0, 15);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
-	public BlockTachyonBomb(Settings settings)
+	public BlockTachyonBomb(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
     }
 
     @Override
-    protected MapCodec<BlockTachyonBomb> getCodec() {
+    protected MapCodec<BlockTachyonBomb> codec() {
         return CODEC;
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-		int var7 = MathHelper.floor((ctx.getPlayerYaw() * 4.0F / 360.0F) + 0.5D) & 3;
-		return super.getPlacementState(ctx).with(META, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+		int var7 = Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3;
+		return super.getStateForPlacement(ctx).setValue(META, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))));
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-        ItemStack stack = player.getStackInHand(hand);
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!stack.isEmpty() && stack.getItem() == RRItems.pliers) {
-            player.openHandledScreen((NamedScreenHandlerFactory) world.getBlockEntity(pos));
+            player.openMenu((MenuProvider) level.getBlockEntity(pos));
+            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+		} else if (!level.isClientSide) {
+			player.displayClientMessage(Component.nullToEmpty("§7[§4Orders§7] §cUse pliers to open."), true);
 		}
-		else if (!world.isClient)
-		{
-			player.sendMessage(Text.of("§7[§4Orders§7] §cUse pliers to open."), true);
-		}
-		return ActionResult.PASS;
+		return ItemInteractionResult.FAIL;
 	}
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityTachyonBomb(pos, state);
 	}
     @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(World world, BlockState state, BlockEntityType<T> type) {
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
     }
 }

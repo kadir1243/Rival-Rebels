@@ -15,55 +15,54 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityCuchillo;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ToolItem;
-import net.minecraft.item.ToolMaterials;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TieredItem;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
-public class ItemCuchillo extends ToolItem
+public class ItemCuchillo extends TieredItem
 {
 	public ItemCuchillo()
 	{
-		super(ToolMaterials.IRON, new Settings().maxCount(5));
+		super(Tiers.IRON, new Properties().stacksTo(5));
 	}
 
     @Override
-	public UseAction getUseAction(ItemStack par1ItemStack)
+	public UseAnim getUseAnimation(ItemStack par1ItemStack)
 	{
-		return UseAction.BOW;
+		return UseAnim.BOW;
 	}
 
     @Override
-	public int getMaxUseTime(ItemStack par1ItemStack)
-	{
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 72000;
 	}
 
     @Override
-    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        if (!(user instanceof PlayerEntity player)) return;
+    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+        if (!(user instanceof Player player)) return;
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.knife);
         if (player.getAbilities().invulnerable || !itemStack.isEmpty())
 		{
-			float f = (getMaxUseTime(stack) - remainingUseTicks) / 20.0F;
+			float f = (getUseDuration(stack, player) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f < 0.1D) return;
 			if (f > 1.0F) f = 1.0F;
-			if (!player.getAbilities().invulnerable) stack.decrement(1);
+			if (!player.getAbilities().invulnerable) stack.shrink(1);
 			RivalRebelsSoundPlayer.playSound(player, 4, 3);
-			if (!world.isClient) world.spawnEntity(new EntityCuchillo(world, player, 0.5f + f));
+			if (!world.isClientSide) world.addFreshEntity(new EntityCuchillo(world, player, 0.5f + f));
 		}
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-        user.setCurrentHand(hand);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+        user.startUsingItem(hand);
         return super.use(world, user, hand);
     }
 }

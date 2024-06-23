@@ -12,43 +12,43 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.block.ShapeContext;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockMario extends Block
 {
-	public BlockMario(Settings settings) {
+	public BlockMario(Properties settings) {
 		super(settings);
 	}
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
 		float f = 0.0625F;
-		return VoxelShapes.cuboid(new Box(x, y, z, x + 1, y + 1 - f, z + 1));
+		return Shapes.create(new AABB(x, y, z, x + 1, y + 1 - f, z + 1));
 	}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-		if (entity instanceof PlayerEntity || entity instanceof AnimalEntity || entity instanceof MobEntity) {
-			world.setBlockState(pos, Blocks.GRAVEL.getDefaultState());
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+		if (entity instanceof Player || entity instanceof Animal || entity instanceof Mob) {
+			world.setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
 		}
 	}
 
@@ -120,8 +120,8 @@ public class BlockMario extends Block
 	}*/
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        return RRBlocks.amario.asItem().getDefaultStack();
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+        return RRBlocks.amario.asItem().getDefaultInstance();
     }
 
 	/*@Override

@@ -12,81 +12,80 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.entity.damage.DamageSource;
-import net.minecraft.entity.damage.DamageType;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.RegistryKeys;
-import net.minecraft.registry.entry.RegistryEntry;
-import net.minecraft.world.World;
-
 import java.util.Optional;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.damagesource.DamageType;
+import net.minecraft.world.level.Level;
 
 public class RivalRebelsDamageSource {
-    public static DamageSource electricity(World world) {
+    public static DamageSource electricity(Level world) {
         return of(world, RRDamageTypes.ELECTRICITY);
     }
 
-    public static DamageSource radioactivePoisoning(World world) {
+    public static DamageSource radioactivePoisoning(Level world) {
         return of(world, RRDamageTypes.RADIOACTIVE_POISONING);
     }
 
-    public static DamageSource nuclearBlast(World world) {
+    public static DamageSource nuclearBlast(Level world) {
         return of(world, RRDamageTypes.NUCLEAR_BLAST);
     }
 
-    public static DamageSource cooked(World world) {
+    public static DamageSource cooked(Level world) {
         return of(world, RRDamageTypes.COOKED);
     }
 
-    public static DamageSource gasGrenade(World world) {
+    public static DamageSource gasGrenade(Level world) {
         return of(world, RRDamageTypes.GAS_GRENADE);
     }
 
-    public static DamageSource cuchillo(World world) {
+    public static DamageSource cuchillo(Level world) {
         return of(world, RRDamageTypes.CUCHILLO);
     }
 
-    public static DamageSource tron(World world) {
+    public static DamageSource tron(Level world) {
         return of(world, RRDamageTypes.TRON);
     }
 
-    public static DamageSource cyanide(World world) {
+    public static DamageSource cyanide(Level world) {
         return of(world, RRDamageTypes.CYANIDE);
     }
 
-    public static DamageSource landmine(World world) {
+    public static DamageSource landmine(Level world) {
         return of(world, RRDamageTypes.LANDMINE);
     }
 
-    public static DamageSource timedBomb(World world) {
+    public static DamageSource timedBomb(Level world) {
         return of(world, RRDamageTypes.TIMED_BOMB);
     }
 
-    public static DamageSource flare(World world) {
+    public static DamageSource flare(Level world) {
         return of(world, RRDamageTypes.FLARE);
     }
 
-    public static DamageSource charge(World world) {
+    public static DamageSource charge(Level world) {
         return of(world, RRDamageTypes.CHARGE);
     }
 
-    public static DamageSource plasmaExplosion(World world) {
+    public static DamageSource plasmaExplosion(Level world) {
         return of(world, RRDamageTypes.PLASMA_EXPLOSION);
     }
 
-    public static DamageSource rocket(World world) {
+    public static DamageSource rocket(Level world) {
         return of(world, RRDamageTypes.ROCKET);
     }
 
-    public static DamageSource laserBurst(World world) {
+    public static DamageSource laserBurst(Level world) {
         return of(world, RRDamageTypes.LASER_BURST);
     }
 
-    private static DamageSource of(World world, RegistryKey<DamageType> key) {
-        Optional<RegistryEntry.Reference<DamageType>> entry = world.getRegistryManager().get(RegistryKeys.DAMAGE_TYPE).getEntry(key);
+    private static DamageSource of(Level world, ResourceKey<DamageType> key) {
+        Optional<Holder.Reference<DamageType>> entry = world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(key);
 
         // TODO: Implement damage sources
-        return entry.map(DamageSource::new).orElseGet(() -> world.getDamageSources().generic());
+        return entry.map(DamageSource::new).orElseGet(() -> world.damageSources().generic());
     }
 
     /*public static final DamageSource electricity = new DamageSource("electricity").setBypassesArmor().setUnblockable();
@@ -106,24 +105,24 @@ public class RivalRebelsDamageSource {
     public static final DamageSource laserburst = new DamageSource("laserburst").setUnblockable();*/
 
     public static class RRDamageTypes {
-        public static final RegistryKey<DamageType> ELECTRICITY = register("electricity");
-        public static final RegistryKey<DamageType> RADIOACTIVE_POISONING = register("radioactive_poisoning");
-        public static final RegistryKey<DamageType> NUCLEAR_BLAST = register("nuclear_blast");
-        public static final RegistryKey<DamageType> COOKED = register("cooked");
-        public static final RegistryKey<DamageType> GAS_GRENADE = register("gas_grenade");
-        public static final RegistryKey<DamageType> CUCHILLO = register("cuchillo");
-        public static final RegistryKey<DamageType> TRON = register("tron");
-        public static final RegistryKey<DamageType> CYANIDE = register("cyanide");
-        public static final RegistryKey<DamageType> LANDMINE = register("landmine");
-        public static final RegistryKey<DamageType> TIMED_BOMB = register("timed_bomb");
-        public static final RegistryKey<DamageType> FLARE = register("flare");
-        public static final RegistryKey<DamageType> CHARGE = register("charge");
-        public static final RegistryKey<DamageType> PLASMA_EXPLOSION = register("plasma_explosion");
-        public static final RegistryKey<DamageType> ROCKET = register("rocket");
-        public static final RegistryKey<DamageType> LASER_BURST = register("laser_burst");
+        public static final ResourceKey<DamageType> ELECTRICITY = register("electricity");
+        public static final ResourceKey<DamageType> RADIOACTIVE_POISONING = register("radioactive_poisoning");
+        public static final ResourceKey<DamageType> NUCLEAR_BLAST = register("nuclear_blast");
+        public static final ResourceKey<DamageType> COOKED = register("cooked");
+        public static final ResourceKey<DamageType> GAS_GRENADE = register("gas_grenade");
+        public static final ResourceKey<DamageType> CUCHILLO = register("cuchillo");
+        public static final ResourceKey<DamageType> TRON = register("tron");
+        public static final ResourceKey<DamageType> CYANIDE = register("cyanide");
+        public static final ResourceKey<DamageType> LANDMINE = register("landmine");
+        public static final ResourceKey<DamageType> TIMED_BOMB = register("timed_bomb");
+        public static final ResourceKey<DamageType> FLARE = register("flare");
+        public static final ResourceKey<DamageType> CHARGE = register("charge");
+        public static final ResourceKey<DamageType> PLASMA_EXPLOSION = register("plasma_explosion");
+        public static final ResourceKey<DamageType> ROCKET = register("rocket");
+        public static final ResourceKey<DamageType> LASER_BURST = register("laser_burst");
 
-        private static RegistryKey<DamageType> register(String name) {
-            return RegistryKey.of(RegistryKeys.DAMAGE_TYPE, RRIdentifiers.create(name));
+        private static ResourceKey<DamageType> register(String name) {
+            return ResourceKey.create(Registries.DAMAGE_TYPE, RRIdentifiers.create(name));
         }
 
         public static void init() {

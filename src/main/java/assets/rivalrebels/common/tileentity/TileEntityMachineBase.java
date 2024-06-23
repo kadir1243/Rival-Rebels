@@ -11,14 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import net.minecraft.block.BlockState;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.BlockPos;
-
 import java.util.HashMap;
 import java.util.Map;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.world.level.block.state.BlockState;
 
 public abstract class TileEntityMachineBase extends BlockEntity implements Tickable {
     public static final Map<BlockPos, TileEntityMachineBase> BLOCK_ENTITIES = new HashMap<>();
@@ -27,7 +27,7 @@ public abstract class TileEntityMachineBase extends BlockEntity implements Ticka
 	public float	edist		= 0;
 	public float	decay		= 0;
 	public float	powerGiven	= 0;
-    public BlockPos pos = BlockPos.ORIGIN;
+    public BlockPos worldPosition = BlockPos.ZERO;
 
     public TileEntityMachineBase(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -42,25 +42,25 @@ public abstract class TileEntityMachineBase extends BlockEntity implements Ticka
 	}
 
     @Override
-    public void readNbt(NbtCompound nbt) {
-        super.readNbt(nbt);
-        pos = BlockPos.fromLong(nbt.getLong("rpos"));
+    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+        super.loadAdditional(nbt, provider);
+        worldPosition = BlockPos.of(nbt.getLong("rpos"));
         edist = nbt.getFloat("edist");
     }
 
     @Override
-    public void writeNbt(NbtCompound nbt) {
-		super.writeNbt(nbt);
-        nbt.putLong("rpos", pos.asLong());
+    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
+		super.saveAdditional(nbt, provider);
+        nbt.putLong("rpos", worldPosition.asLong());
 		nbt.putFloat("edist", edist);
     }
 
     @Override
-    public void markRemoved() {
-        super.markRemoved();
-		BlockEntity connectedTo = world.getBlockEntity(pos);
+    public void setRemoved() {
+        super.setRemoved();
+		BlockEntity connectedTo = level.getBlockEntity(worldPosition);
 		if (connectedTo instanceof TileEntityReactor) ((TileEntityReactor)connectedTo).machines.remove(this);
-        BLOCK_ENTITIES.remove(getPos());
+        BLOCK_ENTITIES.remove(getBlockPos());
 	}
 
 	abstract public float powered(float power, float distance);

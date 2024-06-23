@@ -14,22 +14,22 @@ package assets.rivalrebels.common.command;
 import assets.rivalrebels.RivalRebels;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.server.command.CommandManager;
-import net.minecraft.server.command.ServerCommandSource;
-import net.minecraft.text.Text;
+import net.minecraft.commands.CommandSourceStack;
+import net.minecraft.commands.Commands;
+import net.minecraft.network.chat.Component;
 
 public class CommandMotD {
-    public static void register(CommandDispatcher<ServerCommandSource> dispatcher) {
-        dispatcher.register(CommandManager.literal("rrmotd")
-            .requires(arg -> arg.hasPermissionLevel(3))
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+        dispatcher.register(Commands.literal("rrmotd")
+            .requires(arg -> arg.hasPermission(3))
                 .executes(context -> execute(context.getSource(), null))
-            .then(CommandManager.argument("motd", StringArgumentType.greedyString())
+            .then(Commands.argument("motd", StringArgumentType.greedyString())
                 .executes(context -> execute(context.getSource(), StringArgumentType.getString(context, "motd"))))
         );
     }
 
-    private static int execute(ServerCommandSource source, String motd) {
-        if (motd == null) source.sendFeedback(() -> Text.of(RivalRebels.round.getMotD()), true);
+    private static int execute(CommandSourceStack source, String motd) {
+        if (motd == null) source.sendSuccess(() -> Component.nullToEmpty(RivalRebels.round.getMotD()), true);
         else RivalRebels.round.setMotD(motd);
 
         return 0;

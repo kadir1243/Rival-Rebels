@@ -13,28 +13,28 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.model.json.ModelTransformationMode;
-import net.minecraft.client.texture.SpriteAtlasTexture;
-import net.minecraft.client.util.SpriteIdentifier;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.item.ItemStack;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.Material;
+import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import org.joml.Quaternionf;
 
 public class LaptopRenderer implements DynamicItemRenderer {
-    public static final SpriteIdentifier LAPTOP_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etlaptop);
-    public static final SpriteIdentifier UBUNTU_TEXTURE = new SpriteIdentifier(SpriteAtlasTexture.BLOCK_ATLAS_TEXTURE, RRIdentifiers.etubuntu);
+    public static final Material LAPTOP_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etlaptop);
+    public static final Material UBUNTU_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etubuntu);
 
     @Override
-    public void render(ItemStack stack, ModelTransformationMode mode, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light, int overlay) {
-		matrices.push();
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
 		matrices.translate((float) 0.3, (float) 0.3, 0);
-        matrices.multiply(new Quaternionf(180, 0, 1, 0));
-		ModelLaptop.renderModel(LAPTOP_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, -90, light, overlay);
-		ModelLaptop.renderScreen(UBUNTU_TEXTURE.getVertexConsumer(vertexConsumers, RenderLayer::getEntitySolid), matrices, -90, light, overlay);
-		matrices.pop();
+        matrices.mulPose(new Quaternionf(180, 0, 1, 0));
+		ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, -90, light, overlay);
+		ModelLaptop.renderScreen(UBUNTU_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, -90, light, overlay);
+		matrices.popPose();
 	}
 }
 

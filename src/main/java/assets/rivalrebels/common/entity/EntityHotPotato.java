@@ -16,27 +16,27 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.command.CommandHotPotato;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TsarBomba;
-import net.minecraft.block.BlockState;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.projectile.thrown.ThrownEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.registry.tag.FluidTags;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
-public class EntityHotPotato extends ThrownEntity
+public class EntityHotPotato extends ThrowableProjectile
 {
 	public int	age	= 0;
 	public int round = 0;
@@ -46,19 +46,19 @@ public class EntityHotPotato extends ThrownEntity
 	public boolean dorounds = false;
 	public int charges = RivalRebels.tsarBombaStrength + 9;
 
-    public EntityHotPotato(EntityType<? extends EntityHotPotato> type, World world) {
+    public EntityHotPotato(EntityType<? extends EntityHotPotato> type, Level world) {
         super(type, world);
     }
 
-	public EntityHotPotato(World par1World)
+	public EntityHotPotato(Level par1World)
 	{
 		this(RREntities.HOT_POTATO, par1World);
 	}
 
-	public EntityHotPotato(World par1World, int x, int y, int z, int count)
+	public EntityHotPotato(Level par1World, int x, int y, int z, int count)
 	{
 		this(par1World);
-		setPosition(x+0.5f, y+0.5f, z+0.5f);
+		setPos(x+0.5f, y+0.5f, z+0.5f);
 		round = count;
 		nextx = x;
 		nexty = y;
@@ -66,57 +66,57 @@ public class EntityHotPotato extends ThrownEntity
 		dorounds = true;
 	}
 
-	public EntityHotPotato(World world, double px, double py, double pz, double f, double g, double h)
+	public EntityHotPotato(Level world, double px, double py, double pz, double f, double g, double h)
 	{
 		this(world);
-		setPosition(px, py, pz);
-        setVelocity(f, g, h);
+		setPos(px, py, pz);
+        setDeltaMovement(f, g, h);
 		round = 1;
 		nextx = (int)px;
 		nexty = (int)py;
 		nextz = (int)pz;
-		age = 1;
+		tickCount = 1;
 		dorounds = true;
 	}
 
     @Override
-    protected void initDataTracker() {
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }
 
 	@Override
 	public void tick()
 	{
-		if (age == -100) explode();
-		++this.age;
-		if (age < 2 && dorounds)
+		if (tickCount == -100) explode();
+		++this.tickCount;
+		if (tickCount < 2 && dorounds)
 		{
-			RivalRebelsSoundPlayer.playSound(getWorld(), 14, 0, getX(), getY(), getZ(), 100);
-            setVelocity(Vec3d.ZERO);
-			setPosition(nextx+0.5f, nexty+0.5f, nextz+0.5f);
-			getWorld().setBlockState(new BlockPos(nextx, nexty-400, nextz), RRBlocks.jump.getDefaultState());
-			setPosition(getX(), getY(), getZ());
+			RivalRebelsSoundPlayer.playSound(level(), 14, 0, getX(), getY(), getZ(), 100);
+            setDeltaMovement(Vec3.ZERO);
+			setPos(nextx+0.5f, nexty+0.5f, nextz+0.5f);
+			level().setBlockAndUpdate(new BlockPos(nextx, nexty-400, nextz), RRBlocks.jump.defaultBlockState());
+			setPos(getX(), getY(), getZ());
 			return;
 		}
 
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
-			Vec3d var15 = getPos();
-			Vec3d var2 = getPos().add(getVelocity());
-			HitResult var3 = this.getWorld().raycast(new RaycastContext(var15, var2, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
+			Vec3 var15 = position();
+			Vec3 var2 = position().add(getDeltaMovement());
+			HitResult var3 = this.level().clip(new ClipContext(var15, var2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
 
 			if (var3 != null)
 			{
-				var2 = var3.getPos();
+				var2 = var3.getLocation();
 			}
 			Entity var4 = null;
-			List<Entity> var5 = this.getWorld().getOtherEntities(this, this.getBoundingBox().stretch(this.getVelocity()).expand(1.0D, 1.0D, 1.0D));
+			List<Entity> var5 = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D, 1.0D, 1.0D));
 			double var6 = 0.0D;
 
             for (Entity var9 : var5) {
-                if (var9.isCollidable()) {
+                if (var9.canBeCollidedWith()) {
                     float var10 = 0.3F;
-                    Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
-                    Optional<Vec3d> var12 = var11.raycast(var15, var2);
+                    AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
+                    Optional<Vec3> var12 = var11.clip(var15, var2);
 
                     if (var12.isPresent()) {
                         double var13 = var15.distanceTo(var12.get());
@@ -136,81 +136,81 @@ public class EntityHotPotato extends ThrownEntity
 
 			if (var3 != null)
 			{
-				this.onCollision(var3);
+				this.onHit(var3);
 			}
 
-			if (getWorld().getBlockState(getBlockPos()).getFluidState().isIn(FluidTags.WATER)) {
-                setVelocity(getVelocity().getX(), getVelocity().getY() + 0.06F, getVelocity().getZ());
+			if (level().getBlockState(blockPosition()).getFluidState().is(FluidTags.WATER)) {
+                setDeltaMovement(getDeltaMovement().x(), getDeltaMovement().y() + 0.06F, getDeltaMovement().z());
 			}
 		}
 
-        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		if (getY() < 0) kill();
 
-		if (this.hasVehicle())
+		if (this.isPassenger())
 		{
-		float var16 = MathHelper.sqrt((float) (this.getVelocity().getX() * this.getVelocity().getX() + this.getVelocity().getZ() * this.getVelocity().getZ()));
-		this.setYaw((float) (Math.atan2(getVelocity().getX(), getVelocity().getZ()) * 180.0D / Math.PI));
+		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
+		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
 
-		for (this.setPitch((float) (Math.atan2(getVelocity().getY(), var16) * 180.0D / Math.PI)); this.getPitch() - this.prevPitch < -180.0F; this.prevPitch -= 360.0F)
+		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 		{
         }
 
-		while (this.getPitch() - this.prevPitch >= 180.0F)
+		while (this.getXRot() - this.xRotO >= 180.0F)
 		{
-			this.prevPitch += 360.0F;
+			this.xRotO += 360.0F;
 		}
 
-		while (this.getYaw() - this.prevYaw < -180.0F)
+		while (this.getYRot() - this.yRotO < -180.0F)
 		{
-			this.prevYaw -= 360.0F;
+			this.yRotO -= 360.0F;
 		}
 
-		while (this.getYaw() - this.prevYaw >= 180.0F)
+		while (this.getYRot() - this.yRotO >= 180.0F)
 		{
-			this.prevYaw += 360.0F;
+			this.yRotO += 360.0F;
 		}
 
-		this.setPitch(this.prevPitch + (this.getPitch() - this.prevPitch) * 0.05F);
-		this.setYaw(this.prevYaw + (this.getYaw() - this.prevYaw) * 0.05F);
+		this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.05F);
+		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.05F);
 		}
 		float var17 = 0.98f;
-		float var18 = this.getGravity();
+		float var18 = (float) this.getGravity();
 
-        setVelocity(getVelocity().multiply(var17));
-        setVelocity(getVelocity().subtract(0, var18, 0));
-		this.setPosition(this.getX(), this.getY(), this.getZ());
+        setDeltaMovement(getDeltaMovement().scale(var17));
+        setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
+		this.setPos(this.getX(), this.getY(), this.getZ());
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt)
+	public void addAdditionalSaveData(CompoundTag nbt)
 	{
 		nbt.putInt("charge", charges);
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt)
+	public void readAdditionalSaveData(CompoundTag nbt)
 	{
 		charges = nbt.getInt("charge");
 		if (charges == 0) charges = RivalRebels.tsarBombaStrength + 9;
-		setYaw(prevYaw = nbt.getFloat("rot"));
+		setYRot(yRotO = nbt.getFloat("rot"));
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
     @Override
-    protected void onBlockHit(BlockHitResult blockHitResult) {
-        BlockState state = getWorld().getBlockState(blockHitResult.getBlockPos());
-		if (state.isOf(RRBlocks.jump) || state.isIn(BlockTags.ICE)) {
-			setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
+    protected void onHitBlock(BlockHitResult blockHitResult) {
+        BlockState state = level().getBlockState(blockHitResult.getBlockPos());
+		if (state.is(RRBlocks.jump) || state.is(BlockTags.ICE)) {
+			setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
 			return;
 		}
-		if (getWorld().random.nextInt(10)!=0) {
-			setVelocity(getVelocity().getX(), Math.max(-getVelocity().getY(), 0.2F), getVelocity().getZ());
+		if (level().random.nextInt(10)!=0) {
+			setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
 			return;
 		}
 		explode();
@@ -218,12 +218,12 @@ public class EntityHotPotato extends ThrownEntity
 
     public void explode()
 	{
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
-			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), getWorld(), charges);
-			EntityTsarBlast tsarblast = new EntityTsarBlast(getWorld(), (int)getX(), (int)getY(), (int)getZ(), tsar, charges);
-			getWorld().spawnEntity(tsarblast);
-			age = 0;
+			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), level(), charges);
+			EntityTsarBlast tsarblast = new EntityTsarBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, charges);
+			level().addFreshEntity(tsarblast);
+			tickCount = 0;
 			round = round - 1;
 			CommandHotPotato.roundinprogress = false;
 			if (round <= 0) this.kill();

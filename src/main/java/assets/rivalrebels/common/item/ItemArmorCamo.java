@@ -11,15 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import net.minecraft.item.ArmorItem;
-import net.minecraft.item.ArmorMaterial;
-import net.minecraft.item.Item;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.Item;
 
 public class ItemArmorCamo extends ArmorItem {
 	public int team;
 
-	public ItemArmorCamo(ArmorMaterial material, Type type, int team) {
-		super(material, type, new Item.Settings().maxDamage(material.getDurability(type) * 2));
+	public ItemArmorCamo(Holder<ArmorMaterial> material, Type type, int team) {
+		super(material, type, new Item.Properties().durability(material.value().getDefense(type) * 2));
 		this.team = team;
 	}
 }

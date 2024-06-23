@@ -13,50 +13,50 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.entity.EntitySphereBlast;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RotationAxis;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 
 public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast> {
-	public RenderSphereBlast(EntityRendererFactory.Context manager) {
+	public RenderSphereBlast(EntityRendererProvider.Context manager) {
         super(manager);
 	}
 
     @Override
-    public void render(EntitySphereBlast entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
+    public void render(EntitySphereBlast entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         entity.time++;
-        matrices.push();
-        double elev = ((MathHelper.sin(entity.time / 40f) + 1.5f) * 10);
+        matrices.pushPose();
+        double elev = ((Mth.sin(entity.time / 40f) + 1.5f) * 10);
         matrices.translate(entity.getX(), entity.getY() + elev, entity.getZ());
-        matrices.push();
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) (elev * 2)));
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) (elev * 3)));
+        matrices.pushPose();
+        matrices.mulPose(Axis.YP.rotationDegrees((float) (elev * 2)));
+        matrices.mulPose(Axis.XP.rotationDegrees((float) (elev * 3)));
         ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) elev, 1, 0.25f, 0, 1f);
-        matrices.pop();
-        matrices.push();
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) (elev * -2)));
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) (elev * 4)));
+        matrices.popPose();
+        matrices.pushPose();
+        matrices.mulPose(Axis.YP.rotationDegrees((float) (elev * -2)));
+        matrices.mulPose(Axis.ZP.rotationDegrees((float) (elev * 4)));
         ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
-        matrices.pop();
-        matrices.push();
-        matrices.multiply(RotationAxis.POSITIVE_X.rotationDegrees((float) (elev * -3)));
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) (elev * 2)));
+        matrices.popPose();
+        matrices.pushPose();
+        matrices.mulPose(Axis.XP.rotationDegrees((float) (elev * -3)));
+        matrices.mulPose(Axis.ZP.rotationDegrees((float) (elev * 2)));
         ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.4f), 1, 0, 0, 1f);
-        matrices.pop();
-        matrices.push();
-        matrices.multiply(RotationAxis.POSITIVE_Y.rotationDegrees((float) (elev * -1)));
-        matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees((float) (elev * 3)));
+        matrices.popPose();
+        matrices.pushPose();
+        matrices.mulPose(Axis.YP.rotationDegrees((float) (elev * -1)));
+        matrices.mulPose(Axis.ZP.rotationDegrees((float) (elev * 3)));
         ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.6f), 1, 1, 0, 1);
-        matrices.pop();
-        matrices.pop();
+        matrices.popPose();
+        matrices.popPose();
     }
 
     @Override
-    public Identifier getTexture(EntitySphereBlast entity) {
+    public ResourceLocation getTextureLocation(EntitySphereBlast entity) {
         return null;
     }
 }

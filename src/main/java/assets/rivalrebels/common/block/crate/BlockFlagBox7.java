@@ -12,46 +12,46 @@
 package assets.rivalrebels.common.block.crate;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.text.Text;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockFlagBox7 extends Block
 {
-	public BlockFlagBox7(Settings settings)
+	public BlockFlagBox7(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
-		if (player.isSneaking() && !world.isClient)
+		if (player.isShiftKeyDown() && !level.isClientSide)
 		{
-			ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.flag7, 10));
-			world.spawnEntity(ei);
-            world.setBlockState(new BlockPos(x, y, z), Blocks.AIR.getDefaultState());
-			return ActionResult.PASS;
+			ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.flag7, 10));
+			level.addFreshEntity(ei);
+            level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+			return InteractionResult.PASS;
 		}
-		if (!player.isSneaking() && !world.isClient)
+		if (!player.isShiftKeyDown() && !level.isClientSide)
 		{
-            player.sendMessage(Text.translatable("RivalRebels.Orders").append(" ").append(Text.translatable("RivalRebels.sneak")), false);
-			world.setBlockState(new BlockPos(x, y, z), RRBlocks.flagbox3.getDefaultState());
-			return ActionResult.PASS;
+            player.displayClientMessage(Component.translatable("RivalRebels.Orders").append(" ").append(Component.translatable("RivalRebels.sneak")), false);
+			level.setBlockAndUpdate(new BlockPos(x, y, z), RRBlocks.flagbox3.defaultBlockState());
+			return InteractionResult.PASS;
 		}
-		return ActionResult.PASS;
+		return InteractionResult.PASS;
 	}
 
 	/*@Environment(EnvType.CLIENT)

@@ -19,77 +19,81 @@ import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
 import assets.rivalrebels.common.entity.EntityRoddiskRegular;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.FallingBlockEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.passive.AnimalEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.BooleanProperty;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
-import net.minecraft.world.WorldView;
-import net.minecraft.world.explosion.Explosion;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.entity.item.FallingBlockEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FallingBlock;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockLandMine extends FallingBlock
 {
-    public static final MapCodec<BlockLandMine> CODEC = createCodec(BlockLandMine::new);
+    public static final MapCodec<BlockLandMine> CODEC = simpleCodec(BlockLandMine::new);
 
-    public static final BooleanProperty META = BooleanProperty.of("meta");
-	public BlockLandMine(Settings settings)
+    public static final BooleanProperty META = BooleanProperty.create("meta");
+	public BlockLandMine(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, false));
     }
 
     @Override
-    protected MapCodec<? extends FallingBlock> getCodec() {
+    protected MapCodec<? extends FallingBlock> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-		if (state.get(META)) {
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
-			if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, World.ExplosionSourceType.BLOCK);
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+		if (state.getValue(META)) {
+			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+			if (!world.isClientSide) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
 		}
 	}
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
 		float f = 0.01F;
-		return VoxelShapes.cuboid(new Box(x, y, z, x + 1, y + 1 - f, z + 1));
+		return Shapes.create(new AABB(x, y, z, x + 1, y + 1 - f, z + 1));
 	}
 
     @Override
-    public void onEntityCollision(BlockState state, World world, BlockPos pos, Entity entity) {
-		if (entity instanceof PlayerEntity || entity instanceof AnimalEntity || entity instanceof MobEntity || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
-			world.setBlockState(pos, state.with(META, true));
-			world.scheduleBlockTick(pos, this, 5);
+    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+		if (entity instanceof Player || entity instanceof Animal || entity instanceof Mob || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
+			world.setBlockAndUpdate(pos, state.setValue(META, true));
+			world.scheduleTick(pos, this, 5);
 			RivalRebelsSoundPlayer.playSound(world, 11, 1, pos, 3, 2);
 		}
 	}
 
     @Override
-    public void onDestroyedByExplosion(World world, BlockPos pos, Explosion explosion) {
-		if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, World.ExplosionSourceType.BLOCK);
+    public void wasExploded(Level world, BlockPos pos, Explosion explosion) {
+		if (!world.isClientSide) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
 	}
 
 	/*@Override
@@ -164,12 +168,12 @@ public class BlockLandMine extends FallingBlock
 	}*/
 
     @Override
-    public ItemStack getPickStack(WorldView world, BlockPos pos, BlockState state) {
-        return RRBlocks.alandmine.asItem().getDefaultStack();
+    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+        return RRBlocks.alandmine.asItem().getDefaultInstance();
     }
 
     @Override
-    public void onLanding(World world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
-		if (!world.isClient) world.createExplosion(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, World.ExplosionSourceType.BLOCK);
+    public void onLand(Level world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
+		if (!world.isClientSide) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
 	}
 }

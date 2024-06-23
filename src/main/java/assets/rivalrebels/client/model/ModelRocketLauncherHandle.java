@@ -14,9 +14,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureFace;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 
 public class ModelRocketLauncherHandle
 {
@@ -79,11 +79,11 @@ public class ModelRocketLauncherHandle
 	private static final Vector3f		vbb3			= new Vector3f(20f, 0f, -2f);
 	private static final Vector3f		vbb4			= new Vector3f(8f, 0f, -2f);
 
-	public static void render(MatrixStack matrices, VertexConsumer buffer, int light, int overlay)
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 
-		matrices.push();
+		matrices.pushPose();
 		matrices.scale(1.3F, 1, 1);
 		// bottom
 		RenderHelper.addFace(buffer, vbt3, vbt4, vbt1, vbt2, bottombottom, light, overlay);
@@ -92,7 +92,7 @@ public class ModelRocketLauncherHandle
 		RenderHelper.addFace(buffer, vbt2, vbb2, vbb1, vbt1, bottomside, light, overlay);
 		RenderHelper.addFace(buffer, vbt3, vbb3, vbb4, vbt4, bottomside, light, overlay);
 		RenderHelper.addFace(buffer, vbb3, vbb4, vbb1, vbb2, bottombottom, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 
 		// handle
 		RenderHelper.addFace(buffer, vht4, vhb4, vhb1, vht1, handlefront, light, overlay);
@@ -100,6 +100,6 @@ public class ModelRocketLauncherHandle
 		RenderHelper.addFace(buffer, vht1, vhb1, vhb2, vht2, handleside, light, overlay);
 		RenderHelper.addFace(buffer, vht3, vhb3, vhb4, vht4, handleside, light, overlay);
 		RenderHelper.addFace(buffer, vhb2, vhb1, vhb4, vhb3, handlebottom, light, overlay);
-		matrices.pop();
+		matrices.popPose();
 	}
 }

@@ -15,29 +15,29 @@ import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.RenderPhase;
-import net.minecraft.client.render.VertexFormat;
-import net.minecraft.client.render.VertexFormats;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.random.Random;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
 
 import java.nio.ByteBuffer;
+import net.minecraft.client.renderer.RenderStateShard;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.phys.Vec3;
 
 public class RivalRebelsCellularNoise {
-    private static final Random random = Random.create();
+    private static final RandomSource random = RandomSource.create();
     private static final int pointa3D = 32;
-	private static final Vec3d[] points3D = new Vec3d[pointa3D];
+	private static final Vec3[] points3D = new Vec3[pointa3D];
     private static final int frames = 28;
     private static final int[] id = genTexture(28, 28, frames);
 
-    private static void refresh3D(Random random)
+    private static void refresh3D(RandomSource random)
 	{
 		for (int i = 0; i < pointa3D; i++)
 		{
-			points3D[i] = new Vec3d(random.nextDouble(), random.nextDouble(), random.nextDouble());
+			points3D[i] = new Vec3(random.nextDouble(), random.nextDouble(), random.nextDouble());
 		}
 	}
 
@@ -46,7 +46,7 @@ public class RivalRebelsCellularNoise {
 		double result = 1;
 		for (int i = 0; i < pointa3D; i++)
 		{
-            Vec3d point = points3D[i];
+            Vec3 point = points3D[i];
 			double dist = getDist(point, xin, yin, zin);
 			if (dist <= result)
 			{
@@ -56,7 +56,7 @@ public class RivalRebelsCellularNoise {
 		return (Math.sqrt(result) * 4) - 0.75d;
 	}
 
-    private static double getDist(Vec3d point, double xin, double yin, double zin)
+    private static double getDist(Vec3 point, double xin, double yin, double zin)
 	{
 		double result = 1;
 		for (int x = -1; x <= 1; x++)
@@ -114,15 +114,15 @@ public class RivalRebelsCellularNoise {
         return RivalRebelsCellularNoise.id[(int) ((RivalRebelsCellularNoise.getTime() / 100) % RivalRebelsCellularNoise.frames)];
     }
 
-    public static final RenderLayer CELLULAR_NOISE = RenderLayer.of(
+    public static final RenderType CELLULAR_NOISE = RenderType.create(
         "cellular_noise",
-        VertexFormats.POSITION_COLOR_TEXTURE_LIGHT,
-        VertexFormat.DrawMode.QUADS,
+        DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
+        VertexFormat.Mode.QUADS,
         999,
-        RenderLayer.MultiPhaseParameters.builder()
-            .program(RenderPhase.ENTITY_TRANSLUCENT_PROGRAM)
-            .texture(new RenderPhase.TextureBase(() -> RenderSystem.setShaderTexture(0, getCurrentRandomId()), () -> {}))
-            .transparency(RenderPhase.LIGHTNING_TRANSPARENCY)
-            .build(false)
+        RenderType.CompositeState.builder()
+            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+            .setTextureState(new RenderStateShard.EmptyTextureStateShard(() -> RenderSystem.setShaderTexture(0, getCurrentRandomId()), () -> {}))
+            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+            .createCompositeState(false)
     );
 }

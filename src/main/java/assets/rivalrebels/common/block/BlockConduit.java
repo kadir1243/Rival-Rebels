@@ -11,30 +11,30 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.item.ItemPlacementContext;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
+import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockConduit extends Block
 {
-    public static final IntProperty VARIANT = IntProperty.of("variant", 0, 8);
-	public BlockConduit(Settings settings)
+    public static final IntegerProperty VARIANT = IntegerProperty.create("variant", 0, 8);
+	public BlockConduit(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(VARIANT, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(VARIANT, 0));
     }
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(VARIANT);
     }
 
     @Nullable
     @Override
-    public BlockState getPlacementState(ItemPlacementContext ctx) {
-        return super.getPlacementState(ctx).with(VARIANT, ctx.getWorld().getRandom().nextInt(9));
+    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
+        return super.getStateForPlacement(ctx).setValue(VARIANT, ctx.getLevel().getRandom().nextInt(9));
     }
 
     /*@Environment(EnvType.CLIENT)

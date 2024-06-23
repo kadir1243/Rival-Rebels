@@ -12,10 +12,10 @@
 package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
@@ -37,17 +37,17 @@ public class ModelBlastSphere {
 	private static final Vector3f	vz2	= new Vector3f(0.25f, 0.25f, 0.5f).normalize();
 	private static final Vector3f	vz3	= new Vector3f(0, 0.25f, 0.75f).normalize();
 
-	public static void renderModel(MatrixStack matrices, VertexConsumerProvider vertexConsumers, float size, float red, float green, float blue, float alpha)
+	public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float size, float red, float green, float blue, float alpha)
 	{
-        matrices.push();
+        matrices.pushPose();
         matrices.scale(size, size, size);
         Vector4f color = new Vector4f(red, green, blue, alpha);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
         for (int i = 0; i < 2; i++) {
-			matrices.multiply(new Quaternionf(i * 180, 0, 0, 1));
+			matrices.mulPose(new Quaternionf(i * 180, 0, 0, 1));
 			for (int p = 0; p < 4; p++) {
-				matrices.push();
-				matrices.multiply(new Quaternionf(p * 90, 0, 1, 0));
+				matrices.pushPose();
+				matrices.mulPose(new Quaternionf(p * 90, 0, 1, 0));
 
 				RenderHelper.addTri(buffer, vy, vy1, vy3, color);
 				RenderHelper.addTri(buffer, vy1, vyz, vy2, color);
@@ -69,10 +69,10 @@ public class ModelBlastSphere {
 				RenderHelper.addTri(buffer, vxz, vx2, vz2, color);
 				RenderHelper.addTri(buffer, vx2, vy2, vz2, color);
 
-				matrices.pop();
+				matrices.popPose();
 			}
 		}
-        matrices.pop();
+        matrices.popPose();
     }
 
 }

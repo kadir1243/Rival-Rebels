@@ -15,18 +15,17 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.AntimatterBomb;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.World;
-
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.shapes.Shapes;
 
 public class EntityAntimatterBombBlast extends EntityInanimate
 {
@@ -34,33 +33,33 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	public double		radius;
 	public int			time		= 0;
 
-	public EntityAntimatterBombBlast(EntityType<? extends EntityAntimatterBombBlast> entityType, World par1World) {
+	public EntityAntimatterBombBlast(EntityType<? extends EntityAntimatterBombBlast> entityType, Level par1World) {
 		super(entityType, par1World);
-		ignoreCameraFrustum = true;
+		noCulling = true;
 	}
 
-    public EntityAntimatterBombBlast(World par1World) {
+    public EntityAntimatterBombBlast(Level par1World) {
         super(RREntities.ANTIMATTER_BOMB_BLAST, par1World);
-        ignoreCameraFrustum = true;
+        noCulling = true;
     }
 
-	public EntityAntimatterBombBlast(World par1World, float x, float y, float z, AntimatterBomb tsarBomba, int rad)
+	public EntityAntimatterBombBlast(Level par1World, float x, float y, float z, AntimatterBomb tsarBomba, int rad)
 	{
 		this(par1World);
-		ignoreCameraFrustum = true;
+		noCulling = true;
 		tsar = tsarBomba;
 		radius = rad;
-		setVelocity(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-		setPosition(x, y, z);
+		setDeltaMovement(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setPos(x, y, z);
 	}
 
-	public EntityAntimatterBombBlast(World par1World, double x, double y, double z, float rad)
+	public EntityAntimatterBombBlast(Level par1World, double x, double y, double z, float rad)
 	{
 		this(par1World);
-		ignoreCameraFrustum = true;
+		noCulling = true;
 		radius = rad;
-		setVelocity(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getVelocity().getY(), getVelocity().getZ());
-		setPosition(x, y, z);
+		setDeltaMovement(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setPos(x, y, z);
 	}
 
 	@Override
@@ -68,22 +67,22 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (getWorld().random.nextInt(30) == 0)
+		if (level().random.nextInt(30) == 0)
 		{
-			getWorld().playSound(this.getX(), this.getY(), this.getZ(), SoundEvents.ENTITY_LIGHTNING_BOLT_THUNDER, SoundCategory.AMBIENT, 10.0F, 0.5F, false);
+			level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.AMBIENT, 10.0F, 0.5F, false);
 		}
 		else
 		{
-			if (getWorld().random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
+			if (level().random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
 		}
 
-		age++;
+		tickCount++;
 
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
-			if (tsar == null && age > 1200) kill();
-			if (age % 20 == 0) updateEntityList();
-			if (age < 1200 && age % 5 == 0) pushAndHurtEntities();
+			if (tsar == null && tickCount > 1200) kill();
+			if (tickCount % 20 == 0) updateEntityList();
+			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RivalRebels.tsarBombaSpeed * 2; i++)
 			{
 				if (tsar != null)
@@ -108,9 +107,9 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	{
 		entitylist.clear();
 		double ldist = radius*radius;
-        List<Entity> otherEntities = getWorld().getOtherEntities(this, VoxelShapes.UNBOUNDED.getBoundingBox(), e -> !((e instanceof PlayerEntity && ((PlayerEntity) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityAntimatterBombBlast));
+        List<Entity> otherEntities = level().getEntities(this, Shapes.INFINITY.bounds(), e -> !((e instanceof Player && ((Player) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityAntimatterBombBlast));
         for (Entity e : otherEntities) {
-            double dist = e.squaredDistanceTo(getX(), getY(), getZ());
+            double dist = e.distanceToSqr(getX(), getY(), getZ());
             if (dist < ldist) {
                 entitylist.add(e);
             }
@@ -131,7 +130,7 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 			float dx = (float) (e.getX() - getX());
 			float dy = (float) (e.getY() - getY());
 			float dz = (float) (e.getZ() - getZ());
-			float dist = MathHelper.sqrt(dx * dx + dy * dy + dz * dz);
+			float dist = Mth.sqrt(dx * dx + dy * dy + dz * dz);
 			float rsqrt = 1.0f / (dist + 0.0001f);
 			dx *= rsqrt;
 			dy *= rsqrt;
@@ -139,12 +138,12 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
-				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (radius*f*0.025f));
+				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (radius*f*0.025f));
 			}
 			else
 			{
-				e.damage(RivalRebelsDamageSource.nuclearBlast(getWorld()), (int) (f * f * 2.0f * radius + 20.0f));
-                e.setVelocity(e.getVelocity().subtract(
+				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (f * f * 2.0f * radius + 20.0f));
+                e.setDeltaMovement(e.getDeltaMovement().subtract(
                     dx * f,
                     dy * f,
                     dz * f
@@ -158,30 +157,30 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	}
 
 	@Override
-	public void readCustomDataFromNbt(NbtCompound nbt) {
+	public void readAdditionalSaveData(CompoundTag nbt) {
 		radius = nbt.getFloat("radius");
 	}
 
 	@Override
-	public void writeCustomDataToNbt(NbtCompound nbt)
+	public void addAdditionalSaveData(CompoundTag nbt)
 	{
 		nbt.putFloat("radius", (float) radius);
 	}
 
     @Override
-    public float getBrightnessAtEyes() {
+    public float getLightLevelDependentMagicValue() {
         return 1000F;
     }
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
 
     public EntityAntimatterBombBlast setTime()
 	{
-		age = 920;
+		tickCount = 920;
 		return this;
 	}
 }

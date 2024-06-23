@@ -14,26 +14,25 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import net.minecraft.block.Block;
-import net.minecraft.block.BlockState;
-import net.minecraft.block.Blocks;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.registry.tag.BlockTags;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.EntityHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Box;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.RaycastContext;
-import net.minecraft.world.World;
-
 import java.util.List;
 import java.util.Optional;
+import net.minecraft.core.BlockPos;
+import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityFlameBall1 extends EntityInanimate
 {
@@ -41,52 +40,52 @@ public class EntityFlameBall1 extends EntityInanimate
 	public float	rotation;
 	public float	motionr;
 
-    public EntityFlameBall1(EntityType<? extends EntityFlameBall1> type, World world) {
+    public EntityFlameBall1(EntityType<? extends EntityFlameBall1> type, Level world) {
         super(type, world);
     }
 
-	public EntityFlameBall1(World par1World) {
+	public EntityFlameBall1(Level par1World) {
 		this(RREntities.FLAME_BALL1, par1World);
 		rotation = (float) (random.nextDouble() * 360);
 		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
 
-	public EntityFlameBall1(World par1World, double par2, double par4, double par6) {
+	public EntityFlameBall1(Level par1World, double par2, double par4, double par6) {
 		this(par1World);
-		setPosition(par2, par4, par6);
+		setPos(par2, par4, par6);
 	}
 
-	public EntityFlameBall1(World par1World, Entity player, float par3) {
+	public EntityFlameBall1(Level par1World, Entity player, float par3) {
 		this(par1World);
-		setPosition(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
-		setVelocity((-MathHelper.sin(player.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(player.getPitch() / 180.0F * (float) Math.PI)),
-            (MathHelper.cos(player.getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(player.getPitch() / 180.0F * (float) Math.PI)),
-            (-MathHelper.sin(player.getPitch() / 180.0F * (float) Math.PI)));
-		setPos(
-            getX() - (MathHelper.cos(player.getYaw() / 180.0F * (float) Math.PI) * 0.2F),
+		setPos(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI)),
+            (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI)),
+            (-Mth.sin(player.getXRot() / 180.0F * (float) Math.PI)));
+		setPosRaw(
+            getX() - (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * 0.2F),
             getY() - 0.13,
-            getZ() - (MathHelper.sin(player.getYaw() / 180.0F * (float) Math.PI) * 0.2F)
+            getZ() - (Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * 0.2F)
         );
-        setVelocity(getVelocity().multiply(par3));
+        setDeltaMovement(getDeltaMovement().scale(par3));
 	}
 
-	public EntityFlameBall1(World par1World, TileEntityReciever ter, float f) {
+	public EntityFlameBall1(Level par1World, TileEntityReciever ter, float f) {
 		this(par1World);
-		setYaw((float) (180 - ter.yaw));
-		setPitch((float) (-ter.pitch));
-		setPosition(ter.getPos().getX() + ter.xO + 0.5, ter.getPos().getY() + 0.75, ter.getPos().getZ() + ter.zO + 0.5);
-        setVelocity((-MathHelper.sin(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
-            (MathHelper.cos(getYaw() / 180.0F * (float) Math.PI) * MathHelper.cos(getPitch() / 180.0F * (float) Math.PI)),
-            (-MathHelper.sin(getPitch() / 180.0F * (float) Math.PI)));
+		setYRot((float) (180 - ter.yaw));
+		setXRot((float) (-ter.pitch));
+		setPos(ter.getBlockPos().getX() + ter.xO + 0.5, ter.getBlockPos().getY() + 0.75, ter.getBlockPos().getZ() + ter.zO + 0.5);
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
+            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
+            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
 
-        setVelocity(getVelocity().multiply(f));
+        setDeltaMovement(getDeltaMovement().scale(f));
 	}
 
-	public EntityFlameBall1(World world, double x, double y, double z, double mx, double my, double mz)
+	public EntityFlameBall1(Level world, double x, double y, double z, double mx, double my, double mz)
 	{
 		this(world);
-		setPosition(x, y, z);
-        setVelocity(mx, my, mz);
+		setPos(x, y, z);
+        setDeltaMovement(mx, my, mz);
 		rotation = (float) (random.nextDouble() * 360);
 		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
@@ -94,29 +93,29 @@ public class EntityFlameBall1 extends EntityInanimate
 	@Override
 	public void tick() {
 		super.tick();
-		age++;
-		if (age > 5) sequence++;
+		tickCount++;
+		if (tickCount > 5) sequence++;
 		if (sequence > 15/* > RivalRebels.flamethrowerDecay */) kill();
 
-		Vec3d start = getPos();
-		Vec3d end = getPos().add(getVelocity());
-		HitResult mop = getWorld().raycast(new RaycastContext(start, end, RaycastContext.ShapeType.COLLIDER, RaycastContext.FluidHandling.NONE, this));
-		start = getPos();
-		end = getPos().add(getVelocity());
+		Vec3 start = position();
+		Vec3 end = position().add(getDeltaMovement());
+		HitResult mop = level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+		start = position();
+		end = position().add(getDeltaMovement());
 
-		if (mop != null) end = mop.getPos();
+		if (mop != null) end = mop.getLocation();
 
 		Entity e = null;
-		List<Entity> var5 = getWorld().getOtherEntities(this, getBoundingBox().stretch(getVelocity().getX(), getVelocity().getY(), getVelocity().getZ()).expand(1.0D, 1.0D, 1.0D));
+		List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
 		double var6 = 0.0D;
 
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
             for (Entity var9 : var5) {
-                if (var9.isCollidable()) {
+                if (var9.canBeCollidedWith()) {
                     float var10 = 0.3F;
-                    Box var11 = var9.getBoundingBox().expand(var10, var10, var10);
-                    Optional<Vec3d> var12 = var11.raycast(start, end);
+                    AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
+                    Optional<Vec3> var12 = var11.clip(start, end);
 
                     if (var12.isPresent()) {
                         double var13 = start.distanceTo(var12.get());
@@ -132,67 +131,67 @@ public class EntityFlameBall1 extends EntityInanimate
 
 		if (e != null)
 		{
-			mop = new EntityHitResult(e, mop.getPos());
+			mop = new EntityHitResult(e, mop.getLocation());
 		}
 
-		if (mop != null && mop.getType() == HitResult.Type.ENTITY && age >= 5)
+		if (mop != null && mop.getType() == HitResult.Type.ENTITY && tickCount >= 5)
 		{
 			fire();
 			kill();
 			if (((EntityHitResult) mop).getEntity() != null)
 			{
-				((EntityHitResult) mop).getEntity().setOnFireFor(3);
-				((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked(getWorld()), 12);
-				if (((EntityHitResult) mop).getEntity() instanceof PlayerEntity player) {
-                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, getWorld().random.nextInt(4));
-					if (!player.getEquippedStack(slot).isEmpty() && !getWorld().isClient)
+				((EntityHitResult) mop).getEntity().igniteForSeconds(3);
+				((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cooked(level()), 12);
+				if (((EntityHitResult) mop).getEntity() instanceof Player player) {
+                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
+					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide)
 					{
-						player.getEquippedStack(slot).damage(8, player, player1 -> player1.sendEquipmentBreakStatus(slot));
+						player.getItemBySlot(slot).hurtAndBreak(8, player, slot);
 					}
 				}
 			}
 			else if (mop.getType() == BlockHitResult.Type.ENTITY)
 			{
-				getWorld().spawnEntity(new EntityLightningLink(getWorld(), this, this.distanceTo(((EntityHitResult) mop).getEntity())));
-				if (((EntityHitResult) mop).getEntity() instanceof PlayerEntity player)
+				level().addFreshEntity(new EntityLightningLink(level(), this, this.distanceTo(((EntityHitResult) mop).getEntity())));
+				if (((EntityHitResult) mop).getEntity() instanceof Player player)
 				{
-                    EquipmentSlot slot = EquipmentSlot.fromTypeIndex(EquipmentSlot.Type.ARMOR, getWorld().random.nextInt(4));
-					if (!player.getEquippedStack(slot).isEmpty()) {
-						player.getEquippedStack(slot).damage(44, player, player1 -> player1.sendEquipmentBreakStatus(slot));
+                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
+					if (!player.getItemBySlot(slot).isEmpty()) {
+						player.getItemBySlot(slot).hurtAndBreak(44, player, slot);
 					}
-					player.damage(RivalRebelsDamageSource.cooked(getWorld()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					player.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
 				}
 				else if (((EntityHitResult) mop).getEntity() instanceof EntityB2Spirit)
 				{
-					((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked(getWorld()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
 				}
 				else if (((EntityHitResult) mop).getEntity().isAttackable())
 				{
-					((EntityHitResult) mop).getEntity().damage(RivalRebelsDamageSource.cooked(getWorld()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
 				}
 			}
 		}
 
-        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		rotation += motionr;
 		motionr *= 1.06f;
 
-		if (isInsideWaterOrBubbleColumn()) kill();
+		if (isInWaterOrBubble()) kill();
 		float airFriction = 0.97F;
 		float gravity = 0.01F;
-        setVelocity(getVelocity().multiply(airFriction));
-        setVelocity(getVelocity().subtract(0, gravity, 0));
-		setPosition(getX(), getY(), getZ());
+        setDeltaMovement(getDeltaMovement().scale(airFriction));
+        setDeltaMovement(getDeltaMovement().subtract(0, gravity, 0));
+		setPos(getX(), getY(), getZ());
 	}
 
 	@Override
-	public float getBrightnessAtEyes()
+	public float getLightLevelDependentMagicValue()
 	{
 		return 1000;
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return true;
 	}
@@ -205,7 +204,7 @@ public class EntityFlameBall1 extends EntityInanimate
 
 	private void fire()
 	{
-		if (!getWorld().isClient)
+		if (!level().isClientSide)
 		{
 			for (int x = -1; x < 2; x++)
 			{
@@ -214,12 +213,12 @@ public class EntityFlameBall1 extends EntityInanimate
 					for (int z = -1; z < 2; z++)
 					{
                         BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
-                        BlockState state = getWorld().getBlockState(pos);
+                        BlockState state = level().getBlockState(pos);
                         Block id = state.getBlock();
-						if (id == Blocks.AIR || id == Blocks.SNOW || state.isIn(BlockTags.ICE)) getWorld().setBlockState(pos, Blocks.FIRE.getDefaultState());
-						else if (state.isIn(BlockTags.LEAVES)) getWorld().setBlockState(pos, Blocks.FIRE.getDefaultState());
-						else if (id == Blocks.GRASS_BLOCK && getWorld().random.nextInt(5) == 0) getWorld().setBlockState(pos, Blocks.DIRT.getDefaultState());
-						else if (id == RRBlocks.flare) id.onBroken(getWorld(), pos, state);
+						if (id == Blocks.AIR || id == Blocks.SNOW || state.is(BlockTags.ICE)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+						else if (state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+						else if (id == Blocks.GRASS_BLOCK && level().random.nextInt(5) == 0) level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+						else if (id == RRBlocks.flare) id.destroy(level(), pos, state);
 					}
 				}
 			}

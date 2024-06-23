@@ -15,81 +15,85 @@ import assets.rivalrebels.common.entity.EntityBlood;
 import assets.rivalrebels.common.entity.EntityGoo;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.*;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.server.world.ServerWorld;
-import net.minecraft.state.StateManager;
-import net.minecraft.state.property.IntProperty;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.random.Random;
-import net.minecraft.util.shape.VoxelShape;
-import net.minecraft.util.shape.VoxelShapes;
-import net.minecraft.world.BlockView;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockGore extends BlockWithEntity {
-    public static final MapCodec<BlockGore> CODEC = createCodec(BlockGore::new);
-    public static final IntProperty META = IntProperty.of("meta", 0, 5);
-	public BlockGore(Settings settings)
+public class BlockGore extends BaseEntityBlock {
+    public static final MapCodec<BlockGore> CODEC = simpleCodec(BlockGore::new);
+    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 5);
+	public BlockGore(Properties settings)
 	{
 		super(settings);
-        this.setDefaultState(this.getStateManager().getDefaultState().with(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
     }
 
     @Override
-    protected MapCodec<BlockGore> getCodec() {
+    protected MapCodec<BlockGore> codec() {
         return CODEC;
     }
 
     @Override
-    protected void appendProperties(StateManager.Builder<Block, BlockState> builder) {
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(META);
     }
 
     @Override
-    public ActionResult onUse(BlockState state, World world, BlockPos pos, PlayerEntity player, Hand hand, BlockHitResult hit) {
-		if (player.getAbilities().creativeMode)
+    protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+		if (player.getAbilities().instabuild)
 		{
-			int meta = state.get(META) + 1;
+			int meta = state.getValue(META) + 1;
 			if (meta >= 6) meta = 0;
-			world.setBlockState(pos, state.with(META, meta));
-			return ActionResult.success(world.isClient);
+			level.setBlockAndUpdate(pos, state.setValue(META, meta));
+			return InteractionResult.sidedSuccess(level.isClientSide());
 		}
-		return ActionResult.FAIL;
+		return InteractionResult.FAIL;
 	}
 
     @Override
-    public void randomDisplayTick(BlockState state, World world, BlockPos pos, Random random) {
-        if (world.isAir(pos.down()) && state.get(META) < 2) world.spawnEntity(new EntityBlood(world, pos.getX() + random.nextDouble(), pos.getY() + 0.9f, pos.getZ() + random.nextDouble()));
-		else if (world.isAir(pos.down()) && state.get(META) < 4) world.spawnEntity(new EntityGoo(world, pos.getX() + random.nextDouble(), pos.getY() + 0.9f, pos.getZ() + random.nextDouble()));
+    public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
+        if (world.isEmptyBlock(pos.below()) && state.getValue(META) < 2) world.addFreshEntity(new EntityBlood(world, pos.getX() + random.nextDouble(), pos.getY() + 0.9f, pos.getZ() + random.nextDouble()));
+		else if (world.isEmptyBlock(pos.below()) && state.getValue(META) < 4) world.addFreshEntity(new EntityGoo(world, pos.getX() + random.nextDouble(), pos.getY() + 0.9f, pos.getZ() + random.nextDouble()));
 	}
 
     @Override
-    public VoxelShape getOutlineShape(BlockState state, BlockView world, BlockPos pos, ShapeContext context) {
-        return VoxelShapes.empty();
+    public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+        return Shapes.empty();
     }
 
     @Override
-    public void scheduledTick(BlockState state, ServerWorld world, BlockPos pos, Random random) {
-        if (!Block.sideCoversSmallSquare(world, pos.down(), Direction.UP) ||
-            !Block.sideCoversSmallSquare(world, pos.east(), Direction.WEST) ||
-            !Block.sideCoversSmallSquare(world, pos.west(), Direction.EAST) ||
-            !Block.sideCoversSmallSquare(world, pos.south(), Direction.NORTH) ||
-            !Block.sideCoversSmallSquare(world, pos.north(), Direction.SOUTH) ||
-            !Block.sideCoversSmallSquare(world, pos.up(), Direction.DOWN)) {
-			world.setBlockState(pos, Blocks.AIR.getDefaultState());
+    public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
+        if (!Block.canSupportCenter(world, pos.below(), Direction.UP) ||
+            !Block.canSupportCenter(world, pos.east(), Direction.WEST) ||
+            !Block.canSupportCenter(world, pos.west(), Direction.EAST) ||
+            !Block.canSupportCenter(world, pos.south(), Direction.NORTH) ||
+            !Block.canSupportCenter(world, pos.north(), Direction.SOUTH) ||
+            !Block.canSupportCenter(world, pos.above(), Direction.DOWN)) {
+			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		}
 	}
 
     @Nullable
     @Override
-    public BlockEntity createBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityGore(pos, state);
 	}
 

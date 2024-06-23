@@ -12,11 +12,11 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.util.math.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
@@ -31,30 +31,30 @@ public class GuiFTKnob extends GuiButton
 	}
 
     @Override
-    protected void renderWidget(DrawContext context, int mouseX, int mouseY, float delta) {
-        MatrixStack matrices = context.getMatrices();
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        PoseStack matrices = context.pose();
         this.mouseDragged(mouseX, mouseY, 0, 0,  0);
 		if (mode > 2) mode = 2;
 		if (mode < 0) mode = 0;
-		context.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
-		matrices.push();
+		matrices.pushPose();
 		matrices.translate(this.getX() + (width / 2f), this.getY() + (height / 2f), 0);
-		matrices.multiply(new Quaternionf(mode * 90 - 90, 0, 0, 1));
+		matrices.mulPose(new Quaternionf(mode * 90 - 90, 0, 0, 1));
 		matrices.translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)), 0);
-		context.drawTexture(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
-		matrices.pop();
+		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
+		matrices.popPose();
 	}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-		if (MinecraftClient.getInstance().mouse.wasLeftButtonClicked()) {
+		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
 			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
 			if (pressed) mode = (((((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * 180 / Math.PI)) + 450) % 360) - 45) / 90;
 		} else {
 			pressed = false;
-			int move = (int) MinecraftClient.getInstance().mouse.getY();
+			int move = (int) Minecraft.getInstance().mouseHandler.ypos();
 			mode += Integer.compare(0, move);
 			while (mode < 0)
 				mode += 3;

@@ -11,12 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.world.World;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.level.Level;
 
 public class EntityPassiveFire extends EntityInanimate {
     private boolean	inGround;
@@ -25,26 +25,26 @@ public class EntityPassiveFire extends EntityInanimate {
 	private int		ticksInAir;
 	private double	damage;
 
-    public EntityPassiveFire(EntityType<? extends EntityPassiveFire> type, World world) {
+    public EntityPassiveFire(EntityType<? extends EntityPassiveFire> type, Level world) {
         super(type, world);
     }
 
-	public EntityPassiveFire(World par1World) {
+	public EntityPassiveFire(Level par1World) {
 		this(RREntities.PASSIVE_FIRE, par1World);
         inGround = false;
 		ticksInAir = 0;
 		damage = 2D;
 	}
 
-	public EntityPassiveFire(World par1World, double par2, double par4, double par6) {
+	public EntityPassiveFire(Level par1World, double par2, double par4, double par6) {
 		this(par1World);
-		setPosition(par2, par4, par6);
+		setPos(par2, par4, par6);
 	}
 
-	public EntityPassiveFire(World par1World, MobEntity shootingEntity, MobEntity par3EntityLiving, float par4, float par5) {
+	public EntityPassiveFire(Level par1World, Mob shootingEntity, Mob par3EntityLiving, float par4, float par5) {
 		this(par1World);
 		this.shootingEntity = shootingEntity;
-        setPos(getX(), (shootingEntity.getY() + shootingEntity.getEyeHeight(shootingEntity.getPose())) - 0.1D, getZ());
+        setPosRaw(getX(), (shootingEntity.getY() + shootingEntity.getEyeHeight(shootingEntity.getPose())) - 0.1D, getZ());
 		double d = par3EntityLiving.getX() - shootingEntity.getX();
 		double d1 = (par3EntityLiving.getY() + par3EntityLiving.getEyeHeight(par3EntityLiving.getPose())) - 0.7D - getY();
 		double d2 = par3EntityLiving.getZ() - shootingEntity.getZ();
@@ -56,53 +56,53 @@ public class EntityPassiveFire extends EntityInanimate {
 			float f1 = (float) (-((Math.atan2(d1, d3) * 180D) / Math.PI));
 			double d4 = d / d3;
 			double d5 = d2 / d3;
-			refreshPositionAndAngles(shootingEntity.getX() + d4, getY(), shootingEntity.getZ() + d5, f, f1);
+			moveTo(shootingEntity.getX() + d4, getY(), shootingEntity.getZ() + d5, f, f1);
 			float f2 = (float) d3 * 0.2F;
-			setVelocity(d, d1 + f2, d2);
+			setDeltaMovement(d, d1 + f2, d2);
         }
 	}
 
-	public EntityPassiveFire(World par1World, Entity entity, float par3) {
+	public EntityPassiveFire(Level par1World, Entity entity, float par3) {
 		this(par1World);
 		shootingEntity = entity;
-		refreshPositionAndAngles(entity.getX(), entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ(), entity.getYaw(), entity.getPitch());
-		setYaw((getYaw() + 25) % 360);
-        setPos(
-            getX() - MathHelper.cos((getYaw() / 180F) * (float) Math.PI) * 0.16F,
+		moveTo(entity.getX(), entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ(), entity.getYRot(), entity.getXRot());
+		setYRot((getYRot() + 25) % 360);
+        setPosRaw(
+            getX() - Mth.cos((getYRot() / 180F) * (float) Math.PI) * 0.16F,
             getY() - 0.2D,
-            getZ() - MathHelper.sin((getYaw() / 180F) * (float) Math.PI) * 0.16F
+            getZ() - Mth.sin((getYRot() / 180F) * (float) Math.PI) * 0.16F
         );
-		setPosition(getX(), getY(), getZ());
-        super.setVelocity(-MathHelper.sin((getYaw() / 180F) * (float) Math.PI) * MathHelper.cos((getPitch() / 180F) * (float) Math.PI),
-		 MathHelper.cos((getYaw() / 180F) * (float) Math.PI) * MathHelper.cos((getPitch() / 180F) * (float) Math.PI),
-		 -MathHelper.sin((getPitch() / 180F) * (float) Math.PI));
+		setPos(getX(), getY(), getZ());
+        super.setDeltaMovement(-Mth.sin((getYRot() / 180F) * (float) Math.PI) * Mth.cos((getXRot() / 180F) * (float) Math.PI),
+		 Mth.cos((getYRot() / 180F) * (float) Math.PI) * Mth.cos((getXRot() / 180F) * (float) Math.PI),
+		 -Mth.sin((getXRot() / 180F) * (float) Math.PI));
 	}
 
 	@Override
-	public float getBrightnessAtEyes()
+	public float getLightLevelDependentMagicValue()
 	{
 		return 1000F;
 	}
 
 	@Override
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return (distance <= 16);
 	}
 
-	public EntityPassiveFire(World world, int x, int y, int z, int mx, int my, int mz)
+	public EntityPassiveFire(Level world, int x, int y, int z, int mx, int my, int mz)
 	{
 		this(world);
-		setPosition(x, y, z);
-        super.setVelocity(mx, my, mz);
+		setPos(x, y, z);
+        super.setDeltaMovement(mx, my, mz);
 	}
 
     @Override
-	public void setVelocity(double x, double y, double z) {
-        super.setVelocity(
-            x + (getWorld().random.nextFloat() - 0.5) / 50,
-            y + (getWorld().random.nextFloat() - 0.5) / 50,
-            z + (getWorld().random.nextFloat() - 0.5) / 50);
+	public void setDeltaMovement(double x, double y, double z) {
+        super.setDeltaMovement(
+            x + (level().random.nextFloat() - 0.5) / 50,
+            y + (level().random.nextFloat() - 0.5) / 50,
+            z + (level().random.nextFloat() - 0.5) / 50);
 	}
 
 	@Override
@@ -114,30 +114,30 @@ public class EntityPassiveFire extends EntityInanimate {
 			this.kill();
 		}
 
-        setPos(getX() + getVelocity().getX(), getY() + getVelocity().getY(), getZ() + getVelocity().getZ());
+        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var17 = 0.4F;
 		float var18 = -0.02F;
 
-		if (this.isInsideWaterOrBubbleColumn())
+		if (this.isInWaterOrBubble())
 		{
 			kill();
 		}
 
-        setVelocity(getVelocity().multiply(var17));
-        setVelocity(getVelocity().subtract(0, var18, 0));
-		this.setPosition(this.getX(), this.getY(), this.getZ());
+        setDeltaMovement(getDeltaMovement().scale(var17));
+        setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
+		this.setPos(this.getX(), this.getY(), this.getZ());
 		ticksInAir++;
 	}
 
     @Override
-	public void writeCustomDataToNbt(NbtCompound nbt)
+	public void addAdditionalSaveData(CompoundTag nbt)
 	{
 		nbt.putBoolean("inGround", inGround);
 		nbt.putDouble("damage", damage);
 	}
 
     @Override
-	public void readCustomDataFromNbt(NbtCompound nbt)
+	public void readAdditionalSaveData(CompoundTag nbt)
 	{
 		inGround = nbt.getBoolean("inGround");
         damage = nbt.getDouble("damage");

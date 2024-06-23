@@ -1,14 +1,13 @@
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityType;
-import net.minecraft.entity.SpawnGroup;
-import net.minecraft.world.World;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.MobCategory;
+import net.minecraft.world.level.Level;
 
 public class RREntities {
     public static final Map<String, EntityType<?>> TYPES = new HashMap<>();
@@ -22,7 +21,7 @@ public class RREntities {
     public static final EntityType<EntityBlood> BLOOD = create(EntityBlood::new, "blood", 0.25F, 0.25F);
     public static final EntityType<EntityBomb> BOMB = create(EntityBomb::new, "bomb", 0.5F, 0.5F);
     public static final EntityType<EntityCuchillo> CUCHILLO = create(EntityCuchillo::new, "cuchillo", 0.5F, 0.5F);
-    public static final EntityType<EntityDebris> DEBRIS = create(EntityDebris::new, "debris", 1F, 1F);
+    public static final EntityType<EntityDebris> DEBRIS = create(EntityDebris::new, "debris", 1F, 1F, b -> b.ridingOffset(0.5F));
     public static final EntityType<EntityFlameBall> FLAME_BALL = create(EntityFlameBall::new, "flame_ball", 0.5F, 0.5F);
     public static final EntityType<EntityFlameBall1> FLAME_BALL1 = create(EntityFlameBall1::new, "flame_ball1", 0.5F, 0.5F);
     public static final EntityType<EntityFlameBall2> FLAME_BALL2 = create(EntityFlameBall2::new, "flame_ball2", 0.5F, 0.5F);
@@ -68,20 +67,20 @@ public class RREntities {
     public static final EntityType<EntityTsar> TSAR = create(EntityTsar::new, "tsar", 0.5F, 0.5F);
     public static final EntityType<EntityTsarBlast> TSAR_BLAST = create(EntityTsarBlast::new, "tsar_blast");
 
-    private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, World, T> function, String id) {
-        EntityType<T> type = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().build(id);
+    private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, Level, T> function, String id) {
+        EntityType<T> type = EntityType.Builder.of(function::apply, MobCategory.MISC).noSummon().build(id);
         TYPES.put(id, type);
         return type;
     }
 
-    private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, World, T> function, String id, float width, float height) {
-        EntityType<T> type = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().setDimensions(width, height).build(id);
+    private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, Level, T> function, String id, float width, float height) {
+        EntityType<T> type = EntityType.Builder.of(function::apply, MobCategory.MISC).noSummon().sized(width, height).build(id);
         TYPES.put(id, type);
         return type;
     }
 
-    private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, World, T> function, String id, float width, float height, Consumer<EntityType.Builder<T>> extensions) {
-        EntityType.Builder<T> builder = EntityType.Builder.create(function::apply, SpawnGroup.MISC).disableSummon().setDimensions(width, height);
+    private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, Level, T> function, String id, float width, float height, Consumer<EntityType.Builder<T>> extensions) {
+        EntityType.Builder<T> builder = EntityType.Builder.of(function::apply, MobCategory.MISC).noSummon().sized(width, height);
         extensions.accept(builder);
         EntityType<T> type = builder.build(id);
         TYPES.put(id, type);

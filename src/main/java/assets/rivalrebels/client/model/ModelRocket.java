@@ -12,9 +12,9 @@
 package assets.rivalrebels.client.model;
 
 import assets.rivalrebels.client.renderhelper.RenderHelper;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import org.joml.Vector3f;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.util.math.MatrixStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
@@ -56,9 +56,9 @@ public class ModelRocket
 	private static final float	ty2		= 0.09375f;
 	private static final float	ty3		= 0.1875f;
 
-	public static void render(MatrixStack matrices, VertexConsumer buffer, boolean fins, int light, int overlay)
+	public static void render(PoseStack matrices, VertexConsumer buffer, boolean fins, int light, int overlay)
 	{
-		matrices.push();
+		matrices.pushPose();
 		matrices.scale(0.125f, 0.25f, 0.125f);
 
 		RenderHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2, light, overlay);
@@ -88,6 +88,6 @@ public class ModelRocket
 			RenderHelper.addFace(buffer, vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3, light, overlay);
 		}
 
-		matrices.pop();
+		matrices.popPose();
 	}
 }

@@ -17,45 +17,45 @@ import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.common.container.ContainerLaptop;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.gui.screen.ingame.HandledScreen;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.text.Text;
-import net.minecraft.util.Util;
+import net.minecraft.Util;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Inventory;
 
 @Environment(EnvType.CLIENT)
-public class GuiLaptop extends HandledScreen<ContainerLaptop> {
+public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
     GuiButton button;
 	boolean prevButtonDown;
 
-	public GuiLaptop(ContainerLaptop containerLaptop, PlayerInventory playerInventory, Text title)
+	public GuiLaptop(ContainerLaptop containerLaptop, Inventory playerInventory, Component title)
 	{
 		super(containerLaptop, playerInventory, title);
-		backgroundHeight = 206;
+		imageHeight = 206;
 	}
 
     @Override
     protected void init() {
         super.init();
 
-		int x = (width - backgroundWidth) / 2;
-		int y = (height - backgroundHeight) / 2;
-        this.clearChildren();
-		button = new GuiButton(x + 131, y + 89, 16, 16, Text.empty());
-		addDrawable(button);
+		int x = (width - imageWidth) / 2;
+		int y = (height - imageHeight) / 2;
+        this.clearWidgets();
+		button = new GuiButton(x + 131, y + 89, 16, 16, Component.empty());
+		addRenderableOnly(button);
 	}
 
     @Override
-    protected void drawForeground(DrawContext context, int mouseX, int mouseY) {
-        super.drawForeground(context, mouseX, mouseY);
+    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
+        super.renderLabels(context, mouseX, mouseY);
 
-		if (handler.isReady()) context.drawTexture(RRIdentifiers.guilaptopnuke, 131, 89, 239, 9, 16, 16);
-		else context.drawTexture(RRIdentifiers.guilaptopnuke, 131, 89, 131, 89, 16, 16);
+		if (menu.isReady()) context.blit(RRIdentifiers.guilaptopnuke, 131, 89, 239, 9, 16, 16);
+		else context.blit(RRIdentifiers.guilaptopnuke, 131, 89, 131, 89, 16, 16);
 
 		int mousex = mouseX;
 		int mousey = mouseY;
-		int posx = (width - backgroundWidth) / 2;
-		int posy = (height - backgroundHeight) / 2;
+		int posx = (width - imageWidth) / 2;
+		int posy = (height - imageHeight) / 2;
 		int coordx = posx + 53;
 		int coordy = posy + 194;
 		int widthx = 72;
@@ -64,31 +64,31 @@ public class GuiLaptop extends HandledScreen<ContainerLaptop> {
 		{
 			mousex -= posx;
 			mousey -= posy;
-			context.fillGradient(mousex, mousey, mousex + textRenderer.getWidth("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			context.drawText(textRenderer, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
-			if (!buttondown && client.mouse.wasLeftButtonClicked()) {
-                Util.getOperatingSystem().open("http://rivalrebels.com");
+			context.fillGradient(mousex, mousey, mousex + font.width("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
+			context.drawString(font, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
+			if (!buttondown && minecraft.mouseHandler.isLeftPressed()) {
+                Util.getPlatform().openUri("http://rivalrebels.com");
 			}
 		}
-		buttondown = client.mouse.wasLeftButtonClicked();
+		buttondown = minecraft.mouseHandler.isLeftPressed();
 	}
 
 	boolean	buttondown;
 
     @Override
-    protected void drawBackground(DrawContext context, float delta, int mouseX, int mouseY) {
-        context.setShaderColor(1, 1, 1, 1);
-		int x = (width - backgroundWidth) / 2;
-		int y = (height - backgroundHeight) / 2;
-		context.drawTexture(RRIdentifiers.guilaptopnuke, x, y, 0, 0, backgroundWidth, backgroundHeight);
-		if (handler.hasChips()) context.drawTexture(RRIdentifiers.guilaptopnuke, x + 135, y + 79, 248, 0, 8, 8);
-		context.drawText(textRenderer, Text.translatable("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff, false);
-		context.drawText(textRenderer, Text.translatable("RivalRebels.controller.b2spirit"), x + 25, y + 11, 0xffffff, false);
-		context.drawText(textRenderer, Text.translatable("x" + handler.getB2spirit()), x + 154, y + 96, 0xffffff, false);
-		context.drawText(textRenderer, Text.translatable("x" + handler.getB2carpet()), x + 154, y + 85, 0xffffff, false);
-		if (button.mouseClicked(mouseX, mouseY, 0) && client.mouse.wasLeftButtonClicked() && !prevButtonDown) {
-            handler.onGoButtonPressed();
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+        context.setColor(1, 1, 1, 1);
+		int x = (width - imageWidth) / 2;
+		int y = (height - imageHeight) / 2;
+		context.blit(RRIdentifiers.guilaptopnuke, x, y, 0, 0, imageWidth, imageHeight);
+		if (menu.hasChips()) context.blit(RRIdentifiers.guilaptopnuke, x + 135, y + 79, 248, 0, 8, 8);
+		context.drawString(font, Component.translatable("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff, false);
+		context.drawString(font, Component.translatable("RivalRebels.controller.b2spirit"), x + 25, y + 11, 0xffffff, false);
+		context.drawString(font, Component.translatable("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
+		context.drawString(font, Component.translatable("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
+		if (button.mouseClicked(mouseX, mouseY, 0) && minecraft.mouseHandler.isLeftPressed() && !prevButtonDown) {
+            menu.onGoButtonPressed();
 		}
-		prevButtonDown = client.mouse.wasLeftButtonClicked();
+		prevButtonDown = minecraft.mouseHandler.isLeftPressed();
 	}
 }

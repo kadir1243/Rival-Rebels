@@ -11,41 +11,42 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.math.random.Random;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import org.joml.Quaternionf;
 
 public class RenderLibrary {
 
-	public static void renderModel(MatrixStack matrices, VertexConsumerProvider vertexConsumers, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
-        Random random = MinecraftClient.getInstance().world.random;
-        matrices.push();
+	public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
+        RandomSource random = Minecraft.getInstance().level.random;
+        matrices.pushPose();
 		matrices.translate(x1, y1, z1);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderLayer.getLightning());
-        matrices.multiply(new Quaternionf((float) (Math.atan2(x, z) * 57.295779513 - 90), 0, 1, 0));
-		double dist = Math.sqrt(x * x + z * z);
-		double hdist = dist / 2f;
-		double hdists = hdist * hdist;
-		double rs = radius / steps;
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
+        matrices.mulPose(new Quaternionf((float) (Math.atan2(x, z) * 57.295779513 - 90), 0, 1, 0));
+		float dist = Mth.sqrt(x * x + z * z);
+		float hdist = dist / 2f;
+		float hdists = hdist * hdist;
+		float rs = radius / steps;
 		int segNum = (int) Math.ceil(dist / segDist) + 1;
-		double[] xv = new double[segNum];
-		double[] yv = new double[segNum];
-		double[] zv = new double[segNum];
+		float[] xv = new float[segNum];
+        float[] yv = new float[segNum];
+        float[] zv = new float[segNum];
 
 		for (int i = 1; i < segNum; i++) {
-			double interp = (double) i / (double) segNum;
-			double X = (dist * interp);
-			double Y = (y * interp);
-			double ihdist = (dist * interp) - hdist;
+			float interp = (float) i / (float) segNum;
+			float X = (dist * interp);
+			float Y = (y * interp);
+			float ihdist = (dist * interp) - hdist;
 
 			Y += ((hdists - (ihdist * ihdist)) / hdists) * arcRatio;
 			xv[i] = X;
-			yv[i] = Y + random.nextGaussian() * rvar;
-			zv[i] = random.nextGaussian() * rvar;
+			yv[i] = (float) (Y + random.nextGaussian() * rvar);
+			zv[i] = (float) (random.nextGaussian() * rvar);
 		}
 
 		xv[0] = 0;
@@ -54,29 +55,29 @@ public class RenderLibrary {
 
         for (int o = 0; o < steps; o++) {
 			for (int i = 1; i < segNum; i++) {
-				double s = rs * o;
-				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).color(r, g, b, a).next();
-				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] + s, zv[i] + s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] + s, zv[i] - s).color(r, g, b, a).next();
+                float s = rs * o;
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(r, g, b, a);
 
-				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).color(r, g, b, a).next();
-				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] - s, zv[i] + s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] + s, zv[i] + s).color(r, g, b, a).next();
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(r, g, b, a);
 
-				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).color(r, g, b, a).next();
-				buffer.vertex(xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] + s, zv[i] - s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] - s, zv[i] - s).color(r, g, b, a).next();
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(r, g, b, a);
 
-				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).color(r, g, b, a).next();
-				buffer.vertex(xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] - s, zv[i] - s).color(r, g, b, a).next();
-				buffer.vertex(xv[i], yv[i] - s, zv[i] + s).color(r, g, b, a).next();
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(r, g, b, a);
 			}
 		}
 
-		matrices.pop();
+		matrices.popPose();
 	}
 }

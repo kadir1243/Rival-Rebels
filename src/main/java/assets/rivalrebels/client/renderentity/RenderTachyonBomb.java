@@ -16,39 +16,39 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.WavefrontObject;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityTachyonBomb;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumerProvider;
-import net.minecraft.client.render.entity.EntityRenderer;
-import net.minecraft.client.render.entity.EntityRendererFactory;
-import net.minecraft.client.util.math.MatrixStack;
-import net.minecraft.util.Identifier;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
     public static final WavefrontObject bomb = RenderHelper.getModel("t");
-    private static final RenderLayer RENDER_LAYER = RenderLayer.getEntitySolid(RRIdentifiers.ettachyonbomb);
+    private static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.ettachyonbomb);
 
-    public RenderTachyonBomb(EntityRendererFactory.Context manager) {
+    public RenderTachyonBomb(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
     @Override
-    public void render(EntityTachyonBomb entity, float yaw, float tickDelta, MatrixStack matrices, VertexConsumerProvider vertexConsumers, int light) {
-        matrices.push();
+    public void render(EntityTachyonBomb entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+        matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-        matrices.multiply(new Quaternionf(entity.getYaw() - 90.0f, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
         // GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
-        matrices.multiply(new Quaternionf(entity.getPitch(), 0.0F, 0.0F, 1.0F));
-        bomb.render(vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.DEFAULT_UV);
-        matrices.pop();
+        matrices.mulPose(new Quaternionf(entity.getXRot(), 0.0F, 0.0F, 1.0F));
+        bomb.render(vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        matrices.popPose();
     }
 
     @Override
-    public Identifier getTexture(EntityTachyonBomb entity) {
+    public ResourceLocation getTextureLocation(EntityTachyonBomb entity) {
         return RRIdentifiers.ettachyonbomb;
     }
 }

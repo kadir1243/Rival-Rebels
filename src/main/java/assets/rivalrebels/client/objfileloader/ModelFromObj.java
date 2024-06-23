@@ -13,17 +13,18 @@ package assets.rivalrebels.client.objfileloader;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.render.OverlayTexture;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.resource.Resource;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.world.phys.Vec2;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector4f;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -40,34 +41,35 @@ public class ModelFromObj {
 	}
 
 	public static ModelFromObj readObjFile(String path) {
-        Resource result;
         byte[] bytes;
         try {
-            result = MinecraftClient.getInstance().getResourceManager().getResource(RRIdentifiers.create("models/" + path)).orElseThrow();
-            bytes = result.getInputStream().readAllBytes();
+            Resource result = Minecraft.getInstance().getResourceManager().getResource(RRIdentifiers.create("models/" + path)).orElseThrow();
+            InputStream stream = result.open();
+            bytes = stream.readAllBytes();
+            stream.close();
         } catch (IOException e) {
-            RivalRebels.LOGGER.error("Failed to get model: " + path, e);
+            RivalRebels.LOGGER.error("Failed to get model: {}", path, e);
             return EMPTY;
         } catch (Exception e) {
-            RivalRebels.LOGGER.error("Failed to load model: " + path, e);
+            RivalRebels.LOGGER.error("Failed to load model: {}", path, e);
             return EMPTY;
         }
         List<String> lines = new String(bytes, StandardCharsets.UTF_8).lines().toList();
 		String name = "";
 		List<Triangle> tri = new ArrayList<>();
-		List<Vec3d> v = new ArrayList<>();
-		List<Vec3d> nv = new ArrayList<>();
-		List<Vec2f> tv = new ArrayList<>();
+		List<Vec3> v = new ArrayList<>();
+		List<Vec3> nv = new ArrayList<>();
+		List<Vec2> tv = new ArrayList<>();
         for (String line : lines) {
             if (line.startsWith("vt")) {
                 String[] tex = line.split(" ");
-                tv.add(new Vec2f(Float.parseFloat(tex[1]), 1f - Float.parseFloat(tex[2])));
+                tv.add(new Vec2(Float.parseFloat(tex[1]), 1f - Float.parseFloat(tex[2])));
             } else if (line.startsWith("vn")) {
                 String[] norm = line.split(" ");
-                nv.add(new Vec3d(Float.parseFloat(norm[1]), Float.parseFloat(norm[2]), Float.parseFloat(norm[3])));
+                nv.add(new Vec3(Float.parseFloat(norm[1]), Float.parseFloat(norm[2]), Float.parseFloat(norm[3])));
             } else if (line.startsWith("v")) {
                 String[] vert = line.split(" ");
-                v.add(new Vec3d(Float.parseFloat(vert[1]), Float.parseFloat(vert[2]), Float.parseFloat(vert[3])));
+                v.add(new Vec3(Float.parseFloat(vert[1]), Float.parseFloat(vert[2]), Float.parseFloat(vert[3])));
             } else if (line.startsWith("f")) {
                 String[] coords = line.split(" ");
                 Vertice[] vs = new Vertice[coords.length - 1];
@@ -103,14 +105,7 @@ public class ModelFromObj {
 	public void scale(float x, float y, float z)
 	{
         for (Triangle triangle : pa) {
-            triangle.scale(new Vec3d(x, y, z));
-        }
-	}
-
-    @Deprecated
-	public void render(VertexConsumer buffer) {
-        for (Triangle triangle : pa) {
-            triangle.render(buffer);
+            triangle.scale(new Vec3(x, y, z));
         }
 	}
 
@@ -125,7 +120,7 @@ public class ModelFromObj {
     }
 
     public void render(VertexConsumer buffer, int light) {
-        render(buffer, light, OverlayTexture.DEFAULT_UV);
+        render(buffer, light, OverlayTexture.NO_OVERLAY);
     }
 
 	public void refine() {

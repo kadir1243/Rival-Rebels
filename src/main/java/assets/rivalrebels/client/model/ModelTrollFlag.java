@@ -11,36 +11,37 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
-import net.minecraft.client.render.VertexConsumer;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
 public class ModelTrollFlag
 {
-	public void renderModel(VertexConsumer buffer, int metadata) {
-        double var18 = 0.05;
+	public void renderModel(PoseStack pose, VertexConsumer buffer, int metadata) {
+        float var18 = 0.05F;
 
 		if (metadata == 5) {
-			buffer.vertex(var18, 1, 1).texture(0, 0).next();
-			buffer.vertex(var18, 0, 1).texture(0, 1).next();
-			buffer.vertex(var18, 0, 0).texture(1, 1).next();
-			buffer.vertex(var18, 1, 0).texture(1, 0).next();
+			buffer.addVertex(pose.last(), var18, 1, 1).setUv(0, 0);
+			buffer.addVertex(pose.last(), var18, 0, 1).setUv(0, 1);
+			buffer.addVertex(pose.last(), var18, 0, 0).setUv(1, 1);
+			buffer.addVertex(pose.last(), var18, 1, 0).setUv(1, 0);
 		} else if (metadata == 4) {
-			buffer.vertex(1 - var18, 0, 1).texture(1, 1).next();
-			buffer.vertex(1 - var18, 1, 1).texture(1, 0).next();
-			buffer.vertex(1 - var18, 1, 0).texture(0, 0).next();
-			buffer.vertex(1 - var18, 0, 0).texture(0, 1).next();
+			buffer.addVertex(pose.last(), 1 - var18, 0, 1).setUv(1, 1);
+			buffer.addVertex(pose.last(), 1 - var18, 1, 1).setUv(1, 0);
+			buffer.addVertex(pose.last(), 1 - var18, 1, 0).setUv(0, 0);
+			buffer.addVertex(pose.last(), 1 - var18, 0, 0).setUv(0, 1);
 		} else if (metadata == 3) {
-			buffer.vertex(1, 0, var18).texture(1, 1).next();
-			buffer.vertex(1, 1, var18).texture(1, 0).next();
-			buffer.vertex(0, 1, var18).texture(0, 0).next();
-			buffer.vertex(0, 0, var18).texture(0, 1).next();
+			buffer.addVertex(pose.last(), 1, 0, var18).setUv(1, 1);
+			buffer.addVertex(pose.last(), 1, 1, var18).setUv(1, 0);
+			buffer.addVertex(pose.last(), 0, 1, var18).setUv(0, 0);
+			buffer.addVertex(pose.last(), 0, 0, var18).setUv(0, 1);
 		} else if (metadata == 2) {
-			buffer.vertex(1, 1, 1 - var18).texture(0, 0).next();
-			buffer.vertex(1, 0, 1 - var18).texture(0, 1).next();
-			buffer.vertex(0, 0, 1 - var18).texture(1, 1).next();
-			buffer.vertex(0, 1, 1 - var18).texture(1, 0).next();
+			buffer.addVertex(pose.last(), 1, 1, 1 - var18).setUv(0, 0);
+			buffer.addVertex(pose.last(), 1, 0, 1 - var18).setUv(0, 1);
+			buffer.addVertex(pose.last(), 0, 0, 1 - var18).setUv(1, 1);
+			buffer.addVertex(pose.last(), 0, 1, 1 - var18).setUv(1, 0);
 		}
 	}
 }

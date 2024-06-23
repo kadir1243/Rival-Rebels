@@ -13,24 +13,24 @@ package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
-import net.minecraft.block.Blocks;
-import net.minecraft.world.World;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoTower extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoTower> CODEC = createCodec(BlockAutoTower::new);
+    public static final MapCodec<BlockAutoTower> CODEC = simpleCodec(BlockAutoTower::new);
 
-    public BlockAutoTower(Settings settings)
+    public BlockAutoTower(Properties settings)
 	{
 		super(settings);
 	}
 
     @Override
-    protected MapCodec<BlockAutoTower> getCodec() {
+    protected MapCodec<BlockAutoTower> codec() {
         return CODEC;
     }
 
     @Override
-	public void build(World world, int x, int y, int z)
+	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
 		for (int y1 = 0; y1 <= 16; y1++)

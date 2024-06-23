@@ -12,24 +12,24 @@
 package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.SimpleInventory;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.screen.slot.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
-public class ContainerLoader extends ScreenHandler
+public class ContainerLoader extends AbstractContainerMenu
 {
-	private final Inventory loader;
-	private final Inventory playerInventory;
+	private final Container loader;
+	private final Container playerInventory;
 
-    public ContainerLoader(int syncId, PlayerInventory playerInventory) {
-        this(syncId, playerInventory, new SimpleInventory(64));
+    public ContainerLoader(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, new SimpleContainer(64));
     }
 
-	public ContainerLoader(int syncId, PlayerInventory playerInventory, Inventory loader)
+	public ContainerLoader(int syncId, Inventory playerInventory, Container loader)
 	{
         super(RivalRebelsGuiHandler.LOADER_SCREEN_HANDLER_TYPE, syncId);
         this.loader = loader;
@@ -38,44 +38,44 @@ public class ContainerLoader extends ScreenHandler
 	}
 
 	@Override
-	public boolean canUse(PlayerEntity par1EntityPlayer)
+	public boolean stillValid(Player par1EntityPlayer)
 	{
-		return this.loader.canPlayerUse(par1EntityPlayer);
+		return this.loader.stillValid(par1EntityPlayer);
 	}
 
     public int size() {
-        return this.loader.size();
+        return this.loader.getContainerSize();
     }
 
     @Override
-    public ItemStack quickMove(PlayerEntity player, int slot) {
+    public ItemStack quickMoveStack(Player player, int slot) {
 		ItemStack var3 = ItemStack.EMPTY;
 		Slot var4 = this.slots.get(slot);
 
-		if (var4 != null && var4.hasStack())
+		if (var4 != null && var4.hasItem())
 		{
-			ItemStack var5 = var4.getStack();
+			ItemStack var5 = var4.getItem();
 			var3 = var5.copy();
 
 			if (slot < 60)
 			{
-				if (!this.insertItem(var5, 60, this.slots.size(), true))
+				if (!this.moveItemStackTo(var5, 60, this.slots.size(), true))
 				{
 					return ItemStack.EMPTY;
 				}
 			}
-			else if (!this.insertItem(var5, 0, 60, false))
+			else if (!this.moveItemStackTo(var5, 0, 60, false))
 			{
 				return ItemStack.EMPTY;
 			}
 
 			if (var5.isEmpty())
 			{
-				var4.setStack(ItemStack.EMPTY);
+				var4.setByPlayer(ItemStack.EMPTY);
 			}
 			else
 			{
-				var4.markDirty();
+				var4.setChanged();
 			}
 		}
 

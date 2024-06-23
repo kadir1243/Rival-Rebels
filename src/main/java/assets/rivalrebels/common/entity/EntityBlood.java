@@ -11,44 +11,44 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.minecraft.entity.EntityType;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityBlood extends EntityInanimate
 {
 	private boolean	isGore	= true;
 
-	public EntityBlood(EntityType<? extends EntityBlood> type, World par1World) {
+	public EntityBlood(EntityType<? extends EntityBlood> type, Level par1World) {
 		super(type, par1World);
 	}
 
-    public EntityBlood(World world) {
+    public EntityBlood(Level world) {
         this(RREntities.BLOOD, world);
     }
 
-	public EntityBlood(World par1World, EntityGore bloodEmitter) {
+	public EntityBlood(Level par1World, EntityGore bloodEmitter) {
 		this(par1World);
-		refreshPositionAndAngles(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
-		setPosition(getX(), getY(), getZ());
+		moveTo(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
+		setPos(getX(), getY(), getZ());
 		shoot(0.1f);
 		isGore = true;
 	}
 
-	public EntityBlood(World par1World, double x, double y, double z)
+	public EntityBlood(Level par1World, double x, double y, double z)
 	{
 		this(par1World);
-		refreshPositionAndAngles(x, y, z, 0, 0);
-		setPosition(getX(), getY(), getZ());
+		moveTo(x, y, z, 0, 0);
+		setPos(getX(), getY(), getZ());
 		shoot(0f);
 		isGore = false;
 	}
 
 	public void shoot(float force)
 	{
-		setVelocity(
+		setDeltaMovement(
             random.nextGaussian() * force,
             random.nextGaussian() * force,
             random.nextGaussian() * force);
@@ -59,21 +59,21 @@ public class EntityBlood extends EntityInanimate
 	{
 		super.tick();
 
-		++age;
+		++tickCount;
 
-		if (isInsideWaterOrBubbleColumn() || (age == 20 && isGore)) kill();
+		if (isInWaterOrBubble() || (tickCount == 20 && isGore)) kill();
 
-        Vec3d vec3d = getPos().add(getVelocity());
-        setVelocity(vec3d.getX(), vec3d.getY(), vec3d.getZ());
+        Vec3 vec3d = position().add(getDeltaMovement());
+        setDeltaMovement(vec3d.x(), vec3d.y(), vec3d.z());
 
-        setVelocity(getVelocity().multiply(0.99F));
-        addVelocity(0, -0.03F, 0);
-		setPosition(getX(), getY(), getZ());
+        setDeltaMovement(getDeltaMovement().scale(0.99F));
+        push(0, -0.03F, 0);
+		setPos(getX(), getY(), getZ());
 	}
 
 	@Override
 	@Environment(EnvType.CLIENT)
-	public boolean shouldRender(double distance)
+	public boolean shouldRenderAtSqrDistance(double distance)
 	{
 		return distance < 256;
 	}

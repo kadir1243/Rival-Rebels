@@ -16,89 +16,88 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityGasGrenade;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.effect.StatusEffectInstance;
-import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.sound.SoundCategory;
-import net.minecraft.sound.SoundEvents;
-import net.minecraft.util.Hand;
-import net.minecraft.util.TypedActionResult;
-import net.minecraft.util.UseAction;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.effect.MobEffectInstance;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.level.Level;
 
 public class ItemGasGrenade extends Item
 {
 	public ItemGasGrenade() {
-		super(new Settings().maxCount(6));
+		super(new Properties().stacksTo(6));
 	}
 
     @Override
-	public UseAction getUseAction(ItemStack stack)
+	public UseAnim getUseAnimation(ItemStack stack)
 	{
-		return UseAction.BOW;
+		return UseAnim.BOW;
 	}
 
     @Override
-	public int getMaxUseTime(ItemStack stack)
-	{
+    public int getUseDuration(ItemStack itemStack, LivingEntity livingEntity) {
 		return 75;
 	}
 
     @Override
-    public void onStoppedUsing(ItemStack stack, World world, LivingEntity user, int remainingUseTicks) {
-        if (!(user instanceof PlayerEntity player)) return;
+    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+        if (!(user instanceof Player player)) return;
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.gasgrenade);
         if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteGrenades)
 		{
-			float f = (getMaxUseTime(stack) - remainingUseTicks) / 20.0F;
+			float f = (getUseDuration(stack, player) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
 			EntityGasGrenade entitysuperarrow = new EntityGasGrenade(world, player, 0.3f + f * 0.5f);
 			if (!player.getAbilities().invulnerable)
 			{
-                itemStack.decrement(1);
+                itemStack.shrink(1);
                 if (itemStack.isEmpty())
-                    player.getInventory().removeOne(itemStack);
+                    player.getInventory().removeItem(itemStack);
 			}
 			RivalRebelsSoundPlayer.playSound(player, 4, 3, 1, 0.9f);
-			if (!world.isClient)
+			if (!world.isClientSide)
 			{
-				world.spawnEntity(entitysuperarrow);
-				entitysuperarrow.setPosition(entitysuperarrow.getX(), entitysuperarrow.getY() - 0.05, entitysuperarrow.getZ());
+				world.addFreshEntity(entitysuperarrow);
+				entitysuperarrow.setPos(entitysuperarrow.getX(), entitysuperarrow.getY() - 0.05, entitysuperarrow.getZ());
 			}
 		}
 	}
 
     @Override
-    public TypedActionResult<ItemStack> use(World world, PlayerEntity user, Hand hand) {
-		user.setCurrentHand(hand);
-		world.playSound(user, user.getX(), user.getY(), user.getZ(), SoundEvents.ENTITY_SLIME_ATTACK, SoundCategory.PLAYERS, 1.0F, 1.0F);
+    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+		user.startUsingItem(hand);
+		world.playSound(user, user.getX(), user.getY(), user.getZ(), SoundEvents.SLIME_ATTACK, SoundSource.PLAYERS, 1.0F, 1.0F);
 		return super.use(world, user, hand);
 	}
 
     @Override
-    public void usageTick(World world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
+    public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
 		int time = 75 - remainingUseTicks;
 		if (time == 15 || time == 30 || time == 45 || time == 60)
 		{
-			world.playSound(user.getX(), user.getY(), user.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_SNARE.value(), SoundCategory.PLAYERS, 1.0F, 1.0F, true);
+			world.playLocalSound(user.getX(), user.getY(), user.getZ(), SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.PLAYERS, 1.0F, 1.0F, true);
 		}
 		if (time == 75)
 		{
-			world.playSound(user.getX(), user.getY(), user.getZ(), SoundEvents.BLOCK_NOTE_BLOCK_SNARE.value(), SoundCategory.PLAYERS, 1.0F, 1.0F, true);
-			user.addStatusEffect(new StatusEffectInstance(StatusEffects.POISON, 80, 1));
-			user.addStatusEffect(new StatusEffectInstance(StatusEffects.NAUSEA, 200, 0));
-			user.addStatusEffect(new StatusEffectInstance(StatusEffects.BLINDNESS, 80, 0));
-			user.addStatusEffect(new StatusEffectInstance(StatusEffects.SLOWNESS, 80, 0));
-			if (user instanceof PlayerEntity player && !player.getAbilities().invulnerable) {
+			world.playLocalSound(user.getX(), user.getY(), user.getZ(), SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.PLAYERS, 1.0F, 1.0F, true);
+			user.addEffect(new MobEffectInstance(MobEffects.POISON, 80, 1));
+			user.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
+			user.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 0));
+			user.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
+			if (user instanceof Player player && !player.getAbilities().invulnerable) {
                 ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.gasgrenade);
-                itemStack.decrement(1);
+                itemStack.shrink(1);
                 if (itemStack.isEmpty())
-                    player.getInventory().removeOne(itemStack);
+                    player.getInventory().removeItem(itemStack);
 			}
 		}
 	}
