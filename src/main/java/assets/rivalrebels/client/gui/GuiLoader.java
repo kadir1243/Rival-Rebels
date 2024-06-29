@@ -14,14 +14,13 @@ package assets.rivalrebels.client.gui;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerLoader;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
@@ -43,32 +42,10 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         PoseStack matrices = context.pose();
         matrices.pushPose();
-		matrices.mulPose(new Quaternionf(-13, 0, 0, 1));
+		matrices.mulPose(Axis.ZP.rotationDegrees(-13));
 		context.drawString(font, "Loader", 165, 237, 0x444444, false);
 		matrices.popPose();
-		int mousex = mouseX;
-		int mousey = mouseY;
-		int posx = (width - imageWidth) / 2;
-		int posy = (height - imageHeight) / 2;
-		int coordx = posx + 92;
-		int coordy = posy + 202;
-		int widthx = 72;
-		int widthy = 8;
-		if (mousex > coordx && mousey > coordy && mousex < coordx + widthx && mousey < coordy + widthy)
-		{
-			mousex -= posx;
-			mousey -= posy;
-			context.fillGradient(mousex, mousey, mousex + font.width("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			context.drawString(font, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
-			if (!buttondown && minecraft.mouseHandler.isLeftPressed())
-			{
-                Util.getPlatform().openUri("http://rivalrebels.com");
-            }
-		}
-		buttondown = minecraft.mouseHandler.isLeftPressed();
 	}
-
-	boolean	buttondown;
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {

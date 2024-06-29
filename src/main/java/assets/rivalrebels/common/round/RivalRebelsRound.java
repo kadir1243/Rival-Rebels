@@ -162,10 +162,6 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         return packet;
     }
 
-    public void write(FriendlyByteBuf buf) {
-        toBytes(this, buf);
-    }
-
     public static void toBytes(RivalRebelsRound packet, FriendlyByteBuf buf) {
         buf.writeBoolean(packet.roundstarted);
 		buf.writeInt(packet.cSpawnx);

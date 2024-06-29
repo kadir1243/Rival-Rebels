@@ -16,8 +16,8 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import org.joml.Vector3f;
-import org.joml.Quaternionf;
 
 public class ModelNukeCloud
 {
@@ -37,14 +37,14 @@ public class ModelNukeCloud
 		for (float i = 0; i < segments; i++)
 		{
 			matrices.pushPose();
-			matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
+			matrices.mulPose(Axis.YP.rotationDegrees(add * i));
 			for (int f = 1; f < topx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / topx.length) * f);
 				TextureVertice t2 = new TextureVertice((1f / segments) * (i - 1), (1f / topx.length) * (f - 1));
 				TextureVertice t3 = new TextureVertice((1f / segments) * i, (1f / topx.length) * (f - 1));
 				TextureVertice t4 = new TextureVertice((1f / segments) * i, (1f / topx.length) * f);
-				RenderHelper.addFace(buffer, new Vector3f(0f, topy[f], topx[f]),
+				RenderHelper.addFace(matrices, buffer, new Vector3f(0f, topy[f], topx[f]),
 						new Vector3f(0f, topy[f - 1], topx[f - 1]),
 						new Vector3f(topx[f - 1] * sin, topy[f - 1], topx[f - 1] * cos),
 						new Vector3f(topx[f] * sin, topy[f], topx[f] * cos), t1, t2, t3, t4, light, overlay);
@@ -58,14 +58,14 @@ public class ModelNukeCloud
 		for (float i = 0; i < segments; i++)
 		{
 			matrices.pushPose();
-			matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
+			matrices.mulPose(Axis.YP.rotationDegrees(add * i));
 			for (int f = 1; f < bottomx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / bottomx.length) * f);
 				TextureVertice t2 = new TextureVertice((1f / segments) * (i - 1), (1f / bottomx.length) * (f - 1));
 				TextureVertice t3 = new TextureVertice((1f / segments) * i, (1f / bottomx.length) * (f - 1));
 				TextureVertice t4 = new TextureVertice((1f / segments) * i, (1f / bottomx.length) * f);
-				RenderHelper.addFace(buffer, new Vector3f(0f, bottomy[f], bottomx[f]),
+				RenderHelper.addFace(matrices, buffer, new Vector3f(0f, bottomy[f], bottomx[f]),
 						new Vector3f(0f, bottomy[f - 1], bottomx[f - 1]),
 						new Vector3f(bottomx[f - 1] * sin, bottomy[f - 1], bottomx[f - 1] * cos),
 						new Vector3f(bottomx[f] * sin, bottomy[f], bottomx[f] * cos), t1, t2, t3, t4, light, overlay);

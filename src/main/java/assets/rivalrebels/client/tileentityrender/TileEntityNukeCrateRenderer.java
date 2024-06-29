@@ -18,15 +18,14 @@ import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
 
 public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEntityNukeCrate> {
     public static final Material NUKE_CRATE_TOP_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btnuketop);
@@ -42,11 +41,11 @@ public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEnti
         matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
         Direction metadata = entity.getBlockState().getValue(BlockNukeCrate.DIRECTION);
         switch (metadata) {
-            case DOWN -> matrices.mulPose(new Quaternionf(180, 1, 0, 0));
-            case NORTH -> matrices.mulPose(new Quaternionf(-90, 1, 0, 0));
-            case SOUTH -> matrices.mulPose(new Quaternionf(90, 1, 0, 0));
-            case WEST -> matrices.mulPose(new Quaternionf(90, 0, 0, 1));
-            case EAST -> matrices.mulPose(new Quaternionf(-90, 0, 0, 1));
+            case DOWN -> matrices.mulPose(Axis.XP.rotationDegrees(180));
+            case NORTH -> matrices.mulPose(Axis.XP.rotationDegrees(-90));
+            case SOUTH -> matrices.mulPose(Axis.XP.rotationDegrees(90));
+            case WEST -> matrices.mulPose(Axis.ZP.rotationDegrees(90));
+            case EAST -> matrices.mulPose(Axis.ZP.rotationDegrees(-90));
         }
         VertexConsumer buffer;
         if (entity.getBlockState().is(RRBlocks.nukeCrateBottom))

@@ -14,15 +14,14 @@ package assets.rivalrebels.client.itemrenders;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelDisk;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Quaternionf;
 
 public class RodDiskRenderer implements DynamicItemRenderer {
     public static final Material DISK_0_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etdisk0);
@@ -30,8 +29,8 @@ public class RodDiskRenderer implements DynamicItemRenderer {
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(0.5f, 0.25f, 0f);
-		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
-		matrices.mulPose(new Quaternionf(-25, 1.0F, 0.0F, 0.0F));
+		matrices.mulPose(Axis.ZP.rotationDegrees(35));
+		matrices.mulPose(Axis.XP.rotationDegrees(-25));
 		matrices.scale(0.5f, 0.5f, 0.5f);
 		matrices.pushPose();
 

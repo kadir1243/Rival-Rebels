@@ -20,6 +20,7 @@ import assets.rivalrebels.common.block.machine.BlockReactor;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,7 +31,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntityReactor>, CustomRenderBoxExtension<TileEntityReactor> {
@@ -56,17 +56,17 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
         };
         matrices.pushPose();
 		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1.1875F, (float) entity.getBlockPos().getZ() + 0.5F);
-		matrices.mulPose(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(var11));
 		ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
 		ModelLaptop.renderScreen(SCREEN_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
 		matrices.popPose();
 		matrices.pushPose();
 		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
-		matrices.mulPose(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(var11));
 		mr.renderModel(matrices, REACTOR_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.translate(0, 2, -0.125f);
 		matrices.scale(0.2f, 0.2f, 0.2f);
-		mo.render(ELECTRODE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		mo.render(matrices, ELECTRODE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.popPose();
 		for (int i = 0; i < entity.machines.size(); i++) {
 			TileEntityMachineBase temb = entity.machines.get(i);

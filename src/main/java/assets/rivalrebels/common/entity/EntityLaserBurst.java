@@ -80,11 +80,12 @@ public class EntityLaserBurst extends EntityInanimate {
 	{
 		this(par1World);
 		shooter = player;
-		moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
-            getY() - 0.12D,
-            getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.2F));
-		setPos(getX(), getY(), getZ());
+		moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+            player.getY() + player.getEyeHeight(player.getPose()) - 0.12D,
+            player.getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+            player.getYRot(),
+            player.getXRot());
+
         setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
             (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
             (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));

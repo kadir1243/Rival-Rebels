@@ -17,18 +17,17 @@ import assets.rivalrebels.client.renderentity.RenderNuke;
 import assets.rivalrebels.common.block.trap.BlockNuclearBomb;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityNuclearBombRenderer implements BlockEntityRenderer<TileEntityNuclearBomb>, CustomRenderBoxExtension<TileEntityNuclearBomb> {
@@ -40,17 +39,17 @@ public class TileEntityNuclearBombRenderer implements BlockEntityRenderer<TileEn
     public void render(TileEntityNuclearBomb entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
-		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
+		matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
 		int metadata = entity.getBlockState().getValue(BlockNuclearBomb.META);
         switch (metadata) {
-            case 0 -> matrices.mulPose(new Quaternionf(90, 1, 0, 0));
-            case 1 -> matrices.mulPose(new Quaternionf(-90, 1, 0, 0));
-            case 2 -> matrices.mulPose(new Quaternionf(180, 0, 1, 0));
-            case 3 -> matrices.mulPose(new Quaternionf(0, 0, 1, 0));
-            case 4 -> matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
-            case 5 -> matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+            case 0 -> matrices.mulPose(Axis.XP.rotationDegrees(90));
+            case 1 -> matrices.mulPose(Axis.XP.rotationDegrees(-90));
+            case 2 -> matrices.mulPose(Axis.YP.rotationDegrees(180));
+            case 3 -> matrices.mulPose(Axis.YP.rotationDegrees(0));
+            case 4 -> matrices.mulPose(Axis.YP.rotationDegrees(-90));
+            case 5 -> matrices.mulPose(Axis.YP.rotationDegrees(90));
         }
-		RenderNuke.model.render(TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		RenderNuke.model.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.popPose();
 	}
 

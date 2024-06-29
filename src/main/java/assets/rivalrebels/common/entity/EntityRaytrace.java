@@ -68,23 +68,26 @@ public class EntityRaytrace extends EntityInanimate
 		c = chance;
 		range = distance;
 		shootingEntity = player;
-		moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
-		setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
+		moveTo(player.getX(),
+            player.getY() + player.getEyeHeight(player.getPose()),
+            player.getZ(),
+            player.getYRot(),
+            player.getXRot()
+        );
+
+        setDeltaMovement(
+            (-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
             (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
             (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
 
-        if (shift)
-		{
+        if (shift) {
             setPosRaw(
                 getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F),
                 getY(),
                 getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F)
             );
             setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		}
-		else
-		{
+		} else {
             setPosRaw(
                 getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.3F),
                 getY() - 0.05f,

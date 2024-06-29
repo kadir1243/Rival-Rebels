@@ -13,15 +13,16 @@ package assets.rivalrebels.client.objfileloader;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector4f;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -109,18 +110,18 @@ public class ModelFromObj {
         }
 	}
 
-    public void render(VertexConsumer buffer, int light, int overlay) {
-        render(buffer, new Vector4f(1, 1, 1, 1), light, overlay);
+    public void render(PoseStack pose, VertexConsumer buffer, int light, int overlay) {
+        render(pose, buffer, CommonColors.WHITE, light, overlay);
     }
 
-    public void render(VertexConsumer buffer, Vector4f color, int light, int overlay) {
+    public void render(PoseStack pose, VertexConsumer buffer, int color, int light, int overlay) {
         for (Triangle triangle : pa) {
-            triangle.render(buffer, color, light, overlay);
+            triangle.render(pose, buffer, color, light, overlay);
         }
     }
 
-    public void render(VertexConsumer buffer, int light) {
-        render(buffer, light, OverlayTexture.NO_OVERLAY);
+    public void render(PoseStack pose, VertexConsumer buffer, int light) {
+        render(pose, buffer, light, OverlayTexture.NO_OVERLAY);
     }
 
 	public void refine() {

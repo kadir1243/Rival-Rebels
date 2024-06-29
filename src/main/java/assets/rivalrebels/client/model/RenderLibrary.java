@@ -13,12 +13,12 @@ package assets.rivalrebels.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import org.joml.Quaternionf;
 
 public class RenderLibrary {
 
@@ -27,7 +27,7 @@ public class RenderLibrary {
         matrices.pushPose();
 		matrices.translate(x1, y1, z1);
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
-        matrices.mulPose(new Quaternionf((float) (Math.atan2(x, z) * 57.295779513 - 90), 0, 1, 0));
+        matrices.mulPose(Axis.YP.rotationDegrees((float) (Math.atan2(x, z) * 57.295779513 - 90)));
 		float dist = Mth.sqrt(x * x + z * z);
 		float hdist = dist / 2f;
 		float hdists = hdist * hdist;

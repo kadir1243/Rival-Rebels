@@ -13,11 +13,12 @@ package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import org.joml.Quaternionf;
+import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
 public class GuiFTKnob extends GuiButton
@@ -25,7 +26,7 @@ public class GuiFTKnob extends GuiButton
 	protected int		mode;
 	protected boolean	pressed;
 
-	public GuiFTKnob(int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, String par6Str) {
+	public GuiFTKnob(int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, Component par6Str) {
 		super(x, y, 36, 36, par6Str);
 		mode = startDegree;
 	}
@@ -41,7 +42,7 @@ public class GuiFTKnob extends GuiButton
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
 		matrices.pushPose();
 		matrices.translate(this.getX() + (width / 2f), this.getY() + (height / 2f), 0);
-		matrices.mulPose(new Quaternionf(mode * 90 - 90, 0, 0, 1));
+		matrices.mulPose(Axis.ZP.rotationDegrees(mode * 90 - 90));
 		matrices.translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)), 0);
 		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
 		matrices.popPose();

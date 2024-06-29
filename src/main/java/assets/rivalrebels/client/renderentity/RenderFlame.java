@@ -21,11 +21,11 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
 
 public class RenderFlame extends EntityRenderer<EntityFlameBall> {
     private static final Material FLAMEBALL_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etflameball);
@@ -43,14 +43,14 @@ public class RenderFlame extends EntityRenderer<EntityFlameBall> {
 		float size = 0.0500f * entity.tickCount;
 		size *= size;
         VertexConsumer buffer = FLAMEBALL_TEXTURE.buffer(vertexConsumers, RenderType::entityTranslucentEmissive);
-		matrices.mulPose(new Quaternionf(180 - Minecraft.getInstance().player.getYRot(), 0.0F, 1.0F, 0.0F));
-		matrices.mulPose(new Quaternionf(90 - Minecraft.getInstance().player.getXRot(), 1.0F, 0.0F, 0.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(180 - Minecraft.getInstance().player.getYRot()));
+		matrices.mulPose(Axis.XP.rotationDegrees(90 - Minecraft.getInstance().player.getXRot()));
 		matrices.pushPose();
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		buffer.addVertex(matrices.last(), -size, 0, -size).setColor(1f, 1f, 1f, 1f).setUv(X, Y).setLight(light).setNormal(0, 1, 0);
-		buffer.addVertex(matrices.last(), size, 0, -size).setColor(1f, 1f, 1f, 1f).setUv(X + 0.25f, Y).setLight(light).setNormal(0, 1, 0);
-		buffer.addVertex(matrices.last(), size, 0, size).setColor(1f, 1f, 1f, 1f).setUv(X + 0.25f, Y + 0.25f).setLight(light).setNormal(0, 1, 0);
-		buffer.addVertex(matrices.last(), -size, 0, size).setColor(1f, 1f, 1f, 1f).setUv(X, Y + 0.25f).setLight(light).setNormal(0, 1, 0);
+		buffer.addVertex(matrices.last(), -size, 0, -size).setColor(CommonColors.WHITE).setUv(X, Y).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+		buffer.addVertex(matrices.last(), size, 0, -size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+		buffer.addVertex(matrices.last(), size, 0, size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y + 0.25f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+		buffer.addVertex(matrices.last(), -size, 0, size).setColor(CommonColors.WHITE).setUv(X, Y + 0.25f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
 		matrices.popPose();
 		matrices.popPose();
 

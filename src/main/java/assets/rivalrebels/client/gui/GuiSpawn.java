@@ -24,7 +24,6 @@ import assets.rivalrebels.mixin.client.DrawContextAccessor;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
@@ -46,7 +45,6 @@ public class GuiSpawn extends Screen
 	private GuiScroll	sigmaScroll;
 	private GuiScroll	playerScroll;
 	private GuiScroll	gameScroll;
-	private boolean		prevClick		= true;
 	private final RivalRebelsClass rrclass;
 
 	public GuiSpawn(RivalRebelsClass rrc)
@@ -64,15 +62,24 @@ public class GuiSpawn extends Screen
 		posY = (this.height - ySizeOfTexture) / 2;
         this.clearWidgets();
 
-		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, Component.translatable("RivalRebels.spawn.class"));
-		resetButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.spawn.reset"));
-		omegaButton = new GuiButton(posX + 35, posY + 237, 60, 11, Component.translatable("RivalRebels.spawn.joinomega"));
-		sigmaButton = new GuiButton(posX + 160, posY + 237, 60, 11, Component.translatable("RivalRebels.spawn.joinsigma"));
+		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, Component.translatable("RivalRebels.spawn.class"), button -> this.minecraft.setScreen(new GuiClass(rrclass)));
+		resetButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.spawn.reset"), button -> {
+            this.minecraft.setScreen(new GuiClass(rrclass));
+            ClientPlayNetworking.send(ResetPacket.INSTANCE);
+        });
+		omegaButton = new GuiButton(posX + 35, posY + 237, 60, 11, Component.translatable("RivalRebels.spawn.joinomega"), button -> {
+            ClientPlayNetworking.send(new JoinTeamPacket(rrclass, RivalRebelsTeam.OMEGA));
+            onClose();
+        });
+		sigmaButton = new GuiButton(posX + 160, posY + 237, 60, 11, Component.translatable("RivalRebels.spawn.joinsigma"), button -> {
+            ClientPlayNetworking.send(new JoinTeamPacket(rrclass, RivalRebelsTeam.SIGMA));
+            onClose();
+        });
 		omegaScroll = new GuiScroll(posX + 118, posY + 140, 80);
 		sigmaScroll = new GuiScroll(posX + 243, posY + 140, 80);
 		playerScroll = new GuiScroll(posX + 154, posY + 103, 16);
 		gameScroll = new GuiScroll(posX + 243, posY + 66, 16);
-		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getInstance().player.getGameProfile());
+		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(minecraft.player.getGameProfile());
 		resetButton.active = nw.resets > 0 && !nw.isreset;
 		omegaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
 		sigmaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
@@ -95,7 +102,7 @@ public class GuiSpawn extends Screen
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         PoseStack matrices = context.pose();
-        RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getInstance().player.getGameProfile());
+        RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(minecraft.player.getGameProfile());
 		classButton.active = nw.isreset;
 		omegaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
 		sigmaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
@@ -151,28 +158,7 @@ public class GuiSpawn extends Screen
             MultiLineLabel.create(font, Component.translatable("RivalRebels.spawn.resetwarning"), (int) (116 / scalefactor)).renderLeftAlignedNoShadow(context, (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), font.lineHeight, 0xFF0000);
 			matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 		}
-
-		if (minecraft.mouseHandler.isLeftPressed() && !prevClick)
-		{
-			if (classButton.mouseClicked(mouseX, mouseY, 0)) this.minecraft.setScreen(new GuiClass(rrclass));
-			if (resetButton.mouseClicked(mouseX, mouseY, 0))
-			{
-				this.minecraft.setScreen(new GuiClass(rrclass));
-                ClientPlayNetworking.send(ResetPacket.INSTANCE);
-			}
-			if (omegaButton.mouseClicked(mouseX, mouseY, 0))
-			{
-                ClientPlayNetworking.send(new JoinTeamPacket(rrclass, RivalRebelsTeam.OMEGA));
-				this.minecraft.setScreen(null);
-			}
-			if (sigmaButton.mouseClicked(mouseX, mouseY, 0))
-			{
-                ClientPlayNetworking.send(new JoinTeamPacket(rrclass, RivalRebelsTeam.SIGMA));
-				this.minecraft.setScreen(null);
-			}
-		}
-		prevClick = minecraft.mouseHandler.isLeftPressed();
-	}
+    }
 
 	protected void drawPanel(GuiGraphics context, int x, int y, int height, int scroll, int scrolllimit, RivalRebelsTeam team)
 	{

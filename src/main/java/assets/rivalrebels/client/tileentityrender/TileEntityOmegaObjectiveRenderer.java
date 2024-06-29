@@ -16,6 +16,7 @@ import assets.rivalrebels.client.model.ModelObjective;
 import assets.rivalrebels.common.tileentity.TileEntityOmegaObjective;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,7 +27,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityOmegaObjectiveRenderer implements BlockEntityRenderer<TileEntityOmegaObjective>, CustomRenderBoxExtension<TileEntityOmegaObjective> {
@@ -40,21 +40,21 @@ public class TileEntityOmegaObjectiveRenderer implements BlockEntityRenderer<Til
 		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
 
         VertexConsumer buffer = ETOMEGA.buffer(vertexConsumers, RenderType::entitySolid);
-        matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+        matrices.mulPose(Axis.XP.rotationDegrees(90));
 		ModelObjective.renderA(matrices, buffer, light, overlay);
-		matrices.mulPose(new Quaternionf(-90, 1, 0, 0));
-		matrices.mulPose(new Quaternionf(90, 0, 0, 1));
+		matrices.mulPose(Axis.XP.rotationDegrees(-90));
+		matrices.mulPose(Axis.ZP.rotationDegrees(90));
 		ModelObjective.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 44f / 128f, 0.125f, 0.84375f, light, overlay);
-		matrices.mulPose(new Quaternionf(-90, 0, 0, 1));
+		matrices.mulPose(Axis.ZP.rotationDegrees(-90));
 		ModelObjective.renderB(matrices, buffer, (float) entity.slide, 32f / 256f, 44f / 128f, 0.625f, 0.84375f, light, overlay);
-		matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		ModelObjective.renderB(matrices, buffer, (float) entity.slide, 96f / 256f, 108f / 128f, 0.625f, 0.84375f, light, overlay);
-		matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		ModelObjective.renderB(matrices, buffer, (float) entity.slide, 160f / 256f, 44f / 128f, 0.625f, 0.84375f, light, overlay);
-		matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		ModelObjective.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 108f / 128f, 0.625f, 0.84375f, light, overlay);
-		matrices.mulPose(new Quaternionf(90, 0, 1, 0));
-		matrices.mulPose(new Quaternionf(-90, 0, 0, 1));
+		matrices.mulPose(Axis.YP.rotationDegrees(90));
+		matrices.mulPose(Axis.ZP.rotationDegrees(-90));
 		ModelObjective.renderB(matrices, buffer, (float) entity.slide, 224f / 256f, 44f / 128f, 0.625f, 0.84375f, light, overlay);
 		matrices.popPose();
 	}

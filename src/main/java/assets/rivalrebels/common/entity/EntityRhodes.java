@@ -30,7 +30,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -64,7 +63,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.entity.vehicle.Minecart;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
@@ -680,7 +678,7 @@ public class EntityRhodes extends Entity {
                     ((EntityTachyonBomb) e).ticksInAir = -100;
                     this.hurt(level().damageSources().generic(), 100);
                 } else if (e instanceof EntityHotPotato) {
-                    ((EntityHotPotato) e).tickCount = -100;
+                    e.tickCount = -100;
                     this.hurt(level().damageSources().generic(), 100);
                 } else if (e instanceof EntityB83NoShroom) {
                     ((EntityB83NoShroom) e).ticksInAir = -100;

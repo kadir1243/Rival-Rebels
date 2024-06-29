@@ -447,8 +447,7 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
 		on = !on;
 	}
 
-	public void ejectCore()
-	{
+	public void ejectCore() {
 		eject = true;
 	}
 

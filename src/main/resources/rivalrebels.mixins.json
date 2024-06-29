@@ -3,7 +3,6 @@
   "package": "assets.rivalrebels.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "MappedRegistryMixin",
     "datagen.BlockLootTableGeneratorMixin"
   ],
   "injectors": {

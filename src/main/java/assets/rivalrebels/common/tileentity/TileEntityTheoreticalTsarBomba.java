@@ -21,22 +21,25 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.ChipData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -45,7 +48,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Container, Tickable, MenuProvider
+import java.util.ArrayList;
+import java.util.List;
+
+public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Container, Tickable, MenuProvider, ExtendedScreenHandlerFactory<TileEntityTheoreticalTsarBomba.TheoreticalTsarData>
 {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
@@ -77,22 +83,22 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
 
 	@Override
 	public ItemStack removeItem(int index, int count) {
-		if (!this.chestContents.get(index).isEmpty())
+		if (!this.getItem(index).isEmpty())
 		{
 			ItemStack var3;
 
-			if (this.chestContents.get(index).getCount() <= count)
+			if (this.getItem(index).getCount() <= count)
 			{
-				var3 = this.chestContents.get(index);
-				this.chestContents.set(index, ItemStack.EMPTY);
+				var3 = this.getItem(index);
+				this.setItem(index, ItemStack.EMPTY);
             }
 			else
 			{
-				var3 = this.chestContents.get(index).split(count);
+				var3 = this.getItem(index).split(count);
 
-				if (this.chestContents.get(index).isEmpty())
+				if (this.getItem(index).isEmpty())
 				{
-					this.chestContents.set(index, ItemStack.EMPTY);
+					this.setItem(index, ItemStack.EMPTY);
 				}
 
             }
@@ -103,28 +109,23 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-		if (!this.chestContents.get(index).isEmpty())
+		if (!this.getItem(index).isEmpty())
 		{
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
+			ItemStack var2 = this.getItem(index);
+			this.setItem(index, ItemStack.EMPTY);
 			return var2;
 		}
-		else
-		{
-			return ItemStack.EMPTY;
-		}
-	}
+        return ItemStack.EMPTY;
+    }
 
 	@Override
-	public void setItem(int index, ItemStack stack)
-	{
+	public void setItem(int index, ItemStack stack) {
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
 			stack.setCount(this.getMaxStackSize());
 		}
-
+        setChanged();
 	}
 
     @Override
@@ -147,64 +148,50 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
 	}
 
     @Override
-	public boolean stillValid(@NotNull Player par1EntityPlayer)
+	public boolean stillValid(@NotNull Player player)
 	{
-		return this.level.getBlockEntity(this.getBlockPos()) == this && par1EntityPlayer.distanceToSqr(this.getBlockPos().getX() + 0.5D, this.getBlockPos().getY() + 0.5D, this.getBlockPos().getZ() + 0.5D) <= 64.0D;
+        return Container.stillValidBlockEntity(this, player, 64);
 	}
 
+    public List<ItemStack> getRods() {
+        List<ItemStack> stacks = new ArrayList<>();
+        for (int i = 3; i <= 18; i++) {
+            stacks.add(getItem(i));
+        }
+        return stacks;
+    }
+
     @Override
-	public void tick()
-	{
-		nuclear = 0;
-		for (int i = 3; i <= 18; i++)
-		{
-			if (!getItem(i).isEmpty())
-			{
-				Item item = getItem(i).getItem();
-				if (item == RRItems.nuclearelement)
-				{
-					nuclear++;
-				}
-				if (item == RRItems.trollmask)
-				{
-					hasTrollface = true;
-				}
-			}
-		}
-		megaton = nuclear * 6.25f;
+    public void setChanged() {
+        super.setChanged();
 
-		if (!getItem(0).isEmpty())
-		{
-			hasFuse = getItem(0).getItem() == RRItems.fuse;
-		}
-		else
-		{
-			hasFuse = false;
-		}
+        hasTrollface = false;
+        nuclear = 0;
+        for (ItemStack rod : getRods()) {
+            if (rod.is(RRItems.nuclearelement)) {
+                nuclear++;
+            }
+            hasTrollface |= rod.is(RRItems.trollmask);
+        }
 
-		if (!getItem(20).isEmpty()) {
-			hasChip = getItem(20).is(RRItems.chip);
-			if (hasChip && getItem(20).has(RRComponents.CHIP_DATA)) {
-                ChipData chipData = getItem(20).get(RRComponents.CHIP_DATA);
-                rrteam = chipData.team();
-				username = chipData.username();
-			}
-		} else {
-			hasChip = false;
-		}
+        megaton = nuclear * 6.25f;
 
-		if (!getItem(1).isEmpty() && !getItem(2).isEmpty()) {
-			hasAntennae = getItem(1).getItem() == RRItems.antenna && getItem(2).getItem() == RRItems.antenna;
-		} else {
-			hasAntennae = false;
-		}
+        hasFuse = getItem(0).is(RRItems.fuse);
 
-		if (!getItem(19).isEmpty()) {
-			hasExplosive = true;// getStack(19).func_150998_b(RivalRebels.timedbomb);
-		} else {
-			hasExplosive = false;
-		}
+        hasChip = getItem(20).is(RRItems.chip);
+        if (hasChip && getItem(20).has(RRComponents.CHIP_DATA)) {
+            ChipData chipData = getItem(20).get(RRComponents.CHIP_DATA);
+            rrteam = chipData.team();
+            username = chipData.username();
+        }
 
+        hasAntennae = getItem(1).is(RRItems.antenna) && getItem(2).is(RRItems.antenna);
+
+        hasExplosive = !getItem(19).is(RRBlocks.timedbomb.asItem());
+    }
+
+    @Override
+	public void tick() {
 		boolean sp;
         if (level.isClientSide) {
             sp = Minecraft.getInstance().isLocalServer();
@@ -234,7 +221,7 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
 			}
 			else if (!level.isClientSide)
 			{
-				this.chestContents.set(0, ItemStack.EMPTY);
+				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
                     player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
@@ -249,9 +236,9 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
 
 		if (countdown == 200 && !level.isClientSide && RivalRebels.nuclearBombCountdown > 10)
 		{
-            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
-            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
-            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
+            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_1");
+            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_2");
+            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_3");
             for (Player player : level.players()) {
                 player.displayClientMessage(line1, false);
                 player.displayClientMessage(line2, false);
@@ -297,40 +284,26 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
     }
 
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerTheoreticalTsar(syncId, inv, this, propertyDelegate);
+        return new ContainerTheoreticalTsar(syncId, inv, this, getScreenOpeningData(null));
     }
 
-    private final ContainerData propertyDelegate = new ContainerData() {
-        @Override
-        public int get(int index) {
-            return switch (index) {
-                case 0 -> countdown;
-                case 1 -> hasTrollface ? 1 : 0;
-                case 2 -> hasExplosive && hasFuse ? 1 : 0;
-                default -> 0;
-            };
-        }
+    @Override
+    public TheoreticalTsarData getScreenOpeningData(ServerPlayer player) {
+        return new TheoreticalTsarData(countdown, megaton, hasExplosive && hasFuse);
+    }
 
-        @Override
-        public void set(int index, int value) {
-
-        }
-
-        @Override
-        public int getCount() {
-            return 3;
-        }
-    };
-
+    public record TheoreticalTsarData(int countdown, float megaton, boolean isArmed) {
+        public static final StreamCodec<FriendlyByteBuf, TheoreticalTsarData> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT, TheoreticalTsarData::countdown,
+            ByteBufCodecs.FLOAT, TheoreticalTsarData::megaton,
+            ByteBufCodecs.BOOL, TheoreticalTsarData::isArmed,
+            TheoreticalTsarData::new
+        );
+    }
 }

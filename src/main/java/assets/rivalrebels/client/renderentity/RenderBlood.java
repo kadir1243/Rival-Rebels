@@ -15,14 +15,14 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityBlood;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
-import org.joml.Quaternionf;
+import net.minecraft.util.CommonColors;
 
 public class RenderBlood extends EntityRenderer<EntityBlood>
 {
@@ -38,12 +38,12 @@ public class RenderBlood extends EntityRenderer<EntityBlood>
         float var8 = 0.5F;
         float var9 = 0.25F;
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etblood));
-        matrices.mulPose(new Quaternionf((float) (180.0F - this.entityRenderDispatcher.camera.getPosition().y()), 0.0F, 1.0F, 0.0F));
-        matrices.mulPose(new Quaternionf((float) -this.entityRenderDispatcher.camera.getPosition().x(), 1.0F, 0.0F, 0.0F));
-        buffer.addVertex((0.0F - var8), (0.0F - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 0, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex((var7 - var8), (0.0F - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 1, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex((var7 - var8), (var7 - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 1, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex((0.0F - var8), (var7 - var9), 0, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), 0, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        matrices.mulPose(Axis.YP.rotationDegrees((float) (180.0F - this.entityRenderDispatcher.camera.getPosition().y())));
+        matrices.mulPose(Axis.XP.rotationDegrees((float) -this.entityRenderDispatcher.camera.getPosition().x()));
+        buffer.addVertex((0.0F - var8), (0.0F - var9), 0, CommonColors.WHITE, 0, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex((var7 - var8), (0.0F - var9), 0, CommonColors.WHITE, 1, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex((var7 - var8), (var7 - var9), 0, CommonColors.WHITE, 1, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex((0.0F - var8), (var7 - var9), 0, CommonColors.WHITE, 0, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
         matrices.popPose();
 	}
 

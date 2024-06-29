@@ -40,7 +40,6 @@ import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.fml.config.ModConfig;
@@ -48,7 +47,6 @@ import org.slf4j.Logger;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiConsumer;
 
 public class RivalRebels implements ModInitializer, ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -127,7 +125,6 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
         RRBlocks.init();
         RRComponents.init();
         RRItems.init();
-        registerArmors();
         RREntities.TYPES.forEach((name, type) -> Registry.register(BuiltInRegistries.ENTITY_TYPE, RRIdentifiers.create(name), type));
     }
 
@@ -155,49 +152,6 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
             CommandHotPotato.register(dispatcher);
         });
     }
-
-    public void registerArmors() {
-        RRItems.register("orebelhelmet", RRItems.orebelhelmet);
-		RRItems.register("orebelchest", RRItems.orebelchest);
-		RRItems.register("orebelpants", RRItems.orebelpants);
-		RRItems.register("orebelboots", RRItems.orebelboots);
-		RRItems.register("onukerhelmet", RRItems.onukerhelmet);
-		RRItems.register("onukerchest", RRItems.onukerchest);
-		RRItems.register("onukerpants", RRItems.onukerpants);
-		RRItems.register("onukerboots", RRItems.onukerboots);
-		RRItems.register("ointelhelmet", RRItems.ointelhelmet);
-		RRItems.register("ointelchest", RRItems.ointelchest);
-		RRItems.register("ointelpants", RRItems.ointelpants);
-		RRItems.register("ointelboots", RRItems.ointelboots);
-		RRItems.register("ohackerhelmet", RRItems.ohackerhelmet);
-		RRItems.register("ohackerchest", RRItems.ohackerchest);
-		RRItems.register("ohackerpants", RRItems.ohackerpants);
-		RRItems.register("ohackerboots", RRItems.ohackerboots);
-		RRItems.register("srebelhelmet", RRItems.srebelhelmet);
-		RRItems.register("srebelchest", RRItems.srebelchest);
-		RRItems.register("srebelpants", RRItems.srebelpants);
-		RRItems.register("srebelboots", RRItems.srebelboots);
-		RRItems.register("snukerhelmet", RRItems.snukerhelmet);
-		RRItems.register("snukerchest", RRItems.snukerchest);
-		RRItems.register("snukerpants", RRItems.snukerpants);
-		RRItems.register("snukerboots", RRItems.snukerboots);
-		RRItems.register("sintelhelmet", RRItems.sintelhelmet);
-		RRItems.register("sintelchest", RRItems.sintelchest);
-		RRItems.register("sintelpants", RRItems.sintelpants);
-		RRItems.register("sintelboots", RRItems.sintelboots);
-		RRItems.register("shackerhelmet", RRItems.shackerhelmet);
-		RRItems.register("shackerchest", RRItems.shackerchest);
-		RRItems.register("shackerpants", RRItems.shackerpants);
-		RRItems.register("shackerboots", RRItems.shackerboots);
-		RRItems.register("camohat", RRItems.camohat);
-		RRItems.register("camoshirt", RRItems.camoshirt);
-		RRItems.register("camopants", RRItems.camopants);
-		RRItems.register("camoshoes", RRItems.camoshoes);
-		RRItems.register("camohat2", RRItems.camohat2);
-		RRItems.register("camoshirt2", RRItems.camoshirt2);
-		RRItems.register("camopants2", RRItems.camopants2);
-		RRItems.register("camoshoes2", RRItems.camoshoes2);
-	}
 
     public static List<Block> getBlocks(TagKey<Block> tagKey) {
         return BuiltInRegistries.BLOCK.asTagAddingLookup().get(tagKey).map(HolderSet.ListBacked::stream).map(s -> s.map(Holder::value).toList()).orElse(Collections.emptyList());

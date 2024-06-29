@@ -20,34 +20,9 @@ import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
-public class RhodesJumpPacket implements CustomPacketPayload {
+public record RhodesJumpPacket(int id, boolean jump, boolean rocket, boolean laser, boolean fire, boolean forcefield, boolean plasma, boolean nuke, boolean stop, boolean b2spirit, boolean guard) implements CustomPacketPayload {
     public static final StreamCodec<FriendlyByteBuf, RhodesJumpPacket> STREAM_CODEC = StreamCodec.ofMember(RhodesJumpPacket::toBytes, RhodesJumpPacket::fromBytes);
     public static final Type<RhodesJumpPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("rhodesjump"));
-    private final int id;
-    private final boolean jump;
-    private final boolean rocket;
-    private final boolean laser;
-    private final boolean fire;
-    private final boolean forcefield;
-    private final boolean plasma;
-    private final boolean nuke;
-    private final boolean stop;
-    private final boolean b2spirit;
-    private final boolean guard;
-
-    public RhodesJumpPacket(int id, boolean jump, boolean rocket, boolean laser, boolean fire, boolean forcefield, boolean plasma, boolean nuke, boolean stop, boolean b2spirit, boolean guard) {
-        this.id = id;
-        this.jump = jump;
-        this.rocket = rocket;
-        this.laser = laser;
-        this.fire = fire;
-        this.forcefield = forcefield;
-        this.plasma = plasma;
-        this.nuke = nuke;
-        this.stop = stop;
-        this.b2spirit = b2spirit;
-        this.guard = guard;
-    }
 
     public static RhodesJumpPacket fromBytes(FriendlyByteBuf buf) {
         return new RhodesJumpPacket(buf.readInt(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean());

@@ -11,11 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.client.objfileloader;
 
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Vector4f;
+
+import java.util.Arrays;
 
 @Environment(EnvType.CLIENT)
 public class Triangle
@@ -28,28 +31,22 @@ public class Triangle
 		pa = PA;
 	}
 
-    public void render(VertexConsumer buffer, int light, int overlay) {
-        render(buffer, new Vector4f(1, 1, 1, 1), light, overlay);
+    public void render(PoseStack pose, VertexConsumer buffer, int light, int overlay) {
+        render(pose, buffer, CommonColors.WHITE, light, overlay);
     }
 
-    public void render(VertexConsumer buffer, Vector4f color, int light, int overlay) {
+    public void render(PoseStack pose, VertexConsumer buffer, int color, int light, int overlay) {
         for (Vertice vertice : pa) {
-            vertice.render(buffer, color, light, overlay);
+            vertice.render(pose, buffer, color, light, overlay);
         }
     }
 
-    public void normalize()
-	{
-        for (Vertice vertice : pa) {
-            vertice.normalize();
-        }
+    public void normalize() {
+        Arrays.setAll(pa, i -> pa[i].normalize());
 	}
 
-	public void scale(Vec3 v)
-	{
-        for (Vertice vertice : pa) {
-            vertice.scale(v);
-        }
+	public void scale(Vec3 v) {
+        Arrays.setAll(pa, i -> pa[i].scale(v));
 	}
 
 	public Triangle[] refine()
@@ -60,10 +57,10 @@ public class Triangle
 			Vertice mp1 = Vertice.average(pa[0], pa[1]);
 			Vertice mp2 = Vertice.average(pa[1], pa[2]);
 			Vertice mp3 = Vertice.average(pa[2], pa[0]);
-			p[0] = new Triangle(new Vertice[] { pa[0].copy(), mp1.copy(), mp3.copy() });
-			p[1] = new Triangle(new Vertice[] { pa[1].copy(), mp2.copy(), mp1.copy() });
-			p[2] = new Triangle(new Vertice[] { pa[2].copy(), mp3.copy(), mp2.copy() });
-			p[3] = new Triangle(new Vertice[] { mp1.copy(), mp2.copy(), mp3.copy() });
+			p[0] = new Triangle(new Vertice[] { pa[0], mp1, mp3});
+			p[1] = new Triangle(new Vertice[] { pa[1], mp2, mp1});
+			p[2] = new Triangle(new Vertice[] { pa[2], mp3, mp2});
+			p[3] = new Triangle(new Vertice[] { mp1,   mp2, mp3});
 		}
 		return p;
 	}

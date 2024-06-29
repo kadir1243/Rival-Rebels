@@ -11,6 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
+import org.joml.Vector2i;
+
 public class Rectangle
 {
 	public int xMin, xMax, yMin, yMax;
@@ -23,7 +25,7 @@ public class Rectangle
 		yMax = y + h;
 	}
 
-	public boolean isVecInside(Vector vec)
+	public boolean isVecInside(Vector2i vec)
 	{
         return vec.x >= xMin && vec.x <= xMax && vec.y >= yMin && vec.y <= yMax;
     }

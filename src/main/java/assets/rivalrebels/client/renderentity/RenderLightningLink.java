@@ -15,6 +15,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityLightningLink;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,7 +25,6 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
@@ -56,8 +56,8 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
             VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
 
             matrices.pushPose();
-			matrices.mulPose(new Quaternionf(entity.getYRot(), 0.0F, 1.0F, 0.0F));
-			matrices.mulPose(new Quaternionf(-entity.getXRot(), 1.0F, 0.0F, 0.0F));
+			matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
+			matrices.mulPose(Axis.XP.rotationDegrees(-entity.getXRot()));
 
 			float AddedX = 0;
 			float AddedY = 0;

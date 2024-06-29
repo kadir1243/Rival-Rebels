@@ -17,15 +17,14 @@ import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Quaternionf;
 
 public class PlasmaCannonRenderer implements DynamicItemRenderer {
     public static final Material PLASMA_CANNON = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etplasmacannon);
@@ -45,15 +44,15 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.translate(-0.1f, 0f, 0f);
 		matrices.pushPose();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.ZP.rotationDegrees(35));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
 		matrices.pushPose();
 
         VertexConsumer plasmaCannonVertexConsumer = PLASMA_CANNON.buffer(vertexConsumers, RenderType::entitySolid);
-        model.render(plasmaCannonVertexConsumer, light, overlay);
+        model.render(matrices, plasmaCannonVertexConsumer, light, overlay);
         VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
         if (stack.isEnchanted()) {
-			model.render(cellularNoise, light, overlay);
+			model.render(matrices, cellularNoise, light, overlay);
 		}
 
 		matrices.popPose();
@@ -61,9 +60,9 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 
 		matrices.pushPose();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.ZP.rotationDegrees(35));
 		matrices.pushPose();
-		matrices.mulPose(new Quaternionf(225, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.ZP.rotationDegrees(225));
 		matrices.translate(-0.5f, 0.5f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
         VertexConsumer hydrodVertexConsumer = HYDROD.buffer(vertexConsumers, RenderType::entitySolid);
@@ -76,9 +75,9 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 
 		matrices.pushPose();
 		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.ZP.rotationDegrees(35));
 		matrices.pushPose();
-		matrices.mulPose(new Quaternionf(247.5f, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.ZP.rotationDegrees(247.5f));
 		matrices.translate(-0.175f, 0.1f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
 		md3.render(matrices, hydrodVertexConsumer, light, overlay);

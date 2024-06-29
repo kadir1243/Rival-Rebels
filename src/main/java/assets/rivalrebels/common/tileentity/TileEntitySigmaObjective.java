@@ -162,7 +162,7 @@ public class TileEntitySigmaObjective extends BlockEntity implements Container, 
     @Override
 	public boolean stillValid(Player player)
 	{
-		return this.level.getBlockEntity(this.getBlockPos()) == this && player.distanceToSqr(this.getBlockPos().getX() + 0.5D, this.getBlockPos().getY() + 0.5D, this.getBlockPos().getZ() + 0.5D) <= 64.0D;
+        return Container.stillValidBlockEntity(this, player, 64);
 	}
 
     @Override

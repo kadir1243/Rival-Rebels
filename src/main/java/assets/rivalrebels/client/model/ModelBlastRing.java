@@ -14,9 +14,9 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Vector3f;
-import org.joml.Quaternionf;
 import org.joml.Vector4f;
 
 public class ModelBlastRing {
@@ -33,12 +33,12 @@ public class ModelBlastRing {
 		Vector3f v8 = new Vector3f((float) Math.sin(innerangle) * (size + thickness), +height, (float) Math.cos(innerangle) * (size + thickness));
 
 		matrices.translate(x, y, z);
-		matrices.mulPose(new Quaternionf(pitch, 1, 0, 0));
-		matrices.mulPose(new Quaternionf(yaw, 0, 1, 0));
-		matrices.mulPose(new Quaternionf(roll, 0, 0, 1));
+		matrices.mulPose(Axis.XP.rotationDegrees(pitch));
+		matrices.mulPose(Axis.YP.rotationDegrees(yaw));
+		matrices.mulPose(Axis.ZP.rotationDegrees(roll));
         for (float i = 0; i < 360; i += 360F / segments) {
 			matrices.pushPose();
-			matrices.mulPose(new Quaternionf(i, 0, 1, 0));
+			matrices.mulPose(Axis.YP.rotationDegrees(i));
 			RenderHelper.addFace(matrices, buffer, v5, v6, v8, v7, color, light, overlay);
 			RenderHelper.addFace(matrices, buffer, v2, v1, v3, v4, color, light, overlay);
 			RenderHelper.addFace(matrices, buffer, v2, v4, v8, v6, color, light, overlay);

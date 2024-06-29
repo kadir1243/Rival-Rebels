@@ -17,6 +17,7 @@ import assets.rivalrebels.client.renderentity.RenderTachyonBomb;
 import assets.rivalrebels.common.block.trap.BlockTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -27,7 +28,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityTachyonBombRenderer implements BlockEntityRenderer<TileEntityTachyonBomb>, CustomRenderBoxExtension<TileEntityTachyonBomb> {
@@ -43,14 +43,14 @@ public class TileEntityTachyonBombRenderer implements BlockEntityRenderer<TileEn
         int metadata = entity.getBlockState().getValue(BlockTachyonBomb.META);
 
         if (metadata == 2) {
-            matrices.mulPose(new Quaternionf(180, 0, 1, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(180));
         } else if (metadata == 3) {
         } else if (metadata == 4) {
-            matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(-90));
         } else if (metadata == 5) {
-            matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(90));
         }
-        RenderTachyonBomb.bomb.render(TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        RenderTachyonBomb.bomb.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
         matrices.popPose();
     }
 

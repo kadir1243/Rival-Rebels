@@ -15,7 +15,7 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import org.joml.Quaternionf;
+import com.mojang.math.Axis;
 import org.joml.Vector3f;
 
 public class ModelRod {
@@ -49,15 +49,15 @@ public class ModelRod {
     public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
         for (float i = 0; i < 360; i += 360 / numOfSegs) {
             matrices.pushPose();
-            matrices.mulPose(new Quaternionf(i, 0, 1, 0));
-            RenderHelper.addFace(buffer, v0, vd1, v1, v0, t1, t3, t2, t1, light, overlay);
-            RenderHelper.addFace(buffer, vd1, vd2, v2, v1, t2, t4, t5, t3, light, overlay);
-            RenderHelper.addFace(buffer, vd2, vd3, v3, v2, t4, t6, t7, t5, light, overlay);
-            RenderHelper.addFace(buffer, vd3, vd4, v4, v3, t6, t8, t9, t7, light, overlay);
+            matrices.mulPose(Axis.YP.rotationDegrees(i));
+            RenderHelper.addFace(matrices, buffer, v0, vd1, v1, v0, t1, t3, t2, t1, light, overlay);
+            RenderHelper.addFace(matrices, buffer, vd1, vd2, v2, v1, t2, t4, t5, t3, light, overlay);
+            RenderHelper.addFace(matrices, buffer, vd2, vd3, v3, v2, t4, t6, t7, t5, light, overlay);
+            RenderHelper.addFace(matrices, buffer, vd3, vd4, v4, v3, t6, t8, t9, t7, light, overlay);
             if (rendersecondcap) {
-                RenderHelper.addFace(buffer, v7, v6, vd6, v7, t1, t3, t2, t1, light, overlay);
-                RenderHelper.addFace(buffer, v6, v5, vd5, vd6, t2, t4, t5, t3, light, overlay);
-                RenderHelper.addFace(buffer, v5, v4, vd4, vd5, t4, t6, t7, t5, light, overlay);
+                RenderHelper.addFace(matrices, buffer, v7, v6, vd6, v7, t1, t3, t2, t1, light, overlay);
+                RenderHelper.addFace(matrices, buffer, v6, v5, vd5, vd6, t2, t4, t5, t3, light, overlay);
+                RenderHelper.addFace(matrices, buffer, v5, v4, vd4, vd5, t4, t6, t7, t5, light, overlay);
             }
 
             matrices.popPose();

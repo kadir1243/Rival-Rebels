@@ -15,6 +15,7 @@ import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.block.trap.BlockTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,7 +23,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEntityTsarBomba>, CustomRenderBoxExtension<TileEntityTsarBomba> {
@@ -36,16 +36,16 @@ public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEnti
         int metadata = entity.getBlockState().getValue(BlockTsarBomba.META);
 
         if (metadata == 2) {
-            matrices.mulPose(new Quaternionf(180, 0, 1, 0));
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(180));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         } else if (metadata == 3) {
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         } else if (metadata == 4) {
-            matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(-90));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         } else if (metadata == 5) {
-            matrices.mulPose(new Quaternionf(90, 0, 1, 0));
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(90));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         }
         ModelTsarBomba.render(matrices, vertexConsumers, light, overlay);
         matrices.popPose();

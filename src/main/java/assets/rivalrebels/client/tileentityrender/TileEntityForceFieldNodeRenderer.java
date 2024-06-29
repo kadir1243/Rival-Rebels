@@ -16,15 +16,16 @@ import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<TileEntityForceFieldNode>, CustomRenderBoxExtension<TileEntityForceFieldNode> {
@@ -41,31 +42,31 @@ public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<Til
         int meta = entity.getBlockState().getValue(BlockForceFieldNode.META);
         if (meta == 2)
 		{
-			matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+			matrices.mulPose(Axis.YP.rotationDegrees(90));
 		}
 
 		if (meta == 3)
 		{
-			matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
+			matrices.mulPose(Axis.YP.rotationDegrees(-90));
 		}
 
 		if (meta == 4)
 		{
-			matrices.mulPose(new Quaternionf(180, 0, 1, 0));
+			matrices.mulPose(Axis.YP.rotationDegrees(180));
 		}
 
-		matrices.mulPose(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		matrices.translate(0, 0, 0.5f);
         VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 0).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 1).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 1).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 0).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
 
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 1).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 0f).setColor(1, 1, 1, 1).setUv(0, 0).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 0).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 35f).setColor(1, 1, 1, 1).setUv(5, 1).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
+		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
 
 		matrices.popPose();
 	}

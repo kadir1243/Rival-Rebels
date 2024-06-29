@@ -86,20 +86,20 @@ public class ModelRocketLauncherHandle
 		matrices.pushPose();
 		matrices.scale(1.3F, 1, 1);
 		// bottom
-		RenderHelper.addFace(buffer, vbt3, vbt4, vbt1, vbt2, bottombottom, light, overlay);
-		RenderHelper.addFace(buffer, vbb1, vbt1, vbt4, vbb4, bottomfront, light, overlay);
-		RenderHelper.addFace(buffer, vbb3, vbt3, vbt2, vbb2, bottomback, light, overlay);
-		RenderHelper.addFace(buffer, vbt2, vbb2, vbb1, vbt1, bottomside, light, overlay);
-		RenderHelper.addFace(buffer, vbt3, vbb3, vbb4, vbt4, bottomside, light, overlay);
-		RenderHelper.addFace(buffer, vbb3, vbb4, vbb1, vbb2, bottombottom, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vbt3, vbt4, vbt1, vbt2, bottombottom, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vbb1, vbt1, vbt4, vbb4, bottomfront, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vbb3, vbt3, vbt2, vbb2, bottomback, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vbt2, vbb2, vbb1, vbt1, bottomside, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vbt3, vbb3, vbb4, vbt4, bottomside, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vbb3, vbb4, vbb1, vbb2, bottombottom, light, overlay);
 		matrices.popPose();
 
 		// handle
-		RenderHelper.addFace(buffer, vht4, vhb4, vhb1, vht1, handlefront, light, overlay);
-		RenderHelper.addFace(buffer, vht2, vhb2, vhb3, vht3, handlefront, light, overlay);
-		RenderHelper.addFace(buffer, vht1, vhb1, vhb2, vht2, handleside, light, overlay);
-		RenderHelper.addFace(buffer, vht3, vhb3, vhb4, vht4, handleside, light, overlay);
-		RenderHelper.addFace(buffer, vhb2, vhb1, vhb4, vhb3, handlebottom, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vht4, vhb4, vhb1, vht1, handlefront, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vht2, vhb2, vhb3, vht3, handlefront, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vht1, vhb1, vhb2, vht2, handleside, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vht3, vhb3, vhb4, vht4, handleside, light, overlay);
+		RenderHelper.addFace(matrices, buffer, vhb2, vhb1, vhb4, vhb3, handlebottom, light, overlay);
 		matrices.popPose();
 	}
 }

@@ -43,6 +43,8 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
+import java.util.function.BiConsumer;
+
 public class BlockLandMine extends FallingBlock
 {
     public static final MapCodec<BlockLandMine> CODEC = simpleCodec(BlockLandMine::new);
@@ -92,11 +94,11 @@ public class BlockLandMine extends FallingBlock
 	}
 
     @Override
-    public void wasExploded(Level world, BlockPos pos, Explosion explosion) {
-		if (!world.isClientSide) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
-	}
+    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
+        if (!level.isClientSide) level.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
+    }
 
-	/*@Override
+/*@Override
 	public final IIcon getIcon(IBlockAccess world, int x, int y, int z, int s)
 	{
 		if (this == RivalRebels.landmine) return Blocks.GRASS.getIcon(world, x, y, z, s);

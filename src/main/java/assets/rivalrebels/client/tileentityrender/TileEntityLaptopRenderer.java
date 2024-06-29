@@ -16,16 +16,15 @@ import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.common.block.machine.BlockLaptop;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityLaptop> {
@@ -46,7 +45,7 @@ public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityL
             case 5 -> 90;
             default -> 0;
         };
-        matrices.mulPose(new Quaternionf(var11, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.YP.rotationDegrees(var11));
         ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
 		ModelLaptop.renderScreen(SCREEN_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
 		matrices.popPose();

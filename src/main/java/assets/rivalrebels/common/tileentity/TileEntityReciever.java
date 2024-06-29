@@ -420,9 +420,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	}
 
     @Override
-	public boolean stillValid(Player par1EntityPlayer)
+	public boolean stillValid(Player player)
 	{
-		return this.level.getBlockEntity(this.getBlockPos()) == this && par1EntityPlayer.distanceToSqr(this.getBlockPos().getX() + 0.5D, this.getBlockPos().getY() + 0.5D, this.getBlockPos().getZ() + 0.5D) <= 64.0D;
+        return Container.stillValidBlockEntity(this, player, 64);
 	}
 
     @Override

@@ -17,6 +17,7 @@ import assets.rivalrebels.common.block.machine.BlockReciever;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -27,7 +28,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever>, CustomRenderBoxExtension<TileEntityReciever> {
@@ -53,16 +53,16 @@ public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntit
 		if (m == 5) r = -90;
 
 		matrices.pushPose();
-		matrices.mulPose(new Quaternionf(r, 0, 1, 0));
+		matrices.mulPose(Axis.YP.rotationDegrees(r));
         matrices.translate(0, 0, 0.5);
         VertexConsumer recieverTextureVertexConsumer = RECIEVER_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
-        base.render(recieverTextureVertexConsumer, light, overlay);
+        base.render(matrices, recieverTextureVertexConsumer, light, overlay);
 		if (entity.hasWeapon) {
             matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			matrices.mulPose(new Quaternionf((float) (entity.yaw - r), 0, 1, 0));
-			arm.render(recieverTextureVertexConsumer, light, overlay);
-            matrices.mulPose(new Quaternionf((float) entity.pitch, 1, 0, 0));
-			adsdragon.render(ETS_DRAGON.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+			matrices.mulPose(Axis.YP.rotationDegrees((float) (entity.yaw - r)));
+			arm.render(matrices, recieverTextureVertexConsumer, light, overlay);
+            matrices.mulPose(Axis.XP.rotationDegrees((float) entity.pitch));
+			adsdragon.render(matrices, ETS_DRAGON.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		}
 		matrices.popPose();
 		matrices.popPose();

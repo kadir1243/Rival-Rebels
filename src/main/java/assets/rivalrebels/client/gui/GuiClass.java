@@ -32,11 +32,10 @@ public class GuiClass extends Screen
 	private static final int ySizeOfTexture	= 256;
 	private int			posX;
 	private int			posY;
-    private float[]		sizelookup		= new float[] { 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
+    private static final float[]		sizelookup		= new float[] { 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
 	private GuiButton	nextButton;
 	private GuiButton	doneButton;
 	private GuiScroll	gameScroll;
-	private boolean		prevClick		= true;
 	private RivalRebelsClass rrclass = RivalRebelsClass.NONE;
 
 	public GuiClass(RivalRebelsClass rrc)
@@ -54,8 +53,26 @@ public class GuiClass extends Screen
 		posY = (this.height - ySizeOfTexture) / 2;
 		this.clearWidgets();
 
-		nextButton = new GuiButton(posX + 188, posY + 102, 60, 11, Component.translatable("RivalRebels.class.next"));
-		doneButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.class.done"));
+		nextButton = new GuiButton(posX + 188, posY + 102, 60, 11, Component.translatable("RivalRebels.class.next"), button -> {
+            switch (rrclass) {
+                case HACKER:
+                    rrclass = RivalRebelsClass.REBEL;
+                    break;
+                case INTEL:
+                    rrclass = RivalRebelsClass.HACKER;
+                    break;
+                case NONE:
+                    rrclass = RivalRebelsClass.REBEL;
+                    break;
+                case NUKER:
+                    rrclass = RivalRebelsClass.INTEL;
+                    break;
+                case REBEL:
+                    rrclass = RivalRebelsClass.NUKER;
+                    break;
+            }
+        });
+		doneButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.class.done"), button -> this.minecraft.setScreen(new GuiSpawn(rrclass)));
 		gameScroll = new GuiScroll(posX + 243, posY + 9, 74);
 		this.addRenderableOnly(nextButton);
 		this.addRenderableOnly(doneButton);
@@ -172,39 +189,9 @@ public class GuiClass extends Screen
 		}
 
 		super.render(context, mouseX, mouseY, delta);
-
-		if (minecraft.mouseHandler.isLeftPressed() && !prevClick)
-		{
-			if (nextButton.mouseClicked(mouseX, mouseY, 0))
-			{
-				switch (rrclass)
-				{
-				case HACKER:
-					rrclass = RivalRebelsClass.REBEL;
-					break;
-				case INTEL:
-					rrclass = RivalRebelsClass.HACKER;
-					break;
-				case NONE:
-					rrclass = RivalRebelsClass.REBEL;
-					break;
-				case NUKER:
-					rrclass = RivalRebelsClass.INTEL;
-					break;
-				case REBEL:
-					rrclass = RivalRebelsClass.NUKER;
-					break;
-				}
-			}
-			if (doneButton.mouseClicked(mouseX, mouseY, 0))
-			{
-				this.minecraft.setScreen(new GuiSpawn(rrclass));
-			}
-		}
-		prevClick = minecraft.mouseHandler.isLeftPressed();
 	}
 
-	protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, int scroll, int scrolllimit, String display) {
+    protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, int scroll, int scrolllimit, String display) {
 		int length = 10;
 		int dist = (int) (-((float) scroll / (float) scrolllimit) * (((length) * 10) - height));
 		float scalefactor = 0.6666f;

@@ -20,6 +20,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
+import org.joml.Vector2i;
 
 @Environment(EnvType.CLIENT)
 public class GuiDropdownOption extends Button
@@ -29,7 +30,7 @@ public class GuiDropdownOption extends Button
 	public boolean	mouseDown	= false;
 	public GuiTray	t;
 
-	public GuiDropdownOption(Vector p, int l, int n, Component text, GuiTray tray)
+	public GuiDropdownOption(Vector2i p, int l, int n, Component text, GuiTray tray)
 	{
 		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {}, DEFAULT_NARRATION);
 		bbox = new Rectangle(p.x, p.y + n * 10, l, (n + 1) * 10);
@@ -38,7 +39,7 @@ public class GuiDropdownOption extends Button
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		boolean inside = bbox.isVecInside(new Vector(mouseX, mouseY));
+		boolean inside = bbox.isVecInside(new Vector2i(mouseX, mouseY));
 		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && inside;
 		boolean on = t.getMenu().hasWepReqs();
 		if (current && !mouseDown && on) isPressed = !isPressed;

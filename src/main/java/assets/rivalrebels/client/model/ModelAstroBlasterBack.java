@@ -16,8 +16,8 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import org.joml.Vector3f;
-import org.joml.Quaternionf;
 
 public class ModelAstroBlasterBack {
     private static final float i = 0.05f;
@@ -34,13 +34,13 @@ public class ModelAstroBlasterBack {
         matrices.pushPose();
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
-            matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < barrelx.length; f++) {
                 TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
                 TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
                 TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
                 TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
-                RenderHelper.addFace(buffer, new Vector3f(0f, barrely[f], barrelx[f]),
+                RenderHelper.addFace(matrices, buffer, new Vector3f(0f, barrely[f], barrelx[f]),
                     new Vector3f(0f, barrely[f - 1], barrelx[f - 1]),
                     new Vector3f(barrelx[f - 1] * sin, barrely[f - 1], barrelx[f - 1] * cos),
                     new Vector3f(barrelx[f] * sin, barrely[f], barrelx[f] * cos), t1, t2, t3, t4, light, overlay);

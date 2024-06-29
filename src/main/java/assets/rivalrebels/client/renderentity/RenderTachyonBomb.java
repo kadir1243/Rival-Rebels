@@ -17,6 +17,7 @@ import assets.rivalrebels.client.objfileloader.WavefrontObject;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityTachyonBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -25,7 +26,6 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
@@ -40,10 +40,10 @@ public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
     public void render(EntityTachyonBomb entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-        matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
-        // GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
-        matrices.mulPose(new Quaternionf(entity.getXRot(), 0.0F, 0.0F, 1.0F));
-        bomb.render(vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
+        // matrices.mulPose(Axis.XP.rotationDegrees(90));
+        matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
+        bomb.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

@@ -18,12 +18,11 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class ModelTheoreticalTsarBomba {
@@ -46,13 +45,13 @@ public class ModelTheoreticalTsarBomba {
         VertexConsumer tsarShell1TextureVertexConsumer = TSAR_SHELL1_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
-            matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < tsarx.length; f++) {
                 TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
                 TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
                 TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
                 TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
-                RenderHelper.addFace(tsarShell1TextureVertexConsumer, new Vector3f(0f, tsary[f], tsarx[f]),
+                RenderHelper.addFace(matrices, tsarShell1TextureVertexConsumer, new Vector3f(0f, tsary[f], tsarx[f]),
                     new Vector3f(0f, tsary[f - 1], tsarx[f - 1]),
                     new Vector3f(tsarx[f - 1] * sin, tsary[f - 1], tsarx[f - 1] * cos),
                     new Vector3f(tsarx[f] * sin, tsary[f], tsarx[f] * cos), t1, t2, t3, t4, light, overlay);
@@ -62,14 +61,14 @@ public class ModelTheoreticalTsarBomba {
         VertexConsumer tsarShell2TextureVertexConsumer = TSAR_SHELL2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
-            matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(add * i));
             matrices.scale(0.85f, 0.95f, 0.85f);
             for (int f = 1; f < tsarx.length; f++) {
                 TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
                 TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
                 TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
                 TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
-                RenderHelper.addFace(tsarShell2TextureVertexConsumer, new Vector3f(0f, tsary[f], tsarx[f]),
+                RenderHelper.addFace(matrices, tsarShell2TextureVertexConsumer, new Vector3f(0f, tsary[f], tsarx[f]),
                     new Vector3f(0f, tsary[f - 1], tsarx[f - 1]),
                     new Vector3f(tsarx[f - 1] * sin, tsary[f - 1], tsarx[f - 1] * cos),
                     new Vector3f(tsarx[f] * sin, tsary[f], tsarx[f] * cos), t1, t2, t3, t4, light, overlay);
@@ -87,7 +86,7 @@ public class ModelTheoreticalTsarBomba {
         TextureVertice t7 = new TextureVertice(134f / 256f, 64f / 256f);
         TextureVertice t8 = new TextureVertice(70 / 256f, 64f / 256f);
 
-        RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0.5f, -5f, 0.5f),
+        RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0.5f, -5f, 0.5f),
             new Vector3f(-0.5f, -5f, 0.5f),
             new Vector3f(-0.5f, -5f, -0.5f),
             new Vector3f(0.5f, -5f, -0.5f), t5, t6, t7, t8, light, overlay);
@@ -101,19 +100,19 @@ public class ModelTheoreticalTsarBomba {
         TextureVertice t3 = new TextureVertice(70f / 256f, 96f / 256f);
         TextureVertice t4 = new TextureVertice(0, 96f / 256f);
 
-        RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+        RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
             new Vector3f(0f, -5f, -0.5f),
             new Vector3f(0f, -3.5f, -0.5f),
             new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-        matrices.mulPose(new Quaternionf(120, 0, 1, 0));
-        RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+        matrices.mulPose(Axis.YP.rotationDegrees(120));
+        RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
             new Vector3f(0f, -5f, -0.5f),
             new Vector3f(0f, -3.5f, -0.5f),
             new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-        matrices.mulPose(new Quaternionf(120, 0, 1, 0));
-        RenderHelper.addFace(tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+        matrices.mulPose(Axis.YP.rotationDegrees(120));
+        RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
             new Vector3f(0f, -5f, -0.5f),
             new Vector3f(0f, -3.5f, -0.5f),
             new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);

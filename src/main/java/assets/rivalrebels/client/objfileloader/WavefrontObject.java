@@ -1,6 +1,7 @@
 package assets.rivalrebels.client.objfileloader;
 
 import assets.rivalrebels.RivalRebels;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.api.EnvType;
@@ -8,9 +9,8 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.CommonColors;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -246,19 +246,15 @@ public class WavefrontObject {
         }
     }
 
-    public void render(VertexConsumer buffer, Vector4f color, int light, int overlay) {
+    public void render(PoseStack pose, VertexConsumer buffer, int color, int light, int overlay) {
         if (isEmpty) return;
         for (GroupObject groupObject : groupObjects) {
-            groupObject.render(buffer, color, light, overlay);
+            groupObject.render(pose, buffer, color, light, overlay);
         }
     }
 
-    public void render(VertexConsumer buffer, Vector3f color, int light, int overlay) {
-        render(buffer, new Vector4f(color, 1), light, overlay);
-    }
-
-    public void render(VertexConsumer buffer, int light, int overlay) {
-        render(buffer, new Vector3f(1, 1, 1), light, overlay);
+    public void render(PoseStack pose, VertexConsumer buffer, int light, int overlay) {
+        render(pose, buffer, CommonColors.WHITE, light, overlay);
     }
 
     private Vector3f parseVertex(String line, int lineCount) throws ModelFormatException {
@@ -442,10 +438,10 @@ public class WavefrontObject {
             this.glDrawingMode = glDrawingMode;
         }
 
-        public void render(VertexConsumer buffer, Vector4f color, int light, int overlay) {
+        public void render(PoseStack pose, VertexConsumer buffer, int color, int light, int overlay) {
             if (!faces.isEmpty()) {
                 for (Face face : faces) {
-                    face.addFaceForRender(buffer, color, light, overlay);
+                    face.addFaceForRender(pose, buffer, color, light, overlay);
                 }
             }
         }
@@ -458,11 +454,11 @@ public class WavefrontObject {
         public Vector3f faceNormal;
         public Vector3f[] textureCoordinates;
 
-        public void addFaceForRender(VertexConsumer buffer, Vector4f color, int light, int overlay) {
-            addFaceForRender(buffer, color, light, overlay, 0.0005F);
+        public void addFaceForRender(PoseStack pose, VertexConsumer buffer, int color, int light, int overlay) {
+            addFaceForRender(pose, buffer, color, light, overlay, 0.0005F);
         }
 
-        public void addFaceForRender(VertexConsumer buffer, Vector4f color, int light, int overlay, float textureOffset) {
+        public void addFaceForRender(PoseStack pose, VertexConsumer buffer, int colorRGBA, int light, int overlay, float textureOffset) {
             if (faceNormal == null) {
                 faceNormal = this.calculateFaceNormal();
             }
@@ -483,7 +479,6 @@ public class WavefrontObject {
             float offsetU, offsetV;
 
             for (int i = 0; i < vertices.length; ++i) {
-
                 if ((textureCoordinates != null) && (textureCoordinates.length > 0)) {
                     offsetU = textureOffset;
                     offsetV = textureOffset;
@@ -495,9 +490,9 @@ public class WavefrontObject {
                         offsetV = -offsetV;
                     }
 
-                    buffer.addVertex(vertices[i].x, vertices[i].y, vertices[i].z, FastColor.ARGB32.colorFromFloat(color.x, color.y, color.z, color.w), textureCoordinates[i].x + offsetU, textureCoordinates[i].y + offsetV, overlay, light, faceNormal.x, faceNormal.y, faceNormal.z);
+                    buffer.addVertex(pose.last(), vertices[i]).setColor(colorRGBA).setUv(textureCoordinates[i].x + offsetU, textureCoordinates[i].y + offsetV).setOverlay(overlay).setLight(light).setNormal(pose.last(), faceNormal.x, faceNormal.y, faceNormal.z);
                 } else {
-                    buffer.addVertex(vertices[i].x, vertices[i].y, vertices[i].z).setColor(color.x, color.y, color.z, color.w).setOverlay(overlay).setLight(light).setNormal(faceNormal.x, faceNormal.y, faceNormal.z);
+                    buffer.addVertex(pose.last(), vertices[i]).setColor(colorRGBA).setOverlay(overlay).setLight(light).setNormal(pose.last(), faceNormal.x, faceNormal.y, faceNormal.z);
                 }
             }
         }

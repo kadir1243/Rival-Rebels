@@ -14,6 +14,7 @@ package assets.rivalrebels.client.itemrenders;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -21,7 +22,6 @@ import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Quaternionf;
 
 public class BatteryRenderer implements DynamicItemRenderer {
     public static final Material BATTERY_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etbattery);
@@ -31,11 +31,11 @@ public class BatteryRenderer implements DynamicItemRenderer {
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(0.8f, 0.3f, -0.03f);
-		matrices.mulPose(new Quaternionf(35, 0.0F, 0.0F, 1.0F));
-		matrices.mulPose(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(Axis.ZP.rotationDegrees(35));
+		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		matrices.scale(0.3f, 0.3f, 0.3f);
 
-		battery.render(BATTERY_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		battery.render(matrices, BATTERY_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 
 		matrices.popPose();
 	}

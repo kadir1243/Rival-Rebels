@@ -15,7 +15,6 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerNuclearBomb;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -48,9 +47,9 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
 		}
 		else
 		{
-            context.drawString(font, Component.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 80, 6, 0xFF0000, false);
+            context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 80, 6, 0xFF0000, false);
 		}
-		context.drawString(font, Component.translatable("RivalRebels.nuke.name"), 8, 6, 0xffffff, false);
+		context.drawString(font, Component.translatable("RivalRebels.nuke"), 8, 6, 0xffffff, false);
 		context.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
 		if (menu.isArmed())
 		{
@@ -67,30 +66,7 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
                 context.drawString(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
 			}
 		}
-
-		int mousex = mouseX;
-		int mousey = mouseY;
-		int posx = (width - imageWidth) / 2;
-		int posy = (height - imageHeight) / 2;
-		int coordx = posx + 53;
-		int coordy = posy + 158;
-		int widthx = 72;
-		int widthy = 8;
-		if (mousex > coordx && mousey > coordy && mousex < coordx + widthx && mousey < coordy + widthy)
-		{
-			mousex -= posx;
-			mousey -= posy;
-			context.fillGradient(mousex, mousey, mousex + font.width("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-			context.drawString(font, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
-			if (!buttondown && minecraft.mouseHandler.isLeftPressed())
-			{
-                Util.getPlatform().openUri("http://rivalrebels.com");
-			}
-		}
-		buttondown = minecraft.mouseHandler.isLeftPressed();
-	}
-
-	boolean	buttondown;
+    }
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {

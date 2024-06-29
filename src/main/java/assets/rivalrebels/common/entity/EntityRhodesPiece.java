@@ -12,13 +12,17 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.renderentity.RenderRhodes;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.Explosion;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -62,6 +66,11 @@ public class EntityRhodesPiece extends Entity {
 
     public int getColor() {
         return entityData.get(COLOR);
+    }
+
+    @Environment(EnvType.CLIENT)
+    public int getColorRGBA() {
+        return FastColor.ARGB32.colorFromFloat(1F, RenderRhodes.colors[getColor()*3], RenderRhodes.colors[getColor()*3+1], RenderRhodes.colors[getColor()*3+2]);
     }
 
     public void setColor(int color) {

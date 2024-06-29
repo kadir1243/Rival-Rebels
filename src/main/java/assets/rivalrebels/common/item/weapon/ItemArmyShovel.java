@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.item.DiggerItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Tiers;
@@ -27,7 +28,7 @@ public class ItemArmyShovel extends DiggerItem {
 	private static final Set<Block> blocksEffectiveAgainst = new HashSet<>();
 
 	public ItemArmyShovel() {
-		super(Tiers.DIAMOND, null, new Properties().component(DataComponents.UNBREAKABLE, new Unbreakable(true)));
+		super(Tiers.DIAMOND, BlockTags.MINEABLE_WITH_SHOVEL, new Properties().component(DataComponents.UNBREAKABLE, new Unbreakable(true)));
     }
 
     @Override

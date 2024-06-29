@@ -21,10 +21,6 @@ import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
 public class GuiButton extends Button {
-    public GuiButton(int x, int y, int width, int height, String message) {
-		this(x, y, width, height, Component.nullToEmpty(message), button -> {});
-	}
-
     public GuiButton(int x, int y, int width, int height, Component message) {
         this(x, y, width, height, message, button -> {});
     }

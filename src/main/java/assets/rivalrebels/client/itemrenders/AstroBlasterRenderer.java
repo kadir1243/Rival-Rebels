@@ -19,6 +19,7 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -29,7 +30,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Quaternionf;
 
 public class AstroBlasterRenderer implements DynamicItemRenderer {
     public static final Material REDSTONE_ROD_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etredrod);
@@ -68,7 +68,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         }
         matrices.pushPose();
         matrices.translate(0.4f, 0.35f, -0.03f);
-        matrices.mulPose(new Quaternionf(-55, 0.0F, 0.0F, 1.0F));
+        matrices.mulPose(Axis.ZP.rotationDegrees(-55));
         matrices.translate(0f, -0.05f, 0.05f);
 
         matrices.pushPose();
@@ -83,7 +83,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.pushPose();
         matrices.translate(0.22f, -0.025f, 0f);
-        matrices.mulPose(new Quaternionf(90, 0.0F, 0.0F, 1.0F));
+        matrices.mulPose(Axis.ZP.rotationDegrees(90));
         matrices.scale(0.03125f, 0.03125f, 0.03125f);
         ModelAstroBlasterHandle.render(matrices, EINSTEIN_HANDLE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
         if (stack.isEnchanted()) {
@@ -109,32 +109,32 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.pushPose();
         matrices.translate(0f, -pullback, 0f);
-        matrices.mulPose(new Quaternionf(rotation, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.YP.rotationDegrees(rotation));
         matrices.pushPose();
         VertexConsumer redstoneRodTextureVertexConsumer = REDSTONE_ROD_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
         matrices.translate(0.12f, 0.1f, 0.12f);
-        matrices.mulPose(new Quaternionf(pullback * 270, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
         md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.translate(-0.12f, 0.1f, 0.12f);
-        matrices.mulPose(new Quaternionf(pullback * 270, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
         md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.translate(-0.12f, 0.1f, -0.12f);
-        matrices.mulPose(new Quaternionf(pullback * 270, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
         md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.translate(0.12f, 0.1f, -0.12f);
-        matrices.mulPose(new Quaternionf(pullback * 270, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
         md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
@@ -236,16 +236,16 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.pushPose();
         matrices.translate(0f, 0.8f, 0f);
-        matrices.mulPose(new Quaternionf(180, 0.0F, 0.0F, 1.0F));
-        matrices.mulPose(new Quaternionf(spin, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.ZP.rotationDegrees(180));
+        matrices.mulPose(Axis.YP.rotationDegrees(spin));
         matrices.scale(0.9F, 4.1F, 0.9F);
         ModelAstroBlasterBody.render(matrices, buffer, (float) (0.22f + (Math.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.translate(0f, 0.8f, 0f);
-        matrices.mulPose(new Quaternionf(180, 0.0F, 0.0F, 1.0F));
-        matrices.mulPose(new Quaternionf(-spin, 0.0F, 1.0F, 0.0F));
+        matrices.mulPose(Axis.ZP.rotationDegrees(180));
+        matrices.mulPose(Axis.YP.rotationDegrees(-spin));
         matrices.scale(0.9F, 4.1F, 0.9F);
         ModelAstroBlasterBody.render(matrices, buffer, (float) (0.22f + (Math.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
         matrices.popPose();

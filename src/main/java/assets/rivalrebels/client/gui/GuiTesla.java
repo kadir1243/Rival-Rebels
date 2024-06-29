@@ -19,7 +19,6 @@ import assets.rivalrebels.common.item.weapon.ItemTesla;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.mixin.client.DrawContextAccessor;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -45,7 +44,7 @@ public class GuiTesla extends Screen
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
         this.clearWidgets();
-		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, "Knob");
+		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, Component.literal("Knob"));
 		this.addRenderableOnly(knob);
 	}
 
@@ -57,7 +56,6 @@ public class GuiTesla extends Screen
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         float f = 0.00390625F;
-		minecraft = Minecraft.getInstance();
         ((DrawContextAccessor) context).callDrawTexturedQuad(
             RRIdentifiers.guitesla,
             posX,
@@ -73,7 +71,7 @@ public class GuiTesla extends Screen
         super.render(context, mouseX, mouseY, delta);
 		if (!(ClientProxy.USE_KEY.isDown()))
 		{
-			this.minecraft.setScreen(null);
+            onClose();
 			this.minecraft.setWindowActive(true);
             ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
 			ItemStack stack = minecraft.player.getInventory().getItem(minecraft.player.getInventory().selected);

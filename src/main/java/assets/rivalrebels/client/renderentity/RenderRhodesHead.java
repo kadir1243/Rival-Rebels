@@ -13,8 +13,8 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityRhodesHead;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,10 +22,8 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Vector3f;
 
 @Environment(EnvType.CLIENT)
 public class RenderRhodesHead extends EntityRenderer<EntityRhodesHead> {
@@ -39,10 +37,9 @@ public class RenderRhodesHead extends EntityRenderer<EntityRhodesHead> {
     public void render(EntityRhodesHead entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         matrices.pushPose();
         matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
-        float[] colors = RenderRhodes.colors;
-        matrices.mulPose(new Quaternionf(yaw, 0, 1, 0));
-        matrices.mulPose(new Quaternionf(entity.getXRot(), 1, 0, 0));
-        RenderRhodes.head.render(TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), new Vector3f(colors[entity.getColor()*3], colors[entity.getColor()*3+1], colors[entity.getColor()*3+2]), light, OverlayTexture.NO_OVERLAY);
+        matrices.mulPose(Axis.YP.rotationDegrees(yaw));
+        matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
+        RenderRhodes.head.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

@@ -21,7 +21,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import org.joml.Vector3f;
 
 public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
@@ -73,8 +75,8 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 			height += 0.1;
 		}
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.solid());
         if (entity.tickCount < 600) {
+            VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.solid());
             ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring1 * 15, 64, 4, 0.5f, 0, 0, 0, (float) x, (float) y - 3, (float) z, light);
 			ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring2, 32, 1, 0.5f, 0, 0, 0, (float) x, (float) y + height + ring3, (float) z, light);
 			ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * ring3, 32, 2, 0.5f, 0, 0, 0, (float) x, (float) y + height + 7 + ring2, (float) z, light);
@@ -115,9 +117,9 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 			identifier = RRIdentifiers.etradiation;
 		}
 
-        buffer = vertexConsumers.getBuffer(RenderType.entitySolid(identifier));
+        VertexConsumer solidRenderer = vertexConsumers.getBuffer(RenderType.entitySolid(identifier));
 
-		int size = (int) (entity.getDeltaMovement().y());
+        int size = (int) (entity.getDeltaMovement().y());
 
 		Vector3f pxv1 = new Vector3f(4, 0 - size * 2.5F, 0);
 		Vector3f nxv1 = new Vector3f(-4, 0 - size * 2.5F, 0);
@@ -185,107 +187,111 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
 
 		if (entity.tickCount > 0 && entity.tickCount < 600 + time)
 		{
-			addFace(matrices, buffer, pxv1, nzv1, nzv2, pxv2, par5, par6, par7, par8);
-			addFace(matrices, buffer, pzv1, pxv1, pxv2, pzv2, par5, par6, par7, par8);
-			addFace(matrices, buffer, nxv1, pzv1, pzv2, nxv2, par5, par6, par7, par8);
-			addFace(matrices, buffer, nzv1, nxv1, nxv2, nzv2, par5, par6, par7, par8);
+			addFace(matrices, solidRenderer, pxv1, nzv1, nzv2, pxv2, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, pzv1, pxv1, pxv2, pzv2, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nxv1, pzv1, pzv2, nxv2, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nzv1, nxv1, nxv2, nzv2, par5, par6, par7, par8, light);
 		}
 
 		if (entity.tickCount > 10 && entity.tickCount < 610 + time)
 		{
-			addFace(matrices, buffer, pxv2, nzv2, nzv3, pxv3, par5, par6, par7, par8);
-			addFace(matrices, buffer, pzv2, pxv2, pxv3, pzv3, par5, par6, par7, par8);
-			addFace(matrices, buffer, nxv2, pzv2, pzv3, nxv3, par5, par6, par7, par8);
-			addFace(matrices, buffer, nzv2, nxv2, nxv3, nzv3, par5, par6, par7, par8);
+			addFace(matrices, solidRenderer, pxv2, nzv2, nzv3, pxv3, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, pzv2, pxv2, pxv3, pzv3, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nxv2, pzv2, pzv3, nxv3, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nzv2, nxv2, nxv3, nzv3, par5, par6, par7, par8, light);
 		}
 
 		if (entity.tickCount > 20 && entity.tickCount < 620 + time)
 		{
-			addFace(matrices, buffer, pxv3, nzv3, nzv4, pxv4, par5, par6, par7, par8);
-			addFace(matrices, buffer, pzv3, pxv3, pxv4, pzv4, par5, par6, par7, par8);
-			addFace(matrices, buffer, nxv3, pzv3, pzv4, nxv4, par5, par6, par7, par8);
-			addFace(matrices, buffer, nzv3, nxv3, nxv4, nzv4, par5, par6, par7, par8);
+			addFace(matrices, solidRenderer, pxv3, nzv3, nzv4, pxv4, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, pzv3, pxv3, pxv4, pzv4, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nxv3, pzv3, pzv4, nxv4, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nzv3, nxv3, nxv4, nzv4, par5, par6, par7, par8, light);
 		}
 
 		if (entity.tickCount > 30 && entity.tickCount < 630 + time)
 		{
-			addFace(matrices, buffer, pxv4, nzv4, nzv5, pxv5, par5, par6, par7, par8);
-			addFace(matrices, buffer, pzv4, pxv4, pxv5, pzv5, par5, par6, par7, par8);
-			addFace(matrices, buffer, nxv4, pzv4, pzv5, nxv5, par5, par6, par7, par8);
-			addFace(matrices, buffer, nzv4, nxv4, nxv5, nzv5, par5, par6, par7, par8);
+			addFace(matrices, solidRenderer, pxv4, nzv4, nzv5, pxv5, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, pzv4, pxv4, pxv5, pzv5, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nxv4, pzv4, pzv5, nxv5, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nzv4, nxv4, nxv5, nzv5, par5, par6, par7, par8, light);
 		}
 
 		if (entity.tickCount > 40 && entity.tickCount < 640 + time)
 		{
-			addFace(matrices, buffer, pxv5, nzv5, nzv6, pxv6, par5, par6, par7, par8);
-			addFace(matrices, buffer, pzv5, pxv5, pxv6, pzv6, par5, par6, par7, par8);
-			addFace(matrices, buffer, nxv5, pzv5, pzv6, nxv6, par5, par6, par7, par8);
-			addFace(matrices, buffer, nzv5, nxv5, nxv6, nzv6, par5, par6, par7, par8);
+			addFace(matrices, solidRenderer, pxv5, nzv5, nzv6, pxv6, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, pzv5, pxv5, pxv6, pzv6, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nxv5, pzv5, pzv6, nxv6, par5, par6, par7, par8, light);
+			addFace(matrices, solidRenderer, nzv5, nxv5, nxv6, nzv6, par5, par6, par7, par8, light);
 		}
 
 		if (entity.tickCount > 30 && entity.tickCount < 650 + time)
 		{
-			addFace(matrices, buffer, pxv6, nzv6, nzv7, pxv7, par6, par5, par8, par7);
-			addFace(matrices, buffer, pzv6, pxv6, pxv7, pzv7, par6, par5, par8, par7);
-			addFace(matrices, buffer, nxv6, pzv6, pzv7, nxv7, par6, par5, par8, par7);
-			addFace(matrices, buffer, nzv6, nxv6, nxv7, nzv7, par6, par5, par8, par7);
+			addFace(matrices, solidRenderer, pxv6, nzv6, nzv7, pxv7, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, pzv6, pxv6, pxv7, pzv7, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nxv6, pzv6, pzv7, nxv7, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nzv6, nxv6, nxv7, nzv7, par6, par5, par8, par7, light);
 		}
 
 		if (entity.tickCount > 20 && entity.tickCount < 650 + time)
 		{
-			addFace(matrices, buffer, pzv7, ppv7, ppv8, pzv8, par6, par5, par8, par7);
-			addFace(matrices, buffer, ppv7, pxv7, pxv8, ppv8, par6, par5, par8, par7);
-			addFace(matrices, buffer, pxv7, pnv7, pnv8, pxv8, par6, par5, par8, par7);
-			addFace(matrices, buffer, pnv7, nzv7, nzv8, pnv8, par6, par5, par8, par7);
-			addFace(matrices, buffer, nzv7, nnv7, nnv8, nzv8, par6, par5, par8, par7);
-			addFace(matrices, buffer, nnv7, nxv7, nxv8, nnv8, par6, par5, par8, par7);
-			addFace(matrices, buffer, nxv7, npv7, npv8, nxv8, par6, par5, par8, par7);
-			addFace(matrices, buffer, npv7, pzv7, pzv8, npv8, par6, par5, par8, par7);
+			addFace(matrices, solidRenderer, pzv7, ppv7, ppv8, pzv8, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, ppv7, pxv7, pxv8, ppv8, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, pxv7, pnv7, pnv8, pxv8, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, pnv7, nzv7, nzv8, pnv8, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nzv7, nnv7, nnv8, nzv8, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nnv7, nxv7, nxv8, nnv8, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nxv7, npv7, npv8, nxv8, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, npv7, pzv7, pzv8, npv8, par6, par5, par8, par7, light);
 		}
 
 		if (entity.tickCount > 10 && entity.tickCount < 650 + time)
 		{
-			addFace(matrices, buffer, pzv8, ppv8, ppv9, pzv9, par6, par5, par8, par7);
-			addFace(matrices, buffer, ppv8, pxv8, pxv9, ppv9, par6, par5, par8, par7);
-			addFace(matrices, buffer, pxv8, pnv8, pnv9, pxv9, par6, par5, par8, par7);
-			addFace(matrices, buffer, pnv8, nzv8, nzv9, pnv9, par6, par5, par8, par7);
-			addFace(matrices, buffer, nzv8, nnv8, nnv9, nzv9, par6, par5, par8, par7);
-			addFace(matrices, buffer, nnv8, nxv8, nxv9, nnv9, par6, par5, par8, par7);
-			addFace(matrices, buffer, nxv8, npv8, npv9, nxv9, par6, par5, par8, par7);
-			addFace(matrices, buffer, npv8, pzv8, pzv9, npv9, par6, par5, par8, par7);
+			addFace(matrices, solidRenderer, pzv8, ppv8, ppv9, pzv9, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, ppv8, pxv8, pxv9, ppv9, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, pxv8, pnv8, pnv9, pxv9, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, pnv8, nzv8, nzv9, pnv9, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nzv8, nnv8, nnv9, nzv9, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nnv8, nxv8, nxv9, nnv9, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, nxv8, npv8, npv9, nxv9, par6, par5, par8, par7, light);
+			addFace(matrices, solidRenderer, npv8, pzv8, pzv9, npv9, par6, par5, par8, par7, light);
 
-			addFace(matrices, buffer, pxv6, pzv6, nxv6, nzv6, par6, par5, par8, par7);
+			addFace(matrices, solidRenderer, pxv6, pzv6, nxv6, nzv6, par6, par5, par8, par7, light);
 
-			addTri(matrices, buffer, ppv9, v9, pzv9, par6, par5, par8, par7);
-			addTri(matrices, buffer, pxv9, v9, ppv9, par6, par5, par8, par7);
-			addTri(matrices, buffer, pnv9, v9, pxv9, par6, par5, par8, par7);
-			addTri(matrices, buffer, nzv9, v9, pnv9, par6, par5, par8, par7);
-			addTri(matrices, buffer, nnv9, v9, nzv9, par6, par5, par8, par7);
-			addTri(matrices, buffer, nxv9, v9, nnv9, par6, par5, par8, par7);
-			addTri(matrices, buffer, npv9, v9, nxv9, par6, par5, par8, par7);
-			addTri(matrices, buffer, pzv9, v9, npv9, par6, par5, par8, par7);
+			addTri(matrices, solidRenderer, ppv9, v9, pzv9, par6, par5, par8, par7, light);
+			addTri(matrices, solidRenderer, pxv9, v9, ppv9, par6, par5, par8, par7, light);
+			addTri(matrices, solidRenderer, pnv9, v9, pxv9, par6, par5, par8, par7, light);
+			addTri(matrices, solidRenderer, nzv9, v9, pnv9, par6, par5, par8, par7, light);
+			addTri(matrices, solidRenderer, nnv9, v9, nzv9, par6, par5, par8, par7, light);
+			addTri(matrices, solidRenderer, nxv9, v9, nnv9, par6, par5, par8, par7, light);
+			addTri(matrices, solidRenderer, npv9, v9, nxv9, par6, par5, par8, par7, light);
+			addTri(matrices, solidRenderer, pzv9, v9, npv9, par6, par5, par8, par7, light);
 		}
 
 		matrices.popPose();
 		matrices.popPose();
 	}
 
-	private void addFace(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float par5, float par6, float par7, float par8)
-	{
-		addVertice(poseStack, buffer, v1, par5, par8);
-		addVertice(poseStack, buffer, v2, par6, par8);
-		addVertice(poseStack, buffer, v3, par6, par7);
-		addVertice(poseStack, buffer, v4, par5, par7);
+	private void addFace(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float par5, float par6, float par7, float par8, int light) {
+		addVertice(poseStack, buffer, v1, par5, par8, light);
+		addVertice(poseStack, buffer, v2, par6, par8, light);
+		addVertice(poseStack, buffer, v3, par6, par7, light);
+		addVertice(poseStack, buffer, v4, par5, par7, light);
 	}
 
-	private void addTri(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, float par5, float par6, float par7, float par8) {
-		addVertice(poseStack, buffer, v3, par5, par8);
-		addVertice(poseStack, buffer, v1, par6, par8);
-		addVertice(poseStack, buffer, v2, par6, par7);
+	private void addTri(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, float par5, float par6, float par7, float par8, int light) {
+		addVertice(poseStack, buffer, v3, par5, par8, light);
+		addVertice(poseStack, buffer, v1, par6, par8, light);
+		addVertice(poseStack, buffer, v2, par6, par7, light);
 	}
 
-	private void addVertice(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2) {
-		buffer.addVertex(poseStack.last(), v).setUv(t, t2);
+	private void addVertice(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2, int light) {
+		buffer.addVertex(poseStack.last(), v)
+            .setUv(t, t2)
+            .setColor(CommonColors.WHITE)
+            .setOverlay(OverlayTexture.NO_OVERLAY)
+            .setLight(light)
+            .setNormal(poseStack.last(), 0, 1, 0);
 	}
 
     @Override

@@ -18,6 +18,8 @@ import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.LaptopEngagePacket;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -182,6 +184,7 @@ public class ItemBinoculars extends Item {
         }
     }
 
+    @Environment(EnvType.CLIENT)
     public boolean isMousePressed() {
         return (ClientProxy.USE_KEY.isDown() && RivalRebels.rtarget) || (Minecraft.getInstance().mouseHandler.isLeftPressed() && RivalRebels.lctarget);
     }

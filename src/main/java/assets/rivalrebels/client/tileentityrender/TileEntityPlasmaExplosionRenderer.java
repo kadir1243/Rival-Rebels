@@ -14,6 +14,7 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,7 +22,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<TileEntityPlasmaExplosion>, CustomRenderBoxExtension<TileEntityPlasmaExplosion> {
@@ -36,13 +36,13 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
 		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
 
 		matrices.pushPose();
-		matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
         ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.5f, 0.45f, 0.45f, 0.65f, 0.4f);
-        matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.6f, 0.45f, 0.35f, 0.65f, 0.4f);
-        matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.7f, 0.45f, 0.35f, 0.95f, 0.4f);
-        matrices.mulPose(new Quaternionf(entity.size * 50, 0f, 1, 0f));
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.8f, 0.45f, 0.35f, 0.65f, 0.4f);
 		matrices.popPose();
 		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.9f, 0.45f, 0.35f, 0.65f, 0.4f);

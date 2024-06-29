@@ -29,7 +29,7 @@ public class ContainerTsar extends AbstractContainerMenu {
     private final ContainerData propertyDelegate;
 
     public ContainerTsar(int syncId, Inventory inv) {
-        this(syncId, inv, new SimpleContainer(36), new SimpleContainerData(0));
+        this(syncId, inv, new SimpleContainer(36), new SimpleContainerData(4));
     }
 
 	public ContainerTsar(int syncId, Inventory inventoryPlayer, Container tsarBomb, ContainerData propertyDelegate) {

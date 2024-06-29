@@ -127,5 +127,46 @@ public class RRItems {
         }), enchantmentValue, SoundEvents.ARMOR_EQUIP_GENERIC, () -> Ingredient.EMPTY, layer != null ? List.of(layer) : List.of(), 1, 1));
     }
 
-    public static void init() {}
+    public static void init() {
+        RRItems.register("orebelhelmet", RRItems.orebelhelmet);
+        RRItems.register("orebelchest", RRItems.orebelchest);
+        RRItems.register("orebelpants", RRItems.orebelpants);
+        RRItems.register("orebelboots", RRItems.orebelboots);
+        RRItems.register("onukerhelmet", RRItems.onukerhelmet);
+        RRItems.register("onukerchest", RRItems.onukerchest);
+        RRItems.register("onukerpants", RRItems.onukerpants);
+        RRItems.register("onukerboots", RRItems.onukerboots);
+        RRItems.register("ointelhelmet", RRItems.ointelhelmet);
+        RRItems.register("ointelchest", RRItems.ointelchest);
+        RRItems.register("ointelpants", RRItems.ointelpants);
+        RRItems.register("ointelboots", RRItems.ointelboots);
+        RRItems.register("ohackerhelmet", RRItems.ohackerhelmet);
+        RRItems.register("ohackerchest", RRItems.ohackerchest);
+        RRItems.register("ohackerpants", RRItems.ohackerpants);
+        RRItems.register("ohackerboots", RRItems.ohackerboots);
+        RRItems.register("srebelhelmet", RRItems.srebelhelmet);
+        RRItems.register("srebelchest", RRItems.srebelchest);
+        RRItems.register("srebelpants", RRItems.srebelpants);
+        RRItems.register("srebelboots", RRItems.srebelboots);
+        RRItems.register("snukerhelmet", RRItems.snukerhelmet);
+        RRItems.register("snukerchest", RRItems.snukerchest);
+        RRItems.register("snukerpants", RRItems.snukerpants);
+        RRItems.register("snukerboots", RRItems.snukerboots);
+        RRItems.register("sintelhelmet", RRItems.sintelhelmet);
+        RRItems.register("sintelchest", RRItems.sintelchest);
+        RRItems.register("sintelpants", RRItems.sintelpants);
+        RRItems.register("sintelboots", RRItems.sintelboots);
+        RRItems.register("shackerhelmet", RRItems.shackerhelmet);
+        RRItems.register("shackerchest", RRItems.shackerchest);
+        RRItems.register("shackerpants", RRItems.shackerpants);
+        RRItems.register("shackerboots", RRItems.shackerboots);
+        RRItems.register("camohat", RRItems.camohat);
+        RRItems.register("camoshirt", RRItems.camoshirt);
+        RRItems.register("camopants", RRItems.camopants);
+        RRItems.register("camoshoes", RRItems.camoshoes);
+        RRItems.register("camohat2", RRItems.camohat2);
+        RRItems.register("camoshirt2", RRItems.camoshirt2);
+        RRItems.register("camopants2", RRItems.camopants2);
+        RRItems.register("camoshoes2", RRItems.camoshoes2);
+    }
 }

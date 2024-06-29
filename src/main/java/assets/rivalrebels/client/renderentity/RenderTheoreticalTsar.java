@@ -14,6 +14,7 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.client.model.ModelTheoreticalTsarBomba;
 import assets.rivalrebels.common.entity.EntityTheoreticalTsar;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -21,7 +22,6 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class RenderTheoreticalTsar extends EntityRenderer<EntityTheoreticalTsar> {
@@ -32,9 +32,9 @@ public class RenderTheoreticalTsar extends EntityRenderer<EntityTheoreticalTsar>
     @Override
     public void render(EntityTheoreticalTsar entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
 		matrices.pushPose();
-		matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
-		//GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
-		matrices.mulPose(new Quaternionf(entity.getXRot() - 90.0f, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
+		//matrices.mulPose(Axis.XP.rotationDegrees(90));
+		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
 		matrices.scale(1.3f, 1.3f, 1.3f);
 		ModelTheoreticalTsarBomba.render(matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();

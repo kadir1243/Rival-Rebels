@@ -14,7 +14,7 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.entity.EntityHotPotato;
 import com.mojang.blaze3d.vertex.PoseStack;
-import org.joml.Quaternionf;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -32,9 +32,9 @@ public class RenderHotPotato extends EntityRenderer<EntityHotPotato> {
     @Override
     public void render(EntityHotPotato entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         matrices.pushPose();
-		matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
-		//GlStateManager.rotatef(90.0f, 1.0F, 0.0F, 0.0F);
-		matrices.mulPose(new Quaternionf(entity.getXRot() - 90.0f, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
+		//matrices.mulPose(Axis.XP.rotationDegrees(90));
+		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
 		matrices.scale(2.0f, 1.0f, 2.0f);
 		ModelTsarBomba.render(matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();

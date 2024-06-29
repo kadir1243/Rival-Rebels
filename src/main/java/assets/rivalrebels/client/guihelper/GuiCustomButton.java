@@ -18,19 +18,20 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.joml.Vector2i;
 
 @Environment(EnvType.CLIENT)
 public class GuiCustomButton extends Button
 {
 	Rectangle			bbox;
-	Vector				tbox;
+    Vector2i				tbox;
 	ResourceLocation	resloc;
 	boolean				toggleable;
 	public boolean		isPressed	= false;
 	public boolean		wasPressed	= false;
 	public boolean		mouseDown	= false;
 
-	public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector uv, boolean isToggle)
+	public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector2i uv, boolean isToggle)
 	{
 		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Component.empty(), button -> {}, DEFAULT_NARRATION);
 		bbox = rec;
@@ -41,7 +42,7 @@ public class GuiCustomButton extends Button
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && bbox.isVecInside(new Vector(mouseX, mouseY));
+		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && bbox.isVecInside(new Vector2i(mouseX, mouseY));
 		wasPressed = false;
 		if (toggleable && current && !mouseDown)
 		{

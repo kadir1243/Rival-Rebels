@@ -16,8 +16,8 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.util.RandomSource;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 
 public class ModelAntimatterBombBlast {
@@ -62,7 +62,7 @@ public class ModelAntimatterBombBlast {
         matrices.pushPose();
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
-            matrices.mulPose(new Quaternionf(add * i, 0, 1, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < tsart; f++) {
                 int ind0 = (time.length + index - 1) % time.length;
                 float x0 = tsarx[ind0][f - 1] + (((tsarx[index][f - 1] - tsarx[ind0][f - 1]) / time[ind0]) * timer);
@@ -73,7 +73,7 @@ public class ModelAntimatterBombBlast {
                 TextureVertice t2 = new TextureVertice((1f / segments) * (i - 1), ((1f / tsart) * (f - 1)) + texanim);
                 TextureVertice t3 = new TextureVertice((1f / segments) * i, ((1f / tsart) * (f - 1)) + texanim);
                 TextureVertice t4 = new TextureVertice((1f / segments) * i, ((1f / tsart) * f) + texanim);
-                RenderHelper.addFace(buffer, new Vector3f(0f, y1, x1),
+                RenderHelper.addFace(matrices, buffer, new Vector3f(0f, y1, x1),
                     new Vector3f(0f, y0, x0),
                     new Vector3f(x0 * sin, y0, x0 * cos),
                     new Vector3f(x1 * sin, y1, x1 * cos), t1, t2, t3, t4, light);

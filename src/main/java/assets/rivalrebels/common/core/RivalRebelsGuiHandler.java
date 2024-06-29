@@ -12,15 +12,16 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.gui.*;
 import assets.rivalrebels.common.container.*;
+import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
+import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerType;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
@@ -32,9 +33,9 @@ public class RivalRebelsGuiHandler {
     public static final MenuType<ContainerLaptop> LAPTOP_SCREEN_HANDLER_TYPE = register("laptop", new MenuType<>(ContainerLaptop::new, FeatureFlags.DEFAULT_FLAGS));
     public static final MenuType<ContainerLoader> LOADER_SCREEN_HANDLER_TYPE = register("loader", new MenuType<>(ContainerLoader::new, FeatureFlags.DEFAULT_FLAGS));
     public static final MenuType<ContainerReciever> RECIEVER_SCREEN_HANDLER_TYPE = register("reciever", new MenuType<>(ContainerReciever::new, FeatureFlags.DEFAULT_FLAGS));
-    public static final MenuType<ContainerNuclearBomb> NUCLEAR_BOMB_SCREEN_HANDLER_TYPE = register("nuclear_bomb", new MenuType<>(ContainerNuclearBomb::new, FeatureFlags.DEFAULT_FLAGS));
+    public static final ExtendedScreenHandlerType<ContainerNuclearBomb, TileEntityNuclearBomb.BombData> NUCLEAR_BOMB_SCREEN_HANDLER_TYPE = register("nuclear_bomb", new ExtendedScreenHandlerType<>(ContainerNuclearBomb::new, TileEntityNuclearBomb.BombData.STREAM_CODEC));
     public static final MenuType<ContainerTachyonBomb> TACHYON_SCREEN_HANDLER_TYPE = register("tachyon", new MenuType<>(ContainerTachyonBomb::new, FeatureFlags.DEFAULT_FLAGS));
-    public static final MenuType<ContainerTheoreticalTsar> THEORETICAL_TSAR_SCREEN_HANDLER_TYPE = register("theoretical_tsar", new MenuType<>(ContainerTheoreticalTsar::new, FeatureFlags.DEFAULT_FLAGS));
+    public static final ExtendedScreenHandlerType<ContainerTheoreticalTsar, TileEntityTheoreticalTsarBomba.TheoreticalTsarData> THEORETICAL_TSAR_SCREEN_HANDLER_TYPE = register("theoretical_tsar", new ExtendedScreenHandlerType<>(ContainerTheoreticalTsar::new, TileEntityTheoreticalTsarBomba.TheoreticalTsarData.STREAM_CODEC));
 
     @Environment(EnvType.CLIENT)
     public static void registerClientGuiBinds() {

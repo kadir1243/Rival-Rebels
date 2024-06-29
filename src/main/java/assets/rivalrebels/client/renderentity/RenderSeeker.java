@@ -15,8 +15,8 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocket;
 import assets.rivalrebels.common.entity.EntitySeekB83;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,7 +24,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 
@@ -39,8 +38,8 @@ public class RenderSeeker extends EntityRenderer<EntitySeekB83>
     @Override
     public void render(EntitySeekB83 entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
 		matrices.pushPose();
-		matrices.mulPose(new Quaternionf(entity.getYRot() - 90.0f, 0.0F, 1.0F, 0.0F));
-		matrices.mulPose(new Quaternionf(entity.getXRot() - 90.0f, 0.0F, 0.0F, 1.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
+		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
 		matrices.scale(2.0f, 2.0f, 2.0f);
 		ModelRocket.render(matrices, ROCKET_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), true, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();

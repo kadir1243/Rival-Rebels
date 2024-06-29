@@ -14,29 +14,28 @@ package assets.rivalrebels.common.container;
 import assets.rivalrebels.common.block.trap.BlockTimedBomb;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.*;
+import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerTheoreticalTsar extends AbstractContainerMenu
 {
 	protected Container bomb;
-    private final ContainerData propertyDelegate;
+    private final TileEntityTheoreticalTsarBomba.TheoreticalTsarData data;
 
-    public ContainerTheoreticalTsar(int syncId, Inventory inv) {
-        this(syncId, inv, new SimpleContainer(36), new SimpleContainerData(3));
+    public ContainerTheoreticalTsar(int syncId, Inventory inv, TileEntityTheoreticalTsarBomba.TheoreticalTsarData data) {
+        this(syncId, inv, new SimpleContainer(36), data);
     }
 
-    public ContainerTheoreticalTsar(int syncId, Inventory inventoryPlayer, Container bomb, ContainerData propertyDelegate) {
+    public ContainerTheoreticalTsar(int syncId, Inventory inventoryPlayer, Container bomb, TileEntityTheoreticalTsarBomba.TheoreticalTsarData data) {
         super(RivalRebelsGuiHandler.THEORETICAL_TSAR_SCREEN_HANDLER_TYPE, syncId);
         this.bomb = bomb;
-        this.propertyDelegate = propertyDelegate;
+        this.data = data;
         addSlot(new SlotRR(bomb, 0, 18, 48, 1, ItemFuse.class));
 		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna));
 		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna));
@@ -110,15 +109,15 @@ public class ContainerTheoreticalTsar extends AbstractContainerMenu
 	}
 
     public int getCountdown() {
-        return this.propertyDelegate.get(0);
+        return this.data.countdown();
     }
 
     public boolean isArmed() {
-        return this.propertyDelegate.get(1) == 1;
+        return this.data.isArmed();
     }
 
     public float getMegaton() {
-        return Float.intBitsToFloat(this.propertyDelegate.get(2));
+        return this.data.megaton();
     }
 
 }

@@ -20,19 +20,22 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.ChipData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -40,8 +43,10 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityNuclearBomb extends BlockEntity implements Container, Tickable, MenuProvider
-{
+import java.util.ArrayList;
+import java.util.List;
+
+public class TileEntityNuclearBomb extends BlockEntity implements Container, Tickable, ExtendedScreenHandlerFactory<TileEntityNuclearBomb.BombData> {
 	public String			username		= null;
 	public RivalRebelsTeam	rrteam			= null;
 	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
@@ -65,58 +70,79 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 	}
 
     @Override
-	public ItemStack getItem(int par1)
-	{
-		return this.chestContents.get(par1);
+	public ItemStack getItem(int slot) {
+		return this.chestContents.get(slot);
 	}
 
+    public List<ItemStack> getRods() {
+        List<ItemStack> list = new ArrayList<>();
+        for (int i = 0; i <= 4; i++) {
+            list.add(getItem(i + 1));
+            list.add(getItem(i + 6));
+        }
+        return list;
+    }
+
     @Override
-	public ItemStack removeItem(int slot, int amount)
-	{
-		if (!this.chestContents.get(slot).isEmpty())
-		{
-			ItemStack var3;
+	public ItemStack removeItem(int slot, int amount) {
+        if (!this.getItem(slot).isEmpty()) {
+			ItemStack stack;
 
-			if (this.chestContents.get(slot).getCount() <= amount)
-			{
-				var3 = this.chestContents.get(slot);
-				this.chestContents.set(slot, ItemStack.EMPTY);
-            }
-			else
-			{
-				var3 = this.chestContents.get(slot).split(amount);
+			if (this.getItem(slot).getCount() <= amount) {
+				stack = this.getItem(slot);
+				this.setItem(slot, ItemStack.EMPTY);
+            } else {
+				stack = this.getItem(slot).split(amount);
 
-				if (this.chestContents.get(slot).isEmpty())
-				{
-					this.chestContents.set(slot, ItemStack.EMPTY);
+				if (this.getItem(slot).isEmpty()) {
+					this.setItem(slot, ItemStack.EMPTY);
 				}
-
             }
-            return var3;
+            return stack;
         }
         return ItemStack.EMPTY;
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-		if (!this.chestContents.get(index).isEmpty()) {
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
-			return var2;
+		if (!this.getItem(index).isEmpty()) {
+			ItemStack oldStack = this.getItem(index);
+			this.setItem(index, ItemStack.EMPTY);
+			return oldStack;
 		}
         return ItemStack.EMPTY;
 	}
 
 	@Override
-	public void setItem(int index, ItemStack stack)
-	{
+	public void setItem(int index, ItemStack stack) {
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
+		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
 			stack.setCount(this.getMaxStackSize());
 		}
+        setChanged();
 	}
+
+    @Override
+    public void setChanged() {
+        super.setChanged();
+        hasTrollface = false;
+        AmountOfCharges = 0;
+        for (ItemStack rod : getRods()) {
+            hasTrollface |= rod.is(RRItems.trollmask);
+            if (rod.is(RRItems.nuclearelement)) {
+                AmountOfCharges++;
+            }
+        }
+        hasFuse = getItem(0).is(RRItems.fuse);
+        hasChip = getItem(12).is(RRItems.chip);
+        if (hasChip) {
+            ChipData chipData = getItem(12).get(RRComponents.CHIP_DATA);
+            rrteam = chipData.team();
+            username = chipData.username();
+        }
+        hasExplosive = getItem(11).is(RRBlocks.timedbomb.asItem());
+    }
 
     @Override
     public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
@@ -138,63 +164,21 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 	}
 
     @Override
-	public boolean stillValid(Player player)
-	{
-		return this.level.getBlockEntity(this.getBlockPos()) == this && player.distanceToSqr(this.getBlockPos().getX() + 0.5D, this.getBlockPos().getY() + 0.5D, this.getBlockPos().getZ() + 0.5D) <= 64.0D;
+	public boolean stillValid(Player player) {
+        return Container.stillValidBlockEntity(this, player, 64);
 	}
 
     @Override
 	public void tick() {
-		AmountOfCharges = 0;
-		hasTrollface = false;
-		for (int i = 1; i <= 10; i++) {
-			if (!getItem(i).isEmpty() && getItem(i).getItem() == RRItems.nuclearelement) {
-				AmountOfCharges++;
-			}
-			if (!getItem(i).isEmpty() && getItem(i).getItem() == RRItems.trollmask) {
-				hasTrollface = true;
-			}
-		}
-
-		if (!getItem(0).isEmpty()) {
-			hasFuse = getItem(0).getItem() == RRItems.fuse;
-		} else {
-			hasFuse = false;
-		}
-
-		if (!getItem(12).isEmpty())
-		{
-			hasChip = getItem(12).getItem() == RRItems.chip;
-			if (hasChip) {
-                ChipData chipData = getItem(12).get(RRComponents.CHIP_DATA);
-                rrteam = chipData.team();
-				username = chipData.username();
-			}
-		}
-		else
-		{
-			hasChip = false;
-		}
-
-		if (!getItem(11).isEmpty()) {
-			hasExplosive = true;// getStack(11).func_150998_b(RivalRebels.timedbomb);
-		} else {
-			hasExplosive = false;
-		}
-
         boolean sp = level.isClientSide || (!level.isClientSide && (level.getServer().isSingleplayer() || level.getServer().getPlayerCount() == 1));
 
 		if (hasFuse && hasExplosive && hasChip)
 		{
 			double dist = 10000000;
-			if (!sp || RivalRebels.stopSelfnukeinSP)
-			{
-				if (rrteam == RivalRebelsTeam.OMEGA)
-				{
+			if (!sp || RivalRebels.stopSelfnukeinSP) {
+				if (rrteam == RivalRebelsTeam.OMEGA) {
 					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.omegaObjPos.getZ());
-				}
-				if (rrteam == RivalRebelsTeam.SIGMA)
-				{
+				} else if (rrteam == RivalRebelsTeam.SIGMA) {
 					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
 				}
 			}
@@ -204,7 +188,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 			}
 			else if (!level.isClientSide)
 			{
-				this.chestContents.set(0, ItemStack.EMPTY);
+				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
                     player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
@@ -217,9 +201,9 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 		}
 
 		if (Countdown == 200 && !level.isClientSide && RivalRebels.nuclearBombCountdown > 10) {
-            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
-            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
-            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
+            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_1");
+            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_2");
+            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_3");
             for (Player player : level.players()) {
                 player.displayClientMessage(line1, false);
                 player.displayClientMessage(line2, false);
@@ -272,13 +256,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
-            }
-        }
-
-        return true;
+        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
     }
 
     @Override
@@ -289,29 +267,21 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerNuclearBomb(syncId, inv, this, propertyDelegate);
+        return new ContainerNuclearBomb(syncId, inv, this, getScreenOpeningData(null));
     }
 
-    private final ContainerData propertyDelegate = new ContainerData() {
-        @Override
-        public int get(int index) {
-            return switch (index) {
-                case 0 -> Countdown;
-                case 1 -> AmountOfCharges;
-                case 2 -> hasTrollface ? 1 : 0;
-                case 3 -> hasExplosive && hasFuse ? 1 : 0;
-                default -> 0;
-            };
-        }
+    public record BombData(int countdown, int amountOfCharges, boolean hasTrollFace, boolean isArmed) {
+        public static final StreamCodec<FriendlyByteBuf, BombData> STREAM_CODEC = StreamCodec.composite(
+            ByteBufCodecs.INT, BombData::countdown,
+            ByteBufCodecs.INT, BombData::amountOfCharges,
+            ByteBufCodecs.BOOL, BombData::hasTrollFace,
+            ByteBufCodecs.BOOL, BombData::isArmed,
+            BombData::new
+        );
+    }
 
-        @Override
-        public void set(int index, int value) {
-
-        }
-
-        @Override
-        public int getCount() {
-            return 4;
-        }
-    };
+    @Override
+    public BombData getScreenOpeningData(ServerPlayer player) {
+        return new BombData(Countdown, AmountOfCharges, hasTrollface, hasExplosive && hasFuse);
+    }
 }

@@ -32,7 +32,6 @@ public class GuiNextBattle extends Screen
 	private GuiButton	waitButton;
 	private int			num				= 0;
 	private int			count			= 0;
-	private boolean		prevclick;
 
 	public GuiNextBattle() {
         super(Component.empty());
@@ -44,8 +43,14 @@ public class GuiNextBattle extends Screen
 		posY = (this.height - ySizeOfTexture) / 2;
 		this.clearWidgets();
 
-		nextBattleButton = new GuiButton(posX + 66, posY + 203, 60, 11, Component.translatable("RivalRebels.nextbattle.yes"));
-		waitButton = new GuiButton(posX + 128, posY + 203, 60, 11, Component.translatable("RivalRebels.nextbattle.no"));
+		nextBattleButton = new GuiButton(posX + 66, posY + 203, 60, 11, Component.translatable("RivalRebels.nextbattle.yes"), button -> {
+            ClientPlayNetworking.send(new VotePacket(true));
+            onClose();
+        });
+		waitButton = new GuiButton(posX + 128, posY + 203, 60, 11, Component.translatable("RivalRebels.nextbattle.no"), button -> {
+            ClientPlayNetworking.send(new VotePacket(false));
+            onClose();
+        });
 		this.addRenderableOnly(nextBattleButton);
 		this.addRenderableOnly(waitButton);
 	}
@@ -56,8 +61,8 @@ public class GuiNextBattle extends Screen
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        PoseStack matrices = context.pose();
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        PoseStack matrices = graphics.pose();
         count++;
 		if (count == 60)
 		{
@@ -65,7 +70,7 @@ public class GuiNextBattle extends Screen
 			count = 0;
 		}
         float f = 0.00390625F;
-        ((DrawContextAccessor) context).callDrawTexturedQuad(
+        ((DrawContextAccessor) graphics).callDrawTexturedQuad(
             num == 0 ? RRIdentifiers.guitwarning0 : RRIdentifiers.guitwarning1,
             posX,
             posX + xSizeOfTexture,
@@ -77,24 +82,12 @@ public class GuiNextBattle extends Screen
             ySizeOfTexture * f,
             0
         );
-        context.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
+        graphics.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
 		float scalefactor = 4f;
 		matrices.scale(scalefactor, scalefactor, scalefactor);
-        context.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
+        graphics.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
 		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
-        MultiLineLabel.create(font, Component.translatable("RivalRebels.nextbattle.question"), 128).renderLeftAlignedNoShadow(context, posX + 64, posY + 160, this.font.lineHeight, 0xffffff);
-        super.render(context, mouseX, mouseY, delta);
-
-		if (minecraft.mouseHandler.isLeftPressed() && !prevclick) {
-			if (nextBattleButton.mouseClicked(mouseX, mouseY, 0)) {
-                ClientPlayNetworking.send(new VotePacket(true));
-				this.minecraft.setScreen(null);
-			}
-			if (waitButton.mouseClicked(mouseX, mouseY, 0)) {
-                ClientPlayNetworking.send(new VotePacket(false));
-				this.minecraft.setScreen(null);
-			}
-		}
-		prevclick = minecraft.mouseHandler.isLeftPressed();
+        MultiLineLabel.create(font, Component.translatable("RivalRebels.nextbattle.question"), 128).renderLeftAlignedNoShadow(graphics, posX + 64, posY + 160, this.font.lineHeight, 0xffffff);
+        super.render(graphics, mouseX, mouseY, delta);
 	}
 }

@@ -54,11 +54,11 @@ public class GuiTsar extends AbstractContainerScreen<ContainerTsar> {
 		}
 		if (menu.getCountdown() % 20 >= 10)
 		{
-			context.drawString(font, Component.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, imageHeight - 107, 0xFFFFFF, false);
+			context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFFFFFF, false);
 		}
 		else
 		{
-            context.drawString(font, Component.translatable("RivalRebels.tsar.timer") + ": -" + seconds + ":" + milli, 6, imageHeight - 107, 0xFF0000, false);
+            context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFF0000, false);
 		}
 		float scalef = 0.666f;
 		matrices.pushPose();
@@ -77,28 +77,5 @@ public class GuiTsar extends AbstractContainerScreen<ContainerTsar> {
 		{
             context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable("RivalRebels.tsar.megatons")), 6, imageHeight - 97, 0xFFFFFF, false);
 		}
-
-		int mousex = mouseX;
-		int mousey = mouseY;
-		int posx = (width - imageWidth) / 2;
-		int posy = (height - imageHeight) / 2;
-		int coordx = posx + 53;
-		int coordy = posy + 194;
-		int widthx = 72;
-		int widthy = 8;
-		if (mousex > coordx && mousey > coordy && mousex < coordx + widthx && mousey < coordy + widthy)
-		{
-			mousex -= posx;
-			mousey -= posy;
-			context.fillGradient(mousex, mousey, mousex + font.width("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-            context.drawString(font, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
-			if (!buttondown && minecraft.mouseHandler.isLeftPressed())
-			{
-                Util.getPlatform().openUri("http://rivalrebels.com");
-			}
-		}
-		buttondown = minecraft.mouseHandler.isLeftPressed();
-	}
-
-	boolean	buttondown;
+    }
 }

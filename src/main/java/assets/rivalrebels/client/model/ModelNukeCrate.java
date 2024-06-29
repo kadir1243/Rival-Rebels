@@ -39,17 +39,17 @@ public class ModelNukeCrate
 	public static void renderModelA(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
 		matrices.pushPose();
-		RenderHelper.addFace(buffer, v4, v8, v5, v1, t1, t2, t3, t4, light, overlay);
-		RenderHelper.addFace(buffer, v3, v7, v8, v4, t1, t2, t3, t4, light, overlay);
-		RenderHelper.addFace(buffer, v2, v6, v7, v3, t1, t2, t3, t4, light, overlay);
-		RenderHelper.addFace(buffer, v1, v5, v6, v2, t1, t2, t3, t4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, v4, v8, v5, v1, t1, t2, t3, t4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, v3, v7, v8, v4, t1, t2, t3, t4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, v2, v6, v7, v3, t1, t2, t3, t4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, v1, v5, v6, v2, t1, t2, t3, t4, light, overlay);
 		matrices.popPose();
 	}
 
 	public static void renderModelB(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
 		matrices.pushPose();
-		RenderHelper.addFace(buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, overlay);
-		RenderHelper.addFace(buffer, v8, v7, v6, v5, t1, t2, t3, t4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, v8, v7, v6, v5, t1, t2, t3, t4, light, overlay);
 		matrices.popPose();
 	}
 }

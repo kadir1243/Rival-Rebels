@@ -16,15 +16,14 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.entity.EntityB83;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 
@@ -42,9 +41,9 @@ public class RenderB83 extends EntityRenderer<EntityB83>
     public void render(EntityB83 entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-        matrices.mulPose(new Quaternionf(yaw - 90.0f, 0.0F, 1.0F, 0.0F));
-        matrices.mulPose(new Quaternionf(entity.getXRot() - 180.0f, 0.0F, 0.0F, 1.0F));
-        md.render(TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+        matrices.mulPose(Axis.YP.rotationDegrees(yaw - 90));
+        matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 180));
+        md.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
         matrices.popPose();
     }
 

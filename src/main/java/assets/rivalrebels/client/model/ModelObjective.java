@@ -130,30 +130,30 @@ public class ModelObjective
 	public static void renderA(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
 		matrices.pushPose();
-		RenderHelper.addFace(buffer, lloader1, lloader12, rloader12, rloader1, l1f, l12s, r12s, r1f, light, overlay);
-		RenderHelper.addFace(buffer, lloader2, lloader1, rloader1, rloader2, l2, l1s, r1s, r2, light, overlay);
-		RenderHelper.addFace(buffer, lloader3, lloader2, rloader2, rloader3, l3f, l2, r2, r3f, light, overlay);
-		RenderHelper.addFace(buffer, lloader4, lloader3, rloader3, rloader4, l4, l3s, r3s, r4, light, overlay);
-		RenderHelper.addFace(buffer, lloader5, lloader4, rloader4, rloader5, l5, l4, r4, r5, light, overlay);
-		RenderHelper.addFace(buffer, lloader6, lloader5, rloader5, rloader6, l6f, l5, r5, r6f, light, overlay);
-		RenderHelper.addFace(buffer, lloader7, lloader6, rloader6, rloader7, l7, l6s, r6s, r7, light, overlay);
-		RenderHelper.addFace(buffer, lloader8, lloader7, rloader7, rloader8, l8, l7, r7, r8, light, overlay);
-		RenderHelper.addFace(buffer, lloader9, lloader8, rloader8, rloader9, l9, l8, r8, r9, light, overlay);
-		RenderHelper.addFace(buffer, lloader10, lloader9, rloader9, rloader10, l10, l9, r9, r10, light, overlay);
-		RenderHelper.addFace(buffer, lloader11, lloader10, rloader10, rloader11, l11, l10, r10, r11, light, overlay);
-		RenderHelper.addFace(buffer, lloader12, lloader11, rloader11, rloader12, l12f, l11, r11, r12f, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader1, lloader12, rloader12, rloader1, l1f, l12s, r12s, r1f, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader2, lloader1, rloader1, rloader2, l2, l1s, r1s, r2, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader3, lloader2, rloader2, rloader3, l3f, l2, r2, r3f, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader4, lloader3, rloader3, rloader4, l4, l3s, r3s, r4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader5, lloader4, rloader4, rloader5, l5, l4, r4, r5, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader6, lloader5, rloader5, rloader6, l6f, l5, r5, r6f, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader7, lloader6, rloader6, rloader7, l7, l6s, r6s, r7, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader8, lloader7, rloader7, rloader8, l8, l7, r7, r8, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader9, lloader8, rloader8, rloader9, l9, l8, r8, r9, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader10, lloader9, rloader9, rloader10, l10, l9, r9, r10, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader11, lloader10, rloader10, rloader11, l11, l10, r10, r11, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader12, lloader11, rloader11, rloader12, l12f, l11, r11, r12f, light, overlay);
 
-		RenderHelper.addFace(buffer, lloader1, lloader2, lloader11, lloader12, ls6, ls5, ls8, ls7, light, overlay);
-		RenderHelper.addFace(buffer, lloader2, lloader3, lloader10, lloader11, ls5, ls4, ls9, ls8, light, overlay);
-		RenderHelper.addFace(buffer, lloader3, lloader4, lloader9, lloader10, ls4, ls3, ls10, ls9, light, overlay);
-		RenderHelper.addFace(buffer, lloader4, lloader5, lloader8, lloader9, ls3, ls2, ls11, ls10, light, overlay);
-		RenderHelper.addFace(buffer, lloader5, lloader6, lloader7, lloader8, ls2, ls1, ls12, ls11, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader1, lloader2, lloader11, lloader12, ls6, ls5, ls8, ls7, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader2, lloader3, lloader10, lloader11, ls5, ls4, ls9, ls8, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader3, lloader4, lloader9, lloader10, ls4, ls3, ls10, ls9, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader4, lloader5, lloader8, lloader9, ls3, ls2, ls11, ls10, light, overlay);
+		RenderHelper.addFace(matrices, buffer, lloader5, lloader6, lloader7, lloader8, ls2, ls1, ls12, ls11, light, overlay);
 
-		RenderHelper.addFace(buffer, rloader2, rloader1, rloader12, rloader11, rs8, rs7, rs6, rs5, light, overlay);
-		RenderHelper.addFace(buffer, rloader3, rloader2, rloader11, rloader10, rs9, rs8, rs5, rs4, light, overlay);
-		RenderHelper.addFace(buffer, rloader4, rloader3, rloader10, rloader9, rs10, rs9, rs4, rs3, light, overlay);
-		RenderHelper.addFace(buffer, rloader5, rloader4, rloader9, rloader8, rs11, rs10, rs3, rs2, light, overlay);
-		RenderHelper.addFace(buffer, rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1, light, overlay);
+		RenderHelper.addFace(matrices, buffer, rloader2, rloader1, rloader12, rloader11, rs8, rs7, rs6, rs5, light, overlay);
+		RenderHelper.addFace(matrices, buffer, rloader3, rloader2, rloader11, rloader10, rs9, rs8, rs5, rs4, light, overlay);
+		RenderHelper.addFace(matrices, buffer, rloader4, rloader3, rloader10, rloader9, rs10, rs9, rs4, rs3, light, overlay);
+		RenderHelper.addFace(matrices, buffer, rloader5, rloader4, rloader9, rloader8, rs11, rs10, rs3, rs2, light, overlay);
+		RenderHelper.addFace(matrices, buffer, rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1, light, overlay);
 		matrices.popPose();
 	}
 
@@ -171,18 +171,18 @@ public class ModelObjective
 	{
 		matrices.pushPose();
 		matrices.translate(slide, 0, 0);
-		addFace(buffer, vfront3, vfront4, vfront1, vfront2, x, y, light, overlay);
-		addFace(buffer, vcside3, vfront2, vfront1, vcside2, X, Y, light, overlay);
-		addFace(buffer, vcside5, vfront4, vfront3, vcside4, X, Y, light, overlay);
-		addFace(buffer, vcside2, vfront1, vfront4, vcside5, X, Y, light, overlay);
-		addFace(buffer, vcside4, vfront3, vfront2, vcside3, X, Y, light, overlay);
+		addFace(matrices, buffer, vfront3, vfront4, vfront1, vfront2, x, y, light, overlay);
+		addFace(matrices, buffer, vcside3, vfront2, vfront1, vcside2, X, Y, light, overlay);
+		addFace(matrices, buffer, vcside5, vfront4, vfront3, vcside4, X, Y, light, overlay);
+		addFace(matrices, buffer, vcside2, vfront1, vfront4, vcside5, X, Y, light, overlay);
+		addFace(matrices, buffer, vcside4, vfront3, vfront2, vcside3, X, Y, light, overlay);
 		matrices.popPose();
 	}
 
-	private static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x, float y, int light, int overlay) {
-		RenderHelper.addVertice(buffer, v1, new TextureVertice(x + 0.078125f, y + 0.15625f), light, overlay);
-		RenderHelper.addVertice(buffer, v2, new TextureVertice(x + 0.078125f, y - 0.15625f), light, overlay);
-		RenderHelper.addVertice(buffer, v3, new TextureVertice(x - 0.078125f, y - 0.15625f), light, overlay);
-		RenderHelper.addVertice(buffer, v4, new TextureVertice(x - 0.078125f, y + 0.15625f), light, overlay);
+	private static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x, float y, int light, int overlay) {
+		RenderHelper.addVertice(pose, buffer, v1, new TextureVertice(x + 0.078125f, y + 0.15625f), light, overlay);
+		RenderHelper.addVertice(pose, buffer, v2, new TextureVertice(x + 0.078125f, y - 0.15625f), light, overlay);
+		RenderHelper.addVertice(pose, buffer, v3, new TextureVertice(x - 0.078125f, y - 0.15625f), light, overlay);
+		RenderHelper.addVertice(pose, buffer, v4, new TextureVertice(x - 0.078125f, y + 0.15625f), light, overlay);
 	}
 }

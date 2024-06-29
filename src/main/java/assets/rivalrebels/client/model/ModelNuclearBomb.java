@@ -69,22 +69,22 @@ public class ModelNuclearBomb {
         matrices.pushPose();
         matrices.scale(1.01f, 1.01f, 1.01f);
 
-        RenderHelper.addVertice(buffer, v2, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v1, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v5, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v6, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v3, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v2, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v6, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v7, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v4, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v3, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v7, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v8, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v1, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v4, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v8, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
-        RenderHelper.addVertice(buffer, v5, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v2, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v1, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v5, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v6, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v3, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v2, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v6, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v7, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v4, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v3, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v7, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v8, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v1, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v4, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v8, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
+        RenderHelper.addVertice(matrices, buffer, v5, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
 
         itemIcon = 40;
         var3 = (itemIcon % 16 * 16 + 0) / 256.0F;

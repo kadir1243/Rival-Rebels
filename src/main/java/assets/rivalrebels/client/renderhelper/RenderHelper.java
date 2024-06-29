@@ -17,11 +17,11 @@ import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.FastColor;
-import org.joml.Quaternionf;
 import org.joml.Vector3f;
 import org.joml.Vector4f;
 
@@ -41,7 +41,7 @@ public class RenderHelper {
 
     public static void renderBox(PoseStack matrices, VertexConsumer buffer, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light)
 	{
-		matrices.mulPose(new Quaternionf(90, 0.0F, 1.0F, 0.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		texLocX /= texXsize;
 		texLocY /= texYsize;
 		float hl = (length / 2f) / resolution;
@@ -75,25 +75,25 @@ public class RenderHelper {
 		TextureVertice t12 = new TextureVertice(texLocX + xtd + xtl, texLocY + ytd + yth);
 		TextureVertice t13 = new TextureVertice(texLocX + xtd + xtl + xtd, texLocY + ytd + yth);
 		TextureVertice t14 = new TextureVertice(texLocX + xtd + xtl + xtl + xtd, texLocY + ytd + yth);
-		addFace(buffer, xpypzn, xnypzn, xnypzp, xpypzp, t6, t2, t1, t5, light); // top
-		addFace(buffer, xpynzp, xnynzp, xnynzn, xpynzn, t6, t2, t3, t8, light); // bottom
-		addFace(buffer, xnypzp, xnynzp, xpynzp, xpypzp, t4, t10, t11, t5, light); // right
-		addFace(buffer, xpypzp, xpynzp, xpynzn, xpypzn, t5, t11, t12, t6, light); // front
-		addFace(buffer, xpypzn, xpynzn, xnynzn, xnypzn, t6, t12, t13, t7, light); // left
-		addFace(buffer, xnypzn, xnynzn, xnynzp, xnypzp, t7, t13, t14, t9, light); // back
+		addFace(matrices, buffer, xpypzn, xnypzn, xnypzp, xpypzp, t6, t2, t1, t5, light); // top
+		addFace(matrices, buffer, xpynzp, xnynzp, xnynzn, xpynzn, t6, t2, t3, t8, light); // bottom
+		addFace(matrices, buffer, xnypzp, xnynzp, xpynzp, xpypzp, t4, t10, t11, t5, light); // right
+		addFace(matrices, buffer, xpypzp, xpynzp, xpynzn, xpypzn, t5, t11, t12, t6, light); // front
+		addFace(matrices, buffer, xpypzn, xpynzn, xnynzn, xnypzn, t6, t12, t13, t7, light); // left
+		addFace(matrices, buffer, xnypzn, xnynzn, xnynzp, xnypzp, t7, t13, t14, t9, light); // back
 	}
 
-    public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light) {
-        addFace(buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, OverlayTexture.NO_OVERLAY);
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light) {
+        addFace(pose, buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, OverlayTexture.NO_OVERLAY);
     }
 
-    public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
         Vector3f mv = new Vector3f((v1.x + v2.x + v3.x + v4.x) / 4, (v1.y + v2.y + v3.y + v4.y) / 4, (v1.z + v2.z + v3.z + v4.z) / 4);
         TextureVertice mt = new TextureVertice((t1.x + t2.x + t3.x + t4.x) / 4, (t1.y + t2.y + t3.y + t4.y) / 4);
-        addVertice(buffer, v1, t1, light, overlay);
-        addVertice(buffer, v2, t2, light, overlay);
-        addVertice(buffer, v3, t3, light, overlay);
-        addVertice(buffer, mv, mt, light, overlay);
+        addVertice(pose, buffer, v1, t1, light, overlay);
+        addVertice(pose, buffer, v2, t2, light, overlay);
+        addVertice(pose, buffer, v3, t3, light, overlay);
+        addVertice(pose, buffer, mv, mt, light, overlay);
     }
 
     public static void addFace(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, Vector4f color, int light, int overlay) {
@@ -103,35 +103,46 @@ public class RenderHelper {
         addVertice(poseStack, buffer, v4, color, light, overlay);
     }
 
-    public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureFace t, int light, int overlay) {
-        addVertice(buffer, v1, t.v1, light, overlay);
-        addVertice(buffer, v2, t.v2, light, overlay);
-        addVertice(buffer, v3, t.v3, light, overlay);
-        addVertice(buffer, v4, t.v4, light, overlay);
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureFace t, int light, int overlay) {
+        addVertice(pose, buffer, v1, t.v1, light, overlay);
+        addVertice(pose, buffer, v2, t.v2, light, overlay);
+        addVertice(pose, buffer, v3, t.v3, light, overlay);
+        addVertice(pose, buffer, v4, t.v4, light, overlay);
     }
 
-    public static void addFace(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x1, float x2, float y2, float y1, int light, int overlay) {
-        addVertice(buffer, v1, new TextureVertice(x1, y1), light, overlay);
-        addVertice(buffer, v2, new TextureVertice(x2, y1), light, overlay);
-        addVertice(buffer, v3, new TextureVertice(x2, y2), light, overlay);
-        addVertice(buffer, v4, new TextureVertice(x1, y2), light, overlay);
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x1, float x2, float y2, float y1, int light, int overlay) {
+        addVertice(pose, buffer, v1, new TextureVertice(x1, y1), light, overlay);
+        addVertice(pose, buffer, v2, new TextureVertice(x2, y1), light, overlay);
+        addVertice(pose, buffer, v3, new TextureVertice(x2, y2), light, overlay);
+        addVertice(pose, buffer, v4, new TextureVertice(x1, y2), light, overlay);
     }
 
-    public static void addTri(VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector4f color) {
-        buffer.addVertex(v3).setColor(color.x(), color.y(), color.z(), color.w());
-        buffer.addVertex(v1).setColor(color.x(), color.y(), color.z(), color.w());
-        buffer.addVertex(v2).setColor(color.x(), color.y(), color.z(), color.w());
+    public static void addTri(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector4f color) {
+        buffer.addVertex(pose.last(), v3).setColor(color.x(), color.y(), color.z(), color.w());
+        buffer.addVertex(pose.last(), v1).setColor(color.x(), color.y(), color.z(), color.w());
+        buffer.addVertex(pose.last(), v2).setColor(color.x(), color.y(), color.z(), color.w());
     }
 
-    public static void addVertice(VertexConsumer buffer, Vector3f v, TextureVertice t, Vector4f color, int light, int overlay) {
-        buffer.addVertex(v.x, v.y, v.z, FastColor.ARGB32.colorFromFloat(color.x(), color.y(), color.z(), color.w()), t.x, t.y, overlay, light, 0, 0, 1);
+    public static void addVertice(PoseStack pose, VertexConsumer buffer, Vector3f v, TextureVertice t, Vector4f color, int light, int overlay) {
+        int colorRGBA = FastColor.ARGB32.colorFromFloat(color.x(), color.y(), color.z(), color.w());
+        buffer.addVertex(pose.last(), v)
+            .setColor(colorRGBA)
+            .setUv(t.x, t.y)
+            .setOverlay(overlay)
+            .setLight(light)
+            .setNormal(pose.last(), 0F, 0F, 1F);
     }
 
-    public static void addVertice(VertexConsumer buffer, Vector3f v, TextureVertice t, int light, int overlay) {
-        addVertice(buffer, v, t, new Vector4f(1, 1, 1, 1), light, overlay);
+    public static void addVertice(PoseStack pose, VertexConsumer buffer, Vector3f v, TextureVertice t, int light, int overlay) {
+        addVertice(pose, buffer, v, t, new Vector4f(1, 1, 1, 1), light, overlay);
     }
 
     public static void addVertice(PoseStack poseStack, VertexConsumer buffer, Vector3f v, Vector4f color, int light, int overlay) {
-        buffer.addVertex(poseStack.last(), v).setColor(color.x(), color.y(), color.z(), color.w()).setOverlay(overlay).setLight(light);
+        buffer.addVertex(poseStack.last(), v)
+            .setColor(color.x(), color.y(), color.z(), color.w())
+            .setUv(16, 16)
+            .setOverlay(overlay)
+            .setLight(light)
+            .setNormal(poseStack.last(), 0F, 0F, 1F);
     }
 }

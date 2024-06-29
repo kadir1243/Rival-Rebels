@@ -17,6 +17,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
 
 @Environment(EnvType.CLIENT)
 public class GuiRotor extends GuiButton
@@ -24,7 +25,7 @@ public class GuiRotor extends GuiButton
 	protected int		degree;
 	protected boolean	pressed;
 
-	public GuiRotor(int x, int y, int yawLimit, String par6Str)
+	public GuiRotor(int x, int y, int yawLimit, Component par6Str)
 	{
 		super(x, y, 32, 32, par6Str);
 		degree = yawLimit / 2;

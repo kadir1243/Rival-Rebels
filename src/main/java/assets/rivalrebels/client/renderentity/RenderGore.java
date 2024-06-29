@@ -16,7 +16,7 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityGore;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import org.joml.Quaternionf;
+import com.mojang.math.Axis;
 
 import java.util.Objects;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -52,8 +52,8 @@ public class RenderGore extends EntityRenderer<EntityGore>
 
 		matrices.pushPose();
 		matrices.translate(x, y, z);
-		matrices.mulPose(new Quaternionf(-entity.getYRot() + 180, 0.0F, 1.0F, 0.0F));
-		matrices.mulPose(new Quaternionf(entity.getXRot(), 1.0F, 0.0F, 0.0F));
+		matrices.mulPose(Axis.YP.rotationDegrees(-entity.getYRot() + 180));
+		matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
         int mob = entity.getMob();
 		int type = entity.getTypeOfGore();
 		float size = entity.getSize();
@@ -123,7 +123,7 @@ public class RenderGore extends EntityRenderer<EntityGore>
 			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
 			else if (type == 1)
 			{
-                matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+                matrices.mulPose(Axis.YP.rotationDegrees(90));
 				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
 			}
 			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);
@@ -134,7 +134,7 @@ public class RenderGore extends EntityRenderer<EntityGore>
 			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
 			else if (type == 1)
 			{
-                matrices.mulPose(new Quaternionf(90, 0, 1, 0));
+                matrices.mulPose(Axis.YP.rotationDegrees(90));
 				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
 			}
 			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);

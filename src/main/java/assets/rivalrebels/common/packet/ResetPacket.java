@@ -19,11 +19,10 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.player.Player;
 
-public class ResetPacket implements CustomPacketPayload {
+public record ResetPacket() implements CustomPacketPayload {
     public static final ResetPacket INSTANCE = new ResetPacket();
     public static final StreamCodec<FriendlyByteBuf, ResetPacket> STREAM_CODEC = StreamCodec.unit(INSTANCE);
     public static final Type<ResetPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("reset"));
-
 
     @Override
     public Type<? extends CustomPacketPayload> type() {

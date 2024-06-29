@@ -15,7 +15,6 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiCustomButton;
 import assets.rivalrebels.client.guihelper.GuiScroll;
 import assets.rivalrebels.client.guihelper.Rectangle;
-import assets.rivalrebels.client.guihelper.Vector;
 import assets.rivalrebels.common.block.BlockReactive;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.machine.BlockForceFieldNode;
@@ -29,13 +28,12 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -43,6 +41,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import org.joml.Vector2i;
 
 import java.text.DecimalFormat;
 
@@ -75,8 +74,8 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		int posX = (this.width - 256) / 2;
 		int posY = (this.height - 256) / 2;
 		scroll = new GuiScroll(posX + 236, posY + 127, 60);
-		power = new GuiCustomButton(new Rectangle(posX + 70, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector(212, 0), true);
-		eject = new GuiCustomButton(new Rectangle(posX + 164, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector(234, 0), false);
+		power = new GuiCustomButton(new Rectangle(posX + 70, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(212, 0), true);
+		eject = new GuiCustomButton(new Rectangle(posX + 164, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(234, 0), false);
 		power.isPressed = menu.isOn();
 		this.addRenderableOnly(scroll);
 		this.addRenderableOnly(power);
@@ -96,30 +95,8 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		matrices.popPose();
         context.drawString(font, "Teslas: " + df.format(menu.getPower() - menu.getConsumed()), 120, 8, 0xffffff, false);
         context.drawString(font, "Output/t: " + df.format(menu.getLastTickConsumed()), 140, 18, 0xffffff, false);
-
-		int mousex = mouseX;
-		int mousey = mouseY;
-		int posx = (width - imageWidth) / 2;
-		int posy = (height - imageHeight) / 2;
-		int coordx = posx + 53;
-		int coordy = posy + 191;
-		int widthx = 72;
-		int widthy = 8;
-		if (mousex > coordx && mousey > coordy && mousex < coordx + widthx && mousey < coordy + widthy)
-		{
-			mousex -= posx;
-			mousey -= posy;
-			context.fillGradient(mousex, mousey, mousex + font.width("rivalrebels.com") + 3, mousey + 12, 0xaa111111, 0xaa111111);
-            context.drawString(font, "rivalrebels.com", mousex + 2, mousey + 2, 0xFFFFFF, false);
-			if (!buttondown && minecraft.mouseHandler.isLeftPressed())
-			{
-                Util.getPlatform().openUri("http://rivalrebels.com");
-			}
-		}
-		buttondown = minecraft.mouseHandler.isLeftPressed();
 	}
 
-	boolean	buttondown;
 	boolean	buttondown2;
 
     @Override
@@ -139,7 +116,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 				machines[i] = Blocks.AIR;
 				continue;
 			}
-			boolean current = new Rectangle(X, Y, 15, 15).isVecInside(new Vector(mouseX, mouseY));
+			boolean current = new Rectangle(X, Y, 15, 15).isVecInside(new Vector2i(mouseX, mouseY));
 			if (off + i < machineslist.length && off + i >= 0)
 			{
 				machines[i] = machineslist[off + i];
@@ -179,7 +156,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		}
 		else if (menu.fuel.hasItem() && menu.core.hasItem())
 		{
-			// drawInfographic(resolution, 15, 8, 5, 20, 0.666f, 0.25f, 0.32f);
+			drawInfographic(context, resolution, 15, 8, 5, 20, 0.666f, 0.25f, 0.32f);
 		}
 		long elapsed = System.currentTimeMillis() - time;
 		if (elapsed > 30)
@@ -218,18 +195,17 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
         return state;
     }
 
-	protected void drawDock(GuiGraphics context)
-	{
-		int X = 89 + width / 2;
+	protected void drawDock(GuiGraphics graphics) {
+        PoseStack pose = graphics.pose();
+        int X = 89 + width / 2;
 		int Y = 0 + height / 2;
-		for (int i = 0; i < 4; i++)
-		{
+		for (int i = 0; i < 4; i++) {
 			if (machines[i] == Blocks.AIR) return;
 
 			Block display = machines[i];
             int meta = 2;
             BlockState state = setState(display, meta);
-            BakedModel modelForState = Minecraft.getInstance().getBlockRenderer().getBlockModelShaper().getBlockModel(state);
+            BakedModel modelForState = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state);
             ResourceLocation toppath = ResourceLocation.withDefaultNamespace("textures/block/" + /*display.getIcon(1, meta).getIconName() +*/ ".png");
 			String lsidepath = "minecraft:textures/block/" + /*display.getIcon(4, meta).getIconName() +*/ ".png";
 			String rsidepath = "minecraft:textures/block/" + /*display.getIcon(2, meta).getIconName() +*/ ".png";
@@ -242,35 +218,31 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 
 			RenderSystem.setShaderTexture(0, toppath);
 			buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			buffer.addVertex(X + 1, Y + 3.5F, getZOffset()).setUv(0, 1).setColor(1F, 1F, 1F, alpha);
-			buffer.addVertex(X + 8, Y + 7, getZOffset()).setUv(0, 0).setColor(1F, 1F, 1F, alpha);
-			buffer.addVertex(X + 15, Y + 3.5F, getZOffset()).setUv(1, 0).setColor(1F, 1F, 1F, alpha);
-			buffer.addVertex(X + 8, Y, getZOffset()).setUv(1, 1).setColor(1F, 1F, 1F, alpha);
+			buffer.addVertex(pose.last(), X + 1, Y + 3.5F, 0).setUv(0, 1).setColor(1F, 1F, 1F, alpha);
+			buffer.addVertex(pose.last(), X + 8, Y + 7, 0).setUv(0, 0).setColor(1F, 1F, 1F, alpha);
+			buffer.addVertex(pose.last(), X + 15, Y + 3.5F, 0).setUv(1, 0).setColor(1F, 1F, 1F, alpha);
+			buffer.addVertex(pose.last(), X + 8, Y, 0).setUv(1, 1).setColor(1F, 1F, 1F, alpha);
             BufferUploader.drawWithShader(buffer.buildOrThrow());
 
 			RenderSystem.setShaderTexture(0, ResourceLocation.parse(lsidepath));
             buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			buffer.addVertex(X + 1, Y + 3.5F, getZOffset()).setUv(0, 0).setColor(0.666F, 0.666F, 0.666F, alpha);
-			buffer.addVertex(X + 1, Y + 12.5F, getZOffset()).setUv(0, 1).setColor(0.666F, 0.666F, 0.666F, alpha);
-			buffer.addVertex(X + 8, Y + 16, getZOffset()).setUv(1, 1).setColor(0.666F, 0.666F, 0.666F, alpha);
-			buffer.addVertex(X + 8, Y + 7, getZOffset()).setUv(1, 0).setColor(0.666F, 0.666F, 0.666F, alpha);
+			buffer.addVertex(pose.last(), X + 1, Y + 3.5F, 0).setUv(0, 0).setColor(0.666F, 0.666F, 0.666F, alpha);
+			buffer.addVertex(pose.last(), X + 1, Y + 12.5F, 0).setUv(0, 1).setColor(0.666F, 0.666F, 0.666F, alpha);
+			buffer.addVertex(pose.last(), X + 8, Y + 16, 0).setUv(1, 1).setColor(0.666F, 0.666F, 0.666F, alpha);
+			buffer.addVertex(pose.last(), X + 8, Y + 7, 0).setUv(1, 0).setColor(0.666F, 0.666F, 0.666F, alpha);
             BufferUploader.drawWithShader(buffer.buildOrThrow());
 
 			RenderSystem.setShaderTexture(0, ResourceLocation.parse(rsidepath));
             buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			buffer.addVertex(X + 15, Y + 12.5F, getZOffset()).setUv(1, 1).setColor(0.5F, 0.5F, 0.5F, alpha);
-			buffer.addVertex(X + 15, Y + 3.5F, getZOffset()).setUv(1, 0).setColor(0.5F, 0.5F, 0.5F, alpha);
-			buffer.addVertex(X + 8, Y + 7, getZOffset()).setUv(0, 0).setColor(0.5F, 0.5F, 0.5F, alpha);
-			buffer.addVertex(X + 8, Y + 16, getZOffset()).setUv(0, 1).setColor(0.5F, 0.5F, 0.5F, alpha);
+			buffer.addVertex(pose.last(), X + 15, Y + 12.5F, 0).setUv(1, 1).setColor(0.5F, 0.5F, 0.5F, alpha);
+			buffer.addVertex(pose.last(), X + 15, Y + 3.5F, 0).setUv(1, 0).setColor(0.5F, 0.5F, 0.5F, alpha);
+			buffer.addVertex(pose.last(), X + 8, Y + 7, 0).setUv(0, 0).setColor(0.5F, 0.5F, 0.5F, alpha);
+			buffer.addVertex(pose.last(), X + 8, Y + 16, 0).setUv(0, 1).setColor(0.5F, 0.5F, 0.5F, alpha);
             BufferUploader.drawWithShader(buffer.buildOrThrow());
 
 			Y += 18;
 		}
 	}
-
-    private int getZOffset() {
-        return 0;//TODO: Find replacement
-    }
 
     /**
      * Method that draws the noise sphere.
@@ -349,14 +321,13 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		return f1 * f3 + f2 * (1 - f3);
 	}
 
-	/*protected void drawInfographic(MatrixStack matrices, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2)
-	{
-		Tessellator t = Tessellator.getInstance();
-        BufferBuilder buffer = t.getBuffer();
-        matrices.push();
-		GL11.glPointSize(4 / resolution);
-		buffer.begin(GL11.GL_POINTS, VertexFormats.POSITION_COLOR);
-		radius *= resolution;
+	protected void drawInfographic(GuiGraphics graphics, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {
+        PoseStack pose = graphics.pose();
+        Tesselator t = Tesselator.getInstance();
+        pose.pushPose();
+        float pointSize = 4 / resolution;
+        BufferBuilder buffer = t.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+        radius *= resolution;
 		sep *= resolution;
 		width1 *= resolution;
 		width2 *= resolution;
@@ -371,61 +342,44 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		int outerR = (midR2 + width2);
 		float hheight = (height / 2);
 		float hwidth = (width / 2);
-		for (int x = 1 - outerR; x < outerR; x++)
-		{
+		for (int x = 1 - outerR; x < outerR; x++) {
 			int xs = x * x;
-			double X = (double) x / (double) resolution;
-			for (int y = 1 - outerR; y < outerR; y++)
-			{
+			float X = x / resolution;
+			for (int y = 1 - outerR; y < outerR; y++) {
 				int ys = y * y;
-				double fdist = Math.sqrt(xs + ys);
-				if (fdist >= radius && fdist < midR1)
-				{
-					double Y = (double) y / (double) resolution;
-					double angle = Math.PI + Math.atan2(X, Y);
-                    buffer.vertex(hwidth + X, hheight + Y - 45, 4);
-					if (angle <= outerRatio)
-					{
-						if (angle <= innerRatio1)
-						{
-							buffer.color(0.25f, 0.25f, 1, 1);
+				float fdist = Mth.sqrt(xs + ys);
+				if (fdist >= radius && fdist < midR1) {
+					float Y = y / resolution;
+					float angle = (float) (Math.PI + Math.atan2(X, Y));
+                    int color;
+                    if (angle <= outerRatio) {
+						if (angle <= innerRatio1) {
+							color = FastColor.ARGB32.colorFromFloat(0.25f, 0.25f, 1, 1);
+						} else {
+                            color = FastColor.ARGB32.colorFromFloat(0.75f, 0.75f, 1, 1);
 						}
-						else
-						{
-							buffer.color(0.75f, 0.75f, 1, 1);
-						}
-					}
-					else
-					{
-						if (angle <= innerRatio2)
-						{
-							buffer.color(1, 0.25f, 0.25f, 1);
-						}
-						else
-						{
-							buffer.color(1, 0.75f, 0.75f, 1);
+					} else {
+						if (angle <= innerRatio2) {
+                            color = FastColor.ARGB32.colorFromFloat(1, 0.25f, 0.25f, 1);
+						} else {
+                            color = FastColor.ARGB32.colorFromFloat(1, 0.75f, 0.75f, 1);
 						}
 					}
-					buffer.next();
-				}
-				else if (fdist >= midR2 && fdist < outerR)
-				{
-					double Y = (double) y / (double) resolution;
-					double angle = Math.PI + Math.atan2(X, Y);
-                    buffer.vertex(hwidth + X, hheight + Y - 45, 4);
-                    if (angle <= outerRatio)
-					{
-						buffer.color(0, 0, 1, 1);
+                    drawPoint(pose, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
+				} else if (fdist >= midR2 && fdist < outerR) {
+					float Y = y / resolution;
+					float angle = (float) (Math.PI + Math.atan2(X, Y));
+                    int color;
+                    if (angle <= outerRatio) {
+						color = CommonColors.BLUE;
+					} else {
+                        color = CommonColors.RED;
 					}
-					else
-					{
-						buffer.color(1, 0, 0, 1);
-					}
-					buffer.next();
+                    drawPoint(pose, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
 				}
 			}
 		}
-		t.draw();
-		matrices.pop();
-	}*/
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
+		pose.popPose();
+	}
 }

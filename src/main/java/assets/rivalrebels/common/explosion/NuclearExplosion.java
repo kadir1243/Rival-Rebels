@@ -60,7 +60,7 @@ public class NuclearExplosion
 	public NuclearExplosion(Level world, int x, int y, int z, int strength) {
 		if (!world.isClientSide) {
 			createHole(world, x, y, z, strength, true);
-			// pushAndHurtEntities(world, x, y, z, strength);
+			pushAndHurtEntities(world, x, y, z, strength);
 			fixLag(world, x, y, z, strength);
 		}
 	}
@@ -69,7 +69,7 @@ public class NuclearExplosion
 		if (!world.isClientSide)
 		{
 			createHole(world, x, y, z, strength, breakobj);
-			// pushAndHurtEntities(world, x, y, z, strength);
+			pushAndHurtEntities(world, x, y, z, strength);
 			fixLag(world, x, y, z, strength);
 		}
 	}

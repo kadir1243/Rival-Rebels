@@ -27,7 +27,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
@@ -106,7 +105,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 			}
 			RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE);
 			matrices.scale(random.nextFloat(), random.nextFloat(), random.nextFloat());
-			matrices.mulPose(new Quaternionf(random.nextFloat() * 360.0f, random.nextFloat(), random.nextFloat(), random.nextFloat()));
+			matrices.mulPose(new Quaternionf(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat() * 360));
 			matrices.translate(random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f);
 			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble(), 1);
 		}

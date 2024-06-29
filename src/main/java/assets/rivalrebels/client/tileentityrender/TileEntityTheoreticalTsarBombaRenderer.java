@@ -15,6 +15,7 @@ import assets.rivalrebels.client.model.ModelTheoreticalTsarBomba;
 import assets.rivalrebels.common.block.trap.BlockTheoreticalTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,7 +23,6 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
-import org.joml.Quaternionf;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRenderer<TileEntityTheoreticalTsarBomba>, CustomRenderBoxExtension<TileEntityTheoreticalTsarBomba> {
@@ -37,16 +37,16 @@ public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRender
         int metadata = entity.getBlockState().getValue(BlockTheoreticalTsarBomba.META);
 
         if (metadata == 2) {
-            matrices.mulPose(new Quaternionf(180, 0, 1, 0));
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(180));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         } else if (metadata == 3) {
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         } else if (metadata == 4) {
-            matrices.mulPose(new Quaternionf(-90, 0, 1, 0));
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(-90));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         } else if (metadata == 5) {
-            matrices.mulPose(new Quaternionf(90, 0, 1, 0));
-            matrices.mulPose(new Quaternionf(90, 1, 0, 0));
+            matrices.mulPose(Axis.YP.rotationDegrees(90));
+            matrices.mulPose(Axis.XP.rotationDegrees(90));
         }
         ModelTheoreticalTsarBomba.render(matrices, vertexConsumers, light, overlay);
         matrices.popPose();

@@ -20,7 +20,6 @@ import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.mixin.client.DrawContextAccessor;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -46,7 +45,7 @@ public class GuiFlameThrower extends Screen
 		posX = (width - xSizeOfTexture) / 2;
 		posY = (height - ySizeOfTexture) / 2;
 		clearWidgets();
-		knob = new GuiFTKnob(posX + 108, posY + 176, -90, 90, start, true, "Knob");
+		knob = new GuiFTKnob(posX + 108, posY + 176, -90, 90, start, true, Component.literal("Knob"));
 		addRenderableOnly(knob);
 	}
 
@@ -58,7 +57,6 @@ public class GuiFlameThrower extends Screen
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		float f = 0.00390625F;
-		minecraft = Minecraft.getInstance();
         ((DrawContextAccessor) context).callDrawTexturedQuad(
             RRIdentifiers.guiflamethrower,
             posX,
@@ -73,7 +71,7 @@ public class GuiFlameThrower extends Screen
         );
         super.render(context, mouseX, mouseY, delta);
 		if (!(ClientProxy.USE_KEY.isDown())) {
-			minecraft.setScreen(null);
+            onClose();
 			minecraft.setWindowActive(true);
 			ItemStack itemstack = minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
             if (itemstack.getItem() != RRItems.flamethrower) {

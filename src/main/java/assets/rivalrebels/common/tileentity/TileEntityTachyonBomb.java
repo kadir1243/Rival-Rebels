@@ -140,7 +140,7 @@ public class TileEntityTachyonBomb extends BlockEntity implements Container, Tic
     @Override
 	public boolean stillValid(Player player)
 	{
-		return this.level.getBlockEntity(this.getBlockPos()) == this && player.distanceToSqr(this.getBlockPos().getX() + 0.5D, this.getBlockPos().getY() + 0.5D, this.getBlockPos().getZ() + 0.5D) <= 64.0D;
+		return Container.stillValidBlockEntity(this, player, 64);
 	}
 
     @Override
@@ -249,9 +249,9 @@ public class TileEntityTachyonBomb extends BlockEntity implements Container, Tic
 
 		if (countdown == 200 && !level.isClientSide && RivalRebels.nuclearBombCountdown > 10)
 		{
-            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_1");
-            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_2");
-            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".rivalrebels.warning_bomb_will_explode_line_3");
+            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_1");
+            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_2");
+            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_3");
             for (Player player : level.players()) {
                 player.displayClientMessage(line1, false);
                 player.displayClientMessage(line2, false);

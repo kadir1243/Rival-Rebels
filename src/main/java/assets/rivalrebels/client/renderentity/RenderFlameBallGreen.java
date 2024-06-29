@@ -15,6 +15,7 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityFlameBallGreen;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -22,8 +23,7 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
-import org.joml.Quaternionf;
+import net.minecraft.util.CommonColors;
 
 public class RenderFlameBallGreen extends EntityRenderer<EntityFlameBallGreen>
 {
@@ -43,14 +43,14 @@ public class RenderFlameBallGreen extends EntityRenderer<EntityFlameBallGreen>
         //size *= size;
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entityTranslucentEmissive(RRIdentifiers.etflameballgreen));
         matrices.translate(entity.getX(), entity.getY(), entity.getZ());
-        matrices.mulPose(new Quaternionf(180 - Minecraft.getInstance().player.getYRot(), 0.0F, 1.0F, 0.0F));
-        matrices.mulPose(new Quaternionf(90 - Minecraft.getInstance().player.getXRot(), 1.0F, 0.0F, 0.0F));
+        matrices.mulPose(Axis.YP.rotationDegrees(180 - Minecraft.getInstance().player.getYRot()));
+        matrices.mulPose(Axis.XP.rotationDegrees(90 - Minecraft.getInstance().player.getXRot()));
         matrices.pushPose();
-        matrices.mulPose(new Quaternionf(entity.rotation, 0.0F, 1.0F, 0.0F));
-        buffer.addVertex(-size, 0, -size, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), X, Y, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex( size, 0, -size, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), X + 0.25f, Y, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex( size, 0,  size, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), X + 0.25f, Y + 0.25f, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex(-size, 0,  size, FastColor.ARGB32.colorFromFloat(1F, 1F, 1F, 1F), X, Y + 0.25f, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
+        buffer.addVertex(-size, 0, -size, CommonColors.WHITE, X, Y, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex( size, 0, -size, CommonColors.WHITE, X + 0.25f, Y, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex( size, 0,  size, CommonColors.WHITE, X + 0.25f, Y + 0.25f, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex(-size, 0,  size, CommonColors.WHITE, X, Y + 0.25f, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
         matrices.popPose();
         matrices.popPose();
 

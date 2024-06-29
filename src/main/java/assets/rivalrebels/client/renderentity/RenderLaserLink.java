@@ -17,12 +17,12 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
-import org.joml.Quaternionf;
 
 public class RenderLaserLink extends EntityRenderer<EntityLaserLink> {
     static float red = 0.5F;
@@ -43,19 +43,19 @@ public class RenderLaserLink extends EntityRenderer<EntityLaserLink> {
             matrices.pushPose();
             RenderSystem.enableBlend();
             RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE);
-            matrices.mulPose(new Quaternionf(-entity.getYRot(), 0.0F, 1.0F, 0.0F));
-            matrices.mulPose(new Quaternionf(entity.getXRot(), 1.0F, 0.0F, 0.0F));
+            matrices.mulPose(Axis.YP.rotationDegrees(-entity.getYRot()));
+            matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
 
             for (float o = 0; o <= radius; o += radius / 16) {
-                buffer.addVertex(0 + o, 0 - o, 0).setColor(red, green, blue, 1);
-                buffer.addVertex(0 + o, 0 + o, 0).setColor(red, green, blue, 1);
-                buffer.addVertex(0 + o, 0 + o, 0 + distance).setColor(red, green, blue, 1);
-                buffer.addVertex(0 + o, 0 - o, 0 + distance).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 + o, 0 - o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 + o, 0 + o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 + o, 0 + o, 0 + distance).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 + o, 0 - o, 0 + distance).setColor(red, green, blue, 1);
 
-                buffer.addVertex(0 - o, 0 - o, 0).setColor(red, green, blue, 1);
-                buffer.addVertex(0 - o, 0 - o, 0 + distance).setColor(red, green, blue, 1);
-                buffer.addVertex(0 - o, 0 + o, 0).setColor(red, green, blue, 1);
-                buffer.addVertex(0 - o, 0 + o, 0 + distance).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 - o, 0 - o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 - o, 0 - o, 0 + distance).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 - o, 0 + o, 0).setColor(red, green, blue, 1);
+                buffer.addVertex(matrices.last(), 0 - o, 0 + o, 0 + distance).setColor(red, green, blue, 1);
             }
 
             RenderSystem.disableBlend();
