@@ -150,8 +150,7 @@ public class GuiSpawn extends Screen
 		context.drawString(font, String.valueOf(RivalRebels.round.getOmegaWins()), posX + 9, posY + 239, 0xFFFFFF, false);
 		context.drawString(font, String.valueOf(RivalRebels.round.getSigmaWins()), posX + 134, posY + 239, 0xFFFFFF, false);
 
-		if (resetButton.mouseClicked(mouseX, mouseY, 0) && resetButton.active)
-		{
+		if (resetButton.mouseClicked(mouseX, mouseY, 0) && resetButton.active) {
             context.fillGradient(mouseX, mouseY, mouseX + 120, mouseY + 20, 0xaa111111, 0xaa111111);
 			float scalefactor = 0.666f;
 			matrices.scale(scalefactor, scalefactor, scalefactor);

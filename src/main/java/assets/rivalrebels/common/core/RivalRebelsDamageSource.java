@@ -12,6 +12,9 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RRIdentifiers;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
@@ -88,23 +91,8 @@ public class RivalRebelsDamageSource {
         return entry.map(DamageSource::new).orElseGet(() -> world.damageSources().generic());
     }
 
-    /*public static final DamageSource electricity = new DamageSource("electricity").setBypassesArmor().setUnblockable();
-    public static final DamageSource radioactivepoisoning = new DamageSource("radioactivepoisoning").setBypassesArmor().setUnblockable();
-    public static final DamageSource nuclearblast = new DamageSource("nuclearblast").setUnblockable();
-    public static final DamageSource cooked = new DamageSource("cooked").setUnblockable();
-    public static final DamageSource gasgrenade = new DamageSource("gasgrenade").setUnblockable();
-    public static final DamageSource cuchillo = new DamageSource("cuchillo");
-    public static final DamageSource tron = new DamageSource("tron").setUnblockable();
-    public static final DamageSource cyanide = new DamageSource("cyanide").setUnblockable();
-    public static final DamageSource landmine = new DamageSource("landmine").setUnblockable();
-    public static final DamageSource timebomb = new DamageSource("timebomb").setUnblockable();
-    public static final DamageSource flare = new DamageSource("flare").setUnblockable();
-    public static final DamageSource charge = new DamageSource("charge").setUnblockable();
-    public static final DamageSource plasmaexplosion = new DamageSource("plasmaexplosion").setUnblockable();
-    public static final DamageSource rocket = new DamageSource("rocket").setUnblockable();
-    public static final DamageSource laserburst = new DamageSource("laserburst").setUnblockable();*/
-
     public static class RRDamageTypes {
+        public static final List<ResourceKey<DamageType>> REGISTERED_DAMAGE_TYPES = new ArrayList<>();
         public static final ResourceKey<DamageType> ELECTRICITY = register("electricity");
         public static final ResourceKey<DamageType> RADIOACTIVE_POISONING = register("radioactive_poisoning");
         public static final ResourceKey<DamageType> NUCLEAR_BLAST = register("nuclear_blast");
@@ -122,11 +110,12 @@ public class RivalRebelsDamageSource {
         public static final ResourceKey<DamageType> LASER_BURST = register("laser_burst");
 
         private static ResourceKey<DamageType> register(String name) {
-            return ResourceKey.create(Registries.DAMAGE_TYPE, RRIdentifiers.create(name));
+            ResourceKey<DamageType> key = ResourceKey.create(Registries.DAMAGE_TYPE, RRIdentifiers.create(name));
+            REGISTERED_DAMAGE_TYPES.add(key);
+            return key;
         }
 
         public static void init() {
-
         }
     }
 }

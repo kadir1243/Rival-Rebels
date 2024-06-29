@@ -49,7 +49,8 @@ import java.text.DecimalFormat;
 public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 {
     private static final DecimalFormat	df					= new DecimalFormat("0.0");
-	private float					frame				= 0;
+    private static final RivalRebelsSimplexNoise SIMPLEX_NOISE = new RivalRebelsSimplexNoise(RandomSource.create());
+    private float					frame				= 0;
 	private float					resolution			= 4f;
     private Block[]					machineslist		= { RRBlocks.forcefieldnode, RRBlocks.reactive };
 	private Block[]					machines			= { Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR };
@@ -60,13 +61,11 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 	private GuiCustomButton			power;
 	private GuiCustomButton			eject;
 	private float					melttick			= 30;
-    private static final RandomSource RANDOM = RandomSource.create();
 
-	public GuiReactor(ContainerReactor containerReactor, Inventory playerInventory, Component title) {
+    public GuiReactor(ContainerReactor containerReactor, Inventory playerInventory, Component title) {
 		super(containerReactor, playerInventory, title);
         this.imageHeight = 200;
-		RivalRebelsSimplexNoise.refresh(RANDOM);
-	}
+    }
 
     @Override
     protected void init() {
@@ -74,8 +73,12 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		int posX = (this.width - 256) / 2;
 		int posY = (this.height - 256) / 2;
 		scroll = new GuiScroll(posX + 236, posY + 127, 60);
-		power = new GuiCustomButton(new Rectangle(posX + 70, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(212, 0), true);
-		eject = new GuiCustomButton(new Rectangle(posX + 164, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(234, 0), false);
+		power = new GuiCustomButton(new Rectangle(posX + 70, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(212, 0), true, button -> {
+            menu.toggleOn();
+        });
+		eject = new GuiCustomButton(new Rectangle(posX + 164, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(234, 0), false, button -> {
+            menu.ejectCore();
+        });
 		power.isPressed = menu.isOn();
 		this.addRenderableOnly(scroll);
 		this.addRenderableOnly(power);
@@ -96,8 +99,6 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
         context.drawString(font, "Teslas: " + df.format(menu.getPower() - menu.getConsumed()), 120, 8, 0xffffff, false);
         context.drawString(font, "Output/t: " + df.format(menu.getLastTickConsumed()), 140, 18, 0xffffff, false);
 	}
-
-	boolean	buttondown2;
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
@@ -168,19 +169,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 			if (resolution == 4) resolution = 2;
 		}
 		frame += 0.75f + (menu.getLastTickConsumed() / 100);
-		if (!buttondown2 && minecraft.mouseHandler.isLeftPressed())
-		{
-			if (power.mouseClicked(mouseX, mouseY, 0))
-			{
-                menu.toggleOn();
-			}
-			if (eject.mouseClicked(mouseX, mouseY, 0))
-			{
-				menu.ejectCore();
-			}
-		}
 		power.isPressed = menu.isOn();
-		buttondown2 = minecraft.mouseHandler.isLeftPressed();
 	}
 
     private static BlockState setState(Block block, int meta) {
@@ -284,7 +273,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
                     float a = 1f;
                     float s = sscale;
                     for (int e = 0; e < o; e++) {
-                        v += (float) ((1 + RivalRebelsSimplexNoise.noise(X * s, Y * s, frame * s)) / 2) * a;
+                        v += (float) ((1 + SIMPLEX_NOISE.noise(X * s, Y * s, frame * s)) / 2) * a;
                         s *= 2;
                         a /= 2;
                     }
@@ -296,7 +285,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
                     float a = 1f;
                     float s = sscale;
                     for (int e = 0; e < o; e++) {
-                        v += (float) ((1 + RivalRebelsSimplexNoise.noise(X * s, Y * s, Z * s, frame * s)) / 2) * a;
+                        v += (float) ((1 + SIMPLEX_NOISE.noise(X * s, Y * s, Z * s, frame * s)) / 2) * a;
                         s *= 2;
                         a /= 2;
                     }

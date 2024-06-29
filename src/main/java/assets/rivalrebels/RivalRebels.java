@@ -30,6 +30,7 @@ import com.mojang.logging.LogUtils;
 import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
@@ -106,6 +107,7 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
 	public static float						rhodesBlockBreak;
 	public static boolean					nukedrop = true;
 	public static boolean 					elevation = true;
+    @Environment(EnvType.CLIENT)
     public static RivalRebelsRenderOverlay	rrro;
 
     @Override

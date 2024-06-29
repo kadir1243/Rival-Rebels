@@ -23,8 +23,8 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TachyonBomb
-{
+public class TachyonBomb {
+    private final RivalRebelsSimplexNoise noise;
 	public int		posX;
 	public int		posY;
 	public int		posZ;
@@ -42,8 +42,8 @@ public class TachyonBomb
 	private int 	treeHeight;
 	public int processedchunks = 0;
 
-	public TachyonBomb(int x, int y, int z, Level world, int rad)
-	{
+	public TachyonBomb(int x, int y, int z, Level world, int rad) {
+        noise = new RivalRebelsSimplexNoise(world.random);
 		posX = x;
 		posY = y;
 		posZ = z;
@@ -112,7 +112,7 @@ public class TachyonBomb
 		double dist = x * x + z * z;
 		if (dist < radius * radius)
 		{
-			dist = Math.sqrt(dist) + RivalRebelsSimplexNoise.noise(x*0.05,z*0.05) * 10.0;
+			dist = Math.sqrt(dist) + noise.noise(x*0.05,z*0.05) * 10.0;
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
 			if (RivalRebels.elevation) yele = y;

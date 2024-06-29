@@ -31,9 +31,12 @@ public class GuiCustomButton extends Button
 	public boolean		wasPressed	= false;
 	public boolean		mouseDown	= false;
 
-	public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector2i uv, boolean isToggle)
-	{
-		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Component.empty(), button -> {}, DEFAULT_NARRATION);
+    public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector2i uv, boolean isToggle) {
+        this(rec, rl, uv, isToggle, button -> {});
+    }
+
+	public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector2i uv, boolean isToggle, Button.OnPress onPress) {
+		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Component.empty(), onPress, DEFAULT_NARRATION);
 		bbox = rec;
 		tbox = uv;
 		resloc = rl;

@@ -27,6 +27,8 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.platform.Window;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -43,8 +45,8 @@ import net.minecraft.world.level.block.Blocks;
 
 import static org.lwjgl.glfw.GLFW.*;
 
-public class RivalRebelsRenderOverlay
-{
+@Environment(EnvType.CLIENT)
+public class RivalRebelsRenderOverlay {
 	public int		tic	= 0;
 	public boolean	r	= false;
 	public EntityRhodes rhodes = null;
@@ -59,6 +61,7 @@ public class RivalRebelsRenderOverlay
             }
         });
 	}
+
 	private void renderItems(GuiGraphics context) {
         Minecraft client = Minecraft.getInstance();
         Player player = client.player;

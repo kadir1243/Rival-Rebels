@@ -11,17 +11,25 @@
  *******************************************************************************/
 package assets.rivalrebels.common.noise;
 
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
-public class RivalRebelsSimplexNoise
-{
-	private static final Grad[] grad3 = { new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0), new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1), new Grad(0, 1, 1), new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1) };
+public class RivalRebelsSimplexNoise {
+    public RivalRebelsSimplexNoise(RandomSource random) {
+        for (int i = 0; i < 512; i++) {
+            p[i] = (short) (random.nextDouble() * 255);
+            perm[i] = p[i & 255];
+            permMod12[i] = (short) (perm[i] % 12);
+        }
+    }
+
+    private static final Grad[] grad3 = { new Grad(1, 1, 0), new Grad(-1, 1, 0), new Grad(1, -1, 0), new Grad(-1, -1, 0), new Grad(1, 0, 1), new Grad(-1, 0, 1), new Grad(1, 0, -1), new Grad(-1, 0, -1), new Grad(0, 1, 1), new Grad(0, -1, 1), new Grad(0, 1, -1), new Grad(0, -1, -1) };
 
 	private static final Grad[] grad4 = { new Grad(0, 1, 1, 1), new Grad(0, 1, 1, -1), new Grad(0, 1, -1, 1), new Grad(0, 1, -1, -1), new Grad(0, -1, 1, 1), new Grad(0, -1, 1, -1), new Grad(0, -1, -1, 1), new Grad(0, -1, -1, -1), new Grad(1, 0, 1, 1), new Grad(1, 0, 1, -1), new Grad(1, 0, -1, 1), new Grad(1, 0, -1, -1), new Grad(-1, 0, 1, 1), new Grad(-1, 0, 1, -1), new Grad(-1, 0, -1, 1), new Grad(-1, 0, -1, -1), new Grad(1, 1, 0, 1), new Grad(1, 1, 0, -1), new Grad(1, -1, 0, 1), new Grad(1, -1, 0, -1), new Grad(-1, 1, 0, 1), new Grad(-1, 1, 0, -1), new Grad(-1, -1, 0, 1), new Grad(-1, -1, 0, -1), new Grad(1, 1, 1, 0), new Grad(1, 1, -1, 0), new Grad(1, -1, 1, 0), new Grad(1, -1, -1, 0), new Grad(-1, 1, 1, 0), new Grad(-1, 1, -1, 0), new Grad(-1, -1, 1, 0), new Grad(-1, -1, -1, 0) };
 
-	private static final short[] p = new short[512];
-	private static final short[] perm = new short[512];
-	private static final short[] permMod12 = new short[512];
+	private final short[] p = new short[512];
+	private final short[] perm = new short[512];
+	private final short[] permMod12 = new short[512];
 
 	private static final double	F2			= 0.5 * (Math.sqrt(3.0) - 1.0);
 	private static final double	G2			= (3.0 - Math.sqrt(3.0)) / 6.0;
@@ -30,20 +38,8 @@ public class RivalRebelsSimplexNoise
 	private static final double	F4			= (Math.sqrt(5.0) - 1.0) / 4.0;
 	private static final double	G4			= (5.0 - Math.sqrt(5.0)) / 20.0;
 
-	public static void refresh(RandomSource random)
-	{
-		for (int i = 0; i < 512; i++)
-		{
-			p[i] = (short) (random.nextDouble() * 255);
-			perm[i] = p[i & 255];
-			permMod12[i] = (short) (perm[i] % 12);
-		}
-	}
-
-	private static int fastfloor(double x)
-	{
-		int xi = (int) x;
-		return x < xi ? xi - 1 : xi;
+    private static int fastfloor(double x) {
+		return Mth.floor(x);
 	}
 
 	private static double dot(Grad g, double x, double y)
@@ -61,8 +57,7 @@ public class RivalRebelsSimplexNoise
 		return g.x * x + g.y * y + g.z * z + g.w * w;
 	}
 
-	public static double noise(double xin, double yin)
-	{
+	public double noise(double xin, double yin) {
 		double n0, n1, n2;
 		double s = (xin + yin) * F2;
 		int i = fastfloor(xin + s);
@@ -116,8 +111,7 @@ public class RivalRebelsSimplexNoise
 		return 70.0 * (n0 + n1 + n2);
 	}
 
-	public static double noise(double xin, double yin, double zin)
-	{
+	public double noise(double xin, double yin, double zin) {
 		double n0, n1, n2, n3;
 		double s = (xin + yin + zin) * F3;
 		int i = fastfloor(xin + s);
@@ -239,7 +233,7 @@ public class RivalRebelsSimplexNoise
 		return 32.0 * (n0 + n1 + n2 + n3);
 	}
 
-	public static double noise(double x, double y, double z, double w)
+	public double noise(double x, double y, double z, double w)
 	{
 		double n0, n1, n2, n3, n4;
 		double s = (x + y + z + w) * F4;
@@ -350,19 +344,14 @@ public class RivalRebelsSimplexNoise
 		return 27.0 * (n0 + n1 + n2 + n3 + n4);
 	}
 
-	private static class Grad
-	{
-		double	x, y, z, w;
+	private static class Grad {
+		private final double x, y, z, w;
 
-		Grad(double x, double y, double z)
-		{
-			this.x = x;
-			this.y = y;
-			this.z = z;
+		Grad(double x, double y, double z) {
+            this(x, y, z, 0);
 		}
 
-		Grad(double x, double y, double z, double w)
-		{
+		Grad(double x, double y, double z, double w) {
 			this.x = x;
 			this.y = y;
 			this.z = z;
