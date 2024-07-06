@@ -11,6 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RRSounds;
@@ -38,6 +40,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -77,7 +80,7 @@ public class EntityRhodes extends Entity {
     public static final EntityDataAccessor<Boolean> FIRE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> PLASMA = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
 
-    public int health = RivalRebels.rhodesHealth;
+    public int health = RRConfig.SERVER.getRhodesHealth();
 	public float scale = 1;
 	private int damageUntilWake = 100;
 	private static final Set<Block> blocklist = new HashSet<>();
@@ -204,41 +207,40 @@ public class EntityRhodes extends Entity {
 		{
 			itexloc = texloc;
 		}
-		if (forcecolor == -1)
-		{
-			colorType = (byte) RivalRebels.rhodesTeams[lastct];
-			if (!w.isClientSide)
+		if (forcecolor == -1) {
+            int[] rhodesTeams = RRConfig.SERVER.getRhodesTeams();
+            colorType = (byte) rhodesTeams[lastct];
+			if (!w.isClientSide())
 			{
 				lastct++;
-				if (lastct == RivalRebels.rhodesTeams.length) lastct = 0;
+				if (lastct == rhodesTeams.length) lastct = 0;
 			}
 		}
 		else
 		{
 			colorType = (byte) forcecolor;
 		}
-		Random random = new Random(RivalRebels.rhodesRandomSeed);
-		nukecount = RivalRebels.rhodesNukes;
-		nukecount += nukecount * random.nextFloat() * RivalRebels.rhodesRandom;
-		rocketcount += rocketcount * random.nextFloat() * RivalRebels.rhodesRandom;
-		flamecount += flamecount * random.nextFloat() * RivalRebels.rhodesRandom;
+		RandomSource random = RandomSource.create(RRConfig.SERVER.getRhodesRandomSeed());
+		nukecount = RRConfig.SERVER.getRhodesNukes();
+		nukecount += nukecount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
+		rocketcount += rocketcount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
+		flamecount += flamecount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
 	}
 
 	public EntityRhodes(Level w, double x, double y, double z, float s)
 	{
 		this(w);
 		scale = s;
-		if (scale >= 2.0)
-		{
+		if (scale >= 2.0) {
 			nukecount *= 0.25;
 			rocketcount *= 0.004;
 		}
 		health = health - 5000 + (int)(5000 * Math.min(scale,4));
 		setBoundingBox(new AABB(-5*scale, -15*scale, -5*scale, 5*scale, 15*scale, 5*scale));
 		setPos(x, y, z);
-		if (!level().isClientSide) {
+		if (!level().isClientSide()) {
             for (Player player : level().players()) {
-                player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".warning_tsar_is_armed", getName()), false);
+                player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(RivalRebels.MODID + ".warning_tsar_is_armed", getName())), false);
             }
         }
 	}
@@ -269,7 +271,7 @@ public class EntityRhodes extends Entity {
 			leftlegheight *= scale;
 			rightlegheight *= scale;
 			float bodyY = Math.max(leftlegheight, rightlegheight);
-			if (!level().isClientSide)
+			if (!level().isClientSide())
 			{
 				doAITick(syaw, cyaw);
 				breakBlocks(syaw, cyaw, leftlegheight, rightlegheight, bodyY);
@@ -291,7 +293,7 @@ public class EntityRhodes extends Entity {
 			{
 				rider.setPos(((getX()+syaw*5.5*scale) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*scale - (level().isClientSide?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*scale) - rider.getZ()) * 0.33f + rider.getZ());
 				rider.setOnGround(true);
-				if (level().isClientSide) RivalRebels.round.setInvisible(rider);
+				if (level().isClientSide()) RivalRebels.round.setInvisible(rider);
 				rider.makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
 				rider.getAbilities().invulnerable = true;
 				if (level().isClientSide && rider == Minecraft.getInstance().player) ClientPlayNetworking.send(new RhodesJumpPacket(this.getId(), RivalRebels.proxy.spacebar(), RivalRebels.proxy.a(), RivalRebels.proxy.w(), RivalRebels.proxy.d(), RivalRebels.proxy.c(), RivalRebels.proxy.f(), RivalRebels.proxy.s(), RivalRebels.proxy.x(), RivalRebels.proxy.z(), RivalRebels.proxy.g()));
@@ -299,7 +301,7 @@ public class EntityRhodes extends Entity {
 			if (passenger1 != null)
 			{
 				float offset = 1.62f;
-				if (level().isClientSide)
+				if (level().isClientSide())
 				{
 					if (Minecraft.getInstance().player == passenger1)
 					{
@@ -315,7 +317,7 @@ public class EntityRhodes extends Entity {
 			if (passenger2 != null)
 			{
 				float offset = 1.62f;
-				if (level().isClientSide)
+				if (level().isClientSide())
 				{
 					if (Minecraft.getInstance().player == passenger2)
 					{
@@ -331,10 +333,10 @@ public class EntityRhodes extends Entity {
 		}
 		else
 		{
-			if (!level().isClientSide)
+			if (!level().isClientSide())
 			{
 				if (health == 0) {
-                    MutableComponent text = Component.empty().append(Component.translatable("RivalRebels.Status")).append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Component.literal("") : Component.empty().append(" ").append(rider.getName())));
+                    MutableComponent text = RRIdentifiers.status().append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
                     for (Player player : level().players()) {
                         player.sendSystemMessage(text);
                     }
@@ -372,13 +374,13 @@ public class EntityRhodes extends Entity {
 			if ((rider.isShiftKeyDown() || !rider.isAlive()) && RivalRebels.rhodesExit)
 			{
 				freeze = false;
-				if (!rider.getAbilities().instabuild) rider.getAbilities().invulnerable = false;
+				if (!rider.isCreative()) rider.getAbilities().invulnerable = false;
 				rider = null;
 			}
 			if (health <= 0 && rider != null)
 			{
 				freeze = false;
-				if (!rider.getAbilities().instabuild)
+				if (!rider.isCreative())
 				{
 					rider.getAbilities().invulnerable = false;
 					rider.hurt(level().damageSources().fellOutOfWorld(), 2000000);
@@ -391,12 +393,12 @@ public class EntityRhodes extends Entity {
 		{
 			if ((passenger1.isShiftKeyDown() || !passenger1.isAlive()) && RivalRebels.rhodesExit)
 			{
-				if (!passenger1.getAbilities().instabuild) passenger1.getAbilities().invulnerable = false;
+				if (!passenger1.isCreative()) passenger1.getAbilities().invulnerable = false;
 				passenger1 = null;
 			}
 			if (health <= 0 && passenger1 != null)
 			{
-				if (!passenger1.getAbilities().instabuild)
+				if (!passenger1.isCreative())
 				{
 					passenger1.getAbilities().invulnerable = false;
 					passenger1.hurt(level().damageSources().fellOutOfWorld(), 2000000);
@@ -409,12 +411,12 @@ public class EntityRhodes extends Entity {
 		{
 			if ((passenger2.isShiftKeyDown() || !passenger2.isAlive()) && RivalRebels.rhodesExit)
 			{
-				if (!passenger2.getAbilities().instabuild) passenger2.getAbilities().invulnerable = false;
+				if (!passenger2.isCreative()) passenger2.getAbilities().invulnerable = false;
 				passenger2 = null;
 			}
 			if (health <= 0 && passenger2 != null)
 			{
-				if (!passenger2.getAbilities().instabuild)
+				if (!passenger2.isCreative())
 				{
 					passenger2.getAbilities().invulnerable = false;
 					passenger2.hurt(level().damageSources().fellOutOfWorld(), 2000000);
@@ -450,7 +452,7 @@ public class EntityRhodes extends Entity {
 
 		if (ac > 1)
 		{
-			if (RivalRebels.rhodesBlockBreak > 0.0f)
+			if (RRConfig.SERVER.getRhodesBlockBreak())
 			{
 				int sx = (int) (getX() - 5.0f * scale);
 				int sy = (int) (getY() - 15.0f * scale);
@@ -617,7 +619,7 @@ public class EntityRhodes extends Entity {
                 bbh = 30 * (((EntityRhodes) e).scale + scale) * 0.5;
             }
             double dist = (e.getX() - getX()) * (e.getX() - getX()) + (e.getZ() - getZ()) * (e.getZ() - getZ());
-            if ((ac == 0 || ac == 1 || ac == 11 || !RivalRebels.rhodesAI) && e instanceof Player && dist < bbd * bbd * 0.25f && e.getY() < getY() + bbh + 1 && e.getY() > getY() - bbh + 1) {
+            if ((ac == 0 || ac == 1 || ac == 11 || !RRConfig.SERVER.isRhodesAIEnabled()) && e instanceof Player && dist < bbd * bbd * 0.25f && e.getY() < getY() + bbh + 1 && e.getY() > getY() - bbh + 1) {
                 if (rider == null) {
                     rider = (Player) e;
                     RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
@@ -647,7 +649,7 @@ public class EntityRhodes extends Entity {
                 }
 
                 if (e instanceof EntityRocket) {
-                    e.tickCount = RivalRebels.rpgDecay;
+                    e.tickCount = RRConfig.SERVER.getRpgDecay();
                     this.hurt(level().damageSources().generic(), 20);
                 } else if (e instanceof EntitySeekB83) {
                     e.tickCount = 800;
@@ -660,7 +662,7 @@ public class EntityRhodes extends Entity {
                     this.hurt(level().damageSources().generic(), 40);
                 } else if (e instanceof EntityBomb) {
                     ((EntityBomb) e).explode(true);
-                    for (int i = 0; i < RivalRebels.bombDamageToRhodes; i++)
+                    for (int i = 0; i < RRConfig.SERVER.getBombDamageToRhodes(); i++)
                         this.hurt(level().damageSources().generic(), 50);
                 } else if (e instanceof EntityNuke) {
                     ((EntityNuke) e).ticksInAir = -100;
@@ -722,7 +724,7 @@ public class EntityRhodes extends Entity {
 	private boolean raidedSigmaAlready = false;
 	private void doAITick(float syaw, float cyaw)
 	{
-		if (health*2 < RivalRebels.rhodesHealth) endangered = true;
+		if (health*2 < RRConfig.SERVER.getRhodesHealth()) endangered = true;
 		if (!b2spirit) {
             setDeltaMovement(0, getDeltaMovement().y(), 0);
 		}
@@ -737,12 +739,12 @@ public class EntityRhodes extends Entity {
 			}
 			if (RivalRebels.rhodesHold) return;
 			if (energy < maxenergy) energy += recharge;
-			if (!RivalRebels.infiniteAmmo)
+			if (!RRConfig.SERVER.isInfiniteAmmo())
 			{
 				rocket &= rocketcount > 0;
 				flame &= flamecount > 0;
 			}
-			if (!RivalRebels.infiniteNukes)
+			if (!RRConfig.SERVER.isInfiniteNukes())
 			{
 				bomb &= nukecount > 0;
 			}
@@ -754,7 +756,9 @@ public class EntityRhodes extends Entity {
 			if (forcefield)
 			{
 				energy -= ecshield;
-				if (tickCount%8==0)	RivalRebelsSoundPlayer.playSound(this, 5, 0, 10f, 1f);
+				if (tickCount%8==0) {
+                    this.playSound(RRSounds.FORCE_FIELD, 10, 1);
+                }
 			}
 			if (laser) energy -= eclaser;
 			if (jet || b2spirit)
@@ -1090,7 +1094,7 @@ public class EntityRhodes extends Entity {
 			leftthighpitch  = approach(leftthighpitch, 0);
 			rightshinpitch  = approach(rightshinpitch, 0);
 			leftshinpitch   = approach(leftshinpitch,  0);
-			if (RivalRebels.rhodesAI)
+			if (RRConfig.SERVER.isRhodesAIEnabled())
 			{
 				shootRocketsAtBestTarget(-syaw, cyaw);
 				shootFlameAtBestTarget(-syaw, cyaw);
@@ -1099,7 +1103,7 @@ public class EntityRhodes extends Entity {
 			return;
 		}
 
-		if (!RivalRebels.rhodesAI && ac != 0 && ac != 1 && ac != 11) return;
+		if (!RRConfig.SERVER.isRhodesAIEnabled() && ac != 0 && ac != 1 && ac != 11) return;
 
 		if (counter == 0)
 		{
@@ -1113,8 +1117,8 @@ public class EntityRhodes extends Entity {
 		}
 
 		float movescale = scale;
-		if (RivalRebels.rhodesScaleSpeed) movescale *= RivalRebels.rhodesSpeedScale;
-		else movescale = RivalRebels.rhodesSpeedScale;
+		if (RRConfig.SERVER.isRhodesScaleSpeed()) movescale *= RRConfig.SERVER.getRhodesSpeedScale();
+		else movescale = RRConfig.SERVER.getRhodesSpeedScale();
 		switch (ac)
 		{
 		case 0: //Spawned
@@ -1303,7 +1307,7 @@ public class EntityRhodes extends Entity {
 			leftshinpitch   = approach(leftshinpitch,  60);
 			break;
 		case 10:
-			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && level().getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && level().getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RRBlocks.sigmaobj))
+			if (teamToRaid == 1 && RivalRebels.round.omegaHealth > 0 && level().getBlockState(RivalRebels.round.omegaObjPos).is(RRBlocks.omegaobj) || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaHealth > 0 && level().getBlockState(RivalRebels.round.sigmaObjPos).is(RRBlocks.sigmaobj)))
 			{
 				rightthighpitch = approach(rightthighpitch,0);
 				leftthighpitch  = approach(leftthighpitch, 0);
@@ -1317,13 +1321,13 @@ public class EntityRhodes extends Entity {
 				laserOn = 0;
 				if (teamToRaid == 1)
 				{
-					health += RivalRebels.round.takeOmegaHealth(Math.min(50, RivalRebels.rhodesHealth-health));
+					health += RivalRebels.round.takeOmegaHealth(Math.min(50, RRConfig.SERVER.getRhodesHealth()-health));
 				}
 				if (teamToRaid == 2)
 				{
-					health += RivalRebels.round.takeSigmaHealth(Math.min(50, RivalRebels.rhodesHealth-health));
+					health += RivalRebels.round.takeSigmaHealth(Math.min(50, RRConfig.SERVER.getRhodesHealth()-health));
 				}
-				if (health != RivalRebels.rhodesHealth) counter++;
+				if (health != RRConfig.SERVER.getRhodesHealth()) counter++;
 				else
 				{
 					endangered = false;
@@ -1371,7 +1375,7 @@ public class EntityRhodes extends Entity {
 		double priority = 0;
         List<Entity> otherEntities = level().getEntities(this, Shapes.INFINITY.bounds());
         for (Entity e : otherEntities) {
-            if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) && (!(e instanceof EntityRhodes) || (RivalRebels.rhodesFF && (RivalRebels.rhodesCC || ((EntityRhodes) e).colorType != colorType))) &&
+            if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) && (!(e instanceof EntityRhodes) || (RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || ((EntityRhodes) e).colorType != colorType))) &&
                     !(e instanceof ThrowableProjectile
                             || e instanceof EntityInanimate
                             || e instanceof ItemEntity
@@ -1395,8 +1399,8 @@ public class EntityRhodes extends Entity {
 	private void doWalkingAnimation(float syaw, float cyaw)
 	{
 		float movescale = scale;
-		if (RivalRebels.rhodesScaleSpeed) movescale *= RivalRebels.rhodesSpeedScale;
-		else movescale = RivalRebels.rhodesSpeedScale;
+		if (RRConfig.SERVER.isRhodesScaleSpeed()) movescale *= RRConfig.SERVER.getRhodesSpeedScale();
+		else movescale = RRConfig.SERVER.getRhodesSpeedScale();
 		setDeltaMovement(syaw * 0.125f*movescale,
             getDeltaMovement().y(),
             cyaw * 0.125f*movescale);
@@ -1997,11 +2001,10 @@ public class EntityRhodes extends Entity {
 	}
 
 	//lower is less prior
-	private float getPriority(Entity e)
-	{
-		if (e instanceof Player) return  ((Player) e).getAbilities().invulnerable?-100:600;
+	private float getPriority(Entity e) {
+		if (e instanceof Player) return e.isInvulnerable()?-100:600;
 		if (e instanceof LivingEntity) return ((LivingEntity)e).getMaxHealth()+100;
-		if ((e instanceof EntityRhodes && (RivalRebels.rhodesFF && (RivalRebels.rhodesCC || ((EntityRhodes)e).colorType != colorType))) || e instanceof EntityB2Spirit) return 800;
+		if ((e instanceof EntityRhodes && (RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || ((EntityRhodes)e).colorType != colorType))) || e instanceof EntityB2Spirit) return 800;
 		if (e.getBoundingBox().getSize() > 3) return (float) (e.getBoundingBox().getSize()*3 + 500 + e.getBbHeight());
 		return 0;
 	}

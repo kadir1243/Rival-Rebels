@@ -33,7 +33,7 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
     public void render(TileEntityPlasmaExplosion entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		float fsize = (float) Math.sin(entity.size);
 		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+		matrices.translate(0.5F, 0.5F, 0.5F);
 
 		matrices.pushPose();
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));

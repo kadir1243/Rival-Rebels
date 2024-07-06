@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.EntityCuchillo;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
@@ -48,15 +48,15 @@ public class ItemCuchillo extends TieredItem
         if (!(user instanceof Player player)) return;
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.knife);
-        if (player.getAbilities().invulnerable || !itemStack.isEmpty())
+        if (player.hasInfiniteMaterials() || !itemStack.isEmpty())
 		{
 			float f = (getUseDuration(stack, player) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f < 0.1D) return;
 			if (f > 1.0F) f = 1.0F;
-			if (!player.getAbilities().invulnerable) stack.shrink(1);
-			RivalRebelsSoundPlayer.playSound(player, 4, 3);
-			if (!world.isClientSide) world.addFreshEntity(new EntityCuchillo(world, player, 0.5f + f));
+            stack.consume(1, player);
+            player.playSound(RRSounds.CUCHILLO_UNKNOWN3);
+			if (!world.isClientSide()) world.addFreshEntity(new EntityCuchillo(world, player, 0.5f + f));
 		}
 	}
 

@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.machine.BlockReciever;
 import assets.rivalrebels.common.container.ContainerReciever;
@@ -22,7 +23,10 @@ import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import com.mojang.authlib.GameProfile;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -61,11 +65,10 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	public Entity			target;
 	public double			xO						= 0;
 	public double			zO						= 0;
-	int						direction;
-	double					ll						= -50;
+    double					ll						= -50;
 	double					ul						= 90;
 	double					scale					= 1.5;
-	public NonNullList<ItemStack> chestContents			= NonNullList.withSize(9, ItemStack.EMPTY);
+	public final NonNullList<ItemStack> chestContents			= NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
 	private int				ticksSinceLastTarget	= 0;
 	public int				yawLimit				= 180;
 	public boolean			kTeam					= true;
@@ -79,7 +82,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	public int				wepSelected;
 	public static int		staticEntityIndex		= 1;
 	public int				entityIndex				= 1;
-	public String			username				= "nohbdy";
+	public GameProfile player = new GameProfile(FakePlayer.DEFAULT_UUID, "nobody");
 	private int ticksincepacket;
 	int ticksSinceLastShot = 0;
 
@@ -87,17 +90,17 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
         super(RRTileEntities.RECIEVER, pos, state);
 		entityIndex = staticEntityIndex;
 		pInM = 400;
-		if (RivalRebels.freeDragonAmmo)
+		if (RRConfig.SERVER.isFreeDragonAmmo())
 		{
 			hasWeapon = true;
 			team = RivalRebelsTeam.NONE;
 			kPlayers = true;
-			chestContents.set(3, new ItemStack(RRItems.battery, 64));
-			chestContents.set(4, new ItemStack(RRItems.battery, 64));
-			chestContents.set(5, new ItemStack(RRItems.battery, 64));
-			chestContents.set(0, new ItemStack(RRItems.fuel, 64));
-			chestContents.set(1, new ItemStack(RRItems.fuel, 64));
-			chestContents.set(2, new ItemStack(RRItems.fuel, 64));
+			setItem(3, new ItemStack(RRItems.battery, 64));
+			setItem(4, new ItemStack(RRItems.battery, 64));
+			setItem(5, new ItemStack(RRItems.battery, 64));
+			setItem(0, new ItemStack(RRItems.fuel, 64));
+			setItem(1, new ItemStack(RRItems.fuel, 64));
+			setItem(2, new ItemStack(RRItems.fuel, 64));
 		}
 	}
 
@@ -113,10 +116,10 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
 	private boolean hasBattery()
 	{
-		return !chestContents.get(3).isEmpty() ||
-            !chestContents.get(4).isEmpty() ||
-            !chestContents.get(5).isEmpty() ||
-            RivalRebels.infiniteAmmo;
+		return !getItem(3).isEmpty() ||
+            !getItem(4).isEmpty() ||
+            !getItem(5).isEmpty() ||
+            RRConfig.SERVER.isInfiniteAmmo();
 	}
 
 	private void convertBatteryToEnergy()
@@ -130,31 +133,31 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
 	private void consumeBattery()
 	{
-		if (!chestContents.get(3).isEmpty()) removeItem(3, 1);
-		else if (!chestContents.get(4).isEmpty()) removeItem(4, 1);
-		else if (!chestContents.get(5).isEmpty()) removeItem(5, 1);
+		if (!getItem(3).isEmpty()) removeItem(3, 1);
+		else if (!getItem(4).isEmpty()) removeItem(4, 1);
+		else if (!getItem(5).isEmpty()) removeItem(5, 1);
 	}
 
 	public boolean hasWepReqs()
 	{
-		return !chestContents.get(6).isEmpty() &&
-            !chestContents.get(7).isEmpty() &&
-            !chestContents.get(8).isEmpty();
+		return !getItem(6).isEmpty() &&
+            !getItem(7).isEmpty() &&
+            !getItem(8).isEmpty();
 	}
 
 	public void setWep(int wep)
 	{
 		if (wep != 0)
 		{
-			if (!chestContents.get(6).isEmpty() && chestContents.get(6).has(RRComponents.CHIP_DATA))
+			if (!getItem(6).isEmpty() && getItem(6).has(RRComponents.CHIP_DATA))
 			{
-                ChipData chipData = chestContents.get(6).get(RRComponents.CHIP_DATA);
+                ChipData chipData = getItem(6).get(RRComponents.CHIP_DATA);
                 team = chipData.team();
-				username = chipData.username();
+				player = chipData.gameProfile();
 			}
-			chestContents.set(6, ItemStack.EMPTY);
-            chestContents.set(7, ItemStack.EMPTY);
-            chestContents.set(8, ItemStack.EMPTY);
+			setItem(6, ItemStack.EMPTY);
+            setItem(7, ItemStack.EMPTY);
+            setItem(8, ItemStack.EMPTY);
 			hasWeapon = true;
 			wepSelected = 0;
 		}
@@ -196,7 +199,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 				}
 			}
 			ticksincepacket++;
-			if (ticksincepacket > 6 && !level.isClientSide) {
+			if (ticksincepacket > 6 && !level.isClientSide()) {
 				ticksincepacket = 0;
 			}
 		}
@@ -218,10 +221,10 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
     private boolean hasAmmo()
 	{
-		return !chestContents.get(0).isEmpty() ||
-            !chestContents.get(1).isEmpty() ||
-            !chestContents.get(2).isEmpty() ||
-            RivalRebels.infiniteAmmo;
+		return !getItem(0).isEmpty() ||
+            !getItem(1).isEmpty() ||
+            !getItem(2).isEmpty() ||
+            RRConfig.SERVER.isInfiniteAmmo();
 	}
 
 	private boolean useAmmo()
@@ -230,9 +233,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		if (ammoCounter == 9)
 		{
 			ammoCounter = 0;
-			if (!chestContents.get(0).isEmpty()) removeItem(0, 1);
-			else if (!chestContents.get(1).isEmpty()) removeItem(1, 1);
-			else if (!chestContents.get(2).isEmpty()) removeItem(2, 1);
+			if (!getItem(0).isEmpty()) removeItem(0, 1);
+			else if (!getItem(1).isEmpty()) removeItem(1, 1);
+			else if (!getItem(2).isEmpty()) removeItem(2, 1);
 			else return false;
 			return true;
 		}
@@ -261,21 +264,16 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
 	private boolean isValidTarget(Entity e)
 	{
-		if (e == null) return false;
-		else if (e instanceof Player p)
-		{
-            if (p.getAbilities().invulnerable) return false;
-			else
-			{
-				if (kPlayers) return true;
-				else if (!kTeam) return false;
-				RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(((Player) e).getGameProfile());
-				if (rrp == null) return kTeam;
-				if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getGameProfile().getName().equals(username);
-				if (rrp.rrteam != team) return kTeam;
-				else return false;
-			}
-		}
+		if (e == null || e.isInvulnerable()) return false;
+		else if (e instanceof Player p) {
+            if (kPlayers) return true;
+            else if (!kTeam) return false;
+            RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(((Player) e).getGameProfile());
+            if (rrp == null) return kTeam;
+            if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getGameProfile().equals(player);
+            if (rrp.rrteam != team) return kTeam;
+            else return false;
+        }
 		else return (kMobs && (e instanceof EntityRhodes || (e instanceof Mob && !(e instanceof Animal) && !(e instanceof Bat) && !(e instanceof Villager) && !(e instanceof Squid)) || e instanceof Ghast));
 	}
 
@@ -291,13 +289,13 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
 	private void updateDirection()
 	{
-		direction = this.getBlockState().getValue(BlockReciever.META);
+        Direction direction = this.getBlockState().getValue(BlockReciever.FACING);
 		xO = 0.0;
 		zO = 0.0;
-		if (direction == 2) zO = -0.76f;
-		if (direction == 4) xO = -0.76f;
-		if (direction == 3) zO = 0.76f;
-		if (direction == 5) xO = 0.76f;
+		if (direction == Direction.NORTH) zO = -0.76f;
+		else if (direction == Direction.WEST) xO = -0.76f;
+		else if (direction == Direction.SOUTH) zO = 0.76f;
+		else if (direction == Direction.EAST) xO = 0.76f;
 	}
 
 	public int lookAt(Entity t)
@@ -336,15 +334,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		return 90 - ((pi / Math.PI) * 180);
 	}
 
-	public int getBaseRotation()
-	{
-		int m = getBlockState().getValue(BlockReciever.META);
-		int r = 0;
-		if (m == 2) r = 0;
-		if (m == 3) r = 180;
-		if (m == 4) r = 90;
-		if (m == 5) r = 270;
-		return r;
+	public int getBaseRotation() {
+        return (int) getBlockState().getValue(BlockReciever.FACING).toYRot();
 	}
 
 	/**
@@ -372,22 +363,22 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	@Override
 	public ItemStack removeItem(int par1, int par2)
 	{
-		if (!this.chestContents.get(par1).isEmpty())
+		if (!this.getItem(par1).isEmpty())
 		{
 			ItemStack var3;
 
-			if (this.chestContents.get(par1).getCount() <= par2)
+			if (this.getItem(par1).getCount() <= par2)
 			{
-				var3 = this.chestContents.get(par1);
-				this.chestContents.set(par1, ItemStack.EMPTY);
+				var3 = this.getItem(par1);
+				this.setItem(par1, ItemStack.EMPTY);
             }
 			else
 			{
-				var3 = this.chestContents.get(par1).split(par2);
+				var3 = this.getItem(par1).split(par2);
 
-				if (this.chestContents.get(par1).isEmpty())
+				if (this.getItem(par1).isEmpty())
 				{
-					this.chestContents.set(par1, ItemStack.EMPTY);
+					this.setItem(par1, ItemStack.EMPTY);
 				}
             }
             return var3;
@@ -398,10 +389,10 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
     @Override
     public ItemStack removeItemNoUpdate(int index) {
 		if (index >= getContainerSize()) return ItemStack.EMPTY;
-		if (!this.chestContents.get(index).isEmpty())
+		if (!this.getItem(index).isEmpty())
 		{
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
+			ItemStack var2 = this.getItem(index);
+			this.setItem(index, ItemStack.EMPTY);
 			return var2;
 		}
 		return ItemStack.EMPTY;
@@ -413,10 +404,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		if (index >= getContainerSize()) return;
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
-			stack.setCount(this.getMaxStackSize());
-		}
+        stack.limitSize(this.getMaxStackSize(stack));
 	}
 
     @Override
@@ -435,7 +423,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		kTeam = nbt.getBoolean("kTeam");
 		kMobs = nbt.getBoolean("kMobs");
 		hasWeapon = nbt.getBoolean("hasWeapon");
-		username = nbt.getString("username");
+        player = new GameProfile(nbt.getUUID("uuid"), nbt.getString("username"));
 		team = RivalRebelsTeam.getForID(nbt.getInt("team"));
 		entityIndex = nbt.getInt("entityIndex");
 	}
@@ -450,7 +438,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		nbt.putBoolean("kTeam", kTeam);
 		nbt.putBoolean("kMobs", kMobs);
 		nbt.putBoolean("hasWeapon", hasWeapon);
-		nbt.putString("username", username);
+		nbt.putString("username", player.getName());
+        nbt.putUUID("uuid", player.getId());
 		nbt.putInt("entityIndex", entityIndex);
 		if (team != null) nbt.putInt("team", team.ordinal());
     }
@@ -467,12 +456,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
     }
 
     @Nullable

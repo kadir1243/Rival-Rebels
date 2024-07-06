@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.container.ContainerReactor;
@@ -23,7 +24,9 @@ import assets.rivalrebels.common.item.ItemRod;
 import assets.rivalrebels.common.item.ItemRodNuclear;
 import assets.rivalrebels.common.item.ItemRodRedstone;
 import assets.rivalrebels.common.item.components.RRComponents;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -45,6 +48,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityReactor extends BlockEntity implements Container, Tickable, MenuProvider {
+    public static final ResourceLocation OVERHEAT_TRANSLATION = RRIdentifiers.create("overheat");
 	public double			slide				= 90;
 	private double			test				= Math.PI;
     public ItemStack		core = ItemStack.EMPTY;
@@ -191,7 +195,7 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
                 meltTick++;
                 if (meltTick == 300) meltDown(10);
                 else if (meltTick == 1) {
-                    Component text = Component.translatable(RivalRebels.MODID + ".warning_meltdown");
+                    Component text = RRIdentifiers.warning().append(" ").append(Component.translatable(RivalRebels.MODID + ".warning_meltdown").withStyle(ChatFormatting.RED));
                     for (Player player : level.players()) {
                         player.displayClientMessage(text, false);
                     }
@@ -213,9 +217,10 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
                 if (lastrodwasredstone) on = false;
                 else melt = true;
             }
-            if (tickssincelastrod == 20 && !lastrodwasredstone)
-            {
-                //RivalRebelsServerPacketHandler.sendChatToAll("RivalRebels.WARNING RivalRebels.overheat", 0, world);
+            if (tickssincelastrod == 20 && !lastrodwasredstone) {
+                for (Player player : getLevel().players()) {
+                    player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(OVERHEAT_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), false);
+                }
             }
         }
         else

@@ -40,10 +40,10 @@ public class RenderBlood extends EntityRenderer<EntityBlood>
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etblood));
         matrices.mulPose(Axis.YP.rotationDegrees((float) (180.0F - this.entityRenderDispatcher.camera.getPosition().y())));
         matrices.mulPose(Axis.XP.rotationDegrees((float) -this.entityRenderDispatcher.camera.getPosition().x()));
-        buffer.addVertex((0.0F - var8), (0.0F - var9), 0, CommonColors.WHITE, 0, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex((var7 - var8), (0.0F - var9), 0, CommonColors.WHITE, 1, 0, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex((var7 - var8), (var7 - var9), 0, CommonColors.WHITE, 1, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex((0.0F - var8), (var7 - var9), 0, CommonColors.WHITE, 0, 1, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex(matrices.last(), (0.0F - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+        buffer.addVertex(matrices.last(), (var7 - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+        buffer.addVertex(matrices.last(), (var7 - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+        buffer.addVertex(matrices.last(), (0.0F - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
         matrices.popPose();
 	}
 

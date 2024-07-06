@@ -12,7 +12,7 @@
 package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class GasRenderer implements DynamicItemRenderer {
     public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etflamethrower);
-    private static final ModelFromObj ft = ModelFromObj.readObjFile("o.obj");
 
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
@@ -37,7 +36,7 @@ public class GasRenderer implements DynamicItemRenderer {
         matrices.scale(0.15f, 0.15f, 0.15f);
 		// matrices.translate(0.3f, 0.05f, -0.1f);
 
-		ft.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.gas.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 
 		matrices.popPose();
 	}

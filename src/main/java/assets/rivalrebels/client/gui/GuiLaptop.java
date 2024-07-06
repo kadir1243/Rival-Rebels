@@ -40,7 +40,7 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 		int y = (height - imageHeight) / 2;
         this.clearWidgets();
 		button = new GuiButton(x + 131, y + 89, 16, 16, Component.empty(), button1 -> menu.onGoButtonPressed());
-		addRenderableOnly(button);
+		addRenderableWidget(button);
 	}
 
     @Override
@@ -53,7 +53,6 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        context.setColor(1, 1, 1, 1);
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
 		context.blit(RRIdentifiers.guilaptopnuke, x, y, 0, 0, imageWidth, imageHeight);

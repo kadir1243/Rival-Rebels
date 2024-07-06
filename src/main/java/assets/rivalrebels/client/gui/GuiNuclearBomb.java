@@ -30,26 +30,8 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
     @Override
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         super.renderLabels(context, mouseX, mouseY);
-		int seconds = (menu.getCountDown() / 20);
-		int millis = (menu.getCountDown() % 20) * 3;
-		String milli;
-		if (millis < 10)
-		{
-			milli = "0" + millis;
-		}
-		else
-		{
-			milli = "" + millis;
-		}
-		if (menu.getCountDown() % 20 >= 10)
-		{
-			context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
-		}
-		else
-		{
-            context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 80, 6, 0xFF0000, false);
-		}
-		context.drawString(font, Component.translatable("RivalRebels.nuke"), 8, 6, 0xffffff, false);
+        showTime(context);
+        context.drawString(font, Component.translatable("RivalRebels.nuke"), 8, 6, 0xffffff, false);
 		context.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
 		if (menu.isArmed())
 		{
@@ -68,14 +50,29 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
 		}
     }
 
+    private void showTime(GuiGraphics graphics) {
+        int seconds = (menu.getCountDown() / 20);
+        int millis = (menu.getCountDown() % 20) * 3;
+        String milli;
+        if (millis < 10) {
+            milli = "0" + millis;
+        } else {
+            milli = "" + millis;
+        }
+        if (menu.getCountDown() % 20 >= 10) {
+            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
+        } else {
+            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 0xFF0000, false);
+        }
+    }
+
     @Override
-    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        context.setColor(1, 1, 1, 1);
-		if (menu.getAmountOfCharges() != 0) context.setColor((menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0, 1);
+    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
+		if (menu.getAmountOfCharges() != 0) graphics.setColor((menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0, 1);
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
-		context.blit(RRIdentifiers.guitnuke, x, y, 0, 0, imageWidth, 81);
-		context.setColor(1, 1, 1, 1);
-        context.blit(RRIdentifiers.guitnuke, x, y + 81, 0, 81, imageWidth, imageHeight - 81);
+		graphics.blit(RRIdentifiers.guitnuke, x, y, 0, 0, imageWidth, 81);
+		graphics.setColor(1, 1, 1, 1);
+        graphics.blit(RRIdentifiers.guitnuke, x, y + 81, 0, 81, imageWidth, imageHeight - 81);
 	}
 }

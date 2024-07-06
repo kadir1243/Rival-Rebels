@@ -36,7 +36,7 @@ public class BlockQuickSand extends Block
 	}
 
 	/*@Override
-	public final IIcon getIcon(IBlockAccess world, int x, int y, int z, int s)
+	public final IIcon getIcon(BlockGetter world, int x, int y, int z, int s)
 	{
 		if (this == RivalRebels.quicksand) return Blocks.GRASS.getIcon(world, x, y, z, s);
 		Block[] n = new Block[6];
@@ -70,7 +70,7 @@ public class BlockQuickSand extends Block
 	}
 
 	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
+	public void onBlockAdded(Level world, int x, int y, int z)
 	{
 		Block[] n = new Block[6];
 		n[0] = world.getBlock(x + 1, y, z);

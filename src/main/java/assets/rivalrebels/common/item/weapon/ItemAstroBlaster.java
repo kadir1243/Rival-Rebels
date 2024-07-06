@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityLaserBurst;
@@ -61,44 +61,41 @@ public class ItemAstroBlaster extends TieredItem {
         ItemStack stack = player.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.redrod);
-        if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteAmmo) {
-			if (world.isClientSide) stack.set(DataComponents.REPAIR_COST, 1);
+        if (player.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
+			if (world.isClientSide()) stack.set(DataComponents.REPAIR_COST, 1);
 			player.startUsingItem(hand);
 			RivalRebelsSoundPlayer.playSound(player, 12, 0, 0.7f, 0.7f);
-		} else if (!world.isClientSide) {
+		} else if (!world.isClientSide()) {
 			player.displayClientMessage(Component.nullToEmpty("§cNot enough redstone rods"), false);
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 
     @Override
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
         if (!(user instanceof Player player)) return;
 
-        if (remainingUseTicks < 1980 && !world.isClientSide) {
-			if (!player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo) {
-                ItemStack redrodStack = ItemUtil.getItemStack(player, RRItems.redrod);
+        if (remainingUseTicks < 1980 && !world.isClientSide()) {
+			if (!RRConfig.SERVER.isInfiniteAmmo()) {
+                ItemStack redrodStack = ItemUtil.getItemStack(user, RRItems.redrod);
                 if (!redrodStack.isEmpty()) {
 					redrodStack.hurtAndBreak(1, (ServerLevel) world, (ServerPlayer) player, item -> {});
 					if (redrodStack.getDamageValue() == redrodStack.getMaxDamage()) {
-						redrodStack.shrink(1);
-                        if (redrodStack.isEmpty()) {
-                            player.getInventory().removeItem(redrodStack);
-                        }
-						player.getInventory().add(RRItems.emptyrod.getDefaultInstance());
+						redrodStack.consume(1, user);
+						player.addItem(RRItems.emptyrod.getDefaultInstance());
 					}
 				} else {
 					return;
 				}
 			}
 
-			if (isA) world.playLocalSound(player, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS, SoundSource.PLAYERS, 0.5f, 0.3f);
-			else world.playLocalSound(player, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS2, SoundSource.PLAYERS, 0.4f, 1.7f);
+			if (isA) world.playLocalSound(user, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS, SoundSource.PLAYERS, 0.5f, 0.3f);
+			else world.playLocalSound(user, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS2, SoundSource.PLAYERS, 0.4f, 1.7f);
 
 			isA = !isA;
-			world.addFreshEntity(new EntityLaserBurst(world, player, stack.isEnchanted()));
+			world.addFreshEntity(new EntityLaserBurst(world, user, stack.isEnchanted()));
 		}
-		else if (world.isClientSide)
+		else if (world.isClientSide())
 		{
 			stack.set(DataComponents.REPAIR_COST, (2000 - remainingUseTicks) + 1);
 		}
@@ -106,6 +103,6 @@ public class ItemAstroBlaster extends TieredItem {
 
     @Override
     public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
-		if (world.isClientSide) stack.set(DataComponents.REPAIR_COST, 0);
+		if (world.isClientSide()) stack.set(DataComponents.REPAIR_COST, 0);
 	}
 }

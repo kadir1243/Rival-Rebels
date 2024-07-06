@@ -17,7 +17,6 @@ import assets.rivalrebels.client.guihelper.GuiScroll;
 import assets.rivalrebels.client.guihelper.Rectangle;
 import assets.rivalrebels.common.block.BlockReactive;
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.block.machine.BlockForceFieldNode;
 import assets.rivalrebels.common.container.ContainerReactor;
 import assets.rivalrebels.common.item.ItemCore;
 import assets.rivalrebels.common.item.ItemRod;
@@ -30,6 +29,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -80,9 +80,9 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
             menu.ejectCore();
         });
 		power.isPressed = menu.isOn();
-		this.addRenderableOnly(scroll);
-		this.addRenderableOnly(power);
-		this.addRenderableOnly(eject);
+		this.addRenderableWidget(scroll);
+		this.addRenderableWidget(power);
+		this.addRenderableWidget(eject);
 	}
 
     @Override
@@ -92,7 +92,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		matrices.scale(1.25f, 1f, 1f);
 
         menu.core.locked = menu.isOn();
-        menu.fuel.locked = !menu.fuel.getItem().isEmpty() && menu.isOn();
+        menu.fuel.locked = menu.fuel.hasItem() && menu.isOn();
 
 		context.drawString(font, "ToKaMaK", 10, 8, 0x444444, false);
 		matrices.popPose();
@@ -102,11 +102,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		context.blit(RRIdentifiers.guittokamak, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208);
 
 		float s = (float) scroll.scroll / (float) scroll.limit;
-		int off = (int) Math.floor((machineslist.length - 2) * s);
+		int off = Mth.floor((machineslist.length - 2) * s);
 		if (off < 0) off = 0;
 		int X = 89 + width / 2;
 		int Y = 0 + height / 2;
@@ -146,14 +145,14 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 			if (menu.core.getItem().is(RRItems.core1)) brightness = -0.4f;
 			if (menu.core.getItem().is(RRItems.core2)) brightness = -0.25f;
 			if (menu.core.getItem().is(RRItems.core3)) brightness = -0.1f;
-			if (menu.fuel.getItem().is(RRItems.nuclearelement)) drawNoiseSphere(context, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (menu.fuel.getItem().is(RRItems.NUCLEAR_ROD)) drawNoiseSphere(context, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
 			if (menu.fuel.getItem().is(RRItems.hydrod)) drawNoiseSphere(context, 1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
 			if (menu.fuel.getItem().is(RRItems.redrod)) drawNoiseSphere(context, 1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
 		}
 		else if (menu.isMelt() || (menu.isOn() && !menu.fuel.hasItem()))
 		{
 			if (melttick > 1) melttick -= 0.03f;
-			drawNoiseSphere(context, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, (int) (20 + Math.sin(frame / melttick) * 20), 10, resolution, 0.02f, 0);
+			drawNoiseSphere(context, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, (int) (20 + Mth.sin(frame / melttick) * 20), 10, resolution, 0.02f, 0);
 		}
 		else if (menu.fuel.hasItem() && menu.core.hasItem())
 		{
@@ -175,9 +174,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
     private static BlockState setState(Block block, int meta) {
         BlockState state = block.defaultBlockState();
 
-        if (block == RRBlocks.forcefieldnode) {
-            state = state.setValue(BlockForceFieldNode.META, meta);
-        } else if (block == RRBlocks.reactive) {
+        if (block == RRBlocks.reactive) {
             state = state.setValue(BlockReactive.META, meta);
         }
 
@@ -192,21 +189,20 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 			if (machines[i] == Blocks.AIR) return;
 
 			Block display = machines[i];
-            int meta = 2;
-            BlockState state = setState(display, meta);
+            BlockState state = setState(display, 2);
             BakedModel modelForState = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state);
             ResourceLocation toppath = ResourceLocation.withDefaultNamespace("textures/block/" + /*display.getIcon(1, meta).getIconName() +*/ ".png");
 			String lsidepath = "minecraft:textures/block/" + /*display.getIcon(4, meta).getIconName() +*/ ".png";
 			String rsidepath = "minecraft:textures/block/" + /*display.getIcon(2, meta).getIconName() +*/ ".png";
 
 			Tesselator tessellator = Tesselator.getInstance();
-            BufferBuilder buffer;
 
-			float alpha = 0.5f;
+            float alpha = 0.5f;
 			if (onmachines[i]) alpha = 1;
 
-			RenderSystem.setShaderTexture(0, toppath);
-			buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
+            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
+            RenderSystem.setShaderTexture(0, toppath);
+            BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 			buffer.addVertex(pose.last(), X + 1, Y + 3.5F, 0).setUv(0, 1).setColor(1F, 1F, 1F, alpha);
 			buffer.addVertex(pose.last(), X + 8, Y + 7, 0).setUv(0, 0).setColor(1F, 1F, 1F, alpha);
 			buffer.addVertex(pose.last(), X + 15, Y + 3.5F, 0).setUv(1, 0).setColor(1F, 1F, 1F, alpha);
@@ -249,10 +245,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
      * @param resolution Resolution in pixels of Noise Sphere
      * @param sscale     Noise Scale
      */
-    protected void drawNoiseSphere(GuiGraphics context, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
+    protected void drawNoiseSphere(GuiGraphics graphics, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
         Tesselator t = Tesselator.getInstance();
         BufferBuilder buffer = t.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        PoseStack matrices = context.pose();
+        PoseStack matrices = graphics.pose();
         matrices.pushPose();
         float pointSize = (float) (minecraft.getWindow().getGuiScale() / resolution);
         radius *= resolution;
@@ -278,7 +274,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
                         a /= 2;
                     }
                     v *= 1f - (fdist - radius) / maxdist;
-                    drawPoint(context.pose(), buffer, pointSize, X, Y, 4, FastColor.ARGB32.colorFromFloat(lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v), v));
+                    drawPoint(graphics, buffer, pointSize, X, Y, 4, FastColor.ARGB32.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
                 } else {
                     float Z = Mth.sqrt(rradius - ys) / resolution;
                     float v = startcol;
@@ -291,23 +287,27 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
                     }
 
 
-                    drawPoint(context.pose(), buffer, pointSize, X, Y, 4, FastColor.ARGB32.colorFromFloat(lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v), v));
+                    drawPoint(graphics, buffer, pointSize, X, Y, 4, FastColor.ARGB32.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
                 }
             }
         }
-        MeshData data = buffer.build();
-        if (data != null) { // FIXME: This is empty for now because there is no point is uploaded to buffer
-            BufferUploader.drawWithShader(data);
-        }
+        BufferUploader.drawWithShader(buffer.buildOrThrow());
         matrices.popPose();
     }
 
-    private static void drawPoint(PoseStack pose, BufferBuilder buffer, float pointSize, float x, float y, float z, int color) {
-        // FIXME: draw point
+    private static void drawPoint(GuiGraphics graphics, VertexConsumer buffer, float pointSize, float x, float y, float z, int color) {
+        PoseStack pose = graphics.pose();
+        float halfSize = pointSize / 2.0f;
+
+        // I don't really know what is rendering, so I just tried to create points from quads
+        buffer.addVertex(pose.last(), x - halfSize, y - halfSize, z).setColor(color); // Bottom-left
+        buffer.addVertex(pose.last(), x + halfSize, y - halfSize, z).setColor(color); // Bottom-right
+        buffer.addVertex(pose.last(), x + halfSize, y + halfSize, z).setColor(color); // Top-right
+        buffer.addVertex(pose.last(), x - halfSize, y + halfSize, z).setColor(color); // Top-left
     }
 
-	protected float lerp(float f1, float f2, float f3) {
-		return f1 * f3 + f2 * (1 - f3);
+	protected float lerp(float delta, float start, float end) {
+		return start * (1 - end) + delta * end;
 	}
 
 	protected void drawInfographic(GuiGraphics graphics, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {
@@ -323,9 +323,9 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		innerRatio1 *= outerRatio;
 		innerRatio2 *= outerRatio;
 		innerRatio2 += outerRatio;
-		outerRatio *= Math.PI * 2;
-		innerRatio1 *= Math.PI * 2;
-		innerRatio2 *= Math.PI * 2;
+		outerRatio *= Mth.TWO_PI;
+		innerRatio1 *= Mth.TWO_PI;
+		innerRatio2 *= Mth.TWO_PI;
 		int midR1 = (radius + width1);
 		int midR2 = (midR1 + sep);
 		int outerR = (midR2 + width2);
@@ -339,7 +339,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 				float fdist = Mth.sqrt(xs + ys);
 				if (fdist >= radius && fdist < midR1) {
 					float Y = y / resolution;
-					float angle = (float) (Math.PI + Math.atan2(X, Y));
+					float angle = (float) (Mth.PI + Mth.atan2(X, Y));
                     int color;
                     if (angle <= outerRatio) {
 						if (angle <= innerRatio1) {
@@ -354,17 +354,17 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
                             color = FastColor.ARGB32.colorFromFloat(1, 0.75f, 0.75f, 1);
 						}
 					}
-                    drawPoint(pose, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
+                    drawPoint(graphics, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
 				} else if (fdist >= midR2 && fdist < outerR) {
 					float Y = y / resolution;
-					float angle = (float) (Math.PI + Math.atan2(X, Y));
+					float angle = (float) (Mth.PI + Mth.atan2(X, Y));
                     int color;
                     if (angle <= outerRatio) {
 						color = CommonColors.BLUE;
 					} else {
                         color = CommonColors.RED;
 					}
-                    drawPoint(pose, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
+                    drawPoint(graphics, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
 				}
 			}
 		}

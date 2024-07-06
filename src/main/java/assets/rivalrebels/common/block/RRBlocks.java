@@ -1,7 +1,6 @@
 package assets.rivalrebels.common.block;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.autobuilds.*;
 import assets.rivalrebels.common.block.crate.*;
 import assets.rivalrebels.common.block.machine.*;
@@ -13,7 +12,7 @@ import net.fabricmc.fabric.api.client.rendering.v1.ColorProviderRegistry;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -129,9 +128,9 @@ public class RRBlocks {
         ColorProviderRegistry.BLOCK.register((state, worldIn, pos, tintIndex) -> {
             BlockCycle block = (BlockCycle) state.getBlock();
             block.phase += block.phaseadd;
-            int r = (int) ((Math.sin(block.phase + block.pShiftR) + 1f) * 128f);
-            int g = (int) ((Math.sin(block.phase + block.pShiftG) + 1f) * 128f);
-            int b = (int) ((Math.sin(block.phase + block.pShiftB) + 1f) * 128f);
+            int r = (int) ((Mth.sin(block.phase + block.pShiftR) + 1f) * 128f);
+            int g = (int) ((Mth.sin(block.phase + block.pShiftG) + 1f) * 128f);
+            int b = (int) ((Mth.sin(block.phase + block.pShiftB) + 1f) * 128f);
             return (r & 0xff) << 16 | (g & 0xff) << 8 | b & 0xff;
         }, RRBlocks.cycle);
         ColorProviderRegistry.BLOCK.register((state, worldIn, pos, tintIndex) -> state.getValue(BlockPetrifiedStone.META) * 1118481, RRBlocks.petrifiedstone1, RRBlocks.petrifiedstone2, RRBlocks.petrifiedstone3, RRBlocks.petrifiedstone4);

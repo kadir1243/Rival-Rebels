@@ -12,19 +12,18 @@
 package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.*;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -32,11 +31,23 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class AstroBlasterRenderer implements DynamicItemRenderer {
+    private static final RenderType LIGHTNING = RenderType.create(
+        RivalRebels.MODID+"_lightning_astro_blast",
+        DefaultVertexFormat.POSITION_COLOR,
+        VertexFormat.Mode.QUADS,
+        1536,
+        false,
+        true,
+        RenderType.CompositeState.builder()
+            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+            .createCompositeState(false)
+    );
     public static final Material REDSTONE_ROD_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etredrod);
     public static final Material EINSTEIN_HANDLE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.eteinstenhandle);
     public static final Material EINSTEIN_BARREL_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.eteinstenbarrel);
     public static final Material EINSTEIN_BACK_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.eteinstenback);
-    private final ModelRod md5 = new ModelRod();
     private float pullback = 0;
     private float rotation = 0;
     private boolean isreloading = false;
@@ -73,7 +84,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.pushPose();
         matrices.translate(0f, 0.9f, 0f);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
+        VertexConsumer buffer = vertexConsumers.getBuffer(LIGHTNING);
         VertexConsumer cellular_noise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
         ModelAstroBlasterBarrel.render(matrices, EINSTEIN_BARREL_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
         if (stack.isEnchanted()) {
@@ -93,7 +104,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         // matrices.push();
         // matrices.translate(0f, 0.8f, 0f);
-        // RenderSystem.rotate(180, 0.0F, 0.0F, 1.0F);
+        // matrices.mulPose(180, 0.0F, 0.0F, 1.0F);
         // matrices.scale(0.9F, 4.5F, 0.9F);
         // md3.render(0.2f, 0.3f, 0.3f, 0.3f, 1f);
         // matrices.pop();
@@ -115,34 +126,32 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.translate(0.12f, 0.1f, 0.12f);
         matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
-        md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
+        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.translate(-0.12f, 0.1f, 0.12f);
         matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
-        md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
+        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.translate(-0.12f, 0.1f, -0.12f);
         matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
-        md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
+        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
 
         matrices.pushPose();
         matrices.translate(0.12f, 0.1f, -0.12f);
         matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
-        md5.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
+        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
         matrices.popPose();
         matrices.popPose();
 
         matrices.pushPose();
-        RenderSystem.enableBlend();
-        RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
         matrices.translate(0, 0.25f, 0);
         float segmentDistance = 0.1f;
         float distance = 0.5f;
@@ -176,60 +185,56 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
             }
 
             for (float o = 0; o <= radius; o += radius / 2f) {
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(1, 0, 0, 1);
+                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
 
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(1, 0, 0, 1);
+                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
 
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(1, 0, 0, 1);
+                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
 
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(1, 0, 0, 1);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(1, 0, 0, 1);
+                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
             }
-            // matrices.push();
-            // RenderSystem.rotate(90f, 0.0F, 0.0F, 1.0F);
-            // RenderSystem.rotate((float) angle, 0.0F, 1.0F, 0.0F);
-            // float o = 0.075f;
-            // float s = 0.1f;
-            // tessellator.startDrawingQuads();
-            // tessellator.setColorRGBA_F(1, 0, 0, 1);
-            // tessellator.addVertex( + o, AddedY, - o);
-            // tessellator.addVertex( + o, AddedY, + o);
-            // tessellator.addVertex( + o, AddedY + s, + o);
-            // tessellator.addVertex( + o, AddedY + s, - o);
-            // tessellator.draw();
-            // tessellator.startDrawingQuads();
-            // tessellator.setColorRGBA_F(1, 0, 0, 1);
-            // tessellator.addVertex( - o, AddedY, - o);
-            // tessellator.addVertex( + o, AddedY, - o);
-            // tessellator.addVertex( + o, AddedY + s, - o);
-            // tessellator.addVertex( - o, AddedY + s, - o);
-            // tessellator.draw();
-            // tessellator.startDrawingQuads();
-            // tessellator.setColorRGBA_F(1, 0, 0, 1);
-            // tessellator.addVertex( - o, AddedY, + o);
-            // tessellator.addVertex( - o, AddedY, - o);
-            // tessellator.addVertex( - o, AddedY + s, - o);
-            // tessellator.addVertex( - o, AddedY + s, + o);
-            // tessellator.draw();
-            // tessellator.startDrawingQuads();
-            // tessellator.setColorRGBA_F(1, 0, 0, 1);
-            // tessellator.addVertex( + o, AddedY, + o);
-            // tessellator.addVertex( - o, AddedY, + o);
-            // tessellator.addVertex( - o, AddedY + s, + o);
-            // tessellator.addVertex( + o, AddedY + s, + o);
-            // tessellator.draw();
-            // matrices.pop();
+            //matrices.pushPose();
+            //matrices.mulPose(Axis.ZP.rotationDegrees(90));
+            //matrices.mulPose(Axis.YP.rotationDegrees((float) angle));
+            //float o = 0.075f;
+            //float s = 0.1f;
+            //Tesselator tesselator = Tesselator.getInstance();
+            //BufferBuilder builder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
+
+            //builder.addVertex( + o, AddedY, - o).setColor(CommonColors.RED);
+            //builder.addVertex( + o, AddedY, + o).setColor(CommonColors.RED);
+            //builder.addVertex( + o, AddedY + s, + o).setColor(CommonColors.RED);
+            //builder.addVertex( + o, AddedY + s, - o).setColor(CommonColors.RED);
+
+            //builder.addVertex( - o, AddedY, - o).setColor(CommonColors.RED);
+            //builder.addVertex( + o, AddedY, - o).setColor(CommonColors.RED);
+            //builder.addVertex( + o, AddedY + s, - o).setColor(CommonColors.RED);
+            //builder.addVertex( - o, AddedY + s, - o).setColor(CommonColors.RED);
+
+            //builder.addVertex( - o, AddedY, + o).setColor(CommonColors.RED);
+            //builder.addVertex( - o, AddedY, - o).setColor(CommonColors.RED);
+            //builder.addVertex( - o, AddedY + s, - o).setColor(CommonColors.RED);
+            //builder.addVertex( - o, AddedY + s, + o).setColor(CommonColors.RED);
+
+            //builder.addVertex( + o, AddedY, + o).setColor(CommonColors.RED);
+            //builder.addVertex( - o, AddedY, + o).setColor(CommonColors.RED);
+            //builder.addVertex( - o, AddedY + s, + o).setColor(CommonColors.RED);
+            //builder.addVertex( + o, AddedY + s, + o).setColor(CommonColors.RED);
+
+            //BufferUploader.drawWithShader(builder.buildOrThrow());
+            //matrices.popPose();
         }
 
         matrices.popPose();

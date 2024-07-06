@@ -19,7 +19,7 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public class ModelTrollFlag
 {
-	public void renderModel(PoseStack pose, VertexConsumer buffer, int metadata) {
+	public static void renderModel(PoseStack pose, VertexConsumer buffer, int metadata) {
         float var18 = 0.05F;
 
 		if (metadata == 5) {

@@ -147,7 +147,7 @@ public class EntityB2Frag extends EntityInanimate
             setPosRaw(getX(), hitResult.getLocation().y() + offset, getZ());
 		}
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
 

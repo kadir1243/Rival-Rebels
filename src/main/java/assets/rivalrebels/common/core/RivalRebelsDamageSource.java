@@ -15,8 +15,7 @@ import assets.rivalrebels.RRIdentifiers;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import net.minecraft.core.Holder;
+
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageSource;
@@ -85,10 +84,7 @@ public class RivalRebelsDamageSource {
     }
 
     private static DamageSource of(Level world, ResourceKey<DamageType> key) {
-        Optional<Holder.Reference<DamageType>> entry = world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolder(key);
-
-        // TODO: Implement damage sources
-        return entry.map(DamageSource::new).orElseGet(() -> world.damageSources().generic());
+        return new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key));
     }
 
     public static class RRDamageTypes {

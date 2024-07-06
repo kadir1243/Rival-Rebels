@@ -11,12 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.block.trap.*;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -32,17 +34,18 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockNukeCrate extends BaseEntityBlock {
     public static final MapCodec<BlockNukeCrate> CODEC = simpleCodec(BlockNukeCrate::new);
-    public static final DirectionProperty DIRECTION = DirectionProperty.create("direction");
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 	public BlockNukeCrate(Properties settings)
 	{
 		super(settings);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(DIRECTION, Direction.UP));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.UP));
 	}
 
     @Override
@@ -52,7 +55,7 @@ public class BlockNukeCrate extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(DIRECTION);
+        builder.add(FACING);
     }
 
     public Direction determineOrientation(Level world, BlockPos pos) {
@@ -60,16 +63,14 @@ public class BlockNukeCrate extends BaseEntityBlock {
 		if (this == RRBlocks.nukeCrateTop) {
             for (Direction facing : Direction.values()) {
                 BlockPos offset = pos.relative(facing);
-                Block block = world.getBlockState(offset).getBlock();
-                if (block == RRBlocks.nukeCrateBottom) {
+                if (world.getBlockState(offset).is(RRBlocks.nukeCrateBottom)) {
                     targetFacing = facing.getOpposite();
                 }
             }
 		} else if (this == RRBlocks.nukeCrateBottom) {
             for (Direction facing : Direction.values()) {
                 BlockPos offset = pos.relative(facing);
-                Block block = world.getBlockState(offset).getBlock();
-                if (block == RRBlocks.nukeCrateTop) {
+                if (world.getBlockState(offset).is(RRBlocks.nukeCrateTop)) {
                     targetFacing = facing;
                 }
             }
@@ -79,7 +80,7 @@ public class BlockNukeCrate extends BaseEntityBlock {
 
     @Override
     public void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, BlockPos fromPos, boolean notify) {
-		world.setBlockAndUpdate(pos, state.setValue(DIRECTION, determineOrientation(world, pos)));
+		world.setBlockAndUpdate(pos, state.setValue(FACING, determineOrientation(world, pos)));
 	}
 
     @Override
@@ -88,7 +89,7 @@ public class BlockNukeCrate extends BaseEntityBlock {
         int y = pos.getY();
         int z = pos.getZ();
 
-        world.setBlockAndUpdate(pos, state.setValue(DIRECTION, determineOrientation(world, pos)));
+        world.setBlockAndUpdate(pos, state.setValue(FACING, determineOrientation(world, pos)));
 
         for (Direction facing : Direction.values()) {
             BlockPos offset = pos.relative(facing);
@@ -112,9 +113,9 @@ public class BlockNukeCrate extends BaseEntityBlock {
 		{
 			if (!stack.isEmpty())
 			{
-				if (stack.getItem() == RRItems.pliers)
+				if (stack.is(RRItems.pliers))
 				{
-					int orientation;
+					Direction orientation = null;
 					if (	getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x + 1, y - 1, z) == RRBlocks.nukeCrateBottom)
@@ -122,8 +123,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z, Blocks.AIR);
 						setBlock(level, x + 1, y, z, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x + 1, y - 1, z, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.META, 4));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x + 1, y - 1, z, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.WEST));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
@@ -132,8 +133,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z, Blocks.AIR);
 						setBlock(level, x - 1, y, z, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x - 1, y - 1, z, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.META, 5));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x - 1, y - 1, z, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.EAST));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
@@ -142,8 +143,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z, Blocks.AIR);
 						setBlock(level, x, y, z + 1, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z + 1, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.META, 2));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x, y - 1, z + 1, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.NORTH));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
@@ -152,8 +153,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z, Blocks.AIR);
 						setBlock(level, x, y, z - 1, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z - 1, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.META, 3));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x, y - 1, z - 1, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.SOUTH));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					if (	getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
@@ -162,8 +163,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y + 1, z, Blocks.AIR);
 						setBlock(level, x + 1, y + 1, z, Blocks.AIR);
 						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x + 1, y, z, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.META, 4));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x + 1, y, z, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.WEST));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
@@ -172,8 +173,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y + 1, z, Blocks.AIR);
 						setBlock(level, x - 1, y + 1, z, Blocks.AIR);
 						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x - 1, y, z, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.META, 5));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x - 1, y, z, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.EAST));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
@@ -182,8 +183,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y + 1, z, Blocks.AIR);
 						setBlock(level, x, y + 1, z + 1, Blocks.AIR);
 						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z + 1, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.META, 2));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x, y, z + 1, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.NORTH));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateBottom &&
 							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
@@ -192,8 +193,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y + 1, z, Blocks.AIR);
 						setBlock(level, x, y + 1, z - 1, Blocks.AIR);
 						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z - 1, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.META, 3));
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						setBlock(level, x, y, z - 1, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.SOUTH));
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x + 2, y, z) == RRBlocks.nukeCrateBottom &&
@@ -208,10 +209,10 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x + 2, y, z, Blocks.AIR);
 						setBlock(level, x + 3, y, z, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x + 1, y - 1, z, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.META, 4));
+						setBlock(level, x + 1, y - 1, z, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.WEST));
 						setBlock(level, x + 2, y - 1, z, Blocks.AIR);
 						setBlock(level, x + 3, y - 1, z, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x - 2, y, z) == RRBlocks.nukeCrateBottom &&
@@ -226,10 +227,10 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x - 2, y, z, Blocks.AIR);
 						setBlock(level, x - 3, y, z, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x - 1, y - 1, z, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.META, 5));
+						setBlock(level, x - 1, y - 1, z, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.EAST));
 						setBlock(level, x - 2, y - 1, z, Blocks.AIR);
 						setBlock(level, x - 3, y - 1, z, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x, y, z + 2) == RRBlocks.nukeCrateBottom &&
@@ -244,10 +245,10 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z + 2, Blocks.AIR);
 						setBlock(level, x, y, z + 3, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z + 1, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.META, 2));
+						setBlock(level, x, y - 1, z + 1, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.NORTH));
                         setBlock(level, x, y - 1, z + 2, Blocks.AIR);
 						setBlock(level, x, y - 1, z + 3, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x, y, z - 2) == RRBlocks.nukeCrateBottom &&
@@ -262,10 +263,10 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z - 2, Blocks.AIR);
 						setBlock(level, x, y, z - 3, Blocks.AIR);
 						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z - 1, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.META, 3));
+						setBlock(level, x, y - 1, z - 1, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.SOUTH));
 						setBlock(level, x, y - 1, z - 2, Blocks.AIR);
 						setBlock(level, x, y - 1, z - 3, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x + 2, y, z) == RRBlocks.nukeCrateBottom &&
@@ -280,10 +281,10 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x + 2, y, z, Blocks.AIR);
 						setBlock(level, x + 3, y, z, Blocks.AIR);
 						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x + 1, y, z, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.META, 4));
+						setBlock(level, x + 1, y, z, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.WEST));
 						setBlock(level, x + 2, y + 1, z, Blocks.AIR);
 						setBlock(level, x + 3, y + 1, z, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x - 2, y, z) == RRBlocks.nukeCrateBottom &&
@@ -298,10 +299,10 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x - 2, y, z, Blocks.AIR);
 						setBlock(level, x - 3, y, z, Blocks.AIR);
 						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x - 1, y, z, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.META, 5));
+						setBlock(level, x - 1, y, z, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.EAST));
 						setBlock(level, x - 2, y + 1, z, Blocks.AIR);
 						setBlock(level, x - 3, y + 1, z, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x, y, z + 2) == RRBlocks.nukeCrateBottom &&
@@ -316,10 +317,10 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z + 2, Blocks.AIR);
 						setBlock(level, x, y, z + 3, Blocks.AIR);
 						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y, z + 1, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.META, 2));
+						setBlock(level, x, y, z + 1, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.NORTH));
 						setBlock(level, x, y + 1, z + 2, Blocks.AIR);
 						setBlock(level, x, y + 1, z + 3, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
 					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateTop &&
 							getBlock(level, x, y, z - 2) == RRBlocks.nukeCrateBottom &&
@@ -334,56 +335,33 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, x, y, z - 2, Blocks.AIR);
 						setBlock(level, x, y, z - 3, Blocks.AIR);
 						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y, z - 1, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.META, 3));
+						setBlock(level, x, y, z - 1, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.SOUTH));
 						setBlock(level, x, y + 1, z - 2, Blocks.AIR);
 						setBlock(level, x, y + 1, z - 3, Blocks.AIR);
-						return ItemInteractionResult.sidedSuccess(level.isClientSide);
-					}
-					else if (getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateBottom)
-					{
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						orientation = 0;
-					}
-					else if (getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateBottom)
-					{
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						orientation = 1;
-					}
-					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateBottom)
-					{
-						setBlock(level, x, y, z + 1, Blocks.AIR);
-						orientation = 2;
-					}
-					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateBottom)
-					{
-						setBlock(level, x, y, z - 1, Blocks.AIR);
-						orientation = 3;
-					}
-					else if (getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateBottom)
-					{
-						setBlock(level, x + 1, y, z, Blocks.AIR);
-						orientation = 4;
-					}
-					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateBottom)
-					{
-						setBlock(level, x - 1, y, z, Blocks.AIR);
-						orientation = 5;
-					}
-					else
-					{
-						return ItemInteractionResult.FAIL;
-					}
-                    level.setBlockAndUpdate(new BlockPos(x, y, z), RRBlocks.nuclearBomb.defaultBlockState().setValue(BlockNuclearBomb.META, orientation));
-					return ItemInteractionResult.sidedSuccess(level.isClientSide);
+						return ItemInteractionResult.sidedSuccess(level.isClientSide());
+					} else {
+                        for (Direction direction : Direction.values()) {
+                            if (level.getBlockState(pos.relative(direction.getOpposite())).is(RRBlocks.nukeCrateBottom)) {
+                                level.setBlockAndUpdate(pos.relative(direction.getOpposite()), Blocks.AIR.defaultBlockState());
+                                orientation = direction;
+                                break;
+                            }
+                        }
+                        if (orientation == null) {
+                            return ItemInteractionResult.FAIL;
+                        }
+                    }
+                    level.setBlockAndUpdate(new BlockPos(x, y, z), RRBlocks.nuclearBomb.defaultBlockState().setValue(BlockNuclearBomb.FACING, orientation));
+					return ItemInteractionResult.sidedSuccess(level.isClientSide());
 				}
-				else if (!level.isClientSide)
+				else if (!level.isClientSide())
 				{
-                    player.displayClientMessage(Component.translatable("RivalRebels.Orders").append(" ").append(Component.translatable("RivalRebels.message.use")).append(" ").append(RRItems.pliers.getDescription()), false);
+                    player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" ").append(RRItems.pliers.getDescription()), false);
 				}
 			}
-			else if (!level.isClientSide)
+			else if (!level.isClientSide())
 			{
-				player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".use_pliars", RRItems.pliers.getDescription()), false);
+				player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable(BlockAutoTemplate.USE_PLIERS_TO_BUILD_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), false);
 			}
 		}
 		return ItemInteractionResult.FAIL;

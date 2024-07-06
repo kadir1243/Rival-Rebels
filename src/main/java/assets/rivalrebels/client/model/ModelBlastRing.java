@@ -16,21 +16,22 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public class ModelBlastRing {
-    public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, Vector4f color, int light, int overlay) {
+    public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int color, int light, int overlay) {
 		matrices.pushPose();
-		float innerangle = (float) Math.PI * 2 / segments;
+		float innerangle = Mth.TWO_PI / segments;
 		Vector3f v1 = new Vector3f(0, -height, size - thickness);
 		Vector3f v2 = new Vector3f(0, -height, size + thickness);
-		Vector3f v3 = new Vector3f((float) Math.sin(innerangle) * (size - thickness), -height, (float) Math.cos(innerangle) * (size - thickness));
-		Vector3f v4 = new Vector3f((float) Math.sin(innerangle) * (size + thickness), -height, (float) Math.cos(innerangle) * (size + thickness));
+		Vector3f v3 = new Vector3f(Mth.sin(innerangle) * (size - thickness), -height, Mth.cos(innerangle) * (size - thickness));
+		Vector3f v4 = new Vector3f(Mth.sin(innerangle) * (size + thickness), -height, Mth.cos(innerangle) * (size + thickness));
 		Vector3f v5 = new Vector3f(0, +height, size - thickness);
 		Vector3f v6 = new Vector3f(0, +height, size + thickness);
-		Vector3f v7 = new Vector3f((float) Math.sin(innerangle) * (size - thickness), +height, (float) Math.cos(innerangle) * (size - thickness));
-		Vector3f v8 = new Vector3f((float) Math.sin(innerangle) * (size + thickness), +height, (float) Math.cos(innerangle) * (size + thickness));
+		Vector3f v7 = new Vector3f(Mth.sin(innerangle) * (size - thickness), +height, Mth.cos(innerangle) * (size - thickness));
+		Vector3f v8 = new Vector3f(Mth.sin(innerangle) * (size + thickness), +height, Mth.cos(innerangle) * (size + thickness));
 
 		matrices.translate(x, y, z);
 		matrices.mulPose(Axis.XP.rotationDegrees(pitch));
@@ -49,10 +50,10 @@ public class ModelBlastRing {
 	}
 
     public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int light, int overlay) {
-        renderModel(matrices, buffer, size, segments, thickness, height, pitch, yaw, roll, x, y, z, new Vector4f(1, 1, 1, 1), light, overlay);
+        renderModel(matrices, buffer, size, segments, thickness, height, pitch, yaw, roll, x, y, z, CommonColors.WHITE, light, overlay);
     }
 
     public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int light) {
-        renderModel(matrices, buffer, size, segments, thickness, height, pitch, yaw, roll, x, y, z, new Vector4f(1, 1, 1, 1), light, OverlayTexture.NO_OVERLAY);
+        renderModel(matrices, buffer, size, segments, thickness, height, pitch, yaw, roll, x, y, z, CommonColors.WHITE, light, OverlayTexture.NO_OVERLAY);
     }
 }

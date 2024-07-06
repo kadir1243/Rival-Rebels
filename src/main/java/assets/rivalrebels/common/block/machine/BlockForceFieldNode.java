@@ -17,12 +17,10 @@ import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityForceFieldNode;
-import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -35,17 +33,18 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockForceFieldNode extends BaseEntityBlock {
     public static final MapCodec<BlockForceFieldNode> CODEC = simpleCodec(BlockForceFieldNode::new);
-    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public BlockForceFieldNode(Properties settings)
 	{
 		super(settings);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -55,13 +54,13 @@ public class BlockForceFieldNode extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(FACING);
     }
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		BlockEntity te = level.getBlockEntity(pos);
-		if (te instanceof TileEntityForceFieldNode teffn && !level.isClientSide) {
+		if (te instanceof TileEntityForceFieldNode teffn && !level.isClientSide()) {
 			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.uuid == null && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
@@ -79,15 +78,7 @@ public class BlockForceFieldNode extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        BlockState state = super.getStateForPlacement(ctx);
-
-        return switch (Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3) {
-            case 0 -> state.setValue(META, 2);
-            case 1 -> state.setValue(META, 5);
-            case 2 -> state.setValue(META, 3);
-            case 3 -> state.setValue(META, 4);
-            default -> state;
-        };
+        return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Nullable

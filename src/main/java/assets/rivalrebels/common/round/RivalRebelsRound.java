@@ -79,18 +79,20 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	private int						spawnDist		= 150;
 	private int						objDist			= 200;
 	private boolean					roundstarted	= false;
-	public int omegaHealth=RivalRebels.objectiveHealth;
-	public int sigmaHealth=RivalRebels.objectiveHealth;
+	public int omegaHealth;
+	public int sigmaHealth;
 
 	public RivalRebelsRound() {
     }
 
-	public RivalRebelsRound(int spawnRadius, int spawnDist, int objDist) {
-		this.spawnRadius = spawnRadius;
-		spawnRadius2 = spawnRadius * spawnRadius;
-		this.spawnDist = spawnDist;
-		this.objDist = objDist;
-	}
+    public void setRoundDistances(int spawnRadius, int spawnDist, int objDist) {
+        this.spawnRadius = spawnRadius;
+        spawnRadius2 = spawnRadius * spawnRadius;
+        this.spawnDist = spawnDist;
+        this.objDist = objDist;
+        omegaHealth = RRConfig.SERVER.getObjectiveHealth();
+        sigmaHealth = RRConfig.SERVER.getObjectiveHealth();
+    }
 
 	public static RivalRebelsRound fromBytes(FriendlyByteBuf buf) {
         RivalRebelsRound packet = new RivalRebelsRound();
@@ -136,7 +138,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
             {
                 player.getInventory().clearContent();
                 player.setPosRaw(cSpawnx, 200, cSpawnz);
-                //rrplayerlist.add(new RivalRebelsPlayer(player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RivalRebels.resetMax));
+                //rrplayerlist.add(new RivalRebelsPlayer(player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RRConfig.SERVER.getMaximumResets()));
             }
             ServerPlayNetworking.send(player, rrplayerlist);
             if (isInSpawn(player)) ServerPlayNetworking.send(player, GuiSpawnPacket.INSTANCE);
@@ -234,10 +236,10 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
             player.getInventory().clearContent();
         }
 		cSpawnz += spawnDist;
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawnx, 200, cSpawnz), 0);
         }
-		float f = RivalRebels.rhodesChance;
+		float f = RRConfig.SERVER.getRhodesInRoundsChance();
 		while (f >= 1)
 		{
 			f--;
@@ -245,8 +247,8 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 		}
 		if (f > world.random.nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawnx+world.random.nextDouble()-0.5f, 170, cSpawnz+world.random.nextDouble()-0.5f,1));
 		buildSpawn();
-		omegaHealth=RivalRebels.objectiveHealth;
-		sigmaHealth=RivalRebels.objectiveHealth;
+		omegaHealth=RRConfig.SERVER.getObjectiveHealth();
+		sigmaHealth=RRConfig.SERVER.getObjectiveHealth();
         sendUpdatePacket();
 	}
 
@@ -269,8 +271,8 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 			cSpawnx = (omegaObjPos.getX()+sigmaObjPos.getX())/2;
 			cSpawnz = (omegaObjPos.getZ()+sigmaObjPos.getZ())/2;
             ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawnx, world.getChunk(new BlockPos(cSpawnx, 0, cSpawnz)).getHeight(), cSpawnz), 0F);
-			omegaHealth=RivalRebels.objectiveHealth;
-			sigmaHealth=RivalRebels.objectiveHealth;
+			omegaHealth=RRConfig.SERVER.getObjectiveHealth();
+			sigmaHealth=RRConfig.SERVER.getObjectiveHealth();
 			sendUpdatePacket();
 		}
 	}
@@ -336,7 +338,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	public void updateInvisible() {
 		if (Minecraft.getInstance().level == null) return;
         for (Player player : Minecraft.getInstance().level.players()) {
-            if (player.getItemBySlot(EquipmentSlot.HEAD).getItem() == RRItems.camera)
+            if (player.getItemBySlot(EquipmentSlot.HEAD).is(RRItems.camera))
                 setInvisible(player);
         }
 		for (int i = players.size()-1; i >= 0; i--)
@@ -387,7 +389,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
                 ScoreAccess deaths = scrb.getOrCreatePlayerScore(player, deathObjective);
                 deaths.display(Component.nullToEmpty("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S"));
             }
-            if (RivalRebels.scoreboardenabled) {
+            if (RRConfig.SERVER.isScoreboardEnabled()) {
                 scrb.setDisplayObjective(DisplaySlot.SIDEBAR, deathObjective);
             }
         } catch(Exception ignored) {} //just in case teams already exist etc
@@ -428,7 +430,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 		ChunkAccess chunk = world.getChunk(omegaObjPos);
         for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > 0; omegaObjPos.below())
         {
-            if (chunk.getBlockState(omegaObjPos).getBlock() != Blocks.AIR)
+            if (!chunk.getBlockState(omegaObjPos).isAir())
             {
                 break;
             }
@@ -437,7 +439,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         sigmaObjPos = new BlockPos(sigmaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, sigmaObjPos.getZ());
         for (; sigmaObjPos.getY() > 0; sigmaObjPos = sigmaObjPos.below())
         {
-            if (chunk.getBlockState(sigmaObjPos).getBlock() != Blocks.AIR)
+            if (!chunk.getBlockState(sigmaObjPos).isAir())
             {
                 break;
             }
@@ -619,7 +621,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
     }
 
     private void sendUpdatePacket() {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             return;
         }
         for (Player player : world.players()) {
@@ -635,10 +637,10 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	public float addOmegaHealth(float power)
 	{
 		omegaHealth += power;
-		if (omegaHealth > RivalRebels.objectiveHealth)
+		if (omegaHealth > RRConfig.SERVER.getObjectiveHealth())
 		{
-			int tmp = omegaHealth-RivalRebels.objectiveHealth;
-			omegaHealth = RivalRebels.objectiveHealth;
+			int tmp = omegaHealth-RRConfig.SERVER.getObjectiveHealth();
+			omegaHealth = RRConfig.SERVER.getObjectiveHealth();
 			return tmp;
 		}
 		return 0;
@@ -647,10 +649,10 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	public float addSigmaHealth(float power)
 	{
 		sigmaHealth += power;
-		if (sigmaHealth > RivalRebels.objectiveHealth)
+		if (sigmaHealth > RRConfig.SERVER.getObjectiveHealth())
 		{
-			int tmp = sigmaHealth-RivalRebels.objectiveHealth;
-			sigmaHealth = RivalRebels.objectiveHealth;
+			int tmp = sigmaHealth-RRConfig.SERVER.getObjectiveHealth();
+			sigmaHealth = RRConfig.SERVER.getObjectiveHealth();
 			return tmp;
 		}
 		return 0;

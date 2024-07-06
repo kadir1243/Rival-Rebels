@@ -11,10 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -38,16 +38,16 @@ public class BlockFlagBox5 extends Block
         int y = pos.getY();
         int z = pos.getZ();
 
-		if (player.isShiftKeyDown() && !level.isClientSide)
+		if (player.isShiftKeyDown() && !level.isClientSide())
 		{
 			ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.flag5, 10));
 			level.addFreshEntity(ei);
             level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 			return InteractionResult.PASS;
 		}
-		if (!player.isShiftKeyDown() && !level.isClientSide)
+		if (!player.isShiftKeyDown() && !level.isClientSide())
 		{
-            player.displayClientMessage(Component.translatable("RivalRebels.Orders").append(" ").append(Component.translatable("RivalRebels.sneak")), false);
+            player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.sneak")), false);
 			level.setBlockAndUpdate(new BlockPos(x, y, z), RRBlocks.flagbox6.defaultBlockState());
 			return InteractionResult.PASS;
 		}

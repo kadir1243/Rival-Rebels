@@ -19,6 +19,7 @@ import assets.rivalrebels.common.entity.EntityGore;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.entity.RREntities;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
+import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -33,6 +34,7 @@ import static org.lwjgl.glfw.GLFW.*;
 
 public class ClientProxy extends CommonProxy {
     public static final KeyMapping USE_KEY = new KeyMapping("use_key", GLFW_KEY_F, "");
+    public static final KeyMapping TARGET_KEY = new KeyMapping("target_key", InputConstants.Type.MOUSE, GLFW_MOUSE_BUTTON_LEFT, "");
 
     @Environment(EnvType.CLIENT)
     public static void registerKeyBinding() {
@@ -164,27 +166,27 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public boolean spacebar()
 	{
-		return Minecraft.getInstance().options.keyJump.consumeClick() && Minecraft.getInstance().screen == null;
+		return Minecraft.getInstance().options.keyJump.isDown() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean w()
 	{
-		return Minecraft.getInstance().options.keyUp.consumeClick() && Minecraft.getInstance().screen == null;
+		return Minecraft.getInstance().options.keyUp.isDown() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean a()
 	{
-		return Minecraft.getInstance().options.keyLeft.consumeClick() && Minecraft.getInstance().screen == null;
+		return Minecraft.getInstance().options.keyLeft.isDown() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean s()
 	{
-		return Minecraft.getInstance().options.keyDown.consumeClick() && Minecraft.getInstance().screen == null;
+		return Minecraft.getInstance().options.keyDown.isDown() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean d()
 	{
-		return Minecraft.getInstance().options.keyRight.consumeClick() && Minecraft.getInstance().screen == null;
+		return Minecraft.getInstance().options.keyRight.isDown() && Minecraft.getInstance().screen == null;
 	}
 	@Override
 	public boolean f()

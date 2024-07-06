@@ -18,7 +18,7 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.FlameThrowerMode;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.ItemUpdate;
-import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -46,7 +46,7 @@ public class GuiFlameThrower extends Screen
 		posY = (height - ySizeOfTexture) / 2;
 		clearWidgets();
 		knob = new GuiFTKnob(posX + 108, posY + 176, -90, 90, start, true, Component.literal("Knob"));
-		addRenderableOnly(knob);
+		addRenderableWidget(knob);
 	}
 
     @Override
@@ -57,13 +57,13 @@ public class GuiFlameThrower extends Screen
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		float f = 0.00390625F;
-        ((DrawContextAccessor) context).callDrawTexturedQuad(
+        ((GuiGraphicsAccessor) context).callBlit(
             RRIdentifiers.guiflamethrower,
             posX,
             posX + xSizeOfTexture,
             posY,
             posY + ySizeOfTexture,
-            0, // z offset
+            0,
             0,
             xSizeOfTexture * f,
             ySizeOfTexture * f,

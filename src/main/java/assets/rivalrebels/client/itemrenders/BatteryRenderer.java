@@ -12,7 +12,7 @@
 package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class BatteryRenderer implements DynamicItemRenderer {
     public static final Material BATTERY_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etbattery);
-	private static final ModelFromObj battery = ModelFromObj.readObjFile("k.obj");
 
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
@@ -35,7 +34,7 @@ public class BatteryRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		matrices.scale(0.3f, 0.3f, 0.3f);
 
-		battery.render(matrices, BATTERY_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.battery.render(matrices, BATTERY_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 
 		matrices.popPose();
 	}

@@ -13,8 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.WavefrontObject;
-import assets.rivalrebels.client.renderhelper.RenderHelper;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityNuke;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -30,9 +29,8 @@ import net.minecraft.resources.ResourceLocation;
 @Environment(EnvType.CLIENT)
 public class RenderNuke extends EntityRenderer<EntityNuke> {
     public static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etwacknuke);
-    public static WavefrontObject model = RenderHelper.getModel("wacknuke");
 
-	public RenderNuke(EntityRendererProvider.Context manager) {
+    public RenderNuke(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
@@ -42,7 +40,7 @@ public class RenderNuke extends EntityRenderer<EntityNuke> {
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
-        model.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.nuke.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

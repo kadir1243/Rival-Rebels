@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.command.CommandHotPotato;
@@ -44,7 +45,7 @@ public class EntityHotPotato extends ThrowableProjectile
 	public int nexty = 0;
 	public int nextz = 0;
 	public boolean dorounds = false;
-	public int charges = RivalRebels.tsarBombaStrength + 9;
+	public int charges = RRConfig.SERVER.getTsarBombaStrength() + 9;
 
     public EntityHotPotato(EntityType<? extends EntityHotPotato> type, Level world) {
         super(type, world);
@@ -98,7 +99,7 @@ public class EntityHotPotato extends ThrowableProjectile
 			return;
 		}
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			Vec3 var15 = position();
 			Vec3 var2 = position().add(getDeltaMovement());
@@ -192,7 +193,7 @@ public class EntityHotPotato extends ThrowableProjectile
 	public void readAdditionalSaveData(CompoundTag nbt)
 	{
 		charges = nbt.getInt("charge");
-		if (charges == 0) charges = RivalRebels.tsarBombaStrength + 9;
+		if (charges == 0) charges = RRConfig.SERVER.getTsarBombaStrength() + 9;
 		setYRot(yRotO = nbt.getFloat("rot"));
 	}
 
@@ -218,7 +219,7 @@ public class EntityHotPotato extends ThrowableProjectile
 
     public void explode()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), level(), charges);
 			EntityTsarBlast tsarblast = new EntityTsarBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, charges);

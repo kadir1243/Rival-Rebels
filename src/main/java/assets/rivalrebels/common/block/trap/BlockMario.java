@@ -36,7 +36,7 @@ public class BlockMario extends Block
 	}
 
     @Override
-    public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
@@ -46,14 +46,14 @@ public class BlockMario extends Block
 	}
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+    public void entityInside(BlockState state, Level level, BlockPos pos, Entity entity) {
 		if (entity instanceof Player || entity instanceof Animal || entity instanceof Mob) {
-			world.setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
+			level.setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
 		}
 	}
 
 	/*@Override
-	public final IIcon getIcon(IBlockAccess world, int x, int y, int z, int s)
+	public final IIcon getIcon(BlockGetter world, int x, int y, int z, int s)
 	{
 		if (this == RivalRebels.mario) return Blocks.GRASS.getIcon(world, x, y, z, s);
 		Block[] n = new Block[6];
@@ -87,7 +87,7 @@ public class BlockMario extends Block
 	}
 
 	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
+	public void onBlockAdded(Level world, int x, int y, int z)
 	{
 		Block[] n = new Block[6];
 		n[0] = world.getBlock(x + 1, y, z);
@@ -120,7 +120,7 @@ public class BlockMario extends Block
 	}*/
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state) {
         return RRBlocks.amario.asItem().getDefaultInstance();
     }
 

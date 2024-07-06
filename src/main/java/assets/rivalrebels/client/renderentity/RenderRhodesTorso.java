@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodesTorso;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -39,7 +40,7 @@ public class RenderRhodesTorso extends EntityRenderer<EntityRhodesTorso> {
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
         matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
         matrices.translate(0, 0.7f, 0);
-        RenderRhodes.torso.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.torso.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

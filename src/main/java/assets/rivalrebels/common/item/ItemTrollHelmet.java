@@ -15,6 +15,7 @@ import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -46,7 +47,7 @@ public class ItemTrollHelmet extends ArmorItem {
         ItemStack stack = player.getItemInHand(hand);
         BlockState state = world.getBlockState(pos);
         Block block = state.getBlock();
-        if (block == Blocks.SNOW && state.getValue(SnowLayerBlock.LAYERS) < 1) {
+        if (state.is(BlockTags.SNOW) && state.getValue(SnowLayerBlock.LAYERS) < 1) {
             facing = Direction.UP;
         } else if (block != Blocks.VINE && block != Blocks.TALL_GRASS && block != Blocks.DEAD_BUSH && !state.canBeReplaced(new BlockPlaceContext(context))) {
             pos = pos.relative(facing);
@@ -58,7 +59,7 @@ public class ItemTrollHelmet extends ArmorItem {
             BlockState flagState = RRBlocks.flag2.getStateForPlacement(new BlockPlaceContext(player, hand, stack, new BlockHitResult(context.getClickLocation(), facing, pos, false)));
             world.setBlockAndUpdate(pos, flagState);
             world.playLocalSound((float) pos.getX() + 0.5F, (float) pos.getY() + 0.5F, (float) pos.getZ() + 0.5F, RRBlocks.flag2.defaultBlockState().getSoundType().getStepSound(), SoundSource.PLAYERS, (RRBlocks.flag2.defaultBlockState().getSoundType().getVolume() + 1.0F) / 2.0F, RRBlocks.flag2.defaultBlockState().getSoundType().getPitch() * 0.8F, false);
-            stack.shrink(1);
+            stack.consume(1, context.getPlayer());
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;

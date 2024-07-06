@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.Explosion;
@@ -61,7 +62,7 @@ public class BlockFlare extends WallTorchBlock {
     @Override
     public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
         super.playerWillDestroy(world, pos, state, player);
-		if (RivalRebels.flareExplode) {
+		if (RRConfig.SERVER.isFlareExplodeOnBreak()) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();

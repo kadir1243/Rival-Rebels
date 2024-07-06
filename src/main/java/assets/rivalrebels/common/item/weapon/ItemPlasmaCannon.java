@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
@@ -56,38 +57,36 @@ public class ItemPlasmaCannon extends TieredItem
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
         ItemStack hydrodStack = ItemUtil.getItemStack(user, RRItems.hydrod);
-        if (user.getAbilities().invulnerable || !hydrodStack.isEmpty() || RivalRebels.infiniteAmmo) {
+        if (user.hasInfiniteMaterials() || !hydrodStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
 			user.startUsingItem(hand);
-			if (!user.getAbilities().invulnerable && !RivalRebels.infiniteAmmo) {
+			if (!user.hasInfiniteMaterials() && !RRConfig.SERVER.isInfiniteAmmo()) {
 				if (!hydrodStack.isEmpty())
 				{
 					hydrodStack.hurtAndBreak(1, user, hand == InteractionHand.MAIN_HAND ? EquipmentSlot.MAINHAND : EquipmentSlot.OFFHAND);
 					if (hydrodStack.getDamageValue() == hydrodStack.getMaxDamage())
 					{
-						hydrodStack.shrink(1);
-                        if (hydrodStack.isEmpty())
-                            user.getInventory().removeItem(hydrodStack);
+						hydrodStack.consume(1, user);
 						user.getInventory().add(RRItems.emptyrod.getDefaultInstance());
 					}
 					user.startUsingItem(hand);
 				}
 				else
 				{
-					return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+					return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 				}
 			}
 			RivalRebelsSoundPlayer.playSound(user, 16, 1, 0.25f);
 		}
-		else if (!world.isClientSide)
+		else if (!world.isClientSide())
 		{
 			user.displayClientMessage(Component.nullToEmpty("§cOut of Hydrogen"), true);
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 
     @Override
     public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
-		if (!world.isClientSide) {
+		if (!world.isClientSide()) {
             float f = (getUseDuration(stack, user) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;

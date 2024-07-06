@@ -16,7 +16,6 @@ import assets.rivalrebels.common.container.ContainerAntimatterBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.Util;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -32,23 +31,8 @@ public class GuiAntimatterBomb extends AbstractContainerScreen<ContainerAntimatt
     @Override
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         super.renderLabels(context, mouseX, mouseY);
-		int seconds = (menu.getCountdown() / 20);
-		int millis = (menu.getCountdown() % 20) * 3;
-		String milli;
-		if (millis < 10)
-		{
-			milli = "0" + millis;
-		}
-		else
-		{
-			milli = "" + millis;
-		}
-		if (menu.getCountdown() % 20 >= 10) {
-			context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFFFFFF, false);
-		} else {
-			context.drawString(font, Component.translatable("RivalRebels.tsar.timer").append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFF0000, false);
-		}
-		float scalef = 0.666f;
+        showTimer(context);
+        float scalef = 0.666f;
         PoseStack matrices = context.pose();
         matrices.pushPose();
 		matrices.scale(scalef, scalef, scalef);
@@ -56,7 +40,7 @@ public class GuiAntimatterBomb extends AbstractContainerScreen<ContainerAntimatt
 		matrices.popPose();
 		if (menu.isUnbalanced())
 		{
-			context.drawString(font, Component.translatable("RivalRebels.tsar.unbalanced"), 6, imageHeight - 97, 0xFF0000, false);
+			context.drawString(font, Component.translatable(RRIdentifiers.UNBALANCED_BOMB.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
 		}
 		else if (menu.isArmed())
 		{
@@ -68,9 +52,24 @@ public class GuiAntimatterBomb extends AbstractContainerScreen<ContainerAntimatt
 		}
     }
 
+    private void showTimer(GuiGraphics graphics) {
+        int seconds = (menu.getCountdown() / 20);
+        int millis = (menu.getCountdown() % 20) * 3;
+        String milli;
+        if (millis < 10) {
+            milli = "0" + millis;
+        } else {
+            milli = "" + millis;
+        }
+        if (menu.getCountdown() % 20 >= 10) {
+            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFFFFFF, false);
+        } else {
+            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFF0000, false);
+        }
+    }
+
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        context.setColor(1, 1, 1, 1);
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
         context.blit(RRIdentifiers.guitantimatterbomb, x, y, 0, 0, imageWidth, imageHeight);

@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class EmptyRodRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
     public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etemptyrod);
-    private final ModelRod md = new ModelRod();
 
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
@@ -35,7 +34,7 @@ public class EmptyRodRenderer implements BuiltinItemRendererRegistry.DynamicItem
 		matrices.scale(0.5f, 1.25f, 0.5f);
 		matrices.pushPose();
 
-		md.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ModelRod.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 
 		matrices.popPose();
 		matrices.popPose();

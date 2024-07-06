@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.world.level.Level;
@@ -34,9 +34,9 @@ public class BlockAutoBunker extends BlockAutoTemplate {
 	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
-			int r = RivalRebels.bunkerradius;
+			int r = RRConfig.SERVER.getBunkerRadius();
 
 			for (int x1 = -r; x1 <= r; x1++)
 			{

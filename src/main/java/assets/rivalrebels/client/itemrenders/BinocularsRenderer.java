@@ -12,7 +12,7 @@
 package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
@@ -26,7 +26,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class BinocularsRenderer implements DynamicItemRenderer {
     public static final Material BINOCULAR_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etbinoculars);
-    private static final ModelFromObj model = ModelFromObj.readObjFile("b.obj");
 
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
@@ -41,7 +40,7 @@ public class BinocularsRenderer implements DynamicItemRenderer {
 		}
 		matrices.translate(0.6f, 0.05f, 0.3f);
 
-		model.render(matrices, BINOCULAR_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.binoculars.render(matrices, BINOCULAR_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 
 		matrices.popPose();
 	}

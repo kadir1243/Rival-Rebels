@@ -1,114 +1,165 @@
 package assets.rivalrebels;
 
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
 
 public class RRIdentifiers {
-    public static ResourceLocation guitrivalrebels = create("textures/gui/h.png");
-    public static ResourceLocation guitbutton = create("textures/gui/a.png");
-    public static ResourceLocation guitspawn = create("textures/gui/b.png");
-    public static ResourceLocation guitclass = create("textures/gui/c.png");
-    public static ResourceLocation guitrebel = create("textures/gui/d.png");
-    public static ResourceLocation guitnuker = create("textures/gui/e.png");
-    public static ResourceLocation guitintel = create("textures/gui/f.png");
-    public static ResourceLocation guithacker = create("textures/gui/g.png");
-    public static ResourceLocation guitnuke = create("textures/gui/j.png");
-    public static ResourceLocation guittsar = create("textures/gui/k.png");
-    public static ResourceLocation guitwarning0 = create("textures/gui/l.png");
-    public static ResourceLocation guitwarning1 = create("textures/gui/m.png");
-    public static ResourceLocation guitloader = create("textures/gui/i.png");
-    public static ResourceLocation guittokamak = create("textures/gui/n.png");
-    public static ResourceLocation guibinoculars = create("textures/gui/o.png");
-    public static ResourceLocation guibinocularsoverlay = create("textures/gui/p.png");
-    public static ResourceLocation guilaptopnuke = create("textures/gui/q.png");
-    public static ResourceLocation guitesla = create("textures/gui/r.png");
-    public static ResourceLocation guitray = create("textures/gui/s.png");
-    public static ResourceLocation guiflamethrower = create("textures/gui/u.png");
-    public static ResourceLocation guirhodesline = create("textures/gui/rhodes-gui_line.png");
-    public static ResourceLocation guirhodesout = create("textures/gui/rhodes-gui_out.png");
-    public static ResourceLocation guirhodeshelp = create("textures/gui/rhodes-gui_help.png");
-    public static ResourceLocation guicarpet = create("textures/gui/v.png");
-    public static ResourceLocation guitheoreticaltsar = create("textures/gui/w.png");
-    public static ResourceLocation guitantimatterbomb = create("textures/gui/x.png");
-    public static ResourceLocation guitachyonbomb = create("textures/gui/y.png");
-    public static ResourceLocation etdisk0 = create("textures/entity/ba.png");
-    public static ResourceLocation etdisk1 = create("textures/entity/bb.png");
-    public static ResourceLocation etdisk2 = create("textures/entity/bc.png");
-    public static ResourceLocation etdisk3 = create("textures/entity/bd.png");
-    public static ResourceLocation etrocket = create("textures/entity/az.png");
-    public static ResourceLocation etfire = create("textures/entity/ar.png");
-    public static ResourceLocation etflame = create("textures/entity/as.png");
-    public static ResourceLocation etgasgrenade = create("textures/entity/bf.png");
-    public static ResourceLocation etknife = create("textures/entity/be.png");
-    public static ResourceLocation etloader = create("textures/entity/ac.png");
-    public static ResourceLocation etomegaobj = create("textures/entity/aa.png");
-    public static ResourceLocation etsigmaobj = create("textures/entity/ab.png");
-    public static ResourceLocation etplasmacannon = create("textures/entity/ay.png");
-    public static ResourceLocation ethydrod = create("textures/entity/ao.png");
-    public static ResourceLocation etradrod = create("textures/entity/an.png");
-    public static ResourceLocation etredrod = create("textures/entity/ap.png");
-    public static ResourceLocation ettroll = create("textures/entity/am.png");
-    public static ResourceLocation etreactor = create("textures/entity/ad.png");
-    public static ResourceLocation etlaptop = create("textures/entity/ah.png");
-    public static ResourceLocation etubuntu = create("textures/entity/aj.png");
-    public static ResourceLocation etscreen = create("textures/entity/ai.png");
-    public static ResourceLocation ettsarshell = create("textures/entity/af.png");
-    public static ResourceLocation ettsarfins = create("textures/entity/ag.png");
-    public static ResourceLocation ettsarflame = create("textures/entity/al.png");
-    public static ResourceLocation etnuke = create("textures/entity/ae.png");
-    public static ResourceLocation etradiation = create("textures/entity/ak.png");
-    public static ResourceLocation eteinstenbarrel = create("textures/entity/av.png");
-    public static ResourceLocation eteinstenback = create("textures/entity/aw.png");
-    public static ResourceLocation eteinstenhandle = create("textures/entity/ax.png");
-    public static ResourceLocation etblood = create("textures/entity/at.png");
-    public static ResourceLocation etgoo = create("textures/entity/au.png");
-    public static ResourceLocation etemptyrod = create("textures/entity/aq.png");
-    public static ResourceLocation etrocketlauncherbody = create("textures/entity/bh.png");
-    public static ResourceLocation etrocketlauncherhandle = create("textures/entity/bg.png");
-    public static ResourceLocation etrocketlaunchertube = create("textures/entity/bi.png");
-    public static ResourceLocation etbinoculars = create("textures/entity/bj.png");
-    public static ResourceLocation etelectrode = create("textures/entity/bk.png");
-    public static ResourceLocation etb83 = create("textures/entity/bl.png");
-    public static ResourceLocation etb2spirit = create("textures/entity/bm.png");
-    public static ResourceLocation etrust = create("textures/entity/bn.png");
-    public static ResourceLocation etreciever = create("textures/entity/bo.png");
-    public static ResourceLocation ettesla = create("textures/entity/bp.png");
-    public static ResourceLocation etbattery = create("textures/entity/bq.png");
-    public static ResourceLocation etflamethrower = create("textures/entity/bt.png");
-    public static ResourceLocation ettube = create("textures/entity/br.png");
-    public static ResourceLocation etadsdragon = create("textures/entity/bs.png");
-    public static ResourceLocation etflamecone = create("textures/entity/bu.png");
-    public static ResourceLocation etflameball = create("textures/entity/bv.png");
-    public static ResourceLocation etflamebluered = create("textures/entity/bx.png");
-    public static ResourceLocation etflameblue = create("textures/entity/bw.png");
-    public static ResourceLocation ethack202 = create("textures/entity/by.png");
-    public static ResourceLocation etseek202 = create("textures/entity/bz.png");
-    public static ResourceLocation etrocketseek202 = create("textures/entity/ca.png");
-    public static ResourceLocation etrocketseekhandle202 = create("textures/entity/cb.png");
-    public static ResourceLocation etrocketseektube202 = create("textures/entity/cc.png");
-    public static ResourceLocation ettheoreticaltsarshell1 = create("textures/entity/cd.png");
-    public static ResourceLocation ettheoreticaltsarshell2 = create("textures/entity/ce.png");
-    public static ResourceLocation etblacktsar = create("textures/entity/cf.png");
-    public static ResourceLocation etwacknuke = create("textures/entity/cg.png");
-    public static ResourceLocation ettupolev = create("textures/entity/tupolev.png");
-    public static ResourceLocation etbooster = create("textures/entity/booster.png");
-    public static ResourceLocation etflameballgreen = create("textures/entity/ch.png");
-    public static ResourceLocation etantimatterbomb = create("textures/entity/ci.png");
-    public static ResourceLocation etantimatterblast = create("textures/entity/cj.png");
-    public static ResourceLocation ettachyonbomb = create("textures/entity/ck.png");
-    public static ResourceLocation btcrate = create("textures/blocks/ah.png");
-    public static ResourceLocation btnuketop = create("textures/blocks/ay.png");
-    public static ResourceLocation btnukebottom = create("textures/blocks/ax.png");
-    public static ResourceLocation btsteel = create("textures/blocks/bx.png");
-    public static ResourceLocation btsplash1 = create("textures/blocks/br.png");
-    public static ResourceLocation btsplash2 = create("textures/blocks/bs.png");
-    public static ResourceLocation btsplash3 = create("textures/blocks/bt.png");
-    public static ResourceLocation btsplash4 = create("textures/blocks/bu.png");
-    public static ResourceLocation btsplash5 = create("textures/blocks/bv.png");
-    public static ResourceLocation btsplash6 = create("textures/blocks/bw.png");
-    public static ResourceLocation ittaskb83 = create("textures/items/bc.png");
+    public static final ResourceLocation WARNING_TRANSLATION = create("warning");
+    public static final ResourceLocation ORDERS_TRANSLATION = create("orders");
+    public static final ResourceLocation STATUS_TRANSLATION = create("status");
+    private static final MutableComponent WARNING = Component.empty()
+        .append(Component.literal("[").withStyle(ChatFormatting.DARK_RED))
+        .append(Component.translatable(WARNING_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED))
+        .append(Component.literal("]").withStyle(ChatFormatting.DARK_RED));
+    private static final MutableComponent ORDERS = Component.empty()
+        .append(Component.literal("[").withStyle(ChatFormatting.GRAY))
+        .append(Component.translatable(ORDERS_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.DARK_RED))
+        .append(Component.literal("]").withStyle(ChatFormatting.GRAY));
+    private static final MutableComponent STATUS = Component.empty()
+        .append(Component.literal("[").withStyle(ChatFormatting.GRAY))
+        .append(Component.translatable(STATUS_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.GOLD))
+        .append(Component.literal("]").withStyle(ChatFormatting.GRAY));
+    public static final ResourceLocation BOMB_TIMER = create("bomb.timer");
+    public static final ResourceLocation UNBALANCED_BOMB = create("bomb.unbalanced");
+
+    public static final ResourceLocation AMMUNITION_TRANSLATION = create("ammunition");
+    public static final ResourceLocation guitrivalrebels = create("textures/gui/h.png");
+    public static final ResourceLocation guitbutton = create("textures/gui/a.png");
+    public static final ResourceLocation guitspawn = create("textures/gui/b.png");
+    public static final ResourceLocation guitclass = create("textures/gui/c.png");
+    public static final ResourceLocation guitrebel = create("textures/gui/d.png");
+    public static final ResourceLocation guitnuker = create("textures/gui/e.png");
+    public static final ResourceLocation guitintel = create("textures/gui/f.png");
+    public static final ResourceLocation guithacker = create("textures/gui/g.png");
+    public static final ResourceLocation guitnuke = create("textures/gui/j.png");
+    public static final ResourceLocation guittsar = create("textures/gui/k.png");
+    public static final ResourceLocation guitwarning0 = create("textures/gui/l.png");
+    public static final ResourceLocation guitwarning1 = create("textures/gui/m.png");
+    public static final ResourceLocation guitloader = create("textures/gui/i.png");
+    public static final ResourceLocation guittokamak = create("textures/gui/n.png");
+    public static final ResourceLocation guibinoculars = create("textures/gui/o.png");
+    public static final ResourceLocation guibinocularsoverlay = create("textures/gui/p.png");
+    public static final ResourceLocation guilaptopnuke = create("textures/gui/q.png");
+    public static final ResourceLocation guitesla = create("textures/gui/r.png");
+    public static final ResourceLocation guitray = create("textures/gui/s.png");
+    public static final ResourceLocation guiflamethrower = create("textures/gui/u.png");
+    public static final ResourceLocation guirhodesline = create("textures/gui/rhodes-gui_line.png");
+    public static final ResourceLocation guirhodesout = create("textures/gui/rhodes-gui_out.png");
+    public static final ResourceLocation guirhodeshelp = create("textures/gui/rhodes-gui_help.png");
+    public static final ResourceLocation guicarpet = create("textures/gui/v.png");
+    public static final ResourceLocation guitheoreticaltsar = create("textures/gui/w.png");
+    public static final ResourceLocation guitantimatterbomb = create("textures/gui/x.png");
+    public static final ResourceLocation guitachyonbomb = create("textures/gui/y.png");
+    public static final ResourceLocation etdisk0 = create("entity/ba");
+    public static final ResourceLocation etdisk1 = create("entity/bb");
+    public static final ResourceLocation etdisk2 = create("entity/bc");
+    public static final ResourceLocation etdisk3 = create("entity/bd");
+    public static final ResourceLocation etrocket = create("entity/az");
+    public static final ResourceLocation etfire = create("entity/ar");
+    public static final ResourceLocation etflame = create("entity/as");
+    public static final ResourceLocation etgasgrenade = create("entity/bf");
+    public static final ResourceLocation etknife = create("entity/be");
+    public static final ResourceLocation etloader = create("entity/ac");
+    public static final ResourceLocation etomegaobj = create("entity/aa");
+    public static final ResourceLocation etsigmaobj = create("entity/ab");
+    public static final ResourceLocation etplasmacannon = create("entity/ay");
+    public static final ResourceLocation ethydrod = create("entity/ao");
+    public static final ResourceLocation etradrod = create("entity/an");
+    public static final ResourceLocation etredrod = create("entity/ap");
+    public static final ResourceLocation ettroll = create("entity/am");
+    public static final ResourceLocation etreactor = create("entity/ad");
+    public static final ResourceLocation etlaptop = create("entity/ah");
+    public static final ResourceLocation etubuntu = create("entity/aj");
+    public static final ResourceLocation etscreen = create("entity/ai");
+    public static final ResourceLocation ettsarshell = create("entity/af");
+    public static final ResourceLocation ettsarfins = create("entity/ag");
+    public static final ResourceLocation ettsarflame = create("entity/al");
+    public static final ResourceLocation etnuke = create("entity/ae");
+    public static final ResourceLocation etradiation = create("entity/ak");
+    public static final ResourceLocation eteinstenbarrel = create("entity/av");
+    public static final ResourceLocation eteinstenback = create("entity/aw");
+    public static final ResourceLocation eteinstenhandle = create("entity/ax");
+    public static final ResourceLocation etblood = create("entity/at");
+    public static final ResourceLocation etgoo = create("entity/au");
+    public static final ResourceLocation etemptyrod = create("entity/aq");
+    public static final ResourceLocation etrocketlauncherbody = create("entity/bh");
+    public static final ResourceLocation etrocketlauncherhandle = create("entity/bg");
+    public static final ResourceLocation etrocketlaunchertube = create("entity/bi");
+    public static final ResourceLocation etbinoculars = create("entity/bj");
+    public static final ResourceLocation etelectrode = create("entity/bk");
+    public static final ResourceLocation etb83 = create("entity/bl");
+    public static final ResourceLocation etb2spirit = create("entity/bm");
+    public static final ResourceLocation etrust = create("entity/bn");
+    public static final ResourceLocation etreciever = create("entity/bo");
+    public static final ResourceLocation ettesla = create("entity/bp");
+    public static final ResourceLocation etbattery = create("entity/bq");
+    public static final ResourceLocation etflamethrower = create("entity/bt");
+    public static final ResourceLocation ettube = create("entity/br");
+    public static final ResourceLocation etadsdragon = create("entity/bs");
+    public static final ResourceLocation etflamecone = create("entity/bu");
+    public static final ResourceLocation etflameball = create("entity/bv");
+    public static final ResourceLocation etflamebluered = create("entity/bx");
+    public static final ResourceLocation etflameblue = create("entity/bw");
+    public static final ResourceLocation ethack202 = create("entity/by");
+    public static final ResourceLocation etseek202 = create("entity/bz");
+    public static final ResourceLocation etrocketseek202 = create("entity/ca");
+    public static final ResourceLocation etrocketseekhandle202 = create("entity/cb");
+    public static final ResourceLocation etrocketseektube202 = create("entity/cc");
+    public static final ResourceLocation ettheoreticaltsarshell1 = create("entity/cd");
+    public static final ResourceLocation ettheoreticaltsarshell2 = create("entity/ce");
+    public static final ResourceLocation etblacktsar = create("entity/cf");
+    public static final ResourceLocation etwacknuke = create("entity/cg");
+    public static final ResourceLocation ettupolev = create("entity/tupolev");
+    public static final ResourceLocation etbooster = create("entity/booster");
+    public static final ResourceLocation etflameballgreen = create("entity/ch");
+    public static final ResourceLocation etantimatterbomb = create("entity/ci");
+    public static final ResourceLocation etantimatterblast = create("entity/cj");
+    public static final ResourceLocation ettachyonbomb = create("entity/ck");
+    public static final ResourceLocation btcrate = create("block/ah");
+    public static final ResourceLocation btnuketop = create("block/ay");
+    public static final ResourceLocation btnukebottom = create("block/ax");
+    public static final ResourceLocation btsteel = create("block/bx");
+    public static final ResourceLocation btsplash1 = create("block/br");
+    public static final ResourceLocation btsplash2 = create("block/bs");
+    public static final ResourceLocation btsplash3 = create("block/bt");
+    public static final ResourceLocation btsplash4 = create("block/bu");
+    public static final ResourceLocation btsplash5 = create("block/bv");
+    public static final ResourceLocation btsplash6 = create("block/bw");
+    public static final ResourceLocation ittaskb83 = create("items/bc");
     public static ResourceLocation banner;
 
     public static ResourceLocation create(String path) {
         return ResourceLocation.fromNamespaceAndPath(RivalRebels.MODID, path);
+    }
+
+    public static MutableComponent warning() {
+        return WARNING.copy();
+    }
+
+    public static MutableComponent orders() {
+        return ORDERS.copy();
+    }
+
+    public static MutableComponent status() {
+        return STATUS.copy();
+    }
+
+    public static MutableComponent ammunition() {
+        return Component.translatable(AMMUNITION_TRANSLATION.toLanguageKey());
+    }
+
+    public static void sendWarningBombWillExplodeMessageToPlayers(Level level) {
+        MutableComponent line1 = warning().append(" ").append(Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_1").withStyle(ChatFormatting.RED));
+        MutableComponent line2 = warning().append(" ").append(Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_2").withStyle(ChatFormatting.RED));
+        MutableComponent line3 = warning().append(" ").append(Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_3").withStyle(ChatFormatting.RED));
+        for (Player player : level.players()) {
+            player.displayClientMessage(line1, false);
+            player.displayClientMessage(line2, false);
+            player.displayClientMessage(line3, false);
+        }
     }
 }

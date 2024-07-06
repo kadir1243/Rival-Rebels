@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -38,16 +39,16 @@ public class BlockFlagBox1 extends Block
         int y = pos.getY();
         int z = pos.getZ();
 
-		if (player.isShiftKeyDown() && !level.isClientSide)
+		if (player.isShiftKeyDown() && !level.isClientSide())
 		{
 			ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.flag1, 10));
 			level.addFreshEntity(ei);
 			level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 			return InteractionResult.PASS;
 		}
-		if (!player.isShiftKeyDown() && !level.isClientSide)
+		if (!player.isShiftKeyDown() && !level.isClientSide())
 		{
-			player.displayClientMessage(Component.translatable("RivalRebels.Orders").append(" ").append(Component.translatable("RivalRebels.sneak")), false);
+			player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.sneak")), false);
 			level.setBlockAndUpdate(new BlockPos(x, y, z), RRBlocks.flagbox5.defaultBlockState());
 			return InteractionResult.PASS;
 		}

@@ -16,17 +16,18 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 public class ModelRod {
     private static final int numOfSegs = 16;
-    private static final float deg = (float) Math.PI * 2 / numOfSegs;
-    private static final Vector3f vd1 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 9, 0.03125f * 8 * (float) Math.sin(deg));
-    private static final Vector3f vd2 = new Vector3f(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * 6, 0.03125f * 9 * (float) Math.sin(deg));
-    private static final Vector3f vd3 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * 5, 0.03125f * 8 * (float) Math.sin(deg));
-    private static final Vector3f vd4 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -5, 0.03125f * 8 * (float) Math.sin(deg));
-    private static final Vector3f vd5 = new Vector3f(0.03125f * 9 * (float) Math.cos(deg), 0.03125f * -6, 0.03125f * 9 * (float) Math.sin(deg));
-    private static final Vector3f vd6 = new Vector3f(0.03125f * 8 * (float) Math.cos(deg), 0.03125f * -9, 0.03125f * 8 * (float) Math.sin(deg));
+    private static final float deg = Mth.TWO_PI / numOfSegs;
+    private static final Vector3f vd1 = new Vector3f(0.03125f * 8 * Mth.cos(deg), 0.03125f * 9, 0.03125f * 8 * Mth.sin(deg));
+    private static final Vector3f vd2 = new Vector3f(0.03125f * 9 * Mth.cos(deg), 0.03125f * 6, 0.03125f * 9 * Mth.sin(deg));
+    private static final Vector3f vd3 = new Vector3f(0.03125f * 8 * Mth.cos(deg), 0.03125f * 5, 0.03125f * 8 * Mth.sin(deg));
+    private static final Vector3f vd4 = new Vector3f(0.03125f * 8 * Mth.cos(deg), 0.03125f * -5, 0.03125f * 8 * Mth.sin(deg));
+    private static final Vector3f vd5 = new Vector3f(0.03125f * 9 * Mth.cos(deg), 0.03125f * -6, 0.03125f * 9 * Mth.sin(deg));
+    private static final Vector3f vd6 = new Vector3f(0.03125f * 8 * Mth.cos(deg), 0.03125f * -9, 0.03125f * 8 * Mth.sin(deg));
     private static final TextureVertice t1 = new TextureVertice(0.03125f * 2, 0.03125f * 0);
     private static final TextureVertice t2 = new TextureVertice(0.03125f * 1, 0.03125f * 3);
     private static final TextureVertice t3 = new TextureVertice(0.03125f * 3, 0.03125f * 3);
@@ -44,9 +45,12 @@ public class ModelRod {
     private static final Vector3f v5 = new Vector3f(0.03125f * 9, 0.03125f * -6, 0f);
     private static final Vector3f v6 = new Vector3f(0.03125f * 8, 0.03125f * -9, 0f);
     private static final Vector3f v7 = new Vector3f(0f, 0.03125f * -10, 0f);
-    public boolean rendersecondcap = true;
 
-    public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+    public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+        render(matrices, buffer, light, overlay, true);
+    }
+
+    public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay, boolean rendersecondcap) {
         for (float i = 0; i < 360; i += 360 / numOfSegs) {
             matrices.pushPose();
             matrices.mulPose(Axis.YP.rotationDegrees(i));

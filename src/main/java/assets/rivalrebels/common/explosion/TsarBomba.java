@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.explosion;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockPetrifiedStone;
@@ -53,7 +54,7 @@ public class TsarBomba
 		//if (radiussmaller < radius) radius = radiussmaller;
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
 		rad = rad*rad;
-		if (world.isClientSide) return;
+		if (world.isClientSide()) return;
 		int clamprad = radius;
 		//if (clamprad > 50) clamprad = 50;
 		for (int X = -clamprad; X < clamprad; X++)
@@ -91,7 +92,7 @@ public class TsarBomba
 			if (!repeat)
 			{
 				repeatCount++;
-				if (repeatCount < RivalRebels.tsarBombaSpeed * 2) tick(tsarblast);
+				if (repeatCount < RRConfig.SERVER.getTsarBombaSpeed() * 2) tick(tsarblast);
 				else
 				{
 					repeatCount = 0;
@@ -115,7 +116,7 @@ public class TsarBomba
 			dist = Math.sqrt(dist);
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
-			if (RivalRebels.elevation) yele = y;
+			if (RRConfig.SERVER.isElevation()) yele = y;
 			int ylimit = (int) Math.floor(yele - ((radius - dist) / 2) + (Math.sin(dist * 0.5) * 1.15));
 
 			for (int Y = y; Y > ylimit; Y--)
@@ -208,7 +209,7 @@ public class TsarBomba
 			else
 			{
 				BlockState state = world.getBlockState(new BlockPos(x + posX, y, z + posZ));
-				if (state.getBlock() == Blocks.BEDROCK)
+				if (state.is(Blocks.BEDROCK))
 				;
 				else if (!state.canOcclude()) world.setBlockAndUpdate(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.defaultBlockState());
 				if (isTree)
@@ -237,11 +238,11 @@ public class TsarBomba
 		{
             BlockPos pos = new BlockPos(x, y, z);
             BlockState state = world.getBlockState(pos);
-			if (state.getBlock() != Blocks.AIR)
+			if (!state.isAir())
 			{
-				if (state.getBlock() == RRBlocks.omegaobj) RivalRebels.round.winSigma();
-				else if (state.getBlock() == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
-				if (state.getBlock() == RRBlocks.reactive)
+				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
+				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
+				if (state.is(RRBlocks.reactive))
 				{
 					for (int i = 0; i < (1 - (dist / radius)) * 16 + world.random.nextDouble() * 2; i++)
 					{

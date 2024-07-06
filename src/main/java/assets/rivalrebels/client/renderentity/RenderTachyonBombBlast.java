@@ -13,7 +13,6 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelBlastRing;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ModelTsarBlast;
@@ -28,6 +27,7 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.inventory.InventoryMenu;
 
 public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlast> {
@@ -45,14 +45,14 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
         double y = entity.getY();
         double z = entity.getZ();
         entity.time++;
-        double radius = (((entity.getDeltaMovement().x() * 10) - 1) * ((entity.getDeltaMovement().x() * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;
+        double radius = (((entity.getDeltaMovement().x() * 10) - 1) * ((entity.getDeltaMovement().x() * 10) - 1) * 2) + RRConfig.SERVER.getTsarBombaStrength();
         matrices.pushPose();
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.solid());
         if (entity.time < 60) {
             double elev = entity.time / 5f;
             matrices.translate(x, y + elev, z);
-            ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time * RRConfig.CLIENT.getShroomScale(), 1, 1, 1, 1);
-        } else if (entity.time < 600 && radius - RivalRebels.tsarBombaStrength > 9) {
+            ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time * RRConfig.CLIENT.getShroomScale(), CommonColors.WHITE);
+        } else if (entity.time < 600 && radius - RRConfig.SERVER.getTsarBombaStrength() > 9) {
             double elev = (entity.time - 60f) / 32f + 10.0f;
             matrices.pushPose();
             matrices.translate(x, y, z);
@@ -73,7 +73,7 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
             matrices.scale(RRConfig.CLIENT.getShroomScale(), RRConfig.CLIENT.getShroomScale() * 3.0f, RRConfig.CLIENT.getShroomScale());
             matrices.mulPose(Axis.XP.rotationDegrees((float) (elev * -3)));
             matrices.mulPose(Axis.ZP.rotationDegrees((float) (elev * 2)));
-            ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.4f), 1, 0, 0, 1f);
+            ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.4f), CommonColors.RED);
             matrices.popPose();
             matrices.pushPose();
             matrices.translate(x, y + elev * 4, z);
@@ -83,7 +83,7 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
             ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.6f), 1, 1, 0, 1);
             matrices.popPose();
         } else {
-            float elev = (entity.time - (radius - RivalRebels.tsarBombaStrength > 9 ? 600f : 0f)) / 8f;
+            float elev = (entity.time - (radius - RRConfig.SERVER.getTsarBombaStrength() > 9 ? 600f : 0f)) / 8f;
             ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * (elev) * 1.0f, 32, 2, 0.5f, 0, 0, 0, (float) x, (float) (y + 2.0f), (float) z, light);
             ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * (elev) * 1.1f, 32, 2, 0.5f, 0, 0, 0, (float) x, (float) (y + 6.0f), (float) z, light);
             ModelBlastRing.renderModel(matrices, buffer, RRConfig.CLIENT.getShroomScale() * (elev) * 1.2f, 32, 2, 0.5f, 0, 0, 0, (float) x, (float) (y + 10.0f), (float) z, light);

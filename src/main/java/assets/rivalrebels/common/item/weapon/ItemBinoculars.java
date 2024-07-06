@@ -186,6 +186,6 @@ public class ItemBinoculars extends Item {
 
     @Environment(EnvType.CLIENT)
     public boolean isMousePressed() {
-        return (ClientProxy.USE_KEY.isDown() && RivalRebels.rtarget) || (Minecraft.getInstance().mouseHandler.isLeftPressed() && RivalRebels.lctarget);
+        return ClientProxy.TARGET_KEY.isDown();
     }
 }

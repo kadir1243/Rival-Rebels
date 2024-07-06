@@ -18,13 +18,12 @@ public enum RivalRebelsRank
 	OFFICER(2,16),
 	LEADER(3,3),
 	REP(4,5);
-	public int	id	= 0;
-	public int	snf	= 0;
+	public final int id;
+	public final int snf;
 
-	RivalRebelsRank(int i, int s)
-	{
-		id = i;
-		snf = s;
+	RivalRebelsRank(int id, int sound) {
+		this.id = id;
+		snf = sound;
 	}
 
 	public static RivalRebelsRank getForID(int i)

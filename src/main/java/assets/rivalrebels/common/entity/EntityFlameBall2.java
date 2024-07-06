@@ -27,6 +27,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
@@ -99,7 +100,7 @@ public class EntityFlameBall2 extends EntityInanimate
 		super.tick();
 		tickCount++;
 		sequence++;
-		if (sequence > 15/* > RivalRebels.flamethrowerDecay */) kill();
+		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 		if (tickCount > 5 && random.nextDouble() > 0.5) gonnadie = true;
 
 		if (gonnadie && sequence < 15) sequence++;
@@ -115,7 +116,7 @@ public class EntityFlameBall2 extends EntityInanimate
 		double var6 = 0.0D;
 		Iterator<Entity> var8 = var5.iterator();
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			while (var8.hasNext())
 			{
@@ -173,7 +174,7 @@ public class EntityFlameBall2 extends EntityInanimate
 				{
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
                     ItemStack equippedStack = player.getItemBySlot(slot);
-                    if (!equippedStack.isEmpty() && !level().isClientSide)
+                    if (!equippedStack.isEmpty() && !level().isClientSide())
 					{
 						equippedStack.hurtAndBreak(8, player, slot);
 					}
@@ -216,11 +217,11 @@ public class EntityFlameBall2 extends EntityInanimate
 
 	private void fire()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
             BlockState state = level().getBlockState(blockPosition());
             Block id = state.getBlock();
-			if (state.isAir() || id == Blocks.SNOW || state.is(BlockTags.ICE)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
+			if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
 			else if (state.is(BlockTags.SAND) && level().random.nextInt(60) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.GLASS.defaultBlockState());
 			else if (state.is(ConventionalBlockTags.GLASS_BLOCKS) && level().random.nextInt(120) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
 			else if (state.is(Blocks.OBSIDIAN) && level().random.nextInt(90) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
@@ -232,24 +233,23 @@ public class EntityFlameBall2 extends EntityInanimate
 			else if (state.is(Blocks.GRAVEL) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(ConventionalBlockTags.SANDSTONE_BLOCKS) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(Blocks.IRON_BLOCK) && level().random.nextInt(50) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (id == Blocks.BEDROCK && level().random.nextInt(500) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
+			else if (state.is(Blocks.BEDROCK) && level().random.nextInt(500) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
 			else if (state.getFluidState().is(FluidTags.LAVA)) level().setBlockAndUpdate(blockPosition(), Blocks.AIR.defaultBlockState());
 			else if (state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
 			else if (state.is(BlockTags.DIRT)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
-			else if (id == RRBlocks.flare) id.destroy(level(), blockPosition(), state);
-			else if (id == RRBlocks.timedbomb) id.destroy(level(), blockPosition(), state);
-			else if (id == RRBlocks.remotecharge) id.destroy(level(), blockPosition(), state);
-			else if (id == RRBlocks.landmine) id.destroy(level(), blockPosition(), state);
-			else if (id == RRBlocks.alandmine) id.destroy(level(), blockPosition(), state);
-			else if (id == Blocks.TNT)
-			{
-				level().setBlockAndUpdate(blockPosition(), Blocks.AIR.defaultBlockState());
-				level().explode(null, getX(), getY(), getZ(), 4, Level.ExplosionInteraction.NONE);
+			else if (state.is(RRBlocks.flare)) id.destroy(level(), blockPosition(), state);
+			else if (state.is(RRBlocks.timedbomb)) id.destroy(level(), blockPosition(), state);
+			else if (state.is(RRBlocks.remotecharge)) id.destroy(level(), blockPosition(), state);
+			else if (state.is(RRBlocks.landmine)) id.destroy(level(), blockPosition(), state);
+			else if (state.is(RRBlocks.alandmine)) id.destroy(level(), blockPosition(), state);
+			else if (state.is(Blocks.TNT)) {
+                TntBlock.explode(level(), blockPosition());
+                level().removeBlock(blockPosition(), false);
 			}
-			else if (id == RRBlocks.conduit) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
-			else if (id == RRBlocks.reactive && level().random.nextInt(20) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if ((id == RRBlocks.camo1 || id == RRBlocks.camo2 || id == RRBlocks.camo3) && level().random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), RRBlocks.steel.defaultBlockState());
-			else if (id == RRBlocks.steel && level().random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
+			else if (state.is(RRBlocks.conduit)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
+			else if (state.is(RRBlocks.reactive) && level().random.nextInt(20) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if ((state.is(RRBlocks.camo1) || state.is(RRBlocks.camo2) || state.is(RRBlocks.camo3)) && level().random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), RRBlocks.steel.defaultBlockState());
+			else if (state.is(RRBlocks.steel) && level().random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
 		}
 	}
 }

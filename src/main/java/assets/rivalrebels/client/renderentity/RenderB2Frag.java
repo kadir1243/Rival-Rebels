@@ -12,7 +12,7 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityB2Frag;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -30,15 +30,8 @@ import net.minecraft.world.inventory.InventoryMenu;
 @Environment(EnvType.CLIENT)
 public class RenderB2Frag extends EntityRenderer<EntityB2Frag> {
     public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etb2spirit);
-    private static final ModelFromObj md1 = ModelFromObj.readObjFile("f.obj");
-	private static final ModelFromObj md2 = ModelFromObj.readObjFile("g.obj");
 
-    static {
-        md1.scale(3, 3, 3);
-        md2.scale(3, 3, 3);
-    }
-
-	public RenderB2Frag(EntityRendererProvider.Context manager) {
+    public RenderB2Frag(EntityRendererProvider.Context manager) {
         super(manager);
 	}
 
@@ -48,8 +41,8 @@ public class RenderB2Frag extends EntityRenderer<EntityB2Frag> {
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
 		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
 
-        if (entity.type == 0) md1.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
-		else if (entity.type == 1) md2.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
+        if (entity.type == 0) ObjModels.b2FragSide1.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
+		else if (entity.type == 1) ObjModels.b2FragSide2.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
 

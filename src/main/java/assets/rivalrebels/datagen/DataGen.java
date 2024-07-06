@@ -20,6 +20,7 @@ public class DataGen implements DataGeneratorEntrypoint {
         pack.addProvider(SoundDataGen::new);
         pack.addProvider(DamageSourceTags::new);
         pack.addProvider(LangGen::new);
+        pack.addProvider(DynamicRegistryGen::new);
     }
 
     @Override

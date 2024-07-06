@@ -21,6 +21,7 @@ import assets.rivalrebels.common.round.RivalRebelsTeam;
 import java.util.List;
 import java.util.UUID;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
@@ -56,41 +57,20 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 	{
 		if (level > 0)
 		{
-			int meta = this.getBlockState().getValue(BlockForceFieldNode.META);
+			Direction meta = this.getBlockState().getValue(BlockForceFieldNode.FACING);
 
 			level--;
 			for (int y = 0; y < 7; y++)
 			{
-				switch (meta)
-				{
-					case 2:
-						if (getLevel().getBlockState(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1)).getBlock() == RRBlocks.forcefield)
-						{
-							getLevel().setBlockAndUpdate(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1), Blocks.AIR.defaultBlockState());
-						}
-					break;
-
-					case 3:
-						if (getLevel().getBlockState(getBlockPos().offset(0, y, level).below(3).south()).getBlock() == RRBlocks.forcefield)
-						{
-							getLevel().setBlockAndUpdate(getBlockPos().offset(0, y, level).below(3).south(), Blocks.AIR.defaultBlockState());
-						}
-					break;
-
-					case 4:
-						if (getLevel().getBlockState(getBlockPos().offset(-level, y, 0).below(3).west()).getBlock() == RRBlocks.forcefield)
-						{
-							getLevel().setBlockAndUpdate(getBlockPos().offset(-level, y, 0).below(3).west(), Blocks.AIR.defaultBlockState());
-						}
-					break;
-
-					case 5:
-						if (getLevel().getBlockState(getBlockPos().offset(level, y, 0).below(3).east()).getBlock() == RRBlocks.forcefield)
-						{
-							getLevel().setBlockAndUpdate(getBlockPos().offset(level, y, 0).below(3).east(), Blocks.AIR.defaultBlockState());
-						}
-					break;
-				}
+                if (meta == Direction.NORTH) {
+                    if (getLevel().getBlockState(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1)).is(RRBlocks.forcefield)) {
+                        getLevel().setBlockAndUpdate(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1), Blocks.AIR.defaultBlockState());
+                    }
+                } else {
+                    if (getLevel().getBlockState(getBlockPos().offset(0, y, level).below(3).relative(meta)).is(RRBlocks.forcefield)) {
+                        getLevel().setBlockAndUpdate(getBlockPos().offset(0, y, level).below(3).relative(meta), Blocks.AIR.defaultBlockState());
+                    }
+                }
 			}
 		}
 	}
@@ -115,7 +95,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 	public float powered(float power, float distance)
 	{
 		float hits = getLevel().random.nextFloat();
-		int meta = this.getBlockState().getValue(BlockForceFieldNode.META);
+		Direction meta = this.getBlockState().getValue(BlockForceFieldNode.FACING);
 
 		double randomness = 0.1;
 		float thickness = 0.5f;
@@ -123,7 +103,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		float height = 3.52f;
 		double speed = 2;
 
-		if (meta == 2)
+		if (meta == Direction.NORTH)
 		{
 			AABB aabb = new AABB(getBlockPos().getX() + 0.5f - thickness, getBlockPos().getY() + 0.5f - height, getBlockPos().getZ() - length, getBlockPos().getX() + 0.5f + thickness, getBlockPos().getY() + 0.5f + height, getBlockPos().getZ());
 			List<Entity> list = getLevel().getEntities(null, aabb);
@@ -162,9 +142,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 				placeBlockCarefully(getLevel(), getBlockPos().getX(), getBlockPos().getY(), (int) (getBlockPos().getZ() - length - 1), RRBlocks.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (getLevel().getBlockState(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1)).getBlock() != RRBlocks.forcefield)
+					if (!getLevel().getBlockState(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1)).is(RRBlocks.forcefield))
 					{
-						getLevel().setBlockAndUpdate(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.META, meta));
+						getLevel().setBlockAndUpdate(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.FACING, meta));
 						hits++;
 					}
 				}
@@ -172,7 +152,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 			}
 		}
 
-		if (meta == 3)
+		if (meta == Direction.SOUTH)
 		{
 			AABB aabb = new AABB(getBlockPos().getX() + 0.5f - thickness, getBlockPos().getY() + 0.5f - height, getBlockPos().getZ() + 1f, getBlockPos().getX() + 0.5f + thickness, getBlockPos().getY() + 0.5f + height, getBlockPos().getZ() + 1f + length);
 			List<Entity> list = getLevel().getEntities(null, aabb);
@@ -211,9 +191,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 				placeBlockCarefully(getLevel(), getBlockPos().getX(), getBlockPos().getY(), (int) (getBlockPos().getZ() + length + 1), RRBlocks.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (getLevel().getBlockState(getBlockPos().offset(0, y, level).below(3).south()).getBlock() != RRBlocks.forcefield)
+					if (!getLevel().getBlockState(getBlockPos().offset(0, y, level).below(3).south()).is(RRBlocks.forcefield))
 					{
-						getLevel().setBlockAndUpdate(getBlockPos().offset(0, y, level).below(3).south(), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.META, meta));
+						getLevel().setBlockAndUpdate(getBlockPos().offset(0, y, level).below(3).south(), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.FACING, meta));
 						hits++;
 					}
 				}
@@ -221,7 +201,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 			}
 		}
 
-		if (meta == 4)
+		if (meta == Direction.WEST)
 		{
 			AABB aabb = new AABB(getBlockPos().getX() - length, getBlockPos().getY() + 0.5f - height, getBlockPos().getZ() + 0.5f - thickness, getBlockPos().getX(), getBlockPos().getY() + 0.5f + height, getBlockPos().getZ() + 0.5f + thickness);
 			List<Entity> list = getLevel().getEntities(null, aabb);
@@ -260,9 +240,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 				placeBlockCarefully(getLevel(), (int) (getBlockPos().getX() - length - 1), getBlockPos().getY(), getBlockPos().getZ(), RRBlocks.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (getLevel().getBlockState(getBlockPos().offset(-level, y, 0).below(3).west()).getBlock() != RRBlocks.forcefield)
+					if (!getLevel().getBlockState(getBlockPos().offset(-level, y, 0).below(3).west()).is(RRBlocks.forcefield))
 					{
-						getLevel().setBlockAndUpdate(getBlockPos().offset(-level, y, 0).below(3).west(), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.META, meta));
+						getLevel().setBlockAndUpdate(getBlockPos().offset(-level, y, 0).below(3).west(), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.FACING, meta));
 						hits++;
 					}
 				}
@@ -270,7 +250,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 			}
 		}
 
-		if (meta == 5)
+		if (meta == Direction.EAST)
 		{
 			AABB aabb = new AABB(getBlockPos().getX() + 1f, getBlockPos().getY() + 0.5f - height, getBlockPos().getZ() + 0.5f - thickness, getBlockPos().getX() + 1f + length, getBlockPos().getY() + 0.5f + height, getBlockPos().getZ() + 0.5f + thickness);
 			List<Entity> list = getLevel().getEntities(null, aabb);
@@ -309,9 +289,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 				placeBlockCarefully(getLevel(), (int) (getBlockPos().getX() + length + 1), getBlockPos().getY(), getBlockPos().getZ(), RRBlocks.reactive);
 				for (int y = 0; y < 7; y++)
 				{
-					if (getLevel().getBlockState(getBlockPos().offset(level, y, 0).below(3).east()).getBlock() != RRBlocks.forcefield)
+					if (!getLevel().getBlockState(getBlockPos().offset(level, y, 0).below(3).east()).is(RRBlocks.forcefield))
 					{
-						getLevel().setBlockAndUpdate(getBlockPos().offset(level, y, 0).below(3).east(), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.META, meta));
+						getLevel().setBlockAndUpdate(getBlockPos().offset(level, y, 0).below(3).east(), RRBlocks.forcefield.defaultBlockState().setValue(BlockForceField.FACING, meta));
 						hits++;
 					}
 				}
@@ -321,15 +301,14 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 		return (power - (hits * 16));
 	}
 
-	public void placeBlockCarefully(Level world, int i, int j, int z, Block block)
-	{
+	public void placeBlockCarefully(Level world, int i, int j, int z, Block block) {
         BlockPos pos = new BlockPos(i, j, z);
-        if (world.getBlockState(pos).getBlock() != RRBlocks.reactive &&
-            world.getBlockState(pos).getBlock() != RRBlocks.fshield &&
-            world.getBlockState(pos).getBlock() != RRBlocks.omegaobj &&
-            world.getBlockState(pos).getBlock() != RRBlocks.sigmaobj)
-		{
-			world.setBlockAndUpdate(pos, block.defaultBlockState());
+        BlockState state = world.getBlockState(pos);
+        if (!state.is(RRBlocks.reactive) &&
+            !state.is(RRBlocks.fshield ) &&
+            !state.is(RRBlocks.omegaobj) &&
+            !state.is(RRBlocks.sigmaobj)) {
+            world.setBlockAndUpdate(pos, block.defaultBlockState());
 		}
 	}
 }

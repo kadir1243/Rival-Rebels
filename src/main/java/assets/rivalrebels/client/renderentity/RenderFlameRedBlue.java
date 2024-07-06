@@ -48,10 +48,10 @@ public class RenderFlameRedBlue extends EntityRenderer<EntityFlameBall1>
         matrices.mulPose(Axis.XP.rotationDegrees(90 - Minecraft.getInstance().player.getXRot()));
         matrices.pushPose();
         matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-        buffer.addVertex(-size, 0, -size, CommonColors.WHITE, X, Y, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex( size, 0, -size, CommonColors.WHITE, X + 0.25f, Y, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex( size, 0,  size, CommonColors.WHITE, X + 0.25f, Y + 0.25f, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
-        buffer.addVertex(-size, 0,  size, CommonColors.WHITE, X, Y + 0.25f, OverlayTexture.NO_OVERLAY, light, 0, 1, 0);
+        buffer.addVertex(matrices.last(), -size, 0, -size).setColor(CommonColors.WHITE).setUv(X, Y).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+        buffer.addVertex(matrices.last(),  size, 0, -size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+        buffer.addVertex(matrices.last(),  size, 0,  size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y + 0.25f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
+        buffer.addVertex(matrices.last(), -size, 0,  size).setColor(CommonColors.WHITE).setUv(X, Y + 0.25f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
         matrices.popPose();
         matrices.popPose();
 

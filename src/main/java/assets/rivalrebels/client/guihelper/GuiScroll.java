@@ -39,7 +39,6 @@ public class GuiScroll extends GuiButton
 		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 		if (scroll > limit) scroll = limit;
 		if (scroll < 0) scroll = 0;
-		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 11;
 		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY() + scroll, 0, state, this.width, this.height);

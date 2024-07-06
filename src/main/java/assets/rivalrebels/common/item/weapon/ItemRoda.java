@@ -326,7 +326,7 @@ public class ItemRoda extends Item
 			e = new EntityTachyonBomb(world, x,y,z,mx,my,mz,1);
 		break;
 		}
-		if (world.isClientSide) return;
+		if (world.isClientSide()) return;
 		if (e != null)
 		{
 			world.addFreshEntity(e);
@@ -346,36 +346,36 @@ public class ItemRoda extends Item
 			player.displayClientMessage(Component.nullToEmpty("Password?"), true);
 			pass = true;
 		}
-		player.swing(hand);
 		RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
 		if ((!world.isClientSide && world.getServer().isSingleplayer())
 		 || (rrp != null && (rrp.rrrank == RivalRebelsRank.LEADER || rrp.rrrank == RivalRebelsRank.OFFICER || rrp.rrrank == RivalRebelsRank.REP))) {
 			player.startUsingItem(hand);
 			stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)+10);
-			if (stack.get(RRComponents.HAPPY_NEW_YEAR) > 1400 && !world.isClientSide) //EXPLODE
+			if (stack.get(RRComponents.HAPPY_NEW_YEAR) > 1400 && !world.isClientSide()) //EXPLODE
 			{
 				world.addFreshEntity(new EntityNuclearBlast(world, player.getX(), player.getY(), player.getZ(), 6, true));
 				player.setItemInHand(hand, ItemStack.EMPTY);
-				return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+				return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 			}
 			double motionX = (-Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI));
 			double motionZ = (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI));
 			double motionY = (-Mth.sin(player.getXRot() / 180.0F * (float) Math.PI));
 			spawn(rodaindex, world, player.getX(), player.getY() + 3.0, player.getZ(),motionX,motionY,motionZ, 1.0,0.0);
-		}
+            return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+        }
 		return InteractionResultHolder.pass(stack);
 	}
 
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-		if (world.isClientSide) return;
+		if (world.isClientSide()) return;
 		if (stack.get(RRComponents.HAPPY_NEW_YEAR)>0)stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)-1);
 	}
 
     //@Override
 	public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity)
 	{
-		if (player.level().isClientSide) return true;
+		if (player.level().isClientSide()) return true;
 		RandomSource r = player.level().random;
 		double x = entity.getX() - player.getX();
 		double y = entity.getY() - player.getY();

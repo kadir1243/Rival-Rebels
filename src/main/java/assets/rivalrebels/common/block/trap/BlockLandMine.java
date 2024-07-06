@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRoddiskLeader;
@@ -70,7 +70,7 @@ public class BlockLandMine extends FallingBlock
     public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		if (state.getValue(META)) {
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-			if (!world.isClientSide) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
+			if (!world.isClientSide()) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RRConfig.SERVER.getLandmineExplodeSize(), Level.ExplosionInteraction.BLOCK);
 		}
 	}
 
@@ -95,11 +95,11 @@ public class BlockLandMine extends FallingBlock
 
     @Override
     protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
-        if (!level.isClientSide) level.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
+        if (!level.isClientSide()) level.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RRConfig.SERVER.getLandmineExplodeSize(), Level.ExplosionInteraction.BLOCK);
     }
 
 /*@Override
-	public final IIcon getIcon(IBlockAccess world, int x, int y, int z, int s)
+	public final IIcon getIcon(BlockGetter world, int x, int y, int z, int s)
 	{
 		if (this == RivalRebels.landmine) return Blocks.GRASS.getIcon(world, x, y, z, s);
 		Block[] n = new Block[6];
@@ -133,7 +133,7 @@ public class BlockLandMine extends FallingBlock
 	}
 
 	@Override
-	public void onBlockAdded(World world, int x, int y, int z)
+	public void onBlockAdded(Level world, int x, int y, int z)
 	{
 		Block[] n = new Block[6];
 		n[0] = world.getBlock(x + 1, y, z);
@@ -176,6 +176,6 @@ public class BlockLandMine extends FallingBlock
 
     @Override
     public void onLand(Level world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
-		if (!world.isClientSide) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RivalRebels.landmineExplodeSize, Level.ExplosionInteraction.BLOCK);
+		if (!world.isClientSide()) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RRConfig.SERVER.getLandmineExplodeSize(), Level.ExplosionInteraction.BLOCK);
 	}
 }

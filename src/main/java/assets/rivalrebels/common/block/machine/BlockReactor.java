@@ -16,8 +16,7 @@ import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -30,20 +29,23 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockReactor extends BaseEntityBlock {
     public static final MapCodec<BlockReactor> CODEC = simpleCodec(BlockReactor::new);
-    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
-	public BlockReactor(Properties settings)
-	{
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+
+    public BlockReactor(Properties settings) {
 		super(settings);
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
 	}
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(FACING);
     }
 
     @Override
@@ -54,14 +56,7 @@ public class BlockReactor extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        int meta = switch (Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3) {
-            case 0 -> 2;
-            case 1 -> 5;
-            case 2 -> 3;
-            case 3 -> 4;
-            default -> 0;
-        };
-        return super.getStateForPlacement(ctx).setValue(META, meta);
+        return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Nullable
@@ -69,6 +64,7 @@ public class BlockReactor extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityReactor(pos, state);
 	}
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
@@ -81,6 +77,6 @@ public class BlockReactor extends BaseEntityBlock {
 
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 
-		return InteractionResult.sidedSuccess(level.isClientSide);
+		return InteractionResult.sidedSuccess(level.isClientSide());
 	}
 }

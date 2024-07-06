@@ -10,7 +10,7 @@
   },
   "client": [
     "client.ArmorFeatureRendererMixin",
-    "client.DrawContextAccessor",
-    "client.WorldRendererMixin"
+    "client.GuiGraphicsAccessor",
+    "client.LevelRendererMixin"
   ]
 }

@@ -15,7 +15,6 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -40,7 +39,7 @@ public class BlockSupplies extends Block
         int y = pos.getY();
         int z = pos.getZ();
 
-		if (level.isClientSide)
+		if (level.isClientSide())
 		{
 			player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.armyshovel.getDescription() + ". §9(" + "Ideal for special blocks." + ")"), false);
@@ -53,7 +52,7 @@ public class BlockSupplies extends Block
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.safepill.getDescription() + ". §9(" + "Restores health." + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.breadbox.getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"), false);
 		}
-		if (!level.isClientSide)
+		if (!level.isClientSide())
 		{
 			ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.breadbox));
 			ItemEntity ei1 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.armyshovel));
@@ -78,10 +77,10 @@ public class BlockSupplies extends Block
             level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 			if (level.random.nextInt(5) == 0)
 			{
-				level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.nuclearelement.getDefaultInstance()));
-				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.nuclearelement.getDescription() + ". §9" + "(Used in nuclear weapons)"), false);
+				level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.NUCLEAR_ROD.getDefaultInstance()));
+				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.getDescription() + ". §9" + "(Used in nuclear weapons)"), false);
 			}
-			return InteractionResult.sidedSuccess(level.isClientSide);
+			return InteractionResult.sidedSuccess(level.isClientSide());
 		}
 		return InteractionResult.PASS;
 	}

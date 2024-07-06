@@ -20,7 +20,7 @@ import assets.rivalrebels.common.packet.ResetPacket;
 import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
-import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -84,14 +84,14 @@ public class GuiSpawn extends Screen
 		omegaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
 		sigmaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
 		classButton.active = nw.isreset;
-		this.addRenderableOnly(classButton);
-		this.addRenderableOnly(resetButton);
-		this.addRenderableOnly(omegaButton);
-		this.addRenderableOnly(sigmaButton);
-		this.addRenderableOnly(omegaScroll);
-		this.addRenderableOnly(sigmaScroll);
-		this.addRenderableOnly(playerScroll);
-		this.addRenderableOnly(gameScroll);
+		this.addRenderableWidget(classButton);
+		this.addRenderableWidget(resetButton);
+		this.addRenderableWidget(omegaButton);
+		this.addRenderableWidget(sigmaButton);
+		this.addRenderableWidget(omegaScroll);
+		this.addRenderableWidget(sigmaScroll);
+		this.addRenderableWidget(playerScroll);
+		this.addRenderableWidget(gameScroll);
 	}
 
     @Override
@@ -116,7 +116,7 @@ public class GuiSpawn extends Screen
         context.fillGradient(posX + 6, posY + 99, posX + 161, posY + 131, 0xFF000000, 0xFF000000);
 		drawPanel(context, posX + 10, posY + 105, 50, playerScroll.getScroll(), playerScroll.limit, new String[] { rrclass.name }, new int[] { rrclass.color });
 
-        ((DrawContextAccessor) context).callDrawTexturedQuad(
+        ((GuiGraphicsAccessor) context).callBlit(
             RRIdentifiers.guitspawn,
             posX,
             posX + xSizeOfTexture,
@@ -126,12 +126,11 @@ public class GuiSpawn extends Screen
             0,
             xSizeOfTexture * f,
             ySizeOfTexture * f,
-            0,
-            1F, 1F, 1F, 1F
+            0
         );
 
         if (RRIdentifiers.banner != null) {
-            ((DrawContextAccessor) context).callDrawTexturedQuad(
+            ((GuiGraphicsAccessor) context).callBlit(
                 RRIdentifiers.banner,
                 posX + 3,
                 posX + 253,

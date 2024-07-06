@@ -17,6 +17,7 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.joml.Vector3f;
 
@@ -25,9 +26,9 @@ public class ModelTsarBlast {
     private static final int[] time = {100, 100};
     private static final float texadd = -1f / 500f;
     private static final int segments = 20;
-    private static final float deg = (float) Math.PI * 2f / segments;
-    private static final float sin = (float) Math.sin(deg);
-    private static final float cos = (float) Math.cos(deg);
+    private static final float deg = Mth.TWO_PI / segments;
+    private static final float sin = Mth.sin(deg);
+    private static final float cos = Mth.cos(deg);
     private static final float add = 360 / segments;
     private final float[][] tsarx = {{7f, 6f, 5f, 4f, 3f, 2f, 1.75f, 1.5f, 1.25f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, -1f, -1.25f, -1.5f, -2f, -2f, -1.5f, -1f, 1f, 1.5f, 0f, -1f, -2f, -3f, -4f, -5f, -5.25f, -5f, -4.5f, -3.5f, -2.5f, -1.5f}, {7f, 6f, 5f, 4f, 3f, 2f, 1.75f, 1.5f, 1.25f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, -1f, -1.25f, -1.5f, -2f, -2f, -1.5f, -1f, 1f, 1.5f, 0f, -1f, -2f, -3f, -4f, -5f, -5.25f, -5f, -4.5f, -3.5f, -2.5f, -1.5f}};
     private final float[][] tsary = {{-9f, -8.5f, -8f, -7.5f, -7f, -6f, -5f, -4f, -3f, -2f, -1f, 0f, 1f, 2f, 3f, 4f, 5f, 6f, 10f, 9f, 8f, 7f, 6.5f, 6f, 6f, 10f, 11f, 16.5f, 16.25f, 16f, 16f, 15.5f, 14.5f, 13f, 12f, 11f, 10f, 10f, 11f}, {-9f, -8.5f, -8f, -7.5f, -7f, -6f, -5f, -4f, -3f, -2f, -1f, 0f, 1f, 2f, 3f, 4f, 5f, 6f, 10f, 9f, 8f, 7f, 6.5f, 6f, 6f, 10f, 11f, 16.5f, 16.25f, 16f, 16f, 15.5f, 14.5f, 13f, 12f, 11f, 10f, 10f, 11f}};

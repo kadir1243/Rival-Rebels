@@ -22,6 +22,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Vector3f;
 
@@ -32,9 +33,9 @@ public class ModelTsarBomba {
 	private static final float[]	tsary		= { -5f, -3.5f, -2f, -1f, 1f, 2f, 2.75f, 3f };
 	private static final float[]	tsart		= { 1f, 0.8125f, 0.625f, 0.5f, 0.25f, 0.125f, 0.03125f, 0f };
 	private static final int		segments	= 20;
-	private static final float	deg			= (float) Math.PI * 2f / segments;
-	private static final float	sin			= (float) Math.sin(deg);
-	private static final float	cos			= (float) Math.cos(deg);
+	private static final float	deg			= Mth.TWO_PI / segments;
+	private static final float	sin			= Mth.sin(deg);
+	private static final float	cos			= Mth.cos(deg);
 	private static final float	add			= 360 / segments;
 
 	public static void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay)

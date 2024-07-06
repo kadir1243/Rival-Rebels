@@ -106,7 +106,7 @@ public class EntityBomb extends ThrowableProjectile {
 				var2 = var3.getLocation();
 			}
 
-			if (!this.level().isClientSide)
+			if (!this.level().isClientSide())
 			{
 				Entity var4 = null;
 				List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));

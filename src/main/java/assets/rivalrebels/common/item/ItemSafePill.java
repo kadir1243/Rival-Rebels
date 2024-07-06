@@ -11,7 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -35,9 +37,9 @@ public class ItemSafePill extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
 		player.startUsingItem(hand);
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
-			player.displayClientMessage(Component.nullToEmpty("§7[§6Status§7]§e Regenerating..."), true);
+			player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.literal("Regenerating...").withStyle(ChatFormatting.YELLOW)), true);
 			RivalRebelsSoundPlayer.playSound(player, 15, 1);
 			RivalRebelsSoundPlayer.playSound(player, 28, 18);
 			world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
@@ -46,9 +48,8 @@ public class ItemSafePill extends Item
 			player.getFoodData().eat(10, 200);
 			player.heal(10);
             ItemStack stack = player.getItemInHand(hand);
-            stack.shrink(1);
-            if (stack.isEmpty()) stack = ItemStack.EMPTY;
-            player.setItemInHand(hand, stack);
+            stack.consume(1, player);
+            return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 		}
 		return super.use(world, player, hand);
 	}

@@ -13,7 +13,7 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.renderentity.RenderNuke;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.block.trap.BlockNuclearBomb;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
@@ -38,18 +39,15 @@ public class TileEntityNuclearBombRenderer implements BlockEntityRenderer<TileEn
     @Override
     public void render(TileEntityNuclearBomb entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+		matrices.translate(0.5F, 0.5F, 0.5F);
 		matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
-		int metadata = entity.getBlockState().getValue(BlockNuclearBomb.META);
-        switch (metadata) {
-            case 0 -> matrices.mulPose(Axis.XP.rotationDegrees(90));
-            case 1 -> matrices.mulPose(Axis.XP.rotationDegrees(-90));
-            case 2 -> matrices.mulPose(Axis.YP.rotationDegrees(180));
-            case 3 -> matrices.mulPose(Axis.YP.rotationDegrees(0));
-            case 4 -> matrices.mulPose(Axis.YP.rotationDegrees(-90));
-            case 5 -> matrices.mulPose(Axis.YP.rotationDegrees(90));
+        Direction direction = entity.getBlockState().getValue(BlockNuclearBomb.FACING);
+        if (direction.getAxis().isVertical()) {
+            matrices.mulPose(Axis.XP.rotationDegrees(direction.toYRot()));
+        } else {
+            matrices.mulPose(Axis.YP.rotationDegrees(direction.toYRot()));
         }
-		RenderNuke.model.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.nuke.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.popPose();
 	}
 

@@ -58,18 +58,17 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
 		boolean side2 = isFaceFull(world, entity.getBlockPos(), Direction.WEST);
 		boolean side3 = isFaceFull(world, entity.getBlockPos(), Direction.NORTH);
 		boolean side4 = isFaceFull(world, entity.getBlockPos(), Direction.EAST);
-		int meta = entity.getBlockState().getValue(BlockForceField.META);
+		Direction meta = entity.getBlockState().getValue(BlockForceField.FACING);
 
 		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+		matrices.translate(0.5F, 0.5F, 0.5F);
         ResourceLocation texture = switch (meta) {
-            case 0 -> RRIdentifiers.btsplash1;
-            case 1 -> RRIdentifiers.btsplash2;
-            case 2 -> RRIdentifiers.btsplash3;
-            case 3 -> RRIdentifiers.btsplash4;
-            case 4 -> RRIdentifiers.btsplash5;
-            case 5 -> RRIdentifiers.btsplash6;
-            default -> RRIdentifiers.btsplash1;
+            case DOWN -> RRIdentifiers.btsplash1;
+            case UP -> RRIdentifiers.btsplash2;
+            case NORTH -> RRIdentifiers.btsplash3;
+            case SOUTH -> RRIdentifiers.btsplash4;
+            case WEST -> RRIdentifiers.btsplash5;
+            case EAST -> RRIdentifiers.btsplash6;
         };
 
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));

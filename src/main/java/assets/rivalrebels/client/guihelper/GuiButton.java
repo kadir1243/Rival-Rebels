@@ -33,7 +33,6 @@ public class GuiButton extends Button {
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		if (this.visible) {
             Minecraft client = Minecraft.getInstance();
-			context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 			this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 			int k = this.getYImage(this.isHovered);
 			context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 5, k * 11, this.width, this.height);

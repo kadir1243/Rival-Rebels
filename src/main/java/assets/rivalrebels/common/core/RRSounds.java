@@ -13,20 +13,12 @@ package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.RRIdentifiers;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.sounds.SoundEvent;
 
 public class RRSounds {
@@ -42,22 +34,19 @@ public class RRSounds {
     public static final SoundEvent BLASTER_MESSAGE_FROM_OTHER_PLANETS /*:D i dont know what is it*/ = register("blaster_message_from_other_planets"); // 2.2
     public static final SoundEvent BLASTER_MESSAGE_FROM_OTHER_PLANETS2 /*:D i dont know what is it 2*/ = register("blaster_message_from_other_planets2"); // 2.3
     public static final SoundEvent CRATE = register("crate"); // 3.0
+    public static final SoundEvent CUCHILLO_GLASS_BREAK = register("cuchillo_glass_break"); // 4.0
+    public static final SoundEvent CUCHILLO_UNKNOWN = register("cuchillo_unknown"); // 4.1
+    public static final SoundEvent CUCHILLO_UNKNOWN2 = register("cuchillo_unknown2"); // 4.2
+    public static final SoundEvent CUCHILLO_UNKNOWN3 = register("cuchillo_unknown3"); // 4.3
+    public static final SoundEvent CUCHILLO_UNKNOWN4 = register("cuchillo_unknown4"); // 4.4
+    public static final SoundEvent FORCE_FIELD = register("force_field"); // 5.0
+    public static final SoundEvent ROD_DISK_HIT_ENTITY = register("rod_disk_hit_entity"); // 5.1
+    public static final SoundEvent ROD_DISK_MIRROR_FROM_OBJECT = register("rod_disk_mirror_from_object"); // 5.2
 
     public static void init() {
-        onSoundLoad();
     }
 
 	public static void onSoundLoad() {
-        if (Minecraft.getInstance() == null || Minecraft.getInstance().getResourceManager() == null) return;
-        Optional<Resource> resource = Minecraft.getInstance().getResourceManager().getResource(RRIdentifiers.create("sounds-old"));
-        if (resource.isEmpty()) return;
-        try (BufferedReader bufferedReader = resource.get().openAsReader()) {
-            JsonObject element = JsonParser.parseReader(bufferedReader).getAsJsonObject();
-            for (Map.Entry<String, JsonElement> entry : element.asMap().entrySet()) {
-                SOUNDS.put(entry.getKey(), register(entry.getKey().replace('.', '_')));
-            }
-        } catch (IOException ignored) {
-        }
         /*String[] soundFiles = {
 				// artillery
 				"aa/a1.ogg",

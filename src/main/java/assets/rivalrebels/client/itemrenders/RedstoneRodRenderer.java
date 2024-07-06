@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class RedstoneRodRenderer implements DynamicItemRenderer {
     public static final Material REDSTONE_ROD_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etredrod);
-    private final ModelRod md = new ModelRod();
 
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
@@ -35,7 +34,7 @@ public class RedstoneRodRenderer implements DynamicItemRenderer {
 		matrices.scale(0.5f, 1.25f, 0.5f);
 		matrices.pushPose();
 
-		md.render(matrices, REDSTONE_ROD_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ModelRod.render(matrices, REDSTONE_ROD_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 
 		matrices.popPose();
 		matrices.popPose();

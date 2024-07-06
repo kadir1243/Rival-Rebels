@@ -13,6 +13,7 @@ package assets.rivalrebels.common.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -22,10 +23,10 @@ import net.minecraft.world.level.block.state.BlockState;
 public class BlockCycle extends Block
 {
 	public float	phase		= 0;
-	public float	phaseadd	= (float) (((Math.PI * 2) / 360) * 10);
-	public float	pShiftR		= (float) (((Math.PI * 2f) / 3f) * 0f);
-	public float	pShiftG		= (float) (((Math.PI * 2f) / 3f) * 1f);
-	public float	pShiftB		= (float) (((Math.PI * 2f) / 3f) * 2f);
+	public float	phaseadd	= (((Mth.TWO_PI) / 360) * 10);
+	public float	pShiftR		= (((Mth.TWO_PI) / 3f) * 0f);
+	public float	pShiftG		= (((Mth.TWO_PI) / 3f) * 1f);
+	public float	pShiftB		= (((Mth.TWO_PI) / 3f) * 2f);
 
 	public BlockCycle(Properties settings)
 	{

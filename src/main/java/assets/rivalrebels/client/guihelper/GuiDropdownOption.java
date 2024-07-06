@@ -23,15 +23,13 @@ import net.minecraft.network.chat.Component;
 import org.joml.Vector2i;
 
 @Environment(EnvType.CLIENT)
-public class GuiDropdownOption extends Button
-{
+public class GuiDropdownOption extends Button {
 	Rectangle		bbox;
 	public boolean	isPressed	= false;
 	public boolean	mouseDown	= false;
 	public GuiTray	t;
 
-	public GuiDropdownOption(Vector2i p, int l, int n, Component text, GuiTray tray)
-	{
+	public GuiDropdownOption(Vector2i p, int l, int n, Component text, GuiTray tray) {
 		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {}, DEFAULT_NARRATION);
 		bbox = new Rectangle(p.x, p.y + n * 10, l, (n + 1) * 10);
 		t = tray;
@@ -44,16 +42,16 @@ public class GuiDropdownOption extends Button
 		boolean on = t.getMenu().hasWepReqs();
 		if (current && !mouseDown && on) isPressed = !isPressed;
 		int color = 0x999999;
-		if (on)
-		{
+		if (on) {
 			RivalRebelsTeam team = RivalRebelsTeam.NONE;
-			if (t.getMenu().getSlot(6).hasItem() && t.getMenu().getSlot(6).getItem().has(RRComponents.CHIP_DATA))
-			{
+			if (t.getMenu().getSlot(6).hasItem() && t.getMenu().getSlot(6).getItem().has(RRComponents.CHIP_DATA)) {
 				team = t.getMenu().getSlot(6).getItem().get(RRComponents.CHIP_DATA).team();
 			}
-			if (team == RivalRebelsTeam.NONE) color = 0xffff55;
-			if (team == RivalRebelsTeam.OMEGA) color = 0x55ff55;
-			if (team == RivalRebelsTeam.SIGMA) color = 0x5555ff;
+            color = switch (team) {
+                case NONE -> 0xffff55;
+                case OMEGA -> 0x55ff55;
+                case SIGMA -> 0x5555ff;
+            };
 		}
 		if (inside && on) color = 0xffffff;
         context.drawCenteredString(Minecraft.getInstance().font, getMessage(), bbox.xMin + 1, bbox.yMin + 1, color);

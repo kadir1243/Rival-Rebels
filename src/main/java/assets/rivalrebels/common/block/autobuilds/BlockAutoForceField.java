@@ -33,7 +33,7 @@ public class BlockAutoForceField extends BlockAutoTemplate {
 	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
 			int r = 2;
 			int h = 6;

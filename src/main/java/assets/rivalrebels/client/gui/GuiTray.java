@@ -14,7 +14,7 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.*;
-import assets.rivalrebels.client.tileentityrender.TileEntityRecieverRenderer;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.container.ContainerReciever;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
@@ -64,11 +64,11 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 		mobs = new GuiCustomButton(new Rectangle(x + 94, y + 46, 19, 19), RRIdentifiers.guitray, new Vector2i(237, 46), true);
 		mobs.isPressed = menu.getKMobs();
 		select1 = new GuiDropdownOption(new Vector2i(119 + x, 8 + y), 45, 0, Component.translatable("RivalRebels.ads.dragon"), this);
-		addRenderableOnly(range);
-		addRenderableOnly(chip);
-		addRenderableOnly(players);
-		addRenderableOnly(mobs);
-		addRenderableOnly(select1);
+		addRenderableWidget(range);
+		addRenderableWidget(chip);
+		addRenderableWidget(players);
+		addRenderableWidget(mobs);
+		addRenderableWidget(select1);
 	}
 
     @Override
@@ -122,7 +122,7 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 			matrices.mulPose(Axis.YP.rotationDegrees(spinfac));
 			matrices.translate(0, 0, 0.5f);
 		}
-		// GL11.glRotated(Math.sin(spinfac/(40 * Math.PI)) * 10, 1.0F, 0.0F, 0.0F);
+		// matrices.mulPose(Axis.XP.rotationDegrees(Math.sin(spinfac/(40 * Math.PI)) * 10));
 
 		// entity.pitch = -((float)Math.atan((double)(py / 40.0F))) * 40.0F;
 		// entity.headYaw = (float)Math.atan((double)(px / 40.0F)) * 40.0F;
@@ -133,13 +133,13 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 		// matrices.mulPose((spinfac * 0.5), 0, 1, 0);
 		matrices.translate(0, -0.5 * 1.5, (-0.5 - 0.34) * -1.5);
         MultiBufferSource vertexConsumers = graphics.bufferSource();
-        TileEntityRecieverRenderer.base.render(matrices, RECEIVER.buffer(vertexConsumers, RenderType::entitySolid), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        ObjModels.tray.render(matrices, RECEIVER.buffer(vertexConsumers, RenderType::entitySolid), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 		if (menu.hasWeapon()) {
 			matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
 			matrices.mulPose(Axis.YP.rotationDegrees((float) (-Math.atan(px / 40.0F) * 40.0F)));
-			TileEntityRecieverRenderer.arm.render(matrices, RECEIVER.buffer(vertexConsumers, RenderType::entitySolid), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			ObjModels.arm.render(matrices, RECEIVER.buffer(vertexConsumers, RenderType::entitySolid), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			matrices.mulPose(Axis.XP.rotationDegrees((float) (Math.atan(py / 40.0F) * 40.0F + 20)));
-			TileEntityRecieverRenderer.adsdragon.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etadsdragon)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			ObjModels.adsdragon.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etadsdragon)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 		}
         graphics.flush();
         matrices.popPose();
@@ -147,7 +147,6 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        context.setColor(1, 1, 1, 1);
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
         context.blit(RRIdentifiers.guitray, x, y, 0, 0, imageWidth, imageHeight);

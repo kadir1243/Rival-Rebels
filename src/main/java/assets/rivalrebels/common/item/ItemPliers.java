@@ -11,13 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.command.CommandHotPotato;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -47,14 +47,12 @@ public class ItemPliers extends Item
         BlockPos pos = context.getClickedPos();
         Level world = context.getLevel();
         Player player = context.getPlayer();
-        InteractionHand hand = context.getHand();
-		player.swing(hand);
-        if (!world.isClientSide) {
+        if (!world.isClientSide()) {
             int x = pos.getX();
             int y = pos.getY();
             int z = pos.getZ();
             Block block = world.getBlockState(pos).getBlock();
-            if (block == RRBlocks.jump && player.getAbilities().invulnerable) {
+            if (block == RRBlocks.jump && player.isCreative()) {
                 CommandHotPotato.pos = pos.above(400);
 				player.displayClientMessage(Component.nullToEmpty("Hot Potato drop point set. Use /rrhotpotato to start a round."), false);
 			}
@@ -69,7 +67,7 @@ public class ItemPliers extends Item
 					world.addFreshEntity(ei);
 					world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					i = 0;
-					return InteractionResult.SUCCESS;
+                    return InteractionResult.sidedSuccess(world.isClientSide());
 				}
 			}
 			if (block == RRBlocks.timedbomb)
@@ -84,31 +82,31 @@ public class ItemPliers extends Item
 					world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					world.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());
 					i = 0;
-					return InteractionResult.SUCCESS;
+                    return InteractionResult.sidedSuccess(world.isClientSide());
 				}
 			}
 			if (block instanceof BlockAutoTemplate worldBlock)
 			{
                 i = i + 1;
-				player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".building", i * 100 / worldBlock.time), false);
+				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.translatable(RivalRebels.MODID + ".building", i * 100 / worldBlock.time)), false);
 				if (i >= worldBlock.time)
 				{
                     world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					worldBlock.build(world, x, y, z);
 					i = 0;
-					return InteractionResult.SUCCESS;
+                    return InteractionResult.sidedSuccess(world.isClientSide());
 				}
 			}
-			if (block == RRBlocks.supplies && world.getBlockState(pos.below()).getBlock() == RRBlocks.supplies)
+			if (block == RRBlocks.supplies && world.getBlockState(pos.below()).is(RRBlocks.supplies))
 			{
 				i++;
-				player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".building.tokamak ", i * 100 / 15), false);
+				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.translatable(RivalRebels.MODID + ".building.tokamak ", i * 100 / 15)), false);
 				if (i >= 15)
 				{
                     world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					world.setBlockAndUpdate(pos.below(), RRBlocks.reactor.defaultBlockState());
 					i = 0;
-					return InteractionResult.SUCCESS;
+                    return InteractionResult.sidedSuccess(world.isClientSide());
 				}
 			}
 		}

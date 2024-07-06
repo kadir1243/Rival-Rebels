@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TsarBomba;
@@ -47,14 +47,14 @@ public class EntityTsarBlast extends EntityInanimate
 		this(par1World);
 		tsar = tsarBomba;
 		radius = rad;
-		setDeltaMovement(Math.sqrt(radius - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
 	}
 
 	public EntityTsarBlast(Level par1World, double x, double y, double z, float rad) {
 		this(par1World);
 		radius = rad;
-		setDeltaMovement(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setDeltaMovement(Math.sqrt(rad - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
         setPos(x, y, z);
 	}
 
@@ -74,12 +74,12 @@ public class EntityTsarBlast extends EntityInanimate
 
 		tickCount++;
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			if (tsar == null && tickCount > 1200) kill();
 			if (tickCount % 20 == 0) updateEntityList();
 			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
-			for (int i = 0; i < RivalRebels.tsarBombaSpeed * 2; i++)
+			for (int i = 0; i < RRConfig.SERVER.getTsarBombaSpeed() * 2; i++)
 			{
 				if (tsar != null)
 				{
@@ -109,7 +109,7 @@ public class EntityTsarBlast extends EntityInanimate
 			double dist = e.distanceToSqr(getX(),getY(),getZ());
 			if (dist < ldist)
 			{
-				if ((e instanceof Player && ((Player) e).getAbilities().invulnerable) || e instanceof EntityNuclearBlast || e instanceof EntityTsarBlast || e == this) continue;
+				if ((e instanceof Player && ((Player) e).isCreative()) || e instanceof EntityNuclearBlast || e instanceof EntityTsarBlast || e == this) continue;
 				entitylist.add(e);
 			}
 		}

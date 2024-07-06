@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -49,7 +49,7 @@ public class BlockTimedBomb extends FallingBlock {
         int y = pos.getY();
         int z = pos.getZ();
         world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timedBomb(world));
+		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timedBomb(world));
 		RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
 	}
 
@@ -59,7 +59,7 @@ public class BlockTimedBomb extends FallingBlock {
         int y = pos.getY();
         int z = pos.getZ();
 		world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timedBomb(world));
+		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timedBomb(world));
 		RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
         return state;
     }
@@ -77,17 +77,17 @@ public class BlockTimedBomb extends FallingBlock {
         int z = pos.getZ();
 		world.scheduleTick(pos, this, 8);
 		ticksSincePlaced += 1;
-		if (ticksSincePlaced >= RivalRebels.timedbombTimer * 2.5)
+		if (ticksSincePlaced >= RRConfig.SERVER.getTimedbombTimer() * 2.5)
 		{
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timedBomb(world));
+			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timedBomb(world));
 			RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
 		}
 		if (ticksSincePlaced == 100)
 		{
 			ticksSincePlaced = 0;
 		}
-		if (world.getBlockState(pos.above()).getBlock() == RRBlocks.light && ticksSincePlaced <= 93)
+		if (world.getBlockState(pos.above()).is(RRBlocks.light) && ticksSincePlaced <= 93)
 		{
 			world.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());
 			world.playLocalSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 1, 1, true);
@@ -144,10 +144,10 @@ public class BlockTimedBomb extends FallingBlock {
 		icon6 = iconregister.registerIcon("RivalRebels:ab"); // SIDE E
 	}*/
 
-	/*public void onFinishFalling(World par1World, int par2, int par3, int par4, int par5)
+	/*public void onFinishFalling(Level par1World, int par2, int par3, int par4, int par5)
 	{
 		par1World.setBlock(par2, par3, par4, Blocks.AIR);
-		new Explosion(par1World, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, RivalRebels.timedbombExplodeSize, false, true, RivalRebelsDamageSource.timebomb);
+		new Explosion(par1World, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timebomb);
 		RivalRebelsSoundPlayer.playSound(par1World, 26, 0, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, 2f, 0.3f);
 	}*/
 }

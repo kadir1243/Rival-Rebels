@@ -19,17 +19,7 @@ import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
 @Environment(EnvType.CLIENT)
-public class Vertice {
-	private final Vec3 vertex;
-	private final Vec3 normal;
-	private final Vec2 textureCoords;
-
-    public Vertice(Vec3 vertex, Vec3 normal, Vec2 textureCoords) {
-		this.vertex = vertex;
-		this.normal = normal;
-		this.textureCoords = textureCoords;
-	}
-
+public record Vertice(Vec3 vertex, Vec3 normal, Vec2 textureCoords) {
 	public Vertice normalize() {
         return new Vertice(vertex, normal.normalize(), textureCoords);
 	}

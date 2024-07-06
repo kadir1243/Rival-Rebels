@@ -13,7 +13,6 @@ package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -25,10 +24,8 @@ public class ItemRodNuclear extends ItemRod {
 
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-		if (entity instanceof Player player) {
-            if (world.random.nextInt(16) == 0 && !player.getAbilities().invulnerable) {
-                player.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), world.random.nextInt(4));
-            }
+        if (world.random.nextInt(16) == 0) {
+            entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), world.random.nextInt(4));
         }
 	}
 }

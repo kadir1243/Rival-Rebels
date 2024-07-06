@@ -15,7 +15,7 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.client.guihelper.GuiScroll;
 import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -36,10 +36,9 @@ public class GuiClass extends Screen
 	private GuiButton	nextButton;
 	private GuiButton	doneButton;
 	private GuiScroll	gameScroll;
-	private RivalRebelsClass rrclass = RivalRebelsClass.NONE;
+	private RivalRebelsClass rrclass;
 
-	public GuiClass(RivalRebelsClass rrc)
-	{
+	public GuiClass(RivalRebelsClass rrc) {
         super(Component.empty());
         posX = (width - xSizeOfTexture) / 2;
 		posY = (height - ySizeOfTexture) / 2;
@@ -74,9 +73,9 @@ public class GuiClass extends Screen
         });
 		doneButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.class.done"), button -> this.minecraft.setScreen(new GuiSpawn(rrclass)));
 		gameScroll = new GuiScroll(posX + 243, posY + 9, 74);
-		this.addRenderableOnly(nextButton);
-		this.addRenderableOnly(doneButton);
-		this.addRenderableOnly(gameScroll);
+		this.addRenderableWidget(nextButton);
+		this.addRenderableWidget(doneButton);
+		this.addRenderableWidget(gameScroll);
 	}
 
     @Override
@@ -85,61 +84,54 @@ public class GuiClass extends Screen
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        PoseStack matrices = context.pose();
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        PoseStack pose = graphics.pose();
         if (rrclass == RivalRebelsClass.NONE) rrclass = RivalRebelsClass.REBEL;
         float f = 0.00390625F;
-        renderTransparentBackground(context);
-        context.fillGradient(posX, posY, posX + xSizeOfTexture, posY + ySizeOfTexture, CommonColors.BLACK, CommonColors.BLACK);
-		drawPanel(context, posX + 162, posY + 40, 80, 74, gameScroll.getScroll(), gameScroll.limit, rrclass.name + ".description");
-        context.fillGradient(posX + 160, posY + 9, posX + 244, posY + 38, 0xFF000000, 0xFF000000);
-        ((DrawContextAccessor) context).callDrawTexturedQuad(
+        renderTransparentBackground(graphics);
+        graphics.fillGradient(posX, posY, posX + xSizeOfTexture, posY + ySizeOfTexture, CommonColors.BLACK, CommonColors.BLACK);
+		drawPanel(graphics, posX + 162, posY + 40, 80, 74, gameScroll.getScroll(), gameScroll.limit, rrclass);
+        graphics.fillGradient(posX + 160, posY + 9, posX + 244, posY + 38, 0xFF000000, 0xFF000000);
+
+        ((GuiGraphicsAccessor) graphics).callBlit(
             RRIdentifiers.guitclass,
             posX,
             posX + xSizeOfTexture,
             posY + ySizeOfTexture,
             posY,
-            0, // z offset
+            0,
             0,
             xSizeOfTexture * f,
             ySizeOfTexture * f,
-            0,
-            1F,
-            1F,
-            1F,
-            1F
+            0
         );
 
-        ((DrawContextAccessor) context).callDrawTexturedQuad(
+        graphics.blit(
             rrclass.resource,
             posX + 12,
-            posX + 140,
-            posY + 140,
             posY + 12,
-            0, // z offset
-            0,
-            xSizeOfTexture * f,
-            ySizeOfTexture * f,
-            0,
-            1, 1, 1, 1
+            128,
+            128,
+            xSizeOfTexture,
+            ySizeOfTexture,
+            512,
+            512
         );
 
         float scalefactor = 1.5f;
-        matrices.scale(scalefactor * 1.2f, scalefactor, scalefactor);
-        context.drawCenteredString(font, rrclass.name, (int) ((posX + 76) / (scalefactor * 1.2f)), (int) ((posY + 16) / scalefactor), rrclass.color);
-        matrices.scale(1 / (scalefactor * 1.2f), 1 / scalefactor, 1 / scalefactor);
+        pose.scale(scalefactor * 1.2f, scalefactor, scalefactor);
+        graphics.drawCenteredString(font, rrclass.name, (int) ((posX + 76) / (scalefactor * 1.2f)), (int) ((posY + 16) / scalefactor), rrclass.color);
+        pose.scale(1 / (scalefactor * 1.2f), 1 / scalefactor, 1 / scalefactor);
 
 		scalefactor = 0.666f;
-        matrices.scale(scalefactor, scalefactor, scalefactor);
-        context.drawCenteredString(font, Component.translatable("RivalRebels.class." + rrclass.name + ".minidesc"), (int) ((posX + 76) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
-        matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
+        pose.scale(scalefactor, scalefactor, scalefactor);
+        graphics.drawCenteredString(font, rrclass.getMiniDescriptionTranslation(), (int) ((posX + 76) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
+        pose.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 
 		scalefactor = 0.666f;
-		matrices.scale(scalefactor, scalefactor, scalefactor);
-        context.drawCenteredString(font, Component.translatable("RivalRebels.class.description"), (int) ((posX + 181) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
-        matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
-
-		context.setColor(1F, 1F, 1F, 1F);
+		pose.scale(scalefactor, scalefactor, scalefactor);
+        graphics.drawCenteredString(font, Component.translatable("RivalRebels.class.description"), (int) ((posX + 181) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
+        pose.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 
 		for (int i = 0; i < sizelookup.length; i++)
 		{
@@ -163,41 +155,41 @@ public class GuiClass extends Screen
 		for (int i = rrclass.inventory.length - 1; i >= 0; i--) {
 			int X = posX + 18 + (i % 9) * 22;
 			int Y = posY + 158 + 22 * (i / 9);
-			matrices.pushPose();
-			matrices.translate(X + 8, Y + 8, 0);
-			matrices.scale(sizelookup[i], sizelookup[i], sizelookup[i]);
-			matrices.translate(-X - 8, -Y - 8, 0);
-			context.renderItem(rrclass.inventory[i], X, Y);
-			matrices.popPose();
+			pose.pushPose();
+			pose.translate(X + 8, Y + 8, 0);
+			pose.scale(sizelookup[i], sizelookup[i], sizelookup[i]);
+			pose.translate(-X - 8, -Y - 8, 0);
+			graphics.renderItem(rrclass.inventory[i], X, Y);
+			pose.popPose();
             RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
 		}
 		for (int i = rrclass.inventory.length - 1; i >= 0; i--) {
 			int X = posX + 18 + (i % 9) * 22;
 			int Y = posY + 158 + 22 * (i / 9);
-			matrices.pushPose();
-			matrices.translate(X + 8, Y + 8, 20);
-			matrices.scale(sizelookup[i], sizelookup[i], sizelookup[i]);
-			matrices.translate(-X - 8, -Y - 8, 0);
+			pose.pushPose();
+			pose.translate(X + 8, Y + 8, 20);
+			pose.scale(sizelookup[i], sizelookup[i], sizelookup[i]);
+			pose.translate(-X - 8, -Y - 8, 0);
 			ItemStack stack = rrclass.inventory[i];
-			if (!stack.isEmpty()) context.drawString(font, Component.nullToEmpty(String.valueOf(stack.getCount())),X+17-font.width(String.valueOf(stack.getCount())),Y+9,0xFFFFFF);
+			if (!stack.isEmpty()) graphics.drawString(font, Component.nullToEmpty(String.valueOf(stack.getCount())),X+17-font.width(String.valueOf(stack.getCount())),Y+9,0xFFFFFF);
 			if (sizelookup[i] > 1)
 			{
-                context.fillGradient(X + 17, Y + 3, (int) (X + ((font.width(stack.getHoverName()) + 4) * (sizelookup[i] - 1) * 2) + 15), Y + 13, 0xaa111111, 0xaa111111);
-				context.drawString(font, stack.getHoverName(), X + 18, Y + 4, 0xFFFFFF);
+                graphics.fillGradient(X + 17, Y + 3, (int) (X + ((font.width(stack.getHoverName()) + 4) * (sizelookup[i] - 1) * 2) + 15), Y + 13, 0xaa111111, 0xaa111111);
+				graphics.drawString(font, stack.getHoverName(), X + 18, Y + 4, 0xFFFFFF);
 			}
-			matrices.popPose();
+			pose.popPose();
 		}
 
-		super.render(context, mouseX, mouseY, delta);
+		super.render(graphics, mouseX, mouseY, delta);
 	}
 
-    protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, int scroll, int scrolllimit, String display) {
+    protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, int scroll, int scrolllimit, RivalRebelsClass rrclass) {
 		int length = 10;
 		int dist = (int) (-((float) scroll / (float) scrolllimit) * (((length) * 10) - height));
 		float scalefactor = 0.6666f;
         PoseStack matrices = context.pose();
         matrices.scale(scalefactor, scalefactor, scalefactor);
-		context.drawWordWrap(font, Component.translatable("RivalRebels.class." + display), (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), 0xffffff);
+		context.drawWordWrap(font, rrclass.getDescriptionTranslation(), (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), 0xffffff);
 		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 	}
 }

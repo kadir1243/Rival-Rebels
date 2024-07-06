@@ -64,15 +64,14 @@ public class EntityLaptop extends EntityInanimate
 
     @Override
     public InteractionResult interact(Player player, InteractionHand hand) {
-		if (player.isShiftKeyDown() && !player.level().isClientSide) {
+		if (player.isShiftKeyDown() && !player.level().isClientSide()) {
 			player.openMenu(null);
 		}
-		if (!player.isShiftKeyDown() && player.getInventory().add(RRBlocks.controller.asItem().getDefaultInstance()))
-		{
-			player.swing(hand);
+		if (!player.isShiftKeyDown() && player.getInventory().add(RRBlocks.controller.asItem().getDefaultInstance())) {
 			kill();
+            return InteractionResult.sidedSuccess(level().isClientSide());
 		}
-		return InteractionResult.sidedSuccess(level().isClientSide);
+		return InteractionResult.PASS;
 	}
 
 }

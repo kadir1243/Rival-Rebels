@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.explosion.TachyonBomb;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
@@ -25,10 +25,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SnowLayerBlock;
-import net.minecraft.world.level.block.SpongeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
@@ -60,7 +57,7 @@ public class EntityTachyonBomb extends ThrowableProjectile
 		this.setXRot(xRotO = pitch);
 		aoc = charges;
 		hasTrollface = troll;
-		if (!RivalRebels.nukedrop && !par1World.isClientSide)
+		if (!RRConfig.SERVER.isNukedrop() && !par1World.isClientSide())
 		{
 			explode();
 		}
@@ -94,7 +91,7 @@ public class EntityTachyonBomb extends ThrowableProjectile
 
 	@Override
 	public void tick() {
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			if (ticksInAir == - 100) explode();
 			++this.ticksInAir;
@@ -203,9 +200,8 @@ public class EntityTachyonBomb extends ThrowableProjectile
     protected void onHitBlock(BlockHitResult blockHitResult) {
         super.onHitBlock(blockHitResult);
         BlockState state = level().getBlockState(blockHitResult.getBlockPos());
-        Block b = state.getBlock();
         MapColor color = state.getMapColor(level(), blockHitResult.getBlockPos());
-        if (b == RRBlocks.jump || state.is(BlockTags.ICE))
+        if (state.is(RRBlocks.jump) || state.is(BlockTags.ICE))
         {
             setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
             return;
@@ -215,7 +211,7 @@ public class EntityTachyonBomb extends ThrowableProjectile
             setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
             return;
         }
-        else if (!hasTrollface && (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || b instanceof SnowLayerBlock || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || b instanceof SpongeBlock || state.is(BlockTags.ICE)))
+        else if (!hasTrollface && (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || state.is(BlockTags.SNOW) || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || state.is(Blocks.SPONGE) || state.is(BlockTags.ICE)))
         {
             level().setBlockAndUpdate(blockHitResult.getBlockPos(), Blocks.AIR.defaultBlockState());
             return;
@@ -230,10 +226,10 @@ public class EntityTachyonBomb extends ThrowableProjectile
 
     public void explode()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
-			TachyonBomb tsar = new TachyonBomb((int)getX(), (int)getY(), (int)getZ(), level(), (int) ((RivalRebels.tsarBombaStrength + (aoc * aoc)) * 1.0f));
-			EntityTachyonBombBlast tsarblast = new EntityTachyonBombBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, RivalRebels.tsarBombaStrength + (aoc * aoc));
+			TachyonBomb tsar = new TachyonBomb((int)getX(), (int)getY(), (int)getZ(), level(), (int) ((RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc)) * 1.0f));
+			EntityTachyonBombBlast tsarblast = new EntityTachyonBombBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc));
 			level().addFreshEntity(tsarblast);
 			this.kill();
 		}

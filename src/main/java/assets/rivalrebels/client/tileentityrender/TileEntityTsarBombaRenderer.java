@@ -15,12 +15,12 @@ import assets.rivalrebels.client.model.ModelTsarBomba;
 import assets.rivalrebels.common.block.trap.BlockTsarBomba;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
@@ -30,25 +30,14 @@ public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEnti
     }
 
     @Override
-    public void render(TileEntityTsarBomba entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        matrices.pushPose();
-        matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1F, (float) entity.getBlockPos().getZ() + 0.5F);
-        int metadata = entity.getBlockState().getValue(BlockTsarBomba.META);
+    public void render(TileEntityTsarBomba entity, float tickDelta, PoseStack pose, MultiBufferSource vertexConsumers, int light, int overlay) {
+        pose.pushPose();
+        pose.translate(0.5F, 1F, 0.5F);
+        Direction facing = entity.getBlockState().getValue(BlockTsarBomba.FACING);
 
-        if (metadata == 2) {
-            matrices.mulPose(Axis.YP.rotationDegrees(180));
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (metadata == 3) {
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (metadata == 4) {
-            matrices.mulPose(Axis.YP.rotationDegrees(-90));
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (metadata == 5) {
-            matrices.mulPose(Axis.YP.rotationDegrees(90));
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        }
-        ModelTsarBomba.render(matrices, vertexConsumers, light, overlay);
-        matrices.popPose();
+        pose.mulPose(facing.getRotation());
+        ModelTsarBomba.render(pose, vertexConsumers, light, overlay);
+        pose.popPose();
     }
 
     @Override

@@ -13,7 +13,7 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRod;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -29,13 +29,8 @@ import net.minecraft.world.item.ItemStack;
 public class PlasmaCannonRenderer implements DynamicItemRenderer {
     public static final Material PLASMA_CANNON = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etplasmacannon);
     public static final Material HYDROD = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ethydrod);
-	private final ModelRod md2;
-	private final ModelRod md3 = new ModelRod();
-	private static final ModelFromObj model = ModelFromObj.readObjFile("m.obj");
 
-	public PlasmaCannonRenderer() {
-		md2 = new ModelRod();
-		md2.rendersecondcap = false;
+    public PlasmaCannonRenderer() {
     }
 
     @Override
@@ -49,10 +44,10 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.pushPose();
 
         VertexConsumer plasmaCannonVertexConsumer = PLASMA_CANNON.buffer(vertexConsumers, RenderType::entitySolid);
-        model.render(matrices, plasmaCannonVertexConsumer, light, overlay);
+        ObjModels.plasma_cannon.render(matrices, plasmaCannonVertexConsumer, light, overlay);
         VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
         if (stack.isEnchanted()) {
-			model.render(matrices, cellularNoise, light, overlay);
+			ObjModels.plasma_cannon.render(matrices, cellularNoise, light, overlay);
 		}
 
 		matrices.popPose();
@@ -66,9 +61,9 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.translate(-0.5f, 0.5f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
         VertexConsumer hydrodVertexConsumer = HYDROD.buffer(vertexConsumers, RenderType::entitySolid);
-        md2.render(matrices, hydrodVertexConsumer, light, overlay);
+        ModelRod.render(matrices, hydrodVertexConsumer, light, overlay, false);
 		if (stack.isEnchanted()) {
-			md2.render(matrices, cellularNoise, light, overlay);
+			ModelRod.render(matrices, cellularNoise, light, overlay, false);
 		}
 		matrices.popPose();
 		matrices.popPose();
@@ -80,9 +75,9 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(247.5f));
 		matrices.translate(-0.175f, 0.1f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
-		md3.render(matrices, hydrodVertexConsumer, light, overlay);
+		ModelRod.render(matrices, hydrodVertexConsumer, light, overlay);
 		if (stack.isEnchanted()) {
-			md3.render(matrices, cellularNoise, light, overlay);
+			ModelRod.render(matrices, cellularNoise, light, overlay);
 		}
 		matrices.popPose();
 		matrices.popPose();

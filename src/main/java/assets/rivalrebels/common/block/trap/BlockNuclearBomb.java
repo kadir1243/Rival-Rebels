@@ -11,15 +11,18 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -33,17 +36,18 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockNuclearBomb extends BaseEntityBlock {
     public static final MapCodec<BlockNuclearBomb> CODEC = simpleCodec(BlockNuclearBomb::new);
-    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
-	public BlockNuclearBomb(Properties settings)
-	{
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
+
+	public BlockNuclearBomb(Properties settings) {
 		super(settings);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.DOWN));
     }
 
     @Override
@@ -53,7 +57,7 @@ public class BlockNuclearBomb extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(FACING);
     }
 
     @Nullable
@@ -70,26 +74,25 @@ public class BlockNuclearBomb extends BaseEntityBlock {
 
 			if (var5 - y > 2.0D)
 			{
-				return super.getStateForPlacement(ctx).setValue(META, 1);
+				return super.getStateForPlacement(ctx).setValue(FACING, Direction.UP);
 			}
 
 			if (y - var5 > 0.0D)
 			{
-                return super.getStateForPlacement(ctx).setValue(META, 0);
+                return super.getStateForPlacement(ctx).setValue(FACING, Direction.DOWN);
 			}
 		}
-		int var7 = Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3;
-		return super.getStateForPlacement(ctx).setValue(META, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))));
+		return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection());
 	}
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		if (!player.isShiftKeyDown()) {
-            if (!stack.isEmpty() && stack.getItem() == RRItems.pliers) {
+            if (!stack.isEmpty() && stack.is(RRItems.pliers)) {
                 player.openMenu((MenuProvider) level.getBlockEntity(pos));
                 return ItemInteractionResult.sidedSuccess(level.isClientSide());
-			} else if (!level.isClientSide) {
-				player.displayClientMessage(Component.nullToEmpty("§7[§4Orders§7] §cUse pliers to open."), true);
+			} else if (!level.isClientSide()) {
+				player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable(BlockAutoTemplate.USE_PLIERS_TO_OPEN_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), true);
                 return ItemInteractionResult.FAIL;
 			}
 		}

@@ -14,7 +14,7 @@ package assets.rivalrebels.client.gui;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.common.packet.VotePacket;
-import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
@@ -51,8 +51,8 @@ public class GuiNextBattle extends Screen
             ClientPlayNetworking.send(new VotePacket(false));
             onClose();
         });
-		this.addRenderableOnly(nextBattleButton);
-		this.addRenderableOnly(waitButton);
+		this.addRenderableWidget(nextBattleButton);
+		this.addRenderableWidget(waitButton);
 	}
 
     @Override
@@ -70,7 +70,7 @@ public class GuiNextBattle extends Screen
 			count = 0;
 		}
         float f = 0.00390625F;
-        ((DrawContextAccessor) graphics).callDrawTexturedQuad(
+        ((GuiGraphicsAccessor) graphics).callBlit(
             num == 0 ? RRIdentifiers.guitwarning0 : RRIdentifiers.guitwarning1,
             posX,
             posX + xSizeOfTexture,

@@ -16,6 +16,7 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 public class ModelDisk
@@ -37,15 +38,15 @@ public class ModelDisk
 	private static final Vector3f			v5			= new Vector3f(0.65f, -0.0625f, 0f);
 
 	private static final int numOfSegs	= 32;
-	private static final float	deg			= (float) Math.PI * 2 / numOfSegs;
-	private static final float	cosdeg		= (float) Math.cos(deg);
-	private static final float	sindeg		= (float) Math.sin(deg);
+	private static final float	deg			= Mth.TWO_PI / numOfSegs;
+	private static final float	cosdeg		= Mth.cos(deg);
+	private static final float	sindeg		= Mth.sin(deg);
 
-	private static final Vector3f			v6			= new Vector3f(0.45f * cosdeg, -0.03125f, 0.45f * sindeg);
-	private static final Vector3f			v7			= new Vector3f(0.45f * cosdeg, 0.03125f, 0.45f * sindeg);
-	private static final Vector3f			v8			= new Vector3f(0.65f * cosdeg, 0.0625f, 0.65f * sindeg);
-	private static final Vector3f			v9			= new Vector3f(1.00f * cosdeg, 0f, 1.00f * sindeg);
-	private static final Vector3f			v10			= new Vector3f(0.65f * cosdeg, -0.0625f, 0.65f * sindeg);
+	private static final Vector3f v6 = new Vector3f(0.45f * cosdeg, -0.03125f, 0.45f * sindeg);
+	private static final Vector3f v7 = new Vector3f(0.45f * cosdeg, 0.03125f, 0.45f * sindeg);
+	private static final Vector3f v8 = new Vector3f(0.65f * cosdeg, 0.0625f, 0.65f * sindeg);
+	private static final Vector3f v9 = new Vector3f(1.00f * cosdeg, 0f, 1.00f * sindeg);
+	private static final Vector3f v10 = new Vector3f(0.65f * cosdeg, -0.0625f, 0.65f * sindeg);
 
 	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
 		for (float i = 0; i < 360; i += 360 / numOfSegs) {

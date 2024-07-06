@@ -32,9 +32,9 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
 	public GuiLoader(ContainerLoader containerLoader, Inventory playerInv, Component title)
 	{
 		super(containerLoader, playerInv, title);
-        int var4 = 114;
+        int BASE_IMAGE_HEIGHT = 114;
 		this.inventoryRows = containerLoader.size() / 9;
-		this.imageHeight = var4 + this.inventoryRows * 18;
+		this.imageHeight = BASE_IMAGE_HEIGHT + this.inventoryRows * 18;
 		this.imageWidth = 256;
 	}
 
@@ -49,7 +49,6 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-        context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		context.blit(RRIdentifiers.guitloader, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
 	}
 }

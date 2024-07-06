@@ -20,196 +20,196 @@ import org.joml.Vector3f;
 
 public class ModelPlasmaCannon
 {
-	TextureFace	bodytop				= new TextureFace(
+	private static final TextureFace	bodytop				= new TextureFace(
 											new TextureVertice(14f / 64f, 23f / 32f),
 											new TextureVertice(37f / 64f, 23f / 32f),
 											new TextureVertice(37f / 64f, 29f / 32f),
 											new TextureVertice(14f / 64f, 29f / 32f));
 
-	TextureFace	bodytopfront		= new TextureFace(
+    private static final TextureFace	bodytopfront		= new TextureFace(
 											new TextureVertice(37f / 64f, 29f / 32f),
 											new TextureVertice(43f / 64f, 29f / 32f),
 											new TextureVertice(43f / 64f, 23f / 32f),
 											new TextureVertice(37f / 64f, 23f / 32f));
 
-	TextureFace	bodytopback			= new TextureFace(
+    private static final TextureFace	bodytopback			= new TextureFace(
 											new TextureVertice(10f / 64f, 20f / 32f),
 											new TextureVertice(14f / 64f, 23f / 32f),
 											new TextureVertice(14f / 64f, 29f / 32f),
 											new TextureVertice(10f / 64f, 32f / 32f));
 
-	TextureFace	bodyback			= new TextureFace(
+    private static final TextureFace	bodyback			= new TextureFace(
 											new TextureVertice(7f / 64f, 20f / 32f),
 											new TextureVertice(10f / 64f, 20f / 32f),
 											new TextureVertice(10f / 64f, 32f / 32f),
 											new TextureVertice(7f / 64f, 32f / 32f));
 
-	TextureFace	bodybottomback		= new TextureFace(
+    private static final TextureFace	bodybottomback		= new TextureFace(
 											new TextureVertice(0f / 64f, 23f / 32f),
 											new TextureVertice(7f / 64f, 20f / 32f),
 											new TextureVertice(7f / 64f, 32f / 32f),
 											new TextureVertice(0f / 64f, 29f / 32f));
 
-	TextureFace	bodybottom			= new TextureFace(
+    private static final TextureFace	bodybottom			= new TextureFace(
 											new TextureVertice(7f / 64f, 11f / 32f),
 											new TextureVertice(27f / 64f, 11f / 32f),
 											new TextureVertice(27f / 64f, 17f / 32f),
 											new TextureVertice(7f / 64f, 17f / 32f));
 
-	TextureFace	bodybottomfront		= new TextureFace(
+    private static final TextureFace	bodybottomfront		= new TextureFace(
 											new TextureVertice(27f / 64f, 11f / 32f),
 											new TextureVertice(33f / 64f, 11f / 32f),
 											new TextureVertice(33f / 64f, 17f / 32f),
 											new TextureVertice(27f / 64f, 17f / 32f));
 
-	TextureFace	bodytopside			= new TextureFace(
+    private static final TextureFace	bodytopside			= new TextureFace(
 											new TextureVertice(0f / 64f, 4f / 32f),
 											new TextureVertice(4f / 64f, 0f / 32f),
 											new TextureVertice(27f / 64f, 0f / 32f),
 											new TextureVertice(25f / 64f, 4f / 32f));
 
-	TextureFace	bodyside			= new TextureFace(
+    private static final TextureFace	bodyside			= new TextureFace(
 											new TextureVertice(0f / 64f, 7f / 32f),
 											new TextureVertice(0f / 64f, 4f / 32f),
 											new TextureVertice(25f / 64f, 4f / 32f),
 											new TextureVertice(25f / 64f, 7f / 32f));
 
-	TextureFace	bodybottomside		= new TextureFace(
+    private static final TextureFace	bodybottomside		= new TextureFace(
 											new TextureVertice(0f / 64f, 7f / 32f),
 											new TextureVertice(25f / 64f, 7f / 32f),
 											new TextureVertice(27f / 64f, 11f / 32f),
 											new TextureVertice(7f / 64f, 11f / 32f));
 
-	TextureFace	bodysidefront		= new TextureFace(
+    private static final TextureFace	bodysidefront		= new TextureFace(
 											new TextureVertice(27f / 64f, 7f / 32f),
 											new TextureVertice(27f / 64f, 4f / 32f),
 											new TextureVertice(33f / 64f, 4f / 32f),
 											new TextureVertice(31f / 64f, 7f / 32f));
 
-	TextureFace	bodysidefrontedge	= new TextureFace(
+    private static final TextureFace	bodysidefrontedge	= new TextureFace(
 											new TextureVertice(25f / 64f, 7f / 32f),
 											new TextureVertice(25f / 64f, 4f / 32f),
 											new TextureVertice(27f / 64f, 4f / 32f),
 											new TextureVertice(27f / 64f, 7f / 32f));
 
-	TextureFace	bodytopfrontside	= new TextureFace(
+    private static final TextureFace	bodytopfrontside	= new TextureFace(
 											new TextureVertice(37f / 64f, 23f / 32f),
 											new TextureVertice(43f / 64f, 23f / 32f),
 											new TextureVertice(37f / 64f, 19f / 32f),
 											new TextureVertice(37f / 64f, 19f / 32f));
 
-	TextureFace	detailpurple		= new TextureFace(
+	private static final TextureFace	detailpurple		= new TextureFace(
 											new TextureVertice(21f / 64f, 23f / 32f),
 											new TextureVertice(30f / 64f, 23f / 32f),
 											new TextureVertice(30f / 64f, 21f / 32f),
 											new TextureVertice(21f / 64f, 21f / 32f));
 
-	TextureFace	detailedge1			= new TextureFace(
+	private static final TextureFace	detailedge1			= new TextureFace(
 											new TextureVertice(20f / 64f, 23f / 32f),
 											new TextureVertice(21f / 64f, 23f / 32f),
 											new TextureVertice(21f / 64f, 21f / 32f),
 											new TextureVertice(20f / 64f, 21f / 32f));
 
-	TextureFace	detailedge2			= new TextureFace(
+	private static final TextureFace	detailedge2			= new TextureFace(
 											new TextureVertice(30f / 64f, 20f / 32f),
 											new TextureVertice(30f / 64f, 21f / 32f),
 											new TextureVertice(21f / 64f, 21f / 32f),
 											new TextureVertice(21f / 64f, 20f / 32f));
 
-	TextureFace	handleside			= new TextureFace(
+	private static final TextureFace	handleside			= new TextureFace(
 											new TextureVertice(0f / 64f, 11f / 32f),
 											new TextureVertice(0f / 64f, 18f / 32f),
 											new TextureVertice(4f / 64f, 18f / 32f),
 											new TextureVertice(4f / 64f, 11f / 32f));
 
-	TextureFace	handlefront			= new TextureFace(
+	private static final TextureFace	handlefront			= new TextureFace(
 											new TextureVertice(4f / 64f, 11f / 32f),
 											new TextureVertice(4f / 64f, 18f / 32f),
 											new TextureVertice(7f / 64f, 18f / 32f),
 											new TextureVertice(7f / 64f, 11f / 32f));
 
-	TextureFace	handlebottom		= new TextureFace(
+	private static final TextureFace	handlebottom		= new TextureFace(
 											new TextureVertice(4f / 64f, 18f / 32f),
 											new TextureVertice(0f / 64f, 18f / 32f),
 											new TextureVertice(0f / 64f, 21f / 32f),
 											new TextureVertice(4f / 64f, 21f / 32f));
 
-	TextureFace	bottomside			= new TextureFace(
+	private static final TextureFace	bottomside			= new TextureFace(
 											new TextureVertice(49f / 64f, 10f / 32f),
 											new TextureVertice(46f / 64f, 13f / 32f),
 											new TextureVertice(36f / 64f, 13f / 32f),
 											new TextureVertice(36f / 64f, 10f / 32f));
 
-	TextureFace	bottomfront			= new TextureFace(
+	private static final TextureFace	bottomfront			= new TextureFace(
 											new TextureVertice(46f / 64f, 13f / 32f),
 											new TextureVertice(50f / 64f, 13f / 32f),
 											new TextureVertice(50f / 64f, 17f / 32f),
 											new TextureVertice(46f / 64f, 17f / 32f));
 
-	TextureFace	bottombottom		= new TextureFace(
+	private static final TextureFace	bottombottom		= new TextureFace(
 											new TextureVertice(46f / 64f, 17f / 32f),
 											new TextureVertice(36f / 64f, 17f / 32f),
 											new TextureVertice(36f / 64f, 13f / 32f),
 											new TextureVertice(46f / 64f, 13f / 32f));
 
-	TextureFace	bottomback			= new TextureFace(
+	private static final TextureFace	bottomback			= new TextureFace(
 											new TextureVertice(33f / 64f, 13f / 32f),
 											new TextureVertice(36f / 64f, 13f / 32f),
 											new TextureVertice(36f / 64f, 17f / 32f),
 											new TextureVertice(33f / 64f, 17f / 32f));
 
-	Vector3f		vt1					= new Vector3f(3f, 12f, 3f);
-	Vector3f		vt2					= new Vector3f(27f, 12f, 3f);
-	Vector3f		vt3					= new Vector3f(27f, 12f, -3f);
-	Vector3f		vt4					= new Vector3f(3f, 12f, -3f);
-	Vector3f		vf1					= new Vector3f(34f, 9f, 3f);
-	Vector3f		vf2					= new Vector3f(34f, 9f, -3f);
-	Vector3f		vs1					= new Vector3f(0f, 9f, 6f);
-	Vector3f		vs2					= new Vector3f(0f, 6f, 6f);
-	Vector3f		vs3					= new Vector3f(25f, 6f, 6f);
-	Vector3f		vs4					= new Vector3f(25f, 9f, 6f);
-	Vector3f		vs5					= new Vector3f(0f, 9f, -6f);
-	Vector3f		vs6					= new Vector3f(0f, 6f, -6f);
-	Vector3f		vs7					= new Vector3f(25f, 6f, -6f);
-	Vector3f		vs8					= new Vector3f(25f, 9f, -6f);
-	Vector3f		vfs1				= new Vector3f(25f, 6f, 4f);
-	Vector3f		vfs2				= new Vector3f(25f, 9f, 4f);
-	Vector3f		vfs3				= new Vector3f(25f, 6f, -4f);
-	Vector3f		vfs4				= new Vector3f(25f, 9f, -4f);
-	Vector3f		vff1				= new Vector3f(30f, 6f, 0f);
-	Vector3f		vff2				= new Vector3f(32f, 9f, 0f);
-	Vector3f		vb1					= new Vector3f(7f, 3f, 3f);
-	Vector3f		vb2					= new Vector3f(27f, 3f, 3f);
-	Vector3f		vb3					= new Vector3f(27f, 3f, -3f);
-	Vector3f		vb4					= new Vector3f(7f, 3f, -3f);
-	Vector3f		vfb1				= new Vector3f(31f, 6f, 3f);
-	Vector3f		vfb2				= new Vector3f(31f, 6f, -3f);
-	Vector3f		vdt1				= new Vector3f(10.25f, 12f, 1f);
-	Vector3f		vdt2				= new Vector3f(19.75f, 12f, 1f);
-	Vector3f		vdt3				= new Vector3f(19.75f, 12f, -1f);
-	Vector3f		vdt4				= new Vector3f(10.25f, 12f, -1f);
-	Vector3f		vdb1				= new Vector3f(10.25f, 11.5f, 1f);
-	Vector3f		vdb2				= new Vector3f(19.75f, 11.5f, 1f);
-	Vector3f		vdb3				= new Vector3f(19.75f, 11.5f, -1f);
-	Vector3f		vdb4				= new Vector3f(10.25f, 11.5f, -1f);
-	Vector3f		vht1				= new Vector3f(11f, 0f, 2f);
-	Vector3f		vht2				= new Vector3f(15f, 0f, 2f);
-	Vector3f		vht3				= new Vector3f(15f, 0f, -2f);
-	Vector3f		vht4				= new Vector3f(11f, 0f, -2f);
-	Vector3f		vhb1				= new Vector3f(7f, -7f, 2f);
-	Vector3f		vhb2				= new Vector3f(11f, -7f, 2f);
-	Vector3f		vhb3				= new Vector3f(11f, -7f, -2f);
-	Vector3f		vhb4				= new Vector3f(7f, -7f, -2f);
-	Vector3f		vbt1				= new Vector3f(8f, 3f, 2f);
-	Vector3f		vbt2				= new Vector3f(23f, 3f, 2f);
-	Vector3f		vbt3				= new Vector3f(23f, 3f, -2f);
-	Vector3f		vbt4				= new Vector3f(8f, 3f, -2f);
-	Vector3f		vbb1				= new Vector3f(8f, 0f, 2f);
-	Vector3f		vbb2				= new Vector3f(20f, 0f, 2f);
-	Vector3f		vbb3				= new Vector3f(20f, 0f, -2f);
-	Vector3f		vbb4				= new Vector3f(8f, 0f, -2f);
+	private static final Vector3f		vt1					= new Vector3f(3f, 12f, 3f);
+	private static final Vector3f		vt2					= new Vector3f(27f, 12f, 3f);
+	private static final Vector3f		vt3					= new Vector3f(27f, 12f, -3f);
+	private static final Vector3f		vt4					= new Vector3f(3f, 12f, -3f);
+	private static final Vector3f		vf1					= new Vector3f(34f, 9f, 3f);
+	private static final Vector3f		vf2					= new Vector3f(34f, 9f, -3f);
+	private static final Vector3f		vs1					= new Vector3f(0f, 9f, 6f);
+	private static final Vector3f		vs2					= new Vector3f(0f, 6f, 6f);
+	private static final Vector3f		vs3					= new Vector3f(25f, 6f, 6f);
+	private static final Vector3f		vs4					= new Vector3f(25f, 9f, 6f);
+	private static final Vector3f		vs5					= new Vector3f(0f, 9f, -6f);
+	private static final Vector3f		vs6					= new Vector3f(0f, 6f, -6f);
+	private static final Vector3f		vs7					= new Vector3f(25f, 6f, -6f);
+	private static final Vector3f		vs8					= new Vector3f(25f, 9f, -6f);
+	private static final Vector3f		vfs1				= new Vector3f(25f, 6f, 4f);
+	private static final Vector3f		vfs2				= new Vector3f(25f, 9f, 4f);
+	private static final Vector3f		vfs3				= new Vector3f(25f, 6f, -4f);
+	private static final Vector3f		vfs4				= new Vector3f(25f, 9f, -4f);
+	private static final Vector3f		vff1				= new Vector3f(30f, 6f, 0f);
+	private static final Vector3f		vff2				= new Vector3f(32f, 9f, 0f);
+	private static final Vector3f		vb1					= new Vector3f(7f, 3f, 3f);
+	private static final Vector3f		vb2					= new Vector3f(27f, 3f, 3f);
+	private static final Vector3f		vb3					= new Vector3f(27f, 3f, -3f);
+	private static final Vector3f		vb4					= new Vector3f(7f, 3f, -3f);
+	private static final Vector3f		vfb1				= new Vector3f(31f, 6f, 3f);
+	private static final Vector3f		vfb2				= new Vector3f(31f, 6f, -3f);
+	private static final Vector3f		vdt1				= new Vector3f(10.25f, 12f, 1f);
+	private static final Vector3f		vdt2				= new Vector3f(19.75f, 12f, 1f);
+	private static final Vector3f		vdt3				= new Vector3f(19.75f, 12f, -1f);
+	private static final Vector3f		vdt4				= new Vector3f(10.25f, 12f, -1f);
+	private static final Vector3f		vdb1				= new Vector3f(10.25f, 11.5f, 1f);
+	private static final Vector3f		vdb2				= new Vector3f(19.75f, 11.5f, 1f);
+	private static final Vector3f		vdb3				= new Vector3f(19.75f, 11.5f, -1f);
+	private static final Vector3f		vdb4				= new Vector3f(10.25f, 11.5f, -1f);
+	private static final Vector3f		vht1				= new Vector3f(11f, 0f, 2f);
+	private static final Vector3f		vht2				= new Vector3f(15f, 0f, 2f);
+	private static final Vector3f		vht3				= new Vector3f(15f, 0f, -2f);
+	private static final Vector3f		vht4				= new Vector3f(11f, 0f, -2f);
+	private static final Vector3f		vhb1				= new Vector3f(7f, -7f, 2f);
+	private static final Vector3f		vhb2				= new Vector3f(11f, -7f, 2f);
+	private static final Vector3f		vhb3				= new Vector3f(11f, -7f, -2f);
+	private static final Vector3f		vhb4				= new Vector3f(7f, -7f, -2f);
+	private static final Vector3f		vbt1				= new Vector3f(8f, 3f, 2f);
+	private static final Vector3f		vbt2				= new Vector3f(23f, 3f, 2f);
+	private static final Vector3f		vbt3				= new Vector3f(23f, 3f, -2f);
+	private static final Vector3f		vbt4				= new Vector3f(8f, 3f, -2f);
+	private static final Vector3f		vbb1				= new Vector3f(8f, 0f, 2f);
+	private static final Vector3f		vbb2				= new Vector3f(20f, 0f, 2f);
+	private static final Vector3f		vbb3				= new Vector3f(20f, 0f, -2f);
+	private static final Vector3f		vbb4				= new Vector3f(8f, 0f, -2f);
 
-	public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
 		matrices.pushPose();
 		// body

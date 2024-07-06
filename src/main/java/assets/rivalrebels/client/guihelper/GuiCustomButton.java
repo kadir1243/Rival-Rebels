@@ -67,7 +67,6 @@ public class GuiCustomButton extends Button
 		}
 
 		if (isPressed) {
-			context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
             context.blit(resloc, bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin);
 		}
 	}

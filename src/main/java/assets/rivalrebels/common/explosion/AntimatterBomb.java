@@ -11,12 +11,14 @@
  *******************************************************************************/
 package assets.rivalrebels.common.explosion;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import assets.rivalrebels.common.entity.EntityAntimatterBombBlast;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -52,7 +54,7 @@ public class AntimatterBomb {
 		//if (radiussmaller < radius) radius = radiussmaller;
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
 		rad = rad*rad/2;
-		if (world.isClientSide) return;
+		if (world.isClientSide()) return;
 		int clamprad = radius;
 		//if (clamprad > 50) clamprad = 50;
 		for (int X = -clamprad; X < clamprad; X++)
@@ -91,7 +93,7 @@ public class AntimatterBomb {
 			if (!repeat)
 			{
 				repeatCount++;
-				if (repeatCount < RivalRebels.tsarBombaSpeed * 2) tick(tsarblast);
+				if (repeatCount < RRConfig.SERVER.getTsarBombaSpeed() * 2) tick(tsarblast);
 				else
 				{
 					repeatCount = 0;
@@ -114,15 +116,15 @@ public class AntimatterBomb {
 			dist = Math.sqrt(dist);
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
-			if (RivalRebels.elevation) yele = y;
+			if (RRConfig.SERVER.isElevation()) yele = y;
 			int ylimit = (int) Math.floor(yele - (radius - dist) * 4);
 
 			for (int Y = y; Y > ylimit; Y--)
 			{
 				if (Y == 0) break;
-				Block block = world.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
-				if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
-				else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
+				BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
+				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
+				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 				world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.AIR.defaultBlockState());
 			}
 
@@ -132,9 +134,9 @@ public class AntimatterBomb {
 				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--)
 				{
 					if (Y == 0) break;
-					Block block = world.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
-					if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
-					else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
+					BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
+					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
+					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 					world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.OBSIDIAN.defaultBlockState());
 				}
 			}
@@ -145,10 +147,10 @@ public class AntimatterBomb {
 		{
 			dist = Math.sqrt(dist);
 			int y = getTopBlock(x + posX, z + posZ, dist);
-			int ylimit = (int) Math.ceil(Math.sin((dist - radius - (radius / 16)) * radius * 0.001875) * (radius / 16));
+			int ylimit = Mth.ceil(Math.sin((dist - radius - (radius / 16)) * radius * 0.001875) * (radius / 16));
 			if (dist >= radius + 5)
 			{
-				int metadata = (int) Math.floor((16d / radius) * dist);
+				int metadata = Mth.floor((16D / radius) * dist);
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
@@ -156,13 +158,12 @@ public class AntimatterBomb {
 				{
 					if (Y == 0) continue;
 					int yy = Y + y;
-					Block blockID = world.getBlockState(new BlockPos(x + posX, yy, z + posZ)).getBlock();
-					if (blockID == RRBlocks.omegaobj) RivalRebels.round.winSigma();
-					else if (blockID == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
+					BlockState state = world.getBlockState(new BlockPos(x + posX, yy, z + posZ));
+					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
+					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 					else if (!isTree)
 					{
-						BlockState state = world.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ));
-						world.setBlockAndUpdate(new BlockPos(x + posX, yy, z + posZ), state);
+                        world.setBlockAndUpdate(new BlockPos(x + posX, yy, z + posZ), world.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ)));
 					}
 					else
 					{

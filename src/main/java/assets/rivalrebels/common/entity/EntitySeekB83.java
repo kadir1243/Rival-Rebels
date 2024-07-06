@@ -11,8 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
@@ -149,7 +150,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		Vec3 vec31 = position();
 		Vec3 vec3 = position().add(getDeltaMovement());
 		HitResult mop = level().clip(new ClipContext(vec31, vec3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			vec31 = position();
 			if (mop != null) vec3 = mop.getLocation();
@@ -261,12 +262,12 @@ public class EntitySeekB83 extends AbstractArrow {
                         }
                     }
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-					new Explosion(level(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(level()));
+					new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
 					kill();
 				}
 				else
 				{
-					new Explosion(level(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(level()));
+					new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
 					kill();
 				}
 			}
@@ -277,12 +278,12 @@ public class EntitySeekB83 extends AbstractArrow {
                 if (state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_PANES))
 				{
 					level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-					RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
+                    this.playSound(RRSounds.CUCHILLO_GLASS_BREAK, 5F, 0.3F);
 				}
 				else
 				{
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-					new Explosion(level(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(level()));
+					new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
 					kill();
 				}
 			}
@@ -290,7 +291,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		else
 		{
 			RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
-			new Explosion(level(), getX(), getY(), getZ(), RivalRebels.rpgExplodeSize, false, false, RivalRebelsDamageSource.rocket(level()));
+			new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
 			kill();
 		}
 	}

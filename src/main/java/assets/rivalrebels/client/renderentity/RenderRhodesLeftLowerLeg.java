@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodesLeftLowerLeg;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -41,7 +42,7 @@ public class RenderRhodesLeftLowerLeg extends EntityRenderer<EntityRhodesLeftLow
 		matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
 		matrices.translate(3, 4f, 0);
 		matrices.scale(-1, 1, 1);
-		RenderRhodes.thigh.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
+		ObjModels.thigh.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
 

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -70,12 +70,12 @@ public class BlockRhodesScaffold extends BlockAutoTemplate {
 	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
 			int scale = 1;
-			if (world.getBlockState(new BlockPos(x, y-1, z)).getBlock() == RRBlocks.buildrhodes && world.getBlockState(new BlockPos(x, y-2, z)).getBlock() == RRBlocks.buildrhodes)
+			if (world.getBlockState(new BlockPos(x, y-1, z)).is(RRBlocks.buildrhodes) && world.getBlockState(new BlockPos(x, y-2, z)).is(RRBlocks.buildrhodes))
 			{
-				if (world.getBlockState(new BlockPos(x, y-3, z)).getBlock() == RRBlocks.buildrhodes && world.getBlockState(new BlockPos(x, y-4, z)).getBlock() == RRBlocks.buildrhodes) scale = 3;
+				if (world.getBlockState(new BlockPos(x, y-3, z)).is(RRBlocks.buildrhodes) && world.getBlockState(new BlockPos(x, y-4, z)).is(RRBlocks.buildrhodes)) scale = 3;
 				else scale = 2;
 			}
 			for (int i = 0; i < 32*9; i++)
@@ -148,7 +148,7 @@ public class BlockRhodesScaffold extends BlockAutoTemplate {
 			setBlock(world, x+fx1, y+fy, z-3, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z-2, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z-1, Blocks.AIR);
-			if (RivalRebels.prefillrhodes) setBlock(world, x+fx1, y+fy, z, RRBlocks.conduit);
+			if (RRConfig.SERVER.isPrefillrhodes()) setBlock(world, x+fx1, y+fy, z, RRBlocks.conduit);
 			else setBlock(world, x+fx1, y+fy, z, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z+1, Blocks.AIR);
 			setBlock(world, x+fx1, y+fy, z+2, Blocks.AIR);

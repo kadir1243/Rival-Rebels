@@ -14,8 +14,8 @@ package assets.rivalrebels.client.tileentityrender;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.client.model.ModelReactor;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.client.model.RenderLibrary;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
 import assets.rivalrebels.common.block.machine.BlockReactor;
 import assets.rivalrebels.common.tileentity.TileEntityMachineBase;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
@@ -28,6 +28,7 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.Material;
+import net.minecraft.core.Direction;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
@@ -39,34 +40,26 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
     public static final Material LAPTOP_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etlaptop);
     public static final Material SCREEN_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etscreen);
     private final ModelReactor mr = new ModelReactor();
-	private static final ModelFromObj mo = ModelFromObj.readObjFile("a.obj");
 
-	public TileEntityReactorRenderer(BlockEntityRendererProvider.Context context) {
+    public TileEntityReactorRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
     public void render(TileEntityReactor entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		int meta = entity.getBlockState().getValue(BlockReactor.META);
-		short var11 = switch (meta) {
-            case 2 -> 180;
-            case 3 -> 0;
-            case 4 -> -90;
-            case 5 -> 90;
-            default -> 0;
-        };
+		Direction facing = entity.getBlockState().getValue(BlockReactor.FACING);
         matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1.1875F, (float) entity.getBlockPos().getZ() + 0.5F);
-		matrices.mulPose(Axis.YP.rotationDegrees(var11));
+		matrices.translate(0.5F, 1.1875F, 0.5F);
+		matrices.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
 		ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
 		ModelLaptop.renderScreen(SCREEN_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
 		matrices.popPose();
 		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
-		matrices.mulPose(Axis.YP.rotationDegrees(var11));
+		matrices.translate(0.5F, 0.5F, 0.5F);
+		matrices.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
 		mr.renderModel(matrices, REACTOR_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.translate(0, 2, -0.125f);
 		matrices.scale(0.2f, 0.2f, 0.2f);
-		mo.render(matrices, ELECTRODE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.electrode.render(matrices, ELECTRODE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.popPose();
 		for (int i = 0; i < entity.machines.size(); i++) {
 			TileEntityMachineBase temb = entity.machines.get(i);

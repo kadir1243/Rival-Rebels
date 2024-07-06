@@ -13,6 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityHackB83;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -40,7 +41,7 @@ public class RenderHackB83 extends EntityRenderer<EntityHackB83>
 		matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
 		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 180));
-		RenderB83.md.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+		ObjModels.b83.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
 		matrices.popPose();
 	}
 

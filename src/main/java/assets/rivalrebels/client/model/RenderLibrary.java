@@ -17,6 +17,7 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
@@ -36,6 +37,7 @@ public class RenderLibrary {
 		float[] xv = new float[segNum];
         float[] yv = new float[segNum];
         float[] zv = new float[segNum];
+        int color = FastColor.ARGB32.colorFromFloat(a, r, g, b);
 
 		for (int i = 1; i < segNum; i++) {
 			float interp = (float) i / (float) segNum;
@@ -56,25 +58,25 @@ public class RenderLibrary {
         for (int o = 0; o < steps; o++) {
 			for (int i = 1; i < segNum; i++) {
                 float s = rs * o;
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
 
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
 
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
 
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(r, g, b, a);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(r, g, b, a);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
+				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
 			}
 		}
 

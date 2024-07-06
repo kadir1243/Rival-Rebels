@@ -38,7 +38,7 @@ public class BlockExplosives extends Block
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-		if (!level.isClientSide)
+		if (!level.isClientSide())
 		{
             player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
             player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.timedbomb.getName() + ". §9(" + "1 minute countdown." + ")"), false);
@@ -61,7 +61,7 @@ public class BlockExplosives extends Block
 			level.addFreshEntity(ei5);
 			level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide);
+		return InteractionResult.sidedSuccess(level.isClientSide());
 	}
 
 }

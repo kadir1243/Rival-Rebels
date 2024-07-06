@@ -25,7 +25,6 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -119,7 +118,7 @@ public class EntityFlameBallGreen extends EntityInanimate
 		double var6 = 0.0D;
 		Iterator<Entity> var8 = var5.iterator();
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			while (var8.hasNext())
 			{
@@ -161,7 +160,7 @@ public class EntityFlameBallGreen extends EntityInanimate
 				entity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
 				if (entity instanceof Player player) {
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide) {
+					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide()) {
 						player.getItemBySlot(slot).hurtAndBreak(8, player, slot);
 					}
 				}
@@ -195,7 +194,7 @@ public class EntityFlameBallGreen extends EntityInanimate
 
 	private void fire()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			for (int x = -3; x < 4; x++)
 			{
@@ -205,8 +204,7 @@ public class EntityFlameBallGreen extends EntityInanimate
 					{
                         BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
                         BlockState state = level().getBlockState(pos);
-                        Block id = state.getBlock();
-						if (level().isEmptyBlock(pos) || id == Blocks.SNOW || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+						if (level().isEmptyBlock(pos) || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 					}
 				}
 			}

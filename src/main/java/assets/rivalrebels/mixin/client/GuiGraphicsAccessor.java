@@ -9,11 +9,11 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 
 @Mixin(GuiGraphics.class)
 @Environment(EnvType.CLIENT)
-public interface DrawContextAccessor {
+public interface GuiGraphicsAccessor {
     @Invoker(value = "innerBlit", remap = false)
-    void callDrawTexturedQuad(ResourceLocation texture, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2);
+    void callBlit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV);
 
     @Invoker(value = "innerBlit", remap = false)
-    void callDrawTexturedQuad(ResourceLocation texture, int x1, int x2, int y1, int y2, int z, float u1, float u2, float v1, float v2, float red, float green, float blue, float alpha);
+    void callBlit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV, float red, float green, float blue, float alpha);
 
 }

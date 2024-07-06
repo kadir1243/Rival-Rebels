@@ -44,7 +44,6 @@ public class GuiKnob extends GuiButton
 		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 		if (degree > maxdegreelimit) degree = maxdegreelimit;
 		if (degree < mindegreelimit) degree = mindegreelimit;
-		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
         PoseStack matrices = context.pose();

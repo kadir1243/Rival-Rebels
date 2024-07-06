@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.nbt.CompoundTag;
@@ -24,10 +24,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SnowLayerBlock;
-import net.minecraft.world.level.block.SpongeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
@@ -88,7 +85,7 @@ public class EntityHackB83 extends ThrowableProjectile
 	{
 		if (ticksInAir == - 100 || getY() < 0 || getY() > 256) explode();
 		++this.ticksInAir;
-		if (!straight && !level().isClientSide)
+		if (!straight && !level().isClientSide())
 		{
 			mmx += level().random.nextGaussian()*0.4;
 			mmy += level().random.nextGaussian()*0.4;
@@ -190,7 +187,7 @@ public class EntityHackB83 extends ThrowableProjectile
 		this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.2F);
 		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.2F);
 		float var17 = 0.9f;
-		if (!straight && !level().isClientSide)
+		if (!straight && !level().isClientSide())
 		{
             setDeltaMovement(getDeltaMovement().scale(var17));
 		}
@@ -219,8 +216,7 @@ public class EntityHackB83 extends ThrowableProjectile
     protected void onHitBlock(BlockHitResult blockHitResult) {
         BlockState state = level().getBlockState(blockHitResult.getBlockPos());
         MapColor color = state.getMapColor(level(), blockHitResult.getBlockPos());
-        Block b = state.getBlock();
-        if (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || b instanceof SnowLayerBlock || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || b instanceof SpongeBlock || state.is(BlockTags.ICE))
+        if (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || state.is(BlockTags.SNOW) || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || state.is(Blocks.SPONGE) || state.is(BlockTags.ICE))
         {
             level().setBlockAndUpdate(blockHitResult.getBlockPos(), Blocks.AIR.defaultBlockState());
             return;
@@ -230,8 +226,8 @@ public class EntityHackB83 extends ThrowableProjectile
 
 	public void explode()
 	{
-		new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RivalRebels.b83Strength, false);
-		level().addFreshEntity(new EntityTsarBlast(level(), getX(), getY(), getZ(), RivalRebels.b83Strength * 1.333333333f).setTime());
+		new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength(), false);
+		level().addFreshEntity(new EntityTsarBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f).setTime());
 		this.kill();
 	}
 }

@@ -12,6 +12,8 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -60,35 +62,37 @@ public class ItemTesla extends TieredItem {
         int degree = getDegree(stack);
 		float chance = Math.abs(degree - 90) / 90f;
         ItemStack battery = ItemUtil.getItemStack(player, RRItems.battery);
-        if (player.getAbilities().invulnerable || !battery.isEmpty() || RivalRebels.infiniteAmmo)
-		{
-			if (!player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
-			{
-                battery.shrink(1);
-				if (chance > 0.33333) battery.shrink(1);
-				if (chance > 0.66666) battery.shrink(1);
-                if (battery.isEmpty()) {
-                    player.getInventory().removeItem(battery);
+        if (!battery.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
+			if (!RRConfig.SERVER.isInfiniteAmmo()) {
+                battery.consume(1, player);
+				if (chance > 0.33333) {
+                    if (battery.isEmpty()) {
+                        battery = ItemUtil.getItemStack(player, RRItems.battery);
+                    }
+                    battery.consume(1, player);
+                }
+				if (chance > 0.66666) {
+                    if (battery.isEmpty()) {
+                        battery = ItemUtil.getItemStack(player, RRItems.battery);
+                    }
+                    battery.consume(1, player);
                 }
             }
 			player.startUsingItem(hand);
-		}
-		else if (!world.isClientSide)
-		{
+		} else {
 			player.displayClientMessage(Component.nullToEmpty("§cOut of batteries"), false);
 		}
-		if (message && world.isClientSide)
-		{
-			player.displayClientMessage(Component.translatable("RivalRebels.Orders").append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
+		if (message) {
+			player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 	boolean message = true;
 
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             if (ClientProxy.USE_KEY.isDown() && selected && Minecraft.getInstance().screen == null) {
                 RivalRebels.proxy.teslaGui(getDegree(stack));
             }
@@ -112,7 +116,7 @@ public class ItemTesla extends TieredItem {
 
 		int num = (degree / 25) + 1;
 
-		if (!world.isClientSide) for (int i = 0; i < num; i++)
+		if (!world.isClientSide()) for (int i = 0; i < num; i++)
 			world.addFreshEntity(new EntityRaytrace(world, user, dist, randomness, chance, !stack.isEnchanted()));
 	}
 

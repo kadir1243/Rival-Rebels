@@ -11,8 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
 import net.minecraft.core.BlockPos;
@@ -107,7 +107,7 @@ public class EntityCuchillo extends EntityInanimate
 
 			if (mop != null)
 			{
-				if (!level().isClientSide)
+				if (!level().isClientSide())
 				{
 					if (mop.getType() == HitResult.Type.ENTITY)
 					{
@@ -120,7 +120,7 @@ public class EntityCuchillo extends EntityInanimate
                         BlockState state = level().getBlockState(pos);
 						if (state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_PANES)) {
 							level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-							RivalRebelsSoundPlayer.playSound(this, 4, 0, 5F, 0.3F);
+                            this.playSound(RRSounds.CUCHILLO_GLASS_BREAK, 5F, 0.3F);
                         }
 						else if (state.is(BlockTags.BASE_STONE_OVERWORLD))
 						{
@@ -173,7 +173,7 @@ public class EntityCuchillo extends EntityInanimate
 	@Override
 	public void playerTouch(Player player) {
 		if (!level().isClientSide && inGround) {
-			if (!player.getAbilities().invulnerable) player.getInventory().add(RRItems.knife.getDefaultInstance());
+			if (!player.hasInfiniteMaterials()) player.getInventory().add(RRItems.knife.getDefaultInstance());
 			level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.LAVA_POP, SoundSource.NEUTRAL, 0.2F, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F, true);
 			kill();
 		}

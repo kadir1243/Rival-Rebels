@@ -37,7 +37,7 @@ public class TileEntityOmegaObjectiveRenderer implements BlockEntityRenderer<Til
     @Override
     public void render(TileEntityOmegaObjective entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+		matrices.translate(0.5F, 0.5F, 0.5F);
 
         VertexConsumer buffer = ETOMEGA.buffer(vertexConsumers, RenderType::entitySolid);
         matrices.mulPose(Axis.XP.rotationDegrees(90));

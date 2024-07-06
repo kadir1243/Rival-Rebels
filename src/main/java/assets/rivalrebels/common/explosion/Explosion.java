@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.explosion;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -38,7 +38,7 @@ public class Explosion
 	public Explosion(Level world, double x, double y, double z, int strength, boolean fire, boolean crater, DamageSource dmgsrc)
 	{
 		world.addParticle(ParticleTypes.EXPLOSION, x, y, z, 0, 0, 0);
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
 			if (fire)
 			{
@@ -144,25 +144,24 @@ public class Explosion
 	{
         BlockPos pos = new BlockPos(xx, yy, zz);
         BlockState state = world.getBlockState(pos);
-        Block block = state.getBlock();
-		if (block == RRBlocks.remotecharge)
+		if (state.is(RRBlocks.remotecharge))
 		{
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			RivalRebelsSoundPlayer.playSound(world, 22, 0, xx, yy, zz, 0.5f, 0.3f);
-			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RivalRebels.chargeExplodeSize, false, false, RivalRebelsDamageSource.charge(world));
+			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getChargeExplosionSize(), false, false, RivalRebelsDamageSource.charge(world));
 			return;
 		}
-		if (block == RRBlocks.toxicgas || block == Blocks.CHEST || block == Blocks.VINE || block == Blocks.TALL_GRASS || block == RRBlocks.flare || block == RRBlocks.light || block == RRBlocks.light2 || block == RRBlocks.reactive || block == RRBlocks.timedbomb)
+		if (state.is(RRBlocks.toxicgas) || state.is(Blocks.CHEST) || state.is(Blocks.VINE) || state.is(Blocks.TALL_GRASS) || state.is(RRBlocks.flare) || state.is(RRBlocks.light) || state.is(RRBlocks.light2) || state.is(RRBlocks.reactive) || state.is(RRBlocks.timedbomb))
 		{
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			return;
 		}
 		if (state.is(BlockTags.WOODEN_STAIRS)) world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-		if (block == RRBlocks.camo1 || block == RRBlocks.camo2 || block == RRBlocks.camo3 || block == RRBlocks.conduit)
+		if (state.is(RRBlocks.camo1) || state.is(RRBlocks.camo2) || state.is(RRBlocks.camo3) || state.is(RRBlocks.conduit))
 		{
 			if (world.random.nextInt(20) != 0) return;
 		}
-		if (BlackList.explosion(block))
+		if (BlackList.explosion(state))
 		{
 			return;
 		}

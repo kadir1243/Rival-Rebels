@@ -11,11 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -29,7 +31,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class BlockAutoTemplate extends FallingBlock {
-	public int		time	= 15;
+	public static final ResourceLocation USE_PLIERS_TO_BUILD_TRANSLATION = RRIdentifiers.create("use_pliers_to_build");
+    public static final ResourceLocation USE_PLIERS_TO_OPEN_TRANSLATION = RRIdentifiers.create("use_pliers_to_open");
+    public int		time	= 15;
 	public String	name	= "building";
 
     public BlockAutoTemplate(Properties settings) {
@@ -40,7 +44,7 @@ public abstract class BlockAutoTemplate extends FallingBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!level.isClientSide()) {
             if (!stack.is(RRItems.pliers)){
-                player.displayClientMessage(Component.literal("§4[§cWarning§4]§c Use pliers to build."), true);
+                player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(USE_PLIERS_TO_BUILD_TRANSLATION.toLanguageKey())), true);
                 return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
@@ -53,20 +57,20 @@ public abstract class BlockAutoTemplate extends FallingBlock {
 	}
 
 	public void placeBlockCarefully(Level world, int x, int y, int z, Block block) {
-		if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
+		if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)))) {
 			world.setBlockAndUpdate(new BlockPos(x, y, z), block.defaultBlockState());
 		}
 	}
 
     public void placeBlockCarefully(Level world, int x, int y, int z, BlockState state) {
-        if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)).getBlock())) {
+        if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)))) {
             world.setBlockAndUpdate(new BlockPos(x, y, z), state);
         }
     }
 
     @Override
     public void onLand(Level world, BlockPos pos, BlockState fallingBlockState, BlockState currentStateInPos, FallingBlockEntity fallingBlockEntity) {
-		if (!world.isClientSide) build(world, pos.getX(), pos.getY(), pos.getZ());
+		if (!world.isClientSide()) build(world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
 }

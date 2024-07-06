@@ -46,7 +46,7 @@ public class BlockOmegaObjective extends BaseEntityBlock {
 		if (!pos.equals(RivalRebels.round.omegaObjPos)) {
 			world.setBlockAndUpdate(RivalRebels.round.omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
 			RivalRebels.round.omegaObjPos = pos;
-			if (world.getBlockState(RivalRebels.round.sigmaObjPos).getBlock() == RRBlocks.sigmaobj)
+			if (world.getBlockState(RivalRebels.round.sigmaObjPos).is(RRBlocks.sigmaobj))
 				RivalRebels.round.roundManualStart();
 		}
 	}
@@ -55,7 +55,7 @@ public class BlockOmegaObjective extends BaseEntityBlock {
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
         super.onRemove(state, world, pos, newState, moved);
 
-        if (!newState.is(RRBlocks.plasmaexplosion)) {
+        if (!newState.is(RRBlocks.plasmaexplosion) && !newState.is(this) && !newState.is(RRBlocks.sigmaobj)) {
             world.setBlockAndUpdate(pos, state);
         }
     }
@@ -64,7 +64,7 @@ public class BlockOmegaObjective extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 
-		return InteractionResult.sidedSuccess(level.isClientSide);
+		return InteractionResult.sidedSuccess(level.isClientSide());
 	}
 
     @Nullable

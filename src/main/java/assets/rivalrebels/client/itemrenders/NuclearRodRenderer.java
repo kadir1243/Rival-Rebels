@@ -25,7 +25,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class NuclearRodRenderer implements DynamicItemRenderer {
     public static final Material RAD_ROD_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etradrod);
-	private final ModelRod md = new ModelRod();
 
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
@@ -34,7 +33,7 @@ public class NuclearRodRenderer implements DynamicItemRenderer {
 		matrices.scale(0.5f, 1.25f, 0.5f);
 		matrices.pushPose();
 
-		md.render(matrices, RAD_ROD_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ModelRod.render(matrices, RAD_ROD_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 
 		matrices.popPose();
 		matrices.popPose();

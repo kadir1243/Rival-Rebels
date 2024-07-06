@@ -33,7 +33,7 @@ public class BlockAutoMarioTrap extends BlockAutoTemplate {
 	public void build(Level world, int x, int y, int z)
 	{
 		super.build(world, x, y, z);
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
 			placeBlockCarefully(world, x, y, z, Blocks.AIR);
 			int r = 2;

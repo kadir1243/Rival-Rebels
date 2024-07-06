@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.round;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import com.mojang.authlib.GameProfile;
@@ -75,7 +76,7 @@ public class RivalRebelsPlayerList implements CustomPacketPayload {
 
     public RivalRebelsPlayer getForGameProfile(GameProfile profile) {
         for (int i = 0; i < size; i++) if (list[i].profile.equals(profile)) return list[i];
-        return add(new RivalRebelsPlayer(profile, RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RivalRebels.resetMax));
+        return add(new RivalRebelsPlayer(profile, RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RRConfig.SERVER.getMaximumResets()));
     }
 
 	public void clearVotes()
@@ -128,7 +129,7 @@ public class RivalRebelsPlayerList implements CustomPacketPayload {
 	}
 
     public void refreshForWorld(Level world) {
-        if (world.isClientSide) return;
+        if (world.isClientSide()) return;
         for (Player player : world.players()) {
             ServerPlayNetworking.send((ServerPlayer) player, this);
         }

@@ -15,17 +15,17 @@ import assets.rivalrebels.common.container.ContainerLoader;
 import assets.rivalrebels.common.item.ItemRod;
 import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.core.HolderLookup;
-import org.jetbrains.annotations.Nullable;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -33,9 +33,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityLoader extends BlockEntity implements Container, Tickable, MenuProvider
-{
-	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(64, ItemStack.EMPTY);
+public class TileEntityLoader extends BaseContainerBlockEntity implements Tickable {
+	private NonNullList<ItemStack> items = NonNullList.withSize(64, ItemStack.EMPTY);
 
 	public double			slide			= 0;
 	double					test			= Math.PI;
@@ -53,72 +52,18 @@ public class TileEntityLoader extends BlockEntity implements Container, Tickable
 		return 60;
 	}
 
-	@Override
-	public ItemStack getItem(int slot)
-	{
-		return this.chestContents.get(slot);
-	}
-
-	@Override
-	public ItemStack removeItem(int slot, int amount)
-	{
-		if (!this.chestContents.get(slot).isEmpty())
-		{
-			ItemStack var3;
-
-			if (this.chestContents.get(slot).getCount() <= amount)
-			{
-				var3 = this.chestContents.get(slot);
-				this.chestContents.set(slot, ItemStack.EMPTY);
-            }
-			else
-			{
-				var3 = this.chestContents.get(slot).split(amount);
-
-				if (this.chestContents.get(slot).isEmpty())
-				{
-					this.chestContents.set(slot, ItemStack.EMPTY);
-				}
-
-            }
-            return var3;
-        }
-		return ItemStack.EMPTY;
-	}
-
-    @Override
-    public ItemStack removeItemNoUpdate(int index) {
-		if (!this.chestContents.get(index).isEmpty())
-		{
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
-			return var2;
-		}
-		return ItemStack.EMPTY;
-	}
-
-	@Override
-	public void setItem(int index, ItemStack stack)
-	{
-		this.chestContents.set(index, stack);
-
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
-			stack.setCount(this.getMaxStackSize());
-		}
-	}
-
     @Override
     public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
-        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
+
+        ContainerHelper.loadAllItems(nbt, this.items, provider);
 	}
 
     @Override
     public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.saveAdditional(nbt, provider);
 
-        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
+        ContainerHelper.saveAllItems(nbt, this.items, provider);
     }
 
     @Override
@@ -169,127 +114,23 @@ public class TileEntityLoader extends BlockEntity implements Container, Tickable
 				{
 					if (te instanceof TileEntityReactor ter)
 					{
-                        if (ter.on)
-						{
-							for (int q = 0; q < chestContents.size(); q++)
-							{
-								if (ter.fuel.isEmpty())
-								{
-									if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() instanceof ItemRod && chestContents.get(q).getItem() != RRItems.emptyrod)
-									{
-										ter.fuel = chestContents.get(q);
-										chestContents.set(q, RRItems.emptyrod.getDefaultInstance());
-									}
-								}
-								else
-								{
-									break;
-								}
-							}
-						}
+                        if (ter.on) {
+                            for (int q = 0; q < items.size(); q++) {
+                                if (ter.fuel.isEmpty()) {
+                                    if (!getItem(q).isEmpty() && getItem(q).getItem() instanceof ItemRod && getItem(q).getItem() != RRItems.emptyrod) {
+                                        ter.fuel = getItem(q);
+                                        setItem(q, RRItems.emptyrod.getDefaultInstance());
+                                    }
+                                } else {
+                                    break;
+                                }
+                            }
+                        }
 					}
 					if (te instanceof TileEntityReciever ter)
 					{
-                        for (int q = 0; q < chestContents.size(); q++)
-						{
-							if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() == RRItems.fuel)
-							{
-								int amount = chestContents.get(q).getCount();
-								if (ter.chestContents.get(0).isEmpty() || ter.chestContents.get(0).getCount() < 64)
-								{
-									if (ter.chestContents.get(0).isEmpty())
-									{
-										ter.chestContents.set(0, chestContents.get(q).copyWithCount(amount));
-									}
-									else ter.chestContents.get(0).grow(amount);
-									amount = 0;
-									if (ter.chestContents.get(0).getCount() > 64)
-									{
-										amount = ter.chestContents.get(0).getCount() - 64;
-										ter.chestContents.get(0).setCount(64);
-									}
-								}
-								else if (ter.chestContents.get(1).isEmpty() || ter.chestContents.get(1).getCount() < 64)
-								{
-									if (ter.chestContents.get(1).isEmpty())
-									{
-										ter.chestContents.set(1, chestContents.get(q).copyWithCount(amount));
-									}
-									else ter.chestContents.get(1).grow(amount);
-									amount = 0;
-									if (ter.chestContents.get(1).getCount() > 64)
-									{
-										amount = ter.chestContents.get(1).getCount() - 64;
-										ter.chestContents.get(1).setCount(64);
-									}
-								}
-								else if (ter.chestContents.get(2).isEmpty() || ter.chestContents.get(2).getCount() < 64)
-								{
-									if (ter.chestContents.get(2).isEmpty())
-									{
-										ter.chestContents.set(2, chestContents.get(q).copyWithCount(amount));
-									}
-									else ter.chestContents.get(2).grow(amount);
-									amount = 0;
-									if (ter.chestContents.get(2).getCount() > 64)
-									{
-										amount = ter.chestContents.get(2).getCount() - 64;
-										ter.chestContents.get(2).setCount(64);
-									}
-								}
-								chestContents.get(q).setCount(amount);
-								if (chestContents.get(q).isEmpty()) chestContents.set(q, ItemStack.EMPTY);
-							}
-							if (!chestContents.get(q).isEmpty() && chestContents.get(q).getItem() == RRItems.battery)
-							{
-								int amount = chestContents.get(q).getCount();
-								if (ter.chestContents.get(3).isEmpty() || ter.chestContents.get(3).getCount() < 16)
-								{
-									if (ter.chestContents.get(3).isEmpty())
-									{
-										ter.chestContents.set(3, chestContents.get(q).copyWithCount(amount));
-									}
-									else ter.chestContents.get(3).grow(amount);
-									amount = 0;
-									if (ter.chestContents.get(3).getCount() > 16)
-									{
-										amount = ter.chestContents.get(3).getCount() - 16;
-										ter.chestContents.get(3).setCount(16);
-									}
-								}
-								else if (ter.chestContents.get(4).isEmpty() || ter.chestContents.get(4).getCount() < 16)
-								{
-									if (ter.chestContents.get(4).isEmpty())
-									{
-										ter.chestContents.set(4, chestContents.get(q).copyWithCount(amount));
-									}
-									else ter.chestContents.get(4).grow(amount);
-									amount = 0;
-									if (ter.chestContents.get(4).getCount() > 16)
-									{
-										amount = ter.chestContents.get(4).getCount() - 16;
-										ter.chestContents.get(4).setCount(16);
-									}
-								}
-								else if (ter.chestContents.get(5).isEmpty() || ter.chestContents.get(5).getCount() < 16)
-								{
-									if (ter.chestContents.get(5).isEmpty())
-									{
-										ter.chestContents.set(5, chestContents.get(q).copyWithCount(amount));
-									}
-									else ter.chestContents.get(5).grow(amount);
-									amount = 0;
-									if (ter.chestContents.get(5).getCount() > 16)
-									{
-										amount = ter.chestContents.get(5).getCount() - 16;
-										ter.chestContents.get(5).setCount(16);
-									}
-								}
-								chestContents.get(q).setCount(amount);
-								if (chestContents.get(q).isEmpty()) chestContents.set(q, ItemStack.EMPTY);
-							}
-						}
-					}
+                        transferItemsToReciever(ter);
+                    }
 				}
 				else
 				{
@@ -299,16 +140,16 @@ public class TileEntityLoader extends BlockEntity implements Container, Tickable
 			BlockEntity te = level.getBlockEntity(getBlockPos().below());
 			if (te instanceof TileEntityLoader tel)
 			{
-                for (int q = 0; q < chestContents.size(); q++)
+                for (int q = 0; q < items.size(); q++)
 				{
-					if (!chestContents.get(q).isEmpty())
+					if (!getItem(q).isEmpty())
 					{
-						for (int j = 0; j < tel.chestContents.size(); j++)
+						for (int j = 0; j < tel.items.size(); j++)
 						{
-							if (tel.chestContents.get(j).isEmpty())
+							if (tel.getItem(j).isEmpty())
 							{
-								tel.chestContents.set(j, chestContents.get(q));
-								chestContents.set(q, ItemStack.EMPTY);
+								tel.setItem(j, getItem(q));
+								setItem(q, ItemStack.EMPTY);
 								return;
 							}
 						}
@@ -318,29 +159,62 @@ public class TileEntityLoader extends BlockEntity implements Container, Tickable
 		}
 	}
 
-    @Override
-    public Component getDisplayName() {
-        return Component.nullToEmpty("Loader");
-    }
-
-    @Override
-    public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
+    private void transferItemsToReciever(TileEntityReciever ter) {
+        for (ItemStack item : getItems()) {
+            if (item.isEmpty()) continue;
+            if (item.is(RRItems.fuel)) {
+                int amount = item.getCount();
+                for (int slot : new int[] {0, 1, 2}) {
+                    if (ter.getItem(slot).isEmpty() || ter.getItem(slot).getCount() < 64) {
+                        if (ter.getItem(slot).isEmpty()) {
+                            ter.setItem(slot, item.copyWithCount(amount));
+                        } else ter.getItem(slot).grow(amount);
+                        amount = 0;
+                        if (ter.getItem(slot).getCount() > 64) {
+                            amount = ter.getItem(slot).getCount() - 64;
+                            ter.getItem(slot).setCount(64);
+                        }
+                        break;
+                    }
+                }
+                item.setCount(amount);
+            } else if (item.is(RRItems.battery)) {
+                int amount = item.getCount();
+                for (int slot : new int[] {3, 4, 5}) {
+                    if (ter.getItem(slot).isEmpty() || ter.getItem(slot).getCount() < 16) {
+                        if (ter.getItem(slot).isEmpty()) {
+                            ter.setItem(slot, item.copyWithCount(amount));
+                        } else ter.getItem(slot).grow(amount);
+                        amount = 0;
+                        if (ter.getItem(slot).getCount() > 16) {
+                            amount = ter.getItem(slot).getCount() - 16;
+                            ter.getItem(slot).setCount(16);
+                        }
+                        break;
+                    }
+                }
+                item.setCount(amount);
             }
         }
-        return true;
     }
 
     @Override
-    public void clearContent() {
-        this.chestContents.clear();
+    protected Component getDefaultName() {
+        return Component.literal("Loader");
     }
 
-    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerLoader(syncId, inv, this);
+    protected NonNullList<ItemStack> getItems() {
+        return items;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.items = items;
+    }
+
+    @Override
+    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+        return new ContainerLoader(containerId, inventory, this);
     }
 }

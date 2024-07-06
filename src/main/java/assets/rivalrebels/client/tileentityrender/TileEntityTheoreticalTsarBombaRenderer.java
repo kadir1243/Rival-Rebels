@@ -32,9 +32,9 @@ public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRender
     @Override
     public void render(TileEntityTheoreticalTsarBomba entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         matrices.pushPose();
-        matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1F, (float) entity.getBlockPos().getZ() + 0.5F);
+        matrices.translate(0.5F, 1F, 0.5F);
         matrices.scale(1.3f, 1.3f, 1.3f);
-        int metadata = entity.getBlockState().getValue(BlockTheoreticalTsarBomba.META);
+        int metadata = entity.getBlockState().getValue(BlockTheoreticalTsarBomba.FACING).get3DDataValue();
 
         if (metadata == 2) {
             matrices.mulPose(Axis.YP.rotationDegrees(180));

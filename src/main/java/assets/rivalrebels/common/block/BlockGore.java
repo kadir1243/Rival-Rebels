@@ -19,7 +19,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
@@ -58,8 +57,7 @@ public class BlockGore extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-		if (player.getAbilities().instabuild)
-		{
+		if (player.isCreative()) {
 			int meta = state.getValue(META) + 1;
 			if (meta >= 6) meta = 0;
 			level.setBlockAndUpdate(pos, state.setValue(META, meta));

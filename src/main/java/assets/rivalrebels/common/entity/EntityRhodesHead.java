@@ -41,12 +41,12 @@ public class EntityRhodesHead extends EntityRhodesPiece
 
 	@Override
 	public boolean hurt(DamageSource par1DamageSource, float par2) {
-		if (isAlive() && !level().isClientSide) {
+		if (isAlive() && !level().isClientSide()) {
 			health -= par2;
 			if (health <= 0)
 			{
 				kill();
-				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), new ItemStack(RRItems.nuclearelement, 4)));
+				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), new ItemStack(RRItems.NUCLEAR_ROD, 4)));
 				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.core3.getDefaultInstance()));
 				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.einsten.getDefaultInstance()));
 				if (random.nextBoolean())

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.container.ContainerLaptop;
 import assets.rivalrebels.common.item.RRItems;
@@ -59,13 +59,7 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
-            }
-        }
-
-        return true;
+        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
     }
 
     @Override
@@ -77,22 +71,22 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 	@Override
 	public ItemStack removeItem(int index, int count)
 	{
-		if (!this.chestContents.get(index).isEmpty())
+		if (!this.getItem(index).isEmpty())
 		{
 			ItemStack var3;
 
-			if (this.chestContents.get(index).getCount() <= count)
+			if (this.getItem(index).getCount() <= count)
 			{
-				var3 = this.chestContents.get(index);
-				this.chestContents.set(index, ItemStack.EMPTY);
+				var3 = this.getItem(index);
+				this.setItem(index, ItemStack.EMPTY);
             }
 			else
 			{
-				var3 = this.chestContents.get(index).split(count);
+				var3 = this.getItem(index).split(count);
 
-				if (this.chestContents.get(index).isEmpty())
+				if (this.getItem(index).isEmpty())
 				{
-					this.chestContents.set(index, ItemStack.EMPTY);
+					this.setItem(index, ItemStack.EMPTY);
 				}
 
             }
@@ -103,9 +97,9 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-		if (!this.chestContents.get(index).isEmpty()) {
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
+		if (!this.getItem(index).isEmpty()) {
+			ItemStack var2 = this.getItem(index);
+			this.setItem(index, ItemStack.EMPTY);
 			return var2;
 		}
 		return ItemStack.EMPTY;
@@ -116,10 +110,7 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 	{
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
-			stack.setCount(this.getMaxStackSize());
-		}
+        stack.limitSize(this.getMaxStackSize(stack));
 	}
 
     @Override
@@ -153,13 +144,13 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 			{
 				if (!getItem(j + 6).isEmpty() && !getItem(j + 11).isEmpty())
 				{
-					if (getItem(j + 6).getItem() == RRItems.nuclearelement
+					if (getItem(j + 6).getItem() == RRItems.NUCLEAR_ROD
 							&& getItem(j + 11).getItem() == RRItems.hydrod) {
 						b2spirit++;
 						setItem(j+6, ItemStack.EMPTY);
 						setItem(j+11, ItemStack.EMPTY);
-					} else if (getItem(j + 6).getItem() == RRBlocks.timedbomb.asItem()
-                        && getItem(j + 11).getItem() == RRBlocks.timedbomb.asItem()) {
+					} else if (getItem(j + 6).is(RRBlocks.timedbomb.asItem())
+                        && getItem(j + 11).is(RRBlocks.timedbomb.asItem())) {
 						b2carpet++;
 						setItem(j+6, ItemStack.EMPTY);
 						setItem(j+11, ItemStack.EMPTY);
@@ -171,7 +162,7 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 			setItem(9, ItemStack.EMPTY);
 			setItem(10, ItemStack.EMPTY);
 		}
-		if (RivalRebels.freeb83nukes) {b2spirit += 10;b2carpet += 10;}
+		if (RRConfig.SERVER.isFreeb83nukes()) {b2spirit += 10;b2carpet += 10;}
 	}
 
 	public boolean hasChips()

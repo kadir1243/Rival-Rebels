@@ -14,6 +14,7 @@ package assets.rivalrebels.common.block.autobuilds;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.machine.BlockReciever;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
@@ -67,10 +68,10 @@ public class BlockAutoBarricade extends BlockAutoTemplate {
 		placeBlockCarefully(par1World, x + 1, y + 3, z, RRBlocks.steel);
 		placeBlockCarefully(par1World, x, y + 3, z - 1, RRBlocks.steel);
 		placeBlockCarefully(par1World, x - 1, y + 3, z, RRBlocks.steel);
-		placeBlockCarefully(par1World, x, y + 3, z - 2, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 2));
-		placeBlockCarefully(par1World, x, y + 3, z + 2, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 3));
-		placeBlockCarefully(par1World, x - 2, y + 3, z, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 4));
-		placeBlockCarefully(par1World, x + 2, y + 3, z, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.META, 5));
+		placeBlockCarefully(par1World, x, y + 3, z - 2, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.FACING, Direction.NORTH));
+		placeBlockCarefully(par1World, x, y + 3, z + 2, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.FACING, Direction.SOUTH));
+		placeBlockCarefully(par1World, x - 2, y + 3, z, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.FACING, Direction.WEST));
+		placeBlockCarefully(par1World, x + 2, y + 3, z, RRBlocks.ffreciever.defaultBlockState().setValue(BlockReciever.FACING, Direction.EAST));
 
 		// int h = 1;
 		// int s = 1;

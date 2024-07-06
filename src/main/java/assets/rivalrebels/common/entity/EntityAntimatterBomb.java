@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.explosion.AntimatterBomb;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
@@ -26,7 +26,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SnowLayerBlock;
 import net.minecraft.world.level.block.SpongeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
@@ -59,7 +58,7 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 		xRotO = pitch;
 		aoc = charges;
 		hasTrollface = troll;
-		if (!RivalRebels.nukedrop && !world.isClientSide)
+		if (!RRConfig.SERVER.isNukedrop() && !world.isClientSide())
 		{
 			explode();
 		}
@@ -94,7 +93,7 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
     @Override
 	public void tick()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			if (ticksInAir == - 100) explode();
 			++this.ticksInAir;
@@ -203,7 +202,7 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
         BlockState state = level().getBlockState(blockHitResult.getBlockPos());
         Block b = state.getBlock();
         MapColor color = state.getMapColor(level(), blockHitResult.getBlockPos());
-        if (b == RRBlocks.jump || state.is(BlockTags.ICE)) {
+        if (state.is(RRBlocks.jump) || state.is(BlockTags.ICE)) {
             setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
             return;
         }
@@ -221,14 +220,14 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
                 state.is(Blocks.CAKE) ||
                 state.getBlock().getExplosionResistance() < 1 ||
                 state.is(BlockTags.WOOL) ||
-                b instanceof SnowLayerBlock ||
+                state.is(BlockTags.SNOW) ||
                 state.is(ConventionalBlockTags.GLASS_BLOCKS) ||
                 state.is(BlockTags.SAND) ||
                 state.is(Blocks.SNOW_BLOCK) ||
                 state.ignitedByLava() ||
                 state.canBeReplaced() ||
                 state.getFluidState().is(FluidTags.WATER) ||
-                b instanceof SpongeBlock ||
+                state.is(Blocks.SPONGE) ||
                 state.is(BlockTags.ICE))) {
             level().setBlockAndUpdate(blockHitResult.getBlockPos(), Blocks.AIR.defaultBlockState());
             return;
@@ -238,10 +237,10 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 
     public void explode()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
-			AntimatterBomb tsar = new AntimatterBomb((int)getX(), (int)getY(), (int)getZ(), level(), (int) ((RivalRebels.tsarBombaStrength + (aoc * aoc)) * 0.8f));
-			EntityAntimatterBombBlast tsarblast = new EntityAntimatterBombBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, RivalRebels.tsarBombaStrength + (aoc * aoc));
+			AntimatterBomb tsar = new AntimatterBomb((int)getX(), (int)getY(), (int)getZ(), level(), (int) ((RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc)) * 0.8f));
+			EntityAntimatterBombBlast tsarblast = new EntityAntimatterBombBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc));
 			level().addFreshEntity(tsarblast);
 			this.kill();
 		}

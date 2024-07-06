@@ -12,6 +12,8 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityFlameBall;
@@ -22,9 +24,10 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.FlameThrowerMode;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -37,7 +40,8 @@ import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
 public class ItemFlameThrower extends TieredItem {
-	public ItemFlameThrower() {
+	public static final ResourceLocation OUT_OF_FUEL = RRIdentifiers.create("out_of_fuel");
+    public ItemFlameThrower() {
 		super(Tiers.DIAMOND, new Properties().stacksTo(1).component(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT));
 	}
 
@@ -56,31 +60,26 @@ public class ItemFlameThrower extends TieredItem {
         ItemStack stack = user.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(user, RRItems.fuel);
-        if (user.getAbilities().instabuild || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
+        if (user.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo())
 		{
 			user.startUsingItem(hand);
-			if (!user.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
+			if (!user.hasInfiniteMaterials() && !RRConfig.SERVER.isInfiniteAmmo())
 			{
-				itemStack.shrink(1);
-				if (getMode(stack) != 2) itemStack.shrink(1);
-				if (getMode(stack) != 2) itemStack.shrink(1);
-				if (getMode(stack) == 0) itemStack.shrink(1);
-				if (getMode(stack) == 0) itemStack.shrink(1);
-                if (itemStack.isEmpty())
-                    user.getInventory().removeItem(itemStack);
+				itemStack.consume(1, user);
+				if (getMode(stack) != 2) ItemUtil.findAndConsumeItem(user, RRItems.fuel);
+				if (getMode(stack) != 2) ItemUtil.findAndConsumeItem(user, RRItems.fuel);
+				if (getMode(stack) == 0) ItemUtil.findAndConsumeItem(user, RRItems.fuel);
+				if (getMode(stack) == 0) ItemUtil.findAndConsumeItem(user, RRItems.fuel);
 			}
-			if (stack.isEnchanted() && !world.isClientSide)
+			if (stack.isEnchanted() && !world.isClientSide())
 			{
 				world.addFreshEntity(new EntityFlameBallGreen(world, user, world.random.nextFloat() + 1.0f));
 			}
+		} else {
+			user.displayClientMessage(Component.translatable(OUT_OF_FUEL.toLanguageKey()).withStyle(ChatFormatting.RED), false);
 		}
-		else if (!world.isClientSide)
-		{
-			user.displayClientMessage(Component.nullToEmpty("§cOut of fuel"), false);
-		}
-		if (message && world.isClientSide)
-		{
-			user.displayClientMessage(Component.nullToEmpty(I18n.get("RivalRebels.Orders")+" "+I18n.get("RivalRebels.message.use")+" [R]."), false);
+		if (message) {
+			user.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
 		return InteractionResultHolder.pass(stack);
@@ -89,7 +88,7 @@ public class ItemFlameThrower extends TieredItem {
 
     @Override
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-		if (!world.isClientSide) {
+		if (!world.isClientSide()) {
             if (world.random.nextInt(10) == 0 && !user.isInWaterOrBubble()) {
                 RivalRebelsSoundPlayer.playSound(user, 8, 0, 0.03f);
                 if (world.random.nextInt(3) == 0 && !user.isInWaterOrBubble()) {
@@ -123,7 +122,7 @@ public class ItemFlameThrower extends TieredItem {
                 RivalRebelsSoundPlayer.playSound(entity, 8, 0, 0.03f);
             }
         }
-        if (world.isClientSide) {
+        if (world.isClientSide()) {
             openGui(stack);
         }
 	}

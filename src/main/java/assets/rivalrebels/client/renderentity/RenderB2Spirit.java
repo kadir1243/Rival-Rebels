@@ -13,7 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityB2Spirit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -32,12 +32,6 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit>
 {
     public static final Material B2_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etb2spirit);
     public static final Material TUPOLEV_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettupolev);
-    private static final ModelFromObj	b2 = ModelFromObj.readObjFile("d.obj");
-	public static final ModelFromObj	shuttle = ModelFromObj.readObjFile("shuttle.obj");
-	public static final ModelFromObj	tupolev = ModelFromObj.readObjFile("tupolev.obj");
-    static {
-        b2.scale(3, 3, 3);
-    }
 
     public RenderB2Spirit(EntityRendererProvider.Context manager) {
         super(manager);
@@ -50,11 +44,11 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit>
 		matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
         if (RRConfig.CLIENT.getBomberType().equals("sh")) {
 			matrices.scale(3.0f, 3.0f, 3.0f);
-			shuttle.render(matrices, B2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+			ObjModels.shuttle.render(matrices, B2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
 		} else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
-			tupolev.render(matrices, TUPOLEV_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+			ObjModels.tupolev.render(matrices, TUPOLEV_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
 		} else {
-			b2.render(matrices, B2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+			ObjModels.b2ForSpirit.render(matrices, B2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
 		}
 		matrices.popPose();
 	}

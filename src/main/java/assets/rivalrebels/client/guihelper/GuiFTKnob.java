@@ -37,7 +37,6 @@ public class GuiFTKnob extends GuiButton
         this.mouseDragged(mouseX, mouseY, 0, 0,  0);
 		if (mode > 2) mode = 2;
 		if (mode < 0) mode = 0;
-		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
 		matrices.pushPose();

@@ -151,7 +151,7 @@ public class EntityGasGrenade extends EntityInanimate {
         List<Entity> var6 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
         double var7 = 0.0D;
 
-        if (!level().isClientSide) {
+        if (!level().isClientSide()) {
             for (Entity var10 : var6) {
                 if (var10.canBeCollidedWith() && (var10 != shootingEntity || ticksInAir >= 5)) {
                     AABB var12 = var10.getBoundingBox().inflate(0.3f, 0.3f, 0.3f);

@@ -14,6 +14,7 @@ package assets.rivalrebels.common.tileentity;
 import assets.rivalrebels.common.block.BlockReactive;
 import assets.rivalrebels.common.block.RRBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityReactive extends TileEntityMachineBase
@@ -33,7 +34,7 @@ public class TileEntityReactive extends TileEntityMachineBase
 		{
 			if (cooldown <= 0)
 			{
-				level.setBlock(getBlockPos(), RRBlocks.reactive.defaultBlockState().setValue(BlockReactive.META, metadata - 1), 2);
+				level.setBlock(getBlockPos(), RRBlocks.reactive.defaultBlockState().setValue(BlockReactive.META, metadata - 1), Block.UPDATE_CLIENTS);
 				cooldown = 10;
 				return power - 1;
 			}

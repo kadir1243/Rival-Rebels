@@ -28,6 +28,16 @@ public class SoundDataGen extends FabricSoundProvider {
         soundGenerator.add(RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS2, sounds("ac/d"));
 
         soundGenerator.add(RRSounds.CRATE, sounds("ad/a1", "ad/a2", "ad/a3", "ad/a4"));
+
+        soundGenerator.add(RRSounds.CUCHILLO_GLASS_BREAK, sounds("ae/a1","ae/a2","ae/a3"));
+        soundGenerator.add(RRSounds.CUCHILLO_UNKNOWN, sounds("ae/b1","ae/b2","ae/b3","ae/b4"));
+        soundGenerator.add(RRSounds.CUCHILLO_UNKNOWN2, sounds("ae/c1","ae/c2","ae/c3"));
+        soundGenerator.add(RRSounds.CUCHILLO_UNKNOWN3, sounds("ae/d1","ae/d2","ae/d3"));
+        soundGenerator.add(RRSounds.CUCHILLO_UNKNOWN4, sounds("ae/e"));
+
+        soundGenerator.add(RRSounds.FORCE_FIELD, sounds("af/a"));
+        soundGenerator.add(RRSounds.ROD_DISK_HIT_ENTITY, sounds("af/b1","af/b2","af/b3","af/b4"));
+        soundGenerator.add(RRSounds.ROD_DISK_MIRROR_FROM_OBJECT, sounds("af/c"));
     }
 
     private static SoundBuilder[] sounds(String... sounds) {

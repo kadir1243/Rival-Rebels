@@ -9,6 +9,7 @@ import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
+import net.minecraft.data.models.model.TexturedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -86,7 +87,6 @@ public class BlockStateDataGen extends FabricModelProvider {
         simpleBlock(RRBlocks.easteregg, "ah", "ah", "ai");
         simpleBlock(RRBlocks.bastion, "db", "cz", "da");
         simpleBlock(RRBlocks.mariotrap, "de", "dh");
-
     }
 
     @Override

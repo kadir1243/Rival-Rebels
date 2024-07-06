@@ -11,9 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
+import assets.rivalrebels.RRIdentifiers;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -39,22 +40,22 @@ public class BlockBreadBox extends Block
         if (!player.isShiftKeyDown())
         {
             ItemEntity ei = new ItemEntity(level, x + .5, y + 1, z + .5, Items.BREAD.getDefaultInstance());
-            if (!level.isClientSide)
+            if (!level.isClientSide())
             {
                 level.addFreshEntity(ei);
-                if (level.random.nextInt(64) == 0) player.displayClientMessage(Component.nullToEmpty("§7[§4Orders§7] §cShift-click (Sneak) to pack up toaster."), false);
+                if (level.random.nextInt(64) == 0) player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.literal("Shift-click (Sneak) to pack up toaster.").withStyle(ChatFormatting.RED)), false);
             }
         }
         else
         {
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, this.asItem().getDefaultInstance());
-            if (!level.isClientSide)
+            if (!level.isClientSide())
             {
                 level.addFreshEntity(ei);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.sidedSuccess(level.isClientSide());
     }
 
     /*@Environment(EnvType.CLIENT)

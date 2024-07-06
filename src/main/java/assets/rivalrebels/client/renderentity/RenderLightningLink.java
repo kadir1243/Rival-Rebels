@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.entity.EntityLightningLink;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -39,7 +39,7 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 
     @Override
     public void render(EntityLightningLink entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		float segmentDistance = RivalRebels.teslasegments;
+		float segmentDistance = RRConfig.CLIENT.getTeslaSegments();
 		float distance = (float) entity.getDeltaMovement().x() * 100;
 		distance = 100;
 

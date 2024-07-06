@@ -20,19 +20,19 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public class ModelSteel
 {
-    float		s			= 0.5F;
+    private static final float		s			= 0.5F;
 
-	Vector3f		v1			= new Vector3f(s, s, s);
-	Vector3f		v2			= new Vector3f(s, s, -s);
-	Vector3f		v3			= new Vector3f(-s, s, -s);
-	Vector3f		v4			= new Vector3f(-s, s, s);
+	private static final Vector3f		v1			= new Vector3f(s, s, s);
+	private static final Vector3f		v2			= new Vector3f(s, s, -s);
+	private static final Vector3f		v3			= new Vector3f(-s, s, -s);
+	private static final Vector3f		v4			= new Vector3f(-s, s, s);
 
-	Vector3f		v5			= new Vector3f(s, -s, s);
-	Vector3f		v6			= new Vector3f(s, -s, -s);
-	Vector3f		v7			= new Vector3f(-s, -s, -s);
-	Vector3f		v8			= new Vector3f(-s, -s, s);
+	private static final Vector3f		v5			= new Vector3f(s, -s, s);
+	private static final Vector3f		v6			= new Vector3f(s, -s, -s);
+	private static final Vector3f		v7			= new Vector3f(-s, -s, -s);
+	private static final Vector3f		v8			= new Vector3f(-s, -s, s);
 
-	public void renderModel(PoseStack matrices, VertexConsumer buffer)
+	public static void renderModel(PoseStack matrices, VertexConsumer buffer)
 	{
 		matrices.pushPose();
 
@@ -60,7 +60,7 @@ public class ModelSteel
 		matrices.popPose();
 	}
 
-	private void addVertex(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2) {
+	private static void addVertex(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2) {
 		buffer.addVertex(poseStack.last(), v.mul(0.999F, new Vector3f())).setUv(t, t2);
 	}
 }

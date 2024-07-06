@@ -40,7 +40,7 @@ public class ItemCamera extends ArmorItem
         if (entity instanceof LivingEntity living) {
             ItemStack equippedStack = living.getItemBySlot(getEquipmentSlot());
             if (equippedStack == stack) {
-                if (world.isClientSide) {
+                if (world.isClientSide()) {
                     Minecraft client = Minecraft.getInstance();
                     if (entity == client.player) {
                         boolean key = glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_B) == GLFW_PRESS && client.screen == null;

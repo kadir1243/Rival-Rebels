@@ -15,7 +15,7 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocketLauncherBody;
 import assets.rivalrebels.client.model.ModelRocketLauncherHandle;
 import assets.rivalrebels.client.model.ModelRocketLauncherTube;
-import assets.rivalrebels.client.renderentity.RenderB83;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
@@ -145,9 +145,9 @@ public class HackRocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(-90));
 		matrices.scale(0.7f, 0.7f, 0.7f);
 		matrices.translate(-0.5f, -0.1f, 0);
-		RenderB83.md.render(matrices, B83_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.b83.render(matrices, B83_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		if (stack.isEnchanted()) {
-			RenderB83.md.render(matrices, cellular_noise, light, overlay);
+			ObjModels.b83.render(matrices, cellular_noise, light, overlay);
 		}
 		matrices.popPose();
 		matrices.popPose();

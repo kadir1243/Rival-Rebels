@@ -33,7 +33,7 @@ public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEnti
     @Override
     public void render(TileEntityJumpBlock entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+		matrices.translate(0.5F, 0.5F, 0.5F);
 		ModelJump.renderModel(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.popPose();
 	}

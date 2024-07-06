@@ -18,7 +18,6 @@ import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntitySigmaObjective;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -47,7 +46,7 @@ public class BlockSigmaObjective extends BaseEntityBlock {
 		if (!pos.equals(RivalRebels.round.sigmaObjPos)) {
 			world.setBlockAndUpdate(RivalRebels.round.sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
 			RivalRebels.round.sigmaObjPos = pos;
-			if (world.getBlockState(RivalRebels.round.omegaObjPos).getBlock() == RRBlocks.omegaobj)
+			if (world.getBlockState(RivalRebels.round.omegaObjPos).is(RRBlocks.omegaobj))
 				RivalRebels.round.roundManualStart();
 		}
 	}
@@ -56,7 +55,7 @@ public class BlockSigmaObjective extends BaseEntityBlock {
     public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
         super.onRemove(state, world, pos, newState, moved);
 
-		if (!newState.is(RRBlocks.plasmaexplosion)) {
+		if (!newState.is(RRBlocks.plasmaexplosion) && !newState.is(this) && !newState.is(RRBlocks.omegaobj)) {
 			world.setBlockAndUpdate(pos, state);
 		}
 	}
@@ -65,7 +64,7 @@ public class BlockSigmaObjective extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 
-		return InteractionResult.sidedSuccess(level.isClientSide);
+		return InteractionResult.sidedSuccess(level.isClientSide());
 	}
 
     @Nullable

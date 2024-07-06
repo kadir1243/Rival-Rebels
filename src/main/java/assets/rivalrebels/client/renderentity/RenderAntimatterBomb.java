@@ -13,8 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.WavefrontObject;
-import assets.rivalrebels.client.renderhelper.RenderHelper;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityAntimatterBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -30,7 +29,6 @@ import net.minecraft.resources.ResourceLocation;
 @Environment(EnvType.CLIENT)
 public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb> {
     public static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etantimatterbomb);
-    public static final WavefrontObject bomb = RenderHelper.getModel("t");
 
     public RenderAntimatterBomb(EntityRendererProvider.Context manager) {
         super(manager);
@@ -43,7 +41,7 @@ public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb> {
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
         // matrices.multiply(Axis.XP.rotationDegrees(90));
         matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
-        bomb.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.bomb.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

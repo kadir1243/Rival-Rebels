@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.explosion;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -58,7 +59,7 @@ public class NuclearExplosion
     }
 
 	public NuclearExplosion(Level world, int x, int y, int z, int strength) {
-		if (!world.isClientSide) {
+		if (!world.isClientSide()) {
 			createHole(world, x, y, z, strength, true);
 			pushAndHurtEntities(world, x, y, z, strength);
 			fixLag(world, x, y, z, strength);
@@ -66,7 +67,7 @@ public class NuclearExplosion
 	}
 
 	public NuclearExplosion(Level world, int x, int y, int z, int strength, boolean breakobj) {
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
 			createHole(world, x, y, z, strength, breakobj);
 			pushAndHurtEntities(world, x, y, z, strength);
@@ -78,7 +79,7 @@ public class NuclearExplosion
 	{
         int halfradius = radius / 2;
 		int onepointfiveradius = halfradius * 3;
-		int AOC = radius / RivalRebels.nuclearBombStrength;
+		int AOC = radius / RRConfig.SERVER.getNuclearBombStrength();
 		int onepointfiveradiussqrd = onepointfiveradius * onepointfiveradius;
 		int twoAOC = AOC * 2; // twoaoc its a twoAOC
 

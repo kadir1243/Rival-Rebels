@@ -31,7 +31,7 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 	@Override
 	public float powered(float power, float distance)
 	{
-		if (!level.isClientSide)
+		if (!level.isClientSide())
 		{
 			if (charge == 100)
 			{
@@ -190,17 +190,17 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
 					level.addFreshEntity(er);
 				}
-				else if (level.getBlockState(pos.above()).getBlock() == RRBlocks.conduit
-					&& level.getBlockState(pos.west()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.east()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.west().above()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.east().above()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.west().above(3)).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.east().above(3)).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.above(3)).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.above(2)).getBlock() == RRBlocks.conduit
-					&& level.getBlockState(pos.west().above(2)).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.east().above(2)).getBlock() == RRBlocks.steel)
+				else if (level.getBlockState(pos.above()).is(RRBlocks.conduit)
+					&& level.getBlockState(pos.west()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.east()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.west().above()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.east().above()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.west().above(3)).is(RRBlocks.steel)
+					&& level.getBlockState(pos.east().above(3)).is(RRBlocks.steel)
+					&& level.getBlockState(pos.above(3)).is(RRBlocks.steel)
+					&& level.getBlockState(pos.above(2)).is(RRBlocks.conduit)
+					&& level.getBlockState(pos.west().above(2)).is(RRBlocks.steel)
+					&& level.getBlockState(pos.east().above(2)).is(RRBlocks.steel))
 				{
 					setBlockToAir(pos.above());
 					setBlockToAir(pos.above(2));
@@ -212,14 +212,14 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
 					level.addFreshEntity(er);
 				}
-				else if (level.getBlockState(pos.above()).getBlock() == RRBlocks.conduit
-					&& level.getBlockState(pos.west()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.east()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.west().above()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.east().above()).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.west().above(2)).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.east().above(2)).getBlock() == RRBlocks.steel
-					&& level.getBlockState(pos.above(2)).getBlock() == RRBlocks.steel)
+				else if (level.getBlockState(pos.above()).is(RRBlocks.conduit)
+					&& level.getBlockState(pos.west()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.east()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.west().above()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.east().above()).is(RRBlocks.steel)
+					&& level.getBlockState(pos.west().above(2)).is(RRBlocks.steel)
+					&& level.getBlockState(pos.east().above(2)).is(RRBlocks.steel)
+					&& level.getBlockState(pos.above(2)).is(RRBlocks.steel))
 				{
 					setBlockToAir(pos.above());
 					setBlockToAir(pos.above(2));

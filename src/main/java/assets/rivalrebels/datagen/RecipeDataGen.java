@@ -133,7 +133,7 @@ public class RecipeDataGen extends FabricRecipeProvider {
         // Explosives
         addRecipee(RRItems.pliers, " C", "C ", 'C', Items.COBBLESTONE);
 
-        addRecipee(RRItems.roda, "IN", "IH", "IR", 'I', Items.IRON_INGOT, 'N', RRItems.nuclearelement, 'H', RRItems.hydrod, 'R', RRItems.redrod);
+        addRecipee(RRItems.roda, "IN", "IH", "IR", 'I', Items.IRON_INGOT, 'N', RRItems.NUCLEAR_ROD, 'H', RRItems.hydrod, 'R', RRItems.redrod);
 
         // Weapons
         addRecipe(RRItems.knife, 5, "CG", "GC", 'C', Items.COBBLESTONE, 'G', Items.GRAVEL);
@@ -206,7 +206,7 @@ public class RecipeDataGen extends FabricRecipeProvider {
 
         addRecipee(RRItems.antenna, "RB", "SP", 'S', RRBlocks.steel, 'P', RRItems.pliers, 'B', RRItems.battery, 'R', RRItems.remote);
 
-        addRecipee(RRItems.hackm202, "HFR", " P ", "EMA", 'H', RRItems.hydrod, 'P', RRItems.pliers, 'A', RRBlocks.ammunition, 'R', RRItems.nuclearelement, 'M', RRItems.rpg, 'E', RRBlocks.explosives, 'F', RRItems.fuse);
+        addRecipee(RRItems.hackm202, "HFR", " P ", "EMA", 'H', RRItems.hydrod, 'P', RRItems.pliers, 'A', RRBlocks.ammunition, 'R', RRItems.NUCLEAR_ROD, 'M', RRItems.rpg, 'E', RRBlocks.explosives, 'F', RRItems.fuse);
 
         addRecipee(RRItems.seekm202, "RRR", "BPQ", "SMS", 'S', RRBlocks.steel, 'R', RRItems.antenna, 'B', RRItems.battery, 'P', RRItems.pliers, 'Q', RRItems.remote, 'M', RRItems.rpg);
 

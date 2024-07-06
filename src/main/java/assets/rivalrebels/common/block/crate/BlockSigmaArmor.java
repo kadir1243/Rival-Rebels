@@ -11,10 +11,11 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -38,11 +39,10 @@ public class BlockSigmaArmor extends Block
         int y = pos.getY();
         int z = pos.getZ();
 
-		if (!level.isClientSide)
-		{
+		if (!level.isClientSide()) {
 			player.displayClientMessage(Component.nullToEmpty("§7[§2Inventory§7]"), false);
 			player.displayClientMessage(Component.nullToEmpty("§aArmor. §9(Sigma's color armor.)"), false);
-			player.displayClientMessage(Component.nullToEmpty("§7[§4Orders§7] §cEquipt your set of armor."), false);
+			player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.literal("Equip your set of armor.").withStyle(ChatFormatting.RED)), false);
 			ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camohat2));
 			ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshirt2));
 			ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camopants2));
@@ -53,7 +53,7 @@ public class BlockSigmaArmor extends Block
 			level.addFreshEntity(ei10);
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide);
+		return InteractionResult.sidedSuccess(level.isClientSide());
 	}
 
 	/*@Environment(EnvType.CLIENT)

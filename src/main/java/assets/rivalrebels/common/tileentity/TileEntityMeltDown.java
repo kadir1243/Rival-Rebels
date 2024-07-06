@@ -18,6 +18,7 @@ import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -51,8 +52,8 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable
 			this.setRemoved();
 		}
 
-		double fsize = Math.sin(size) * 5.9;
-		fsize *= 2;
+		float fsize = Mth.sin(size) * 5.9F;
+		fsize *= 2F;
 		List<Entity> l = this.level.getEntities(null, new AABB(getBlockPos().getX() - fsize + 0.5, getBlockPos().getY() - fsize + 0.5, getBlockPos().getZ() - fsize + 0.5, getBlockPos().getX() + fsize + 0.5, getBlockPos().getY() + fsize + 0.5, getBlockPos().getZ() + fsize + 0.5));
         for (Entity e : l) {
             double var13 = Math.sqrt(e.distanceToSqr(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ())) / fsize;

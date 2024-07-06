@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.BlackList;
 import java.util.List;
@@ -136,7 +136,7 @@ public class EntityPlasmoid extends EntityInanimate
 		++tickCount;
 		rotation += (int) slide;
 		slide *= 0.9;
-		if (tickCount >= RivalRebels.plasmoidDecay * (gravity ? 3 : 1)) explode();
+		if (tickCount >= RRConfig.SERVER.getPlasmoidDecay() * (gravity ? 3 : 1)) explode();
 
 		Vec3 vec31 = position();
 		Vec3 vec3 = position().add(getDeltaMovement());
@@ -179,14 +179,14 @@ public class EntityPlasmoid extends EntityInanimate
 
 	protected void explode()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			kill();
 			BlockState state = Blocks.STONE.defaultBlockState();
 			int i = -1;
             Vec3 subtract = position().subtract(getDeltaMovement().scale(i));
             BlockPos pos = BlockPos.containing(subtract);
-            while ((state.canOcclude() || BlackList.plasmaExplosion(state.getBlock())) && i < 4)
+            while ((state.canOcclude() || BlackList.plasmaExplosion(state)) && i < 4)
 			{
 				++i;
 				state = level().getBlockState(pos);

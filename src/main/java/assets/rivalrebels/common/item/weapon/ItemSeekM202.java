@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntitySeekB83;
 import assets.rivalrebels.common.item.RRItems;
@@ -49,17 +49,13 @@ public class ItemSeekM202 extends TieredItem
         ItemStack stack = player.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.rocket);
-        if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
-		{
+        if (player.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
 			player.startUsingItem(hand);
-			if (!player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
-			{
-                itemStack.shrink(1);
-				if (itemStack.isEmpty())
-                    player.getInventory().removeItem(itemStack);
+			if (!RRConfig.SERVER.isInfiniteAmmo()) {
+                itemStack.consume(1, player);
 			}
 			RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
-			if (!world.isClientSide)
+			if (!world.isClientSide())
 			{
 				if (!stack.isEnchanted())
 				{
@@ -75,10 +71,10 @@ public class ItemSeekM202 extends TieredItem
 				}
 			}
 		}
-		else if (!world.isClientSide)
+		else if (!world.isClientSide())
 		{
 			player.displayClientMessage(Component.nullToEmpty("§cOut of ammunition"), false);
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 }

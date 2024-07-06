@@ -24,7 +24,7 @@ public class ItemModelDataGen extends FabricModelProvider {
         simpleItem(RRItems.trollmask, "bf");
         simpleItem(RRItems.safepill, "ak");
         simpleItem(RRItems.redrod, "al");
-        simpleItem(RRItems.nuclearelement, "av");
+        simpleItem(RRItems.NUCLEAR_ROD, "av");
         simpleItem(RRItems.hydrod, "au");
         simpleItem(RRItems.emptyrod, "at");
         simpleItem(RRItems.rocket, "ar");

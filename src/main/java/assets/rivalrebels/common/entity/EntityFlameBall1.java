@@ -95,7 +95,7 @@ public class EntityFlameBall1 extends EntityInanimate
 		super.tick();
 		tickCount++;
 		if (tickCount > 5) sequence++;
-		if (sequence > 15/* > RivalRebels.flamethrowerDecay */) kill();
+		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 
 		Vec3 start = position();
 		Vec3 end = position().add(getDeltaMovement());
@@ -109,7 +109,7 @@ public class EntityFlameBall1 extends EntityInanimate
 		List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
 		double var6 = 0.0D;
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
             for (Entity var9 : var5) {
                 if (var9.canBeCollidedWith()) {
@@ -144,7 +144,7 @@ public class EntityFlameBall1 extends EntityInanimate
 				((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cooked(level()), 12);
 				if (((EntityHitResult) mop).getEntity() instanceof Player player) {
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide)
+					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
 					{
 						player.getItemBySlot(slot).hurtAndBreak(8, player, slot);
 					}
@@ -204,7 +204,7 @@ public class EntityFlameBall1 extends EntityInanimate
 
 	private void fire()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			for (int x = -1; x < 2; x++)
 			{
@@ -212,13 +212,13 @@ public class EntityFlameBall1 extends EntityInanimate
 				{
 					for (int z = -1; z < 2; z++)
 					{
-                        BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
+                        BlockPos pos = blockPosition().offset(x, y, z);
                         BlockState state = level().getBlockState(pos);
                         Block id = state.getBlock();
-						if (id == Blocks.AIR || id == Blocks.SNOW || state.is(BlockTags.ICE)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+						if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 						else if (state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 						else if (id == Blocks.GRASS_BLOCK && level().random.nextInt(5) == 0) level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
-						else if (id == RRBlocks.flare) id.destroy(level(), pos, state);
+						else if (state.is(RRBlocks.flare)) id.destroy(level(), pos, state);
 					}
 				}
 			}

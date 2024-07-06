@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.client.renderentity.RenderRhodes;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -92,7 +92,7 @@ public class EntityRhodesPiece extends Entity {
 	public void tick() {
 		super.tick();
 		tickCount++;
-		if (level().random.nextInt(Math.max(getMaxAge()*(RivalRebels.rhodesPromode?1:30) - tickCount, RivalRebels.rhodesPromode?100:1))==0)
+		if (level().random.nextInt(Math.max(getMaxAge()*(RRConfig.SERVER.isRhodesPromode() ?1:30) - tickCount, RRConfig.SERVER.isRhodesPromode()?100:1))==0)
 		{
 			kill();
 		}
@@ -128,7 +128,7 @@ public class EntityRhodesPiece extends Entity {
 	public boolean hurt(DamageSource par1DamageSource, float par2)
 	{
 		super.hurt(par1DamageSource, par2);
-		if (isAlive() && !level().isClientSide)
+		if (isAlive() && !level().isClientSide())
 		{
 			health -= par2;
 			if (health <= 0)

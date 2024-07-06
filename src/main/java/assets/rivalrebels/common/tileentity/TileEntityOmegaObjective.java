@@ -101,22 +101,22 @@ public class TileEntityOmegaObjective extends BlockEntity implements Container, 
     @Override
 	public ItemStack removeItem(int index, int count)
 	{
-		if (!this.chestContents.get(index).isEmpty())
+		if (!this.getItem(index).isEmpty())
 		{
 			ItemStack var3;
 
-			if (this.chestContents.get(index).getCount() <= count)
+			if (this.getItem(index).getCount() <= count)
 			{
-				var3 = this.chestContents.get(index);
-				this.chestContents.set(index, ItemStack.EMPTY);
+				var3 = this.getItem(index);
+				this.setItem(index, ItemStack.EMPTY);
             }
 			else
 			{
-				var3 = this.chestContents.get(index).split(count);
+				var3 = this.getItem(index).split(count);
 
-				if (this.chestContents.get(index).isEmpty())
+				if (this.getItem(index).isEmpty())
 				{
-					this.chestContents.set(index, ItemStack.EMPTY);
+					this.setItem(index, ItemStack.EMPTY);
 				}
             }
             return var3;
@@ -126,10 +126,10 @@ public class TileEntityOmegaObjective extends BlockEntity implements Container, 
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-		if (!this.chestContents.get(index).isEmpty())
+		if (!this.getItem(index).isEmpty())
 		{
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
+			ItemStack var2 = this.getItem(index);
+			this.setItem(index, ItemStack.EMPTY);
 			return var2;
 		}
 		return ItemStack.EMPTY;
@@ -140,10 +140,7 @@ public class TileEntityOmegaObjective extends BlockEntity implements Container, 
 	{
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
-			stack.setCount(this.getMaxStackSize());
-		}
+        stack.limitSize(this.getMaxStackSize(stack));
 	}
 
     @Override
@@ -182,19 +179,14 @@ public class TileEntityOmegaObjective extends BlockEntity implements Container, 
 			if (slide > 0.004) test -= 0.05;
 		}
 
-		if (level.getBlockState(getBlockPos()).getBlock() != RRBlocks.omegaobj) {
+		if (!level.getBlockState(getBlockPos()).is(RRBlocks.omegaobj)) {
 			this.setRemoved();
 		}
 	}
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
     }
 
     @Override

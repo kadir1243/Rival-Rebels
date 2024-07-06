@@ -17,7 +17,7 @@ import assets.rivalrebels.client.guihelper.GuiKnob;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
 import assets.rivalrebels.common.packet.ItemUpdate;
-import assets.rivalrebels.mixin.client.DrawContextAccessor;
+import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
@@ -45,7 +45,7 @@ public class GuiTesla extends Screen
 		posY = (this.height - ySizeOfTexture) / 2;
         this.clearWidgets();
 		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, Component.literal("Knob"));
-		this.addRenderableOnly(knob);
+		this.addRenderableWidget(knob);
 	}
 
     @Override
@@ -56,7 +56,7 @@ public class GuiTesla extends Screen
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         float f = 0.00390625F;
-        ((DrawContextAccessor) context).callDrawTexturedQuad(
+        ((GuiGraphicsAccessor) context).callBlit(
             RRIdentifiers.guitesla,
             posX,
             posX + xSizeOfTexture,

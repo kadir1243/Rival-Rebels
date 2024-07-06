@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 
 public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast> {
@@ -45,7 +46,7 @@ public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast> {
         matrices.pushPose();
         matrices.mulPose(Axis.XP.rotationDegrees((float) (elev * -3)));
         matrices.mulPose(Axis.ZP.rotationDegrees((float) (elev * 2)));
-        ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.4f), 1, 0, 0, 1f);
+        ModelBlastSphere.renderModel(matrices, vertexConsumers, (float) (elev - 0.4f), CommonColors.RED);
         matrices.popPose();
         matrices.pushPose();
         matrices.mulPose(Axis.YP.rotationDegrees((float) (elev * -1)));

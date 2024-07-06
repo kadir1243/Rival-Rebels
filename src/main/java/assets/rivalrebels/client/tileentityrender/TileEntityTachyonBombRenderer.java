@@ -13,7 +13,7 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.renderentity.RenderTachyonBomb;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.block.trap.BlockTachyonBomb;
 import assets.rivalrebels.common.tileentity.TileEntityTachyonBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -38,19 +38,11 @@ public class TileEntityTachyonBombRenderer implements BlockEntityRenderer<TileEn
     @Override
     public void render(TileEntityTachyonBomb entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
         matrices.pushPose();
-        matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1F, (float) entity.getBlockPos().getZ() + 0.5F);
+        matrices.translate(0.5F, 1F, 0.5F);
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
-        int metadata = entity.getBlockState().getValue(BlockTachyonBomb.META);
 
-        if (metadata == 2) {
-            matrices.mulPose(Axis.YP.rotationDegrees(180));
-        } else if (metadata == 3) {
-        } else if (metadata == 4) {
-            matrices.mulPose(Axis.YP.rotationDegrees(-90));
-        } else if (metadata == 5) {
-            matrices.mulPose(Axis.YP.rotationDegrees(90));
-        }
-        RenderTachyonBomb.bomb.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockTachyonBomb.FACING).toYRot()));
+        ObjModels.bomb.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
         matrices.popPose();
     }
 

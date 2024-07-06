@@ -35,19 +35,12 @@ public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityL
     }
 
     @Override
-    public void render(TileEntityLaptop entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY(), (float) entity.getBlockPos().getZ() + 0.5F);
-        short var11 = switch (entity.getBlockState().getValue(BlockLaptop.META)) {
-            case 2 -> 180;
-            case 3 -> 0;
-            case 4 -> -90;
-            case 5 -> 90;
-            default -> 0;
-        };
-        matrices.mulPose(Axis.YP.rotationDegrees(var11));
-        ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
-		ModelLaptop.renderScreen(SCREEN_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), matrices, (float) -entity.slide, light, overlay);
-		matrices.popPose();
+    public void render(TileEntityLaptop entity, float tickDelta, PoseStack pose, MultiBufferSource vertexConsumers, int light, int overlay) {
+		pose.pushPose();
+		pose.translate(0.5F, 0, 0.5F);
+        pose.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockLaptop.FACING).toYRot()));
+        ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), pose, (float) -entity.slide, light, overlay);
+		ModelLaptop.renderScreen(SCREEN_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), pose, (float) -entity.slide, light, overlay);
+		pose.popPose();
 	}
 }

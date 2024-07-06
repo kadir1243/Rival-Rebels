@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -38,7 +39,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
 	public EntitySphereBlast(Level par1World, double x, double y, double z, float rad) {
 		this(par1World);
 		radius = rad;
-		setDeltaMovement(Math.sqrt(rad - RivalRebels.tsarBombaStrength) / 10, getDeltaMovement().y(), getDeltaMovement().z());
+		setDeltaMovement(Math.sqrt(rad - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
 	}
 
@@ -74,7 +75,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
 
         for (Entity var31 : var9) {
             if (var31 instanceof LivingEntity) {
-                if (var31 instanceof Player && ((Player) var31).getAbilities().instabuild) continue;
+                if (var31 instanceof Player && ((Player) var31).isCreative()) continue;
 
                 double var13 = Math.sqrt(var31.distanceToSqr(getX(), getY(), getZ())) / radius;
 

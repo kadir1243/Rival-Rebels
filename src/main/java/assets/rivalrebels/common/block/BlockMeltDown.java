@@ -67,7 +67,7 @@ public class BlockMeltDown extends BaseEntityBlock {
     public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
 		int meta = state.getValue(META);
 		if (meta < 14) {
-			world.setBlock(pos.above(2), state.setValue(META, meta + 1), 2);
+			world.setBlock(pos.above(2), state.setValue(META, meta + 1), Block.UPDATE_CLIENTS);
 		}
 	}
 }

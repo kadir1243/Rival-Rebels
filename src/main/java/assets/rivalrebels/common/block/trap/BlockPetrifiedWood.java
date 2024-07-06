@@ -13,7 +13,6 @@ package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -41,9 +40,9 @@ public class BlockPetrifiedWood extends Block {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-		if (player.getAbilities().instabuild) {
-			level.setBlock(pos, state.setValue(META, state.getValue(META) + 1), 3);
-			return InteractionResult.sidedSuccess(level.isClientSide);
+		if (player.isCreative()) {
+			level.setBlockAndUpdate(pos, state.setValue(META, state.getValue(META) + 1));
+			return InteractionResult.sidedSuccess(level.isClientSide());
 		}
 		return InteractionResult.PASS;
 	}

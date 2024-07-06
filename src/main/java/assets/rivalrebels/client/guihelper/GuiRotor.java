@@ -35,7 +35,6 @@ public class GuiRotor extends GuiButton
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         PoseStack matrices = context.pose();
         this.mouseDragged(mouseX, mouseY, 0, 0, 0);
-		context.setColor(1.0F, 1.0F, 1.0F, 1.0F);
 		matrices.pushPose();
 		int deg = (degree % 180);
 		if (degree >= 180) deg = 180 - deg;

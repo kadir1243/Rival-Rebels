@@ -20,7 +20,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -39,21 +38,16 @@ public class ItemChip extends Item {
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
 		if (RivalRebels.round.isStarted() && !stack.get(RRComponents.CHIP_DATA).isReady() && entity instanceof Player player) {
-            stack.set(RRComponents.CHIP_DATA, new ChipData(player.getUUID(), player.getGameProfile().getName(), RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam, true));
+            stack.set(RRComponents.CHIP_DATA, new ChipData(player.getGameProfile(), RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam, true));
 		}
 	}
 
     @Override
     public InteractionResult useOn(UseOnContext context) {
-        Player player = context.getPlayer();
         BlockPos pos = context.getClickedPos();
         Level world = context.getLevel();
-        InteractionHand hand = context.getHand();
-		player.swing(hand);
-		if (!world.isClientSide)
-		{
-			if (world.getBlockState(pos).getBlock() == RRBlocks.buildrhodes)
-			{
+		if (!world.isClientSide()) {
+			if (world.getBlockState(pos).is(RRBlocks.buildrhodes)) {
 				world.setBlockAndUpdate(pos.west(), RRBlocks.steel.defaultBlockState());
 				world.setBlockAndUpdate(pos.east(), RRBlocks.steel.defaultBlockState());
 				world.setBlockAndUpdate(pos.above(), RRBlocks.conduit.defaultBlockState());
@@ -62,21 +56,18 @@ public class ItemChip extends Item {
 				world.setBlockAndUpdate(pos.above(2), RRBlocks.steel.defaultBlockState());
 				world.setBlockAndUpdate(pos.west().above(2), RRBlocks.steel.defaultBlockState());
 				world.setBlockAndUpdate(pos.east().above(2), RRBlocks.steel.defaultBlockState());
-				if (world.getBlockState(pos.below()).getBlock() == RRBlocks.buildrhodes)
-				{
+				if (world.getBlockState(pos.below()).is(RRBlocks.buildrhodes)) {
 					world.setBlockAndUpdate(pos, RRBlocks.conduit.defaultBlockState());
 					world.setBlockAndUpdate(pos.below(), RRBlocks.rhodesactivator.defaultBlockState());
 					world.setBlockAndUpdate(pos.west().below(), RRBlocks.steel.defaultBlockState());
 					world.setBlockAndUpdate(pos.east().below(), RRBlocks.steel.defaultBlockState());
-				}
-				else
-				{
+				} else {
 					world.setBlockAndUpdate(pos, RRBlocks.rhodesactivator.defaultBlockState());
 				}
-				return InteractionResult.PASS;
+				return InteractionResult.sidedSuccess(world.isClientSide());
 			}
 		}
-		return InteractionResult.sidedSuccess(world.isClientSide);
+		return InteractionResult.PASS;
 	}
 
     @Override
@@ -84,7 +75,7 @@ public class ItemChip extends Item {
         ChipData chipData = stack.get(RRComponents.CHIP_DATA);
         if (chipData.isReady()) {
 			tooltipComponents.add(Component.nullToEmpty(chipData.team().name()));
-            tooltipComponents.add(Component.nullToEmpty("Player Of UUID: " + chipData.player().toString()));
+            tooltipComponents.add(Component.literal("Player with name " + chipData.gameProfile().getName() + ", and uuid " + chipData.gameProfile().getId()));
 		}
 	}
 }

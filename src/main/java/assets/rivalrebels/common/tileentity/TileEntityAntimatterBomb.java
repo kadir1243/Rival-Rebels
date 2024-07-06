@@ -11,6 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockAntimatterBomb;
@@ -21,13 +23,14 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.ChipData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -46,11 +49,11 @@ import org.jetbrains.annotations.Nullable;
 
 public class TileEntityAntimatterBomb extends BlockEntity implements Container, Tickable, MenuProvider
 {
-	public String			username		= null;
+	public GameProfile player = null;
 	public RivalRebelsTeam	rrteam			= null;
 	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(36, ItemStack.EMPTY);
 
-	public int				countdown		= RivalRebels.nuclearBombCountdown * 20;
+	public int				countdown		= RRConfig.SERVER.getNuclearBombCountdown() * 20;
 	public int				nuclear			= 0;
 	public int				hydrogen		= 0;
 	public boolean			hasAntennae		= false;
@@ -78,17 +81,17 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 
     @Override
     public ItemStack removeItem(int slot, int amount) {
-		if (!this.chestContents.get(slot).isEmpty()) {
+		if (!this.getItem(slot).isEmpty()) {
 			ItemStack var3;
 
-			if (this.chestContents.get(slot).getCount() <= amount) {
-				var3 = this.chestContents.get(slot);
-				this.chestContents.set(slot, ItemStack.EMPTY);
+			if (this.getItem(slot).getCount() <= amount) {
+				var3 = this.getItem(slot);
+				this.setItem(slot, ItemStack.EMPTY);
             } else {
-				var3 = this.chestContents.get(slot).split(amount);
+				var3 = this.getItem(slot).split(amount);
 
-				if (this.chestContents.get(slot).isEmpty()) {
-					this.chestContents.set(slot, ItemStack.EMPTY);
+				if (this.getItem(slot).isEmpty()) {
+					this.setItem(slot, ItemStack.EMPTY);
 				}
 
             }
@@ -99,10 +102,10 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-		if (!this.chestContents.get(slot).isEmpty())
+		if (!this.getItem(slot).isEmpty())
 		{
-			ItemStack var2 = this.chestContents.get(slot);
-			this.chestContents.set(slot, ItemStack.EMPTY);
+			ItemStack var2 = this.getItem(slot);
+			this.setItem(slot, ItemStack.EMPTY);
 			return var2;
 		}
         return ItemStack.EMPTY;
@@ -112,11 +115,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
     public void setItem(int slot, ItemStack stack) {
 		this.chestContents.set(slot, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
-			stack.setCount(this.getMaxStackSize());
-		}
-
+        stack.limitSize(this.getMaxStackSize(stack));
 	}
 
     @Override
@@ -151,7 +150,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 			ItemStack is = getItem(i);
 			if (!is.isEmpty() && is.isEnchanted()) {
 				Item item = is.getItem();
-				if (i < 11 && item == RRItems.nuclearelement)
+				if (i < 11 && item == RRItems.NUCLEAR_ROD)
 				{
 					nuclear++;
 				}
@@ -169,7 +168,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 
 		if (!getItem(0).isEmpty())
 		{
-			hasFuse = getItem(0).getItem() == RRItems.fuse;
+			hasFuse = getItem(0).is(RRItems.fuse);
 		}
 		else
 		{
@@ -183,7 +182,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 			{
                 ChipData chipData = getItem(20).get(RRComponents.CHIP_DATA);
                 rrteam = chipData.team();
-				username = chipData.username();
+				player = chipData.gameProfile();
 			}
 		}
 		else
@@ -193,7 +192,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 
 		if (!getItem(1).isEmpty() && !getItem(2).isEmpty())
 		{
-			hasAntennae = getItem(1).getItem() == RRItems.antenna && getItem(2).getItem() == RRItems.antenna;
+			hasAntennae = getItem(1).is(RRItems.antenna) && getItem(2).is(RRItems.antenna);
 		}
 		else
 		{
@@ -210,7 +209,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 		}
 
 		boolean sp;
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             sp = Minecraft.getInstance().isLocalServer();
         } else {
             MinecraftServer server = level.getServer();
@@ -221,7 +220,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 		{
 			double dist = 1000000;
 
-			if (!sp || RivalRebels.stopSelfnukeinSP)
+			if (!sp || RRConfig.SERVER.isStopSelfnukeinSP())
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
 				{
@@ -232,51 +231,38 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
 				}
 			}
-			if (dist > (RivalRebels.tsarBombaStrength + (nuclear * hydrogen) + 29) * (RivalRebels.tsarBombaStrength + (nuclear * hydrogen) + 29))
+			if (dist > (RRConfig.SERVER.getTsarBombaStrength() + (nuclear * hydrogen) + 29) * (RRConfig.SERVER.getTsarBombaStrength() + (nuclear * hydrogen) + 29))
 			{
 				if (countdown > 0) countdown--;
 			}
-			else if (!level.isClientSide)
+			else if (!level.isClientSide())
 			{
-				this.chestContents.set(0, ItemStack.EMPTY);
+				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
+                    player.displayClientMessage(RRIdentifiers.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
                     player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
 		}
 		else
 		{
-			countdown = RivalRebels.nuclearBombCountdown * 20;
-			if (RivalRebels.nuclearBombCountdown == 0) countdown = 10;
+			countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
+			if (RRConfig.SERVER.getNuclearBombCountdown() == 0) countdown = 10;
 		}
 
-		if (countdown == 200 && !level.isClientSide && RivalRebels.nuclearBombCountdown > 10)
+		if (countdown == 200 && !level.isClientSide && RRConfig.SERVER.getNuclearBombCountdown() > 10)
 		{
-            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_1");
-            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_2");
-            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_3");
-            for (Player player : level.players()) {
-                player.displayClientMessage(line1, false);
-                player.displayClientMessage(line2, false);
-                player.displayClientMessage(line3, false);
-            }
+            RRIdentifiers.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}
 
-		if (countdown % 20 == 0 && countdown <= 200 && RivalRebels.nuclearBombCountdown > 10) RivalRebelsSoundPlayer.playSound(level, 14, 0, getBlockPos(), 100);
+		if (countdown % 20 == 0 && countdown <= 200 && RRConfig.SERVER.getNuclearBombCountdown() > 10) RivalRebelsSoundPlayer.playSound(level, 14, 0, getBlockPos(), 100);
 
 		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !level.isClientSide && nuclear == hydrogen)
 		{
 			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 			level.setSkyFlashTime(2);
 			float pitch = 0;
-			float yaw = switch (this.getBlockState().getValue(BlockAntimatterBomb.META)) {
-                case 2 -> 180;
-                case 3 -> 0;
-                case 4 -> 270;
-                case 5 -> 90;
-                default -> 0;
-            };
+			float yaw = this.getBlockState().getValue(BlockAntimatterBomb.FACING).toYRot();
 
             EntityAntimatterBomb tsar = new EntityAntimatterBomb(level, getBlockPos().getX()+0.5f, getBlockPos().getY()+1f, getBlockPos().getZ()+0.5f, yaw, pitch, hydrogen, hasTrollface);
 			level.addFreshEntity(tsar);
@@ -296,12 +282,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
     }
 
     @Override

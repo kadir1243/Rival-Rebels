@@ -13,7 +13,7 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelLoader;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.block.machine.BlockLoader;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -27,6 +27,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
@@ -34,58 +35,35 @@ import net.minecraft.world.phys.AABB;
 public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityLoader>, CustomRenderBoxExtension<TileEntityLoader> {
     public static final Material TUBE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettube);
     public static final Material LOADER_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etloader);
-    private static final ModelFromObj tube = ModelFromObj.readObjFile("l.obj");
 
-	public TileEntityLoaderRenderer(BlockEntityRendererProvider.Context context) {
+    public TileEntityLoaderRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityLoader entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
-		int var9 = entity.getBlockState().getValue(BlockLoader.META);
-		short var11 = 0;
-		if (var9 == 2)
-		{
-			var11 = 90;
-		}
-
-		if (var9 == 3)
-		{
-			var11 = -90;
-		}
-
-		if (var9 == 4)
-		{
-			var11 = 180;
-		}
-
-		if (var9 == 5)
-		{
-			var11 = 0;
-		}
+    public void render(TileEntityLoader loader, float tickDelta, PoseStack pose, MultiBufferSource vertexConsumers, int light, int overlay) {
+		pose.pushPose();
+		pose.translate(0.5F, 0.5F, 0.5F);
+        pose.mulPose(Axis.YP.rotationDegrees(loader.getBlockState().getValue(BlockLoader.FACING).toYRot()));
 
         VertexConsumer vertexConsumer = LOADER_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
-        matrices.mulPose(Axis.YP.rotationDegrees(var11));
-		ModelLoader.renderA(vertexConsumer, matrices, light, overlay);
-		ModelLoader.renderB(vertexConsumer, matrices, (float) entity.slide, light, overlay);
-		matrices.popPose();
-		for (int i = 0; i < entity.machines.size(); i++)
-		{
-			matrices.pushPose();
-			matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
-			int xdif = entity.machines.get(i).getBlockPos().getX() - entity.getBlockPos().getX();
-			int zdif = entity.machines.get(i).getBlockPos().getZ() - entity.getBlockPos().getZ();
-			matrices.mulPose(Axis.YP.rotationDegrees((float) (-90 + (Math.atan2(xdif, zdif) / Math.PI) * 180F)));
-			matrices.translate(-1f, -0.40f, 0);
-			matrices.scale(0.5F, 0.15F, 0.15F);
+		ModelLoader.renderA(vertexConsumer, pose, light, overlay);
+		ModelLoader.renderB(vertexConsumer, pose, (float) loader.slide, light, overlay);
+		pose.popPose();
+        for (BlockEntity machine : loader.machines) {
+			pose.pushPose();
+			pose.translate(0.5F, 0.5F, 0.5F);
+			int xdif = machine.getBlockPos().getX() - loader.getBlockPos().getX();
+			int zdif = machine.getBlockPos().getZ() - loader.getBlockPos().getZ();
+			pose.mulPose(Axis.YP.rotationDegrees((float) (-90 + (Math.atan2(xdif, zdif) / Math.PI) * 180F)));
+			pose.translate(-1f, -0.40f, 0);
+			pose.scale(0.5F, 0.15F, 0.15F);
 			int dist = (int) Math.sqrt((xdif * xdif) + (zdif * zdif));
             VertexConsumer ettubeBuffer = TUBE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
             for (int d = 0; d < dist; d++) {
-				matrices.translate(2, 0, 0);
-                tube.render(matrices, ettubeBuffer, light, overlay);
+				pose.translate(2, 0, 0);
+                ObjModels.tube.render(pose, ettubeBuffer, light, overlay);
 			}
-			matrices.popPose();
+			pose.popPose();
 		}
 	}
 

@@ -13,8 +13,7 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.WavefrontObject;
-import assets.rivalrebels.client.renderhelper.RenderHelper;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityTachyonBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -29,7 +28,6 @@ import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
-    public static final WavefrontObject bomb = RenderHelper.getModel("t");
     private static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.ettachyonbomb);
 
     public RenderTachyonBomb(EntityRendererProvider.Context manager) {
@@ -43,7 +41,7 @@ public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
         // matrices.mulPose(Axis.XP.rotationDegrees(90));
         matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
-        bomb.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.bomb.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

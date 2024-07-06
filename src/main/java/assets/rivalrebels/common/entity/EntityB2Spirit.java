@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
@@ -49,7 +49,7 @@ public class EntityB2Spirit extends EntityInanimate
 		super(entityType, par1World);
 		noCulling = true;
 		setBoundingBox(new AABB(-10, -3, -10, 10, 4, 10));
-		health = RivalRebels.b2spirithealth;
+		health = RRConfig.SERVER.getB2spirithealth();
 	}
 
     public EntityB2Spirit(Level par1World) {
@@ -80,7 +80,7 @@ public class EntityB2Spirit extends EntityInanimate
 				entityIndex = staticEntityIndex;
 			}
 		}
-		if (!level().isClientSide) startBombRun(tz-z1, x1-tx); //perpendicular to view
+		if (!level().isClientSide()) startBombRun(tz-z1, x1-tx); //perpendicular to view
 	}
 
 	public EntityB2Spirit(EntityRhodes r)
@@ -121,7 +121,7 @@ public class EntityB2Spirit extends EntityInanimate
 			}
 		}
 
-		if (!this.level().isClientSide)
+		if (!this.level().isClientSide())
 		{
 			double distfromtarget = Math.sqrt((tx-getX())*(tx-getX())+(tz-getZ())*(tz-getZ()));
 			ticksSinceStart++;
@@ -289,7 +289,7 @@ public class EntityB2Spirit extends EntityInanimate
 	public boolean hurt(DamageSource par1DamageSource, float par2)
 	{
 		super.hurt(par1DamageSource, par2);
-		if (this.isAlive() && !this.level().isClientSide) {
+		if (this.isAlive() && !this.level().isClientSide()) {
 			this.health -= par2;
 			if (this.health <= 0) {
 				this.kill();

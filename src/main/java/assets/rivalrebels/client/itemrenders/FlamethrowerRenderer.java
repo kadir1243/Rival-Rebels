@@ -12,7 +12,7 @@
 package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -26,9 +26,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class FlamethrowerRenderer implements DynamicItemRenderer {
     public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etflamethrower);
-    private static final ModelFromObj ft = ModelFromObj.readObjFile("n.obj");
 
-	public FlamethrowerRenderer() {
+    public FlamethrowerRenderer() {
     }
 
     @Override
@@ -40,9 +39,9 @@ public class FlamethrowerRenderer implements DynamicItemRenderer {
 		matrices.scale(0.18f, 0.18f, 0.18f);
 		// matrices.translate(0.3f, 0.05f, -0.1f);
 
-        ft.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        ObjModels.flamethrower.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		if (stack.isEnchanted()) {
-            ft.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, overlay);
+            ObjModels.flamethrower.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, overlay);
 		}
 
 		matrices.popPose();

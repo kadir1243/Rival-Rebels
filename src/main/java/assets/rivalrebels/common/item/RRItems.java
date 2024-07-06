@@ -22,13 +22,13 @@ import java.util.*;
 public class RRItems {
     public static final Set<Item> ALL = new LinkedHashSet<>();
     public static final Holder<ArmorMaterial> TROLL_MATERIAL = registerMaterial("troll", new int[] {0, 0, 0, 0}, 1000);
-    public static final CreativeModeTab rralltab = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, RRIdentifiers.create("alltab"), FabricItemGroup.builder().icon(() -> RRItems.nuclearelement.getDefaultInstance()).title(Component.translatable("itemGroup." + RivalRebels.MODID + ".all")).displayItems((displayContext, entries) -> entries.acceptAll(ALL.stream().map(Item::getDefaultInstance).toList())).build());
+    public static final CreativeModeTab rralltab = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, RRIdentifiers.create("alltab"), FabricItemGroup.builder().icon(() -> RRItems.NUCLEAR_ROD.getDefaultInstance()).title(Component.translatable("itemGroup." + RivalRebels.MODID + ".all")).displayItems((displayContext, entries) -> entries.acceptAll(ALL.stream().map(Item::getDefaultInstance).toList())).build());
     public static final Item rpg = register("rpg", new ItemRPG());
     public static final Item flamethrower = register("flamethrower", new ItemFlameThrower());
     public static final Item tesla = register("tesla", new ItemTesla());
     public static final Item einsten = register("astro_blaster", new ItemAstroBlaster());
     public static final Item rocket = register("rocket", new ItemRocket());
-    public static final Item fuel = register("fuel", new ItemFuel());
+    public static final Item fuel = register("fuel", new Item(new Item.Properties()));
     public static final Item battery = register("battery", new Item(new Item.Properties()));
     public static final Item redrod = register("redstone_rod", new ItemRodRedstone());
     public static final Item pliers = register("pliers", new ItemPliers());
@@ -39,7 +39,7 @@ public class RRItems {
     public static final Item expill = register("expill", new ItemExPill());
     public static final Item remote = register("remote", new ItemRemote());
     public static final Item fuse = register("fuse", new ItemFuse());
-    public static final Item nuclearelement = register("nuclear_rod", new ItemRodNuclear());
+    public static final Item NUCLEAR_ROD = register("nuclear_rod", new ItemRodNuclear());
     public static final Item hydrod = register("hydrogen_rod", new ItemRodHydrogen());
     public static final Item plasmacannon = register("plasma_cannon", new ItemPlasmaCannon());
     public static final Item roddisk = register("rod_disk", new ItemRodDisk());

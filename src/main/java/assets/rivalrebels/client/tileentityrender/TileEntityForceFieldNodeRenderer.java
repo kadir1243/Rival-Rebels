@@ -37,36 +37,21 @@ public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<Til
         if (entity.pInR <= 0) return;
 
 		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 0.5F, (float) entity.getBlockPos().getZ() + 0.5F);
+		matrices.translate(0.5F, 0.5F, 0.5F);
 
-        int meta = entity.getBlockState().getValue(BlockForceFieldNode.META);
-        if (meta == 2)
-		{
-			matrices.mulPose(Axis.YP.rotationDegrees(90));
-		}
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockForceFieldNode.FACING).toYRot()));
 
-		if (meta == 3)
-		{
-			matrices.mulPose(Axis.YP.rotationDegrees(-90));
-		}
-
-		if (meta == 4)
-		{
-			matrices.mulPose(Axis.YP.rotationDegrees(180));
-		}
-
-		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		matrices.translate(0, 0, 0.5f);
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), -0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
+        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
+		cellularNoise.addVertex(matrices.last(), -0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
+		cellularNoise.addVertex(matrices.last(), -0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
+		cellularNoise.addVertex(matrices.last(), -0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
+		cellularNoise.addVertex(matrices.last(), -0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
 
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
-		vertexConsumer.addVertex(matrices.last(), 0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
+		cellularNoise.addVertex(matrices.last(), 0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
+		cellularNoise.addVertex(matrices.last(), 0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
+		cellularNoise.addVertex(matrices.last(), 0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
+		cellularNoise.addVertex(matrices.last(), 0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
 
 		matrices.popPose();
 	}
@@ -83,14 +68,14 @@ public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<Til
         float l = 35f;
         float h = 3.5f;
         BlockPos pos = entity.getBlockPos();
-        return switch (entity.getBlockState().getValue(BlockForceFieldNode.META)) {
-            case 2 ->
+        return switch (entity.getBlockState().getValue(BlockForceFieldNode.FACING)) {
+            case NORTH ->
                 new AABB(pos.getX() + 0.5f - t, pos.getY() + 0.5f - h, pos.getZ() - l, pos.getX() + 0.5f + t, pos.getY() + 0.5f + h, pos.getZ());
-            case 3 ->
+            case SOUTH ->
                 new AABB(pos.getX() + 0.5f - t, pos.getY() + 0.5f - h, pos.getZ() + 1f, pos.getX() + 0.5f + t, pos.getY() + 0.5f + h, pos.getZ() + 1f + l);
-            case 4 ->
+            case WEST ->
                 new AABB(pos.getX() - l, pos.getY() + 0.5f - h, pos.getZ() + 0.5f - t, pos.getX(), pos.getY() + 0.5f + h, pos.getZ() + 0.5f + t);
-            case 5 ->
+            case EAST ->
                 new AABB(pos.getX() + 1f, pos.getY() + 0.5f - h, pos.getZ() + 0.5f - t, pos.getX() + 1f + l, pos.getY() + 0.5f + h, pos.getZ() + 0.5f + t);
             default -> new AABB(Vec3.ZERO, Vec3.ZERO);
         };

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
 import java.util.List;
@@ -65,7 +65,7 @@ public class EntityNuclearBlast extends EntityInanimate {
 	public void tick()
 	{
 		super.tick();
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			if (tickCount == 0)
 			{
@@ -76,7 +76,7 @@ public class EntityNuclearBlast extends EntityInanimate {
 				time++;
 				if (time <= Strength)
 				{
-					new NuclearExplosion(level(), (int) getX(), (int) getY() - 5, (int) getZ(), (time * time) / 2 + RivalRebels.nuclearBombStrength);
+					new NuclearExplosion(level(), (int) getX(), (int) getY() - 5, (int) getZ(), (time * time) / 2 + RRConfig.SERVER.getNuclearBombStrength());
 				}
 			}
 			if (tickCount % 2 == 0 && tickCount < 400) pushAndHurtEntities();
@@ -112,7 +112,7 @@ public class EntityNuclearBlast extends EntityInanimate {
 
 	private void pushAndHurtEntities()
 	{
-		int radius = Strength * RivalRebels.nuclearBombStrength;
+		int radius = Strength * RRConfig.SERVER.getNuclearBombStrength();
 		if (radius > 80) radius = 80;
 		int var3 = Mth.floor(getX() - radius - 1.0D);
 		int var4 = Mth.floor(getX() + radius + 1.0D);
@@ -138,7 +138,7 @@ public class EntityNuclearBlast extends EntityInanimate {
                     if (!(entity instanceof EntityNuclearBlast) && !(entity instanceof EntityTsarBlast)) {
                         if (entity instanceof FallingBlockEntity) entity.kill();
                         else {
-                            if (entity instanceof Player && ((Player) entity).getAbilities().invulnerable)
+                            if (entity instanceof Player && entity.isInvulnerable())
                                 continue;
                             entity.hurt(RivalRebelsDamageSource.nuclearBlast(level()), 16 * radius);
                             entity.setDeltaMovement(getDeltaMovement().subtract(

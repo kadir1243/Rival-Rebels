@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityBomb;
 import assets.rivalrebels.common.entity.EntityRocket;
@@ -49,27 +49,22 @@ public class ItemRPG extends TieredItem
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.rocket);
-        if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteAmmo)
-		{
+        if (!itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
 			player.startUsingItem(hand);
-			if (!world.isClientSide && !player.getAbilities().invulnerable && !RivalRebels.infiniteAmmo)
-			{
-                itemStack.shrink(1);
-                if (itemStack.isEmpty())
-                    player.getInventory().removeItem(itemStack);
+			if (!world.isClientSide && !RRConfig.SERVER.isInfiniteAmmo()) {
+                itemStack.consume(1, player);
 			}
 			if (!stack.isEnchanted()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
 			else RivalRebelsSoundPlayer.playSound(player, 10, 4, 1.0f);
-			if (!world.isClientSide)
-			{
+			if (!world.isClientSide()) {
 				if (!stack.isEnchanted()) world.addFreshEntity(new EntityRocket(world, player, 0.1F));
 				else world.addFreshEntity(new EntityBomb(world, player, 0.1F));
 			}
 		}
-		else if (!world.isClientSide)
+		else if (!world.isClientSide())
 		{
 			player.displayClientMessage(Component.nullToEmpty("§cOut of ammunition"), false);
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 }

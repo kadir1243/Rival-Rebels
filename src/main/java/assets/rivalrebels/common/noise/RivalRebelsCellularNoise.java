@@ -33,16 +33,13 @@ public class RivalRebelsCellularNoise {
     private static final int frames = 28;
     private static final int[] id = genTexture(28, 28, frames);
 
-    private static void refresh3D(RandomSource random)
-	{
-		for (int i = 0; i < pointa3D; i++)
-		{
+    private static void refresh3D(RandomSource random) {
+		for (int i = 0; i < pointa3D; i++) {
 			points3D[i] = new Vec3(random.nextDouble(), random.nextDouble(), random.nextDouble());
 		}
 	}
 
-    private static double noise(double xin, double yin, double zin)
-	{
+    private static double noise(double xin, double yin, double zin) {
 		double result = 1;
 		for (int i = 0; i < pointa3D; i++)
 		{

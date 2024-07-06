@@ -13,7 +13,7 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.renderentity.RenderAntimatterBomb;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.block.trap.BlockAntimatterBomb;
 import assets.rivalrebels.common.tileentity.TileEntityAntimatterBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -38,18 +38,11 @@ public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<Til
     @Override
     public void render(TileEntityAntimatterBomb entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
-		matrices.translate((float) entity.getBlockPos().getX() + 0.5F, (float) entity.getBlockPos().getY() + 1.0F, (float) entity.getBlockPos().getZ() + 0.5F);
+		matrices.translate(0.5F, 1F, 0.5F);
 		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-		int metadata = entity.getBlockState().getValue(BlockAntimatterBomb.META);
 
-		if (metadata == 2) {
-			matrices.mulPose(Axis.YP.rotationDegrees(180));
-		} else if (metadata == 4) {
-            matrices.mulPose(Axis.YP.rotationDegrees(-90));
-		} else if (metadata == 5) {
-            matrices.mulPose(Axis.YP.rotationDegrees(90));
-		}
-		RenderAntimatterBomb.bomb.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        matrices.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockAntimatterBomb.FACING).toYRot()));
+		ObjModels.bomb.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
 		matrices.popPose();
 	}
 

@@ -38,7 +38,6 @@ import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -76,7 +75,7 @@ public class EntityLaserBurst extends EntityInanimate {
         setAccurateHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 4F, 0.075f);
 	}
 
-	public EntityLaserBurst(Level par1World, Player player, boolean accurate)
+	public EntityLaserBurst(Level par1World, LivingEntity player, boolean accurate)
 	{
 		this(par1World);
 		shooter = player;
@@ -162,7 +161,7 @@ public class EntityLaserBurst extends EntityInanimate {
 			var2 = var3.getLocation();
 		}
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			Entity var4 = null;
 			List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
@@ -197,17 +196,16 @@ public class EntityLaserBurst extends EntityInanimate {
 			{
                 BlockPos pos = ((BlockHitResult) var3).getBlockPos();
                 BlockState state = level().getBlockState(pos);
-                Block block = state.getBlock();
-				if (block == Blocks.TNT) {
-					if (!level().isClientSide) {
+                if (state.is(Blocks.TNT)) {
+					if (!level().isClientSide()) {
 						PrimedTnt entitytntprimed = new PrimedTnt(level(), (pos.getX() + 0.5F), (pos.getY() + 0.5F), (pos.getZ() + 0.5F), shooter);
 						entitytntprimed.setFuse(level().random.nextInt(entitytntprimed.getFuse() / 4) + entitytntprimed.getFuse() / 8);
 						level().addFreshEntity(entitytntprimed);
 						level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					}
-				} else if (block == RRBlocks.remotecharge) {
+				} else if (state.is(RRBlocks.remotecharge)) {
 					state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
-				} else if (block == RRBlocks.timedbomb) {
+				} else if (state.is(RRBlocks.timedbomb)) {
 					state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
 				}
 				kill();
@@ -217,7 +215,7 @@ public class EntityLaserBurst extends EntityInanimate {
                 Entity hitEntity = ((EntityHitResult) var3).getEntity();
                 if (hitEntity instanceof Player player && shooter != hitEntity) {
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide)
+					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
 					{
 						player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
 					}

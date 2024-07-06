@@ -42,7 +42,7 @@ import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
  *
  * <p>Register an instance of the class with {@link FabricDataGenerator.Pack#addProvider} in a {@link net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint}.
  */
-public abstract class FabricSoundProvider implements DataProvider { //TODO:Remove when added to fabric api
+public abstract class FabricSoundProvider implements DataProvider {
     protected final FabricDataOutput dataOutput;
 
     protected FabricSoundProvider(FabricDataOutput dataOutput) {
@@ -85,7 +85,7 @@ public abstract class FabricSoundProvider implements DataProvider { //TODO:Remov
                 soundEventData.addProperty("subtitle", subtitle);
             }
 
-            soundEvents.put(sound.getLocation().getPath().toString(), soundEventData);
+            soundEvents.put(sound.getLocation().getPath(), soundEventData);
         }));
 
         JsonObject soundsJson = new JsonObject();

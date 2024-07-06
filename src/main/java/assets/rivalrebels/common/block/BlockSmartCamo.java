@@ -31,7 +31,7 @@ public class BlockSmartCamo extends Block
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (getBlock(world, x + 1, y, z) == Blocks.SNOW || getBlock(world, x - 1, y, z) == Blocks.SNOW || getBlock(world, x, y, z - 1) == Blocks.SNOW || getBlock(world, x, y, z + 1) == Blocks.SNOW) {
+        if (getBlockState(world, x + 1, y, z).is(BlockTags.SNOW) || getBlockState(world, x - 1, y, z).is(BlockTags.SNOW) || getBlockState(world, x, y, z - 1).is(BlockTags.SNOW) || getBlockState(world, x, y, z + 1).is(BlockTags.SNOW)) {
             setBlock(world, pos, RRBlocks.camo3);
         } else {
             if (getBlockState(world, pos.below()).is(BlockTags.DIRT)) {

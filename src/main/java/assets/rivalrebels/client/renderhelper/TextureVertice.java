@@ -11,14 +11,5 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderhelper;
 
-public class TextureVertice
-{
-	public float x;
-	public float y;
-
-	public TextureVertice(float X, float Y)
-	{
-		x = X;
-		y = Y;
-	}
+public record TextureVertice(float x, float y) {
 }

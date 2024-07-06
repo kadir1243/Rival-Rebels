@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
@@ -90,14 +91,14 @@ public class EntityRoddiskLeader extends RoddiskBase {
 
     @Override
 	public void tick() {
-		if (tickCount > 100 && shooter == null && !level().isClientSide) {
+		if (tickCount > 100 && shooter == null && !level().isClientSide()) {
 			//world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), new ItemStack(RivalRebels.roddisk)));
 			kill();
-			RivalRebelsSoundPlayer.playSound(this, 5, 0);
+            this.playSound(RRSounds.FORCE_FIELD);
 		}
 		if (tickCount >= 120 && !level().isClientSide && shooter != null)
 		{
-			ItemEntity ei = new ItemEntity(level(), shooter.getX(), shooter.getY(), shooter.getZ(), new ItemStack(RRItems.roddisk));
+			ItemEntity ei = new ItemEntity(level(), shooter.getX(), shooter.getY(), shooter.getZ(), RRItems.roddisk.getDefaultInstance());
 			level().addFreshEntity(ei);
 			kill();
 			RivalRebelsSoundPlayer.playSound(this, 6, 1);
@@ -131,7 +132,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
 			var2 = var3.getLocation();
 		}
 
-		if (!this.level().isClientSide)
+		if (!this.level().isClientSide())
 		{
 			Entity var4 = null;
 			List<Entity> var5 = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D, 1.0D, 1.0D));
@@ -140,7 +141,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRoddiskRegular || var9 instanceof EntityRoddiskRebel) {
                     var9.kill();
-                    ItemEntity ei = new ItemEntity(level(), var9.getX(), var9.getY(), var9.getZ(), new ItemStack(RRItems.roddisk));
+                    ItemEntity ei = new ItemEntity(level(), var9.getX(), var9.getY(), var9.getZ(), RRItems.roddisk.getDefaultInstance());
                     level().addFreshEntity(ei);
                 } else if (var9 instanceof EntityRoddiskOfficer) {
                     if (this.getDeltaMovement().x() + this.getDeltaMovement().y() + this.getDeltaMovement().z() >= var9.getDeltaMovement().x() + var9.getDeltaMovement().y() + var9.getDeltaMovement().z()) {
@@ -148,7 +149,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
                     } else {
                         kill();
                     }
-                    ItemEntity ei = new ItemEntity(level(), var9.getX(), var9.getY(), var9.getZ(), new ItemStack(RRItems.roddisk));
+                    ItemEntity ei = new ItemEntity(level(), var9.getX(), var9.getY(), var9.getZ(), RRItems.roddisk.getDefaultInstance());
                     level().addFreshEntity(ei);
                 } else if (var9.canBeCollidedWith() && var9 != this.shooter) {
                     float var10 = 0.3F;
@@ -182,7 +183,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
 			if (var3.getType() == HitResult.Type.ENTITY)
 			{
                 Entity entityHit = ((EntityHitResult) var3).getEntity();
-                RivalRebelsSoundPlayer.playSound(this, 5, 1);
+                this.playSound(RRSounds.ROD_DISK_HIT_ENTITY);
 
 				if (entityHit instanceof Player entityPlayerHit && shooter instanceof Player && entityHit != shooter) {
                     for (EquipmentSlot slot : EquipmentSlot.values()) {
@@ -225,16 +226,16 @@ public class EntityRoddiskLeader extends RoddiskBase {
                 BlockPos pos = ((BlockHitResult) var3).getBlockPos();
                 Direction side = ((BlockHitResult) var3).getDirection();
                 BlockState state = level().getBlockState(pos);
-                if (state.getBlock() == RRBlocks.flare) {
+                if (state.is(RRBlocks.flare)) {
                     state.getBlock().destroy(level(), pos, state);
-                } else if (state.getBlock() == RRBlocks.landmine || state.getBlock() == RRBlocks.alandmine) {
+                } else if (state.is(RRBlocks.landmine) || state.is(RRBlocks.alandmine)) {
                     state.entityInside(level(), pos, this);
                 } else {
                     if (state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_PANES))
                     {
                         level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                     }
-                    RivalRebelsSoundPlayer.playSound(this, 5, 2);
+                    this.playSound(RRSounds.ROD_DISK_MIRROR_FROM_OBJECT);
 
                     if (side == Direction.EAST || side == Direction.WEST) this.setDeltaMovement(getDeltaMovement().multiply(-1, 1, 1));
                     if (side == Direction.UP || side == Direction.DOWN) this.setDeltaMovement(getDeltaMovement().multiply(1, -1, 1));
@@ -290,6 +291,6 @@ public class EntityRoddiskLeader extends RoddiskBase {
 			kill();
 			RivalRebelsSoundPlayer.playSound(this, 6, 1);
 		}
-		return InteractionResult.sidedSuccess(level().isClientSide);
+		return InteractionResult.sidedSuccess(level().isClientSide());
 	}
 }

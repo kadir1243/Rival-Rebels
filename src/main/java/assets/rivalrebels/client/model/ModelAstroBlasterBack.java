@@ -17,6 +17,7 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 public class ModelAstroBlasterBack {
@@ -25,9 +26,9 @@ public class ModelAstroBlasterBack {
     private static final float[] barrely = {0.1f, 0.1f, 0.05f, -0.25f, -0.25f};
     private static final float[] tsart = {i * 20, i * 16, i * 13, i * 5, 0};
     private static final int segments = 8;
-    private static final float deg = (float) Math.PI * 2f / segments;
-    private static final float sin = (float) Math.sin(deg);
-    private static final float cos = (float) Math.cos(deg);
+    private static final float deg = Mth.TWO_PI / segments;
+    private static final float sin = Mth.sin(deg);
+    private static final float cos = Mth.cos(deg);
     private static final float add = 360 / segments;
 
     public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {

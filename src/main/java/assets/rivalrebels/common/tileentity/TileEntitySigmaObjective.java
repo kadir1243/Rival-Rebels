@@ -99,22 +99,22 @@ public class TileEntitySigmaObjective extends BlockEntity implements Container, 
     @Override
 	public ItemStack removeItem(int slot, int amount)
 	{
-		if (!this.chestContents.get(slot).isEmpty())
+		if (!this.getItem(slot).isEmpty())
 		{
 			ItemStack var3;
 
-			if (this.chestContents.get(slot).getCount() <= amount)
+			if (this.getItem(slot).getCount() <= amount)
 			{
-				var3 = this.chestContents.get(slot);
-				this.chestContents.set(slot, ItemStack.EMPTY);
+				var3 = this.getItem(slot);
+				this.setItem(slot, ItemStack.EMPTY);
             }
 			else
 			{
-				var3 = this.chestContents.get(slot).split(amount);
+				var3 = this.getItem(slot).split(amount);
 
-				if (this.chestContents.get(slot).isEmpty())
+				if (this.getItem(slot).isEmpty())
 				{
-					this.chestContents.set(slot, ItemStack.EMPTY);
+					this.setItem(slot, ItemStack.EMPTY);
 				}
             }
             return var3;
@@ -124,10 +124,10 @@ public class TileEntitySigmaObjective extends BlockEntity implements Container, 
 
     @Override
     public ItemStack removeItemNoUpdate(int index) {
-		if (!this.chestContents.get(index).isEmpty())
+		if (!this.getItem(index).isEmpty())
 		{
-			ItemStack var2 = this.chestContents.get(index);
-			this.chestContents.set(index, ItemStack.EMPTY);
+			ItemStack var2 = this.getItem(index);
+			this.setItem(index, ItemStack.EMPTY);
 			return var2;
 		}
 		return ItemStack.EMPTY;
@@ -138,10 +138,7 @@ public class TileEntitySigmaObjective extends BlockEntity implements Container, 
 	{
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize())
-		{
-			stack.setCount(this.getMaxStackSize());
-		}
+        stack.limitSize(this.getMaxStackSize(stack));
 	}
 
     @Override
@@ -187,11 +184,6 @@ public class TileEntitySigmaObjective extends BlockEntity implements Container, 
 
     @Override
     public boolean isEmpty() {
-        for (ItemStack stack : this.chestContents) {
-            if (!stack.isEmpty()) {
-                return false;
-            }
-        }
-        return true;
+        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
     }
 }

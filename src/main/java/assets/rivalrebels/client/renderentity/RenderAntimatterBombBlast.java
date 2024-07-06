@@ -13,7 +13,6 @@ package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelAntimatterBombBlast;
 import assets.rivalrebels.client.model.ModelBlastRing;
 import assets.rivalrebels.client.model.ModelBlastSphere;
@@ -29,10 +28,11 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Quaternionf;
-import org.joml.Vector4f;
 
 public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast> {
     public static final Material ANTIMATTER_BLAST_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etantimatterblast);
@@ -47,17 +47,17 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
     public void render(EntityAntimatterBombBlast entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         RandomSource random = entity.getCommandSenderWorld().random;
         entity.time++;
-		double radius = (((entity.getDeltaMovement().x() * 10) - 1) * ((entity.getDeltaMovement().x() * 10) - 1) * 2) + RivalRebels.tsarBombaStrength;
+		double radius = (((entity.getDeltaMovement().x() * 10) - 1) * ((entity.getDeltaMovement().x() * 10) - 1) * 2) + RRConfig.SERVER.getTsarBombaStrength();
 		matrices.pushPose();
 		matrices.pushPose();
 		matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
 		float size = (entity.time % 100) * 2.0f;
-		ModelBlastRing.renderModel(matrices, vertexConsumers.getBuffer(RenderType.solid()), size, 64, 6f, 2f, 0f, 0f, 0f, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), new Vector4f(0, 0, 0.2F, 1), light, OverlayTexture.NO_OVERLAY);
+		ModelBlastRing.renderModel(matrices, vertexConsumers.getBuffer(RenderType.solid()), size, 64, 6f, 2f, 0f, 0f, 0f, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), FastColor.ARGB32.colorFromFloat(1, 0, 0, 0.2F), light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 		if (entity.time < 60) {
 			double elev = entity.time / 5f;
 			matrices.translate(entity.getX(), entity.getY() + elev, entity.getZ());
-			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time, 1, 1, 1, 1);
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time, CommonColors.WHITE);
 		}
 		else
 		{

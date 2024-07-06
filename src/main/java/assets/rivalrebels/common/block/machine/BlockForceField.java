@@ -12,33 +12,35 @@
 package assets.rivalrebels.common.block.machine;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockForceField extends Block {
-    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 6);
+    public static final DirectionProperty FACING = BlockStateProperties.FACING;
 
     public BlockForceField(Properties settings) {
 		super(settings);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.DOWN));
 	}
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(FACING);
     }
 
     //@Override
     public AABB getBoundingBox(BlockState state, BlockGetter source, BlockPos pos) {
-		int var5 = state.getValue(META);
+		int var5 = state.getValue(FACING).get3DDataValue();
 		float var6 = 0.4375f;
 
 		if (var5 == 4) {
@@ -58,25 +60,25 @@ public class BlockForceField extends Block {
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         float var6 = 0.4375f;
 
-        return switch (state.getValue(META)) {
-            case 4 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 5 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 2 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
-            case 3 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+        return switch (state.getValue(FACING).get3DDataValue()) {
+            case 4 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            case 5 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            case 2 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+            case 3 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
             default -> super.getCollisionShape(state, world, pos, context);
         };
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		int var5 = state.getValue(META);
+		int var5 = state.getValue(FACING).get3DDataValue();
 		float var6 = 0.4375f;
 
         return switch (var5) {
-            case 4 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 5 -> Shapes.create(new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6));
-            case 2 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
-            case 3 -> Shapes.create(new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F));
+            case 4 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            case 5 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            case 2 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+            case 3 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
             default -> super.getShape(state, world, pos, context);
         };
     }

@@ -11,8 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.EntityGasGrenade;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
@@ -51,20 +51,15 @@ public class ItemGasGrenade extends Item
         if (!(user instanceof Player player)) return;
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.gasgrenade);
-        if (player.getAbilities().invulnerable || !itemStack.isEmpty() || RivalRebels.infiniteGrenades)
+        if (player.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteGrenades())
 		{
 			float f = (getUseDuration(stack, player) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
 			EntityGasGrenade entitysuperarrow = new EntityGasGrenade(world, player, 0.3f + f * 0.5f);
-			if (!player.getAbilities().invulnerable)
-			{
-                itemStack.shrink(1);
-                if (itemStack.isEmpty())
-                    player.getInventory().removeItem(itemStack);
-			}
-			RivalRebelsSoundPlayer.playSound(player, 4, 3, 1, 0.9f);
-			if (!world.isClientSide)
+            stack.consume(1, player);
+            player.playSound(RRSounds.CUCHILLO_UNKNOWN3, 1, 0.9F);
+			if (!world.isClientSide())
 			{
 				world.addFreshEntity(entitysuperarrow);
 				entitysuperarrow.setPos(entitysuperarrow.getX(), entitysuperarrow.getY() - 0.05, entitysuperarrow.getZ());
@@ -82,23 +77,17 @@ public class ItemGasGrenade extends Item
     @Override
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
 		int time = 75 - remainingUseTicks;
-		if (time == 15 || time == 30 || time == 45 || time == 60)
-		{
+		if (time == 15 || time == 30 || time == 45 || time == 60) {
 			world.playLocalSound(user.getX(), user.getY(), user.getZ(), SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.PLAYERS, 1.0F, 1.0F, true);
 		}
-		if (time == 75)
-		{
+
+        if (time == 75) {
 			world.playLocalSound(user.getX(), user.getY(), user.getZ(), SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.PLAYERS, 1.0F, 1.0F, true);
 			user.addEffect(new MobEffectInstance(MobEffects.POISON, 80, 1));
 			user.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
 			user.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 0));
 			user.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
-			if (user instanceof Player player && !player.getAbilities().invulnerable) {
-                ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.gasgrenade);
-                itemStack.shrink(1);
-                if (itemStack.isEmpty())
-                    player.getInventory().removeItem(itemStack);
-			}
-		}
+            stack.consume(1, user);
+        }
 	}
 }

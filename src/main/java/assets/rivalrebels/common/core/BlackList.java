@@ -13,38 +13,47 @@ package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-
-import static assets.rivalrebels.RivalRebels.getBlocks;
+import java.util.function.Predicate;
 
 public class BlackList {
-    public static Set<Block> tesla = new HashSet<>();
+    private static final Set<Predicate<BlockState>> tesla = new HashSet<>(Set.of(
+        of(RRBlocks.omegaobj),
+        of(RRBlocks.sigmaobj),
+        of(RRBlocks.fshield),
+        of(Blocks.BEDROCK),
+        of(Blocks.WATER),
+        of(Blocks.LAVA),
+        of(ConventionalBlockTags.GLASS_BLOCKS),
+        of(Blocks.OBSIDIAN),
+        of(ConventionalBlockTags.GLASS_PANES),
+        of(RRBlocks.nuclearBomb),
+        of(RRBlocks.tsarbombablock),
+        of(RRBlocks.loader),
+        of(RRBlocks.reactor),
+        of(RRBlocks.forcefieldnode),
+        of(RRBlocks.conduit),
+        of(RRBlocks.forcefield),
+        of(RRBlocks.meltdown),
+        of(RRBlocks.ffreciever)
+    ));
 
-    static {
-        tesla.add(RRBlocks.omegaobj);
-        tesla.add(RRBlocks.sigmaobj);
-        tesla.add(RRBlocks.fshield);
-        tesla.add(Blocks.BEDROCK);
-        tesla.add(Blocks.WATER);
-        tesla.add(Blocks.LAVA);
-        tesla.addAll(getBlocks(ConventionalBlockTags.GLASS_BLOCKS));
-        tesla.add(Blocks.OBSIDIAN);
-        tesla.addAll(getBlocks(ConventionalBlockTags.GLASS_PANES));
-        tesla.add(RRBlocks.nuclearBomb);
-        tesla.add(RRBlocks.tsarbombablock);
-        tesla.add(RRBlocks.loader);
-        tesla.add(RRBlocks.reactor);
-        tesla.add(RRBlocks.forcefieldnode);
-        tesla.add(RRBlocks.conduit);
-        tesla.add(RRBlocks.forcefield);
-        tesla.add(RRBlocks.meltdown);
-        tesla.add(RRBlocks.ffreciever);
+    private static Predicate<BlockState> of(Block block) {
+        return state -> state.is(block);
     }
-    public static Block[] explosion =
-        {
+
+    private static Predicate<BlockState> of(TagKey<Block> tag) {
+        return state -> state.is(tag);
+    }
+
+    public static final Set<Predicate<BlockState>> explosion = createSet(
             RRBlocks.fshield,
             RRBlocks.nuclearBomb,
             RRBlocks.tsarbombablock,
@@ -55,10 +64,10 @@ public class BlackList {
             RRBlocks.loader,
             RRBlocks.meltdown,
             RRBlocks.forcefield,
-            RRBlocks.ffreciever,
-        };
-    public static Block[] plasmaExplosion =
-        {
+            RRBlocks.ffreciever
+        );
+    private static final Set<Predicate<BlockState>> plasmaExplosion =
+        createSet(
             RRBlocks.omegaobj,
             RRBlocks.sigmaobj,
             RRBlocks.tsarbombablock,
@@ -68,10 +77,10 @@ public class BlackList {
             RRBlocks.controller,
             RRBlocks.meltdown,
             RRBlocks.forcefield,
-            RRBlocks.ffreciever,
-        };
-    public static Block[] autobuild =
-        {
+            RRBlocks.ffreciever
+        );
+    private static final Set<Predicate<BlockState>> autobuild =
+        createSet(
             RRBlocks.fshield,
             RRBlocks.nuclearBomb,
             RRBlocks.tsarbombablock,
@@ -85,34 +94,26 @@ public class BlackList {
             RRBlocks.meltdown,
             RRBlocks.forcefield,
             RRBlocks.ffreciever,
-            Blocks.BEDROCK,
-        };
+            Blocks.BEDROCK
+        );
 
-    public static boolean tesla(Block block) {
-        for (Block value : tesla) {
-            if (value == block) return true;
-        }
-        return false;
+    private static Set<Predicate<BlockState>> createSet(Block... blocks) {
+        return new HashSet<>(Arrays.stream(blocks).map(BlackList::of).toList());
     }
 
-    public static boolean explosion(Block block) {
-        for (Block value : explosion) {
-            if (value == block) return true;
-        }
-        return false;
+    public static boolean tesla(BlockState state) {
+        return tesla.stream().anyMatch(value -> value.test(state));
     }
 
-    public static boolean plasmaExplosion(Block block) {
-        for (Block value : plasmaExplosion) {
-            if (value == block) return true;
-        }
-        return false;
+    public static boolean explosion(BlockState state) {
+        return explosion.stream().anyMatch(value -> value.test(state));
     }
 
-    public static boolean autobuild(Block block) {
-        for (Block value : autobuild) {
-            if (value == block) return true;
-        }
-        return false;
+    public static boolean plasmaExplosion(BlockState state) {
+        return plasmaExplosion.stream().anyMatch(value -> value.test(state));
+    }
+
+    public static boolean autobuild(BlockState state) {
+        return autobuild.stream().anyMatch(value -> value.test(state));
     }
 }

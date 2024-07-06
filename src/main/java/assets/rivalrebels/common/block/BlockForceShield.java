@@ -40,7 +40,7 @@ public class BlockForceShield extends Block
 
     //@Override
     public void onBlockHarvested(Level world, BlockPos pos, BlockState state, Player player) {
-		if (!world.isClientSide && player.getAbilities().invulnerable && player.isShiftKeyDown())
+		if (!world.isClientSide() && player.hasInfiniteMaterials() && player.isShiftKeyDown())
 		{
 			Destroy = true;
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

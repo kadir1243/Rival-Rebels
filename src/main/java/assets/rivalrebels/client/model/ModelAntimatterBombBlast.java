@@ -17,6 +17,7 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import org.joml.Vector3f;
 
@@ -25,21 +26,21 @@ public class ModelAntimatterBombBlast {
     private static final int[] time = {100, 100};
     private static final float texadd = -1f / 500f;
     private static final int segments = 20;
-    private static final float deg = (float) Math.PI * 2f / segments;
-    private static final float sin = (float) Math.sin(deg);
-    private static final float cos = (float) Math.cos(deg);
+    private static final float deg = Mth.TWO_PI / segments;
+    private static final float sin = Mth.sin(deg);
+    private static final float cos = Mth.cos(deg);
     private static final float add = 360 / segments;
-    private final float[][] tsarx = {
+    private static final float[][] tsarx = {
         {7f, 6f, 5f, 4f, 3f, 2f, 1.75f, 1.5f, 1.25f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f /*17*/, 1f, 2.5f, 4f, 6f, 7f, 8f, 8.7f, 9.5f, 10.5f, 11.5f, 12f, 12f, 11.3f, 10f, 9f, 7f, 5f, 3f, 0f},
         {7f, 6f, 5f, 4f, 3f, 2f, 1.75f, 1.5f, 1.25f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f /*17*/, 1f, 2.5f, 4f, 6f, 7f, 8f, 8.7f, 9.5f, 10.5f, 11.5f, 12f, 12f, 11.3f, 10f, 9f, 7f, 5f, 3f, 0f}};
-    private final float[][] tsary = {
+    private static final float[][] tsary = {
         {-9f, -8.5f, -8f, -7.5f, -7f, -6f, -5f, -4f, -3f, -2f, -1f, 0f, 1f, 2f, 3f, 4f, 5f, 6f /*17*/, 8f, 9f, 9f, 8f, 7f, 5.5f, 4f, 2f, 0f, 0f, 2f, 4f, 6f, 8f, 9.5f, 10.8f, 11.7f, 12f, 12f},
         {-9f, -8.5f, -8f, -7.5f, -7f, -6f, -5f, -4f, -3f, -2f, -1f, 0f, 1f, 2f, 3f, 4f, 5f, 6f /*17*/, 8f, 9f, 9f, 8f, 7f, 5.5f, 4f, 2f, 0f, 0f, 2f, 4f, 6f, 8f, 9.5f, 10.8f, 11.7f, 12f, 12f}};
     private float texanim = 0f;
     private int timer = 0;
     private int index = 0;
 
-    public ModelAntimatterBombBlast() {
+    static {
         RandomSource random = RandomSource.create();
         for (int f = 0; f < tsarx.length; f++) {
             for (int i = 0; i < tsarx[f].length; i++) {

@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.explosion;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockPetrifiedWood;
@@ -53,7 +54,7 @@ public class TachyonBomb {
 		//if (radiussmaller < radius) radius = radiussmaller;
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
 		rad = rad*rad/2;
-		if (world.isClientSide) return;
+		if (world.isClientSide()) return;
 		int clamprad = radius;
 		//if (clamprad > 50) clamprad = 50;
 		for (int X = -clamprad; X < clamprad; X++)
@@ -91,7 +92,7 @@ public class TachyonBomb {
 			if (!repeat)
 			{
 				repeatCount++;
-				if (repeatCount < RivalRebels.tsarBombaSpeed * 2) tick(tsarblast);
+				if (repeatCount < RRConfig.SERVER.getTsarBombaSpeed() * 2) tick(tsarblast);
 				else
 				{
 					repeatCount = 0;
@@ -115,7 +116,7 @@ public class TachyonBomb {
 			dist = Math.sqrt(dist) + noise.noise(x*0.05,z*0.05) * 10.0;
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
-			if (RivalRebels.elevation) yele = y;
+			if (RRConfig.SERVER.isElevation()) yele = y;
 			int ylimit = (int) Math.floor(yele - (radius - dist));
 
 			for (int Y = y; Y > ylimit; Y--)

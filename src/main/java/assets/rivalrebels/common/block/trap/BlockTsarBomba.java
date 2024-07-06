@@ -11,13 +11,16 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.trap;
 
+import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityTsarBomba;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
@@ -32,17 +35,18 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockTsarBomba extends BaseEntityBlock {
     public static final MapCodec<BlockTsarBomba> CODEC = simpleCodec(BlockTsarBomba::new);
-    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public BlockTsarBomba(Properties settings)
 	{
 		super(settings);
-        registerDefaultState(getStateDefinition().any().setValue(META, 0));
+        registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH));
     }
 
     @Override
@@ -52,22 +56,21 @@ public class BlockTsarBomba extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(FACING);
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-		int var7 = Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3;
-		return super.getStateForPlacement(ctx).setValue(META, var7 == 0 ? 2 : (var7 == 1 ? 5 : (var7 == 2 ? 3 : (var7 == 3 ? 4 : 0))));
+        return super.getStateForPlacement(ctx).setValue(FACING, Direction.getFacingAxis(ctx.getPlayer(), Direction.Axis.X));
 	}
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!stack.isEmpty() && stack.getItem() == RRItems.pliers) {
+        if (!stack.isEmpty() && stack.is(RRItems.pliers)) {
 			player.openMenu((MenuProvider) level.getBlockEntity(pos));
-		} else if (!level.isClientSide) {
-			player.displayClientMessage(Component.nullToEmpty("§7[§4Orders§7] §cUse pliers to open."), true);
+		} else if (!level.isClientSide()) {
+			player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable(BlockAutoTemplate.USE_PLIERS_TO_OPEN_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), true);
 		}
 		return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
 	}
@@ -77,6 +80,7 @@ public class BlockTsarBomba extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityTsarBomba(pos, state);
 	}
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {

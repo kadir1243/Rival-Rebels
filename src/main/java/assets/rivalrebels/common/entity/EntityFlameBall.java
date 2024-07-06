@@ -26,7 +26,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -107,7 +106,7 @@ public class EntityFlameBall extends EntityInanimate
 		super.tick();
 		tickCount++;
 		if (tickCount % 3 == 0) sequence++;
-		if (sequence > 15/* > RivalRebels.flamethrowerDecay */) kill();
+		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 
 		Vec3 start = position();
 		Vec3 end = position().add(getDeltaMovement());
@@ -120,7 +119,7 @@ public class EntityFlameBall extends EntityInanimate
 		double var6 = 0.0D;
 		Iterator<Entity> var8 = var5.iterator();
 
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			while (var8.hasNext())
 			{
@@ -162,7 +161,7 @@ public class EntityFlameBall extends EntityInanimate
 				if (hitEntity instanceof Player player) {
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
                     ItemStack equippedStack = player.getItemBySlot(slot);
-                    if (!equippedStack.isEmpty() && !level().isClientSide) {
+                    if (!equippedStack.isEmpty() && !level().isClientSide()) {
 						equippedStack.hurtAndBreak(8, player, slot);
 					}
 				}
@@ -201,7 +200,7 @@ public class EntityFlameBall extends EntityInanimate
 
 	private void fire()
 	{
-		if (!level().isClientSide)
+		if (!level().isClientSide())
 		{
 			for (int x = -1; x < 2; x++)
 			{
@@ -211,8 +210,7 @@ public class EntityFlameBall extends EntityInanimate
 					{
                         BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
                         BlockState state = level().getBlockState(pos);
-                        Block id = state.getBlock();
-						if (level().isEmptyBlock(pos) || id == Blocks.SNOW || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+						if (level().isEmptyBlock(pos) || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 					}
 				}
 			}

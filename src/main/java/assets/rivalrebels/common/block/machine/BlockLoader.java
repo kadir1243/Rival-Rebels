@@ -17,8 +17,6 @@ import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -33,13 +31,14 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockLoader extends BaseEntityBlock {
     public static final MapCodec<BlockLoader> CODEC = simpleCodec(BlockLoader::new);
-    public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
+    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
     public BlockLoader(Properties settings) {
 		super(settings);
 	}
@@ -51,25 +50,13 @@ public class BlockLoader extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(FACING);
     }
 
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        int l = Mth.floor((ctx.getRotation() * 4.0F / 360.0F) + 0.5D) & 3;
-
-        int meta = 0;
-        if (l == 0) {
-            meta = 2;
-        } else if (l == 1) {
-            meta = 5;
-        } else if (l == 2) {
-            meta = 3;
-        } else if (l == 3) {
-            meta = 4;
-        }
-        return super.getStateForPlacement(ctx).setValue(META, meta);
+        return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection());
     }
 
     @Override
@@ -84,7 +71,7 @@ public class BlockLoader extends BaseEntityBlock {
         int x = pos.getX();
         int y = pos.getY();
         int z =pos.getZ();
-        world.addFreshEntity(new ItemEntity(world, x, y, z, new ItemStack(RRBlocks.loader)));
+        world.addFreshEntity(new ItemEntity(world, x, y, z, RRBlocks.loader.asItem().getDefaultInstance()));
         if (var7 != null)
         {
             for (int var8 = 0; var8 < var7.getContainerSize(); ++var8)
@@ -128,7 +115,7 @@ public class BlockLoader extends BaseEntityBlock {
 
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 
-		return InteractionResult.sidedSuccess(level.isClientSide);
+		return InteractionResult.sidedSuccess(level.isClientSide());
 	}
 
     @Nullable

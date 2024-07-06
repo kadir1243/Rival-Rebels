@@ -12,7 +12,7 @@
 package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.ModelFromObj;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -29,9 +29,7 @@ import net.minecraft.world.item.ItemStack;
 
 public class TeslaRenderer implements DynamicItemRenderer {
     public static final Material TESLA_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettesla);
-    private static final ModelFromObj tesla = ModelFromObj.readObjFile("i.obj");
-	private static final ModelFromObj dynamo = ModelFromObj.readObjFile("j.obj");
-	private int spin;
+    private int spin;
 
 	private static int getDegree(ItemStack item) {
         return item.getOrDefault(RRComponents.TESLA_DIAL, 0);
@@ -49,13 +47,13 @@ public class TeslaRenderer implements DynamicItemRenderer {
 			matrices.scale(0.12f, 0.12f, 0.12f);
 			// matrices.translate(0.3f, 0.05f, -0.1f);
 
-			tesla.render(matrices, buffer, light, overlay);
+			ObjModels.tesla.render(matrices, buffer, light, overlay);
 			matrices.mulPose(Axis.XP.rotationDegrees(spin));
-			dynamo.render(matrices, buffer, light, overlay);
+			ObjModels.dynamo.render(matrices, buffer, light, overlay);
 
 			matrices.popPose();
 		} else {
-			if (mode != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) matrices.popPose();
+			if (mode.firstPerson()) matrices.popPose();
 			matrices.pushPose();
             VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
 			matrices.scale(1.01f, 1.01f, 1.01f);
@@ -112,7 +110,7 @@ public class TeslaRenderer implements DynamicItemRenderer {
             cellularNoise.addVertex(matrices.last(),  1,  1,  1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
             cellularNoise.addVertex(matrices.last(),  1, -1,  1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
 			matrices.popPose();
-			if (mode != ItemDisplayContext.FIRST_PERSON_RIGHT_HAND) matrices.pushPose();
+			if (mode.firstPerson()) matrices.pushPose();
 		}
 	}
 

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -26,8 +26,8 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -145,26 +145,26 @@ public class EntityRaytrace extends EntityInanimate
 			if (MOP.getType() == HitResult.Type.BLOCK)
 			{
                 BlockPos pos = ((BlockHitResult) MOP).getBlockPos();
-                if (!level().isClientSide) level().addFreshEntity(new EntityLightningLink(level(), this, Math.sqrt(distanceToSqr(MOP.getLocation().x, MOP.getLocation().y, MOP.getLocation().z))));
+                if (!level().isClientSide()) level().addFreshEntity(new EntityLightningLink(level(), this, Math.sqrt(distanceToSqr(MOP.getLocation().x, MOP.getLocation().y, MOP.getLocation().z))));
 				// world.spawnEntity(new EntityNuclearBlast(world, MOP.blockX, pos.getY(), pos.getZ(), 5, false));
-				Block BlockHit = level().getBlockState(pos).getBlock();
+				BlockState BlockHit = level().getBlockState(pos);
 				float r = level().random.nextFloat();
-				if (BlockHit == RRBlocks.camo1 || BlockHit == RRBlocks.camo2 || BlockHit == RRBlocks.camo3)
+				if (BlockHit.is(RRBlocks.camo1) || BlockHit.is(RRBlocks.camo2) || BlockHit.is(RRBlocks.camo3))
 				{
 					if (r * 10 <= c)
 					{
-						if (!level().isClientSide) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+						if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						for (int i = 0; i < 4; i++)
 						{
 							level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (level().random.nextFloat() - 0.5F) * 0.1, level().random.nextFloat() * 0.05, (level().random.nextFloat() - 0.5F) * 0.1);
 						}
 					}
 				}
-				else if (BlockHit == RRBlocks.reactive)
+				else if (BlockHit.is(RRBlocks.reactive))
 				{
 					if (r * 15 <= c)
 					{
-						if (!level().isClientSide) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+						if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						for (int i = 0; i < 4; i++)
 						{
 							level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (level().random.nextFloat() - 0.5F) * 0.1, level().random.nextFloat() * 0.05, (level().random.nextFloat() - 0.5F) * 0.1);
@@ -173,7 +173,7 @@ public class EntityRaytrace extends EntityInanimate
 				}
 				else if (!BlackList.tesla(BlockHit) && r <= c)
 				{
-					if (!level().isClientSide) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+					if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					for (int i = 0; i < 4; i++)
 					{
 						level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (level().random.nextFloat() - 0.5F) * 0.1, level().random.nextFloat() * 0.05, (level().random.nextFloat() - 0.5F) * 0.1);
@@ -183,7 +183,7 @@ public class EntityRaytrace extends EntityInanimate
 			else if (MOP.getType() == HitResult.Type.ENTITY)
 			{
                 Entity entityHit = ((EntityHitResult) MOP).getEntity();
-                if (!level().isClientSide) level().addFreshEntity(new EntityLightningLink(level(), this, distanceTo(entityHit)));
+                if (!level().isClientSide()) level().addFreshEntity(new EntityLightningLink(level(), this, distanceTo(entityHit)));
 				if (entityHit instanceof Player entityPlayerHit)
 				{
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
@@ -195,22 +195,22 @@ public class EntityRaytrace extends EntityInanimate
 					}
 					else
 					{
-						entityPlayerHit.hurt(RivalRebelsDamageSource.electricity(level()), (RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
+						entityPlayerHit.hurt(RivalRebelsDamageSource.electricity(level()), (RRConfig.SERVER.getTeslaDecay() / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
 					}
 				}
 				else if (entityHit instanceof EntityB2Spirit)
 				{
-					entityHit.hurt(RivalRebelsDamageSource.electricity(level()), (RivalRebels.teslaDecay / 1.5f) / ((int) entityHit.distanceTo(this) + 1));
+					entityHit.hurt(RivalRebelsDamageSource.electricity(level()), (RRConfig.SERVER.getTeslaDecay() / 1.5f) / ((int) entityHit.distanceTo(this) + 1));
 				}
 				else
 				{
-					entityHit.hurt(RivalRebelsDamageSource.electricity(level()), RivalRebels.teslaDecay / ((int) entityHit.distanceTo(this) + 1));
+					entityHit.hurt(RivalRebelsDamageSource.electricity(level()), RRConfig.SERVER.getTeslaDecay() / ((int) entityHit.distanceTo(this) + 1));
 				}
 			}
 		}
 		else
 		{
-			if (!level().isClientSide) level().addFreshEntity(new EntityLightningLink(level(), this, range));
+			if (!level().isClientSide()) level().addFreshEntity(new EntityLightningLink(level(), this, range));
 		}
 		kill();
 	}

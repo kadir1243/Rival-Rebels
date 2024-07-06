@@ -40,12 +40,12 @@ public class ItemHackM202 extends TieredItem
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
 		user.setItemInHand(hand, ItemStack.EMPTY);
-		if (!world.isClientSide)
+		if (!world.isClientSide())
 		{
 			world.addFreshEntity(new EntityHackB83(world, user.getX(), user.getY(), user.getZ(), -user.yHeadRot, user.getXRot(), stack.isEnchanted()));
 		}
 		RivalRebelsSoundPlayer.playSound(user, 23, 2, 0.4f);
 		new Explosion(world, user.getX(), user.getY(), user.getZ(), 2, true, false, RivalRebelsDamageSource.flare(world));
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide);
+		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 }

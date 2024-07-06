@@ -15,13 +15,13 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.util.FastColor;
 import org.joml.Vector3f;
-import org.joml.Vector4f;
 
 public class ModelAstroBlasterBody {
-	private static final Vector3f vx	= new Vector3f(1, 0, 0).normalize();
-	private static final Vector3f vy	= new Vector3f(0, 1, 0).normalize();
-	private static final Vector3f vz	= new Vector3f(0, 0, 1).normalize();
+	private static final Vector3f vx = new Vector3f(1, 0, 0).normalize();
+	private static final Vector3f vy = new Vector3f(0, 1, 0).normalize();
+	private static final Vector3f vz = new Vector3f(0, 0, 1).normalize();
 	private static final Vector3f vxy = new Vector3f(0.5f, 0.5f, 0).normalize();
 	private static final Vector3f vyz = new Vector3f(0, 0.5f, 0.5f).normalize();
 	private static final Vector3f vxz = new Vector3f(0.5f, 0, 0.5f).normalize();
@@ -37,7 +37,7 @@ public class ModelAstroBlasterBody {
 
 	public static void render(PoseStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
 		matrices.pushPose();
-        Vector4f color = new Vector4f(red, green, blue, alpha);
+        int color = FastColor.ARGB32.colorFromFloat(alpha, red, green, blue);
 
 		matrices.scale(size, size, size);
         for (int p = 0; p < 4; p++) {

@@ -11,6 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockNuclearBomb;
@@ -20,14 +22,16 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.ChipData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import com.mojang.authlib.GameProfile;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.server.level.ServerPlayer;
@@ -47,11 +51,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TileEntityNuclearBomb extends BlockEntity implements Container, Tickable, ExtendedScreenHandlerFactory<TileEntityNuclearBomb.BombData> {
-	public String			username		= null;
+	public GameProfile player = null;
 	public RivalRebelsTeam	rrteam			= null;
 	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
 
-    public int				Countdown		= RivalRebels.nuclearBombCountdown * 20;
+    public int				Countdown		= RRConfig.SERVER.getNuclearBombCountdown() * 20;
 
 	public int				AmountOfCharges	= 0;
 	public boolean			hasTrollface	= false;
@@ -117,9 +121,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 	public void setItem(int index, ItemStack stack) {
 		this.chestContents.set(index, stack);
 
-		if (!stack.isEmpty() && stack.getCount() > this.getMaxStackSize()) {
-			stack.setCount(this.getMaxStackSize());
-		}
+        stack.limitSize(this.getMaxStackSize(stack));
         setChanged();
 	}
 
@@ -130,7 +132,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
         AmountOfCharges = 0;
         for (ItemStack rod : getRods()) {
             hasTrollface |= rod.is(RRItems.trollmask);
-            if (rod.is(RRItems.nuclearelement)) {
+            if (rod.is(RRItems.NUCLEAR_ROD)) {
                 AmountOfCharges++;
             }
         }
@@ -139,7 +141,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
         if (hasChip) {
             ChipData chipData = getItem(12).get(RRComponents.CHIP_DATA);
             rrteam = chipData.team();
-            username = chipData.username();
+            player = chipData.gameProfile();
         }
         hasExplosive = getItem(11).is(RRBlocks.timedbomb.asItem());
     }
@@ -175,68 +177,41 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 		if (hasFuse && hasExplosive && hasChip)
 		{
 			double dist = 10000000;
-			if (!sp || RivalRebels.stopSelfnukeinSP) {
+			if (!sp || RRConfig.SERVER.isStopSelfnukeinSP()) {
 				if (rrteam == RivalRebelsTeam.OMEGA) {
 					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.omegaObjPos.getZ());
 				} else if (rrteam == RivalRebelsTeam.SIGMA) {
 					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
 				}
 			}
-			if (dist > (RivalRebels.nuclearBombStrength + (AmountOfCharges * AmountOfCharges) + 29) * (RivalRebels.nuclearBombStrength + (AmountOfCharges * AmountOfCharges) + 29))
+			if (dist > (RRConfig.SERVER.getNuclearBombStrength() + (AmountOfCharges * AmountOfCharges) + 29) * (RRConfig.SERVER.getNuclearBombStrength() + (AmountOfCharges * AmountOfCharges) + 29))
 			{
 				if (Countdown > 0) Countdown--;
 			}
-			else if (!level.isClientSide)
+			else if (!level.isClientSide())
 			{
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".warning_to_specific_player", username), false);
+                    player.displayClientMessage(RRIdentifiers.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
                     player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
 		}
 		else
 		{
-			Countdown = RivalRebels.nuclearBombCountdown * 20;
+			Countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
 		}
 
-		if (Countdown == 200 && !level.isClientSide && RivalRebels.nuclearBombCountdown > 10) {
-            MutableComponent line1 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_1");
-            MutableComponent line2 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_2");
-            MutableComponent line3 = Component.translatable(RivalRebels.MODID + ".warning_bomb_will_explode_line_3");
-            for (Player player : level.players()) {
-                player.displayClientMessage(line1, false);
-                player.displayClientMessage(line2, false);
-                player.displayClientMessage(line3, false);
-            }
+		if (Countdown == 200 && !level.isClientSide && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
+            RRIdentifiers.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}
 
-		if (Countdown == 0 && AmountOfCharges != 0 && !level.isClientSide)
+		if (Countdown == 0 && AmountOfCharges != 0 && !level.isClientSide())
 		{
 			level.setSkyFlashTime(2);
-			float pitch = 0;
-			float yaw = 0;
-			switch(this.getBlockState().getValue(BlockNuclearBomb.META))
-			{
-			default:
-				pitch = -90;
-				break;
-			case 1:
-				pitch = 90;
-				break;
-			case 2:
-				yaw = 180;
-				break;
-			case 3:
-				yaw = 0;
-				break;
-			case 4:
-				yaw = 270;
-				break;
-			case 5:
-				yaw = 90;
-				break;
-			}
+            Direction facing = this.getBlockState().getValue(BlockNuclearBomb.FACING);
+            float pitch = facing.getAxis().isVertical() ? facing.toYRot() : 0;
+			float yaw = facing.getAxis().isHorizontal() ? facing.toYRot() : 0;
 
 			level.addFreshEntity(new EntityNuke(level, getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, yaw, pitch, AmountOfCharges, hasTrollface));
 			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
