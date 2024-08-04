@@ -16,8 +16,8 @@ import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -47,33 +47,21 @@ public class BlockAmmunition extends Block
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.redrod.getDescription() + ". §9(" + RRItems.einsten.getDescription() + " " + RRIdentifiers.ammunition() + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.gasgrenade.getDescription() + ". §9(" + Component.translatable("RivalRebels.chemicalweapon") + ")"), false);
 		} else {
-			ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.rocket, 32));
-			ItemEntity ei1 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.battery, 16));
-			ItemEntity ei2 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultInstance());
-			ItemEntity ei3 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultInstance());
-			ItemEntity ei4 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultInstance());
-			ItemEntity ei5 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.hydrod.getDefaultInstance());
-			ItemEntity ei10 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.fuel, 64));
-			ItemEntity ei11 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.gasgrenade, 6));
-			ItemEntity ei12 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultInstance());
-			ItemEntity ei13 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultInstance());
-			ItemEntity ei14 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultInstance());
-			ItemEntity ei15 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.redrod.getDefaultInstance());
-			level.addFreshEntity(ei);
-			level.addFreshEntity(ei1);
-			level.addFreshEntity(ei2);
-			level.addFreshEntity(ei3);
-			level.addFreshEntity(ei4);
-			level.addFreshEntity(ei5);
-			level.addFreshEntity(ei10);
-			level.addFreshEntity(ei11);
-			level.addFreshEntity(ei12);
-			level.addFreshEntity(ei13);
-			level.addFreshEntity(ei14);
-			level.addFreshEntity(ei15);
-			level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+            Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.rocket, 32));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.battery, 16));
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.fuel, 64));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.gasgrenade, 6));
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.getDefaultInstance());
+			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			if (level.random.nextInt(3) == 0) {
-				level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.NUCLEAR_ROD, 1)));
+				Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.getDefaultInstance());
 				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.getDescription() + ". §9(" + "Used in nuclear weapons" + ")"), false);
 			}
 		}

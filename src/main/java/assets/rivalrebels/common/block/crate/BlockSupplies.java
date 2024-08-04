@@ -15,8 +15,8 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -54,30 +54,20 @@ public class BlockSupplies extends Block
 		}
 		if (!level.isClientSide())
 		{
-			ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.breadbox));
-			ItemEntity ei1 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.armyshovel));
-			ItemEntity ei2 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.jump, 4));
-			ItemEntity ei3 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.quicksandtrap, 4));
-			ItemEntity ei4 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.steel, 32));
-			ItemEntity ei5 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.loader, 2));
-			ItemEntity ei6 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(Items.BUCKET, 2));
-			ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.mariotrap, 4));
-			ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.expill, 6));
-			ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.safepill, 3));
-			level.addFreshEntity(ei);
-			level.addFreshEntity(ei1);
-			level.addFreshEntity(ei2);
-			level.addFreshEntity(ei3);
-			level.addFreshEntity(ei4);
-			level.addFreshEntity(ei5);
-			level.addFreshEntity(ei6);
-			level.addFreshEntity(ei7);
-			level.addFreshEntity(ei8);
-			level.addFreshEntity(ei9);
-            level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+            Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.breadbox));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.armyshovel));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.jump, 4));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.quicksandtrap, 4));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.steel, 32));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.loader, 2));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(Items.BUCKET, 2));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.mariotrap, 4));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.expill, 6));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.safepill, 3));
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			if (level.random.nextInt(5) == 0)
 			{
-				level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.NUCLEAR_ROD.getDefaultInstance()));
+                Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.getDefaultInstance());
 				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.getDescription() + ". §9" + "(Used in nuclear weapons)"), false);
 			}
 			return InteractionResult.sidedSuccess(level.isClientSide());

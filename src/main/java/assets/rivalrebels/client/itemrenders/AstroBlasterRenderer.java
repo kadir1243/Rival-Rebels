@@ -12,42 +12,44 @@
 package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.*;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class AstroBlasterRenderer implements DynamicItemRenderer {
     private static final RenderType LIGHTNING = RenderType.create(
-        RivalRebels.MODID+"_lightning_astro_blast",
+        RRIdentifiers.MODID+"_lightning_astro_blast",
         DefaultVertexFormat.POSITION_COLOR,
         VertexFormat.Mode.QUADS,
-        1536,
-        false,
-        true,
+        99999,
         RenderType.CompositeState.builder()
             .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
             .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
             .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
             .createCompositeState(false)
     );
-    public static final Material REDSTONE_ROD_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etredrod);
-    public static final Material EINSTEIN_HANDLE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.eteinstenhandle);
-    public static final Material EINSTEIN_BARREL_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.eteinstenbarrel);
-    public static final Material EINSTEIN_BACK_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.eteinstenback);
+    private static final RenderType LIGHTNING_TRIANGLES = RenderType.create(
+        RRIdentifiers.MODID+"_lightning_astro_blast_triangles",
+        DefaultVertexFormat.POSITION_COLOR,
+        VertexFormat.Mode.TRIANGLES,
+        99999,
+        RenderType.CompositeState.builder()
+            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+            .createCompositeState(false)
+    );
+
     private float pullback = 0;
     private float rotation = 0;
     private boolean isreloading = false;
@@ -56,13 +58,14 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
     private int reloadcooldown = 0;
 
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        int repairCost = stack.getOrDefault(DataComponents.REPAIR_COST, 0);
         spin++;
-        if (stack.get(DataComponents.REPAIR_COST) >= 1) {
-            spin += stack.get(DataComponents.REPAIR_COST) / 2.2;
+        if (repairCost >= 1) {
+            spin = (int) (spin + repairCost / 2.2);
         }
         spin %= 628;
         if (reloadcooldown > 0) reloadcooldown--;
-        if (stack.get(DataComponents.REPAIR_COST) > 20 && reloadcooldown == 0) isreloading = true;
+        if (repairCost > 20 && reloadcooldown == 0) isreloading = true;
         if (isreloading) {
             if (stage == 0) if (pullback < 0.3) pullback += 0.03;
             else stage = 1;
@@ -84,9 +87,8 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.pushPose();
         matrices.translate(0f, 0.9f, 0f);
-        VertexConsumer buffer = vertexConsumers.getBuffer(LIGHTNING);
-        VertexConsumer cellular_noise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-        ModelAstroBlasterBarrel.render(matrices, EINSTEIN_BARREL_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        VertexConsumer cellular_noise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES);
+        ModelAstroBlasterBarrel.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.eteinstenbarrel)), light, overlay);
         if (stack.isEnchanted()) {
             ModelAstroBlasterBarrel.render(matrices, cellular_noise, light, overlay);
         }
@@ -96,7 +98,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.translate(0.22f, -0.025f, 0f);
         matrices.mulPose(Axis.ZP.rotationDegrees(90));
         matrices.scale(0.03125f, 0.03125f, 0.03125f);
-        ModelAstroBlasterHandle.render(matrices, EINSTEIN_HANDLE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        ModelAstroBlasterHandle.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.eteinstenhandle)), light, overlay);
         if (stack.isEnchanted()) {
             ModelAstroBlasterHandle.render(matrices, cellular_noise, light, overlay);
         }
@@ -112,9 +114,9 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.pushPose();
         matrices.translate(0f, 0.2f, 0f);
         matrices.scale(0.85F, 0.85F, 0.85F);
-        ModelAstroBlasterBack.render(matrices, EINSTEIN_BACK_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.eteinstenback)), light, overlay);
         if (stack.isEnchanted()) {
-            ModelAstroBlasterBack.render(matrices, cellular_noise, light, overlay);
+            ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES), light, overlay);
         }
         matrices.popPose();
 
@@ -122,7 +124,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.translate(0f, -pullback, 0f);
         matrices.mulPose(Axis.YP.rotationDegrees(rotation));
         matrices.pushPose();
-        VertexConsumer redstoneRodTextureVertexConsumer = REDSTONE_ROD_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+        VertexConsumer redstoneRodTextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etredrod));
         matrices.translate(0.12f, 0.1f, 0.12f);
         matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
@@ -163,6 +165,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         float prevAddedX;
         float prevAddedZ;
         // double angle = 0;
+        VertexConsumer lightningQuads = vertexConsumers.getBuffer(LIGHTNING);
         for (float AddedY = distance; AddedY >= 0; AddedY -= segmentDistance) {
             prevAddedX = AddedX;
             prevAddedZ = AddedZ;
@@ -172,10 +175,10 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
             if (dist != 0) {
                 float tempAddedX = AddedX / dist;
                 float tempAddedZ = AddedZ / dist;
-                if (Math.abs(tempAddedX) < Math.abs(AddedX)) {
+                if (Mth.abs(tempAddedX) < Mth.abs(AddedX)) {
                     AddedX = tempAddedX;
                 }
-                if (Math.abs(tempAddedZ) < Math.abs(AddedZ)) {
+                if (Mth.abs(tempAddedZ) < Mth.abs(AddedZ)) {
                     AddedZ = tempAddedZ;
                 }
                 // angle = Math.atan2(tempAddedX, tempAddedZ);
@@ -185,25 +188,25 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
             }
 
             for (float o = 0; o <= radius; o += radius / 2f) {
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
 
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
 
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
 
-                buffer.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
-                buffer.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
             }
             //matrices.pushPose();
             //matrices.mulPose(Axis.ZP.rotationDegrees(90));
@@ -239,12 +242,13 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.popPose();
 
+        VertexConsumer lightningTriangles = vertexConsumers.getBuffer(LIGHTNING_TRIANGLES);
         matrices.pushPose();
         matrices.translate(0f, 0.8f, 0f);
         matrices.mulPose(Axis.ZP.rotationDegrees(180));
         matrices.mulPose(Axis.YP.rotationDegrees(spin));
         matrices.scale(0.9F, 4.1F, 0.9F);
-        ModelAstroBlasterBody.render(matrices, buffer, (float) (0.22f + (Math.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
+        ModelAstroBlasterBody.render(matrices, lightningTriangles, (float) (0.22f + (Mth.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
         matrices.popPose();
 
         matrices.pushPose();
@@ -252,7 +256,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.mulPose(Axis.ZP.rotationDegrees(180));
         matrices.mulPose(Axis.YP.rotationDegrees(-spin));
         matrices.scale(0.9F, 4.1F, 0.9F);
-        ModelAstroBlasterBody.render(matrices, buffer, (float) (0.22f + (Math.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
+        ModelAstroBlasterBody.render(matrices, lightningTriangles, (float) (0.22f + (Mth.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
         matrices.popPose();
 
         matrices.popPose();

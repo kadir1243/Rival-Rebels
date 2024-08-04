@@ -68,15 +68,15 @@ public class EntityB2Frag extends EntityInanimate
 
 		if (Type == 1)
 		{
-            setPosRaw(getX() - (Mth.cos(((-getYRot()) / 180.0F) * (float) Math.PI) * 7.5F),
+            setPosRaw(getX() - (Mth.cos(((-getYRot()) / 180.0F) * Mth.PI) * 7.5F),
                 getY(),
-                getZ() - (Mth.sin(((-getYRot()) / 180.0F) * (float) Math.PI) * 7.5F));
+                getZ() - (Mth.sin(((-getYRot()) / 180.0F) * Mth.PI) * 7.5F));
 		}
 		else if (Type == 0)
 		{
-            setPosRaw(getX() - (Mth.cos(((-getYRot() + 180) / 180.0F) * (float) Math.PI) * 7.5F),
+            setPosRaw(getX() - (Mth.cos(((-getYRot() + 180) / 180.0F) * Mth.PI) * 7.5F),
                 getY(),
-                getZ() - (Mth.sin(((-getYRot() + 180) / 180.0F) * (float) Math.PI) * 7.5F));
+                getZ() - (Mth.sin(((-getYRot() + 180) / 180.0F) * Mth.PI) * 7.5F));
 		}
 
 		setPos(getX(), getY(), getZ());

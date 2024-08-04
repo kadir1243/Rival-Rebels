@@ -65,7 +65,7 @@ public class AntimatterBomb {
 				if (x2 + Z * Z < rad)
 				{
                     BlockPos pos1 = new BlockPos(X + pos.getX(), 70,Z + pos.getZ());
-					for (; pos1.getY() > 0; pos1 = pos1.below())
+					for (; pos1.getY() > world.getMinBuildHeight(); pos1 = pos1.below())
 					{
                         BlockState state = world.getBlockState(pos1);
 						if (!state.getFluidState().isEmpty()) {
@@ -83,9 +83,9 @@ public class AntimatterBomb {
 		{
 			boolean repeat = processChunk(lastposX, lastposZ);
 
-			shell = (int) Math.floor((Math.sqrt(n) + 1) / 2);
+			shell = Mth.floor((Math.sqrt(n) + 1) / 2);
 			int shell2 = 2 * shell;
-			leg = (int) Math.floor((n - (shell2 - 1) * (shell2 - 1)) / shell2);
+			leg = Mth.floor((n - (shell2 - 1) * (shell2 - 1)) / shell2);
 			element = (n - (shell2 - 1) * (shell2 - 1)) - shell2 * leg - shell + 1;
 			lastposX = leg == 0 ? shell : leg == 1 ? -element : leg == 2 ? -shell : element;
 			lastposZ = leg == 0 ? element : leg == 1 ? shell : leg == 2 ? -element : -shell;
@@ -117,7 +117,7 @@ public class AntimatterBomb {
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
 			if (RRConfig.SERVER.isElevation()) yele = y;
-			int ylimit = (int) Math.floor(yele - (radius - dist) * 4);
+			int ylimit = Mth.floor(yele - (radius - dist) * 4);
 
 			for (int Y = y; Y > ylimit; Y--)
 			{
@@ -154,9 +154,7 @@ public class AntimatterBomb {
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y >= 0; Y--)
-				{
-					if (Y == 0) continue;
+				for (int Y = ylimit; Y >= world.getMinBuildHeight(); Y--) {
 					int yy = Y + y;
 					BlockState state = world.getBlockState(new BlockPos(x + posX, yy, z + posZ));
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();

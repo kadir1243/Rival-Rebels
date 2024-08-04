@@ -20,7 +20,6 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -28,8 +27,6 @@ import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public class RenderNuke extends EntityRenderer<EntityNuke> {
-    public static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etwacknuke);
-
     public RenderNuke(EntityRendererProvider.Context manager) {
         super(manager);
     }
@@ -40,7 +37,7 @@ public class RenderNuke extends EntityRenderer<EntityNuke> {
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
-        ObjModels.nuke.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.renderSolid(ObjModels.nuke, RRIdentifiers.etwacknuke, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

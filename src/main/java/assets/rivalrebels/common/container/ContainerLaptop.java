@@ -15,6 +15,7 @@ import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -27,16 +28,16 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerLaptop extends AbstractContainerMenu {
 	protected Container laptop;
-    private final ContainerData propertyDelegate;
+    private final ContainerData containerData;
 
     public ContainerLaptop(int syncId, Inventory playerInventory) {
-        this(syncId, playerInventory, new SimpleContainer(14), new SimpleContainerData(4));
+        this(syncId, playerInventory, new SimpleContainer(14), new SimpleContainerData(7));
     }
 
-    public ContainerLaptop(int syncId, Inventory inventoryPlayer, Container laptop, ContainerData propertyDelegate) {
+    public ContainerLaptop(int syncId, Inventory inventoryPlayer, Container laptop, ContainerData containerData) {
         super(RivalRebelsGuiHandler.LAPTOP_SCREEN_HANDLER_TYPE, syncId);
         this.laptop = laptop;
-        this.propertyDelegate = propertyDelegate;
+        this.containerData = containerData;
         addSlot(new SlotRR(laptop, 0, 80, 23, 1, ItemChip.class));
 		addSlot(new SlotRR(laptop, 1, 50, 40, 1, ItemChip.class));
 		addSlot(new SlotRR(laptop, 2, 111, 40, 1, ItemChip.class));
@@ -52,6 +53,7 @@ public class ContainerLaptop extends AbstractContainerMenu {
 		addSlot(new SlotRR(laptop, 12, 80, 94, 1, ItemRodHydrogen.class).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 13, 98, 94, 1, ItemRodHydrogen.class).setAcceptsTimedBomb(true));
 		bindPlayerInventory(inventoryPlayer);
+        this.addDataSlots(containerData);
 	}
 
 	@Override
@@ -82,22 +84,22 @@ public class ContainerLaptop extends AbstractContainerMenu {
 	}
 
     public boolean isReady() {
-        return propertyDelegate.get(0) == 1;
+        return containerData.get(0) == 1;
     }
 
     public boolean hasChips() {
-        return propertyDelegate.get(1) == 1;
+        return containerData.get(1) == 1;
     }
 
     public int getB2spirit() {
-        return propertyDelegate.get(2);
+        return containerData.get(2);
     }
 
     public int getB2carpet() {
-        return propertyDelegate.get(3);
+        return containerData.get(3);
     }
 
-    public void onGoButtonPressed() {
-        propertyDelegate.set(0, 0);
+    public BlockPos getLaptopPos() {
+        return new BlockPos(containerData.get(4), containerData.get(5), containerData.get(6));
     }
 }

@@ -14,9 +14,8 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -60,14 +59,14 @@ public class EntityRoddiskLeader extends RoddiskBase {
 	public EntityRoddiskLeader(Level par1World, LivingEntity shooter, float par3) {
 		super(RREntities.RODDISK_LEADER, par1World, shooter);
 		this.moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYRot(), shooter.getXRot());
-        setPosRaw(getX() - (Mth.cos(this.getYRot() / 180.0F * (float) Math.PI) * 0.16F),
+        setPosRaw(getX() - (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY() - 0.1,
-            getZ() - (Mth.sin(this.getYRot() / 180.0F * (float) Math.PI) * 0.16F)
+            getZ() - (Mth.sin(this.getYRot() / 180.0F * Mth.PI) * 0.16F)
         );
 		this.setPos(this.getX(), this.getY(), this.getZ());
-        setDeltaMovement((-Mth.sin(this.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(this.getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(this.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(this.getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(this.getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(this.getYRot() / 180.0F * Mth.PI) * Mth.cos(this.getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * Mth.cos(this.getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(this.getXRot() / 180.0F * Mth.PI)));
 		this.setHeading(this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), par3 * 1.5F, 1.0F);
 	}
 
@@ -85,8 +84,8 @@ public class EntityRoddiskLeader extends RoddiskBase {
 		par5 *= par7;
 		setDeltaMovement(par1, par3, par5);
 		float var10 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-		this.setYRot(yRotO = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
-		this.setXRot(xRotO = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI));
+		this.setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
+		this.setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -101,11 +100,11 @@ public class EntityRoddiskLeader extends RoddiskBase {
 			ItemEntity ei = new ItemEntity(level(), shooter.getX(), shooter.getY(), shooter.getZ(), RRItems.roddisk.getDefaultInstance());
 			level().addFreshEntity(ei);
 			kill();
-			RivalRebelsSoundPlayer.playSound(this, 6, 1);
+            this.playSound(RRSounds.RODDISK_UNKNOWN1);
 		}
 		if (tickCount == 10)
 		{
-			RivalRebelsSoundPlayer.playSound(this, 6, 0);
+            this.playSound(RRSounds.RODDISK_UNKNOWN0);
 		}
 
 		int radius = 2;
@@ -231,7 +230,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
                 } else if (state.is(RRBlocks.landmine) || state.is(RRBlocks.alandmine)) {
                     state.entityInside(level(), pos, this);
                 } else {
-                    if (state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_PANES))
+                    if (state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES))
                     {
                         level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                     }
@@ -246,9 +245,9 @@ public class EntityRoddiskLeader extends RoddiskBase {
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
-		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
+		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 		{
         }
 
@@ -289,7 +288,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
 		if (player.getInventory().add(RRItems.roddisk.getDefaultInstance()))
 		{
 			kill();
-			RivalRebelsSoundPlayer.playSound(this, 6, 1);
+            this.playSound(RRSounds.RODDISK_UNKNOWN1);
 		}
 		return InteractionResult.sidedSuccess(level().isClientSide());
 	}

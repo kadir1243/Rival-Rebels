@@ -14,13 +14,15 @@ package assets.rivalrebels.client.model;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 
 @Environment(EnvType.CLIENT)
-public class ModelRocket
-{
+public class ModelRocket {
 	private static final Vector3f	vy1		= new Vector3f(0, 0, 0);
 	private static final Vector3f	vy2		= new Vector3f(0, 2.5f, 0);
 	private static final Vector3f	vpx1	= new Vector3f(0.5f, 0, 0);
@@ -56,9 +58,9 @@ public class ModelRocket
 	private static final float	ty2		= 0.09375f;
 	private static final float	ty3		= 0.1875f;
 
-	public static void render(PoseStack matrices, VertexConsumer buffer, boolean fins, int light, int overlay)
-	{
-		matrices.pushPose();
+	public static void render(PoseStack matrices, MultiBufferSource vertexConsumers, ResourceLocation texture, boolean fins, int light, int overlay) {
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
+        matrices.pushPose();
 		matrices.scale(0.125f, 0.25f, 0.125f);
 
 		RenderHelper.addFace(matrices, buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2, light, overlay);
@@ -80,8 +82,7 @@ public class ModelRocket
 		RenderHelper.addFace(matrices, buffer, vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2, light, overlay);
 		RenderHelper.addFace(matrices, buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2, light, overlay);
 
-		if (fins)
-		{
+		if (fins) {
 			RenderHelper.addFace(matrices, buffer, vnx3, vpx3, vpx4, vnx4, tx3, tx4, ty1, ty3, light, overlay);
 			RenderHelper.addFace(matrices, buffer, vpx3, vnx3, vnx4, vpx4, tx3, tx4, ty1, ty3, light, overlay);
 			RenderHelper.addFace(matrices, buffer, vnz3, vpz3, vpz4, vnz4, tx3, tx4, ty1, ty3, light, overlay);

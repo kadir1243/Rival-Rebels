@@ -38,9 +38,11 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -59,7 +61,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
     private static final SavedData.Factory<RivalRebelsRound> WORLD_DATA_TYPE = new SavedData.Factory<>(RivalRebelsRound::new, RivalRebelsRound::fromNbt, null);
     public static final StreamCodec<FriendlyByteBuf, RivalRebelsRound> STREAM_CODEC = StreamCodec.ofMember(RivalRebelsRound::toBytes, RivalRebelsRound::fromBytes);
     public static final Type<RivalRebelsRound> PACKET_TYPE = new Type<>(RRIdentifiers.create("rivalrebelsrounddata"));
-    private int						cSpawnx			= -1, cSpawnz = -1;
+    public ChunkPos cSpawn = new ChunkPos(-1, -1);
     public BlockPos omegaObjPos = new BlockPos(-1, -1, -1);
     public BlockPos sigmaObjPos = new BlockPos(-1, -1, -1);
 	private String					MotD			= "Select your class and nuke the enemy team's objective to win.";
@@ -97,8 +99,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	public static RivalRebelsRound fromBytes(FriendlyByteBuf buf) {
         RivalRebelsRound packet = new RivalRebelsRound();
         packet.roundstarted = buf.readBoolean();
-        packet.cSpawnx = buf.readInt();
-        packet.cSpawnz = buf.readInt();
+        packet.cSpawn = buf.readChunkPos();
         packet.omegaObjPos = buf.readBlockPos();
         packet.sigmaObjPos = buf.readBlockPos();
         packet.winCountdown = buf.readInt();
@@ -128,7 +129,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             if (!roundstarted) return;
-            newPlayer.setPosRaw(cSpawnx, 200, cSpawnz);
+            newPlayer.setPosRaw(cSpawn.x, 200, cSpawn.z);
             ServerPlayNetworking.send(newPlayer, GuiSpawnPacket.INSTANCE);
         });
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -137,7 +138,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
             if (!rrplayerlist.contains(player.getGameProfile()))
             {
                 player.getInventory().clearContent();
-                player.setPosRaw(cSpawnx, 200, cSpawnz);
+                player.setPosRaw(cSpawn.x, 200, cSpawn.z);
                 //rrplayerlist.add(new RivalRebelsPlayer(player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RRConfig.SERVER.getMaximumResets()));
             }
             ServerPlayNetworking.send(player, rrplayerlist);
@@ -150,8 +151,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
     public static RivalRebelsRound fromNbt(CompoundTag nbt, HolderLookup.Provider registries) {
         RivalRebelsRound packet = new RivalRebelsRound();
         packet.roundstarted = nbt.getBoolean("roundstarted");
-        packet.cSpawnx = nbt.getInt("cSpawnx");
-        packet.cSpawnz = nbt.getInt("cSpawnz");
+        packet.cSpawn = new ChunkPos(nbt.getLong("cSpawn"));
         packet.omegaObjPos = BlockPos.of(nbt.getLong("omegaObjPos"));
         packet.sigmaObjPos = BlockPos.of(nbt.getLong("sigmaObjPos"));
         packet.winCountdown = nbt.getInt("winCountdown");
@@ -166,8 +166,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 
     public static void toBytes(RivalRebelsRound packet, FriendlyByteBuf buf) {
         buf.writeBoolean(packet.roundstarted);
-		buf.writeInt(packet.cSpawnx);
-		buf.writeInt(packet.cSpawnz);
+		buf.writeChunkPos(packet.cSpawn);
         buf.writeBlockPos(packet.omegaObjPos);
 		buf.writeBlockPos(packet.sigmaObjPos);
 		buf.writeInt(packet.winCountdown);
@@ -187,8 +186,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putBoolean("roundstarted", roundstarted);
-        tag.putInt("cSpawnx", cSpawnx);
-        tag.putInt("cSpawnz", cSpawnz);
+        tag.putLong("cSpawn", cSpawn.toLong());
         tag.putLong("omegaObjPos", omegaObjPos.asLong());
         tag.putLong("sigmaObjPos", sigmaObjPos.asLong());
         tag.putInt("winCountdown", winCountdown);
@@ -210,8 +208,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	public void copy(RivalRebelsRound m)
 	{
 		roundstarted = m.roundstarted;
-		cSpawnx = m.cSpawnx;
-		cSpawnz = m.cSpawnz;
+		cSpawn = m.cSpawn;
         omegaObjPos = m.omegaObjPos;
         sigmaObjPos = m.sigmaObjPos;
 		winCountdown = m.winCountdown;
@@ -235,17 +232,17 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
             player.hurt(world.damageSources().fellOutOfWorld(), 20000);
             player.getInventory().clearContent();
         }
-		cSpawnz += spawnDist;
+        cSpawn = new ChunkPos(cSpawn.x, cSpawn.z + spawnDist);
         if (!world.isClientSide()) {
-            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawnx, 200, cSpawnz), 0);
+            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawn.x, 200, cSpawn.z), 0);
         }
 		float f = RRConfig.SERVER.getRhodesInRoundsChance();
 		while (f >= 1)
 		{
 			f--;
-			world.addFreshEntity(new EntityRhodes(world, cSpawnx+world.random.nextDouble()-0.5f, 170, cSpawnz+world.random.nextDouble()-0.5f,1));
+			world.addFreshEntity(new EntityRhodes(world, cSpawn.x+world.random.nextDouble()-0.5f, 170, cSpawn.z+world.random.nextDouble()-0.5f,1));
 		}
-		if (f > world.random.nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawnx+world.random.nextDouble()-0.5f, 170, cSpawnz+world.random.nextDouble()-0.5f,1));
+		if (f > world.random.nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawn.x+world.random.nextDouble()-0.5f, 170, cSpawn.z+world.random.nextDouble()-0.5f,1));
 		buildSpawn();
 		omegaHealth=RRConfig.SERVER.getObjectiveHealth();
 		sigmaHealth=RRConfig.SERVER.getObjectiveHealth();
@@ -256,8 +253,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	{
 		fatnuke = false;
 		roundstarted = true;
-		cSpawnx = x;
-		cSpawnz = z - spawnDist;
+        cSpawn = new ChunkPos(x, z - spawnDist);
 		newRound();
 	}
 
@@ -268,9 +264,8 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 			fatnuke = true;
 			roundstarted = true;
 			rrplayerlist = new RivalRebelsPlayerList();
-			cSpawnx = (omegaObjPos.getX()+sigmaObjPos.getX())/2;
-			cSpawnz = (omegaObjPos.getZ()+sigmaObjPos.getZ())/2;
-            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawnx, world.getChunk(new BlockPos(cSpawnx, 0, cSpawnz)).getHeight(), cSpawnz), 0F);
+			cSpawn = new ChunkPos((omegaObjPos.getX()+sigmaObjPos.getX())/2, (omegaObjPos.getZ()+sigmaObjPos.getZ())/2);
+            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawn.x, world.getChunk(new BlockPos(cSpawn.x, 0, cSpawn.z)).getHeight(), cSpawn.z), 0F);
 			omegaHealth=RRConfig.SERVER.getObjectiveHealth();
 			sigmaHealth=RRConfig.SERVER.getObjectiveHealth();
 			sendUpdatePacket();
@@ -419,16 +414,16 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 				for (int y1 = -5; y1 < hrs; y1++)
 				{
 					int YY = y1 * y1 + ZZ;
-					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlockAndUpdate(new BlockPos(cSpawnx + x1, 200 + y1, cSpawnz + z1), RRBlocks.fshield.defaultBlockState());
+					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlockAndUpdate(new BlockPos(cSpawn.x + x1, 200 + y1, cSpawn.z + z1), RRBlocks.fshield.defaultBlockState());
 				}
 			}
 		}
 
-        omegaObjPos = new BlockPos(cSpawnx + objDist, omegaObjPos.getY(), cSpawnz);
-        sigmaObjPos = new BlockPos(cSpawnx - objDist, sigmaObjPos.getY(), cSpawnz);
+        omegaObjPos = new BlockPos(cSpawn.x + objDist, omegaObjPos.getY(), cSpawn.z);
+        sigmaObjPos = new BlockPos(cSpawn.x - objDist, sigmaObjPos.getY(), cSpawn.z);
 
 		ChunkAccess chunk = world.getChunk(omegaObjPos);
-        for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > 0; omegaObjPos.below())
+        for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > world.getMinBuildHeight(); omegaObjPos.below())
         {
             if (!chunk.getBlockState(omegaObjPos).isAir())
             {
@@ -437,7 +432,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         }
         chunk = world.getChunk(sigmaObjPos);
         sigmaObjPos = new BlockPos(sigmaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, sigmaObjPos.getZ());
-        for (; sigmaObjPos.getY() > 0; sigmaObjPos = sigmaObjPos.below())
+        for (; sigmaObjPos.getY() > world.getMinBuildHeight(); sigmaObjPos = sigmaObjPos.below())
         {
             if (!chunk.getBlockState(sigmaObjPos).isAir())
             {
@@ -453,7 +448,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 				int ZZ = zz * zz + XX;
 				if (ZZ <= objRadius2)
 				{
-					if (Math.abs(xx) == 15 && Math.abs(zz) == 15)
+					if (Mth.abs(xx) == 15 && Mth.abs(zz) == 15)
 					{
 						world.setBlockAndUpdate(omegaObjPos.offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
 						world.setBlockAndUpdate(sigmaObjPos.offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
@@ -503,7 +498,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 
 	private boolean isInSpawn(Player player)
 	{
-		return player.position().y() < 203 && player.position().y() > 198 && player.distanceToSqr(cSpawnx, 200, cSpawnz) < spawnRadius2;
+		return player.position().y() < 203 && player.position().y() > 198 && player.distanceToSqr(cSpawn.x, 200, cSpawn.z) < spawnRadius2;
 	}
 
 	public void winSigma()

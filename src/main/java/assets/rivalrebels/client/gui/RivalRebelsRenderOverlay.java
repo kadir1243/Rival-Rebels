@@ -85,7 +85,7 @@ public class RivalRebelsRenderOverlay {
         int h = graphics.guiHeight();
 
         RenderSystem.defaultBlendFunc();
-        ((GuiGraphicsAccessor) graphics).callBlit(
+        ((GuiGraphicsAccessor) graphics).blit(
             RRIdentifiers.guirhodesline,
             0,
             w,
@@ -100,7 +100,7 @@ public class RivalRebelsRenderOverlay {
         );
 
         RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA);
-        ((GuiGraphicsAccessor) graphics).callBlit(
+        ((GuiGraphicsAccessor) graphics).blit(
             RRIdentifiers.guirhodesout,
             0,
             w,
@@ -116,7 +116,7 @@ public class RivalRebelsRenderOverlay {
 
         if (glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_H) == GLFW_PRESS) {
             RenderSystem.defaultBlendFunc();
-            ((GuiGraphicsAccessor) graphics).callBlit(
+            ((GuiGraphicsAccessor) graphics).blit(
                 RRIdentifiers.guirhodeshelp,
                     Mth.floor(w*0.25F),
                     Mth.floor(w*0.75F),
@@ -135,7 +135,7 @@ public class RivalRebelsRenderOverlay {
             float s = 8;
             float wl = w*0.5f;
             float hl = h*0.05f;
-            ((GuiGraphicsAccessor) graphics).callBlit(
+            ((GuiGraphicsAccessor) graphics).blit(
                 RRIdentifiers.create("textures/" + RenderRhodes.texfolders[rhodes.itexfolder] + rhodes.itexloc + ".png"),
                     Mth.floor(wl-s),
                     Mth.floor(wl+s),
@@ -200,7 +200,7 @@ public class RivalRebelsRenderOverlay {
             int h = graphics.guiHeight();
 
             RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA);
-            ((GuiGraphicsAccessor) graphics).callBlit(
+            ((GuiGraphicsAccessor) graphics).blit(
                 RRIdentifiers.guibinoculars,
                 0,
                 w,
@@ -213,7 +213,7 @@ public class RivalRebelsRenderOverlay {
                 1
             );
 
-            ((GuiGraphicsAccessor) graphics).callBlit(
+            ((GuiGraphicsAccessor) graphics).blit(
                 RRIdentifiers.guibinocularsoverlay,
                 0,
                 w,
@@ -276,13 +276,13 @@ public class RivalRebelsRenderOverlay {
             else if (ItemBinoculars.ready)
                 graphics.drawString(tr, Component.translatable("RivalRebels.binoculars.target"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.binoculars.target")) / 2f)), (int) (h * 0.85), 0xff0000, false);
 
-            graphics.drawString(tr, Component.translatable("RivalRebels.message.use").append(" ").append(Component.translatable("RivalRebels.sneak")).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
+            graphics.drawString(tr, Component.translatable("RivalRebels.message.use").append(" ").append(Component.translatable("RRIdentifiers.SHIFT_CLICK.toLanguageKey()")).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
             graphics.drawString(tr, "Press C to select bomb type", (int) (w * 0.60), (int) (h * 0.95), 0xff0000, false);
 
             if ((tasks > 0 || carpet > 0) && dist < 10) {
                 RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA);
                 float col = (float) (1 - dist / 10);
-                ((GuiGraphicsAccessor) graphics).callBlit(
+                ((GuiGraphicsAccessor) graphics).blit(
                     ItemBinoculars.c ? RRIdentifiers.guicarpet : RRIdentifiers.ittaskb83,
                     Mth.floor(w * 0.72),
                     Mth.floor(w * 0.72 + 16),

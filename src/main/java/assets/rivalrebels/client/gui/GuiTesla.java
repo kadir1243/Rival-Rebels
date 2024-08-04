@@ -56,7 +56,7 @@ public class GuiTesla extends Screen
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
         float f = 0.00390625F;
-        ((GuiGraphicsAccessor) context).callBlit(
+        ((GuiGraphicsAccessor) context).blit(
             RRIdentifiers.guitesla,
             posX,
             posX + xSizeOfTexture,

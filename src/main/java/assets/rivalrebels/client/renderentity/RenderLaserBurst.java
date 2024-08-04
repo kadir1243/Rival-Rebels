@@ -35,7 +35,6 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst>
         int distance = 4;
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
         matrices.pushPose();
-        matrices.translate(entity.getX(), entity.getY(), entity.getZ());
 
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
         matrices.mulPose(Axis.XP.rotationDegrees(-entity.getXRot()));

@@ -49,9 +49,9 @@ public class ItemRPG extends TieredItem
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.rocket);
-        if (!itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
+        if (player.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
 			player.startUsingItem(hand);
-			if (!world.isClientSide && !RRConfig.SERVER.isInfiniteAmmo()) {
+			if (!world.isClientSide && !RRConfig.SERVER.isInfiniteAmmo() && !player.hasInfiniteMaterials()) {
                 itemStack.consume(1, player);
 			}
 			if (!stack.isEnchanted()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);

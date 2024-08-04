@@ -42,7 +42,6 @@ public class RenderFlameBallGreen extends EntityRenderer<EntityFlameBallGreen>
         float size = 0.0500f * entity.tickCount;
         //size *= size;
         VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entityTranslucentEmissive(RRIdentifiers.etflameballgreen));
-        matrices.translate(entity.getX(), entity.getY(), entity.getZ());
         matrices.mulPose(Axis.YP.rotationDegrees(180 - Minecraft.getInstance().player.getYRot()));
         matrices.mulPose(Axis.XP.rotationDegrees(90 - Minecraft.getInstance().player.getXRot()));
         matrices.pushPose();

@@ -22,10 +22,9 @@ import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class GuiNextBattle extends Screen
-{
-	private final int	xSizeOfTexture	= 256;
-	private final int	ySizeOfTexture	= 256;
+public class GuiNextBattle extends Screen {
+	private static final int	xSizeOfTexture	= 256;
+	private static final int	ySizeOfTexture	= 256;
 	private int			posX;
 	private int			posY;
 	private GuiButton	nextBattleButton;
@@ -70,7 +69,7 @@ public class GuiNextBattle extends Screen
 			count = 0;
 		}
         float f = 0.00390625F;
-        ((GuiGraphicsAccessor) graphics).callBlit(
+        ((GuiGraphicsAccessor) graphics).blit(
             num == 0 ? RRIdentifiers.guitwarning0 : RRIdentifiers.guitwarning1,
             posX,
             posX + xSizeOfTexture,

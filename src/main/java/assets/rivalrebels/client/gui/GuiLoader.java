@@ -24,17 +24,11 @@ import net.minecraft.world.entity.player.Inventory;
 
 @Environment(EnvType.CLIENT)
 public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
-    /**
-	 * window height is calculated with this values, the more rows, the heigher
-	 */
-	private final int inventoryRows;
-
-	public GuiLoader(ContainerLoader containerLoader, Inventory playerInv, Component title)
-	{
+    public GuiLoader(ContainerLoader containerLoader, Inventory playerInv, Component title) {
 		super(containerLoader, playerInv, title);
         int BASE_IMAGE_HEIGHT = 114;
-		this.inventoryRows = containerLoader.size() / 9;
-		this.imageHeight = BASE_IMAGE_HEIGHT + this.inventoryRows * 18;
+        int inventoryRows = containerLoader.size() / 9;
+		this.imageHeight = BASE_IMAGE_HEIGHT + inventoryRows * 18;
 		this.imageWidth = 256;
 	}
 

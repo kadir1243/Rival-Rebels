@@ -27,16 +27,16 @@ import net.minecraft.world.item.ItemStack;
 public class ContainerAntimatterBomb extends AbstractContainerMenu
 {
 	protected Container antimatter;
-    private final ContainerData propertyDelegate;
+    private final ContainerData containerData;
 
     public ContainerAntimatterBomb(int syncId, Inventory inv) {
         this(syncId, inv, new SimpleContainer(36), new SimpleContainerData(4));
     }
 
-    public ContainerAntimatterBomb(int syncId, Inventory inv, Container antimatter, ContainerData propertyDelegate) {
+    public ContainerAntimatterBomb(int syncId, Inventory inv, Container antimatter, ContainerData containerData) {
         super(RivalRebelsGuiHandler.ANTIMATTER_SCREEN_HANDLER_TYPE, syncId);
 		this.antimatter = antimatter;
-        this.propertyDelegate = propertyDelegate;
+        this.containerData = containerData;
         addSlot(new SlotRR(antimatter, 0, 18, 48, 1, ItemFuse.class));
 		addSlot(new SlotRR(antimatter, 1, 40, 59, 1, RRItems.antenna));
 		addSlot(new SlotRR(antimatter, 2, 40, 37, 1, RRItems.antenna));
@@ -50,6 +50,7 @@ public class ContainerAntimatterBomb extends AbstractContainerMenu
 		addSlot(new SlotRR(antimatter, 19, 138, 48, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(antimatter, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inv);
+        addDataSlots(containerData);
 	}
 
 	@Override
@@ -110,19 +111,19 @@ public class ContainerAntimatterBomb extends AbstractContainerMenu
 	}
 
     public int getCountdown() {
-        return this.propertyDelegate.get(0);
+        return this.containerData.get(0);
     }
 
     public boolean isUnbalanced() {
-        return this.propertyDelegate.get(1) == 1;
+        return this.containerData.get(1) == 1;
     }
 
     public boolean isArmed() {
-        return this.propertyDelegate.get(2) == 1;
+        return this.containerData.get(2) == 1;
     }
 
     public float getMegaton() {
-        return Float.intBitsToFloat(this.propertyDelegate.get(3));
+        return this.containerData.get(3) / 100F;
     }
 
 }

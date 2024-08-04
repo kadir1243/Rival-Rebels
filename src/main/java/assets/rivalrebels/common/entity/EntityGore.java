@@ -22,6 +22,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -93,8 +94,8 @@ public class EntityGore extends EntityInanimate {
     public void setAnglesMotion(double mx, double my, double mz)
 	{
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Mth.atan2(mx, mz) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
 	public EntityGore(Level par1World, Entity toBeGibbed, int Type, int mob)
@@ -322,7 +323,7 @@ public class EntityGore extends EntityInanimate {
     public void shoot(float par7)
 	{
 		setDeltaMovement(random.nextGaussian() * par7,
-            Math.abs(random.nextGaussian() * par7),
+            Mth.abs((float) (random.nextGaussian() * par7)),
             random.nextGaussian() * par7);
 	}
 
@@ -419,7 +420,7 @@ public class EntityGore extends EntityInanimate {
                 setDeltaMovement(getDeltaMovement().multiply(1, -((random.nextDouble() * 0.5) + 0.35), 1));
 				isSliding = false;
 				slideCount = 0;
-				pitchLock = (int) ((Math.ceil((getXRot() / 90f))) * 90);
+				pitchLock = (Mth.ceil((getXRot() / 90f))) * 90;
 			}
 			else setDeltaMovement(getDeltaMovement().x(), 0, getDeltaMovement().z());
 			motionpitch = 0;

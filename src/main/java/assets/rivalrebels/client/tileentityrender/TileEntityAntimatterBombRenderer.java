@@ -21,17 +21,13 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<TileEntityAntimatterBomb>, CustomRenderBoxExtension<TileEntityAntimatterBomb> {
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etantimatterbomb);
     public TileEntityAntimatterBombRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -42,7 +38,7 @@ public class TileEntityAntimatterBombRenderer implements BlockEntityRenderer<Til
 		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
 
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockAntimatterBomb.FACING).toYRot()));
-		ObjModels.bomb.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.renderSolid(ObjModels.bomb, RRIdentifiers.etantimatterbomb, matrices, vertexConsumers, light, overlay);
 		matrices.popPose();
 	}
 

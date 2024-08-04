@@ -16,8 +16,8 @@ import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -56,26 +56,16 @@ public class BlockWeapons extends Block
         }
         if (!level.isClientSide())
         {
-            ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.rpg.getDefaultInstance());
-            ItemEntity ei1 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.tesla.getDefaultInstance());
-            ItemEntity ei2 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.plasmacannon.getDefaultInstance());
-            ItemEntity ei3 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.flamethrower.getDefaultInstance());
-            ItemEntity ei4 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.roddisk.getDefaultInstance());
-            // ItemEntity ei5 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.barricade, 6));
-            // ItemEntity ei6 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RivalRebels.tower, 3));
-            ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.knife, 10));
-            ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.gasgrenade, 6));
-            ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.einsten.getDefaultInstance());
-            level.addFreshEntity(ei);
-            level.addFreshEntity(ei1);
-            level.addFreshEntity(ei2);
-            level.addFreshEntity(ei3);
-            level.addFreshEntity(ei4);
-            // level.spawnEntity(ei5);
-            // level.spawnEntity(ei6);
-            level.addFreshEntity(ei7);
-            level.addFreshEntity(ei8);
-            level.addFreshEntity(ei9);
+            Containers.dropItemStack(level, x, y, z, RRItems.rpg.getDefaultInstance());
+            Containers.dropItemStack(level, x, y, z, RRItems.tesla.getDefaultInstance());
+            Containers.dropItemStack(level, x, y, z, RRItems.plasmacannon.getDefaultInstance());
+            Containers.dropItemStack(level, x, y, z, RRItems.flamethrower.getDefaultInstance());
+            Containers.dropItemStack(level, x, y, z, RRItems.roddisk.getDefaultInstance());
+         // Containers.dropItemStack(level, x, y, z, new ItemStack(RivalRebels.barricade, 6));
+         // Containers.dropItemStack(level, x, y, z, new ItemStack(RivalRebels.tower, 3));
+            Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.knife, 10));
+            Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.gasgrenade, 6));
+            Containers.dropItemStack(level, x, y, z, RRItems.einsten.getDefaultInstance());
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
         return InteractionResult.PASS;

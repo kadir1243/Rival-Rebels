@@ -52,8 +52,8 @@ public class EntityPassiveFire extends EntityInanimate {
 
 		if (d3 < 9.9999999999999995E-008D) {
         } else {
-			float f = (float) ((Math.atan2(d2, d) * 180D) / Math.PI) - 90F;
-			float f1 = (float) (-((Math.atan2(d1, d3) * 180D) / Math.PI));
+			float f = (float) ((Math.atan2(d2, d) * 180D) / Mth.PI) - 90F;
+			float f1 = (float) (-((Math.atan2(d1, d3) * 180D) / Mth.PI));
 			double d4 = d / d3;
 			double d5 = d2 / d3;
 			moveTo(shootingEntity.getX() + d4, getY(), shootingEntity.getZ() + d5, f, f1);
@@ -68,14 +68,14 @@ public class EntityPassiveFire extends EntityInanimate {
 		moveTo(entity.getX(), entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ(), entity.getYRot(), entity.getXRot());
 		setYRot((getYRot() + 25) % 360);
         setPosRaw(
-            getX() - Mth.cos((getYRot() / 180F) * (float) Math.PI) * 0.16F,
+            getX() - Mth.cos((getYRot() / 180F) * Mth.PI) * 0.16F,
             getY() - 0.2D,
-            getZ() - Mth.sin((getYRot() / 180F) * (float) Math.PI) * 0.16F
+            getZ() - Mth.sin((getYRot() / 180F) * Mth.PI) * 0.16F
         );
 		setPos(getX(), getY(), getZ());
-        super.setDeltaMovement(-Mth.sin((getYRot() / 180F) * (float) Math.PI) * Mth.cos((getXRot() / 180F) * (float) Math.PI),
-		 Mth.cos((getYRot() / 180F) * (float) Math.PI) * Mth.cos((getXRot() / 180F) * (float) Math.PI),
-		 -Mth.sin((getXRot() / 180F) * (float) Math.PI));
+        super.setDeltaMovement(-Mth.sin((getYRot() / 180F) * Mth.PI) * Mth.cos((getXRot() / 180F) * Mth.PI),
+		 Mth.cos((getYRot() / 180F) * Mth.PI) * Mth.cos((getXRot() / 180F) * Mth.PI),
+		 -Mth.sin((getXRot() / 180F) * Mth.PI));
 	}
 
 	@Override

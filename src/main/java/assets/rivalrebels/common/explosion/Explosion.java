@@ -23,7 +23,6 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -90,22 +89,18 @@ public class Explosion
 		}
 	}
 
-	private void createHole(Level world, double x, double y, double z, int radius, boolean crater, int delete)
-	{
+	private void createHole(Level world, double x, double y, double z, int radius, boolean crater, int delete) {
         int halfradius = radius >> 2;
 		int tworadius = radius << 2;
-		for (int X = -tworadius; X <= tworadius; X++)
-		{
+		for (int X = -tworadius; X <= tworadius; X++) {
 			int xx = (int) x + X;
-			for (int Y = -tworadius; Y <= tworadius; Y++)
-			{
+			for (int Y = -tworadius; Y <= tworadius; Y++) {
 				int yy = (int) y + Y;
-				for (int Z = -tworadius; Z <= tworadius; Z++)
-				{
+				for (int Z = -tworadius; Z <= tworadius; Z++) {
 					int zz = (int) z + Z;
                     BlockPos pos = new BlockPos(xx, yy, zz);
                     Block block = world.getBlockState(pos).getBlock();
-					if (block != Blocks.AIR && block != Blocks.BEDROCK)
+					if (!world.isEmptyBlock(pos) && block != Blocks.BEDROCK)
 					{
 						int dist = X * X + Y * Y + Z * Z;
 						if (dist <= delete && block == RRBlocks.camo1 && block == RRBlocks.camo2 && block == RRBlocks.camo3)
@@ -117,13 +112,13 @@ public class Explosion
 							int varrand = 1 + dist - halfradius;
 							if (dist < halfradius)
 							{
-								breakBlock(world, xx, yy, zz, radius, x, y, z);
+								breakBlock(world, pos, radius, x, y, z);
 							}
 							else if (varrand > 0)
 							{
 								if ((world.random.nextInt(varrand) == 0 || world.random.nextInt(varrand / 2 + 1) == 0))
 								{
-									breakBlock(world, xx, yy, zz, radius, x, y, z);
+									breakBlock(world, pos, radius, x, y, z);
 								}
 							}
 						}
@@ -131,7 +126,7 @@ public class Explosion
 						{
 							if ((Y >= 2 || (dist < radius * 1.5 && Y == 1)) && crater)
 							{
-								breakBlock(world, xx, yy, zz, radius, x, y, z);
+								breakBlock(world, pos, radius, x, y, z);
 							}
 						}
 					}
@@ -140,14 +135,12 @@ public class Explosion
 		}
 	}
 
-	private void breakBlock(Level world, int xx, int yy, int zz, int strength, double x, double y, double z)
-	{
-        BlockPos pos = new BlockPos(xx, yy, zz);
+	private void breakBlock(Level world, BlockPos pos, int strength, double x, double y, double z) {
         BlockState state = world.getBlockState(pos);
 		if (state.is(RRBlocks.remotecharge))
 		{
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-			RivalRebelsSoundPlayer.playSound(world, 22, 0, xx, yy, zz, 0.5f, 0.3f);
+			RivalRebelsSoundPlayer.playSound(world, 22, 0, pos, 0.5f, 0.3f);
 			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getChargeExplosionSize(), false, false, RivalRebelsDamageSource.charge(world));
 			return;
 		}
@@ -166,23 +159,14 @@ public class Explosion
 			return;
 		}
 
-		EntityDebris e = new EntityDebris(world, xx, yy, zz);
-		double xmo = x - xx;
-		double ymo = y - yy;
-		double zmo = z - zz;
-		e.push(xmo * 0.2f, ymo * 0.2f, zmo * 0.2f);
+		EntityDebris e = new EntityDebris(world, pos);
+		e.push(new Vec3(x, y, z).subtract(Vec3.atLowerCornerOf(pos)).scale(0.2));
 		world.addFreshEntity(e);
 	}
 
-	private void pushAndHurtEntities(Level world, double x, double y, double z, int radius, DamageSource dmgsrc)
-	{
-		int var3 = Mth.floor(x - radius - 1.0D);
-		int var4 = Mth.floor(x + radius + 1.0D);
-		int var5 = Mth.floor(y - radius - 1.0D);
-		int var28 = Mth.floor(y + radius + 1.0D);
-		int var7 = Mth.floor(z - radius - 1.0D);
-		int var29 = Mth.floor(z + radius + 1.0D);
-		List<Entity> var9 = world.getEntities(null, new AABB(var3, var5, var7, var4, var28, var29));
+	private void pushAndHurtEntities(Level world, double x, double y, double z, int radius, DamageSource dmgsrc) {
+        AABB aabb = new AABB(x, y, z, x, y, z).inflate(radius + 1, -(radius + 1), radius + 1);
+		List<Entity> var9 = world.getEntities(null, aabb);
 		Vec3 var30 = new Vec3(x, y, z);
 
 		radius *= 4;

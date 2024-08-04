@@ -60,8 +60,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuProvider
 {
-	public double			yaw;
-	public double			pitch;
+	public float			yaw;
+	public float			pitch;
 	public Entity			target;
 	public double			xO						= 0;
 	public double			zO						= 0;
@@ -185,13 +185,13 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 					{
 						if (level.random.nextInt(3) == 0)
 						{
-							RivalRebelsSoundPlayer.playSound(level, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 8, 1, 0.1f);
+							RivalRebelsSoundPlayer.playSound(level, 8, 1, getBlockPos(), 0.1f);
 						}
-						float yaw = (float) (180 - this.yaw);
-						float pitch = (float) (-this.pitch);
-						double motionX = (-Mth.sin(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI));
-						double motionZ = (Mth.cos(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI));
-						double motionY = (-Mth.sin(pitch / 180.0F * (float) Math.PI));
+						float yaw = 180 - this.yaw;
+						float pitch = -this.pitch;
+						double motionX = (-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI));
+						double motionZ = (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI));
+						double motionY = (-Mth.sin(pitch / 180.0F * Mth.PI));
 						ItemRoda.spawn(entityIndex,level,getBlockPos().getX() + xO + 0.5, getBlockPos().getY() + 0.75, getBlockPos().getZ() + zO + 0.5,motionX,motionY,motionZ,1.0f,0.0f);
 						useAmmo();
 					}
@@ -280,7 +280,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	private boolean canSee(Entity e)
 	{
 		int yaw = (int) (getYawTo(e, 0) - getBaseRotation() + 360) % 360;
-		if (Math.abs(yaw) > yawLimit / 2 && Math.abs(yaw) < 360 - (yawLimit / 2)) return false;
+		if (Mth.abs(yaw) > yawLimit / 2 && Mth.abs(yaw) < 360 - (yawLimit / 2)) return false;
 		Vec3 start = e.position().add(0, e.getEyeHeight(e.getPose()), 0);
 		Vec3 end = new Vec3(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()).add(0.5 + xO, 0.5, 0.5 + zO);
 		BlockHitResult mop = level.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, CollisionContext.empty()));
@@ -300,15 +300,15 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
 	public int lookAt(Entity t)
 	{
-		double dist = Math.sqrt(t.distanceToSqr(getBlockPos().getX() + 0.5 + xO, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5 + zO));
-		double ya = getYawTo(t, le == t ? dist : 0);
-		double pi = getPitchTo(t, le == t ? dist : 0);
+		float dist = Mth.sqrt((float) t.distanceToSqr(getBlockPos().getX() + 0.5 + xO, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5 + zO));
+		float ya = getYawTo(t, le == t ? dist : 0);
+		float pi = getPitchTo(t, le == t ? dist : 0);
 		if (pi > ll && pi < ul)
 		{
-			pitch = (pitch + pitch + pitch + pi) / 4;
+			pitch = (pitch + pitch + pitch + pi) / 4F;
 			if (yaw - ya < -180) yaw += 360;
 			else if (yaw - ya > 180) yaw -= 360;
-			yaw = (yaw + yaw + yaw + ya) / 4;
+			yaw = (yaw + yaw + yaw + ya) / 4F;
 			//pitch += dist / 10;
             prevTpos = t.position();
 			le = t;
@@ -317,21 +317,21 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		else return 0;
 	}
 
-	public double getYawTo(Entity t, double off)
+	public float getYawTo(Entity t, float off)
 	{
 		double x = getBlockPos().getX() + 0.5 + xO - t.getX() - (t.getX() - prevTpos.x()) * off;
 		double z = getBlockPos().getZ() + 0.5 + zO - t.getZ() - (t.getZ() - prevTpos.z()) * off;
 		double ya = Math.atan2(x, z);
-		return ((ya / Math.PI) * 180);
+		return (float) ((ya / Mth.PI) * 180);
 	}
 
-	public double getPitchTo(Entity t, double off) {
+	public float getPitchTo(Entity t, float off) {
 		double x = getBlockPos().getX() + 0.5 + xO - t.getX() - (t.getX() - prevTpos.x()) * off;
 		double y = getBlockPos().getY() + (0.5 * scale) - t.getY() - t.getEyeHeight(t.getPose()) - (t.getY() - prevTpos.y()) * off;
 		double z = getBlockPos().getZ() + 0.5 + zO - t.getZ() - (t.getZ() - prevTpos.z()) * off;
 		double d = Math.sqrt(x * x + z * z);
 		double pi = Math.atan2(d, -y);
-		return 90 - ((pi / Math.PI) * 180);
+		return (float) (90 - ((pi / Mth.PI) * 180));
 	}
 
 	public int getBaseRotation() {

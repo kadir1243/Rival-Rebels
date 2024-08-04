@@ -25,6 +25,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.MenuProvider;
@@ -43,7 +44,7 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(14, ItemStack.EMPTY);
 
 	public double			slide			= 0;
-	double					test			= Math.PI;
+	private float test = Mth.PI;
 	public int				b2spirit		= 0;
 	public int				b2carpet		= 0;
 
@@ -198,17 +199,17 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 
     @Override
 	public void tick() {
-		slide = (Math.cos(test) + 1) * 45;
+		slide = (Mth.cos(test) + 1) * 45;
 
         ItemBinoculars.add(this);
         boolean i = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
 		if (i)
 		{
-			if (slide < 89.995) test += 0.05;
+			if (slide < 89.995) test += 0.05F;
 		}
 		else
 		{
-			if (slide > 0.004) test -= 0.05;
+			if (slide > 0.004) test -= 0.05F;
 		}
 
 		if (b2spirit > 0 && !hasChips())
@@ -256,18 +257,25 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
                 case 1 -> hasChips() ? 1 : 0;
                 case 2 -> b2spirit;
                 case 3 -> b2carpet;
+                case 4 -> getBlockPos().getX();
+                case 5 -> getBlockPos().getY();
+                case 6 -> getBlockPos().getZ();
                 default -> 0;
             };
         }
 
         @Override
         public void set(int index, int value) {
-            if (index == 0) onGoButtonPressed();
+            switch (index) {
+                case 2 -> b2spirit = value;
+                case 3 -> b2carpet = value;
+                default -> {}
+            }
         }
 
         @Override
         public int getCount() {
-            return 4;
+            return 7;
         }
     };
 }

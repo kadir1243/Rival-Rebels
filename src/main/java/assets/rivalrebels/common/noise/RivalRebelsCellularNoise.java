@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.noise;
 
+import assets.rivalrebels.RRIdentifiers;
 import com.mojang.blaze3d.platform.GlConst;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.platform.TextureUtil;
@@ -102,19 +103,26 @@ public class RivalRebelsCellularNoise {
 		return ids;
 	}
 
-    private static long getTime()
-	{
-		return System.currentTimeMillis();
-	}
-
     public static int getCurrentRandomId() {
-        return RivalRebelsCellularNoise.id[(int) ((RivalRebelsCellularNoise.getTime() / 100) % RivalRebelsCellularNoise.frames)];
+        return RivalRebelsCellularNoise.id[(int) ((System.currentTimeMillis() / 100) % RivalRebelsCellularNoise.frames)];
     }
 
     public static final RenderType CELLULAR_NOISE = RenderType.create(
-        "cellular_noise",
+        RRIdentifiers.MODID + "_cellular_noise",
         DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
         VertexFormat.Mode.QUADS,
+        999,
+        RenderType.CompositeState.builder()
+            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+            .setTextureState(new RenderStateShard.EmptyTextureStateShard(() -> RenderSystem.setShaderTexture(0, getCurrentRandomId()), () -> {}))
+            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+            .createCompositeState(false)
+    );
+
+    public static final RenderType CELLULAR_NOISE_TRIANGLES = RenderType.create(
+        RRIdentifiers.MODID + "_cellular_noise_triangles",
+        DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
+        VertexFormat.Mode.TRIANGLES,
         999,
         RenderType.CompositeState.builder()
             .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)

@@ -58,8 +58,8 @@ public class EntityRaytrace extends EntityInanimate
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
 	public EntityRaytrace(Level par1World, Entity player, float distance, float randomness, float chance, boolean shift)
@@ -76,22 +76,22 @@ public class EntityRaytrace extends EntityInanimate
         );
 
         setDeltaMovement(
-            (-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+            (-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         if (shift) {
             setPosRaw(
-                getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F),
+                getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
                 getY(),
-                getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F)
+                getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
             );
             setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		} else {
             setPosRaw(
-                getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.3F),
+                getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.3F),
                 getY() - 0.05f,
-                getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.3F)
+                getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.3F)
             );
 		}
 		setArrowHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), range, randomness);
@@ -111,8 +111,8 @@ public class EntityRaytrace extends EntityInanimate
 		par5 *= par7;
 		setDeltaMovement(par1, par3, par5);
 		float var10 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-		setYRot(yRotO = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
 	}
 
     @Override

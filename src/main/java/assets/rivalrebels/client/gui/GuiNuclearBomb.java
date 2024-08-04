@@ -22,8 +22,7 @@ import net.minecraft.world.entity.player.Inventory;
 
 @Environment(EnvType.CLIENT)
 public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb> {
-
-	public GuiNuclearBomb(ContainerNuclearBomb containerNuclearBomb, Inventory inventoryPlayer, Component title) {
+    public GuiNuclearBomb(ContainerNuclearBomb containerNuclearBomb, Inventory inventoryPlayer, Component title) {
 		super(containerNuclearBomb, inventoryPlayer, title);
 	}
 
@@ -31,17 +30,17 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         super.renderLabels(context, mouseX, mouseY);
         showTime(context);
-        context.drawString(font, Component.translatable("RivalRebels.nuke"), 8, 6, 0xffffff, false);
+        //context.drawString(font, Component.translatable(NUKE_TRANSLATION.toLanguageKey()), 8, 6, 0xffffff, false);
 		context.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
 		if (menu.isArmed())
 		{
-            context.drawString(font, Component.translatable("RivalRebels.tsar.armed"), 80, imageHeight - 96 + 2, 0xffffff, false);
+            context.drawString(font, Component.translatable(RRIdentifiers.BOMB_ARMED.toLanguageKey()), 80, imageHeight - 96 + 2, 0xffffff, false);
 		}
 		else
 		{
 			if (!menu.hasTrollFace())
 			{
-                context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable("RivalRebels.tsar.megatons")), 80, imageHeight - 96 + 2, 0xffffff, false);
+                context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable(RRIdentifiers.BOMB_MEGATONS.toLanguageKey())), 80, imageHeight - 96 + 2, 0xffffff, false);
 			}
 			else
 			{

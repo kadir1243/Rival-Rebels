@@ -47,7 +47,7 @@ public class BlockFlagBox5 extends Block
 		}
 		if (!player.isShiftKeyDown() && !level.isClientSide())
 		{
-            player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.sneak")), false);
+            player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RRIdentifiers.SHIFT_CLICK.toLanguageKey()")), false);
 			level.setBlockAndUpdate(new BlockPos(x, y, z), RRBlocks.flagbox6.defaultBlockState());
 			return InteractionResult.PASS;
 		}

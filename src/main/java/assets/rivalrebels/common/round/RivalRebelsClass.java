@@ -12,7 +12,6 @@
 package assets.rivalrebels.common.round;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
 import com.mojang.serialization.Codec;
@@ -142,11 +141,11 @@ public enum RivalRebelsClass implements StringRepresentable {
 	}
 
     public String getDescriptionTranslationKey() {
-        return RivalRebels.MODID + ".class." + name + ".description";
+        return RRIdentifiers.MODID + ".class." + name + ".description";
     }
 
     public String getMiniDescriptionTranslationKey() {
-        return RivalRebels.MODID + ".class." + name + ".minidesc";
+        return RRIdentifiers.MODID + ".class." + name + ".minidesc";
     }
 
     public Component getDescriptionTranslation() {

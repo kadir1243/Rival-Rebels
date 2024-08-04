@@ -1,14 +1,4 @@
 {
-  "6.0":  {"sounds": ["af/a/a"]},
-  "6.1":  {"sounds": ["af/a/b"]},
-  "6.2":  {"sounds": ["af/a/c"]},
-  "6.3":  {"sounds": ["af/a/d"]},
-
-  "7.0":  {"sounds": ["af/b/a"]},
-  "7.1":  {"sounds": ["af/b/b"]},
-  "7.2":  {"sounds": ["af/b/c"]},
-  "7.3":  {"sounds": ["af/b/d"]},
-
   "8.0":  {"sounds": ["ag/a1","ag/a2"]},
   "8.1":  {"sounds": ["ag/b"]},
   "8.2":  {"sounds": ["ag/c"]},

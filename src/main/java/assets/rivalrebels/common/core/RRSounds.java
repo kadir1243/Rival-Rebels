@@ -42,6 +42,14 @@ public class RRSounds {
     public static final SoundEvent FORCE_FIELD = register("force_field"); // 5.0
     public static final SoundEvent ROD_DISK_HIT_ENTITY = register("rod_disk_hit_entity"); // 5.1
     public static final SoundEvent ROD_DISK_MIRROR_FROM_OBJECT = register("rod_disk_mirror_from_object"); // 5.2
+    public static final SoundEvent RODDISK_UNKNOWN0 = register("roddisk_unknown0"); // 6.0
+    public static final SoundEvent RODDISK_UNKNOWN1 = register("roddisk_unknown1"); // 6.1
+    public static final SoundEvent RODDISK_UNKNOWN2 = register("roddisk_unknown2"); // 6.2
+    public static final SoundEvent RODDISK_UNKNOWN3 = register("roddisk_unknown3"); // 6.3
+    public static final SoundEvent RODDISK_UNKNOWN4 = register("roddisk_unknown4"); // 7.0
+    public static final SoundEvent RODDISK_UNKNOWN5 = register("roddisk_unknown5"); // 7.1
+    public static final SoundEvent RODDISK_UNKNOWN6 = register("roddisk_unknown6"); // 7.2
+    public static final SoundEvent RODDISK_UNKNOWN7 = register("roddisk_unknown7"); // 7.3
 
     public static void init() {
     }

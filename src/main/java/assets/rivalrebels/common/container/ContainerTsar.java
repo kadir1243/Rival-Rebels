@@ -26,16 +26,16 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerTsar extends AbstractContainerMenu {
 	protected Container tsarBomb;
-    private final ContainerData propertyDelegate;
+    private final ContainerData containerData;
 
     public ContainerTsar(int syncId, Inventory inv) {
         this(syncId, inv, new SimpleContainer(36), new SimpleContainerData(4));
     }
 
-	public ContainerTsar(int syncId, Inventory inventoryPlayer, Container tsarBomb, ContainerData propertyDelegate) {
+	public ContainerTsar(int syncId, Inventory inventoryPlayer, Container tsarBomb, ContainerData containerData) {
         super(RivalRebelsGuiHandler.TSAR_SCREEN_HANDLER_TYPE, syncId);
         this.tsarBomb = tsarBomb;
-        this.propertyDelegate = propertyDelegate;
+        this.containerData = containerData;
         addSlot(new SlotRR(tsarBomb, 0, 18, 48, 1, ItemFuse.class));
 		addSlot(new SlotRR(tsarBomb, 1, 40, 59, 1, RRItems.antenna));
 		addSlot(new SlotRR(tsarBomb, 2, 40, 37, 1, RRItems.antenna));
@@ -49,6 +49,7 @@ public class ContainerTsar extends AbstractContainerMenu {
 		addSlot(new SlotRR(tsarBomb, 19, 138, 48, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(tsarBomb, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
+        this.addDataSlots(containerData);
 	}
 
     @Override
@@ -108,18 +109,18 @@ public class ContainerTsar extends AbstractContainerMenu {
 	}
 
     public int getCountdown() {
-        return this.propertyDelegate.get(0);
+        return this.containerData.get(0);
     }
 
     public boolean isUnbalanced() {
-        return this.propertyDelegate.get(1) == 1;
+        return this.containerData.get(1) == 1;
     }
 
     public boolean isArmed() {
-        return this.propertyDelegate.get(2) == 1;
+        return this.containerData.get(2) == 1;
     }
 
     public float getMegaton() {
-        return Float.intBitsToFloat(this.propertyDelegate.get(3));
+        return this.containerData.get(3) / 100F;
     }
 }

@@ -109,7 +109,7 @@ public class EntityB2Spirit extends EntityInanimate
 
 		if (rhodeswing != null) {
             setDeltaMovement(rhodeswing.position().subtract(position()));
-			double t = Math.sqrt(getDeltaMovement().lengthSqr());
+			double t = getDeltaMovement().length();
             setDeltaMovement(getDeltaMovement().scale(1/t));
             setYRot(rhodeswing.getYRot());
 			setXRot((float) (Math.min(t, 90.0)));
@@ -158,9 +158,9 @@ public class EntityB2Spirit extends EntityInanimate
                     setYRot(getYRot() + 10.0f);
 				else if (mode == 2)
                     setYRot(getYRot() - 10.0f);
-				setDeltaMovement(Mth.sin(getYRot() / 180.0F * (float) Math.PI),
+				setDeltaMovement(Mth.sin(getYRot() / 180.0F * Mth.PI),
                     getDeltaMovement().y(),
-                    Mth.cos(getYRot() / 180.0F * (float) Math.PI)
+                    Mth.cos(getYRot() / 180.0F * Mth.PI)
                 );
 				if (distfromtarget < 80.0f)
 					mode = 0;
@@ -199,9 +199,9 @@ public class EntityB2Spirit extends EntityInanimate
 		if (rhodeswing == null)
 		{
 			double var16 = Math.sqrt(this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z());
-			this.setYRot((float) (Math.atan2(this.getDeltaMovement().x(), this.getDeltaMovement().z()) * 180.0D / Math.PI));
+			this.setYRot((float) (Math.atan2(this.getDeltaMovement().x(), this.getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-			for (this.setXRot((float) (Math.atan2(-this.getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
+			for (this.setXRot((float) (Math.atan2(-this.getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 			{
             }
 
@@ -246,7 +246,7 @@ public class EntityB2Spirit extends EntityInanimate
 		z *= dist;
         setDeltaMovement(-x, getDeltaMovement().y(), -z);
 		setPos(tx + x*80, ty+60, tz + z*80);
-        setYRot(yRotO = (float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+        setYRot(yRotO = (float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 	}
 
 	@Override

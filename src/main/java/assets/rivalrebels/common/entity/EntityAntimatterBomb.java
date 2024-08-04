@@ -14,11 +14,12 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.explosion.AntimatterBomb;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
@@ -26,7 +27,6 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SpongeBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.AABB;
@@ -82,8 +82,8 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 
     public void setAnglesMotion(double mx, double my, double mz) {
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -146,9 +146,9 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 		if (this.isPassenger())
 		{
 		double var16 = Math.sqrt(this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z());
-		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
+		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 		{
         }
 
@@ -221,7 +221,7 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
                 state.getBlock().getExplosionResistance() < 1 ||
                 state.is(BlockTags.WOOL) ||
                 state.is(BlockTags.SNOW) ||
-                state.is(ConventionalBlockTags.GLASS_BLOCKS) ||
+                state.is(ModBlockTags.GLASS_BLOCKS) ||
                 state.is(BlockTags.SAND) ||
                 state.is(Blocks.SNOW_BLOCK) ||
                 state.ignitedByLava() ||

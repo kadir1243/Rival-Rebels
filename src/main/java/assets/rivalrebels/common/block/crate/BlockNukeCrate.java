@@ -105,239 +105,231 @@ public class BlockNukeCrate extends BaseEntityBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        if (this == RRBlocks.nukeCrateTop)
-		{
-			if (!stack.isEmpty())
-			{
-				if (stack.is(RRItems.pliers))
-				{
+        if (this == RRBlocks.nukeCrateTop) {
+			if (!stack.isEmpty()) {
+				if (stack.is(RRItems.pliers)) {
 					Direction orientation = null;
-					if (	getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 1, y - 1, z) == RRBlocks.nukeCrateBottom)
-					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x + 1, y, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x + 1, y - 1, z, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.WEST));
+					if (	getBlock(level, pos.east()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().east()) == RRBlocks.nukeCrateBottom) {
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.east(), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().east(), RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.WEST));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 1, y - 1, z) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().west()) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x - 1, y, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x - 1, y - 1, z, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.EAST));
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.west(), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().west(), RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.EAST));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y - 1, z + 1) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().south()) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z + 1, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z + 1, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.NORTH));
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.south(), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().south(), RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.NORTH));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y - 1, z - 1) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().north()) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z - 1, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z - 1, RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.SOUTH));
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.north(), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().north(), RRBlocks.antimatterbombblock.defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.SOUTH));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					if (	getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 1, y + 1, z) == RRBlocks.nukeCrateBottom)
+					if (	getBlock(level, pos.east()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().east()) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x + 1, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x + 1, y, z, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.WEST));
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.above().east(), Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.east(), RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.WEST));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 1, y + 1, z) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().west()) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x - 1, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x - 1, y, z, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.EAST));
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.above().west(), Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.west(), RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.EAST));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y + 1, z + 1) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().south()) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y + 1, z + 1, Blocks.AIR);
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z + 1, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.NORTH));
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.above().south(), Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.south(), RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.NORTH));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y + 1, z - 1) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().north()) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y + 1, z - 1, Blocks.AIR);
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z - 1, RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.SOUTH));
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.above().north(), Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.north(), RRBlocks.tachyonbombblock.defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.SOUTH));
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 2, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x + 3, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 1, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 2, y - 1, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x + 3, y - 1, z) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.east()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.east(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.east(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().east()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().east(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below().east(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x + 1, y, z, Blocks.AIR);
-						setBlock(level, x + 2, y, z, Blocks.AIR);
-						setBlock(level, x + 3, y, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x + 1, y - 1, z, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.WEST));
-						setBlock(level, x + 2, y - 1, z, Blocks.AIR);
-						setBlock(level, x + 3, y - 1, z, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.east(), Blocks.AIR);
+						setBlock(level, pos.east(2), Blocks.AIR);
+						setBlock(level, pos.east(3), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().east(), RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.WEST));
+						setBlock(level, pos.below().east(2), Blocks.AIR);
+						setBlock(level, pos.below().east(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 2, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x - 3, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 1, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 2, y - 1, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x - 3, y - 1, z) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.west(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.west(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().west()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().west(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below().west(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x - 1, y, z, Blocks.AIR);
-						setBlock(level, x - 2, y, z, Blocks.AIR);
-						setBlock(level, x - 3, y, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x - 1, y - 1, z, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.EAST));
-						setBlock(level, x - 2, y - 1, z, Blocks.AIR);
-						setBlock(level, x - 3, y - 1, z, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.west(), Blocks.AIR);
+						setBlock(level, pos.west(2), Blocks.AIR);
+						setBlock(level, pos.west(3), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().west(), RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.EAST));
+						setBlock(level, pos.below().west(2), Blocks.AIR);
+						setBlock(level, pos.below().west(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y, z + 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y, z + 3) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y - 1, z + 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y - 1, z + 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z + 3) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.south(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.south(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().south()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().south(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below().south(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z + 1, Blocks.AIR);
-						setBlock(level, x, y, z + 2, Blocks.AIR);
-						setBlock(level, x, y, z + 3, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z + 1, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.NORTH));
-                        setBlock(level, x, y - 1, z + 2, Blocks.AIR);
-						setBlock(level, x, y - 1, z + 3, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.south(), Blocks.AIR);
+						setBlock(level, pos.south(2), Blocks.AIR);
+						setBlock(level, pos.south(3), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().south(), RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.NORTH));
+                        setBlock(level, pos.below().south(2), Blocks.AIR);
+						setBlock(level, pos.below().south(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y, z - 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y, z - 3) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y - 1, z - 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y - 1, z - 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y - 1, z - 3) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.north(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.north(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().north()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.below().north(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.below().north(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y, z - 1, Blocks.AIR);
-						setBlock(level, x, y, z - 2, Blocks.AIR);
-						setBlock(level, x, y, z - 3, Blocks.AIR);
-						setBlock(level, x, y - 1, z, Blocks.AIR);
-						setBlock(level, x, y - 1, z - 1, RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.SOUTH));
-						setBlock(level, x, y - 1, z - 2, Blocks.AIR);
-						setBlock(level, x, y - 1, z - 3, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.north(), Blocks.AIR);
+						setBlock(level, pos.north(2), Blocks.AIR);
+						setBlock(level, pos.north(3), Blocks.AIR);
+						setBlock(level, pos.below(), Blocks.AIR);
+						setBlock(level, pos.below().north(), RRBlocks.tsarbombablock.defaultBlockState().setValue(BlockTsarBomba.FACING, Direction.SOUTH));
+						setBlock(level, pos.below().north(2), Blocks.AIR);
+						setBlock(level, pos.below().north(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x + 1, y, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 2, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x + 3, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 1, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x + 2, y + 1, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x + 3, y + 1, z) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.east()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.east(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.east(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().east()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().east(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above().east(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x + 1, y + 1, z, Blocks.AIR);
-						setBlock(level, x + 2, y, z, Blocks.AIR);
-						setBlock(level, x + 3, y, z, Blocks.AIR);
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x + 1, y, z, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.WEST));
-						setBlock(level, x + 2, y + 1, z, Blocks.AIR);
-						setBlock(level, x + 3, y + 1, z, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.above().east(), Blocks.AIR);
+						setBlock(level, pos.east(2), Blocks.AIR);
+						setBlock(level, pos.east(3), Blocks.AIR);
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.east(), RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.WEST));
+						setBlock(level, pos.above().east(2), Blocks.AIR);
+						setBlock(level, pos.above().east(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x - 1, y, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 2, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x - 3, y, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 1, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x - 2, y + 1, z) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x - 3, y + 1, z) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.west(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.west(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().west()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().west(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above().west(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x - 1, y + 1, z, Blocks.AIR);
-						setBlock(level, x - 2, y, z, Blocks.AIR);
-						setBlock(level, x - 3, y, z, Blocks.AIR);
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x - 1, y, z, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.EAST));
-						setBlock(level, x - 2, y + 1, z, Blocks.AIR);
-						setBlock(level, x - 3, y + 1, z, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.above().west(), Blocks.AIR);
+						setBlock(level, pos.west(2), Blocks.AIR);
+						setBlock(level, pos.west(3), Blocks.AIR);
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.west(), RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.EAST));
+						setBlock(level, pos.above().west(2), Blocks.AIR);
+						setBlock(level, pos.above().west(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z + 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y, z + 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y, z + 3) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y + 1, z + 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y + 1, z + 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z + 3) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.south(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.south(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().south()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().south(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above().south(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y + 1, z + 1, Blocks.AIR);
-						setBlock(level, x, y, z + 2, Blocks.AIR);
-						setBlock(level, x, y, z + 3, Blocks.AIR);
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y, z + 1, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.NORTH));
-						setBlock(level, x, y + 1, z + 2, Blocks.AIR);
-						setBlock(level, x, y + 1, z + 3, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.above().south(), Blocks.AIR);
+						setBlock(level, pos.south(2), Blocks.AIR);
+						setBlock(level, pos.south(3), Blocks.AIR);
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.south(), RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.NORTH));
+						setBlock(level, pos.above().south(2), Blocks.AIR);
+						setBlock(level, pos.above().south(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					}
-					else if (getBlock(level, x, y, z - 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y, z - 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y, z - 3) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y + 1, z - 1) == RRBlocks.nukeCrateTop &&
-							getBlock(level, x, y + 1, z - 2) == RRBlocks.nukeCrateBottom &&
-							getBlock(level, x, y + 1, z - 3) == RRBlocks.nukeCrateBottom)
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.north(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.north(3)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().north()) == RRBlocks.nukeCrateTop &&
+							getBlock(level, pos.above().north(2)) == RRBlocks.nukeCrateBottom &&
+							getBlock(level, pos.above().north(3)) == RRBlocks.nukeCrateBottom)
 					{
-						setBlock(level, x, y, z, Blocks.AIR);
-						setBlock(level, x, y + 1, z - 1, Blocks.AIR);
-						setBlock(level, x, y, z - 2, Blocks.AIR);
-						setBlock(level, x, y, z - 3, Blocks.AIR);
-						setBlock(level, x, y + 1, z, Blocks.AIR);
-						setBlock(level, x, y, z - 1, RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.SOUTH));
-						setBlock(level, x, y + 1, z - 2, Blocks.AIR);
-						setBlock(level, x, y + 1, z - 3, Blocks.AIR);
+						setBlock(level, pos, Blocks.AIR);
+						setBlock(level, pos.above().north(), Blocks.AIR);
+						setBlock(level, pos.north(2), Blocks.AIR);
+						setBlock(level, pos.north(3), Blocks.AIR);
+						setBlock(level, pos.above(), Blocks.AIR);
+						setBlock(level, pos.north(), RRBlocks.theoreticaltsarbombablock.defaultBlockState().setValue(BlockTheoreticalTsarBomba.FACING, Direction.SOUTH));
+						setBlock(level, pos.above().north(2), Blocks.AIR);
+						setBlock(level, pos.above().north(3), Blocks.AIR);
 						return ItemInteractionResult.sidedSuccess(level.isClientSide());
 					} else {
                         for (Direction direction : Direction.values()) {
@@ -351,7 +343,7 @@ public class BlockNukeCrate extends BaseEntityBlock {
                             return ItemInteractionResult.FAIL;
                         }
                     }
-                    level.setBlockAndUpdate(new BlockPos(x, y, z), RRBlocks.nuclearBomb.defaultBlockState().setValue(BlockNuclearBomb.FACING, orientation));
+                    level.setBlockAndUpdate(pos, RRBlocks.nuclearBomb.defaultBlockState().setValue(BlockNuclearBomb.FACING, orientation));
 					return ItemInteractionResult.sidedSuccess(level.isClientSide());
 				}
 				else if (!level.isClientSide())
@@ -367,16 +359,16 @@ public class BlockNukeCrate extends BaseEntityBlock {
 		return ItemInteractionResult.FAIL;
 	}
 
-    private static void setBlock(Level world, int x, int y, int z, Block block) {
-        world.setBlockAndUpdate(new BlockPos(x, y, z), block.defaultBlockState());
+    private static void setBlock(Level world, BlockPos pos, Block block) {
+        world.setBlockAndUpdate(pos, block.defaultBlockState());
     }
 
-    private static void setBlock(Level world, int x, int y, int z, BlockState state) {
-        world.setBlockAndUpdate(new BlockPos(x, y, z), state);
+    private static void setBlock(Level world, BlockPos pos, BlockState state) {
+        world.setBlockAndUpdate(pos, state);
     }
 
-    private static Block getBlock(Level world, int x, int y, int z) {
-        return world.getBlockState(new BlockPos(x, y, z)).getBlock();
+    private static Block getBlock(Level world, BlockPos pos) {
+        return world.getBlockState(pos).getBlock();
     }
 
     @Nullable

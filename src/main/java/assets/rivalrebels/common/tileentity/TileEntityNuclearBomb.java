@@ -23,23 +23,20 @@ import assets.rivalrebels.common.item.components.ChipData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import com.mojang.authlib.GameProfile;
-import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -50,7 +47,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityNuclearBomb extends BlockEntity implements Container, Tickable, ExtendedScreenHandlerFactory<TileEntityNuclearBomb.BombData> {
+public class TileEntityNuclearBomb extends BlockEntity implements Container, Tickable, MenuProvider {
 	public GameProfile player = null;
 	public RivalRebelsTeam	rrteam			= null;
 	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
@@ -193,7 +190,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.displayClientMessage(RRIdentifiers.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
+                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
 		}
@@ -242,21 +239,38 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerNuclearBomb(syncId, inv, this, getScreenOpeningData(null));
+        return new ContainerNuclearBomb(syncId, inv, this, containerData);
     }
 
-    public record BombData(int countdown, int amountOfCharges, boolean hasTrollFace, boolean isArmed) {
-        public static final StreamCodec<FriendlyByteBuf, BombData> STREAM_CODEC = StreamCodec.composite(
-            ByteBufCodecs.INT, BombData::countdown,
-            ByteBufCodecs.INT, BombData::amountOfCharges,
-            ByteBufCodecs.BOOL, BombData::hasTrollFace,
-            ByteBufCodecs.BOOL, BombData::isArmed,
-            BombData::new
-        );
-    }
+    private final ContainerData containerData = new ContainerData() {
+        @Override
+        public int get(int index) {
+            return switch (index) {
+                case 0 -> Countdown;
+                case 1 -> AmountOfCharges;
+                case 2 -> hasTrollface ? 1 : 0;
+                case 3 -> hasExplosive ? 1 : 0;
+                case 4 -> hasFuse ? 1 : 0;
+                default -> 0;
+            };
+        }
 
-    @Override
-    public BombData getScreenOpeningData(ServerPlayer player) {
-        return new BombData(Countdown, AmountOfCharges, hasTrollface, hasExplosive && hasFuse);
-    }
+        @Override
+        public void set(int index, int value) {
+            switch (index) {
+                case 0 -> Countdown = value;
+                case 1 -> AmountOfCharges = value;
+                case 2 -> hasTrollface = value == 1;
+                case 3 -> hasExplosive = value == 1;
+                case 4 -> hasFuse = value == 1;
+                default -> {}
+            }
+        }
+
+        @Override
+        public int getCount() {
+            return 5;
+        }
+    };
+
 }

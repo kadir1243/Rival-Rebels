@@ -22,13 +22,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
-import net.minecraft.world.inventory.InventoryMenu;
 
 public class RenderFlame extends EntityRenderer<EntityFlameBall> {
-    private static final Material FLAMEBALL_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etflameball);
     public RenderFlame(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
@@ -42,7 +39,7 @@ public class RenderFlame extends EntityRenderer<EntityFlameBall> {
 		float Y = (entity.sequence - (entity.sequence % 4)) / 16f;
 		float size = 0.0500f * entity.tickCount;
 		size *= size;
-        VertexConsumer buffer = FLAMEBALL_TEXTURE.buffer(vertexConsumers, RenderType::entityTranslucentEmissive);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entityTranslucentEmissive(RRIdentifiers.etflameball));
 		matrices.mulPose(Axis.YP.rotationDegrees(180 - Minecraft.getInstance().player.getYRot()));
 		matrices.mulPose(Axis.XP.rotationDegrees(90 - Minecraft.getInstance().player.getXRot()));
 		matrices.pushPose();

@@ -13,6 +13,7 @@ package assets.rivalrebels.common.block.autobuilds;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import com.mojang.serialization.MapCodec;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
@@ -44,7 +45,7 @@ public class BlockAutoForceField extends BlockAutoTemplate {
 				{
 					for (int z1 = -r; z1 <= r; z1++)
 					{
-						if (((Math.abs(x1) == r || Math.abs(z1) == r) && (y1 != 3 || (Math.abs(x1) != 0 && Math.abs(z1) != 0))) || y1 == 0 || y1 == h)
+						if (((Mth.abs(x1) == r || Mth.abs(z1) == r) && (y1 != 3 || (Mth.abs(x1) != 0 && Mth.abs(z1) != 0))) || y1 == 0 || y1 == h)
 						{
 							placeBlockCarefully(world, x + x1, y + y1, z + z1, RRBlocks.reactive);
 						}

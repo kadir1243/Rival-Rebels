@@ -17,7 +17,7 @@ import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
@@ -70,14 +70,14 @@ public class EntitySeekB83 extends AbstractArrow {
 		fins = false;
 		moveTo(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYRot(), entity2.getXRot());
         setPosRaw(
-            getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F),
+            getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY(),
-            getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F)
+            getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
         );
 		setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         shoot(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 0.5f, 1f);
 	}
@@ -88,14 +88,14 @@ public class EntitySeekB83 extends AbstractArrow {
 		fins = false;
 		moveTo(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYRot() + yawdelta, entity2.getXRot());
         setPosRaw(
-            getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F),
+            getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY(),
-            getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F)
+            getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
         );
 		setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         shoot(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 0.5f, 1f);
 	}
@@ -116,8 +116,8 @@ public class EntitySeekB83 extends AbstractArrow {
             random.nextGaussian() * 0.0075 * divergence,
             random.nextGaussian() * 0.0075 * divergence).scale(speed);
         setDeltaMovement(vec3d.x(), vec3d.y(), vec3d.z());
-		setYRot(yRotO = (float) (Math.atan2(vec3d.x(), vec3d.z()) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(vec3d.y(), Mth.sqrt((float) (vec3d.x() * vec3d.x() + vec3d.z() * vec3d.z()))) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(vec3d.x(), vec3d.z()) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(vec3d.y(), Mth.sqrt((float) (vec3d.x() * vec3d.x() + vec3d.z() * vec3d.z()))) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -197,8 +197,8 @@ public class EntitySeekB83 extends AbstractArrow {
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var16 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
-		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
-		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
+		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
+		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
 			;
 		while (getXRot() - xRotO >= 180.0F)
 			xRotO += 360.0F;
@@ -275,7 +275,7 @@ public class EntitySeekB83 extends AbstractArrow {
 			{
                 BlockPos pos = ((BlockHitResult) mop).getBlockPos();
                 BlockState state = level().getBlockState(pos);
-                if (state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_PANES))
+                if (state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES))
 				{
 					level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                     this.playSound(RRSounds.CUCHILLO_GLASS_BREAK, 5F, 0.3F);

@@ -16,20 +16,16 @@ import assets.rivalrebels.client.model.ModelRocket;
 import assets.rivalrebels.common.entity.EntityRocket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public class RenderRocket extends EntityRenderer<EntityRocket> {
-    public static final Material ROCKET_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrocket);
     public RenderRocket(EntityRendererProvider.Context manager)
 	{
         super(manager);
@@ -41,7 +37,7 @@ public class RenderRocket extends EntityRenderer<EntityRocket> {
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
 		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelRocket.render(matrices, ROCKET_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.fins, light, OverlayTexture.NO_OVERLAY);
+		ModelRocket.render(matrices, vertexConsumers, RRIdentifiers.etrocket, entity.fins, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
 

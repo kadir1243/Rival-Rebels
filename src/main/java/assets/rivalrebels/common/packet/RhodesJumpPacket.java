@@ -12,7 +12,7 @@
 package assets.rivalrebels.common.packet;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.command.CommandRobot;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
@@ -60,7 +60,7 @@ public record RhodesJumpPacket(int id, boolean jump, boolean rocket, boolean las
             er.jet = m.jump;
             er.b2spirit = m.b2spirit;
             er.guard = m.guard;
-            if (m.guard && RivalRebels.rhodesExit) {
+            if (m.guard && CommandRobot.rhodesExit) {
                 if (er.rider != null) {
                     er.rider.getAbilities().invulnerable = false;
                     er.rider = null;

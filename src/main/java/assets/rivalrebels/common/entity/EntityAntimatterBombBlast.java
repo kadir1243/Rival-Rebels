@@ -31,7 +31,6 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 {
 	public AntimatterBomb	tsar		= null;
 	public double		radius;
-	public int			time		= 0;
 
 	public EntityAntimatterBombBlast(EntityType<? extends EntityAntimatterBombBlast> entityType, Level par1World) {
 		super(entityType, par1World);

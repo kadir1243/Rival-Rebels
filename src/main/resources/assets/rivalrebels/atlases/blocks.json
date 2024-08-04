@@ -4,6 +4,10 @@
       "type": "directory",
       "source": "entity",
       "prefix": "entity/"
+    },
+    {
+      "type": "single",
+      "source": "rivalrebels:entity/rhodes"
     }
   ]
 }

@@ -14,7 +14,7 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.item.RRItems;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.sounds.SoundEvents;
@@ -55,13 +55,13 @@ public class EntityCuchillo extends EntityInanimate
 		this(par1World);
 		shootingEntity = player;
 		moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F),
+        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY() - 0.1f,
-            getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F));
+            getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F));
 		setPos(getX(), getY(), getZ());
-		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)) * par3,
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)) * par3,
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)) * par3);
+		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)) * par3,
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)) * par3,
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)) * par3);
 	}
 	public EntityCuchillo(Level par1World, double x, double y,double z, double mx, double my, double mz)
 	{
@@ -72,8 +72,8 @@ public class EntityCuchillo extends EntityInanimate
 
 	public void setAnglesMotion(double mx, double my, double mz) {
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -118,7 +118,7 @@ public class EntityCuchillo extends EntityInanimate
 					{
                         BlockPos pos = ((BlockHitResult) mop).getBlockPos();
                         BlockState state = level().getBlockState(pos);
-						if (state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_PANES)) {
+						if (state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES)) {
 							level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                             this.playSound(RRSounds.CUCHILLO_GLASS_BREAK, 5F, 0.3F);
                         }
@@ -137,7 +137,7 @@ public class EntityCuchillo extends EntityInanimate
 			else
 			{
                 setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-				setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+				setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 				while (getYRot() - yRotO < -180.0F)
 					yRotO -= 360.0F;
 				while (getYRot() - yRotO >= 180.0F)

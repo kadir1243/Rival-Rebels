@@ -18,17 +18,13 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
 public class RenderRhodesTorso extends EntityRenderer<EntityRhodesTorso> {
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RenderRhodes.texture);
     public RenderRhodesTorso(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
@@ -40,7 +36,7 @@ public class RenderRhodesTorso extends EntityRenderer<EntityRhodesTorso> {
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
         matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
         matrices.translate(0, 0.7f, 0);
-        ObjModels.torso.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.renderSolid(ObjModels.torso, RenderRhodes.texture, matrices, vertexConsumers, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

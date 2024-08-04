@@ -38,7 +38,6 @@ import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -76,12 +75,8 @@ public class BlockLandMine extends FallingBlock
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
 		float f = 0.01F;
-		return Shapes.create(new AABB(x, y, z, x + 1, y + 1 - f, z + 1));
+		return Shapes.create(0, 0, 0, 1, 1 - f, 1);
 	}
 
     @Override

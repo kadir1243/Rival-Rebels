@@ -18,18 +18,12 @@ import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class PlasmaCannonRenderer implements DynamicItemRenderer {
-    public static final Material PLASMA_CANNON = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etplasmacannon);
-    public static final Material HYDROD = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ethydrod);
-
     public PlasmaCannonRenderer() {
     }
 
@@ -43,11 +37,10 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
 		matrices.pushPose();
 
-        VertexConsumer plasmaCannonVertexConsumer = PLASMA_CANNON.buffer(vertexConsumers, RenderType::entitySolid);
-        ObjModels.plasma_cannon.render(matrices, plasmaCannonVertexConsumer, light, overlay);
-        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
+        ObjModels.renderSolid(ObjModels.plasma_cannon, RRIdentifiers.etplasmacannon, matrices, vertexConsumers, light, overlay);
+        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES);
         if (stack.isEnchanted()) {
-			ObjModels.plasma_cannon.render(matrices, cellularNoise, light, overlay);
+			ObjModels.renderNoise(ObjModels.plasma_cannon, matrices, vertexConsumers, light, overlay);
 		}
 
 		matrices.popPose();
@@ -60,7 +53,7 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(225));
 		matrices.translate(-0.5f, 0.5f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
-        VertexConsumer hydrodVertexConsumer = HYDROD.buffer(vertexConsumers, RenderType::entitySolid);
+        VertexConsumer hydrodVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ethydrod));
         ModelRod.render(matrices, hydrodVertexConsumer, light, overlay, false);
 		if (stack.isEnchanted()) {
 			ModelRod.render(matrices, cellularNoise, light, overlay, false);

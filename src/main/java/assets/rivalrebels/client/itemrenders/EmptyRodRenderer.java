@@ -13,19 +13,14 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRod;
+import assets.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
-public class EmptyRodRenderer implements BuiltinItemRendererRegistry.DynamicItemRenderer {
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etemptyrod);
-
+public class EmptyRodRenderer implements DynamicItemRenderer {
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
@@ -34,7 +29,7 @@ public class EmptyRodRenderer implements BuiltinItemRendererRegistry.DynamicItem
 		matrices.scale(0.5f, 1.25f, 0.5f);
 		matrices.pushPose();
 
-		ModelRod.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ModelRod.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etemptyrod)), light, overlay);
 
 		matrices.popPose();
 		matrices.popPose();

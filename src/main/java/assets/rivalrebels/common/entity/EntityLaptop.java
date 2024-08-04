@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.block.RRBlocks;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.EntityType;
@@ -22,7 +23,7 @@ import net.minecraft.world.phys.AABB;
 public class EntityLaptop extends EntityInanimate
 {
 	public double	slide	= 0;
-	double			test	= Math.PI;
+	private float test = Mth.PI;
 
     public EntityLaptop(EntityType<? extends EntityLaptop> type, Level world) {
         super(type, world);
@@ -53,12 +54,12 @@ public class EntityLaptop extends EntityInanimate
 	public void tick()
 	{
 		super.tick();
-		slide = (Math.cos(test) + 1) * 45;
+		slide = (Mth.cos(test) + 1) * 45;
 
         if (level().hasNearbyAlivePlayer(getX() + 0.5F, getY() + 0.5F, getZ() + 0.5F, 9)) {
-			if (slide < 89.995) test += 0.05;
+			if (slide < 89.995) test += 0.05F;
 		} else {
-			if (slide > 0.004) test -= 0.05;
+			if (slide > 0.004) test -= 0.05F;
 		}
 	}
 

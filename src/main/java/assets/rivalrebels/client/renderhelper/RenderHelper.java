@@ -25,9 +25,9 @@ public class RenderHelper {
         return WavefrontObject.loadModel(RRIdentifiers.create("models/" + modelName + ".obj"));
     }
 
-    public static void renderBox(PoseStack matrices, VertexConsumer buffer, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light)
+    public static void renderBox(PoseStack pose, VertexConsumer buffer, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light)
 	{
-		matrices.mulPose(Axis.YP.rotationDegrees(90));
+		pose.mulPose(Axis.YP.rotationDegrees(90));
 		texLocX /= texXsize;
 		texLocY /= texYsize;
 		float hl = (length / 2f) / resolution;
@@ -61,12 +61,12 @@ public class RenderHelper {
 		TextureVertice t12 = new TextureVertice(texLocX + xtd + xtl, texLocY + ytd + yth);
 		TextureVertice t13 = new TextureVertice(texLocX + xtd + xtl + xtd, texLocY + ytd + yth);
 		TextureVertice t14 = new TextureVertice(texLocX + xtd + xtl + xtl + xtd, texLocY + ytd + yth);
-		addFace(matrices, buffer, xpypzn, xnypzn, xnypzp, xpypzp, t6, t2, t1, t5, light); // top
-		addFace(matrices, buffer, xpynzp, xnynzp, xnynzn, xpynzn, t6, t2, t3, t8, light); // bottom
-		addFace(matrices, buffer, xnypzp, xnynzp, xpynzp, xpypzp, t4, t10, t11, t5, light); // right
-		addFace(matrices, buffer, xpypzp, xpynzp, xpynzn, xpypzn, t5, t11, t12, t6, light); // front
-		addFace(matrices, buffer, xpypzn, xpynzn, xnynzn, xnypzn, t6, t12, t13, t7, light); // left
-		addFace(matrices, buffer, xnypzn, xnynzn, xnynzp, xnypzp, t7, t13, t14, t9, light); // back
+		addFace(pose, buffer, xpypzn, xnypzn, xnypzp, xpypzp, t6, t2, t1, t5, light); // top
+		addFace(pose, buffer, xpynzp, xnynzp, xnynzn, xpynzn, t6, t2, t3, t8, light); // bottom
+		addFace(pose, buffer, xnypzp, xnynzp, xpynzp, xpypzp, t4, t10, t11, t5, light); // right
+		addFace(pose, buffer, xpypzp, xpynzp, xpynzn, xpypzn, t5, t11, t12, t6, light); // front
+		addFace(pose, buffer, xpypzn, xpynzn, xnynzn, xnypzn, t6, t12, t13, t7, light); // left
+		addFace(pose, buffer, xnypzn, xnynzn, xnynzp, xnypzp, t7, t13, t14, t9, light); // back
 	}
 
     public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light) {
@@ -78,7 +78,18 @@ public class RenderHelper {
         TextureVertice mt = new TextureVertice((t1.x() + t2.x() + t3.x() + t4.x()) / 4, (t1.y() + t2.y() + t3.y() + t4.y()) / 4);
         addVertice(pose, buffer, v1, t1, light, overlay);
         addVertice(pose, buffer, v2, t2, light, overlay);
+        addVertice(pose, buffer, mv, mt, light, overlay);
+
+        addVertice(pose, buffer, v2, t2, light, overlay);
         addVertice(pose, buffer, v3, t3, light, overlay);
+        addVertice(pose, buffer, mv, mt, light, overlay);
+
+        addVertice(pose, buffer, v3, t3, light, overlay);
+        addVertice(pose, buffer, v4, t4, light, overlay);
+        addVertice(pose, buffer, mv, mt, light, overlay);
+
+        addVertice(pose, buffer, v4, t4, light, overlay);
+        addVertice(pose, buffer, v1, t1, light, overlay);
         addVertice(pose, buffer, mv, mt, light, overlay);
     }
 

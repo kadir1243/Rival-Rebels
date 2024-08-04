@@ -89,7 +89,7 @@ public class EntityNuclearBlast extends EntityInanimate {
 		{
 			for (int i = 0; i < 21; i++)
 			{
-				level().playLocalSound(getX() + Math.sin(i) * (i / 0.5), getY() + 17, getZ() + Math.cos(i) * (i / 0.5), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), 4.0f, level().random.nextFloat() + 1.0f, true);
+				level().playLocalSound(getX() + Mth.sin(i) * (i / 0.5), getY() + 17, getZ() + Mth.cos(i) * (i / 0.5), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), 4.0f, level().random.nextFloat() + 1.0f, true);
 			}
 		}
 		if (tickCount < 600)

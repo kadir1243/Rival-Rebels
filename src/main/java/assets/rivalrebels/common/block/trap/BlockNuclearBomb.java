@@ -28,6 +28,7 @@ import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
@@ -38,7 +39,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockNuclearBomb extends BaseEntityBlock {
@@ -63,27 +69,19 @@ public class BlockNuclearBomb extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        BlockPos pos = ctx.getClickedPos();
-        Player placer = ctx.getPlayer();
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-		if (Mth.abs((float) placer.getX() - x) < 2.0F && Mth.abs((float) placer.getZ() - z) < 2.0F)
-		{
-			double var5 = placer.getY() + 1.82D - placer.getVehicleAttachmentPoint(placer).y();
-
-			if (var5 - y > 2.0D)
-			{
-				return super.getStateForPlacement(ctx).setValue(FACING, Direction.UP);
-			}
-
-			if (y - var5 > 0.0D)
-			{
-                return super.getStateForPlacement(ctx).setValue(FACING, Direction.DOWN);
-			}
-		}
-		return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection());
+		return super.getStateForPlacement(ctx).setValue(FACING, ctx.getNearestLookingDirection());
 	}
+
+    @Override
+    protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
+        Direction direction = state.getValue(FACING);
+        return Shapes.create(-direction.getStepX(), -direction.getStepY(), -direction.getStepZ(), 1 + direction.getStepX(), 1 + direction.getStepY(), 1 + direction.getStepZ());
+    }
+
+    @Override
+    protected VoxelShape getInteractionShape(BlockState state, BlockGetter level, BlockPos pos) {
+        return state.getShape(level, pos);
+    }
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {

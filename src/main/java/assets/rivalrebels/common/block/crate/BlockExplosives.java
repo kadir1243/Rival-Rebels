@@ -13,8 +13,10 @@ package assets.rivalrebels.common.block.crate;
 
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -38,28 +40,21 @@ public class BlockExplosives extends Block
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-		if (!level.isClientSide())
-		{
+		if (!level.isClientSide()) {
             player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
-            player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.timedbomb.getName() + ". §9(" + "1 minute countdown." + ")"), false);
-            player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.pliers.getDescription() + ". §9(" + "to defuse explosives." + ")"), false);
-            player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.remotecharge.getName() + ". §9(" + "Remote charge." + ")"), false);
-            player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.remote.getDescription() + ". §9(" + "Set and detonate charge." + ")"), false);
-            player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.minetrap.getName() + ". §9(" + "Handle with care." + ")"), false);
-            player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.flare.getName() + ". §9(" + "Incendiary defense." + ")"), false);
-            ItemEntity ei = new ItemEntity(level, x + .5, y + .5, z + .5, RRBlocks.timedbomb.asItem().getDefaultInstance());
-			ItemEntity ei1 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.remotecharge, 8));
-			ItemEntity ei2 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.minetrap, 16));
-			ItemEntity ei3 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRBlocks.flare, 8));
-			ItemEntity ei4 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.remote.getDefaultInstance());
-			ItemEntity ei5 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.pliers.getDefaultInstance());
-			level.addFreshEntity(ei);
-			level.addFreshEntity(ei1);
-			level.addFreshEntity(ei2);
-			level.addFreshEntity(ei3);
-			level.addFreshEntity(ei4);
-			level.addFreshEntity(ei5);
-			level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
+            player.displayClientMessage(RRBlocks.timedbomb.getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(1 minute countdown.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRItems.pliers.getDescription().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("§9(to defuse explosives.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRBlocks.remotecharge.getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Remote charge.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRItems.remote.getDescription().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Set and detonate charge.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRBlocks.minetrap.getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Handle with care.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRBlocks.flare.getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Incendiary defense.)").withStyle(ChatFormatting.BLUE)), false);
+            Containers.dropItemStack(level, x, y, z, RRBlocks.timedbomb.asItem().getDefaultInstance());
+            Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.remotecharge, 8));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.minetrap, 16));
+			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.flare, 8));
+			Containers.dropItemStack(level, x, y, z, RRItems.remote.getDefaultInstance());
+			Containers.dropItemStack(level, x, y, z, RRItems.pliers.getDefaultInstance());
+			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		}
 		return InteractionResult.sidedSuccess(level.isClientSide());
 	}

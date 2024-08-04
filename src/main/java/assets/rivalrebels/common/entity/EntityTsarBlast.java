@@ -31,7 +31,6 @@ public class EntityTsarBlast extends EntityInanimate
 {
 	public TsarBomba	tsar		= null;
 	public double		radius;
-	public int			time		= 0;
 
     public EntityTsarBlast(EntityType<? extends EntityTsarBlast> type, Level world) {
         super(type, world);

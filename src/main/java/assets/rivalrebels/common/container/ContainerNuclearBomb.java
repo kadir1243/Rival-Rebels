@@ -16,28 +16,29 @@ import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.item.ItemFuse;
 import assets.rivalrebels.common.item.ItemRodNuclear;
-import assets.rivalrebels.common.tileentity.TileEntityNuclearBomb;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerNuclearBomb extends AbstractContainerMenu
 {
 	protected Container nuclearBomb;
-    private final TileEntityNuclearBomb.BombData bombData;
+    private final ContainerData containerData;
 
-    public ContainerNuclearBomb(int syncId, Inventory playerInventory, TileEntityNuclearBomb.BombData bombData) {
-        this(syncId, playerInventory, new SimpleContainer(36), bombData);
+    public ContainerNuclearBomb(int syncId, Inventory playerInventory) {
+        this(syncId, playerInventory, new SimpleContainer(36), new SimpleContainerData(5));
     }
 
-    public ContainerNuclearBomb(int syncId, Inventory inventoryPlayer, Container nuclearBomb, TileEntityNuclearBomb.BombData bombData) {
+    public ContainerNuclearBomb(int syncId, Inventory inventoryPlayer, Container nuclearBomb, ContainerData containerData) {
         super(RivalRebelsGuiHandler.NUCLEAR_BOMB_SCREEN_HANDLER_TYPE, syncId);
 		this.nuclearBomb = nuclearBomb;
-        this.bombData = bombData;
+        this.containerData = containerData;
         addSlot(new SlotRR(nuclearBomb, 0, 16, 34, 1, ItemFuse.class));
 		for (int i = 0; i <= 4; i++) {
 			addSlot(new SlotRR(nuclearBomb, i + 1, 38 + i * 18, 25, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
@@ -46,6 +47,7 @@ public class ContainerNuclearBomb extends AbstractContainerMenu
 		addSlot(new SlotRR(nuclearBomb, 11, 133, 34, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(nuclearBomb, 12, 152, 34, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
+        addDataSlots(containerData);
 	}
 
 	@Override
@@ -76,18 +78,18 @@ public class ContainerNuclearBomb extends AbstractContainerMenu
 	}
 
     public int getCountDown() {
-        return bombData.countdown();
+        return containerData.get(0);
     }
 
     public int getAmountOfCharges() {
-        return bombData.amountOfCharges();
+        return containerData.get(1);
     }
 
     public boolean hasTrollFace() {
-        return bombData.hasTrollFace();
+        return containerData.get(2) == 1;
     }
 
     public boolean isArmed() {
-        return bombData.isArmed();
+        return containerData.get(3) == 1 && containerData.get(4) == 1;
     }
 }

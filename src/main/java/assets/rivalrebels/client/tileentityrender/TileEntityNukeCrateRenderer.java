@@ -13,6 +13,7 @@ package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelNukeCrate;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.crate.BlockNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
@@ -23,15 +24,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
-import net.minecraft.world.inventory.InventoryMenu;
 
 public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEntityNukeCrate> {
-    public static final Material NUKE_CRATE_TOP_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btnuketop);
-    public static final Material NUKE_CRATE_BOTTOM_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btnukebottom);
-    public static final Material CRATE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btcrate);
-
     public TileEntityNukeCrateRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -49,12 +44,12 @@ public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEnti
         }
         VertexConsumer buffer;
         if (entity.getBlockState().is(RRBlocks.nukeCrateBottom))
-            buffer = NUKE_CRATE_BOTTOM_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+            buffer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.btnukebottom));
         else if (entity.getBlockState().is(RRBlocks.nukeCrateTop))
-            buffer = NUKE_CRATE_TOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+            buffer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.btnuketop));
         else throw new UnsupportedOperationException("Unknown block to render");
         ModelNukeCrate.renderModelA(matrices, buffer, light, overlay);
-        ModelNukeCrate.renderModelB(matrices, CRATE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        ModelNukeCrate.renderModelB(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.btcrate)), light, overlay);
         matrices.popPose();
     }
 }

@@ -11,16 +11,31 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.FastColor;
 import org.joml.Vector3f;
 
 public class ModelBlastSphere {
+    private static final RenderType LIGHTNING_TRIANGLES = RenderType.create(
+        RRIdentifiers.MODID +"_lightning_triangles",
+        DefaultVertexFormat.POSITION_COLOR,
+        VertexFormat.Mode.TRIANGLES,
+        1536,
+        RenderType.CompositeState.builder()
+            .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
+            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+            .createCompositeState(false)
+    );
 	private static final Vector3f	vx	= new Vector3f(1, 0, 0).normalize();
 	private static final Vector3f	vy	= new Vector3f(0, 1, 0).normalize();
 	private static final Vector3f	vz	= new Vector3f(0, 0, 1).normalize();
@@ -42,7 +57,7 @@ public class ModelBlastSphere {
     }
 
     public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float size, int color) {
-        renderModel(matrices, vertexConsumers.getBuffer(RenderType.lightning()), size, color);
+        renderModel(matrices, vertexConsumers.getBuffer(LIGHTNING_TRIANGLES), size, color);
     }
 
 	public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int color) {

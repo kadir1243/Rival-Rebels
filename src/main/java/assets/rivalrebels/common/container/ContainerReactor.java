@@ -30,25 +30,25 @@ public class ContainerReactor extends AbstractContainerMenu
 	protected Container reactor;
 	public SlotRR fuel;
 	public SlotRR core;
-    private final ContainerData propertyDelegate;
+    private final ContainerData containerData;
 
     public ContainerReactor(int syncId, Inventory playerInv) {
         this(syncId, playerInv, new SimpleContainer(2), new SimpleContainerData(7));
     }
 
-    public ContainerReactor(int syncId, Inventory inv, Container reactor, ContainerData propertyDelegate)
-	{
+    public ContainerReactor(int syncId, Inventory inv, Container reactor, ContainerData containerData) {
         super(RivalRebelsGuiHandler.REACTOR_SCREEN_HANDLER_TYPE, syncId);
         this.reactor = reactor;
 		fuel = new SlotRR(reactor, 0, 58, 139, 1, ItemRod.class);
 		core = new SlotRR(reactor, 1, 103, 139, 1, ItemCore.class);
-        this.propertyDelegate = propertyDelegate;
+        this.containerData = containerData;
         addSlot(fuel);
 		addSlot(core);
 		bindPlayerInventory(inv);
+        addDataSlots(containerData);
 	}
 
-	@Override
+    @Override
 	public boolean stillValid(Player player)
 	{
 		return reactor.stillValid(player);
@@ -61,39 +61,32 @@ public class ContainerReactor extends AbstractContainerMenu
 	}
 
     @Override
-    public ItemStack quickMoveStack(Player player, int slot) {
-		return ItemStack.EMPTY;
+    public ItemStack quickMoveStack(Player player, int index) {
+        return ItemStack.EMPTY;
 	}
 
     public boolean isOn() {
-        return propertyDelegate.get(0) == 1;
+        return containerData.get(0) == 1;
     }
 
     public float getPower() {
-        return Float.intBitsToFloat(propertyDelegate.get(1));
+        return containerData.get(1) * 100F;
     }
 
     public int getConsumed() {
-        return propertyDelegate.get(2);
+        return containerData.get(2);
     }
 
     public int getLastTickConsumed() {
-        return propertyDelegate.get(2);
+        return containerData.get(2);
     }
 
     public boolean isMelt() {
-        return propertyDelegate.get(3) == 1;
+        return containerData.get(3) == 1;
     }
 
     public BlockPos getPos() {
-        return new BlockPos(propertyDelegate.get(4), propertyDelegate.get(5), propertyDelegate.get(6));
+        return new BlockPos(containerData.get(4), containerData.get(5), containerData.get(6));
     }
 
-    public void toggleOn() {
-        propertyDelegate.set(4, 0);
-    }
-
-    public void ejectCore() {
-        propertyDelegate.set(5, 0);
-    }
 }

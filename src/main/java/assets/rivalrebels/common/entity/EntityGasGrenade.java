@@ -65,8 +65,8 @@ public class EntityGasGrenade extends EntityInanimate {
         double var12 = Math.sqrt(var6 * var6 + var10 * var10);
 
         if (var12 >= 1.0E-7D) {
-            float var14 = (float) (Math.atan2(var10, var6) * 180.0D / Math.PI) - 90.0F;
-            float var15 = (float) (-(Math.atan2(var8, var12) * 180.0D / Math.PI));
+            float var14 = (float) (Math.atan2(var10, var6) * Mth.RAD_TO_DEG) - 90.0F;
+            float var15 = (float) (-(Math.atan2(var8, var12) * Mth.RAD_TO_DEG));
             double var16 = var6 / var12;
             double var18 = var10 / var12;
             moveTo(shooting.getX() + var16, getY(), shooting.getZ() + var18, var14, var15);
@@ -80,20 +80,20 @@ public class EntityGasGrenade extends EntityInanimate {
         shootingEntity = player;
 
         moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F),
+        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
         getY() - 0.10000000149011612D,
-        getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F));
+        getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F));
         setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-        (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-        (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+        (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+        (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
         setArrowHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), par3 * 1.5F, 1.0F);
     }
 
     public void setAnglesMotion(double mx, double my, double mz) {
         setDeltaMovement(mx, my, mz);
-        setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
     }
 
     /**
@@ -112,8 +112,8 @@ public class EntityGasGrenade extends EntityInanimate {
         par5 *= par7;
         super.setDeltaMovement(par1, par3, par5);
         float var10 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-        setYRot(yRotO = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
-        setXRot(xRotO = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI));
+        setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
     }
 
     @Override
@@ -123,8 +123,8 @@ public class EntityGasGrenade extends EntityInanimate {
 
         if (xRotO == 0.0F && yRotO == 0.0F) {
             float var7 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-            setYRot(yRotO = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
-            setXRot(xRotO = (float) (Math.atan2(par3, var7) * 180.0D / Math.PI));
+            setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
+            setXRot(xRotO = (float) (Math.atan2(par3, var7) * Mth.RAD_TO_DEG));
             moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
         }
     }
@@ -135,8 +135,8 @@ public class EntityGasGrenade extends EntityInanimate {
 
         if (xRotO == 0.0F && yRotO == 0.0F) {
             float var1 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
-            setYRot(yRotO = (float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
-            setXRot(xRotO = (float) (Math.atan2(getDeltaMovement().y(), var1) * 180.0D / Math.PI));
+            setYRot(yRotO = (float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
+            setXRot(xRotO = (float) (Math.atan2(getDeltaMovement().y(), var1) * Mth.RAD_TO_DEG));
         }
         ++ticksInAir;
         Vec3 var17 = position();
@@ -182,9 +182,9 @@ public class EntityGasGrenade extends EntityInanimate {
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
         var20 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
-        setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+        setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-        for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var20) * 180.0D / Math.PI)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F) {
+        for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var20) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F) {
         }
 
         while (getXRot() - xRotO >= 180.0F) {

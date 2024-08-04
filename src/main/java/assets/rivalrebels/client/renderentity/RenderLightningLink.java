@@ -74,8 +74,8 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 				{
                     float tempAddedX = AddedX / dist;
                     float tempAddedY = AddedY / dist;
-					if (Math.abs(tempAddedX) < Math.abs(AddedX)) AddedX = tempAddedX;
-					if (Math.abs(tempAddedY) < Math.abs(AddedY)) AddedY = tempAddedY;
+					if (Mth.abs(tempAddedX) < Mth.abs(AddedX)) AddedX = tempAddedX;
+					if (Mth.abs(tempAddedY) < Mth.abs(AddedY)) AddedY = tempAddedY;
 				}
 				if (addedZ <= 0)
 				{

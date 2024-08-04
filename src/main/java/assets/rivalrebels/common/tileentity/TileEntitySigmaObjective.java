@@ -19,6 +19,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Player;
@@ -34,7 +35,7 @@ public class TileEntitySigmaObjective extends BlockEntity implements Container, 
 	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(16, ItemStack.EMPTY);
 
 	public double slide	= 0;
-	private double test	= Math.PI - 0.05;
+	private float test	= Mth.PI - 0.05F;
     private final BaseCommandBlock commandExecutor = new BaseCommandBlock() {
         @Override
         public void setCommand(String command) {
@@ -164,16 +165,16 @@ public class TileEntitySigmaObjective extends BlockEntity implements Container, 
 
     @Override
 	public void tick() {
-		slide = (Math.cos(test) + 1) / 32 * 10;
+		slide = (Mth.cos(test) + 1) / 32 * 10;
 
         boolean i = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
 		if (i)
 		{
-			if (slide < 0.621) test += 0.05;
+			if (slide < 0.621) test += 0.05F;
 		}
 		else
 		{
-			if (slide > 0.004) test -= 0.05;
+			if (slide > 0.004) test -= 0.05F;
 		}
 	}
 

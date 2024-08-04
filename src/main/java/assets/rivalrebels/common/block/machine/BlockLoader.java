@@ -11,17 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLoader;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -60,53 +58,9 @@ public class BlockLoader extends BaseEntityBlock {
     }
 
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-        TileEntityLoader var7 = null;
-        try {
-            var7 = (TileEntityLoader) world.getBlockEntity(pos);
-        } catch (Exception e) {
-            // no error message ;]
-        }
-
-        int x = pos.getX();
-        int y = pos.getY();
-        int z =pos.getZ();
-        world.addFreshEntity(new ItemEntity(world, x, y, z, RRBlocks.loader.asItem().getDefaultInstance()));
-        if (var7 != null)
-        {
-            for (int var8 = 0; var8 < var7.getContainerSize(); ++var8)
-            {
-                ItemStack var9 = var7.getItem(var8);
-
-                if (!var9.isEmpty())
-                {
-                    float var10 = world.random.nextFloat() * 0.8F + 0.1F;
-                    float var11 = world.random.nextFloat() * 0.8F + 0.1F;
-                    ItemEntity var14;
-
-                    for (float var12 = world.random.nextFloat() * 0.8F + 0.1F; var9.getCount() > 0; world.addFreshEntity(var14))
-                    {
-                        int var13 = world.random.nextInt(21) + 10;
-
-                        if (var13 > var9.getCount())
-                        {
-                            var13 = var9.getCount();
-                        }
-
-                        var9.shrink(var13);
-                        ItemStack copy = var9.copyWithCount(var13);
-                        var14 = new ItemEntity(world, (x + var10), (y + var11), (z + var12), copy);
-                        float var15 = 0.05F;
-                        var14.setDeltaMovement(((float) world.random.nextGaussian() * var15),
-                            ((float) world.random.nextGaussian() * var15 + 0.2F),
-                            ((float) world.random.nextGaussian() * var15));
-                    }
-                }
-            }
-            var7.setRemoved();
-        }
-        super.playerWillDestroy(world, pos, state, player);
-        return state;
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        Containers.dropContentsOnDestroy(state, newState, level, pos);
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
     @Override

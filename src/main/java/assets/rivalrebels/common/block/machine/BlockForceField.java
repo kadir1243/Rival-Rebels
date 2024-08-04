@@ -40,45 +40,33 @@ public class BlockForceField extends Block {
 
     //@Override
     public AABB getBoundingBox(BlockState state, BlockGetter source, BlockPos pos) {
-		int var5 = state.getValue(FACING).get3DDataValue();
-		float var6 = 0.4375f;
+        float var6 = 0.4375f;
 
-		if (var5 == 4) {
-			return new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		} else if (var5 == 5) {
-			return new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-		} else if (var5 == 2) {
-			return new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		} else if (var5 == 3) {
-			return new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-		}
-
-        return new AABB(0.0F, 0.0F, 0.4375f, 1.0F, 1.0F, 1.0F - 0.4375f);
-	}
+        return switch (state.getValue(FACING).getAxis()) {
+            case X -> new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            case Z -> new AABB(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+            default -> new AABB(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+        };
+    }
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
         float var6 = 0.4375f;
 
-        return switch (state.getValue(FACING).get3DDataValue()) {
-            case 4 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-            case 5 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-            case 2 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-            case 3 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+        return switch (state.getValue(FACING).getAxis()) {
+            case X -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            case Z -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
             default -> super.getCollisionShape(state, world, pos, context);
         };
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-		int var5 = state.getValue(FACING).get3DDataValue();
-		float var6 = 0.4375f;
+        float var6 = 0.4375f;
 
-        return switch (var5) {
-            case 4 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-            case 5 -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
-            case 2 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
-            case 3 -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
+        return switch (state.getValue(FACING).getAxis()) {
+            case X -> Shapes.create(0.0F, 0.0F, var6, 1.0F, 1.0F, 1.0F - var6);
+            case Z -> Shapes.create(var6, 0.0F, 0.0F, 1.0F - var6, 1.0F, 1.0F);
             default -> super.getShape(state, world, pos, context);
         };
     }

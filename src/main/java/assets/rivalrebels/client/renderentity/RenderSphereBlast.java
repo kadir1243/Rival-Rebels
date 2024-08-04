@@ -29,10 +29,9 @@ public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast> {
 
     @Override
     public void render(EntitySphereBlast entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        entity.time++;
         matrices.pushPose();
-        double elev = ((Mth.sin(entity.time / 40f) + 1.5f) * 10);
-        matrices.translate(entity.getX(), entity.getY() + elev, entity.getZ());
+        double elev = ((Mth.sin(entity.tickCount / 40f) + 1.5f) * 10);
+        matrices.translate(0, elev, 0);
         matrices.pushPose();
         matrices.mulPose(Axis.YP.rotationDegrees((float) (elev * 2)));
         matrices.mulPose(Axis.XP.rotationDegrees((float) (elev * 3)));

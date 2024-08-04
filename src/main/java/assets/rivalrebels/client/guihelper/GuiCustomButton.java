@@ -23,13 +23,13 @@ import org.joml.Vector2i;
 @Environment(EnvType.CLIENT)
 public class GuiCustomButton extends Button
 {
-	Rectangle			bbox;
-    Vector2i				tbox;
-	ResourceLocation	resloc;
+	Rectangle bbox;
+    Vector2i tbox;
+	ResourceLocation resloc;
 	boolean				toggleable;
-	public boolean		isPressed	= false;
-	public boolean		wasPressed	= false;
-	public boolean		mouseDown	= false;
+	public boolean	 isPressed	= false;
+	public boolean	 wasPressed	= false;
+	public boolean	 mouseDown	= false;
 
     public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector2i uv, boolean isToggle) {
         this(rec, rl, uv, isToggle, button -> {});

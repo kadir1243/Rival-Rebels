@@ -20,16 +20,12 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
 public class RenderBomb extends EntityRenderer<EntityBomb> {
-    public static final Material NUKE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etnuke);
     public RenderBomb(EntityRendererProvider.Context manager) {
         super(manager);
 	}
@@ -52,13 +48,13 @@ public class RenderBomb extends EntityRenderer<EntityBomb> {
         }
         else {
             matrices.scale(0.25f, 0.5f, 0.25f);
-            ModelNuclearBomb.renderModel(matrices, NUKE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, true);
+            ModelNuclearBomb.renderModel(matrices, vertexConsumers, RRIdentifiers.etnuke, light, true);
         }
         matrices.popPose();
     }
 
     @Override
     public ResourceLocation getTextureLocation(EntityBomb entity) {
-        return null;
+        return RRIdentifiers.etnuke;
     }
 }

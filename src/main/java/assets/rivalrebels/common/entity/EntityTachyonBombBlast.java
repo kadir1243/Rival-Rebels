@@ -31,7 +31,6 @@ public class EntityTachyonBombBlast extends EntityInanimate
 {
 	public TachyonBomb	tsar		= null;
 	public double		radius;
-	public int			time		= 0;
 
     public EntityTachyonBombBlast(EntityType<? extends EntityTachyonBombBlast> type, Level par1World) {
         super(type, par1World);

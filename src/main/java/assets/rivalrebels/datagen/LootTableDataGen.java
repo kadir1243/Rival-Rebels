@@ -5,12 +5,7 @@ import assets.rivalrebels.common.item.RRItems;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.data.loot.BlockLootSubProvider;
-import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.world.flag.FeatureFlagSet;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import java.util.List;
-import java.util.Set;
+
 import java.util.concurrent.CompletableFuture;
 
 public class LootTableDataGen extends FabricBlockLootTableProvider {

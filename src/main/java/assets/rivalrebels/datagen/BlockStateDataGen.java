@@ -9,7 +9,6 @@ import net.minecraft.data.models.ItemModelGenerators;
 import net.minecraft.data.models.model.ModelTemplates;
 import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
-import net.minecraft.data.models.model.TexturedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -70,7 +69,7 @@ public class BlockStateDataGen extends FabricModelProvider {
         simpleBlock(RRBlocks.radioactivesand, Blocks.SAND);
         simpleBlock(RRBlocks.remotecharge, "af", "ag");
         simpleBlock(RRBlocks.omegaobj, "ba");
-        simpleBlock(RRBlocks.sigmaobj, "bq");
+        simpleBlock(RRBlocks.sigmaobj, "bp");
         simpleBlock(RRBlocks.ffreciever, "dj");
         simpleBlock(RRBlocks.rhodesactivator, "ci", "ch");
         simpleBlock(RRBlocks.reactor, "bj");

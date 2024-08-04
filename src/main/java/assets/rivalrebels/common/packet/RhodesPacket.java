@@ -17,6 +17,7 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
@@ -137,13 +138,13 @@ public class RhodesPacket implements CustomPacketPayload {
             er.lastrightthighpitch = er.rightthighpitch;
             er.lastleftshinpitch = er.leftshinpitch;
             er.lastrightshinpitch = er.rightshinpitch;
-            if (Math.abs(er.bodyyaw - m.bodyyaw) > 90) {
+            if (Mth.abs(er.bodyyaw - m.bodyyaw) > 90) {
                 er.lastbodyyaw = m.bodyyaw;
             }
-            if (Math.abs(er.rightarmyaw - m.rightarmyaw) > 90) {
+            if (Mth.abs(er.rightarmyaw - m.rightarmyaw) > 90) {
                 er.lastrightarmyaw = m.rightarmyaw;
             }
-            if (Math.abs(er.leftarmyaw - m.leftarmyaw) > 90) {
+            if (Mth.abs(er.leftarmyaw - m.leftarmyaw) > 90) {
                 er.lastleftarmyaw = m.leftarmyaw;
             }
             er.bodyyaw = m.bodyyaw;

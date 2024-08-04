@@ -20,6 +20,8 @@ import com.mojang.math.Axis;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
+import java.util.stream.IntStream;
+
 public class ModelAstroBlasterBarrel {
 	private static final float	i			= 0.035714286f;
 	private static final float[]	barrelx		= { 0f, 0.2f, 0.2f, 0.25f, 0.25f, 0.2f, 0f };
@@ -34,12 +36,11 @@ public class ModelAstroBlasterBarrel {
 	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
 	{
 		matrices.pushPose();
-		for (float i = 0; i < segments; i++)
-		{
+
+		for (float i = 0; i < segments; i++) {
 			matrices.pushPose();
 			matrices.mulPose(Axis.YP.rotationDegrees(add * i));
-			for (int f = 1; f < barrelx.length; f++)
-			{
+			for (int f = 1; f < barrelx.length; f++) {
 				TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
 				TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
 				TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);

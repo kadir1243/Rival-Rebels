@@ -48,9 +48,9 @@ public class EntityBomb extends ThrowableProjectile {
 	public EntityBomb(Level par1World, double x, double y, double z, float yaw, float pitch) {
 		this(par1World);
 		moveTo(x, y, z, yaw, pitch);
-		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)),
-            (Mth.cos(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)),
-            (-Mth.sin(pitch / 180.0F * (float) Math.PI)));
+		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
+            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
+            (-Mth.sin(pitch / 180.0F * Mth.PI)));
 	}
 
 	public EntityBomb(Level par1World, double x, double y,double z, double mx, double my, double mz)
@@ -64,9 +64,9 @@ public class EntityBomb extends ThrowableProjectile {
 		this(par1World);
 		moveTo(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYRot(), entity2.getXRot());
 		setPos(getX(), getY(), getZ());
-		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
         shoot(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 2.5f, 0.1f);
 	}
@@ -74,8 +74,8 @@ public class EntityBomb extends ThrowableProjectile {
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -142,9 +142,9 @@ public class EntityBomb extends ThrowableProjectile {
 
             setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 			float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
-			this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+			this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-			for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
+			for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 			{
             }
 

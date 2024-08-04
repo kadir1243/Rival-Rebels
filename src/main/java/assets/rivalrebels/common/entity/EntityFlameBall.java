@@ -62,13 +62,13 @@ public class EntityFlameBall extends EntityInanimate
 	{
 		this(par1World);
 		setPos(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
-		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(player.getXRot() / 180.0F * (float) Math.PI)));
+		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(player.getXRot() / 180.0F * Mth.PI)));
 		setPosRaw(
-            getX() - (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+            getX() - (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * 0.2F),
             getY() - 0.13,
-            getZ() - (Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * 0.2F)
+            getZ() - (Mth.sin(player.getYRot() / 180.0F * Mth.PI) * 0.2F)
         );
         setDeltaMovement(getDeltaMovement().scale(par3));
 		rotation = (float) (random.nextDouble() * 360);
@@ -78,12 +78,12 @@ public class EntityFlameBall extends EntityInanimate
 	public EntityFlameBall(Level par1World, TileEntityReciever ter, float f)
 	{
 		this(par1World);
-		setYRot((float) (180 - ter.yaw));
-		setXRot((float) (-ter.pitch));
+		setYRot(180 - ter.yaw);
+		setXRot(-ter.pitch);
 		setPos(ter.getBlockPos().getX() + ter.xO + 0.5, ter.getBlockPos().getY() + 0.5, ter.getBlockPos().getZ() + ter.zO + 0.5);
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         setDeltaMovement(getDeltaMovement().scale(f));
 	}
@@ -175,13 +175,17 @@ public class EntityFlameBall extends EntityInanimate
 
 		if (isInWaterOrBubble()) kill();
 		float airFriction = 0.96F;
-		float gravity = 0.01F;
         setDeltaMovement(getDeltaMovement().scale(airFriction));
-        setDeltaMovement(getDeltaMovement().subtract(0, gravity, 0));
+        applyGravity();
 		setPos(getX(), getY(), getZ());
 	}
 
-	@Override
+    @Override
+    protected double getDefaultGravity() {
+        return 0.01;
+    }
+
+    @Override
 	public float getLightLevelDependentMagicValue() {
 		return 1000;
 	}

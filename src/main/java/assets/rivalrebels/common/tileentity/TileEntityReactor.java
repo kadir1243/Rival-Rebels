@@ -12,7 +12,6 @@
 package assets.rivalrebels.common.tileentity;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.container.ContainerReactor;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -24,20 +23,25 @@ import assets.rivalrebels.common.item.ItemRod;
 import assets.rivalrebels.common.item.ItemRodNuclear;
 import assets.rivalrebels.common.item.ItemRodRedstone;
 import assets.rivalrebels.common.item.components.RRComponents;
+import assets.rivalrebels.common.packet.ReactorMachinesPacket;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.Mth;
+import net.minecraft.world.inventory.MenuConstructor;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Container;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -47,10 +51,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityReactor extends BlockEntity implements Container, Tickable, MenuProvider {
+public class TileEntityReactor extends BlockEntity implements Container, Tickable, MenuConstructor {
     public static final ResourceLocation OVERHEAT_TRANSLATION = RRIdentifiers.create("overheat");
 	public double			slide				= 90;
-	private double			test				= Math.PI;
+	private float test = Mth.PI;
     public ItemStack		core = ItemStack.EMPTY;
 	public ItemStack		fuel = ItemStack.EMPTY;
 	public boolean			on					= false;
@@ -62,7 +66,8 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
 	public double			lasttickconsumed	= 0;
 	public int				tickssincelastrod	= 0;
 	public boolean			lastrodwasredstone	= false;
-	public List<TileEntityMachineBase>	machines			= new ArrayList<>();
+    public final Map<BlockPos, ReactorMachinesPacket.MachineEntry> entries = new HashMap<>();
+	public List<TileEntityMachineBase>	machines = new ArrayList<>();
 	public int				tick				= 0;
 
     public TileEntityReactor(BlockPos pos, BlockState state) {
@@ -119,62 +124,39 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
 
     @Override
     public void clientTick() {
-            slide = (Math.cos(test) + 1) * 45;
-            boolean flag = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
-            if (flag)
-            {
-                if (slide < 89.995) test += 0.05;
-            }
-            else
-            {
-                if (slide > 0.004) test -= 0.05;
-            }
-            if (core.isEmpty())
-            {
-                on = false;
-                consumed = 0;
-                lasttickconsumed = 0;
-                melt = false;
-                meltTick = 0;
-            }
+        slide = (Mth.cos(test) + 1) * 45;
+        boolean flag = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
+        if (flag) {
+            if (slide < 89.995) test += 0.05F;
+        } else {
+            if (slide > 0.004) test -= 0.05F;
+        }
+        if (core.isEmpty()) {
+            on = false;
+            consumed = 0;
+            lasttickconsumed = 0;
+            melt = false;
+            meltTick = 0;
+        }
 
-            if (eject)
-            {
-                consumed = 0;
-                lasttickconsumed = 0;
-                fuel = ItemStack.EMPTY;
-                core = ItemStack.EMPTY;
-                melt = false;
-                meltTick = 0;
-                on = false;
-                eject = false;
-            }
+        if (eject) {
+            consumed = 0;
+            lasttickconsumed = 0;
+            fuel = ItemStack.EMPTY;
+            core = ItemStack.EMPTY;
+            melt = false;
+            meltTick = 0;
+            on = false;
+            eject = false;
+        }
 
-            if (melt)
-            {
-                if (!core.isEmpty())
-                {
-                    for (int i = 0; i < 4; i++)
-                    {
-                        level.addParticle(ParticleTypes.SMOKE, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, level.random.nextDouble() - 0.5, level.random.nextDouble() / 2, level.random.nextDouble() - 0.5);
-                    }
-                }
-                else
-                {
-                    melt = false;
-                    meltTick = 0;
-                    on = false;
-                }
-            }
         prevOn = on;
     }
 
     @Override
     public void serverTick() {
-        if (eject)
-        {
-            if (!core.isEmpty())
-            {
+        if (eject) {
+            if (!core.isEmpty()) {
                 consumed = 0;
                 lasttickconsumed = 0;
                 level.addFreshEntity(new ItemEntity(level, getBlockPos().getX() + 0.5, getBlockPos().getY() + 1, getBlockPos().getZ() + 0.5, core));
@@ -186,34 +168,31 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
             }
         }
 
-        if (melt)
-        {
-            if (!core.isEmpty())
-            {
+        if (melt) {
+            if (!core.isEmpty()) {
                 if (meltTick % 20 == 0) RivalRebelsSoundPlayer.playSound(level, 21, 1, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5);
                 on = true;
                 meltTick++;
                 if (meltTick == 300) meltDown(10);
                 else if (meltTick == 1) {
-                    Component text = RRIdentifiers.warning().append(" ").append(Component.translatable(RivalRebels.MODID + ".warning_meltdown").withStyle(ChatFormatting.RED));
+                    Component text = RRIdentifiers.warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_meltdown").withStyle(ChatFormatting.RED));
                     for (Player player : level.players()) {
                         player.displayClientMessage(text, false);
                     }
                 }
-            }
-            else
-            {
+                for (int i = 0; i < 4; i++) {
+                    level.addParticle(ParticleTypes.SMOKE, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, level.random.nextDouble() - 0.5, level.random.nextDouble() / 2, level.random.nextDouble() - 0.5);
+                }
+            } else {
                 melt = false;
                 meltTick = 0;
                 on = false;
             }
         }
 
-        if (fuel.isEmpty() && tickssincelastrod != 0)
-        {
+        if (fuel.isEmpty() && tickssincelastrod != 0) {
             tickssincelastrod++;
-            if (tickssincelastrod >= 100)
-            {
+            if (tickssincelastrod >= 100) {
                 if (lastrodwasredstone) on = false;
                 else melt = true;
             }
@@ -222,19 +201,15 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
                     player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(OVERHEAT_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), false);
                 }
             }
-        }
-        else
-        {
+        } else {
             tickssincelastrod = 0;
         }
 
-        if (melt)
-        {
+        if (melt) {
             machines.clear();
         }
 
-        if (core.isEmpty())
-        {
+        if (core.isEmpty()) {
             on = false;
             consumed = 0;
             lasttickconsumed = 0;
@@ -442,11 +417,6 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
 		return 0;
 	}
 
-    @Override
-    public Component getDisplayName() {
-        return Component.nullToEmpty("Tokamak");
-    }
-
 	public void toggleOn()
 	{
 		on = !on;
@@ -478,7 +448,7 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
         public int get(int index) {
             return switch (index) {
                 case 0 -> on ? 1 : 0;
-                case 1 -> Float.floatToIntBits(getPower());
+                case 1 -> (int) (getPower() * 100);
                 case 2 -> (int) consumed;
                 case 3 -> melt ? 1 : 0;
                 case 4 -> getBlockPos().getX();
@@ -491,8 +461,9 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
         @Override
         public void set(int index, int value) {
             switch (index) {
-                case 4 -> toggleOn();
-                case 5 -> ejectCore();
+                case 0 -> on = value == 1;
+                case 2 -> consumed = value;
+                case 3 -> melt = value == 1;
                 default -> {}
             }
         }

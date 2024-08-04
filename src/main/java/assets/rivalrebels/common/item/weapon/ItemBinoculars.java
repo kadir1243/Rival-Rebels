@@ -117,10 +117,10 @@ public class ItemBinoculars extends Item {
                 Minecraft.getInstance().options.sensitivity().set((double) (senset * Mth.sqrt(zoom) * 0.1f));
 
                 if (Minecraft.getInstance().mouseHandler.isRightPressed()) {
-                    double cospitch = Mth.cos(player.getXRot() / 180.0F * (float) Math.PI);
-                    double sinpitch = Mth.sin(player.getXRot() / 180.0F * (float) Math.PI);
-                    double cosyaw = Mth.cos(player.getYRot() / 180.0F * (float) Math.PI);
-                    double sinyaw = Mth.sin(player.getYRot() / 180.0F * (float) Math.PI);
+                    double cospitch = Mth.cos(player.getXRot() / 180.0F * Mth.PI);
+                    double sinpitch = Mth.sin(player.getXRot() / 180.0F * Mth.PI);
+                    double cosyaw = Mth.cos(player.getYRot() / 180.0F * Mth.PI);
+                    double sinyaw = Mth.sin(player.getYRot() / 180.0F * Mth.PI);
 
                     double dx = (-sinyaw * cospitch) * 130;
                     double dz = (cosyaw * cospitch) * 130;

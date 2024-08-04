@@ -15,6 +15,7 @@ import assets.rivalrebels.common.container.ContainerLoader;
 import assets.rivalrebels.common.item.ItemRod;
 import assets.rivalrebels.common.item.RRItems;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 
 import java.util.ArrayList;
@@ -36,9 +37,9 @@ import net.minecraft.world.level.block.state.BlockState;
 public class TileEntityLoader extends BaseContainerBlockEntity implements Tickable {
 	private NonNullList<ItemStack> items = NonNullList.withSize(64, ItemStack.EMPTY);
 
-	public double			slide			= 0;
-	double					test			= Math.PI;
-	int						counter;
+	public float slide = 0;
+	private float test = Mth.PI;
+	private int counter;
 
 	public List<BlockEntity> machines		= new ArrayList<>();
 
@@ -74,12 +75,12 @@ public class TileEntityLoader extends BaseContainerBlockEntity implements Tickab
 
 	@Override
 	public void tick() {
-		slide = (Math.cos(test) + 1) / 32 * 14;
+		slide = (Mth.cos(test) + 1) / 32 * 14;
 
         if (level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9)) {
-			if (slide < 0.871) test += 0.05;
+			if (slide < 0.871) test += 0.05F;
 		} else {
-			if (slide > 0.004) test -= 0.05;
+			if (slide > 0.004) test -= 0.05F;
 		}
 		counter++;
 		if (counter % 10 == 0)

@@ -20,6 +20,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
@@ -30,7 +31,7 @@ public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntit
 
     @Override
     public void render(TileEntityMeltDown entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        float fsize = (float) Math.sin(entity.size);
+        float fsize = Mth.sin(entity.size);
 		if (fsize <= 0) return;
 		matrices.pushPose();
 		matrices.translate(0.5F, 0.5F, 0.5F);

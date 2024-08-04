@@ -46,12 +46,7 @@ public class RenderGore extends EntityRenderer<EntityGore>
 
     @Override
     public void render(EntityGore entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        double x = entity.getX();
-        double y = entity.getY();
-        double z = entity.getZ();
-
 		matrices.pushPose();
-		matrices.translate(x, y, z);
 		matrices.mulPose(Axis.YP.rotationDegrees(-entity.getYRot() + 180));
 		matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
         int mob = entity.getMob();

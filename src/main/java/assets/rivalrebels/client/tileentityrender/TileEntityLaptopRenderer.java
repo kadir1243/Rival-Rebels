@@ -20,17 +20,11 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityLaptop> {
-    public static final Material LAPTOP_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etlaptop);
-    public static final Material SCREEN_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etubuntu);
-
     public TileEntityLaptopRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -39,8 +33,8 @@ public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityL
 		pose.pushPose();
 		pose.translate(0.5F, 0, 0.5F);
         pose.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockLaptop.FACING).toYRot()));
-        ModelLaptop.renderModel(LAPTOP_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), pose, (float) -entity.slide, light, overlay);
-		ModelLaptop.renderScreen(SCREEN_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), pose, (float) -entity.slide, light, overlay);
+        ModelLaptop.renderModel(vertexConsumers, pose, (float) -entity.slide, light, overlay);
+		ModelLaptop.renderScreen(vertexConsumers, RRIdentifiers.etubuntu, pose, (float) -entity.slide, light, overlay);
 		pose.popPose();
 	}
 }

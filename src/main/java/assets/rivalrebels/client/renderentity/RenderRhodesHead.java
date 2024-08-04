@@ -15,21 +15,16 @@ import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodesHead;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public class RenderRhodesHead extends EntityRenderer<EntityRhodesHead> {
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RenderRhodes.texture);
-
     public RenderRhodesHead(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
@@ -40,7 +35,7 @@ public class RenderRhodesHead extends EntityRenderer<EntityRhodesHead> {
         matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
         matrices.mulPose(Axis.YP.rotationDegrees(yaw));
         matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
-        ObjModels.head.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.renderSolid(ObjModels.head, RenderRhodes.texture, matrices, vertexConsumers, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

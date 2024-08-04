@@ -21,12 +21,9 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEntityJumpBlock> {
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.btcrate);
     public TileEntityJumpBlockRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -34,7 +31,7 @@ public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEnti
     public void render(TileEntityJumpBlock entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(0.5F, 0.5F, 0.5F);
-		ModelJump.renderModel(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ModelJump.renderModel(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.btcrate)), light, overlay);
 		matrices.popPose();
 	}
 }

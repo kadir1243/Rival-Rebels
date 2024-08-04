@@ -17,7 +17,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -30,11 +29,8 @@ public class BlockSteel extends Block {
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
         float f = 0.0625F;
-        return Shapes.create(new AABB(x + f, y + f, z + f, (x + 1) - f, (float) y + 1, (z + 1) - f));
+        return Shapes.create(f, f, f, 1 - f, 1, 1 - f);
     }
 
     @Override

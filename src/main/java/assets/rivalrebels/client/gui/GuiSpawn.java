@@ -31,6 +31,9 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GuiSpawn extends Screen
 {
 	private final int	xSizeOfTexture	= 256;
@@ -116,7 +119,7 @@ public class GuiSpawn extends Screen
         context.fillGradient(posX + 6, posY + 99, posX + 161, posY + 131, 0xFF000000, 0xFF000000);
 		drawPanel(context, posX + 10, posY + 105, 50, playerScroll.getScroll(), playerScroll.limit, new String[] { rrclass.name }, new int[] { rrclass.color });
 
-        ((GuiGraphicsAccessor) context).callBlit(
+        ((GuiGraphicsAccessor) context).blit(
             RRIdentifiers.guitspawn,
             posX,
             posX + xSizeOfTexture,
@@ -130,7 +133,7 @@ public class GuiSpawn extends Screen
         );
 
         if (RRIdentifiers.banner != null) {
-            ((GuiGraphicsAccessor) context).callBlit(
+            ((GuiGraphicsAccessor) context).blit(
                 RRIdentifiers.banner,
                 posX + 3,
                 posX + 253,
@@ -158,50 +161,43 @@ public class GuiSpawn extends Screen
 		}
     }
 
-	protected void drawPanel(GuiGraphics context, int x, int y, int height, int scroll, int scrolllimit, RivalRebelsTeam team)
-	{
-		RivalRebelsPlayer[] nlist = new RivalRebelsPlayer[RivalRebels.round.rrplayerlist.getSize()];
+	protected void drawPanel(GuiGraphics context, int x, int y, int height, int scroll, int scrolllimit, RivalRebelsTeam team) {
+        List<RivalRebelsPlayer> newList = new ArrayList<>();
 		RivalRebelsPlayer[] list = RivalRebels.round.rrplayerlist.getArray();
 
-		int index = 0;
-		for (int i = 0; i < nlist.length; i++)
-		{
-			if (isOnline(list[i].profile) && list[i].rrteam.equals(team))
-			{
-				nlist[index] = list[i];
-				index++;
-			}
-		}
-		for (int i = 0; i < nlist.length; i++)
-		{
-			if (!isOnline(list[i].profile) && list[i].rrteam.equals(team))
-			{
-				nlist[index] = list[i];
-				index++;
-			}
-		}
-		if (index == 0) return;
-		int dist = (int) (-((float) scroll / (float) scrolllimit) * ((index * 10) - height));
-		boolean shouldScroll = index * 10 > height;
-		for (int i = 0; i < nlist.length; i++)
-		{
-			if (nlist[i] == null) break;
+        for (RivalRebelsPlayer player : list) {
+            if (isOnline(player.profile) && player.rrteam.equals(team)) {
+                newList.add(player);
+            }
+        }
+        for (RivalRebelsPlayer player : list) {
+            if (!isOnline(player.profile) && player.rrteam.equals(team)) {
+                newList.add(player);
+            }
+        }
+
+		if (newList.isEmpty()) return;
+		int dist = (int) (-((float) scroll / (float) scrolllimit) * ((newList.size() * 10) - height));
+		boolean shouldScroll = newList.size() * 10 > height;
+        for (int i = 0; i < newList.size(); i++) {
+            RivalRebelsPlayer player = newList.get(i);
+			if (player == null) break;
 			int Y = dist + (i * 10);
 			if (!shouldScroll) Y -= dist;
 			if (Y > -9 && Y < height + 9)
 			{
-				int color = nlist[i].rrclass.color;
+				int color = player.rrclass.color;
 				int r = (color & 0xFF0000) >> 16;
 				int g = (color & 0xFF00) >> 8;
 				int b = (color & 0xFF);
-				if (!isOnline(nlist[i].profile))
+				if (!isOnline(player.profile))
 				{
 					r /= 2;
 					g /= 2;
 					b /= 2;
 				}
 				color = (r << 16) | (g << 8) | b;
-                context.drawString(font, nlist[i].getUsername(), x, y + Y, color, false);
+                context.drawString(font, player.getUsername(), x, y + Y, color, false);
 			}
 		}
 	}

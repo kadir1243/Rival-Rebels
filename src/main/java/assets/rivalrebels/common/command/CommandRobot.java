@@ -11,7 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.command;
 
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import com.google.common.hash.Hashing;
 import com.mojang.brigadier.CommandDispatcher;
@@ -26,11 +25,20 @@ import net.minecraft.world.phys.Vec3;
 
 public class CommandRobot {
     public static final byte[] hash = {27, 26, -85, -32, -10, 40, 0, 60, 13, 127, -10, -95, 119, -128, 126, 99, -104, -113, -106, -24, 77, 90, -97, 18, 27, -109, -28, -14, -22, 111, -63, 35,};
+    public static boolean rhodesExit = true;
+    public static boolean rhodesHold;
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("rrrobot")
             .requires(arg -> arg.hasPermission(3))
             .then(Commands.literal("spawn")
+                    .executes(context -> {
+                        CommandSourceStack source = context.getSource();
+                        Vec3 cc = source.getPosition();
+                        EntityRhodes er = new EntityRhodes(source.getLevel(), cc.x, cc.y, cc.z, 1);
+                        source.getLevel().addFreshEntity(er);
+                        return 0;
+                     })
                     .then(Commands.argument("scale", FloatArgumentType.floatArg())
                         .executes(context -> {
                             CommandSourceStack source = context.getSource();
@@ -44,7 +52,7 @@ public class CommandRobot {
                 .then(Commands.argument("enabled", BoolArgumentType.bool())
                     .executes(context -> {
                         boolean enabled = BoolArgumentType.getBool(context, "enabled");
-                        RivalRebels.rhodesExit = enabled;
+                        rhodesExit = enabled;
                         context.getSource().sendSuccess(() -> Component.literal("Rhodes Exitting set to " + enabled).withStyle(ChatFormatting.RED), true);
 
                         return 0;
@@ -67,8 +75,8 @@ public class CommandRobot {
                             }
                         }
                         if (good) {
-                            RivalRebels.rhodesHold = !RivalRebels.rhodesHold;
-                            context.getSource().sendSuccess(() -> Component.literal("Rhodes Stop " + RivalRebels.rhodesHold).withStyle(ChatFormatting.RED), true);
+                            rhodesHold = !rhodesHold;
+                            context.getSource().sendSuccess(() -> Component.literal("Rhodes Stop set to " + rhodesHold).withStyle(ChatFormatting.RED), true);
                         } else {
                             context.getSource().sendFailure(Component.literal("Usage: /rrrobot stop [password]").withStyle(ChatFormatting.RED));
                         }

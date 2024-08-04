@@ -1,6 +1,8 @@
 package assets.rivalrebels.client.objfileloader;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.mixin.client.BufferBuilderAccessor;
+import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.blaze3d.vertex.VertexFormat;
@@ -9,13 +11,13 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
-import net.minecraft.util.CommonColors;
 import org.joml.Vector3f;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -253,10 +255,6 @@ public class WavefrontObject {
         }
     }
 
-    public void render(PoseStack pose, VertexConsumer buffer, int light, int overlay) {
-        render(pose, buffer, CommonColors.WHITE, light, overlay);
-    }
-
     private Vector3f parseVertex(String line, int lineCount) throws ModelFormatException {
         if (isValidVertexLine(line)) {
             line = line.substring(line.indexOf(" ") + 1);
@@ -425,10 +423,6 @@ public class WavefrontObject {
         public List<Face> faces = new ArrayList<>();
         public VertexFormat.Mode glDrawingMode;
 
-        public GroupObject() {
-            this("");
-        }
-
         public GroupObject(String name) {
             this(name, null);
         }
@@ -440,6 +434,12 @@ public class WavefrontObject {
 
         public void render(PoseStack pose, VertexConsumer buffer, int color, int light, int overlay) {
             if (!faces.isEmpty()) {
+                if (buffer instanceof BufferBuilder) {
+                    VertexFormat.Mode mode = ((BufferBuilderAccessor) buffer).getMode();
+                    if (mode != glDrawingMode) {
+                        RivalRebels.LOGGER.error("Drawing Mode is not correct expected: {}, found: {}", glDrawingMode, mode, new IllegalArgumentException("Drawing Mode is wrong"));
+                    }
+                }
                 for (Face face : faces) {
                     face.addFaceForRender(pose, buffer, color, light, overlay);
                 }

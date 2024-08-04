@@ -25,6 +25,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -357,9 +358,9 @@ public class ItemRoda extends Item
 				player.setItemInHand(hand, ItemStack.EMPTY);
 				return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 			}
-			double motionX = (-Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI));
-			double motionZ = (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI));
-			double motionY = (-Mth.sin(player.getXRot() / 180.0F * (float) Math.PI));
+			double motionX = (-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI));
+			double motionZ = (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI));
+			double motionY = (-Mth.sin(player.getXRot() / 180.0F * Mth.PI));
 			spawn(rodaindex, world, player.getX(), player.getY() + 3.0, player.getZ(),motionX,motionY,motionZ, 1.0,0.0);
             return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
         }
@@ -372,14 +373,13 @@ public class ItemRoda extends Item
 		if (stack.get(RRComponents.HAPPY_NEW_YEAR)>0)stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)-1);
 	}
 
-    //@Override
-	public boolean onLeftClickEntity(ItemStack stack, Player player, Entity entity)
-	{
-		if (player.level().isClientSide()) return true;
-		RandomSource r = player.level().random;
-		double x = entity.getX() - player.getX();
-		double y = entity.getY() - player.getY();
-		double z = entity.getZ() - player.getZ();
+    @Override
+    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		if (attacker.level().isClientSide()) return true;
+		RandomSource r = attacker.level().random;
+		double x = target.getX() - attacker.getX();
+		double y = target.getY() - attacker.getY();
+		double z = target.getZ() - attacker.getZ();
 
 		double dist = Math.sqrt(x * x + y * y + z * z);
 
@@ -390,7 +390,7 @@ public class ItemRoda extends Item
 				y /= -dist;
 				z /= -dist;
 
-				entity.setDeltaMovement(
+				target.setDeltaMovement(
                     x * 3 + (r.nextFloat() - 0.5f) * 0.1,
                     y * 3 + (r.nextFloat() - 0.5f) * 0.1,
                     z * 3 + (r.nextFloat() - 0.5f) * 0.1);
@@ -400,7 +400,7 @@ public class ItemRoda extends Item
 				y /= dist;
 				z /= dist;
 
-				entity.setDeltaMovement(
+				target.setDeltaMovement(
                     x * 2 + (r.nextFloat() - 0.5f) * 0.1,
                     y * 2 + (r.nextFloat() - 0.5f) * 0.1,
                     z * 2 + (r.nextFloat() - 0.5f) * 0.1);

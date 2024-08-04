@@ -14,28 +14,24 @@ package assets.rivalrebels.common.container;
 import assets.rivalrebels.common.block.trap.BlockTimedBomb;
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.item.*;
-import assets.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 
-public class ContainerTheoreticalTsar extends AbstractContainerMenu
-{
+public class ContainerTheoreticalTsar extends AbstractContainerMenu {
 	protected Container bomb;
-    private final TileEntityTheoreticalTsarBomba.TheoreticalTsarData data;
+    private final ContainerData containerData;
 
-    public ContainerTheoreticalTsar(int syncId, Inventory inv, TileEntityTheoreticalTsarBomba.TheoreticalTsarData data) {
-        this(syncId, inv, new SimpleContainer(36), data);
+    public ContainerTheoreticalTsar(int syncId, Inventory inv) {
+        this(syncId, inv, new SimpleContainer(36), new SimpleContainerData(4));
     }
 
-    public ContainerTheoreticalTsar(int syncId, Inventory inventoryPlayer, Container bomb, TileEntityTheoreticalTsarBomba.TheoreticalTsarData data) {
+    public ContainerTheoreticalTsar(int syncId, Inventory inventoryPlayer, Container bomb, ContainerData containerData) {
         super(RivalRebelsGuiHandler.THEORETICAL_TSAR_SCREEN_HANDLER_TYPE, syncId);
         this.bomb = bomb;
-        this.data = data;
         addSlot(new SlotRR(bomb, 0, 18, 48, 1, ItemFuse.class));
 		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna));
 		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna));
@@ -49,7 +45,9 @@ public class ContainerTheoreticalTsar extends AbstractContainerMenu
 		addSlot(new SlotRR(bomb, 19, 138, 48, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(bomb, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
-	}
+        addDataSlots(containerData);
+        this.containerData = containerData;
+    }
 
 	@Override
 	public boolean stillValid(Player player)
@@ -109,15 +107,14 @@ public class ContainerTheoreticalTsar extends AbstractContainerMenu
 	}
 
     public int getCountdown() {
-        return this.data.countdown();
+        return this.containerData.get(0);
     }
 
     public boolean isArmed() {
-        return this.data.isArmed();
+        return this.containerData.get(2) == 1 && this.containerData.get(3) == 1;
     }
 
     public float getMegaton() {
-        return this.data.megaton();
+        return this.containerData.get(1) / 100F;
     }
-
 }

@@ -23,6 +23,7 @@ import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
@@ -60,9 +61,9 @@ public class ItemTesla extends TieredItem {
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
         int degree = getDegree(stack);
-		float chance = Math.abs(degree - 90) / 90f;
+		float chance = Mth.abs(degree - 90) / 90f;
         ItemStack battery = ItemUtil.getItemStack(player, RRItems.battery);
-        if (!battery.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
+        if (player.hasInfiniteMaterials() || !battery.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
 			if (!RRConfig.SERVER.isInfiniteAmmo()) {
                 battery.consume(1, player);
 				if (chance > 0.33333) {
@@ -107,7 +108,7 @@ public class ItemTesla extends TieredItem {
 		if (user.level().random.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);
 
 		int degree = getDegree(stack);
-		float chance = Math.abs(degree - 90) / 90f;
+		float chance = Mth.abs(degree - 90) / 90f;
 		if (degree - 90 > 0) chance /= 10f;
 
 		float dist = 7 + (1 - (degree / 180f)) * 73;
@@ -116,8 +117,9 @@ public class ItemTesla extends TieredItem {
 
 		int num = (degree / 25) + 1;
 
-		if (!world.isClientSide()) for (int i = 0; i < num; i++)
-			world.addFreshEntity(new EntityRaytrace(world, user, dist, randomness, chance, !stack.isEnchanted()));
+		if (!world.isClientSide())
+            for (int i = 0; i < num; i++)
+                world.addFreshEntity(new EntityRaytrace(world, user, dist, randomness, chance, !stack.isEnchanted()));
 	}
 
 	public static int getDegree(ItemStack item)

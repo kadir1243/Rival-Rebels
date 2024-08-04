@@ -16,7 +16,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.entity.*;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -161,7 +161,7 @@ public class NuclearExplosion
 									{
 										world.setBlockAndUpdate(pos, RRBlocks.radioactivedirt.defaultBlockState());
 									}
-									else if ((state.is(BlockTags.SAND) || state.is(ConventionalBlockTags.SANDSTONE_BLOCKS)))
+									else if ((state.is(BlockTags.SAND) || state.is(ModBlockTags.SANDSTONE_BLOCKS)))
 									{
 										world.setBlockAndUpdate(pos, RRBlocks.radioactivesand.defaultBlockState());
 									}
@@ -186,7 +186,7 @@ public class NuclearExplosion
 								{
 									world.setBlockAndUpdate(pos, RRBlocks.radioactivedirt.defaultBlockState());
 								}
-								else if ((state.is(BlockTags.SAND) || state.is(ConventionalBlockTags.SANDSTONE_BLOCKS)))
+								else if ((state.is(BlockTags.SAND) || state.is(ModBlockTags.SANDSTONE_BLOCKS)))
 								{
 									world.setBlockAndUpdate(pos, RRBlocks.radioactivesand.defaultBlockState());
 								}

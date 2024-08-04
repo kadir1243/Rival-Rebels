@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.*;
 import net.minecraft.network.chat.Component;
@@ -54,8 +55,8 @@ public class ItemRodDisk extends Item
 			pass = true;
 		}
 		user.startUsingItem(hand);
-		if (RivalRebels.round.rrplayerlist.getForGameProfile(user.getGameProfile()).rrrank.id > 1) RivalRebelsSoundPlayer.playSound(user, 6, 2);
-		else RivalRebelsSoundPlayer.playSound(user, 7, 2);
+		if (RivalRebels.round.rrplayerlist.getForGameProfile(user.getGameProfile()).rrrank.id > 1) user.playSound(RRSounds.RODDISK_UNKNOWN2);
+		else user.playSound(RRSounds.RODDISK_UNKNOWN6);
 		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 	}
 
@@ -74,31 +75,31 @@ public class ItemRodDisk extends Item
 			{
 				Entity entity = new EntityRoddiskRegular(world, user, 1);
 				world.addFreshEntity(entity);
-				RivalRebelsSoundPlayer.playSound(user, 7, 3);
-			}
+                user.playSound(RRSounds.RODDISK_UNKNOWN7);
+            }
 			else if (rank == 1)
 			{
 				Entity entity = new EntityRoddiskRebel(world, user, 1.1f);
 				world.addFreshEntity(entity);
-				RivalRebelsSoundPlayer.playSound(user, 7, 3);
+                user.playSound(RRSounds.RODDISK_UNKNOWN7);
 			}
 			else if (rank == 2)
 			{
 				Entity entity = new EntityRoddiskOfficer(world, user, 1.2f);
 				world.addFreshEntity(entity);
-				RivalRebelsSoundPlayer.playSound(user, 6, 3);
+				user.playSound(RRSounds.RODDISK_UNKNOWN3);
 			}
 			else if (rank == 3)
 			{
 				Entity entity = new EntityRoddiskLeader(world, user, 4f);
 				world.addFreshEntity(entity);
-				RivalRebelsSoundPlayer.playSound(user, 6, 3);
+                user.playSound(RRSounds.RODDISK_UNKNOWN3);
 			}
 			else if (rank == 4)
 			{
 				Entity entity = new EntityRoddiskRep(world, user, 4f);
 				world.addFreshEntity(entity);
-				RivalRebelsSoundPlayer.playSound(user, 6, 3);
+                user.playSound(RRSounds.RODDISK_UNKNOWN3);
 			}
 		}
 	}

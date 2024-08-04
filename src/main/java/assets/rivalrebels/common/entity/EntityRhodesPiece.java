@@ -23,6 +23,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -52,7 +53,7 @@ public class EntityRhodesPiece extends Entity {
 		myaw = (float) (random.nextGaussian()*20);
 		mpitch = (float) (random.nextGaussian()*20);
 		setDeltaMovement((float) (random.nextGaussian()*0.75),
-        (float) Math.abs(random.nextGaussian()*0.75),
+            Mth.abs((float) (random.nextGaussian()*0.75F)),
         (float) (random.nextGaussian()*0.75));
 	}
 
@@ -91,9 +92,7 @@ public class EntityRhodesPiece extends Entity {
 	@Override
 	public void tick() {
 		super.tick();
-		tickCount++;
-		if (level().random.nextInt(Math.max(getMaxAge()*(RRConfig.SERVER.isRhodesPromode() ?1:30) - tickCount, RRConfig.SERVER.isRhodesPromode()?100:1))==0)
-		{
+		if (level().random.nextInt(Math.max(getMaxAge()*(RRConfig.SERVER.isRhodesPromode() ?1:30) - tickCount, RRConfig.SERVER.isRhodesPromode()?100:1))==0) {
 			kill();
 		}
         setDeltaMovement(getDeltaMovement().scale(0.999));

@@ -24,18 +24,14 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Vector2i;
 
 @Environment(EnvType.CLIENT)
 public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
-    private static final Material RECEIVER = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etreciever);
-	private float				xSize_lo;
+    private float				xSize_lo;
 	private float				ySize_lo;
 	GuiRotor					range;
 	GuiCustomButton				chip;
@@ -63,7 +59,11 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 		players.isPressed = menu.getKPlayers();
 		mobs = new GuiCustomButton(new Rectangle(x + 94, y + 46, 19, 19), RRIdentifiers.guitray, new Vector2i(237, 46), true);
 		mobs.isPressed = menu.getKMobs();
-		select1 = new GuiDropdownOption(new Vector2i(119 + x, 8 + y), 45, 0, Component.translatable("RivalRebels.ads.dragon"), this);
+		select1 = new GuiDropdownOption(new Vector2i(119 + x, 8 + y), 45, 0, Component.translatable("RivalRebels.ads.dragon"), button -> {
+            if (menu.hasWepReqs()) {
+                menu.setWep(true);
+            }
+        }, this);
 		addRenderableWidget(range);
 		addRenderableWidget(chip);
 		addRenderableWidget(players);
@@ -89,19 +89,6 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 		}
         return super.charTyped(chr, modifiers);
 	}
-
-    @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
-        super.renderLabels(context, mouseX, mouseY);
-
-		if (select1.isPressed)
-		{
-            if (menu.hasWepReqs()) {
-                menu.setWep(true);
-            }
-		}
-		select1.isPressed = false;
-    }
 
 	static int	spinfac	= 0;
 
@@ -133,13 +120,13 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 		// matrices.mulPose((spinfac * 0.5), 0, 1, 0);
 		matrices.translate(0, -0.5 * 1.5, (-0.5 - 0.34) * -1.5);
         MultiBufferSource vertexConsumers = graphics.bufferSource();
-        ObjModels.tray.render(matrices, RECEIVER.buffer(vertexConsumers, RenderType::entitySolid), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        ObjModels.renderSolid(ObjModels.tray, RRIdentifiers.etreciever, matrices, vertexConsumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 		if (menu.hasWeapon()) {
 			matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
 			matrices.mulPose(Axis.YP.rotationDegrees((float) (-Math.atan(px / 40.0F) * 40.0F)));
-			ObjModels.arm.render(matrices, RECEIVER.buffer(vertexConsumers, RenderType::entitySolid), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			ObjModels.renderSolid(ObjModels.arm, RRIdentifiers.etreciever, matrices, vertexConsumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 			matrices.mulPose(Axis.XP.rotationDegrees((float) (Math.atan(py / 40.0F) * 40.0F + 20)));
-			ObjModels.adsdragon.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etadsdragon)), LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+			ObjModels.renderSolid(ObjModels.adsdragon, RRIdentifiers.etadsdragon, matrices, vertexConsumers, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
 		}
         graphics.flush();
         matrices.popPose();

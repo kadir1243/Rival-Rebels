@@ -20,7 +20,6 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -28,8 +27,6 @@ import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
 public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb> {
-    public static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etantimatterbomb);
-
     public RenderAntimatterBomb(EntityRendererProvider.Context manager) {
         super(manager);
     }
@@ -41,7 +38,7 @@ public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb> {
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
         // matrices.multiply(Axis.XP.rotationDegrees(90));
         matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
-        ObjModels.bomb.render(matrices, vertexConsumers.getBuffer(RENDER_LAYER), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.renderSolid(ObjModels.bomb, RRIdentifiers.etantimatterbomb, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

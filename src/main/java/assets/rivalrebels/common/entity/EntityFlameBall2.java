@@ -14,7 +14,7 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -64,13 +64,13 @@ public class EntityFlameBall2 extends EntityInanimate
 		this(par1World);
 		// par3/=3f;
 		setPos(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
-		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(player.getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(player.getXRot() / 180.0F * (float) Math.PI)));
+		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(player.getXRot() / 180.0F * Mth.PI)));
         setPosRaw(
-            getX() - (Mth.cos(player.getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+            getX() - (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * 0.2F),
             getY() - 0.13,
-            getZ() - (Mth.sin(player.getYRot() / 180.0F * (float) Math.PI) * 0.2F)
+            getZ() - (Mth.sin(player.getYRot() / 180.0F * Mth.PI) * 0.2F)
         );
         setDeltaMovement(getDeltaMovement().scale(par3));
 	}
@@ -78,12 +78,12 @@ public class EntityFlameBall2 extends EntityInanimate
 	public EntityFlameBall2(Level par1World, TileEntityReciever ter, float f)
 	{
 		this(par1World);
-		setYRot((float) (180 - ter.yaw));
-		setXRot((float) (-ter.pitch));
+		setYRot(180 - ter.yaw);
+		setXRot(-ter.pitch);
 		setPos(ter.getBlockPos().getX() + ter.xO + 0.5, ter.getBlockPos().getY() + 0.5, ter.getBlockPos().getZ() + ter.zO + 0.5);
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         setDeltaMovement(getDeltaMovement().scale(f));
 	}
@@ -223,7 +223,7 @@ public class EntityFlameBall2 extends EntityInanimate
             Block id = state.getBlock();
 			if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
 			else if (state.is(BlockTags.SAND) && level().random.nextInt(60) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.GLASS.defaultBlockState());
-			else if (state.is(ConventionalBlockTags.GLASS_BLOCKS) && level().random.nextInt(120) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
+			else if (state.is(ModBlockTags.GLASS_BLOCKS) && level().random.nextInt(120) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
 			else if (state.is(Blocks.OBSIDIAN) && level().random.nextInt(90) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if ((state.is(BlockTags.BASE_STONE_OVERWORLD) || state.is(Blocks.COBBLESTONE)) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(BlockTags.IRON_ORES) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
@@ -231,7 +231,7 @@ public class EntityFlameBall2 extends EntityInanimate
 			else if (state.is(BlockTags.GOLD_ORES) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(BlockTags.LAPIS_ORES) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(Blocks.GRAVEL) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(ConventionalBlockTags.SANDSTONE_BLOCKS) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(ModBlockTags.SANDSTONE_BLOCKS) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(Blocks.IRON_BLOCK) && level().random.nextInt(50) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(Blocks.BEDROCK) && level().random.nextInt(500) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
 			else if (state.getFluidState().is(FluidTags.LAVA)) level().setBlockAndUpdate(blockPosition(), Blocks.AIR.defaultBlockState());

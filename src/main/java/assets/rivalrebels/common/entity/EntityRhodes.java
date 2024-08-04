@@ -15,6 +15,7 @@ import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.command.CommandRobot;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -240,7 +241,7 @@ public class EntityRhodes extends Entity {
 		setPos(x, y, z);
 		if (!level().isClientSide()) {
             for (Player player : level().players()) {
-                player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(RivalRebels.MODID + ".warning_tsar_is_armed", getName())), false);
+                player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_tsar_is_armed", getName())), false);
             }
         }
 	}
@@ -371,7 +372,7 @@ public class EntityRhodes extends Entity {
 
 		if (rider != null)
 		{
-			if ((rider.isShiftKeyDown() || !rider.isAlive()) && RivalRebels.rhodesExit)
+			if ((rider.isShiftKeyDown() || !rider.isAlive()) && CommandRobot.rhodesExit)
 			{
 				freeze = false;
 				if (!rider.isCreative()) rider.getAbilities().invulnerable = false;
@@ -391,7 +392,7 @@ public class EntityRhodes extends Entity {
 
 		if (passenger1 != null)
 		{
-			if ((passenger1.isShiftKeyDown() || !passenger1.isAlive()) && RivalRebels.rhodesExit)
+			if ((passenger1.isShiftKeyDown() || !passenger1.isAlive()) && CommandRobot.rhodesExit)
 			{
 				if (!passenger1.isCreative()) passenger1.getAbilities().invulnerable = false;
 				passenger1 = null;
@@ -409,7 +410,7 @@ public class EntityRhodes extends Entity {
 
 		if (passenger2 != null)
 		{
-			if ((passenger2.isShiftKeyDown() || !passenger2.isAlive()) && RivalRebels.rhodesExit)
+			if ((passenger2.isShiftKeyDown() || !passenger2.isAlive()) && CommandRobot.rhodesExit)
 			{
 				if (!passenger2.isCreative()) passenger2.getAbilities().invulnerable = false;
 				passenger2 = null;
@@ -737,7 +738,7 @@ public class EntityRhodes extends Entity {
 				health -= 1000;
 				level().addFreshEntity(new EntityB2Spirit(this));
 			}
-			if (RivalRebels.rhodesHold) return;
+			if (CommandRobot.rhodesHold) return;
 			if (energy < maxenergy) energy += recharge;
 			if (!RRConfig.SERVER.isInfiniteAmmo())
 			{
@@ -826,9 +827,9 @@ public class EntityRhodes extends Entity {
 			double starty = rider.getY() + rider.getEyeHeight(rider.getPose());
 			double startz = rider.getZ();
 			double range = 100;
-			double endx = startx + range * (-Mth.sin(rider.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(rider.getXRot() / 180.0F * (float) Math.PI));
-			double endy = starty + range * (-Mth.sin(rider.getXRot() / 180.0F * (float) Math.PI));
-			double endz = startz + range * (Mth.cos(rider.getYRot() / 180.0F * (float) Math.PI) * Mth.cos(rider.getXRot() / 180.0F * (float) Math.PI));
+			double endx = startx + range * (-Mth.sin(rider.getYRot() / 180.0F * Mth.PI) * Mth.cos(rider.getXRot() / 180.0F * Mth.PI));
+			double endy = starty + range * (-Mth.sin(rider.getXRot() / 180.0F * Mth.PI));
+			double endz = startz + range * (Mth.cos(rider.getYRot() / 180.0F * Mth.PI) * Mth.cos(rider.getXRot() / 180.0F * Mth.PI));
 
 			Vec3 hit = rayTraceBlocks((float)startx, (float)starty, (float)startz, (float)endx, (float)endy, (float)endz);
 
@@ -853,25 +854,20 @@ public class EntityRhodes extends Entity {
 				float x = (float) (getX() - endx);
 				float y = (float) (getY() + 13*scale - endy);
 				float z = (float) (getZ() - endz);
-				float pitch = (720f-atan2((float)Math.sqrt(x*x+z*z)*(syaw*x+cyaw*z>0?-1f:1f), y)) %360-270;
+				float pitch = (720f-atan2(Mth.sqrt(x*x+z*z) *(syaw*x+cyaw*z>0?-1f:1f), y)) %360-270;
 
 				headpitch += Math.max(-20, Math.min(20, (pitch-headpitch)));
 
-				if (Math.abs(headpitch-pitch) < 10f && tickCount % 3 == 0)
+				if (Mth.abs(headpitch-pitch) < 10f && tickCount % 3 == 0)
 				{
 					range = 70*scale;
 					Vec3 start = new Vec3(getX(), getY()+13*scale, getZ());
 					Vec3 end = new Vec3(0, 0, range);
-					end = end.xRot(-headpitch / 180.0F * (float) Math.PI);
-					end = end.yRot(bodyyaw / 180.0F * (float) Math.PI);
+					end = end.xRot(-headpitch / 180.0F * Mth.PI);
+					end = end.yRot(bodyyaw / 180.0F * Mth.PI);
 					end = end.add(getX(), getY()+13*scale, getZ());
-                    for (Entity e : level().getEntities(this, new AABB(
-                        Math.min(start.x, end.x) - 5,
-                            Math.min(start.y, end.y) - 5,
-                            Math.min(start.z, end.z) - 5,
-                            Math.max(start.x, end.x) + 5,
-                            Math.max(start.y, end.y) + 5,
-                            Math.max(start.z, end.z) + 5))) {
+                    List<Entity> entities = level().getEntities(this, new AABB(start, end).inflate(5));
+                    for (Entity e : entities) {
                         if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) &&
                                 !(e instanceof ThrowableProjectile
                                         || e instanceof EntityInanimate
@@ -982,14 +978,14 @@ public class EntityRhodes extends Entity {
 				float y = py - (float)endy;
 				float z = pz - (float)endz;
 				float yaw = ((atan2(x, z)-bodyyaw+810)%360)-270;
-				float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
+				float pitch = -(atan2(Mth.sqrt(x*x+z*z), y));
 				rightarmyaw += Math.max(-3, Math.min(3, (yaw-rightarmyaw)));
 				rightarmpitch += Math.max(-3, Math.min(3, (pitch-rightarmpitch)));
 
 				if (isPlasma())
 				{
 					plasmacharge++;
-					if (Math.abs(rightarmyaw-yaw) < 3f && Math.abs(rightarmpitch-pitch) < 3f)
+					if (Mth.abs(rightarmyaw-yaw) < 3f && Mth.abs(rightarmpitch-pitch) < 3f)
 					{
 						if (!flame && prevflame)
 						{
@@ -998,7 +994,7 @@ public class EntityRhodes extends Entity {
 							if (f > 1.0F) f = 1.0F;
 							f+=0.7f;
 							RivalRebelsSoundPlayer.playSound(this, 16, 2, 1, 0.5f);
-							float cp = -f/(float)Math.sqrt(x*x+y*y+z*z)*scale;
+							float cp = -f/ Mth.sqrt(x*x+y*y+z*z) *scale;
 							x*=cp;
 							y*=cp;
 							z*=cp;
@@ -1015,11 +1011,11 @@ public class EntityRhodes extends Entity {
 				}
 				else
 				{
-					if (Math.abs(rightarmyaw-yaw) < 3f && Math.abs(rightarmpitch-pitch) < 3f)
+					if (Mth.abs(rightarmyaw-yaw) < 3f && Mth.abs(rightarmpitch-pitch) < 3f)
 					{
 						flamecount--;
 						RivalRebelsSoundPlayer.playSound(this, 8, 1, 1f);
-						float cp = -1f/(float)Math.sqrt(x*x+y*y+z*z);
+						float cp = -1f/ Mth.sqrt(x*x+y*y+z*z);
 						x*=cp;
 						y*=cp;
 						z*=cp;
@@ -1040,11 +1036,11 @@ public class EntityRhodes extends Entity {
 				float y = py - (float)endy;
 				float z = pz - (float)endz;
 				float yaw = ((atan2(x, z)-bodyyaw+630)%360)-90;
-				float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
+				float pitch = -(atan2(Mth.sqrt(x*x+z*z), y));
 				leftarmyaw += Math.max(-3, Math.min(3, (yaw-leftarmyaw)));
 				leftarmpitch += Math.max(-3, Math.min(3, (pitch-leftarmpitch)));
 
-				if (Math.abs(leftarmyaw-yaw) < 3f && Math.abs(leftarmpitch-pitch) < 3f)
+				if (Mth.abs(leftarmyaw-yaw) < 3f && Mth.abs(leftarmpitch-pitch) < 3f)
 				{
 					if (bomb && !rocket)
 					{
@@ -1053,7 +1049,7 @@ public class EntityRhodes extends Entity {
 							tickssincenuke = 0;
 							nukecount--;
 							RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
-							float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
+							float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 							if (scale >= 3.0)
 								level().addFreshEntity(new EntityHotPotato(level(), px, py, pz,
 										x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
@@ -1073,7 +1069,7 @@ public class EntityRhodes extends Entity {
 						if (shotstaken == 21) shotstaken = 0;
 						shotstaken++;
 						RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
-						float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
+						float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 
 						if (scale >= 2.0)
 							level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
@@ -1088,7 +1084,7 @@ public class EntityRhodes extends Entity {
 			return;
 		}
 
-		if (RivalRebels.rhodesHold || guard)
+		if (CommandRobot.rhodesHold || guard)
 		{
 			rightthighpitch = approach(rightthighpitch,0);
 			leftthighpitch  = approach(leftthighpitch, 0);
@@ -1197,15 +1193,15 @@ public class EntityRhodes extends Entity {
 					float angle = ((atan2(dx, dz) - bodyyaw)%360);
 					if (angle > 1f)
 					{
-						actionqueue.add(new RhodesAction(5, (int) Math.abs(angle)));
+						actionqueue.add(new RhodesAction(5, (int) Mth.abs(angle)));
 					}
 					else if (angle < -1f)
 					{
-						actionqueue.add(new RhodesAction(7, (int) Math.abs(angle)));
+						actionqueue.add(new RhodesAction(7, (int) Mth.abs(angle)));
 					}
 					else
 					{
-						float d = Math.abs(dx)+Math.abs(dz);
+						float d = Mth.abs(dx)+Mth.abs(dz);
 						if (d<5)
 						{
 							RivalRebelsSoundPlayer.playSound(this, 13, 0, 900f, 1f);
@@ -1234,11 +1230,11 @@ public class EntityRhodes extends Entity {
 					float angle = ((atan2(dx, dz) - bodyyaw)%360);
 					if (angle > 1 && random.nextBoolean())
 					{
-						actionqueue.add(new RhodesAction(5, (int) Math.abs(angle)));
+						actionqueue.add(new RhodesAction(5, (int) Mth.abs(angle)));
 					}
 					else if (angle < -1 && random.nextBoolean())
 					{
-						actionqueue.add(new RhodesAction(7, (int) Math.abs(angle)));
+						actionqueue.add(new RhodesAction(7, (int) Mth.abs(angle)));
 					}
 					else
 					{
@@ -1351,7 +1347,7 @@ public class EntityRhodes extends Entity {
 
 	public static float atan2(float y, float x)
 	{
-		float dx = ((float)Math.sqrt(x*x+y*y)+x);
+		float dx = Mth.sqrt(x*x+y*y) +x;
 		if (y > dx)
 		{
 			float r = dx/y;
@@ -1570,13 +1566,13 @@ public class EntityRhodes extends Entity {
 				float dx = ((float)lastRocketTarget.getX()-px);
 				float dz = ((float)lastRocketTarget.getZ()-pz);
 				float dot = (cyaw * dx + syaw * dz);
-				if (dot*Math.abs(dot) > -0.25 * (dx*dx+dz*dz))
+				if (dot*Mth.abs(dot) > -0.25 * (dx*dx+dz*dz))
 				{
 					float dy = ((float)lastRocketTarget.getY()-(float)getY()-6.2f*scale);
 					float dist = dx*dx+dy*dy+dz*dz;
 					if (dist < 100*100*scale*scale && rayTraceBlocks(px, py, pz, (float)lastRocketTarget.getX(), (float)lastRocketTarget.getY()+lastRocketTarget.getBbHeight()/2f, (float)lastRocketTarget.getZ()) == null)
 					{
-						priority = getPriority(lastRocketTarget)-(float)Math.sqrt(dist)+10;
+						priority = getPriority(lastRocketTarget)- Mth.sqrt(dist) +10;
 					}
 				}
 			}
@@ -1595,11 +1591,11 @@ public class EntityRhodes extends Entity {
                     float dx = (float) e.getX() - px;
                     float dz = (float) e.getZ() - pz;
                     float dot = (cyaw * dx + syaw * dz);
-                    if (dot * Math.abs(dot) > -0.25 * (dx * dx + dz * dz)) {
+                    if (dot * Mth.abs(dot) > -0.25 * (dx * dx + dz * dz)) {
                         float dy = (float) e.getY() - py;
                         float dist = dx * dx + dy * dy + dz * dz;
                         if (dist < 100 * 100 * scale * scale) {
-                            float prio = getPriority(e) - (float) Math.sqrt(dist);
+                            float prio = getPriority(e) - Mth.sqrt(dist);
                             if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getX(), (float) e.getY() + e.getBbHeight() / 2f, (float) e.getZ()) == null) {
                                 lastRocketTarget = e;
                                 priority = prio;
@@ -1614,11 +1610,11 @@ public class EntityRhodes extends Entity {
                     float dx = (float) e.getBlockPos().getX() - px;
                     float dz = (float) e.getBlockPos().getZ() - pz;
                     float dot = (cyaw * dx + syaw * dz);
-                    if (dot * Math.abs(dot) > -0.25 * (dx * dx + dz * dz)) {
+                    if (dot * Mth.abs(dot) > -0.25 * (dx * dx + dz * dz)) {
                         float dy = (float) e.getBlockPos().getY() - py;
                         float dist = dx * dx + dy * dy + dz * dz;
                         if (dist < 100 * 100) {
-                            float prio = 300 - (float) Math.sqrt(dist);
+                            float prio = 300 - Mth.sqrt(dist);
                             if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getBlockPos().getX(), (float) e.getBlockPos().getY(), (float) e.getBlockPos().getZ()) == null) {
                                 te = e;
                                 lastRocketTarget = null;
@@ -1635,18 +1631,18 @@ public class EntityRhodes extends Entity {
 			float y = py - (float)te.getBlockPos().getY();
 			float z = pz - (float)te.getBlockPos().getZ();
 			float yaw = ((atan2(x, z)-bodyyaw+630)%360)-90;
-			float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
+			float pitch = -(atan2(Mth.sqrt(x*x+z*z), y));
 			boolean pointing = true;
-			if (Math.abs(leftarmyaw-yaw) >= 0.001f)
+			if (Mth.abs(leftarmyaw-yaw) >= 0.001f)
 			{
 				leftarmyaw += Math.max(-3, Math.min(3, (yaw-leftarmyaw)));
-				if (Math.abs(leftarmyaw-yaw) < 3f) pointing &= true;
+				if (Mth.abs(leftarmyaw-yaw) < 3f) pointing &= true;
 				else pointing = false;
 			}
-			if (Math.abs(leftarmpitch-pitch) >= 0.001f)
+			if (Mth.abs(leftarmpitch-pitch) >= 0.001f)
 			{
 				leftarmpitch += Math.max(-3, Math.min(3, (pitch-leftarmpitch)));
-				if (Math.abs(leftarmpitch-pitch) < 3f) pointing &= true;
+				if (Mth.abs(leftarmpitch-pitch) < 3f) pointing &= true;
 				else pointing = false;
 			}
 
@@ -1657,7 +1653,7 @@ public class EntityRhodes extends Entity {
 				if (shotstaken == 21) shotstaken = 0;
 				shotstaken++;
 				RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
-				float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
+				float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 				if (scale >= 2.0)
 					level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
 							x*cp, y*cp, z*cp));
@@ -1672,18 +1668,18 @@ public class EntityRhodes extends Entity {
 			float y = py - (float)lastRocketTarget.getY();
 			float z = pz - (float)lastRocketTarget.getZ();
 			float yaw = ((atan2(x, z)-bodyyaw+630)%360)-90;
-			float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
+			float pitch = -(atan2(Mth.sqrt(x*x+z*z), y));
 			boolean pointing = true;
-			if (Math.abs(leftarmyaw-yaw) >= 0.001f)
+			if (Mth.abs(leftarmyaw-yaw) >= 0.001f)
 			{
 				leftarmyaw += Math.max(-3, Math.min(3, (yaw-leftarmyaw)));
-				if (Math.abs(leftarmyaw-yaw) < 3f) pointing &= true;
+				if (Mth.abs(leftarmyaw-yaw) < 3f) pointing &= true;
 				else pointing = false;
 			}
-			if (Math.abs(leftarmpitch-pitch) >= 0.001f)
+			if (Mth.abs(leftarmpitch-pitch) >= 0.001f)
 			{
 				leftarmpitch += Math.max(-3, Math.min(3, (pitch-leftarmpitch)));
-				if (Math.abs(leftarmpitch-pitch) < 3f) pointing &= true;
+				if (Mth.abs(leftarmpitch-pitch) < 3f) pointing &= true;
 				else pointing = false;
 			}
 
@@ -1692,7 +1688,7 @@ public class EntityRhodes extends Entity {
 				if (pointing && tickCount % 100 == 0)
 				{
 					RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
-					float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
+					float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 					if (scale >= 2.0)
 						level().addFreshEntity(new EntityTsar(level(), px, py, pz,
 								x*cp*5.0f, y*cp*5.0f, z*cp*5.0f));
@@ -1710,7 +1706,7 @@ public class EntityRhodes extends Entity {
 					if (shotstaken == 21) shotstaken = 0;
 					shotstaken++;
 					RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
-					float cp = -0.5f/(float)Math.sqrt(x*x+y*y+z*z);
+					float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 					if (scale >= 2.0)
 						level().addFreshEntity(new EntityB83NoShroom(level(), px, py, pz,
 								x*cp, y*cp, z*cp));
@@ -1740,13 +1736,13 @@ public class EntityRhodes extends Entity {
 				float dx = ((float)lastFlameTarget.getX()-px);
 				float dz = ((float)lastFlameTarget.getZ()-pz);
 				float dot = (-cyaw * dx + -syaw * dz);
-				if (dot*Math.abs(dot) > -0.25 * (dx*dx+dz*dz))
+				if (dot*Mth.abs(dot) > -0.25 * (dx*dx+dz*dz))
 				{
 					float dy = ((float)lastFlameTarget.getY()-(float)getY()-6.2f);
 					float dist = dx*dx+dy*dy+dz*dz;
 					if (dist < 40*40*scale*scale && rayTraceBlocks(px, py, pz, (float)lastFlameTarget.getX(), (float)lastFlameTarget.getY()+lastFlameTarget.getBbHeight(), (float)lastFlameTarget.getZ()) == null)
 					{
-						priority = getPriority(lastFlameTarget)-(float)Math.sqrt(dist)+10;
+						priority = getPriority(lastFlameTarget)- Mth.sqrt(dist) +10;
 					}
 				}
 			}
@@ -1765,11 +1761,11 @@ public class EntityRhodes extends Entity {
                     float dx = (float) e.getX() - px;
                     float dz = (float) e.getZ() - pz;
                     float dot = (-cyaw * dx + -syaw * dz);
-                    if (dot * Math.abs(dot) > -0.25 * (dx * dx + dz * dz)) {
+                    if (dot * Mth.abs(dot) > -0.25 * (dx * dx + dz * dz)) {
                         float dy = (float) e.getY() - py;
                         float dist = dx * dx + dy * dy + dz * dz;
                         if (dist < 40 * 40 * scale * scale) {
-                            float prio = getPriority(e) - (float) Math.sqrt(dist);
+                            float prio = getPriority(e) - Mth.sqrt(dist);
                             if (prio > priority && rayTraceBlocks(px, py, pz, (float) e.getX(), (float) e.getY() + e.getBbHeight(), (float) e.getZ()) == null) {
                                 lastFlameTarget = e;
                                 priority = prio;
@@ -1786,25 +1782,25 @@ public class EntityRhodes extends Entity {
 			float y = py - (float)lastFlameTarget.getY() - (lastFlameTarget.getBbHeight()*0.5f);
 			float z = pz - (float)lastFlameTarget.getZ();
 			float yaw = ((atan2(x, z)-bodyyaw+810)%360)-270;
-			float pitch = -(atan2((float)Math.sqrt(x*x+z*z), y));
+			float pitch = -(atan2(Mth.sqrt(x*x+z*z), y));
 			boolean pointing = true;
-			if (Math.abs(rightarmyaw-yaw) >= 0.001f)
+			if (Mth.abs(rightarmyaw-yaw) >= 0.001f)
 			{
 				rightarmyaw += Math.max(-3, Math.min(3, (yaw-rightarmyaw)));
-				if (Math.abs(rightarmyaw-yaw) < 0.001f) pointing &= true;
+				if (Mth.abs(rightarmyaw-yaw) < 0.001f) pointing &= true;
 				else pointing = false;
 			}
-			if (Math.abs(rightarmpitch-pitch) >= 0.001f)
+			if (Mth.abs(rightarmpitch-pitch) >= 0.001f)
 			{
 				rightarmpitch += Math.max(-3, Math.min(3, (pitch-rightarmpitch)));
-				if (Math.abs(rightarmpitch-pitch) < 0.001f) pointing &= true;
+				if (Mth.abs(rightarmpitch-pitch) < 0.001f) pointing &= true;
 				else pointing = false;
 			}
 
 			if (pointing)
 			{
 				RivalRebelsSoundPlayer.playSound(this, 8, 1, 1f);
-				float cp = -1f/(float)Math.sqrt(x*x+y*y+z*z);
+				float cp = -1f/ Mth.sqrt(x*x+y*y+z*z);
 				x*=cp;
 				y*=cp;
 				z*=cp;
@@ -1830,10 +1826,10 @@ public class EntityRhodes extends Entity {
 				float tempdi = (float) ((lastLaserTarget.getX()-getX())*(lastLaserTarget.getX()-getX())
 						+(lastLaserTarget.getY()-13-getY())*(lastLaserTarget.getY()-13-getY())
 						+(lastLaserTarget.getZ()-getZ())*(lastLaserTarget.getZ()-getZ()));
-				if (Math.abs(cyaw*(lastLaserTarget.getX()-getX())+syaw*(lastLaserTarget.getZ()-getZ()))<2&&tempdi<70*70
+				if (Mth.abs((float) (cyaw*(lastLaserTarget.getX()-getX())+syaw*(lastLaserTarget.getZ()-getZ())))<2&&tempdi<70*70
 						&&rayTraceBlocks((float)getX(), (float)getY() + 13, (float)getZ(), (float)lastLaserTarget.getX(), (float)lastLaserTarget.getY()+lastLaserTarget.getBbHeight()/2f, (float)lastLaserTarget.getZ()) == null)
 				{
-					priority = getPriority(lastLaserTarget)-(float)Math.sqrt(tempdi);
+					priority = getPriority(lastLaserTarget)- Mth.sqrt(tempdi);
 					if (priority > 0) priority += 10;
 				}
 			}
@@ -1852,12 +1848,12 @@ public class EntityRhodes extends Entity {
                                 || e instanceof Minecart)) {
                     float x = (float) (e.getX() - getX());
                     float z = (float) (e.getZ() - getZ());
-                    if (Math.abs(cyaw * x + syaw * z) < 2) {
+                    if (Mth.abs(cyaw * x + syaw * z) < 2) {
                         float y = (float) (e.getY() - 13 - getY());
                         float dist = x * x + y * y + z * z;
                         if (dist < 70 * 70 * scale * scale) {
-                            if (y * Math.abs(y) > -0.64f * dist) {
-                                float prio = getPriority(e) - (float) Math.sqrt(dist);
+                            if (y * Mth.abs(y) > -0.64f * dist) {
+                                float prio = getPriority(e) - Mth.sqrt(dist);
                                 if (prio > priority && rayTraceBlocks((float) getX(), (float) getY() + 13, (float) getZ(), (float) e.getX(), (float) e.getY() + e.getBbHeight() / 2f, (float) e.getZ()) == null) {
                                     lastLaserTarget = e;
                                     priority = prio;
@@ -1876,13 +1872,13 @@ public class EntityRhodes extends Entity {
 			float y = (float) (getY() + 13 - lastLaserTarget.getY());
 			float z = (float) (getZ() - lastLaserTarget.getZ());
 			float dot = -syaw*x+cyaw*z;
-			float pitch = (720f-atan2((float)Math.sqrt(x*x+z*z)*(dot>0?-1f:1f), y)) %360-270;
+			float pitch = (720f-atan2(Mth.sqrt(x*x+z*z) *(dot>0?-1f:1f), y)) %360-270;
 
 			boolean pointing = true;
-			if (Math.abs(headpitch-pitch) >= 0.001f)
+			if (Mth.abs(headpitch-pitch) >= 0.001f)
 			{
 				headpitch += Math.max(-20, Math.min(20, (pitch-headpitch)));
-                pointing = Math.abs(headpitch - pitch) < 3f;
+                pointing = Mth.abs(headpitch - pitch) < 3f;
 			}
 
 			if (pointing)

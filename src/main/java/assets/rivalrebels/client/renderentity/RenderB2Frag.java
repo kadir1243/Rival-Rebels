@@ -19,18 +19,13 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
 public class RenderB2Frag extends EntityRenderer<EntityB2Frag> {
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etb2spirit);
-
     public RenderB2Frag(EntityRendererProvider.Context manager) {
         super(manager);
 	}
@@ -40,9 +35,10 @@ public class RenderB2Frag extends EntityRenderer<EntityB2Frag> {
 		matrices.pushPose();
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
 		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
+        matrices.scale(3, 3, 3);
 
-        if (entity.type == 0) ObjModels.b2FragSide1.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
-		else if (entity.type == 1) ObjModels.b2FragSide2.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
+        if (entity.type == 0) ObjModels.renderSolid(ObjModels.b2FragSide1, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+		else if (entity.type == 1) ObjModels.renderSolid(ObjModels.b2FragSide2, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
 

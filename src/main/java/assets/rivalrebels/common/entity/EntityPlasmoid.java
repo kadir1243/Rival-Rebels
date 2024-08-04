@@ -66,8 +66,8 @@ public class EntityPlasmoid extends EntityInanimate
 
 		if (var12 >= 1.0E-7D)
 		{
-			float var14 = (float) (Math.atan2(var10, var6) * 180.0D / Math.PI) - 90.0F;
-			float var15 = (float) (-(Math.atan2(var8, var12) * 180.0D / Math.PI));
+			float var14 = (float) (Math.atan2(var10, var6) * Mth.RAD_TO_DEG) - 90.0F;
+			float var15 = (float) (-(Math.atan2(var8, var12) * Mth.RAD_TO_DEG));
 			double var16 = var6 / var12;
 			double var18 = var10 / var12;
 			moveTo(thrower.getX() + var16, getY(), thrower.getZ() + var18, var14, var15);
@@ -82,11 +82,14 @@ public class EntityPlasmoid extends EntityInanimate
 		par3 *= (gravity ? 3 : 1);
 		gravity = drop;
 		this.thrower = thrower;
-		moveTo(thrower.getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.16F), thrower.getY() + thrower.getEyeHeight(thrower.getPose()), thrower.getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.16F), thrower.getYRot(), thrower.getXRot());
+		moveTo(
+            thrower.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+            thrower.getY() + thrower.getEyeHeight(thrower.getPose()),
+            thrower.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F), thrower.getYRot(), thrower.getXRot());
 		reapplyPosition();
-		setDeltaMovement(-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI),
-		 (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-		 (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+		setDeltaMovement(-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI),
+		 (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+		 (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 		setAccurateHeading(getDeltaMovement(), par3 * 1.5F, 1.0F);
 	}
 
@@ -96,16 +99,16 @@ public class EntityPlasmoid extends EntityInanimate
 		setPos(px+x*f, py+y*f, pz+z*f);
         setDeltaMovement(x, y, z);
 		float var10 = Mth.sqrt((float) (x * x + z * z));
-		setYRot(yRotO = (float) (Math.atan2(x, z) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(y, var10) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(x, z) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(y, var10) * Mth.RAD_TO_DEG));
 	}
 
 	public void setAccurateHeading(Vec3 vec, float speed, float par8) {
         vec = vec.scale(1/vec.length()).scale(speed);
         setDeltaMovement(vec);
 		float var10 = Mth.sqrt((float) (vec.x * vec.x + vec.z * vec.z));
-		setYRot(yRotO = (float) (Math.atan2(vec.x, vec.z) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(vec.y, var10) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(vec.x, vec.z) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(vec.y, var10) * Mth.RAD_TO_DEG));
 	}
 
 	@Override
@@ -163,8 +166,8 @@ public class EntityPlasmoid extends EntityInanimate
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var16 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
-		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
-		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
+		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
+		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
 			;
 		while (getXRot() - xRotO >= 180.0F)
 			xRotO += 360.0F;

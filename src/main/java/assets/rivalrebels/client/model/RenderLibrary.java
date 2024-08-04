@@ -33,7 +33,7 @@ public class RenderLibrary {
 		float hdist = dist / 2f;
 		float hdists = hdist * hdist;
 		float rs = radius / steps;
-		int segNum = (int) Math.ceil(dist / segDist) + 1;
+		int segNum = Mth.ceil(dist / segDist) + 1;
 		float[] xv = new float[segNum];
         float[] yv = new float[segNum];
         float[] zv = new float[segNum];

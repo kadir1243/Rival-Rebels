@@ -19,6 +19,7 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 @Environment(EnvType.CLIENT)
 public class GuiFTKnob extends GuiButton
@@ -51,7 +52,7 @@ public class GuiFTKnob extends GuiButton
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
 		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
 			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
-			if (pressed) mode = (((((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * 180 / Math.PI)) + 450) % 360) - 45) / 90;
+			if (pressed) mode = (((((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * Mth.RAD_TO_DEG)) + 450) % 360) - 45) / 90;
 		} else {
 			pressed = false;
 			int move = (int) Minecraft.getInstance().mouseHandler.ypos();

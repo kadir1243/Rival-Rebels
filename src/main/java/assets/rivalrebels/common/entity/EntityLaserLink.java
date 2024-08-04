@@ -35,9 +35,9 @@ public class EntityLaserLink extends EntityInanimate {
 		tickCount = 0;
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
 		moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYRot(), shooter.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
 		getY() - 0.08,
-		getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.2F));
+		getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
 		setPos(getX(), getY(), getZ());
 	}
 

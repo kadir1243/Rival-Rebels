@@ -14,23 +14,17 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodesLeftLowerArm;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
-public class RenderRhodesLeftLowerArm extends EntityRenderer<EntityRhodesLeftLowerArm>
-{
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RenderRhodes.texture);
+public class RenderRhodesLeftLowerArm extends EntityRenderer<EntityRhodesLeftLowerArm> {
     public RenderRhodesLeftLowerArm(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
@@ -43,9 +37,8 @@ public class RenderRhodesLeftLowerArm extends EntityRenderer<EntityRhodesLeftLow
         matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
         matrices.translate(0, 4f, 0);
         matrices.scale(-1, 1, 1);
-        VertexConsumer vertexConsumer = TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
-        ObjModels.lowerarm.render(matrices, vertexConsumer, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
-        ObjModels.rhodes_rocketlauncher.render(matrices, vertexConsumer, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.renderSolid(ObjModels.lowerarm, RenderRhodes.texture, matrices, vertexConsumers, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
+        ObjModels.renderSolid(ObjModels.rhodes_rocketlauncher, RenderRhodes.texture, matrices, vertexConsumers, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
     }
 

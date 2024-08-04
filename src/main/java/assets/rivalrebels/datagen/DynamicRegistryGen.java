@@ -1,6 +1,6 @@
 package assets.rivalrebels.datagen;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricDynamicRegistryProvider;
@@ -18,12 +18,12 @@ public class DynamicRegistryGen extends FabricDynamicRegistryProvider {
     @Override
     protected void configure(HolderLookup.Provider registries, Entries entries) {
         for (ResourceKey<DamageType> type : RivalRebelsDamageSource.RRDamageTypes.REGISTERED_DAMAGE_TYPES) {
-            entries.add(type, new DamageType(RivalRebels.MODID + "." + type.location().getPath(), 1F));
+            entries.add(type, new DamageType(RRIdentifiers.MODID + "." + type.location().getPath(), 1F));
         }
     }
 
     @Override
     public String getName() {
-        return RivalRebels.MODID + " Dynamic Registry Generator";
+        return RRIdentifiers.MODID + " Dynamic Registry Generator";
     }
 }

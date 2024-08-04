@@ -13,7 +13,7 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.BlockTags;
@@ -32,15 +32,14 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+
 import java.util.List;
 import java.util.Optional;
 
 public class EntityHackB83 extends ThrowableProjectile
 {
 	public int	ticksInAir	= 0;
-	double mmx = 0;
-	double mmy = 0;
-	double mmz = 0;
+    private Vec3 mmPos = Vec3.ZERO;
 	boolean straight;
 
     public EntityHackB83(EntityType<? extends EntityHackB83> entityType, Level world) {
@@ -57,9 +56,9 @@ public class EntityHackB83 extends ThrowableProjectile
 		this(par1World);
 		straight = flystraight;
 		moveTo(x, y, z, yaw, pitch);
-        setDeltaMovement(-(-Mth.sin(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)),
-            (Mth.cos(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)),
-            (-Mth.sin(pitch / 180.0F * (float) Math.PI)));
+        setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
+            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
+            (-Mth.sin(pitch / 180.0F * Mth.PI)));
     }
 	public EntityHackB83(Level par1World, double x, double y,double z, double mx, double my, double mz, boolean flystraight)
 	{
@@ -72,8 +71,8 @@ public class EntityHackB83 extends ThrowableProjectile
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -87,22 +86,18 @@ public class EntityHackB83 extends ThrowableProjectile
 		++this.ticksInAir;
 		if (!straight && !level().isClientSide())
 		{
-			mmx += level().random.nextGaussian()*0.4;
-			mmy += level().random.nextGaussian()*0.4;
-			mmz += level().random.nextGaussian()*0.4;
-			double dist = 1/Math.sqrt(mmx*mmx + mmy*mmy + mmz*mmz);
-			mmx *= dist;
-			mmy *= dist;
-			mmz *= dist;
+			mmPos = mmPos.add(level().random.nextGaussian()*0.4,
+                level().random.nextGaussian()*0.4,
+                level().random.nextGaussian()*0.4);
+			double dist = 1/mmPos.length();
+            mmPos = mmPos.scale(dist);
 			if (ticksInAir > 35) {
-				setDeltaMovement(getDeltaMovement().add(mmx * 0.2f,
-                    mmy * 0.2f,
-                    mmz * 0.2f));
+				setDeltaMovement(getDeltaMovement().add(mmPos.scale(0.2)));
 			} else {
                 setDeltaMovement(getDeltaMovement().add(
-                    mmx*0.2f,
-                    Math.abs(mmy)*0.2f,
-                    mmz*0.2f
+                    mmPos.x()*0.2f,
+                    Mth.abs((float) mmPos.y())*0.2f,
+                    mmPos.z()*0.2f
                 ));
 			}
 		}
@@ -163,9 +158,9 @@ public class EntityHackB83 extends ThrowableProjectile
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
-		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
+		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 		{
         }
 
@@ -216,7 +211,7 @@ public class EntityHackB83 extends ThrowableProjectile
     protected void onHitBlock(BlockHitResult blockHitResult) {
         BlockState state = level().getBlockState(blockHitResult.getBlockPos());
         MapColor color = state.getMapColor(level(), blockHitResult.getBlockPos());
-        if (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || state.is(BlockTags.SNOW) || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || state.is(Blocks.SPONGE) || state.is(BlockTags.ICE))
+        if (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ModBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || state.is(BlockTags.SNOW) || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || state.is(Blocks.SPONGE) || state.is(BlockTags.ICE))
         {
             level().setBlockAndUpdate(blockHitResult.getBlockPos(), Blocks.AIR.defaultBlockState());
             return;

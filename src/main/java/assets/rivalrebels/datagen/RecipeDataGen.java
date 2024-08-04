@@ -8,7 +8,6 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
-import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -23,56 +22,56 @@ public class RecipeDataGen extends FabricRecipeProvider {
     @Override
     public void buildRecipes(RecipeOutput exporter) {
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.fuel, 16)
-            .define('C', Items.COBBLESTONE)
-            .define('S', Items.SAND)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
+            .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
-            .define('D', Items.DIRT)
+            .define('D', ItemTags.DIRT)
             .pattern("DS")
             .pattern("GC")
             .showNotification(false)
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, RRItems.rocket, 16)
-            .define('C', Items.COBBLESTONE)
-            .define('S', Items.SAND)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
+            .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
-            .define('D', Items.DIRT)
+            .define('D', ItemTags.DIRT)
             .pattern("SC")
             .pattern("DG")
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.battery, 4)
-            .define('C', Items.COBBLESTONE)
-            .define('S', Items.SAND)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
+            .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
             .define('D', ItemTags.DIRT)
             .pattern("CG")
             .pattern("SD")
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.gasgrenade, 6)
-            .define('C', Items.COBBLESTONE)
-            .define('S', Items.SAND)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
+            .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
             .define('D', ItemTags.DIRT)
             .pattern("GD")
             .pattern("CS")
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.easteregg)
-            .define('C', Items.COBBLESTONE)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('D', ItemTags.DIRT)
             .pattern("DD")
             .pattern("CC")
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.sigmaarmor)
-            .define('C', Items.COBBLESTONE)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', RRBlocks.steel)
             .define('P', RRItems.pliers)
             .define('D', ItemTags.DIRT)
@@ -80,11 +79,11 @@ public class RecipeDataGen extends FabricRecipeProvider {
             .pattern("SSC")
             .pattern("SPB")
             .pattern("SSD")
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.omegaarmor)
-            .define('C', Items.COBBLESTONE)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', RRBlocks.steel)
             .define('P', RRItems.pliers)
             .define('D', ItemTags.DIRT)
@@ -92,7 +91,7 @@ public class RecipeDataGen extends FabricRecipeProvider {
             .pattern("SSD")
             .pattern("SPB")
             .pattern("SSC")
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.flagbox1)
@@ -110,36 +109,42 @@ public class RecipeDataGen extends FabricRecipeProvider {
             .save(exporter);
 
         ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.armyshovel)
-            .define('C', Items.COBBLESTONE)
-            .define('S', Items.SAND)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
+            .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
             .define('D', ItemTags.DIRT)
             .pattern("CD")
             .pattern("SG")
-            .unlockedBy("has_cobblestone", has(Items.COBBLESTONE))
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
             .save(exporter);
 
         // Supplies
-        addRecipe(RRBlocks.amario, 16, "SS", "GG", 'S', Items.SAND, 'G', Items.GRAVEL);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.amario, 16)
+            .define('S', ItemTags.SAND)
+            .define('G', Items.GRAVEL)
+            .pattern("SS")
+            .pattern("GG")
+            .unlockedBy("has_sand", has(ItemTags.SAND))
+            .save(exporter);
 
-        addRecipe(RRBlocks.aquicksand, 16, "SS", "DD", 'S', Items.SAND, 'D', BlockTags.DIRT);
+        addRecipe(RRBlocks.aquicksand, 16, "SS", "DD", 'S', ItemTags.SAND, 'D', ItemTags.DIRT);
 
-        addRecipe(RRBlocks.jump, 8, "CC", "DD", 'C', Items.COBBLESTONE, 'D', BlockTags.DIRT);
+        addRecipe(RRBlocks.jump, 8, "CC", "DD", 'C', ItemTags.STONE_CRAFTING_MATERIALS, 'D', ItemTags.DIRT);
 
-        addRecipe(RRBlocks.steel, 16, "CC", "CC", 'C', Items.COBBLESTONE);
+        addRecipe(RRBlocks.steel, 16, "CC", "CC", 'C', ItemTags.STONE_CRAFTING_MATERIALS);
 
-        addRecipe(RRBlocks.smartcamo, 16, "SCS", "CPC", "SCS", 'C', Items.COBBLESTONE, 'S', RRBlocks.steel, 'P', RRItems.pliers);
+        addRecipe(RRBlocks.smartcamo, 16, "SCS", "CPC", "SCS", 'C', ItemTags.STONE_CRAFTING_MATERIALS, 'S', RRBlocks.steel, 'P', RRItems.pliers);
 
         // Explosives
-        addRecipee(RRItems.pliers, " C", "C ", 'C', Items.COBBLESTONE);
+        addRecipee(RRItems.pliers, " C", "C ", 'C', ItemTags.STONE_CRAFTING_MATERIALS);
 
         addRecipee(RRItems.roda, "IN", "IH", "IR", 'I', Items.IRON_INGOT, 'N', RRItems.NUCLEAR_ROD, 'H', RRItems.hydrod, 'R', RRItems.redrod);
 
         // Weapons
-        addRecipe(RRItems.knife, 5, "CG", "GC", 'C', Items.COBBLESTONE, 'G', Items.GRAVEL);
+        addRecipe(RRItems.knife, 5, "CG", "GC", 'C', ItemTags.STONE_CRAFTING_MATERIALS, 'G', Items.GRAVEL);
 
         // Miscellaneous
-        addRecipe(RRItems.trollmask, 8, "SS", 'S', Items.SAND);
+        addRecipe(RRItems.trollmask, 8, "SS", 'S', ItemTags.SAND);
 
         addRecipee(RRBlocks.cycle, "TT", "TT", 'T', RRItems.trollmask);
 
@@ -156,9 +161,9 @@ public class RecipeDataGen extends FabricRecipeProvider {
 
         addRecipee(RRItems.remote, "BF", "RP", 'P', RRItems.pliers, 'B', RRItems.battery, 'R', RRItems.rocket, 'F', RRItems.fuel);
 
-        addRecipe(RRBlocks.alandmine, 16, "DB", "RP", 'D', BlockTags.DIRT, 'B', RRItems.battery, 'P', RRItems.pliers, 'R', RRItems.rocket);
+        addRecipe(RRBlocks.alandmine, 16, "DB", "RP", 'D', ItemTags.DIRT, 'B', RRItems.battery, 'P', RRItems.pliers, 'R', RRItems.rocket);
 
-        addRecipe(RRBlocks.flare, 8, "FD", "RD", 'F', RRItems.fuel, 'D', BlockTags.DIRT, 'R', RRItems.rocket);
+        addRecipe(RRBlocks.flare, 8, "FD", "RD", 'F', RRItems.fuel, 'D', ItemTags.DIRT, 'R', RRItems.rocket);
 
         addRecipee(RRBlocks.nukeCrateTop, " SS", "SP ", " SS", 'S', RRBlocks.steel, 'P', RRItems.pliers);
 

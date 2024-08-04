@@ -30,10 +30,8 @@ public class TileEntityReactive extends TileEntityMachineBase
 	public float powered(float power, float distance)
 	{
 		int metadata = this.getBlockState().getValue(BlockReactive.META);
-		if (metadata > 0)
-		{
-			if (cooldown <= 0)
-			{
+		if (metadata > 0) {
+			if (cooldown <= 0) {
 				level.setBlock(getBlockPos(), RRBlocks.reactive.defaultBlockState().setValue(BlockReactive.META, metadata - 1), Block.UPDATE_CLIENTS);
 				cooldown = 10;
 				return power - 1;

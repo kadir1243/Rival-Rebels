@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block;
 
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.Level;
@@ -37,7 +37,7 @@ public class BlockSmartCamo extends Block
             if (getBlockState(world, pos.below()).is(BlockTags.DIRT)) {
                 setBlock(world, pos, RRBlocks.camo1);
             } else {
-                if (getBlockState(world, pos.below()).is(BlockTags.SAND) || getBlockState(world, pos.below()).is(ConventionalBlockTags.SANDSTONE_BLOCKS)) {
+                if (getBlockState(world, pos.below()).is(BlockTags.SAND) || getBlockState(world, pos.below()).is(ModBlockTags.SANDSTONE_BLOCKS)) {
                     setBlock(world, pos, RRBlocks.camo2);
                 } else {
                     if (getBlockState(world, pos.below()).is(BlockTags.BASE_STONE_OVERWORLD) || getBlockState(world, pos.below()).is(Blocks.GRAVEL) || getBlock(world, pos.below()) == Blocks.BEDROCK || getBlockState(world, pos.below()).is(Blocks.COBBLESTONE)) {

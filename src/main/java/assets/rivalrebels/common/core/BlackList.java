@@ -12,7 +12,7 @@
 package assets.rivalrebels.common.core;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -31,9 +31,9 @@ public class BlackList {
         of(Blocks.BEDROCK),
         of(Blocks.WATER),
         of(Blocks.LAVA),
-        of(ConventionalBlockTags.GLASS_BLOCKS),
+        of(ModBlockTags.GLASS_BLOCKS),
         of(Blocks.OBSIDIAN),
-        of(ConventionalBlockTags.GLASS_PANES),
+        of(ModBlockTags.GLASS_PANES),
         of(RRBlocks.nuclearBomb),
         of(RRBlocks.tsarbombablock),
         of(RRBlocks.loader),

@@ -20,17 +20,13 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
-public class RenderHackB83 extends EntityRenderer<EntityHackB83>
-{
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etb83);
+public class RenderHackB83 extends EntityRenderer<EntityHackB83> {
     public RenderHackB83(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
@@ -41,7 +37,7 @@ public class RenderHackB83 extends EntityRenderer<EntityHackB83>
 		matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
 		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 180));
-		ObjModels.b83.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+        ObjModels.renderSolid(ObjModels.b83, RRIdentifiers.etb83, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
 

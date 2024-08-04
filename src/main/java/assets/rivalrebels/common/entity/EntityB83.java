@@ -13,7 +13,7 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
-import net.fabricmc.fabric.api.tag.convention.v2.ConventionalBlockTags;
+import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
@@ -45,18 +45,18 @@ public class EntityB83 extends ThrowableProjectile
 	public EntityB83(Level par1World, double x, double y, double z, float yaw, float pitch) {
 		this(RREntities.B83, par1World);
 		moveTo(x, y, z, yaw, pitch);
-        setDeltaMovement(-(-Mth.sin(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)),
-            (Mth.cos(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)),
-            (-Mth.sin(pitch / 180.0F * (float) Math.PI)));
+        setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
+            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
+            (-Mth.sin(pitch / 180.0F * Mth.PI)));
     }
 
 	public EntityB83(Level par1World, double x, double y, double z, float yaw, float pitch, float strength)
 	{
         this(RREntities.B83, par1World);
 		moveTo(x, y, z, yaw, pitch);
-		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)) * strength,
-		(Mth.cos(yaw / 180.0F * (float) Math.PI) * Mth.cos(pitch / 180.0F * (float) Math.PI)) * strength,
-		(-Mth.sin(pitch / 180.0F * (float) Math.PI)) * strength);
+		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)) * strength,
+		(Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)) * strength,
+		(-Mth.sin(pitch / 180.0F * Mth.PI)) * strength);
 	}
 	public EntityB83(Level par1World, double x, double y,double z, double mx, double my, double mz)
 	{
@@ -68,8 +68,8 @@ public class EntityB83 extends ThrowableProjectile
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
         setDeltaMovement(mx, my, mz);
-        setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -128,9 +128,9 @@ public class EntityB83 extends ThrowableProjectile
 		if (this.isPassenger())
 		{
 		double var16 = Math.sqrt(this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z());
-		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
+		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 		{
         }
 
@@ -169,7 +169,7 @@ public class EntityB83 extends ThrowableProjectile
     @Override
     protected void onHitBlock(BlockHitResult blockHitResult) {
         BlockState state = level().getBlockState(blockHitResult.getBlockPos());
-        if (state.is(BlockTags.LEAVES) || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(ConventionalBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || state.is(BlockTags.SNOW) || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || state.is(Blocks.SPONGE) || state.is(BlockTags.ICE)) {
+        if (state.is(BlockTags.LEAVES) || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES) || state.is(BlockTags.SAND) || state.is(BlockTags.SNOW) || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || state.is(Blocks.SPONGE) || state.is(BlockTags.ICE)) {
             level().setBlockAndUpdate(blockHitResult.getBlockPos(), Blocks.AIR.defaultBlockState());
             return;
         }

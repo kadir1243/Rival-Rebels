@@ -15,8 +15,10 @@ package assets.rivalrebels.client.gui;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.common.container.ContainerLaptop;
+import assets.rivalrebels.common.packet.LaptopPressPacket;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -39,7 +41,7 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
         this.clearWidgets();
-		button = new GuiButton(x + 131, y + 89, 16, 16, Component.empty(), button1 -> menu.onGoButtonPressed());
+		button = new GuiButton(x + 131, y + 89, 16, 16, Component.empty(), button1 -> ClientPlayNetworking.send(new LaptopPressPacket(menu.getLaptopPos())));
 		addRenderableWidget(button);
 	}
 

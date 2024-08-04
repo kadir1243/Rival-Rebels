@@ -14,10 +14,7 @@ package assets.rivalrebels;
 import assets.rivalrebels.client.gui.*;
 import assets.rivalrebels.client.renderentity.*;
 import assets.rivalrebels.client.tileentityrender.*;
-import assets.rivalrebels.common.entity.EntityBloodFX;
-import assets.rivalrebels.common.entity.EntityGore;
-import assets.rivalrebels.common.entity.EntityRhodes;
-import assets.rivalrebels.common.entity.RREntities;
+import assets.rivalrebels.common.entity.*;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.fabricmc.api.EnvType;
@@ -28,17 +25,23 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
+import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 public class ClientProxy extends CommonProxy {
-    public static final KeyMapping USE_KEY = new KeyMapping("use_key", GLFW_KEY_F, "");
-    public static final KeyMapping TARGET_KEY = new KeyMapping("target_key", InputConstants.Type.MOUSE, GLFW_MOUSE_BUTTON_LEFT, "");
+    public static final KeyMapping USE_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".use_key", GLFW_KEY_F, "key." + RRIdentifiers.MODID);
+    public static final KeyMapping TARGET_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".target_key", InputConstants.Type.MOUSE, GLFW_MOUSE_BUTTON_LEFT, "key." + RRIdentifiers.MODID);
+    public static final KeyMapping GUARD_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".guard_key", GLFW_KEY_G, "key." + RRIdentifiers.MODID);
 
     @Environment(EnvType.CLIENT)
     public static void registerKeyBinding() {
         KeyBindingHelper.registerKeyBinding(USE_KEY);
+        KeyBindingHelper.registerKeyBinding(TARGET_KEY);
+        KeyBindingHelper.registerKeyBinding(GUARD_KEY);
     }
 
 	@Environment(EnvType.CLIENT)
@@ -113,6 +116,17 @@ public class ClientProxy extends CommonProxy {
 		EntityRendererRegistry.register(RREntities.ANTIMATTER_BOMB_BLAST, RenderAntimatterBombBlast::new);
 		EntityRendererRegistry.register(RREntities.TACHYON_BOMB, RenderTachyonBomb::new);
 		EntityRendererRegistry.register(RREntities.TACHYON_BOMB_BLAST, RenderTachyonBombBlast::new);
+        EntityRendererRegistry.register(RREntities.RAYTRACE, context -> new EntityRenderer<>(context) {
+            @Override
+            public ResourceLocation getTextureLocation(EntityRaytrace entity) {
+                return null;
+            }
+
+            @Override
+            public boolean shouldRender(EntityRaytrace livingEntity, Frustum camera, double camX, double camY, double camZ) {
+                return false;
+            }
+        });
 	}
 
     @Override
@@ -191,7 +205,7 @@ public class ClientProxy extends CommonProxy {
 	@Override
 	public boolean f()
 	{
-		return glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_F) == GLFW_PRESS && Minecraft.getInstance().screen == null;
+		return USE_KEY.isDown() && Minecraft.getInstance().screen == null;
 	}
 	boolean prevc = false;
 	public boolean c()
@@ -202,22 +216,22 @@ public class ClientProxy extends CommonProxy {
 		return x;
 	}
 	boolean prevx = false;
-	@Override
-	public boolean x()
-	{
+
+    @Override
+	public boolean x() {
 		boolean isdown = glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_X) == GLFW_PRESS && Minecraft.getInstance().screen == null;
 		boolean x = !prevx && isdown;
 		prevx = isdown;
 		return x;
 	}
-	@Override
-	public boolean z()
-	{
+
+    @Override
+	public boolean z() {
 		return glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_Z) == GLFW_PRESS && Minecraft.getInstance().screen == null;
 	}
-	public boolean g()
-	{
-		return glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_G) == GLFW_PRESS && Minecraft.getInstance().screen == null;
+
+    public boolean g() {
+		return GUARD_KEY.isDown() && Minecraft.getInstance().screen == null;
 	}
 
 	@Override

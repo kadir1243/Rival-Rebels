@@ -14,23 +14,18 @@ package assets.rivalrebels.client.itemrenders;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocket;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class RocketRenderer implements DynamicItemRenderer {
-    public static final Material ROCKET_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrocket);
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(0.8f, 0.3f, -0.03f);
 		matrices.scale(2, 2, 2);
 
-		ModelRocket.render(matrices, ROCKET_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), true, light, overlay);
+		ModelRocket.render(matrices, vertexConsumers, RRIdentifiers.etrocket, true, light, overlay);
 
 		matrices.popPose();
 	}

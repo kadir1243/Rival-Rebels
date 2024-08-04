@@ -64,13 +64,13 @@ public class EntityLaserBurst extends EntityInanimate {
 		this(par1World);
 		shooter = player;
 		moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
             getY() - 0.12D,
-            getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.2F));
+            getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
 		setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         setAccurateHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 4F, 0.075f);
 	}
@@ -79,15 +79,15 @@ public class EntityLaserBurst extends EntityInanimate {
 	{
 		this(par1World);
 		shooter = player;
-		moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+		moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
             player.getY() + player.getEyeHeight(player.getPose()) - 0.12D,
-            player.getZ() - (Mth.sin(getYRot() / 180.0F * (float) Math.PI) * 0.2F),
+            player.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F),
             player.getYRot(),
             player.getXRot());
 
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (Mth.cos(getYRot() / 180.0F * (float) Math.PI) * Mth.cos(getXRot() / 180.0F * (float) Math.PI)),
-            (-Mth.sin(getXRot() / 180.0F * (float) Math.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         setAccurateHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 4F * (float)random.nextDouble() + 1.0F, accurate?0.001F:0.075F);
 	}
@@ -100,8 +100,8 @@ public class EntityLaserBurst extends EntityInanimate {
 	public void setAnglesMotion(double mx, double my, double mz)
 	{
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
 	public EntityLaserBurst(Level par1World, double x, double y, double z, double mx, double my, double mz, LivingEntity player)
@@ -126,8 +126,8 @@ public class EntityLaserBurst extends EntityInanimate {
 		par5 *= par7;
         setDeltaMovement(par1, par3, par5);
 		float var10 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-		setYRot(yRotO = (float) (Math.atan2(par1, par5) * 180.0D / Math.PI));
-		setXRot(xRotO = (float) (Math.atan2(par3, var10) * 180.0D / Math.PI));
+		setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
+		setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
 	}
 
 	@Override
@@ -339,9 +339,9 @@ public class EntityLaserBurst extends EntityInanimate {
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var16 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
-		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * 180.0D / Math.PI));
+		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
-		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * 180.0D / Math.PI)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
+		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
 		{
         }
 		while (getXRot() - xRotO >= 180.0F)

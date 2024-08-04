@@ -1,6 +1,6 @@
 package assets.rivalrebels.datagen;
 
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
@@ -27,7 +27,7 @@ public class DataGen implements DataGeneratorEntrypoint {
     public void buildRegistry(RegistrySetBuilder registryBuilder) {
         registryBuilder.add(Registries.DAMAGE_TYPE, bootstrapContext -> {
             for (ResourceKey<DamageType> type : RivalRebelsDamageSource.RRDamageTypes.REGISTERED_DAMAGE_TYPES) {
-                bootstrapContext.register(type, new DamageType(RivalRebels.MODID + "." + type.location().getPath(), 1F));
+                bootstrapContext.register(type, new DamageType(RRIdentifiers.MODID + "." + type.location().getPath(), 1F));
             }
         });
     }

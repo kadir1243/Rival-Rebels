@@ -3,13 +3,20 @@ package assets.rivalrebels.mixin.client;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
 import com.llamalad7.mixinextras.sugar.Local;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.layers.HumanoidArmorLayer;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -17,9 +24,12 @@ import java.util.List;
 
 @Mixin(HumanoidArmorLayer.class)
 @Environment(EnvType.CLIENT)
-public class ArmorFeatureRendererMixin {
+public abstract class ArmorFeatureRendererMixin {
+    @Shadow
+    protected abstract void renderModel(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, HumanoidModel<LivingEntity> model, int dyeColor, ResourceLocation textureLocation);
+
     @Redirect(method = "renderArmorPiece", at = @At(value = "INVOKE", target = "Lnet/minecraft/world/item/ArmorMaterial;layers()Ljava/util/List;"))
-    private List<ArmorMaterial.Layer> getArmorTexture(ArmorMaterial instance, @Local ItemStack stack) {
+    private List<ArmorMaterial.Layer> getArmorTexture(ArmorMaterial instance, PoseStack poseStack, MultiBufferSource bufferSource, LivingEntity livingEntity, EquipmentSlot slot, int packedLight, HumanoidModel<LivingEntity> model, @Local ItemStack stack) {
         Item item = stack.getItem();
         String name;
         if (item == RRItems.camohat || item == RRItems.camoshirt || item == RRItems.camoshoes)
@@ -66,7 +76,8 @@ public class ArmorFeatureRendererMixin {
         else name = null;
 
         if (name != null) {
-            return List.of(new ArmorMaterial.Layer(RRIdentifiers.create(name)));
+            this.renderModel(poseStack, bufferSource, packedLight, model, -1, RRIdentifiers.create(name)); // direct rendering
+            return List.of();
         }
         return instance.layers();
     }

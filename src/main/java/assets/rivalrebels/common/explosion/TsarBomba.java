@@ -19,6 +19,7 @@ import assets.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -64,7 +65,7 @@ public class TsarBomba
 			{
 				if (x2 + Z * Z < rad)
 				{
-					for (int Y = 70; Y > 0; Y--)
+					for (int Y = 70; Y > world.getMinBuildHeight(); Y--)
 					{
                         BlockState state = world.getBlockState(new BlockPos(X + posX, Y, Z + posZ));
 						if (!state.getFluidState().isEmpty()) {
@@ -82,9 +83,9 @@ public class TsarBomba
 		{
 			boolean repeat = processChunk(lastposX, lastposZ);
 
-			shell = (int) Math.floor((Math.sqrt(n) + 1) / 2);
+			shell = Mth.floor((Mth.sqrt(n) + 1) / 2);
 			int shell2 = 2 * shell;
-			leg = (int) Math.floor((n - (shell2 - 1) * (shell2 - 1)) / shell2);
+			leg = Mth.floor((n - (shell2 - 1) * (shell2 - 1)) / shell2);
 			element = (n - (shell2 - 1) * (shell2 - 1)) - shell2 * leg - shell + 1;
 			lastposX = leg == 0 ? shell : leg == 1 ? -element : leg == 2 ? -shell : element;
 			lastposZ = leg == 0 ? element : leg == 1 ? shell : leg == 2 ? -element : -shell;
@@ -117,7 +118,7 @@ public class TsarBomba
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
 			if (RRConfig.SERVER.isElevation()) yele = y;
-			int ylimit = (int) Math.floor(yele - ((radius - dist) / 2) + (Math.sin(dist * 0.5) * 1.15));
+			int ylimit = Mth.floor(yele - ((radius - dist) / 2) + (Math.sin(dist * 0.5) * 1.15));
 
 			for (int Y = y; Y > ylimit; Y--)
 			{
@@ -137,7 +138,7 @@ public class TsarBomba
 				if (x > 0 && z >= 0) blockType = 2;
 				if (x <= 0 && z > 0) blockType = 3;
 				if (x < 0 && z <= 0) blockType = 4;
-				int metadata = (int) Math.ceil((16d / limit) * dist);
+				int metadata = Mth.ceil((16d / limit) * dist);
 				metadata -= (radius / 10) - 1;
 				if (metadata < 0) metadata = -metadata;
 				metadata++;
@@ -159,7 +160,7 @@ public class TsarBomba
 			if (isTree)
 			{
 				isTree = false;
-				int metadata = (int) Math.floor((16d / radius) * dist);
+				int metadata = Mth.floor((16d / radius) * dist);
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
@@ -176,16 +177,14 @@ public class TsarBomba
 		{
 			dist = Math.sqrt(dist);
 			int y = getTopBlock(x + posX, z + posZ, dist);
-			int ylimit = (int) Math.ceil(Math.sin((dist - radius - (radius / 16)) * radius * 0.001875) * (radius / 16));
+			int ylimit = Mth.ceil(Math.sin((dist - radius - (radius / 16)) * radius * 0.001875) * (radius / 16));
 			if (dist >= radius + 5)
 			{
-				int metadata = (int) Math.floor((16d / radius) * dist);
+				int metadata = Mth.floor((16d / radius) * dist);
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y >= 0; Y--)
-				{
-					if (Y == 0) break;
+				for (int Y = ylimit; Y >= world.getMinBuildHeight(); Y--) {
 					int yy = Y + y;
 					Block blockID = world.getBlockState(new BlockPos(x + posX, yy, z + posZ)).getBlock();
 					if (blockID == RRBlocks.omegaobj) RivalRebels.round.winSigma();
@@ -215,7 +214,7 @@ public class TsarBomba
 				if (isTree)
 				{
 					isTree = false;
-					int metadata = (int) Math.floor((16d / radius) * dist);
+					int metadata = Mth.floor((16d / radius) * dist);
 					if (metadata < 0) metadata = 0;
 					metadata++;
 					if (metadata > 15) metadata = 15;
@@ -232,9 +231,9 @@ public class TsarBomba
 
 	private int getTopBlock(int x, int z, double dist)
 	{
-		int foundY = 0;
+		int foundY = world.getMinBuildHeight();
 		boolean found = false;
-		for (int y = 256; y > 0; y--)
+		for (int y = world.getMaxBuildHeight(); y > world.getMinBuildHeight(); y--)
 		{
             BlockPos pos = new BlockPos(x, y, z);
             BlockState state = world.getBlockState(pos);

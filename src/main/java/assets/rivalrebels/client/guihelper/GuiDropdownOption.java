@@ -24,23 +24,16 @@ import org.joml.Vector2i;
 
 @Environment(EnvType.CLIENT)
 public class GuiDropdownOption extends Button {
-	Rectangle		bbox;
-	public boolean	isPressed	= false;
-	public boolean	mouseDown	= false;
-	public GuiTray	t;
+    public GuiTray t;
 
-	public GuiDropdownOption(Vector2i p, int l, int n, Component text, GuiTray tray) {
-		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, button -> {}, DEFAULT_NARRATION);
-		bbox = new Rectangle(p.x, p.y + n * 10, l, (n + 1) * 10);
-		t = tray;
+	public GuiDropdownOption(Vector2i p, int l, int n, Component text, Button.OnPress onPress, GuiTray tray) {
+		super(p.x, p.y + n * 10, l, (n + 1) * 10, text, onPress, DEFAULT_NARRATION);
+        t = tray;
 	}
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		boolean inside = bbox.isVecInside(new Vector2i(mouseX, mouseY));
-		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && inside;
-		boolean on = t.getMenu().hasWepReqs();
-		if (current && !mouseDown && on) isPressed = !isPressed;
+        boolean on = t.getMenu().hasWepReqs();
 		int color = 0x999999;
 		if (on) {
 			RivalRebelsTeam team = RivalRebelsTeam.NONE;
@@ -53,8 +46,7 @@ public class GuiDropdownOption extends Button {
                 case SIGMA -> 0x5555ff;
             };
 		}
-		if (inside && on) color = 0xffffff;
-        context.drawCenteredString(Minecraft.getInstance().font, getMessage(), bbox.xMin + 1, bbox.yMin + 1, color);
-		mouseDown = current;
+		if (isMouseOver(mouseX, mouseY) && on) color = 0xffffff;
+        context.drawCenteredString(Minecraft.getInstance().font, getMessage(), this.getX() + 1, this.getY() + 1, color);
 	}
 }

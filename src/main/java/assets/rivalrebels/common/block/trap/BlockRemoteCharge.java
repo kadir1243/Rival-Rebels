@@ -36,7 +36,6 @@ import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -66,31 +65,25 @@ public class BlockRemoteCharge extends FallingBlock {
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return Shapes.create(new AABB(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f));
+		return Shapes.create(f1, 0.0F, f, 1.0F - f, f2, 1.0F - f);
 	}
 
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
 		int meta = state.getValue(META);
 		float f = 0.0625F;
 		float f1 = (1 + meta * 2) / 16F;
 		float f2 = 0.5F;
-		return Shapes.create(new AABB(x + f1, y, z + f, (x + 1) - f, (y + f2) - f, (z + 1) - f));
+		return Shapes.create(f1, 0, f, 1 - f, f2 - f, 1 - f);
 	}
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
         int i = state.getValue(META);
 		float f = 0.0625F;
 		float f1 = (1 + i * 2) / 16F;
 		float f2 = 0.5F;
-		return Shapes.create(new AABB(x + f1, y, z + f, (x + 1) - f, y + f2, (z + 1) - f));
+		return Shapes.create(f1, 0, f, 1 - f, f2, 1 - f);
 	}
 
     @Override

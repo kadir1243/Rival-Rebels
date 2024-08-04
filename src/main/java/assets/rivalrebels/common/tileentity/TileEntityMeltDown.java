@@ -26,27 +26,22 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class TileEntityMeltDown extends BlockEntity implements Tickable
-{
+public class TileEntityMeltDown extends BlockEntity implements Tickable {
+    private static final float INCREMENT_AMOUNT = 0.075f;
 	public float	size		= 0;
-	float			increment	= 0.075f;
-	float			prevsize	= 0;
 
     public TileEntityMeltDown(BlockPos pos, BlockState state) {
         super(RRTileEntities.MELT_DOWN, pos, state);
     }
 
     @Override
-	public void tick()
-	{
-		prevsize = size;
-		size += increment;
-		if (prevsize == 0)
-		{
-			RivalRebelsSoundPlayer.playSound(level, 16, 0, getBlockPos(), 4);
-		}
-		if (size > 9.3f)
-		{
+	public void tick() {
+        if (size == 0) {
+            RivalRebelsSoundPlayer.playSound(level, 16, 0, getBlockPos(), 4);
+        }
+		size += INCREMENT_AMOUNT;
+
+		if (size > 9.3f) {
 			size = 0f;
 			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 			this.setRemoved();

@@ -12,7 +12,6 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.explosion.NuclearExplosion;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -42,7 +41,7 @@ public class EntityB83NoShroom extends EntityB83
 	{
 		new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength()/2);
 		EntitySphereBlast etb = new EntitySphereBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f);
-		etb.time = -920;
+		etb.tickCount = -920;
 		level().addFreshEntity(etb);
 		this.kill();
 	}

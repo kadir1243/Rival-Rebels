@@ -34,7 +34,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -43,15 +42,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 
-public class TileEntityAntimatterBomb extends BlockEntity implements Container, Tickable, MenuProvider
-{
+public class TileEntityAntimatterBomb extends BaseContainerBlockEntity implements Tickable {
 	public GameProfile player = null;
 	public RivalRebelsTeam	rrteam			= null;
-	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(36, ItemStack.EMPTY);
+	private NonNullList<ItemStack> items = NonNullList.withSize(36, ItemStack.EMPTY);
 
 	public int				countdown		= RRConfig.SERVER.getNuclearBombCountdown() * 20;
 	public int				nuclear			= 0;
@@ -74,60 +71,25 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 	}
 
     @Override
-	public ItemStack getItem(int slot)
-	{
-		return this.chestContents.get(slot);
-	}
-
-    @Override
-    public ItemStack removeItem(int slot, int amount) {
-		if (!this.getItem(slot).isEmpty()) {
-			ItemStack var3;
-
-			if (this.getItem(slot).getCount() <= amount) {
-				var3 = this.getItem(slot);
-				this.setItem(slot, ItemStack.EMPTY);
-            } else {
-				var3 = this.getItem(slot).split(amount);
-
-				if (this.getItem(slot).isEmpty()) {
-					this.setItem(slot, ItemStack.EMPTY);
-				}
-
-            }
-            return var3;
-        }
-        return ItemStack.EMPTY;
+    protected NonNullList<ItemStack> getItems() {
+        return this.items;
     }
 
     @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-		if (!this.getItem(slot).isEmpty())
-		{
-			ItemStack var2 = this.getItem(slot);
-			this.setItem(slot, ItemStack.EMPTY);
-			return var2;
-		}
-        return ItemStack.EMPTY;
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.items = items;
     }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-		this.chestContents.set(slot, stack);
-
-        stack.limitSize(this.getMaxStackSize(stack));
-	}
 
     @Override
     public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
-        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
+        ContainerHelper.loadAllItems(nbt, this.items, provider);
 	}
 
     @Override
     public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.saveAdditional(nbt, provider);
-        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
+        ContainerHelper.saveAllItems(nbt, this.items, provider);
     }
 
     @Override
@@ -143,72 +105,44 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 	}
 
     @Override
+    public void setChanged() {
+        super.setChanged();
+
+        nuclear = 0;
+        hydrogen = 0;
+        for (int i = 3; i <= 18; i++) {
+            ItemStack is = getItem(i);
+            if (!is.isEmpty() && is.isEnchanted()) {
+                Item item = is.getItem();
+                if (i < 11 && item == RRItems.NUCLEAR_ROD) {
+                    nuclear++;
+                } else if (i > 10 && item == RRItems.redrod) {
+                    hydrogen++;
+                }
+                if (item == RRItems.trollmask) {
+                    hasTrollface = true;
+                }
+            }
+        }
+        if (nuclear == hydrogen) megaton = nuclear * 6.25f;
+
+        hasFuse = getItem(0).is(RRItems.fuse);
+
+        hasChip = getItem(20).is(RRItems.chip);
+        if (hasChip && getItem(20).has(RRComponents.CHIP_DATA)) {
+            ChipData chipData = getItem(20).get(RRComponents.CHIP_DATA);
+            rrteam = chipData.team();
+            player = chipData.gameProfile();
+        }
+
+        hasAntennae = getItem(1).is(RRItems.antenna) && getItem(2).is(RRItems.antenna);
+
+        hasExplosive = getItem(19).is(RRBlocks.timedbomb.asItem());
+    }
+
+    @Override
 	public void tick() {
-		nuclear = 0;
-		hydrogen = 0;
-		for (int i = 3; i <= 18; i++) {
-			ItemStack is = getItem(i);
-			if (!is.isEmpty() && is.isEnchanted()) {
-				Item item = is.getItem();
-				if (i < 11 && item == RRItems.NUCLEAR_ROD)
-				{
-					nuclear++;
-				}
-				else if (i > 10 && item == RRItems.redrod)
-				{
-					hydrogen++;
-				}
-				if (item == RRItems.trollmask)
-				{
-					hasTrollface = true;
-				}
-			}
-		}
-		if (nuclear == hydrogen) megaton = nuclear * 6.25f;
-
-		if (!getItem(0).isEmpty())
-		{
-			hasFuse = getItem(0).is(RRItems.fuse);
-		}
-		else
-		{
-			hasFuse = false;
-		}
-
-		if (!getItem(20).isEmpty())
-		{
-			hasChip = getItem(20).is(RRItems.chip);
-			if (hasChip && getItem(20).has(RRComponents.CHIP_DATA))
-			{
-                ChipData chipData = getItem(20).get(RRComponents.CHIP_DATA);
-                rrteam = chipData.team();
-				player = chipData.gameProfile();
-			}
-		}
-		else
-		{
-			hasChip = false;
-		}
-
-		if (!getItem(1).isEmpty() && !getItem(2).isEmpty())
-		{
-			hasAntennae = getItem(1).is(RRItems.antenna) && getItem(2).is(RRItems.antenna);
-		}
-		else
-		{
-			hasAntennae = false;
-		}
-
-		if (!getItem(19).isEmpty())
-		{
-			hasExplosive = true;// getStack(19).func_150998_b(RivalRebels.timedbomb);
-		}
-		else
-		{
-			hasExplosive = false;
-		}
-
-		boolean sp;
+        boolean sp;
         if (level.isClientSide()) {
             sp = Minecraft.getInstance().isLocalServer();
         } else {
@@ -240,7 +174,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.displayClientMessage(RRIdentifiers.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
+                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
 		}
@@ -276,24 +210,13 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
     }
 
     @Override
-    public Component getDisplayName() {
+    protected Component getDefaultName() {
         return Component.nullToEmpty("Antimatter Bomb");
     }
 
     @Override
-    public boolean isEmpty() {
-        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
-    }
-
-    @Override
-    public void clearContent() {
-        this.chestContents.clear();
-    }
-
-    @Nullable
-    @Override
-    public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerAntimatterBomb(syncId, inv, this, propertyDelegate);
+    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+        return new ContainerAntimatterBomb(containerId, inventory, this, propertyDelegate);
     }
 
     private final ContainerData propertyDelegate = new ContainerData() {
@@ -303,7 +226,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
                 case 0 -> countdown;
                 case 1 -> nuclear != hydrogen ? 1 : 0;
                 case 2 -> hasExplosive && hasFuse && hasAntennae ? 1 : 0;
-                case 3 -> Float.floatToIntBits(megaton);
+                case 3 -> (int) (megaton * 100);
                 default -> 0;
             };
         }
@@ -312,6 +235,7 @@ public class TileEntityAntimatterBomb extends BlockEntity implements Container, 
         public void set(int index, int value) {
             switch (index) {
                 case 0 -> countdown = value;
+                case 3 -> megaton = value / 100F;
                 default -> {}
             }
         }

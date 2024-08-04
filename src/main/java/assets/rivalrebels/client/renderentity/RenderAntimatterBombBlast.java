@@ -16,26 +16,25 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelAntimatterBombBlast;
 import assets.rivalrebels.client.model.ModelBlastRing;
 import assets.rivalrebels.client.model.ModelBlastSphere;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityAntimatterBombBlast;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
-import org.joml.Quaternionf;
+import org.joml.Vector3f;
 
 public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast> {
-    public static final Material ANTIMATTER_BLAST_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etantimatterblast);
     private final ModelAntimatterBombBlast modelabomb = new ModelAntimatterBombBlast();
 
 	public RenderAntimatterBombBlast(EntityRendererProvider.Context manager)
@@ -46,48 +45,46 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
     @Override
     public void render(EntityAntimatterBombBlast entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         RandomSource random = entity.getCommandSenderWorld().random;
-        entity.time++;
 		double radius = (((entity.getDeltaMovement().x() * 10) - 1) * ((entity.getDeltaMovement().x() * 10) - 1) * 2) + RRConfig.SERVER.getTsarBombaStrength();
 		matrices.pushPose();
 		matrices.pushPose();
 		matrices.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
-		float size = (entity.time % 100) * 2.0f;
-		ModelBlastRing.renderModel(matrices, vertexConsumers.getBuffer(RenderType.solid()), size, 64, 6f, 2f, 0f, 0f, 0f, (float)entity.getX(), (float)entity.getY(), (float)entity.getZ(), FastColor.ARGB32.colorFromFloat(1, 0, 0, 0.2F), light, OverlayTexture.NO_OVERLAY);
+		float size = (entity.tickCount % 100) * 2.0f;
+		ModelBlastRing.renderModel(matrices, vertexConsumers.getBuffer(RenderType.solid()), size, 64, 6f, 2f, 0f, 0f, 0f, 0, 0, 0, FastColor.ARGB32.colorFromFloat(1, 0, 0, 0.2F), light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
-		if (entity.time < 60) {
-			double elev = entity.time / 5f;
-			matrices.translate(entity.getX(), entity.getY() + elev, entity.getZ());
-			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time, CommonColors.WHITE);
+		if (entity.tickCount < 60) {
+			double elev = entity.tickCount / 5f;
+			matrices.translate(0, elev, 0);
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.tickCount, CommonColors.WHITE);
 		}
 		else
 		{
 			//double elev = Math.sin(entity.time * 0.1f) * 5.0f + 60.0f;
 			//double noisy = 5.0f;
 			//double hnoisy = noisy * 0.5f;
-			matrices.translate(entity.getX(), entity.getY(), entity.getZ());
 			matrices.scale((float) (radius * 0.06f), (float) (radius * 0.06f), (float) (radius * 0.06f));
-			modelabomb.render(matrices, ANTIMATTER_BLAST_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+			modelabomb.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etantimatterblast)), light);
 			/*modelsphere.renderModel(50.0f, 0.0f, 0.0f, 0.0f, 1.0f, false);
 			matrices.push();
-			//RenderSystem.translatef(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
+			//matrices.translate(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
 			RenderSystem.rotatef((float) (elev * 2), 0, 1, 0);
 			RenderSystem.rotatef((float) (elev * 3), 1, 0, 0);
 			modelsphere.renderModel((float) elev, 0.2f, 0.6f, 1, 1f);
 			matrices.pop();
 			matrices.push();
-			//RenderSystem.translatef(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
+			//matrices.translate(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
 			RenderSystem.rotatef((float) (elev * -2), 0, 1, 0);
 			RenderSystem.rotatef((float) (elev * 4), 0, 0, 1);
 			modelsphere.renderModel((float) (elev - 0.2f), 0.6f, 0.2f, 1, 1f);
 			matrices.pop();
 			matrices.push();
-			//RenderSystem.translatef(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
+			//matrices.translate(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
 			RenderSystem.rotatef((float) (elev * -3), 1, 0, 0);
 			RenderSystem.rotatef((float) (elev * 2), 0, 0, 1);
 			modelsphere.renderModel((float) (elev - 0.4f), 0.4f, 0, 1, 1f);
 			matrices.pop();
 			matrices.push();
-			//RenderSystem.translatef(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
+			//matrices.translate(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
 			RenderSystem.rotatef((float) (elev * -1), 0, 1, 0);
 			RenderSystem.rotatef((float) (elev * 3), 0, 0, 1);
 			modelsphere.renderModel((float) (elev - 0.6f), 0, 0.4f, 1, 1);
@@ -105,9 +102,9 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 			}
 			RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE);
 			matrices.scale(random.nextFloat(), random.nextFloat(), random.nextFloat());
-			matrices.mulPose(new Quaternionf(random.nextFloat(), random.nextFloat(), random.nextFloat(), random.nextFloat() * 360));
+			matrices.mulPose(Axis.of(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat())).rotationDegrees(random.nextFloat() * 360));
 			matrices.translate(random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f);
-			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.time, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble(), 1);
+			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.tickCount, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble(), 1);
 		}
 	}
 

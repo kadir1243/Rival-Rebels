@@ -13,20 +13,13 @@ package assets.rivalrebels.client.itemrenders;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ObjModels;
-import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class RodaRenderer implements DynamicItemRenderer {
-    public static final Material RUST_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrust);
-
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
@@ -37,9 +30,9 @@ public class RodaRenderer implements DynamicItemRenderer {
 		if (!mode.firstPerson()) matrices.scale(-1, 1, 1);
 		matrices.translate(0.2f, -0.55f, 0.1f);
 
-        ObjModels.roda.render(matrices, RUST_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        ObjModels.renderSolid(ObjModels.roda, RRIdentifiers.etrust, matrices, vertexConsumers, light, overlay);
 		matrices.pushPose();
-		ObjModels.roda.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, overlay);
+		ObjModels.renderNoise(ObjModels.roda, matrices, vertexConsumers, light, overlay);
 		matrices.popPose();
 
 		matrices.popPose();

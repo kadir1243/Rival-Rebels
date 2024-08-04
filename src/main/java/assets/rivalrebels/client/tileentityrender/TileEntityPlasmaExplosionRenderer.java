@@ -20,18 +20,18 @@ import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<TileEntityPlasmaExplosion>, CustomRenderBoxExtension<TileEntityPlasmaExplosion> {
-
     public TileEntityPlasmaExplosionRenderer(BlockEntityRendererProvider.Context context) {
 	}
 
     @Override
     public void render(TileEntityPlasmaExplosion entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		float fsize = (float) Math.sin(entity.size);
+		float fsize = Mth.sin(entity.size);
 		matrices.pushPose();
 		matrices.translate(0.5F, 0.5F, 0.5F);
 

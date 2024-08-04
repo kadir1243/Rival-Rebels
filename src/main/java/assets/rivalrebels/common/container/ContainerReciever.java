@@ -27,16 +27,16 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerReciever extends AbstractContainerMenu {
 	protected Container reciever;
-    private final ContainerData propertyDelegate;
+    private final ContainerData containerData;
 
     public ContainerReciever(int syncId, Inventory playerInv) {
         this(syncId, playerInv, new SimpleContainer(9), new SimpleContainerData(7));
     }
 
-	public ContainerReciever(int syncId, Inventory inventoryPlayer, Container reciever, ContainerData propertyDelegate) {
+	public ContainerReciever(int syncId, Inventory inventoryPlayer, Container reciever, ContainerData containerData) {
         super(RivalRebelsGuiHandler.RECIEVER_SCREEN_HANDLER_TYPE, syncId);
         this.reciever = reciever;
-        this.propertyDelegate = propertyDelegate;
+        this.containerData = containerData;
         addSlot(new SlotRR(reciever, 0, 8, 76, 64, RRItems.fuel));
 		addSlot(new SlotRR(reciever, 1, 26, 76, 64, RRItems.fuel));
 		addSlot(new SlotRR(reciever, 2, 44, 76, 64, RRItems.fuel));
@@ -47,6 +47,7 @@ public class ContainerReciever extends AbstractContainerMenu {
 		addSlot(new SlotRR(reciever, 7, 134, 94, 1, BlockWeapons.class));
 		addSlot(new SlotRR(reciever, 8, 152, 94, 1, BlockWeapons.class));
 		bindPlayerInventory(inventoryPlayer);
+        addDataSlots(containerData);
 	}
 
 	@Override
@@ -77,50 +78,50 @@ public class ContainerReciever extends AbstractContainerMenu {
 	}
 
     public int getYawLimit() {
-        return propertyDelegate.get(0);
+        return containerData.get(0);
     }
 
     public void setYawLimit(int yawLimit) {
-        propertyDelegate.set(0, yawLimit);
+        containerData.set(0, yawLimit);
     }
 
     public boolean getKTeam() {
-        return propertyDelegate.get(1) == 1;
+        return containerData.get(1) == 1;
     }
 
     public boolean getKPlayers() {
-        return propertyDelegate.get(2) == 1;
+        return containerData.get(2) == 1;
     }
 
     public boolean getKMobs() {
-        return propertyDelegate.get(3) == 1;
+        return containerData.get(3) == 1;
     }
 
     public void setKTeam(boolean kTeam) {
-        propertyDelegate.set(1, kTeam ? 1 : 0);
+        containerData.set(1, kTeam ? 1 : 0);
     }
 
     public void setKPlayers(boolean kPlayers) {
-        propertyDelegate.set(2, kPlayers ? 1 : 0);
+        containerData.set(2, kPlayers ? 1 : 0);
     }
 
     public void setKMobs(boolean kMobs) {
-        propertyDelegate.set(3, kMobs ? 1 : 0);
+        containerData.set(3, kMobs ? 1 : 0);
     }
 
     public boolean hasWeapon() {
-        return propertyDelegate.get(4) == 1;
+        return containerData.get(4) == 1;
     }
 
     public boolean hasWepReqs() {
-        return propertyDelegate.get(5) == 1;
+        return containerData.get(5) == 1;
     }
 
     public void setWep(boolean wep) {
-        propertyDelegate.set(5, wep ? 1 : 0);
+        containerData.set(5, wep ? 1 : 0);
     }
 
     public float getPInR() {
-        return Float.intBitsToFloat(propertyDelegate.get(6));
+        return Float.intBitsToFloat(containerData.get(6));
     }
 }

@@ -16,6 +16,9 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -57,7 +60,8 @@ public class ModelNuclearBomb {
     private static final Vector3f v19 = new Vector3f(-s, -g * 24, -s);
     private static final Vector3f v20 = new Vector3f(-s, -g * 24, s);
 
-    public static void renderModel(PoseStack matrices, VertexConsumer buffer, int light, boolean hasFuse) {
+    public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, ResourceLocation texture, int light, boolean hasFuse) {
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
         matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         int itemIcon = 39;
@@ -73,14 +77,17 @@ public class ModelNuclearBomb {
         RenderHelper.addVertice(matrices, buffer, v1, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v5, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v6, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
+
         RenderHelper.addVertice(matrices, buffer, v3, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v2, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v6, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v7, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
+
         RenderHelper.addVertice(matrices, buffer, v4, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v3, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v7, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v8, new TextureVertice(var3, var5), light, OverlayTexture.NO_OVERLAY);
+
         RenderHelper.addVertice(matrices, buffer, v1, new TextureVertice(var3, var6), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v4, new TextureVertice(var4, var6), light, OverlayTexture.NO_OVERLAY);
         RenderHelper.addVertice(matrices, buffer, v8, new TextureVertice(var4, var5), light, OverlayTexture.NO_OVERLAY);
@@ -93,37 +100,44 @@ public class ModelNuclearBomb {
         var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
         buffer.addVertex(matrices.last(), v6).setUv(var3, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v5.x, v5.y, v5.z).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v21.x, v21.y, v21.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v22.x, v22.y, v22.z).setUv(var3, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v7.x, v7.y, v7.z).setUv(var3, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v5).setUv(var4, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v21).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v22).setUv(var3, var5).setLight(light);
+
+        buffer.addVertex(matrices.last(), v7).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v6).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v22.x, v22.y, v22.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v23.x, v23.y, v23.z).setUv(var3, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v8.x, v8.y, v8.z).setUv(var3, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v7.x, v7.y, v7.z).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v23.x, v23.y, v23.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v24.x, v24.y, v24.z).setUv(var3, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v5.x, v5.y, v5.z).setUv(var3, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v8.x, v8.y, v8.z).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v24.x, v24.y, v24.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v21.x, v21.y, v21.z).setUv(var3, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v22.x, v22.y, v22.z).setUv(var3, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v21.x, v21.y, v21.z).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v9.x, v9.y, v9.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v10.x, v10.y, v10.z).setUv(var3, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v23.x, v23.y, v23.z).setUv(var3, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v22.x, v22.y, v22.z).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v10.x, v10.y, v10.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v11.x, v11.y, v11.z).setUv(var3, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v24.x, v24.y, v24.z).setUv(var3, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v23.x, v23.y, v23.z).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v11.x, v11.y, v11.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v12.x, v12.y, v12.z).setUv(var3, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v21.x, v21.y, v21.z).setUv(var3, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v24.x, v24.y, v24.z).setUv(var4, var6).setLight(light);
-        buffer.addVertex(matrices.last(), v12.x, v12.y, v12.z).setUv(var4, var5).setLight(light);
-        buffer.addVertex(matrices.last(), v9.x, v9.y, v9.z).setUv(var3, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v22).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v23).setUv(var3, var5).setLight(light);
+
+        buffer.addVertex(matrices.last(), v8).setUv(var3, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v7).setUv(var4, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v23).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v24).setUv(var3, var5).setLight(light);
+
+        buffer.addVertex(matrices.last(), v5).setUv(var3, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v8).setUv(var4, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v24).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v21).setUv(var3, var5).setLight(light);
+
+        buffer.addVertex(matrices.last(), v22).setUv(var3, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v21).setUv(var4, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v9).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v10).setUv(var3, var5).setLight(light);
+
+        buffer.addVertex(matrices.last(), v23).setUv(var3, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v22).setUv(var4, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v10).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v11).setUv(var3, var5).setLight(light);
+
+        buffer.addVertex(matrices.last(), v24).setUv(var3, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v23).setUv(var4, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v11).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v12).setUv(var3, var5).setLight(light);
+
+        buffer.addVertex(matrices.last(), v21).setUv(var3, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v24).setUv(var4, var6).setLight(light);
+        buffer.addVertex(matrices.last(), v12).setUv(var4, var5).setLight(light);
+        buffer.addVertex(matrices.last(), v9).setUv(var3, var5).setLight(light);
 
         itemIcon = 38;
         var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -147,14 +161,17 @@ public class ModelNuclearBomb {
         buffer.addVertex(matrices.last(), v14.x * o, v14.y, v14.z * o).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v18.x * o, v18.y, v18.z * o).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v17.x * o, v17.y, v17.z * o).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v14.x * o, v14.y, v14.z * o).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v15.x * o, v15.y, v15.z * o).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v19.x * o, v19.y, v19.z * o).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v18.x * o, v18.y, v18.z * o).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v15.x * o, v15.y, v15.z * o).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v16.x * o, v16.y, v16.z * o).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v20.x * o, v20.y, v20.z * o).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v19.x * o, v19.y, v19.z * o).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v16.x * o, v16.y, v16.z * o).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v13.x * o, v13.y, v13.z * o).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v17.x * o, v17.y, v17.z * o).setUv(var4, var5).setLight(light);
@@ -163,14 +180,17 @@ public class ModelNuclearBomb {
         buffer.addVertex(matrices.last(), v13).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v17).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v18).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v15).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v14).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v18).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v19).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v16).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v15).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v19).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v20).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v13).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v16).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v20).setUv(var4, var5).setLight(light);
@@ -186,14 +206,17 @@ public class ModelNuclearBomb {
         buffer.addVertex(matrices.last(), v15).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v19).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v17).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v16).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v14).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v18).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v20).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v15).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v13).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v17).setUv(var4, var5).setLight(light);
         buffer.addVertex(matrices.last(), v19).setUv(var3, var5).setLight(light);
+
         buffer.addVertex(matrices.last(), v14).setUv(var3, var6).setLight(light);
         buffer.addVertex(matrices.last(), v16).setUv(var4, var6).setLight(light);
         buffer.addVertex(matrices.last(), v20).setUv(var4, var5).setLight(light);
@@ -216,18 +239,22 @@ public class ModelNuclearBomb {
             var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
             var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-            buffer.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
-            buffer.addVertex(matrices.last(), v1).setUv(var4, var6).setLight(light);
-            buffer.addVertex(matrices.last(), v2).setUv(var4, var5).setLight(light);
-            buffer.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
-            buffer.addVertex(matrices.last(), v2).setUv(var4, var5).setLight(light);
-            buffer.addVertex(matrices.last(), v3).setUv(var4, var6).setLight(light);
-            buffer.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
-            buffer.addVertex(matrices.last(), v3).setUv(var3, var5).setLight(light);
-            buffer.addVertex(matrices.last(), v4).setUv(var4, var5).setLight(light);
-            buffer.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
-            buffer.addVertex(matrices.last(), v4).setUv(var4, var5).setLight(light);
-            buffer.addVertex(matrices.last(), v1).setUv(var4, var6).setLight(light);
+            VertexConsumer bufferTriangles = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(texture));
+            bufferTriangles.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v1).setUv(var4, var6).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v2).setUv(var4, var5).setLight(light);
+
+            bufferTriangles.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v2).setUv(var4, var5).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v3).setUv(var4, var6).setLight(light);
+
+            bufferTriangles.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v3).setUv(var3, var5).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v4).setUv(var4, var5).setLight(light);
+
+            bufferTriangles.addVertex(matrices.last(), v0).setUv(var3, var6).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v4).setUv(var4, var5).setLight(light);
+            bufferTriangles.addVertex(matrices.last(), v1).setUv(var4, var6).setLight(light);
         }
         matrices.popPose();
         matrices.popPose();

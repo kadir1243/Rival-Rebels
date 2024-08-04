@@ -21,18 +21,14 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.core.Direction;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityNuclearBombRenderer implements BlockEntityRenderer<TileEntityNuclearBomb>, CustomRenderBoxExtension<TileEntityNuclearBomb> {
-    public static final Material TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etwacknuke);
     public TileEntityNuclearBombRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -47,7 +43,7 @@ public class TileEntityNuclearBombRenderer implements BlockEntityRenderer<TileEn
         } else {
             matrices.mulPose(Axis.YP.rotationDegrees(direction.toYRot()));
         }
-		ObjModels.nuke.render(matrices, TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ObjModels.renderSolid(ObjModels.nuke, RRIdentifiers.etwacknuke, matrices, vertexConsumers, light, overlay);
 		matrices.popPose();
 	}
 

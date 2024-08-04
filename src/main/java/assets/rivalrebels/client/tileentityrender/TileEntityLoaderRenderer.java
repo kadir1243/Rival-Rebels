@@ -25,17 +25,13 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
 @Environment(EnvType.CLIENT)
 public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityLoader>, CustomRenderBoxExtension<TileEntityLoader> {
-    public static final Material TUBE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettube);
-    public static final Material LOADER_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etloader);
-
     public TileEntityLoaderRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -45,24 +41,23 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
 		pose.translate(0.5F, 0.5F, 0.5F);
         pose.mulPose(Axis.YP.rotationDegrees(loader.getBlockState().getValue(BlockLoader.FACING).toYRot()));
 
-        VertexConsumer vertexConsumer = LOADER_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etloader));
 		ModelLoader.renderA(vertexConsumer, pose, light, overlay);
-		ModelLoader.renderB(vertexConsumer, pose, (float) loader.slide, light, overlay);
+		ModelLoader.renderB(vertexConsumer, pose, loader.slide, light, overlay);
 		pose.popPose();
         for (BlockEntity machine : loader.machines) {
 			pose.pushPose();
 			pose.translate(0.5F, 0.5F, 0.5F);
 			int xdif = machine.getBlockPos().getX() - loader.getBlockPos().getX();
 			int zdif = machine.getBlockPos().getZ() - loader.getBlockPos().getZ();
-			pose.mulPose(Axis.YP.rotationDegrees((float) (-90 + (Math.atan2(xdif, zdif) / Math.PI) * 180F)));
+			pose.mulPose(Axis.YP.rotationDegrees((float) (-90 + (Math.atan2(xdif, zdif) / Mth.PI) * 180F)));
 			pose.translate(-1f, -0.40f, 0);
 			pose.scale(0.5F, 0.15F, 0.15F);
-			int dist = (int) Math.sqrt((xdif * xdif) + (zdif * zdif));
-            VertexConsumer ettubeBuffer = TUBE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+			int dist = (int) Mth.sqrt((xdif * xdif) + (zdif * zdif));
             for (int d = 0; d < dist; d++) {
 				pose.translate(2, 0, 0);
-                ObjModels.tube.render(pose, ettubeBuffer, light, overlay);
-			}
+                ObjModels.renderSolid(ObjModels.tube, RRIdentifiers.ettube, pose, vertexConsumers, light, overlay);
+            }
 			pose.popPose();
 		}
 	}

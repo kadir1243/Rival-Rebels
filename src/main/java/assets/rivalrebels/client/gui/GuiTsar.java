@@ -51,11 +51,11 @@ public class GuiTsar extends AbstractContainerScreen<ContainerTsar> {
 		}
 		else if (menu.isArmed())
 		{
-            context.drawString(font, Component.translatable("RivalRebels.tsar.armed"), 6, imageHeight - 97, 0xFF0000, false);
+            context.drawString(font, Component.translatable(RRIdentifiers.BOMB_ARMED.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
 		}
 		else
 		{
-            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable("RivalRebels.tsar.megatons")), 6, imageHeight - 97, 0xFFFFFF, false);
+            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable(RRIdentifiers.BOMB_MEGATONS.toLanguageKey())), 6, imageHeight - 97, 0xFFFFFF, false);
 		}
     }
 

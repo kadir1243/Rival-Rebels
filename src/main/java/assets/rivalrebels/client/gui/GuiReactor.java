@@ -13,58 +13,54 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiCustomButton;
-import assets.rivalrebels.client.guihelper.GuiScroll;
+import assets.rivalrebels.client.guihelper.ReactorDockScroll;
 import assets.rivalrebels.client.guihelper.Rectangle;
-import assets.rivalrebels.common.block.BlockReactive;
-import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.container.ContainerReactor;
 import assets.rivalrebels.common.item.ItemCore;
 import assets.rivalrebels.common.item.ItemRod;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.noise.RivalRebelsSimplexNoise;
-import com.mojang.blaze3d.systems.RenderSystem;
+import assets.rivalrebels.common.packet.ReactorMachinesPacket;
+import assets.rivalrebels.common.packet.ReactorStatePacket;
 import com.mojang.blaze3d.vertex.*;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
-import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import org.joml.Vector2i;
 
 import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 @Environment(EnvType.CLIENT)
-public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
-{
+public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
     private static final DecimalFormat	df					= new DecimalFormat("0.0");
     private static final RivalRebelsSimplexNoise SIMPLEX_NOISE = new RivalRebelsSimplexNoise(RandomSource.create());
+    private static final List<ReactorMachinesPacket.MachineEntry> machineEntries = new ArrayList<>();
     private float					frame				= 0;
 	private float					resolution			= 4f;
-    private Block[]					machineslist		= { RRBlocks.forcefieldnode, RRBlocks.reactive };
-	private Block[]					machines			= { Blocks.AIR, Blocks.AIR, Blocks.AIR, Blocks.AIR };
-	private boolean[]				onmachines			= new boolean[machines.length];
-	private boolean[]				enabledmachines		= new boolean[machineslist.length];
-	private boolean[]				prevenabledmachines	= new boolean[machineslist.length];
-	private GuiScroll				scroll;
 	private GuiCustomButton			power;
 	private GuiCustomButton			eject;
-	private float					melttick			= 30;
+	private float melttick = 30;
+    private ReactorDockScroll dockWidget;
 
     public GuiReactor(ContainerReactor containerReactor, Inventory playerInventory, Component title) {
 		super(containerReactor, playerInventory, title);
         this.imageHeight = 200;
+    }
+
+    public static void onMachinesPacket(ReactorMachinesPacket packet, ClientPlayNetworking.Context context) {
+        machineEntries.clear();
+        machineEntries.addAll(packet.machines());
     }
 
     @Override
@@ -72,17 +68,21 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
         super.init();
 		int posX = (this.width - 256) / 2;
 		int posY = (this.height - 256) / 2;
-		scroll = new GuiScroll(posX + 236, posY + 127, 60);
 		power = new GuiCustomButton(new Rectangle(posX + 70, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(212, 0), true, button -> {
-            menu.toggleOn();
+            ClientPlayNetworking.send(new ReactorStatePacket(menu.getPos(), ReactorStatePacket.Type.TOGGLE_ON));
         });
 		eject = new GuiCustomButton(new Rectangle(posX + 164, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(234, 0), false, button -> {
-            menu.ejectCore();
+            ClientPlayNetworking.send(new ReactorStatePacket(menu.getPos(), ReactorStatePacket.Type.EJECT_CORE));
         });
 		power.isPressed = menu.isOn();
-		this.addRenderableWidget(scroll);
 		this.addRenderableWidget(power);
 		this.addRenderableWidget(eject);
+        dockWidget = new ReactorDockScroll(minecraft, 20, 70, 89 + width / 2, height / 2, 18);
+        this.addRenderableWidget(dockWidget);
+        for (ReactorMachinesPacket.MachineEntry entry : machineEntries) {
+            dockWidget.addEntry(new ReactorDockScroll.WidgetEntry(entry.pos(), entry.block(), entry.enabled()));
+        }
+        machineEntries.clear();
 	}
 
     @Override
@@ -101,43 +101,19 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 	}
 
     @Override
+    public void onClose() {
+        super.onClose();
+        ClientPlayNetworking.send(new ReactorMachinesPacket(menu.getPos(), this.dockWidget.children().stream().map(e -> new ReactorMachinesPacket.MachineEntry(e.getMachinePos(), e.getMachine(), e.isEnabledMachine())).toList()));
+    }
+
+    @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
 		context.blit(RRIdentifiers.guittokamak, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208);
 
-		float s = (float) scroll.scroll / (float) scroll.limit;
-		int off = Mth.floor((machineslist.length - 2) * s);
-		if (off < 0) off = 0;
-		int X = 89 + width / 2;
-		int Y = 0 + height / 2;
-		for (int i = 0; i < 4; i++)
-		{
-			if (off + i >= machineslist.length)
-			{
-				machines[i] = Blocks.AIR;
-				continue;
-			}
-			boolean current = new Rectangle(X, Y, 15, 15).isVecInside(new Vector2i(mouseX, mouseY));
-			if (off + i < machineslist.length && off + i >= 0)
-			{
-				machines[i] = machineslist[off + i];
-				onmachines[i] = enabledmachines[off + i];
-				if (minecraft.mouseHandler.isLeftPressed() && current) enabledmachines[off + i] = !prevenabledmachines[off + i];
-				else prevenabledmachines[off + i] = enabledmachines[off + i];
-			}
-			else
-			{
-				machines[i] = Blocks.AIR;
-				onmachines[i] = false;
-			}
-			Y += 18;
-		}
-
-		drawDock(context);
 		long time = System.currentTimeMillis();
 		// 1f, 1f, 1f, 0.7f, 0f, 1f, HYDROGEN
 		// 1f, 0.8f, 0f, 1f, 0f, 0f REDSTONE
-        if (menu.isOn() && menu.fuel.hasItem() && menu.core.hasItem())
-		{
+        if (menu.isOn() && menu.fuel.hasItem() && menu.core.hasItem()) {
 			float radius = 10;
 			if (menu.fuel.getItem().has(RRComponents.REACTOR_FUEL_LEFT)) radius += (((((ItemRod) menu.fuel.getItem().getItem()).power * ((ItemCore) menu.core.getItem().getItem()).timemult) - menu.fuel.getItem().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0)) / (((ItemRod) menu.fuel.getItem().getItem()).power * ((ItemCore) menu.core.getItem().getItem()).timemult)) * 30;
 			melttick = 30;
@@ -169,64 +145,6 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
 		}
 		frame += 0.75f + (menu.getLastTickConsumed() / 100);
 		power.isPressed = menu.isOn();
-	}
-
-    private static BlockState setState(Block block, int meta) {
-        BlockState state = block.defaultBlockState();
-
-        if (block == RRBlocks.reactive) {
-            state = state.setValue(BlockReactive.META, meta);
-        }
-
-        return state;
-    }
-
-	protected void drawDock(GuiGraphics graphics) {
-        PoseStack pose = graphics.pose();
-        int X = 89 + width / 2;
-		int Y = 0 + height / 2;
-		for (int i = 0; i < 4; i++) {
-			if (machines[i] == Blocks.AIR) return;
-
-			Block display = machines[i];
-            BlockState state = setState(display, 2);
-            BakedModel modelForState = minecraft.getBlockRenderer().getBlockModelShaper().getBlockModel(state);
-            ResourceLocation toppath = ResourceLocation.withDefaultNamespace("textures/block/" + /*display.getIcon(1, meta).getIconName() +*/ ".png");
-			String lsidepath = "minecraft:textures/block/" + /*display.getIcon(4, meta).getIconName() +*/ ".png";
-			String rsidepath = "minecraft:textures/block/" + /*display.getIcon(2, meta).getIconName() +*/ ".png";
-
-			Tesselator tessellator = Tesselator.getInstance();
-
-            float alpha = 0.5f;
-			if (onmachines[i]) alpha = 1;
-
-            RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
-            RenderSystem.setShaderTexture(0, toppath);
-            BufferBuilder buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			buffer.addVertex(pose.last(), X + 1, Y + 3.5F, 0).setUv(0, 1).setColor(1F, 1F, 1F, alpha);
-			buffer.addVertex(pose.last(), X + 8, Y + 7, 0).setUv(0, 0).setColor(1F, 1F, 1F, alpha);
-			buffer.addVertex(pose.last(), X + 15, Y + 3.5F, 0).setUv(1, 0).setColor(1F, 1F, 1F, alpha);
-			buffer.addVertex(pose.last(), X + 8, Y, 0).setUv(1, 1).setColor(1F, 1F, 1F, alpha);
-            BufferUploader.drawWithShader(buffer.buildOrThrow());
-
-			RenderSystem.setShaderTexture(0, ResourceLocation.parse(lsidepath));
-            buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			buffer.addVertex(pose.last(), X + 1, Y + 3.5F, 0).setUv(0, 0).setColor(0.666F, 0.666F, 0.666F, alpha);
-			buffer.addVertex(pose.last(), X + 1, Y + 12.5F, 0).setUv(0, 1).setColor(0.666F, 0.666F, 0.666F, alpha);
-			buffer.addVertex(pose.last(), X + 8, Y + 16, 0).setUv(1, 1).setColor(0.666F, 0.666F, 0.666F, alpha);
-			buffer.addVertex(pose.last(), X + 8, Y + 7, 0).setUv(1, 0).setColor(0.666F, 0.666F, 0.666F, alpha);
-            BufferUploader.drawWithShader(buffer.buildOrThrow());
-
-			RenderSystem.setShaderTexture(0, ResourceLocation.parse(rsidepath));
-            buffer = tessellator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
-			buffer.addVertex(pose.last(), X + 15, Y + 12.5F, 0).setUv(1, 1).setColor(0.5F, 0.5F, 0.5F, alpha);
-			buffer.addVertex(pose.last(), X + 15, Y + 3.5F, 0).setUv(1, 0).setColor(0.5F, 0.5F, 0.5F, alpha);
-			buffer.addVertex(pose.last(), X + 8, Y + 7, 0).setUv(0, 0).setColor(0.5F, 0.5F, 0.5F, alpha);
-			buffer.addVertex(pose.last(), X + 8, Y + 16, 0).setUv(0, 1).setColor(0.5F, 0.5F, 0.5F, alpha);
-            BufferUploader.drawWithShader(buffer.buildOrThrow());
-
-			Y += 18;
-		}
 	}
 
     /**
@@ -307,7 +225,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor>
     }
 
 	protected float lerp(float delta, float start, float end) {
-		return start * (1 - end) + delta * end;
+        return start * (1 - end) + delta * end;
 	}
 
 	protected void drawInfographic(GuiGraphics graphics, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {

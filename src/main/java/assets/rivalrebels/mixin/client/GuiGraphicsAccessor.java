@@ -11,9 +11,9 @@ import org.spongepowered.asm.mixin.gen.Invoker;
 @Environment(EnvType.CLIENT)
 public interface GuiGraphicsAccessor {
     @Invoker(value = "innerBlit", remap = false)
-    void callBlit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV);
+    void blit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV);
 
     @Invoker(value = "innerBlit", remap = false)
-    void callBlit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV, float red, float green, float blue, float alpha);
+    void blit(ResourceLocation atlasLocation, int x1, int x2, int y1, int y2, int blitOffset, float minU, float maxU, float minV, float maxV, float red, float green, float blue, float alpha);
 
 }

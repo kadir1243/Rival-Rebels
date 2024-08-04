@@ -11,12 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.client.model;
 
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Axis;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
-import org.joml.Quaternionf;
 
 public class ModelLaptop
 {
@@ -65,9 +68,9 @@ public class ModelLaptop
 	private static final Vector3f			v11		= new Vector3f(-0.4375f, 0.125f, 0);
 	private static final Vector3f			v12		= new Vector3f(-0.4375f, 0.125f, 0.5625f);
 
-	public static void renderModel(VertexConsumer buffer, PoseStack matrices, float turn, int light, int overlay)
-	{
-		matrices.pushPose();
+    public static void renderModel(MultiBufferSource vertexConsumers, PoseStack matrices, float turn, int light, int overlay) {
+        VertexConsumer buffer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etlaptop));
+        matrices.pushPose();
 		RenderHelper.addFace(matrices, buffer, v11, v12, v9, v10, t4t, t9t, t10t, t5t, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v12, v4, v1, v9, t9t, t13t, t14t, t10t, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v11, v3, v4, v12, t4t, t3t, t8t, t9t, light, overlay);
@@ -78,7 +81,7 @@ public class ModelLaptop
 
 		matrices.pushPose();
 		matrices.translate(0, 0.125f, 0);
-		matrices.mulPose(new Quaternionf(0.1875f, 0, 0, turn));
+		matrices.mulPose(ROTATION_AXIS.rotationDegrees(turn));
 		RenderHelper.addFace(matrices, buffer, v5, v6, v7, v8, t4, t9, t10, t5, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v8, v4, v1, v5, t9, t13, t14, t10, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v7, v3, v4, v8, t4, t3, t8, t9, light, overlay);
@@ -96,13 +99,13 @@ public class ModelLaptop
 	private static final Vector3f v2v		= new Vector3f(0.375f, 0f, 0.0625f);
 	private static final Vector3f v3v		= new Vector3f(-0.375f, 0f, 0.0625f);
 	private static final Vector3f v4v		= new Vector3f(-0.375f, 0f, 0.5f);
+    private static final Axis ROTATION_AXIS = Axis.of(new Vector3f(0.1875f, 0, 0));
 
-	public static void renderScreen(VertexConsumer buffer, PoseStack matrices, float turn, int light, int overlay)
-	{
+    public static void renderScreen(MultiBufferSource vertexConsumers, ResourceLocation screenTexture, PoseStack matrices, float turn, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(0, 0.125f, 0);
-		matrices.mulPose(new Quaternionf(0.1875f, 0, 0, turn));
-		RenderHelper.addFace(matrices, buffer, v2v, v1v, v4v, v3v, t333, t222, t111, t444, light, overlay);
+		matrices.mulPose(ROTATION_AXIS.rotationDegrees(turn));
+		RenderHelper.addFace(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(screenTexture)), v2v, v1v, v4v, v3v, t333, t222, t111, t444, light, overlay);
 		matrices.popPose();
 	}
 }

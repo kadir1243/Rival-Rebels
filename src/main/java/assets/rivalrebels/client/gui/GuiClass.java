@@ -24,6 +24,7 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 
 public class GuiClass extends Screen
@@ -93,7 +94,7 @@ public class GuiClass extends Screen
 		drawPanel(graphics, posX + 162, posY + 40, 80, 74, gameScroll.getScroll(), gameScroll.limit, rrclass);
         graphics.fillGradient(posX + 160, posY + 9, posX + 244, posY + 38, 0xFF000000, 0xFF000000);
 
-        ((GuiGraphicsAccessor) graphics).callBlit(
+        ((GuiGraphicsAccessor) graphics).blit(
             RRIdentifiers.guitclass,
             posX,
             posX + xSizeOfTexture,
@@ -136,7 +137,7 @@ public class GuiClass extends Screen
 		for (int i = 0; i < sizelookup.length; i++)
 		{
 			int X = posX + 18 + (i % 9) * 22;
-			int Y = posY + 158 + 22 * (int) Math.floor(i / 9D);
+			int Y = posY + 158 + 22 * Mth.floor(i / 9D);
 			float size = sizelookup[i];
 			if (mouseX >= X && mouseY >= Y && mouseX < X + 16 && mouseY < Y + 16)
 			{

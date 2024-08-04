@@ -15,23 +15,17 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelRocketLauncherBody;
 import assets.rivalrebels.client.model.ModelRocketLauncherHandle;
 import assets.rivalrebels.client.model.ModelRocketLauncherTube;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.Material;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class RocketLauncherRenderer implements DynamicItemRenderer {
-    public static final Material ROCKET_LAUNCHER_HANDLE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrocketlauncherhandle);
-    public static final Material ROCKET_LAUNCHER_TUBE_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrocketlaunchertube);
-    public static final Material ROCKET_LAUNCHER_BODY_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etrocketlauncherbody);
-
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
@@ -44,7 +38,7 @@ public class RocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(90));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
         VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-        ModelRocketLauncherHandle.render(matrices, ROCKET_LAUNCHER_HANDLE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+        ModelRocketLauncherHandle.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlauncherhandle)), light, overlay);
 		if (stack.isEnchanted()) {
 			ModelRocketLauncherHandle.render(matrices, cellularNoise, light, overlay);
 		}
@@ -55,9 +49,9 @@ public class RocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(90));
 		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		matrices.scale(0.4f, 0.4f, 0.4f);
-		ModelRocketLauncherBody.render(matrices, ROCKET_LAUNCHER_BODY_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, overlay);
+		ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etrocketlauncherbody)), light, overlay);
 		if (stack.isDamaged()) {
-			ModelRocketLauncherBody.render(matrices, cellularNoise, light, overlay);
+			ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES), light, overlay);
 		}
 		matrices.popPose();
 
@@ -66,7 +60,7 @@ public class RocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.pushPose();
 		matrices.translate(-0.07f + s, 0.71f, s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
-        VertexConsumer rocketLauncherTubeTextureVertexConsumer = ROCKET_LAUNCHER_TUBE_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+        VertexConsumer rocketLauncherTubeTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlaunchertube));
 		ModelRocketLauncherTube.render(matrices, rocketLauncherTubeTextureVertexConsumer, light, overlay);
 		matrices.popPose();
 

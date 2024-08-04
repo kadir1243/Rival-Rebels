@@ -12,14 +12,20 @@
 package assets.rivalrebels.common.block.machine;
 
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.packet.ReactorMachinesPacket;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import com.mojang.serialization.MapCodec;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -33,6 +39,8 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class BlockReactor extends BaseEntityBlock {
     public static final MapCodec<BlockReactor> CODEC = simpleCodec(BlockReactor::new);
@@ -71,9 +79,20 @@ public class BlockReactor extends BaseEntityBlock {
         return world.isClientSide ? (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).clientTick() : (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).serverTick();
     }
 
+    public static final Component DEFAULT_TOKAMAK = Component.literal("Tokamak");
+
+    @Nullable
+    @Override
+    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+        return new SimpleMenuProvider((MenuConstructor) level.getBlockEntity(pos), DEFAULT_TOKAMAK);
+    }
+
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        player.openMenu((MenuProvider) level.getBlockEntity(pos));
+        player.openMenu(getMenuProvider(state, level, pos));
+        if (!level.isClientSide()) {
+            ServerPlayNetworking.send((ServerPlayer) player, new ReactorMachinesPacket(pos, List.copyOf(((TileEntityReactor) level.getBlockEntity(pos)).entries.values())));
+        }
 
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 

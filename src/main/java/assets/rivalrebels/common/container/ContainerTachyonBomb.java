@@ -26,16 +26,16 @@ import net.minecraft.world.item.ItemStack;
 
 public class ContainerTachyonBomb extends AbstractContainerMenu {
 	protected Container bomb;
-    private final ContainerData propertyDelegate;
+    private final ContainerData containerData;
 
     public ContainerTachyonBomb(int syncId, Inventory inventoryPlayer) {
         this(syncId, inventoryPlayer, new SimpleContainer(36), new SimpleContainerData(4));
     }
 
-    public ContainerTachyonBomb(int syncId, Inventory inventoryPlayer, Container bomb, ContainerData propertyDelegate) {
+    public ContainerTachyonBomb(int syncId, Inventory inventoryPlayer, Container bomb, ContainerData containerData) {
         super(RivalRebelsGuiHandler.TACHYON_SCREEN_HANDLER_TYPE, syncId);
         this.bomb = bomb;
-        this.propertyDelegate = propertyDelegate;
+        this.containerData = containerData;
         addSlot(new SlotRR(bomb, 0, 18, 48, 1, ItemFuse.class));
 		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna));
 		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna));
@@ -49,6 +49,7 @@ public class ContainerTachyonBomb extends AbstractContainerMenu {
 		addSlot(new SlotRR(bomb, 19, 138, 48, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(bomb, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
+        addDataSlots(containerData);
 	}
 
 	@Override
@@ -109,19 +110,19 @@ public class ContainerTachyonBomb extends AbstractContainerMenu {
 	}
 
     public int getCountdown() {
-        return this.propertyDelegate.get(0);
+        return this.containerData.get(0);
     }
 
     public boolean isUnbalanced() {
-        return this.propertyDelegate.get(1) == 1;
+        return this.containerData.get(1) == 1;
     }
 
     public boolean isArmed() {
-        return this.propertyDelegate.get(2) == 1;
+        return this.containerData.get(2) == 1;
     }
 
     public float getMegaton() {
-        return Float.intBitsToFloat(this.propertyDelegate.get(3));
+        return this.containerData.get(3) / 100F;
     }
 
 }

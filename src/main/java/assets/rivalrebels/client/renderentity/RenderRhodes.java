@@ -16,7 +16,6 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodes;
-import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -34,32 +33,28 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
-import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Matrix4f;
 
 import java.util.function.Function;
 
 @Environment(EnvType.CLIENT)
 public class RenderRhodes extends EntityRenderer<EntityRhodes> {
-    private static final RenderType LASER_RENDER_TYPE = RenderType.create(RivalRebels.MODID+"_entity_solid", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, true, false, RenderType.CompositeState.builder()
+    private static final RenderType LASER_RENDER_TYPE = RenderType.create(RRIdentifiers.MODID+"_laser_render_type", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES, 1536, true, false, RenderType.CompositeState.builder()
             .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
             .setLightmapState(RenderStateShard.LIGHTMAP)
             .setCullState(RenderStateShard.CULL)
             .setTransparencyState(RenderStateShard.ADDITIVE_TRANSPARENCY)
             .setOverlayState(RenderStateShard.OVERLAY)
             .createCompositeState(true));
-    private static final RenderType LIGHTNING = RenderType.create(RivalRebels.MODID+"_lightning",
+    private static final RenderType LIGHTNING = RenderType.create(RRIdentifiers.MODID+"_rhodes_lightning",
         DefaultVertexFormat.POSITION_COLOR,
-        VertexFormat.Mode.QUADS,
+        VertexFormat.Mode.TRIANGLES,
         1536,
-        false,
-        true,
         RenderType.CompositeState.builder()
             .setCullState(RenderStateShard.NO_CULL)
             .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
@@ -69,7 +64,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
             .createCompositeState(false)
     );
 
-    private static final RenderType RHODES_UNKNOWN_TYPE = RenderType.create(RivalRebels.MODID+"_unknown_maybe_i_will_change_this_to_better_name",
+    private static final RenderType RHODES_UNKNOWN_TYPE = RenderType.create(RRIdentifiers.MODID+"_unknown_maybe_i_will_change_this_to_better_name",
         DefaultVertexFormat.POSITION_COLOR_NORMAL,
         VertexFormat.Mode.QUADS,
         1536,
@@ -92,23 +87,21 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
                 .setOverlayState(RenderStateShard.OVERLAY)
                 .setCullState(RenderStateShard.NO_CULL)
                 .createCompositeState(true);
-            return RenderType.create(RivalRebels.MODID+"entity_solid", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.QUADS, 1536, true, false, compositeState);
+            return RenderType.create(RRIdentifiers.MODID+"entity_solid", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES, 9999, true, false, compositeState);
         }
     );
 
-    public static final ResourceLocation texture = RRIdentifiers.create("entity/rhodes");
-    public static final Material RHODES_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, texture);
-    public static final Material B2_SPIRIT_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etb2spirit);
-    public static final Material BOOSTER_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etbooster);
-    public static final Material FLAME_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.create("entity/flame"));
+    public static final ResourceLocation texture = RRIdentifiers.create("entity/rhodes.png");
+    private static final ResourceLocation flame = RRIdentifiers.create("entity/flame");
     public static String[] texfolders = {
 			"blocks/",
 			"entity/",
 			"items/",
 			"flags/",
 	};
+    private static final RenderType TEXTURE_RENDER_TYPE = RHODES_TEXTURE_RENDER_TYPE.apply(RenderRhodes.texture);
 
-	public RenderRhodes(EntityRendererProvider.Context manager) {
+    public RenderRhodes(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
@@ -181,16 +174,16 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 				matrices.pushPose();
                 matrices.mulPose(Axis.YP.rotationDegrees(entity.getbodyyaw(ptt)));
 				matrices.translate(0, 10f, 0);
-		    	ObjModels.booster.render(matrices, BOOSTER_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
+		    	ObjModels.renderSolid(ObjModels.booster, RRIdentifiers.etbooster, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 				matrices.pushPose();
 				matrices.mulPose(Axis.XP.rotationDegrees(-90));
 				matrices.translate(0, 4, -2);
 				matrices.scale(2.2f, 2.2f, 2.2f);
-				if (entity.b2energy > 0) ObjModels.shuttle.render(matrices, B2_SPIRIT_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light, OverlayTexture.NO_OVERLAY);
+				if (entity.b2energy > 0) ObjModels.renderSolid(ObjModels.shuttle, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 				matrices.popPose();
 				matrices.popPose();
 			} else {
-                VertexConsumer textureBuffer = RHODES_TEXTURE.buffer(vertexConsumers, RHODES_TEXTURE_RENDER_TYPE);
+                VertexConsumer textureBuffer = vertexConsumers.getBuffer(TEXTURE_RENDER_TYPE);
 				matrices.mulPose(Axis.YP.rotationDegrees(entity.getbodyyaw(ptt)));
 
 				float leftlegheight = 7.26756f - 15
@@ -208,8 +201,18 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 				matrices.pushPose();
 				matrices.mulPose(Axis.XP.rotationDegrees(-90));
 				matrices.translate(0, 4, -2);
-				if (entity.b2energy > 0) ObjModels.b2ForRhodes.render(matrices, B2_SPIRIT_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
-				if (entity.jet && entity.b2energy > 0) ObjModels.b2jetForRhodes.render(matrices, FLAME_TEXTURE.buffer(vertexConsumers, RenderType::entityTranslucent), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
+				if (entity.b2energy > 0) {
+                    matrices.pushPose();
+                    matrices.scale(2.5F, 2.5F, 2.5F);
+                    ObjModels.renderSolid(ObjModels.b2ForSpirit, RRIdentifiers.etb2spirit, matrices, vertexConsumers, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
+                    matrices.popPose();
+                }
+				if (entity.jet && entity.b2energy > 0) {
+                    matrices.pushPose();
+                    matrices.scale(2.5F, 2.5F, 2.5F);
+                    ObjModels.b2jetForRhodes.render(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(flame)), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
+                    matrices.popPose();
+                }
 				matrices.popPose();
 
 		    	ObjModels.torso.render(matrices, textureBuffer, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
@@ -262,7 +265,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 						matrices.mulPose(Axis.XP.rotationDegrees(entity.getrightshinpitch(ptt)));
 				    	ObjModels.shin.render(matrices, textureBuffer, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
 				    	if (entity.isFire()) {
-					    	ObjModels.rhodes_flame.render(matrices, FLAME_TEXTURE.buffer(vertexConsumers, RenderType::entityTranslucent), light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.rhodes_flame.render(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(flame)), CommonColors.WHITE, light, OverlayTexture.NO_OVERLAY);
 				    	}
 						matrices.popPose();
 
@@ -280,7 +283,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 						matrices.mulPose(Axis.XP.rotationDegrees(entity.getleftshinpitch(ptt)));
 				    	ObjModels.shin.render(matrices, textureBuffer, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
 				    	if (entity.isFire()) {
-					    	ObjModels.rhodes_flame.render(matrices, FLAME_TEXTURE.buffer(vertexConsumers, RenderType::entityTranslucent), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.rhodes_flame.render(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(flame)), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
 				    	}
 						matrices.popPose();
 
@@ -308,37 +311,35 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 					matrices.translate(0, Math.max(leftlegheight, rightlegheight), 0);
 					if (entity.itexfolder != -1) {
 						try {
-					    	ObjModels.flag.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.create(texfolders[entity.itexfolder] + entity.itexloc + ".png"))), light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.renderSolid(ObjModels.flag, RRIdentifiers.create(texfolders[entity.itexfolder] + entity.itexloc + ".png"), matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 						} catch (Exception ignored) {
 						}
 					}
-			    	if (entity.forcefield)
-			    	{
-                        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-			    		ObjModels.fftorso.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+			    	if (entity.forcefield) {
+			    		ObjModels.renderNoise(ObjModels.fftorso, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 						//RIGHT UPPERARM
 						matrices.pushPose();
 						matrices.translate(-6.4f, 0, 0);
 						matrices.mulPose(Axis.YP.rotationDegrees(entity.getrightarmyaw(ptt)));
 						matrices.scale(-1, 1, 1);
-				    	ObjModels.ffupperarm.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+				    	ObjModels.renderNoise(ObjModels.ffupperarm, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 					    	//RIGHT LOWERARM
 							matrices.pushPose();
 							matrices.translate(0, -1.5f, 0);
 							matrices.mulPose(Axis.XP.rotationDegrees(entity.getrightarmpitch(ptt)));
-					    	ObjModels.fflowerarm.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.renderNoise(ObjModels.fflowerarm, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 							matrices.popPose();
 						matrices.popPose();
 						//LEFT UPPERARM
 						matrices.pushPose();
 						matrices.translate(6.4f, 0, 0);
 						matrices.mulPose(Axis.YP.rotationDegrees(entity.getleftarmyaw(ptt)));
-				    	ObjModels.ffupperarm.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+				    	ObjModels.renderNoise(ObjModels.ffupperarm, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 					    	//LEFT LOWERARM
 							matrices.pushPose();
 							matrices.translate(0, -1.5f, 0);
 							matrices.mulPose(Axis.XP.rotationDegrees(entity.getleftarmpitch(ptt)));
-					    	ObjModels.fflowerarm.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.renderNoise(ObjModels.fflowerarm, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 							matrices.popPose();
 						matrices.popPose();
 						//RIGHT THIGH
@@ -346,24 +347,24 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 						matrices.translate(0, -7.26756f, -0.27904f);
 						matrices.mulPose(Axis.XP.rotationDegrees(entity.getrightthighpitch(ptt)));
 						matrices.scale(-1, 1, 1);
-				    	ObjModels.ffthigh.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+				    	ObjModels.renderNoise(ObjModels.ffthigh, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 					    	//RIGHT SHIN
 							matrices.pushPose();
 							matrices.translate(0, -7.17156f, -1.52395f);
 							matrices.mulPose(Axis.XP.rotationDegrees(entity.getrightshinpitch(ptt)));
-					    	ObjModels.ffshin.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.renderNoise(ObjModels.ffshin, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 							matrices.popPose();
 						matrices.popPose();
 						//LEFT THIGH
 						matrices.pushPose();
 						matrices.translate(0, -7.26756f, -0.27904f);
 						matrices.mulPose(Axis.XP.rotationDegrees(entity.getleftthighpitch(ptt)));
-				    	ObjModels.ffthigh.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+				    	ObjModels.renderNoise(ObjModels.ffthigh, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 					    	//LEFT SHIN
 							matrices.pushPose();
 							matrices.translate(0, -7.17156f, -1.52395f);
 							matrices.mulPose(Axis.XP.rotationDegrees(entity.getleftshinpitch(ptt)));
-					    	ObjModels.ffshin.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.renderNoise(ObjModels.ffshin, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 							matrices.popPose();
 						matrices.popPose();
 						//HEAD
@@ -371,7 +372,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 						matrices.translate(0, 5.23244f, 0);
 						matrices.mulPose(Axis.XP.rotationDegrees(entity.getheadpitch(ptt)));
 						matrices.mulPose(Axis.YP.rotationDegrees(entity.getheadyaw(ptt)));
-				    	ObjModels.ffhead.render(matrices, cellularNoise, light, OverlayTexture.NO_OVERLAY);
+				    	ObjModels.renderNoise(ObjModels.ffhead, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 						matrices.popPose();
 			    	}
 				matrices.popPose();
@@ -381,7 +382,6 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 		if (entity.health < 1) {
             VertexConsumer lightning = vertexConsumers.getBuffer(LIGHTNING);
             matrices.pushPose();
-            matrices.translate((float) entity.getX(), (float) entity.getY(), (float) entity.getZ());
 			float elev = Mth.sin((entity.health-tickDelta)*-0.0314159265359F)*15;
 			matrices.pushPose();
 			matrices.mulPose(Axis.YP.rotationDegrees(elev * 2));

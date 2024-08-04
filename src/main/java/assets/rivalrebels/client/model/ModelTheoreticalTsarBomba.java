@@ -21,15 +21,10 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.Material;
 import net.minecraft.util.Mth;
-import net.minecraft.world.inventory.InventoryMenu;
 import org.joml.Vector3f;
 
 public class ModelTheoreticalTsarBomba {
-    public static final Material TSAR_SHELL1_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettheoreticaltsarshell1);
-    public static final Material TSAR_SHELL2_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettheoreticaltsarshell2);
-    public static final Material TSAR_FINS_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettsarfins);
     private static final float[] tsarx = {0.5f, 0.5f, 0.875f, 1f, 1f, 0.875f, 0.5f, 0f};
     private static final float[] tsary = {-5f, -3.5f, -2f, -1f, 1f, 2f, 2.75f, 3f};
     private static final float[] tsart = {1f, 0.8125f, 0.625f, 0.5f, 0.25f, 0.125f, 0.03125f, 0f};
@@ -43,7 +38,7 @@ public class ModelTheoreticalTsarBomba {
         matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         matrices.pushPose();
-        VertexConsumer tsarShell1TextureVertexConsumer = TSAR_SHELL1_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+        VertexConsumer tsarShell1TextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettheoreticaltsarshell1));
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
             matrices.mulPose(Axis.YP.rotationDegrees(add * i));
@@ -59,7 +54,7 @@ public class ModelTheoreticalTsarBomba {
             }
             matrices.popPose();
         }
-        VertexConsumer tsarShell2TextureVertexConsumer = TSAR_SHELL2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+        VertexConsumer tsarShell2TextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettheoreticaltsarshell2));
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
             matrices.mulPose(Axis.YP.rotationDegrees(add * i));
@@ -78,7 +73,7 @@ public class ModelTheoreticalTsarBomba {
         }
         matrices.popPose();
 
-        VertexConsumer tsarFinsTextureVertexConsumer = TSAR_FINS_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid);
+        VertexConsumer tsarFinsTextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettsarfins));
 
         matrices.pushPose();
 

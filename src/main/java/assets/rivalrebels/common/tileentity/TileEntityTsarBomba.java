@@ -100,8 +100,7 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
-		if (!this.getItem(slot).isEmpty())
-		{
+		if (!this.getItem(slot).isEmpty()) {
 			ItemStack var2 = this.getItem(slot);
 			this.setItem(slot, ItemStack.EMPTY);
 			return var2;
@@ -114,6 +113,8 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
 		this.chestContents.set(slot, stack);
 
         stack.limitSize(this.getMaxStackSize(stack));
+
+        setChanged();
 	}
 
     @Override
@@ -240,7 +241,7 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.displayClientMessage(RRIdentifiers.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.getId()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RivalRebels.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
+                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
 		}
@@ -303,7 +304,7 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
                 case 0 -> countdown;
                 case 1 -> nuclear != hydrogen ? 1 : 0;
                 case 2 -> hasExplosive && hasFuse && hasAntennae ? 1 : 0;
-                case 3 -> Float.floatToIntBits(megaton);
+                case 3 -> (int) (megaton * 100);
                 default -> 0;
             };
         }
@@ -312,6 +313,7 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
         public void set(int index, int value) {
             switch (index) {
                 case 0 -> countdown = value;
+                case 3 -> megaton = value / 100F;
                 default -> {}
             }
         }

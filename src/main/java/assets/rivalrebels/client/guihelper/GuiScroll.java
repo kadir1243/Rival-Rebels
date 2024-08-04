@@ -12,9 +12,9 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 
 public class GuiScroll extends GuiButton
 {
@@ -24,43 +24,26 @@ public class GuiScroll extends GuiButton
 	/** Current scroll amount (from the top down) */
 	public int		scroll;
 
-	/** Keeps if the scroll is active */
-	public boolean	pressed;
-
-	public GuiScroll(int par2, int par3, int par4)
-	{
-		super(par2, par3, 5, 11, Component.empty());
-		this.limit = par4;
-		pressed = false;
+    public GuiScroll(int x, int y, int limit) {
+		super(x, y, 5, 11, Component.empty());
+		this.limit = limit;
 	}
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
 		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
-		if (scroll > limit) scroll = limit;
-		if (scroll < 0) scroll = 0;
+        scroll = Mth.clamp(scroll, 0, limit);
 		int state = 0;
-		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 11;
+		if (mouseClicked(mouseX, mouseY, 0)) state = 11;
 		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY() + scroll, 0, state, this.width, this.height);
 	}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
-			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
-			if (pressed) scroll = (int) (mouseY - getY() - 5);
-		} else {
-			pressed = false;
-		}
+        scroll = (int) (mouseY - getY() - 5);
 	}
 
-    @Override
-    public void onRelease(double mouseX, double mouseY) {
-		pressed = false;
-	}
-
-	public int getScroll()
-	{
+	public int getScroll() {
 		return scroll;
 	}
 }

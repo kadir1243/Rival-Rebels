@@ -33,7 +33,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry.DynamicItemRenderer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
@@ -44,7 +43,7 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
 
 import java.util.Collections;
@@ -52,22 +51,21 @@ import java.util.List;
 
 public class RivalRebels implements ModInitializer, ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
-	public static final String MODID = "rivalrebels";
-	public static final CommonProxy proxy = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? new ClientProxy() : new CommonProxy();
+    public static CommonProxy proxy;
+
     public static RivalRebelsRound round;
 
-    public static boolean rhodesExit = true;
-	public static boolean rhodesHold;
     @Environment(EnvType.CLIENT)
     public static RivalRebelsRenderOverlay rrro;
 
     @Override
     public void onInitialize() {
+        proxy = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? new ClientProxy() : new CommonProxy();
         PacketDispatcher.registerPackets();
 
-        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.COMMON, RRConfig.COMMON_SPEC);
-        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.CLIENT, RRConfig.CLIENT_SPEC);
-        ForgeConfigRegistry.INSTANCE.register(MODID, ModConfig.Type.SERVER, RRConfig.SERVER_SPEC);
+        ForgeConfigRegistry.INSTANCE.register(RRIdentifiers.MODID, ModConfig.Type.COMMON, RRConfig.COMMON_SPEC);
+        ForgeConfigRegistry.INSTANCE.register(RRIdentifiers.MODID, ModConfig.Type.CLIENT, RRConfig.CLIENT_SPEC);
+        ForgeConfigRegistry.INSTANCE.register(RRIdentifiers.MODID, ModConfig.Type.SERVER, RRConfig.SERVER_SPEC);
 
         ServerLifecycleEvents.SERVER_STARTED.register(server -> {
             round.setRoundDistances(RRConfig.SERVER.getSpawnDomeRadius(), RRConfig.SERVER.getTeleportDistance(), RRConfig.SERVER.getObjectiveDistance());

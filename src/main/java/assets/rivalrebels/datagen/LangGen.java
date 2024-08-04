@@ -1,7 +1,6 @@
 package assets.rivalrebels.datagen;
 
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource.RRDamageTypes;
@@ -99,14 +98,18 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(BlockAutoTemplate.USE_PLIERS_TO_BUILD_TRANSLATION, "Use pliers to build.");
         lang.add(BlockAutoTemplate.USE_PLIERS_TO_OPEN_TRANSLATION, "Use pliers to open.");
         lang.add(RRIdentifiers.AMMUNITION_TRANSLATION, "ammunition");
+        lang.add(RRIdentifiers.NUKE_TRANSLATION, "Nuclear Bomb");
+        lang.add(RRIdentifiers.SHIFT_CLICK, "Shift-Click (Sneak).");
 
-        lang.add(RivalRebels.MODID + ".warning_bomb_will_explode_line_1", "Radiological Alarm.");
-        lang.add(RivalRebels.MODID + ".warning_bomb_will_explode_line_2", "Nuclear weapon armed.");
-        lang.add(RivalRebels.MODID + ".warning_bomb_will_explode_line_3", "10 seconds left.");
+        lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_1", "Radiological Alarm.");
+        lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_2", "Nuclear weapon armed.");
+        lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_3", "10 seconds left.");
 
-        lang.add(RivalRebels.MODID + ".warning_meltdown", "Meltdown");
+        lang.add(RRIdentifiers.MODID + ".warning_meltdown", "Meltdown");
         lang.add(RRIdentifiers.BOMB_TIMER, "Timer");
         lang.add(RRIdentifiers.UNBALANCED_BOMB, "Unbalanced");
+        lang.add(RRIdentifiers.BOMB_MEGATONS, "Megatons");
+        lang.add(RRIdentifiers.BOMB_ARMED, "Armed");
 
         lang.add(RivalRebelsClass.NONE.getDescriptionTranslationKey(), "None");
         lang.add(RivalRebelsClass.REBEL.getDescriptionTranslationKey(), "Front line hero, heavy warrior, super soldier, half human half war machine, tank. Team value: essential to achieve victory by holding the enemy and protecting the team. Armor: Heavy, long durability. Speed: +1");
@@ -168,6 +171,6 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
     }
 
     public void addDamage(ResourceKey<DamageType> resourceKey, String translation) {
-        translationBuilder.add("death.attack."+ RivalRebels.MODID + "." + resourceKey.location().getPath(), translation);
+        translationBuilder.add("death.attack."+ RRIdentifiers.MODID + "." + resourceKey.location().getPath(), translation);
     }
 }

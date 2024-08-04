@@ -20,19 +20,13 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.resources.model.Material;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
-public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit>
-{
-    public static final Material B2_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.etb2spirit);
-    public static final Material TUPOLEV_TEXTURE = new Material(InventoryMenu.BLOCK_ATLAS, RRIdentifiers.ettupolev);
-
+public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit> {
     public RenderB2Spirit(EntityRendererProvider.Context manager) {
         super(manager);
 	}
@@ -43,13 +37,14 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit>
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
 		matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
         if (RRConfig.CLIENT.getBomberType().equals("sh")) {
-			matrices.scale(3.0f, 3.0f, 3.0f);
-			ObjModels.shuttle.render(matrices, B2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
+			matrices.scale(3, 3, 3);
+            ObjModels.renderSolid(ObjModels.shuttle, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 		} else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
-			ObjModels.tupolev.render(matrices, TUPOLEV_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
-		} else {
-			ObjModels.b2ForSpirit.render(matrices, B2_TEXTURE.buffer(vertexConsumers, RenderType::entitySolid), light);
-		}
+            ObjModels.renderSolid(ObjModels.tupolev, RRIdentifiers.ettupolev, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+        } else {
+            matrices.scale(3, 3, 3);
+            ObjModels.renderSolid(ObjModels.b2ForSpirit, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+        }
 		matrices.popPose();
 	}
 
