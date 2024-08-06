@@ -22,6 +22,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TieredItem;
 import net.minecraft.world.item.Tiers;
@@ -57,8 +58,9 @@ public class ItemRPG extends TieredItem
 			if (!stack.isEnchanted()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
 			else RivalRebelsSoundPlayer.playSound(player, 10, 4, 1.0f);
 			if (!world.isClientSide()) {
-				if (!stack.isEnchanted()) world.addFreshEntity(new EntityRocket(world, player, 0.1F));
-				else world.addFreshEntity(new EntityBomb(world, player, 0.1F));
+                Projectile projectile = stack.isEnchanted() ? new EntityBomb(world, player, 0.1F) : new EntityRocket(world, player, 0.1F);
+                projectile.setOwner(player);
+                world.addFreshEntity(projectile);
 			}
 		}
 		else if (!world.isClientSide())

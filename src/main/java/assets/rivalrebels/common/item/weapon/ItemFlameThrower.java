@@ -24,6 +24,9 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.FlameThrowerMode;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
+import assets.rivalrebels.common.util.Translations;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
@@ -79,7 +82,7 @@ public class ItemFlameThrower extends TieredItem {
 			user.displayClientMessage(Component.translatable(OUT_OF_FUEL.toLanguageKey()).withStyle(ChatFormatting.RED), false);
 		}
 		if (message) {
-			user.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
+			user.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
 		return InteractionResultHolder.pass(stack);
@@ -127,7 +130,8 @@ public class ItemFlameThrower extends TieredItem {
         }
 	}
 
-	public void openGui(ItemStack item) {
+    @Environment(EnvType.CLIENT)
+    public void openGui(ItemStack item) {
 		if (ClientProxy.USE_KEY.isDown() && Minecraft.getInstance().screen == null)
 		{
 			RivalRebels.proxy.flamethrowerGui(getMode(item));

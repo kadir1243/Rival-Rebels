@@ -11,8 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -40,11 +40,11 @@ public class BlockAmmunition extends Block
         int z = pos.getZ();
 		if (level.isClientSide()) {
 			player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
-            player.displayClientMessage(RRItems.rocket.getDescription().copy().withStyle(ChatFormatting.GREEN).append(". ").append(RRItems.rpg.getDescription().copy().withStyle(ChatFormatting.BLUE)).append(" ").append(RRIdentifiers.ammunition()).append(")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.battery.getDescription() + ". §9(" + RRItems.tesla.getDescription() + " " + RRIdentifiers.ammunition() + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.hydrod.getDescription() + ". §9(" + RRItems.plasmacannon.getDescription() + " " + RRIdentifiers.ammunition() + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.fuel.getDescription() + ". §9(" + RRItems.flamethrower.getDescription() + " " + RRIdentifiers.ammunition() + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.redrod.getDescription() + ". §9(" + RRItems.einsten.getDescription() + " " + RRIdentifiers.ammunition() + ")"), false);
+            player.displayClientMessage(RRItems.rocket.getDescription().copy().withStyle(ChatFormatting.GREEN).append(". ").append(RRItems.rpg.getDescription().copy().withStyle(ChatFormatting.BLUE)).append(" ").append(Translations.ammunition()).append(")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.battery.getDescription() + ". §9(" + RRItems.tesla.getDescription() + " " + Translations.ammunition() + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.hydrod.getDescription() + ". §9(" + RRItems.plasmacannon.getDescription() + " " + Translations.ammunition() + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.fuel.getDescription() + ". §9(" + RRItems.flamethrower.getDescription() + " " + Translations.ammunition() + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.redrod.getDescription() + ". §9(" + RRItems.einsten.getDescription() + " " + Translations.ammunition() + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.gasgrenade.getDescription() + ". §9(" + Component.translatable("RivalRebels.chemicalweapon") + ")"), false);
 		} else {
             Containers.dropItemStack(level, x, y, z, new ItemStack(RRItems.rocket, 32));

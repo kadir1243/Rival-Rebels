@@ -16,6 +16,7 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.common.container.ContainerLaptop;
 import assets.rivalrebels.common.packet.LaptopPressPacket;
+import assets.rivalrebels.common.util.Translations;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -60,7 +61,7 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 		context.blit(RRIdentifiers.guilaptopnuke, x, y, 0, 0, imageWidth, imageHeight);
 		if (menu.hasChips()) context.blit(RRIdentifiers.guilaptopnuke, x + 135, y + 79, 248, 0, 8, 8);
 		context.drawString(font, Component.translatable("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff, false);
-		context.drawString(font, Component.translatable("RivalRebels.controller.b2spirit"), x + 25, y + 11, 0xffffff, false);
+		context.drawString(font, Component.translatable(Translations.LAPTOP_B2_SPIRIT.toLanguageKey()), x + 25, y + 11, 0xffffff, false);
 		context.drawString(font, Component.translatable("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
 		context.drawString(font, Component.translatable("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
 	}

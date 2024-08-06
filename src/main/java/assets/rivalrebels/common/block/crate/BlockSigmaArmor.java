@@ -11,8 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -42,7 +42,7 @@ public class BlockSigmaArmor extends Block
 		if (!level.isClientSide()) {
 			player.displayClientMessage(Component.nullToEmpty("§7[§2Inventory§7]"), false);
 			player.displayClientMessage(Component.nullToEmpty("§aArmor. §9(Sigma's color armor.)"), false);
-			player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.literal("Equip your set of armor.").withStyle(ChatFormatting.RED)), false);
+			player.displayClientMessage(Translations.orders().append(" ").append(Component.literal("Equip your set of armor.").withStyle(ChatFormatting.RED)), false);
 			ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camohat2));
 			ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camoshirt2));
 			ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, new ItemStack(RRItems.camopants2));

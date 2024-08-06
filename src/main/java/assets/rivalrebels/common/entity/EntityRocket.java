@@ -16,34 +16,29 @@ import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.Explosion;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import java.util.List;
-import java.util.Optional;
 
 public class EntityRocket extends AbstractArrow
 {
-	private LivingEntity	thrower;
-	public boolean				fins			= false;
-	public int					rotation		= 45;
-	public float				slide			= 0;
-	private boolean				inwaterprevtick	= false;
-	private int					soundfile		= 0;
+    public boolean fins			= false;
+	public int rotation		= 45;
+	public float slide			= 0;
+	private boolean inwaterprevtick	= false;
+	private int soundfile = 0;
 
 	public EntityRocket(EntityType<? extends EntityRocket> type, Level par1World) {
 		super(type, par1World);
@@ -58,17 +53,15 @@ public class EntityRocket extends AbstractArrow
 		setPos(par2, par4, par6);
 	}
 
-	public EntityRocket(Level par1World, Player entity2, float par3) {
-		this(par1World);
-		thrower = entity2;
-		fins = false;
-		moveTo(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYRot(), entity2.getXRot());
-        setPosRaw(
+	public EntityRocket(Level level, Player entity2, float par3) {
+		this(level);
+        fins = false;
+		moveTo(entity2.getEyePosition(), entity2.getYRot(), entity2.getXRot());
+        setPos(
             getX() - Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F,
             getY(),
             getZ() - Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F
         );
-		setPos(getX(), getY(), getZ());
 		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
 		(Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
 		(-Mth.sin(getXRot() / 180.0F * Mth.PI)));
@@ -79,31 +72,12 @@ public class EntityRocket extends AbstractArrow
 		this(par1World);
 		fins = false;
 		setPos(x,y,z);
-		setAnglesMotion(mx, my, mz);
-	}
-
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
-
-    @Override
-	public void shoot(double mx, double my, double mz, float speed, float randomness)
-	{
-		float f2 = Mth.sqrt((float) (mx * mx + my * my + mz * mz));
-		mx /= f2;
-		my /= f2;
-		mz /= f2;
-		mx += random.nextGaussian() * 0.0075 * randomness;
-		my += random.nextGaussian() * 0.0075 * randomness;
-		mz += random.nextGaussian() * 0.0075 * randomness;
-		mx *= speed;
-		my *= speed;
-		mz *= speed;
-		setAnglesMotion(mx, my, mz);
-	}
+        this.setYRot((float)(Mth.atan2(mx, mz) * 180.0F / Mth.PI));
+        this.setXRot((float)(Mth.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0F / Mth.PI));
+        this.yRotO = this.getYRot();
+        this.xRotO = this.getXRot();
+    }
 
     @Override
 	public void tick()
@@ -124,7 +98,7 @@ public class EntityRocket extends AbstractArrow
 
 		if (tickCount >= RRConfig.SERVER.getRpgDecay())
 		{
-			explode(null);
+			explode();
 		}
 		// world.spawnEntity(new EntityLightningLink(world, getX(), getY(), getZ(), yaw, pitch, 100));
 
@@ -132,33 +106,11 @@ public class EntityRocket extends AbstractArrow
 		{
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x() * 0.5, -getDeltaMovement().y() * 0.5 - 0.1, -getDeltaMovement().z() * 0.5));
 		}
-		Vec3 vec31 = position();
-		Vec3 vec3 = position().add(getDeltaMovement());
-		HitResult mop = level().clip(new ClipContext(vec31, vec3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-		if (!level().isClientSide())
-		{
-			vec31 = position();
-			if (mop != null) vec3 = mop.getLocation();
-			else vec3 = position().add(getDeltaMovement());
+        HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
+		if (hitResult.getType() != HitResult.Type.MISS) onHit(hitResult);
 
-			List<Entity> list = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-			double d0 = Double.MAX_VALUE;
-            for (Entity entity : list) {
-                if (entity.canBeCollidedWith() && tickCount >= 7 && entity != thrower) {
-                    Optional<Vec3> mop1 = entity.getBoundingBox().inflate(0.5f, 0.5f, 0.5f).clip(vec31, vec3);
-                    if (mop1.isPresent()) {
-                        double d1 = vec31.distanceToSqr(mop1.get());
-                        if (d1 < d0) {
-                            mop = new EntityHitResult(entity, mop1.get());
-                            d0 = d1;
-                        }
-                    }
-                }
-            }
-		}
-		if (mop != null) explode(mop);
         setPosRaw(getX() + getDeltaMovement().y(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
 			;
@@ -203,35 +155,31 @@ public class EntityRocket extends AbstractArrow
 
     @Override
     protected ItemStack getDefaultPickupItem() {
-        return ItemStack.EMPTY;
+        return RRItems.rocket.getDefaultInstance();
     }
 
-    public void explode(HitResult mop)
-	{
-		if (mop != null && mop.getType() == HitResult.Type.ENTITY && ((EntityHitResult) mop).getEntity() instanceof Player player) {
+    @Override
+    protected void onHitEntity(EntityHitResult result) {
+        if (result.getEntity() instanceof Player player) {
             player.hurt(RivalRebelsDamageSource.rocket(level()), 48);
-		} else if (mop != null && mop.getType() == HitResult.Type.BLOCK) {
-            BlockState state = level().getBlockState(((BlockHitResult) mop).getBlockPos());
-			if (state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES)) {
-				level().setBlockAndUpdate(((BlockHitResult) mop).getBlockPos(), Blocks.AIR.defaultBlockState());
-                this.playSound(RRSounds.CUCHILLO_GLASS_BREAK, 5F, 0.3F);
-				return;
-			}
-		}
+        }
+        explode();
+    }
+
+    @Override
+    protected void onHitBlock(BlockHitResult result) {
+        BlockState state = level().getBlockState(result.getBlockPos());
+        if (state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES)) {
+            level().setBlockAndUpdate(result.getBlockPos(), Blocks.AIR.defaultBlockState());
+            this.playSound(RRSounds.CUCHILLO_GLASS_BREAK, 5F, 0.3F);
+            return;
+        }
+        explode();
+    }
+
+    public void explode() {
 		RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
 		new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
 		kill();
 	}
-
-    @Override
-    public boolean shouldRenderAtSqrDistance(double distance) {
-        return true;
-    }
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
 }

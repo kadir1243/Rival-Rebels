@@ -56,7 +56,7 @@ public class TileEntityPlasmaExplosion extends BlockEntity implements Tickable
 		List<Entity> l = this.level.getEntities(null, new AABB(getBlockPos().getX() - fsize + 0.5, getBlockPos().getY() - fsize + 0.5, getBlockPos().getZ() - fsize + 0.5, getBlockPos().getX() + fsize + 0.5, getBlockPos().getY() + fsize + 0.5, getBlockPos().getZ() + fsize + 0.5));
         for (Entity e : l) {
             double var15 = e.getZ() - getBlockPos().getX();
-            double var17 = e.getZ() + e.getEyeHeight(e.getPose()) - getBlockPos().getY() + 1.5f;
+            double var17 = e.getEyeY() - getBlockPos().getY() + 1.5f;
             double var19 = e.getZ() - getBlockPos().getZ();
             double dist = 0.5f / (Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19) + 0.01f);
             if (dist <= 0.5f && !(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityTsarBlast) && !(e instanceof EntityRhodes)) {

@@ -55,7 +55,7 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable {
 
             if (var13 <= 1.0D) {
                 double var15 = e.getX() - getBlockPos().getX();
-                double var17 = e.getY() + e.getEyeHeight(e.getPose()) - getBlockPos().getY();
+                double var17 = e.getEyeY() - getBlockPos().getY();
                 double var19 = e.getZ() - getBlockPos().getZ();
                 double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
 

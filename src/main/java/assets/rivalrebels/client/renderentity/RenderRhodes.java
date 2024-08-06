@@ -30,9 +30,11 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
@@ -64,19 +66,6 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
             .createCompositeState(false)
     );
 
-    private static final RenderType RHODES_UNKNOWN_TYPE = RenderType.create(RRIdentifiers.MODID+"_unknown_maybe_i_will_change_this_to_better_name",
-        DefaultVertexFormat.POSITION_COLOR_NORMAL,
-        VertexFormat.Mode.QUADS,
-        1536,
-        false,
-        true,
-        RenderType.CompositeState.builder()
-            .setCullState(RenderStateShard.NO_CULL)
-            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
-            .setTransparencyState(RenderStateShard.TRANSLUCENT_TRANSPARENCY)
-            .createCompositeState(false)
-    );
     private static final Function<ResourceLocation, RenderType> RHODES_TEXTURE_RENDER_TYPE = Util.memoize(
         resourceLocation -> {
             RenderType.CompositeState compositeState = RenderType.CompositeState.builder()
@@ -87,12 +76,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
                 .setOverlayState(RenderStateShard.OVERLAY)
                 .setCullState(RenderStateShard.NO_CULL)
                 .createCompositeState(true);
-            return RenderType.create(RRIdentifiers.MODID+"entity_solid", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES, 9999, true, false, compositeState);
+            return RenderType.create(RRIdentifiers.MODID+"_rhodes_solid_render", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES, 9999, true, false, compositeState);
         }
     );
 
-    public static final ResourceLocation texture = RRIdentifiers.create("entity/rhodes.png");
-    private static final ResourceLocation flame = RRIdentifiers.create("entity/flame");
+    public static final ResourceLocation texture = RRIdentifiers.create("textures/entity/rhodes.png");
+    private static final ResourceLocation flame = RRIdentifiers.create("textures/entity/flame.png");
     public static String[] texfolders = {
 			"blocks/",
 			"entity/",
@@ -126,49 +115,63 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 	};
 
     @Override
+    public boolean shouldRender(EntityRhodes livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntityRhodes entity, BlockPos pos) {
+        return super.getBlockLightLevel(entity, pos.atY(255));
+    }
+
+    @Override
+    protected int getSkyLightLevel(EntityRhodes entity, BlockPos pos) {
+        return super.getSkyLightLevel(entity, pos.atY(255));
+    }
+
+    @Override
+    protected void renderNameTag(EntityRhodes entity, Component displayName, PoseStack pose, MultiBufferSource bufferSource, int packedLight, float partialTick) {
+        int color = 0;
+        if (entity.rider != null) {
+            RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(entity.rider.getGameProfile());
+            color = switch (rrp.rrteam) {
+                case OMEGA -> 0x44FF44;
+                case SIGMA -> 0x4444FF;
+                case NONE -> CommonColors.WHITE;
+            };
+        }
+        pose.pushPose();
+        pose.translate(0, 16, 0);
+        pose.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        pose.scale(0.025F, -0.025F, 0.025F);
+        Matrix4f matrix4f = pose.last().pose();
+        float f = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
+        int j = (int)(f * 255.0F) << 24;
+        Font font = this.getFont();
+        float x = (float)(-font.width(displayName) / 2);
+        font.drawInBatch(
+            displayName, x, 0, color, false, matrix4f, bufferSource, Font.DisplayMode.SEE_THROUGH, j, packedLight
+        );
+        font.drawInBatch(displayName, x, 0, color, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
+
+        pose.popPose();
+    }
+
+    @Override
     public void render(EntityRhodes entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        if (entity.health > 0)
-		{
+        if (entity.getHealth() > 0) {
 			float ptt = Math.min((entity.ticksSinceLastPacket + tickDelta)/5f, 1);
 			if (entity.tickCount<10) ptt = 1;
 			matrices.pushPose();
-			matrices.scale(entity.scale, entity.scale, entity.scale);
+			matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
 
-			Font fontrenderer = this.getFont();
-            float f = 5F;
-            float f1 = 0.016666668F * f;
-            matrices.pushPose();
-            matrices.translate(0, 16, 0);
-            matrices.mulPose(Axis.YP.rotationDegrees((float) -this.entityRenderDispatcher.camera.getPosition().y));
-            matrices.mulPose(Axis.XP.rotationDegrees((float) this.entityRenderDispatcher.camera.getPosition().x));
-            matrices.scale(-f1, -f1, f1);
-            Component name = entity.getDisplayName();
-            int color = -1;
-            if (entity.rider != null)
             {
-                name = name.copy().append(" - ").append(entity.rider.getDisplayName());
-            	RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(entity.rider.getGameProfile());
-            	if (rrp!=null)
-            	{
-                    color = switch (rrp.rrteam) {
-                        case OMEGA -> 0x44FF44;
-                        case SIGMA -> 0x4444FF;
-                        case NONE -> -1;
-                    };
-            	}
+                Component name = entity.getDisplayName();
+                if (entity.rider != null) {
+                    name = name.copy().append(" - ").append(entity.rider.getDisplayName());
+                }
+                this.renderNameTag(entity, name, matrices, vertexConsumers, light, tickDelta);
             }
-            int j = fontrenderer.width(name) / 2;
-            VertexConsumer buffer = vertexConsumers.getBuffer(RHODES_UNKNOWN_TYPE);
-            buffer.addVertex(matrices.last(), -j - 1, -1, 0).setColor(0, 0, 0, 0.25F).setNormal(matrices.last(), 0.0F, 1.0F, 0.0F);
-            buffer.addVertex(matrices.last(), -j - 1, 8, 0).setColor(0, 0, 0, 0.25F).setNormal(matrices.last(), 0.0F, 1.0F, 0.0F);
-            buffer.addVertex(matrices.last(), j + 1, 8, 0).setColor(0, 0, 0, 0.25F).setNormal(matrices.last(), 0.0F, 1.0F, 0.0F);
-            buffer.addVertex(matrices.last(), j + 1, -1, 0).setColor(0, 0, 0, 0.25F).setNormal(matrices.last(), 0.0F, 1.0F, 0.0F);
-            float textBackgroundOpacity = Minecraft.getInstance().options.getBackgroundOpacity(0.25f);
-            int backgroundColor = (int)(textBackgroundOpacity * 255.0f) << 24;
-            Matrix4f positionMatrix = matrices.last().pose();
-            fontrenderer.drawInBatch(name, -fontrenderer.width(name) / 2F, 0, color, true, positionMatrix, vertexConsumers, Font.DisplayMode.NORMAL, backgroundColor, light);
-            fontrenderer.drawInBatch(name, -fontrenderer.width(name) / 2F, 0, color, true, positionMatrix, vertexConsumers, Font.DisplayMode.NORMAL, backgroundColor, light);
-            matrices.popPose();
 
 			if (entity.colorType == 16) {
 				matrices.pushPose();
@@ -210,7 +213,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 				if (entity.jet && entity.b2energy > 0) {
                     matrices.pushPose();
                     matrices.scale(2.5F, 2.5F, 2.5F);
-                    ObjModels.b2jetForRhodes.render(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(flame)), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
+                    ObjModels.b2jetForRhodes.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(flame)), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
                     matrices.popPose();
                 }
 				matrices.popPose();
@@ -265,7 +268,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 						matrices.mulPose(Axis.XP.rotationDegrees(entity.getrightshinpitch(ptt)));
 				    	ObjModels.shin.render(matrices, textureBuffer, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
 				    	if (entity.isFire()) {
-					    	ObjModels.rhodes_flame.render(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(flame)), CommonColors.WHITE, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.rhodes_flame.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(flame)), CommonColors.WHITE, light, OverlayTexture.NO_OVERLAY);
 				    	}
 						matrices.popPose();
 
@@ -283,7 +286,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 						matrices.mulPose(Axis.XP.rotationDegrees(entity.getleftshinpitch(ptt)));
 				    	ObjModels.shin.render(matrices, textureBuffer, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
 				    	if (entity.isFire()) {
-					    	ObjModels.rhodes_flame.render(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(flame)), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.rhodes_flame.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(flame)), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
 				    	}
 						matrices.popPose();
 
@@ -379,10 +382,10 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 			}
 	    	matrices.popPose();
 		}
-		if (entity.health < 1) {
+		if (entity.getHealth() < 1) {
             VertexConsumer lightning = vertexConsumers.getBuffer(LIGHTNING);
             matrices.pushPose();
-			float elev = Mth.sin((entity.health-tickDelta)*-0.0314159265359F)*15;
+			float elev = Mth.sin((entity.getHealth()-tickDelta)*-0.0314159265359F)*15;
 			matrices.pushPose();
 			matrices.mulPose(Axis.YP.rotationDegrees(elev * 2));
 			matrices.mulPose(Axis.XP.rotationDegrees(elev * 3));

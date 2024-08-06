@@ -56,8 +56,9 @@ public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade> {
         buffer.addVertex(matrices.last(), -7, -2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0F, 0F);
 		buffer.addVertex(matrices.last(), -7, -2,  2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0.0F, 0.0F);
 		buffer.addVertex(matrices.last(), -7,  2,  2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0.0F, 0.0F);
-		buffer.addVertex(matrices.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0.0F, 0.0F);
-		buffer.addVertex(matrices.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0.0F, 0.0F);
+        buffer.addVertex(matrices.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0.0F, 0.0F);
+
+        buffer.addVertex(matrices.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0.0F, 0.0F);
 		buffer.addVertex(matrices.last(), -7,  2,  2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0.0F, 0.0F);
 		buffer.addVertex(matrices.last(), -7, -2,  2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0.0F, 0.0F);
 		buffer.addVertex(matrices.last(), -7, -2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0.0F, 0.0F);

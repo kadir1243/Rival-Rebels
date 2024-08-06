@@ -61,13 +61,11 @@ public class BlockForceFieldNode extends BaseEntityBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		BlockEntity te = level.getBlockEntity(pos);
 		if (te instanceof TileEntityForceFieldNode teffn && !level.isClientSide()) {
-			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.uuid == null && (teffn.rrteam == null || teffn.rrteam == RivalRebelsTeam.NONE))
+			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.uuid == null && teffn.rrteam == RivalRebelsTeam.NONE)
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
-				if (teffn.rrteam == RivalRebelsTeam.NONE || teffn.rrteam == null)
-				{
+				if (teffn.rrteam == RivalRebelsTeam.NONE) {
 					teffn.uuid = player.getGameProfile().getId();
-					teffn.rrteam = null;
 				}
 				RivalRebelsSoundPlayer.playSound(level, 10, 5, pos);
 			}

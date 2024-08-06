@@ -22,6 +22,7 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.ChipData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import assets.rivalrebels.common.util.Translations;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -176,9 +177,9 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 			double dist = 10000000;
 			if (!sp || RRConfig.SERVER.isStopSelfnukeinSP()) {
 				if (rrteam == RivalRebelsTeam.OMEGA) {
-					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.omegaObjPos.getZ());
+					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.omegaData.objPos().getZ());
 				} else if (rrteam == RivalRebelsTeam.SIGMA) {
-					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
+					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.sigmaData.objPos().getZ());
 				}
 			}
 			if (dist > (RRConfig.SERVER.getNuclearBombStrength() + (AmountOfCharges * AmountOfCharges) + 29) * (RRConfig.SERVER.getNuclearBombStrength() + (AmountOfCharges * AmountOfCharges) + 29))
@@ -189,7 +190,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 			{
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.displayClientMessage(RRIdentifiers.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
+                    player.displayClientMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
                     player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
@@ -200,7 +201,7 @@ public class TileEntityNuclearBomb extends BlockEntity implements Container, Tic
 		}
 
 		if (Countdown == 200 && !level.isClientSide && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
-            RRIdentifiers.sendWarningBombWillExplodeMessageToPlayers(getLevel());
+            Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}
 
 		if (Countdown == 0 && AmountOfCharges != 0 && !level.isClientSide())

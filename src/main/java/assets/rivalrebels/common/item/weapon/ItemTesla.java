@@ -13,7 +13,6 @@ package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -21,6 +20,7 @@ import assets.rivalrebels.common.entity.EntityRaytrace;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -49,7 +49,7 @@ public class ItemTesla extends TieredItem {
 	@Override
 	public UseAnim getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.BOW;
+		return UseAnim.NONE;
 	}
 
     @Override
@@ -84,7 +84,7 @@ public class ItemTesla extends TieredItem {
 			player.displayClientMessage(Component.nullToEmpty("§cOut of batteries"), false);
 		}
 		if (message) {
-			player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
+			player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
 		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());

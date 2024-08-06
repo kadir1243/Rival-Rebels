@@ -23,6 +23,7 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.ChipData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import assets.rivalrebels.common.util.Translations;
 import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -220,11 +221,11 @@ public class TileEntityTachyonBomb extends BlockEntity implements Container, Tic
 			{
 				if (rrteam == RivalRebelsTeam.OMEGA)
 				{
-					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.omegaObjPos.getZ());
+					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.omegaData.objPos().getZ());
 				}
 				if (rrteam == RivalRebelsTeam.SIGMA)
 				{
-					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaObjPos.getX(), getBlockPos().getY(), RivalRebels.round.sigmaObjPos.getZ());
+					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.sigmaData.objPos().getZ());
 				}
 			}
 			if (dist > (RRConfig.SERVER.getTsarBombaStrength() + (nuclear * hydrogen) + 29) * (RRConfig.SERVER.getTsarBombaStrength() + (nuclear * hydrogen) + 29))
@@ -235,7 +236,7 @@ public class TileEntityTachyonBomb extends BlockEntity implements Container, Tic
 			{
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.displayClientMessage(RRIdentifiers.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.getId()).getName().copy().withStyle(ChatFormatting.RED)), false);
+                    player.displayClientMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.getId()).getName().copy().withStyle(ChatFormatting.RED)), false);
                     player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.getName() : Component.nullToEmpty("NONE")), false);
                 }
 			}
@@ -248,7 +249,7 @@ public class TileEntityTachyonBomb extends BlockEntity implements Container, Tic
 
 		if (countdown == 200 && !level.isClientSide && RRConfig.SERVER.getNuclearBombCountdown() > 10)
 		{
-            RRIdentifiers.sendWarningBombWillExplodeMessageToPlayers(getLevel());
+            Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}
 
 		if (countdown % 20 == 0 && countdown <= 200 && RRConfig.SERVER.getNuclearBombCountdown() > 10) RivalRebelsSoundPlayer.playSound(level, 14, 0, getBlockPos(), 100);

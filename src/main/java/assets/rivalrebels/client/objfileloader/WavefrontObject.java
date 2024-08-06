@@ -17,7 +17,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
-import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -466,7 +465,7 @@ public class WavefrontObject {
             float averageU = 0F;
             float averageV = 0F;
 
-            if ((textureCoordinates != null) && (textureCoordinates.length > 0)) {
+            if (textureCoordinates != null && textureCoordinates.length > 0) {
                 for (Vector3f textureCoordinate : textureCoordinates) {
                     averageU += textureCoordinate.x;
                     averageV += textureCoordinate.y;

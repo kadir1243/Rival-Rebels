@@ -37,6 +37,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -48,11 +49,11 @@ public class BlockLandMine extends FallingBlock
 {
     public static final MapCodec<BlockLandMine> CODEC = simpleCodec(BlockLandMine::new);
 
-    public static final BooleanProperty META = BooleanProperty.create("meta");
+    public static final BooleanProperty UNSTABLE = BlockStateProperties.UNSTABLE;
 	public BlockLandMine(Properties settings)
 	{
 		super(settings);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(META, false));
+        this.registerDefaultState(this.getStateDefinition().any().setValue(UNSTABLE, false));
     }
 
     @Override
@@ -62,12 +63,12 @@ public class BlockLandMine extends FallingBlock
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(UNSTABLE);
     }
 
     @Override
     public void tick(BlockState state, ServerLevel world, BlockPos pos, RandomSource random) {
-		if (state.getValue(META)) {
+		if (state.getValue(UNSTABLE)) {
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			if (!world.isClientSide()) world.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RRConfig.SERVER.getLandmineExplodeSize(), Level.ExplosionInteraction.BLOCK);
 		}
@@ -82,7 +83,7 @@ public class BlockLandMine extends FallingBlock
     @Override
     public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		if (entity instanceof Player || entity instanceof Animal || entity instanceof Mob || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
-			world.setBlockAndUpdate(pos, state.setValue(META, true));
+			world.setBlockAndUpdate(pos, state.setValue(UNSTABLE, true));
 			world.scheduleTick(pos, this, 5);
 			RivalRebelsSoundPlayer.playSound(world, 11, 1, pos, 3, 2);
 		}

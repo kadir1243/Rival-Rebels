@@ -49,18 +49,6 @@ public class EntityLightningLink extends EntityInanimate {
 	}
 
 	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
-	@Override
 	public void tick()
 	{
 		super.tick();

@@ -11,13 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.autobuilds;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
@@ -31,8 +30,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public abstract class BlockAutoTemplate extends FallingBlock {
-	public static final ResourceLocation USE_PLIERS_TO_BUILD_TRANSLATION = RRIdentifiers.create("use_pliers_to_build");
-    public static final ResourceLocation USE_PLIERS_TO_OPEN_TRANSLATION = RRIdentifiers.create("use_pliers_to_open");
     public int		time	= 15;
 	public String	name	= "building";
 
@@ -44,7 +41,7 @@ public abstract class BlockAutoTemplate extends FallingBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!level.isClientSide()) {
             if (!stack.is(RRItems.pliers)){
-                player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(USE_PLIERS_TO_BUILD_TRANSLATION.toLanguageKey())), true);
+                player.displayClientMessage(Translations.warning().append(" ").append(Component.translatable(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.toLanguageKey())), true);
                 return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
             }
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
@@ -57,14 +54,20 @@ public abstract class BlockAutoTemplate extends FallingBlock {
 	}
 
 	public void placeBlockCarefully(Level world, int x, int y, int z, Block block) {
-		if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)))) {
-			world.setBlockAndUpdate(new BlockPos(x, y, z), block.defaultBlockState());
-		}
+		placeBlockCarefully(world, x, y, z, block.defaultBlockState());
 	}
 
     public void placeBlockCarefully(Level world, int x, int y, int z, BlockState state) {
-        if (!BlackList.autobuild(world.getBlockState(new BlockPos(x, y, z)))) {
-            world.setBlockAndUpdate(new BlockPos(x, y, z), state);
+        placeBlockCarefully(world, new BlockPos(x, y, z), state);
+    }
+
+    public void placeBlockCarefully(Level world, BlockPos pos, Block block) {
+        placeBlockCarefully(world, pos, block.defaultBlockState());
+    }
+
+    public void placeBlockCarefully(Level world, BlockPos pos, BlockState state) {
+        if (!BlackList.autobuild(world.getBlockState(pos))) {
+            world.setBlockAndUpdate(pos, state);
         }
     }
 

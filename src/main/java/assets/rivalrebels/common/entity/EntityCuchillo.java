@@ -54,7 +54,7 @@ public class EntityCuchillo extends EntityInanimate
 	{
 		this(par1World);
 		shootingEntity = player;
-		moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
+		moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
         setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY() - 0.1f,
             getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F));

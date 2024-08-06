@@ -34,7 +34,7 @@ public class EntityLaserLink extends EntityInanimate {
 		shooter = player;
 		tickCount = 0;
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
-		moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYRot(), shooter.getXRot());
+		moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
         setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
 		getY() - 0.08,
 		getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
@@ -48,18 +48,6 @@ public class EntityLaserLink extends EntityInanimate {
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
 		tickCount = 0;
 		setPos(getX(), getY(), getZ());
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
 	}
 
 	@Override

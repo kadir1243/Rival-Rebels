@@ -34,7 +34,7 @@ public class GuiOmegaWin extends Screen
         context.drawCenteredString(font, Component.translatable("RivalRebels.omegawin.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
 		float scalefactor = 4f;
 		matrices.scale(scalefactor, scalefactor, scalefactor);
-        context.drawCenteredString( font, Component.translatable("RivalRebels.omegawin.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
+        context.drawCenteredString(font, Component.translatable("RivalRebels.omegawin.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
 		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 
 		context.drawString(font, "Omega: " + RivalRebels.round.getOmegaWins(), (this.width / 2) - 60, (this.height / 2 + 70), 0x44FF44);

@@ -19,11 +19,14 @@ import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
+import net.minecraft.world.level.lighting.LightEngine;
 
 public class RenderFlameBallGreen extends EntityRenderer<EntityFlameBallGreen>
 {
@@ -61,4 +64,13 @@ public class RenderFlameBallGreen extends EntityRenderer<EntityFlameBallGreen>
         return RRIdentifiers.etflameballgreen;
     }
 
+    @Override
+    public boolean shouldRender(EntityFlameBallGreen livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntityFlameBallGreen entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
+    }
 }

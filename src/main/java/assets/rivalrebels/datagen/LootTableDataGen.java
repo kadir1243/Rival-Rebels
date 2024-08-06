@@ -25,7 +25,7 @@ public class LootTableDataGen extends FabricBlockLootTableProvider {
         dropOther(RRBlocks.quicksand, RRBlocks.aquicksand);
         dropSelf(RRBlocks.aquicksand);
         dropSelf(RRBlocks.flag1);
-        dropOther(RRBlocks.flag2, RRItems.trollmask);
+        dropOther(RRBlocks.trollFlag, RRItems.trollmask);
         dropSelf(RRBlocks.flag3);
         dropSelf(RRBlocks.flag4);
         dropSelf(RRBlocks.flag5);

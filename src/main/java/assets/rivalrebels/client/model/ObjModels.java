@@ -16,6 +16,7 @@ import net.minecraft.util.CommonColors;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class ObjModels {
@@ -69,6 +70,19 @@ public class ObjModels {
                 .setOverlayState(RenderStateShard.OVERLAY)
                 .createCompositeState(true);
             return RenderType.create(RRIdentifiers.MODID + "_render_solid_triangles", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES, 1536, true, false, compositeState);
+        }
+    );
+    public static final Function<ResourceLocation, RenderType> RENDER_TRANSLUCENT_TRIANGLES = Util.memoize(
+        (resourceLocation) -> {
+            RenderType.CompositeState compositeState = RenderType.CompositeState.builder()
+                .setShaderState(RenderType.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
+                .setTextureState(new RenderStateShard.TextureStateShard(resourceLocation, false, false))
+                .setTransparencyState(RenderType.TRANSLUCENT_TRANSPARENCY)
+                .setCullState(RenderType.NO_CULL)
+                .setLightmapState(RenderType.LIGHTMAP)
+                .setOverlayState(RenderType.OVERLAY)
+                .createCompositeState(true);
+            return RenderType.create("entity_translucent", DefaultVertexFormat.NEW_ENTITY, VertexFormat.Mode.TRIANGLES, 1536, true, true, compositeState);
         }
     );
     private static final Map<ResourceLocation, RenderType> RENDER_SOLID_TRIANGLES_CACHE = new ConcurrentHashMap<>();

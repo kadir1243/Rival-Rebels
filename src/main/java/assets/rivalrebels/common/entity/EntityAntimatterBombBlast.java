@@ -20,11 +20,11 @@ import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 
 public class EntityAntimatterBombBlast extends EntityInanimate
@@ -126,14 +126,10 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 				remove.add(e);
 				continue;
 			}
-			float dx = (float) (e.getX() - getX());
-			float dy = (float) (e.getY() - getY());
-			float dz = (float) (e.getZ() - getZ());
-			float dist = Mth.sqrt(dx * dx + dy * dy + dz * dz);
+            Vec3 vec3 = e.position().subtract(position());
+			float dist = (float) vec3.length();
 			float rsqrt = 1.0f / (dist + 0.0001f);
-			dx *= rsqrt;
-			dy *= rsqrt;
-			dz *= rsqrt;
+            vec3 = vec3.scale(rsqrt);
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
@@ -142,11 +138,7 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 			else
 			{
 				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (f * f * 2.0f * radius + 20.0f));
-                e.setDeltaMovement(e.getDeltaMovement().subtract(
-                    dx * f,
-                    dy * f,
-                    dz * f
-                ));
+                e.setDeltaMovement(e.getDeltaMovement().subtract(vec3.scale(f)));
 			}
 		}
 		for (Entity e : remove)
@@ -166,19 +158,7 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 		nbt.putFloat("radius", (float) radius);
 	}
 
-    @Override
-    public float getLightLevelDependentMagicValue() {
-        return 1000F;
-    }
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
-    public EntityAntimatterBombBlast setTime()
-	{
+    public EntityAntimatterBombBlast setTime() {
 		tickCount = 920;
 		return this;
 	}

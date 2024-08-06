@@ -25,7 +25,7 @@ import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsRound;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
 import com.google.common.base.Supplier;
-import com.google.common.base.Suppliers;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
@@ -36,11 +36,14 @@ import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.fml.config.ModConfig;
@@ -114,9 +117,13 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
     }
 
     private static void addItemRenderer(ItemLike item, Supplier<DynamicItemRenderer> renderer) {
-        renderer = Suppliers.memoize(renderer);
-        Supplier<DynamicItemRenderer> finalRenderer = renderer;
-        BuiltinItemRendererRegistry.INSTANCE.register(item, (stack, mode, matrices, vertexConsumers, light, overlay) -> finalRenderer.get().render(stack, mode, matrices, vertexConsumers, light, overlay));
+        BuiltinItemRendererRegistry.INSTANCE.register(item, new BuiltinItemRendererRegistry.DynamicItemRenderer() {
+            private final DynamicItemRenderer itemRenderer = renderer.get();
+            @Override
+            public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+                itemRenderer.render(stack, mode, matrices, vertexConsumers, light, overlay);
+            }
+        });
     }
 
     private static void registerCustomRenderers() {

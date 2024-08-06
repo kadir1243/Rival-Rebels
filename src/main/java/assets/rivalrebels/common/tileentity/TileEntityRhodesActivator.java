@@ -206,9 +206,7 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 					setBlockToAir(pos.above(2));
 					setBlockToAir(pos.above(3));
 					EntityRhodes er = new EntityRhodes(level, x+0.5f, y+2.5f, z+0.5f, 0.0666666666666f);
-					er.wakeX = x;
-					er.wakeY = y;
-					er.wakeZ = z;
+                    er.wakePos = pos;
 					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
 					level.addFreshEntity(er);
 				}
@@ -224,9 +222,7 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
 					setBlockToAir(pos.above());
 					setBlockToAir(pos.above(2));
 					EntityRhodes er = new EntityRhodes(level, x+0.5f, y+1.5f, z+0.5f, 0.0333333333333f);
-					er.wakeX = x;
-					er.wakeY = y;
-					er.wakeZ = z;
+                    er.wakePos = pos;
 					if (getBlockPos().getZ() > this.worldPosition.getZ()) er.bodyyaw = 180;
 					level.addFreshEntity(er);
 				}

@@ -11,8 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
@@ -46,7 +46,7 @@ public class BlockFlagBox1 extends Block
 		}
 		if (!player.isShiftKeyDown() && !level.isClientSide())
 		{
-			player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable(RRIdentifiers.SHIFT_CLICK.toLanguageKey())), false);
+			player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable(Translations.SHIFT_CLICK.toLanguageKey())), false);
 			level.setBlockAndUpdate(pos, RRBlocks.flagbox5.defaultBlockState());
 			return InteractionResult.PASS;
 		}

@@ -11,12 +11,12 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockRemoteCharge;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -54,7 +54,7 @@ public class ItemRemote extends Item {
         ItemStack itemStack = ItemUtil.getItemStack(player, RRBlocks.remotecharge.asItem());
         if (((player.getAbilities().invulnerable && world.isEmptyBlock(pos.above()) || !itemStack.isEmpty() && world.isEmptyBlock(pos.above()))) && !player.isShiftKeyDown()) {
 			RivalRebelsSoundPlayer.playSound(player, 22, 2);
-            player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.literal("Shift-click (Sneak) to detonate.").withStyle(ChatFormatting.RED)), false);
+            player.displayClientMessage(Translations.orders().append(" ").append(Component.literal("Shift-click (Sneak) to detonate.").withStyle(ChatFormatting.RED)), false);
             itemStack.set(RRComponents.REMOTE_CONTROLLED_BOMB_POS, pos);
             itemStack.consume(1, context.getPlayer());
 			world.setBlockAndUpdate(pos.above(), RRBlocks.remotecharge.defaultBlockState());

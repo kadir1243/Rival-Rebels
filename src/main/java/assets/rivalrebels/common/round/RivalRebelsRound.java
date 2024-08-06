@@ -14,10 +14,14 @@ package assets.rivalrebels.common.round;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.gui.GuiNextBattle;
+import assets.rivalrebels.client.gui.GuiOmegaWin;
+import assets.rivalrebels.client.gui.GuiSigmaWin;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.packet.GuiSpawnPacket;
+import com.mojang.datafixers.util.Function9;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -28,12 +32,15 @@ import net.fabricmc.fabric.api.event.lifecycle.v1.ServerWorldEvents;
 import net.fabricmc.fabric.api.networking.v1.*;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.numbers.StyledFormat;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerLevel;
@@ -42,7 +49,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -56,22 +62,41 @@ import net.minecraft.world.scores.Scoreboard;
 import net.minecraft.world.scores.criteria.ObjectiveCriteria;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
     private static final SavedData.Factory<RivalRebelsRound> WORLD_DATA_TYPE = new SavedData.Factory<>(RivalRebelsRound::new, RivalRebelsRound::fromNbt, null);
-    public static final StreamCodec<FriendlyByteBuf, RivalRebelsRound> STREAM_CODEC = StreamCodec.ofMember(RivalRebelsRound::toBytes, RivalRebelsRound::fromBytes);
+    public static final StreamCodec<FriendlyByteBuf, RivalRebelsRound> STREAM_CODEC = composite(
+        ByteBufCodecs.BOOL,
+        rivalRebelsRound -> rivalRebelsRound.roundstarted,
+        BlockPos.STREAM_CODEC,
+        rivalRebelsRound -> rivalRebelsRound.cSpawn,
+        TeamData.STREAM_CODEC,
+        rivalRebelsRound -> rivalRebelsRound.omegaData,
+        TeamData.STREAM_CODEC,
+        rivalRebelsRound -> rivalRebelsRound.sigmaData,
+        ByteBufCodecs.INT,
+        rivalRebelsRound -> rivalRebelsRound.winCountdown,
+        RivalRebelsTeam.STREAM_CODEC,
+        rivalRebelsRound -> rivalRebelsRound.lastWinnerTeam,
+        ByteBufCodecs.BOOL,
+        rivalRebelsRound -> rivalRebelsRound.fatnuke,
+        ByteBufCodecs.STRING_UTF8,
+        RivalRebelsRound::getMotD,
+        RivalRebelsPlayerList.STREAM_CODEC,
+        rivalRebelsRound -> rivalRebelsRound.rrplayerlist,
+        RivalRebelsRound::new
+    );
     public static final Type<RivalRebelsRound> PACKET_TYPE = new Type<>(RRIdentifiers.create("rivalrebelsrounddata"));
-    public ChunkPos cSpawn = new ChunkPos(-1, -1);
-    public BlockPos omegaObjPos = new BlockPos(-1, -1, -1);
-    public BlockPos sigmaObjPos = new BlockPos(-1, -1, -1);
-	private String					MotD			= "Select your class and nuke the enemy team's objective to win.";
-	public RivalRebelsPlayerList	rrplayerlist	= new RivalRebelsPlayerList();
+    public BlockPos cSpawn;
+    public TeamData omegaData;
+    public TeamData sigmaData;
+	private String					MotD;
+	public RivalRebelsPlayerList	rrplayerlist;
 	public Level					world;
-	private int						winCountdown	= 0;
-	private int						omegaWins		= 0;
-	private int						sigmaWins		= 0;
-	private boolean					lastwinomega 	= false; //t: omega f: sigma
-	private boolean					fatnuke			= false;
+	private int						winCountdown;
+    private RivalRebelsTeam lastWinnerTeam;
+	private boolean					fatnuke;
 	public int						waitVotes		= 0;
 	public int						newBattleVotes	= 0;
 	private int						spawnRadius 	= 20;
@@ -80,11 +105,37 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	private int						objRadius2		= 29*29;
 	private int						spawnDist		= 150;
 	private int						objDist			= 200;
-	private boolean					roundstarted	= false;
-	public int omegaHealth;
-	public int sigmaHealth;
+	private boolean					roundstarted;
 
-	public RivalRebelsRound() {
+    public RivalRebelsRound() {
+        this.MotD = "Select your class and nuke the enemy team's objective to win.";
+        this.cSpawn = new BlockPos(-1, -1, -1);
+        this.rrplayerlist = new RivalRebelsPlayerList();
+        this.lastWinnerTeam = RivalRebelsTeam.NONE;
+        this.winCountdown = 0;
+        this.fatnuke = false;
+        this.roundstarted = false;
+    }
+
+    private RivalRebelsRound(boolean roundStarted,
+                             BlockPos cSpawn,
+                             TeamData omegaData,
+                             TeamData sigmaData,
+                             int winCountdown,
+                             RivalRebelsTeam lastWinnerTeam,
+                             boolean fatnuke,
+                             String motD,
+                             RivalRebelsPlayerList playerList
+    ) {
+        this.roundstarted = roundStarted;
+        this.cSpawn = cSpawn;
+        this.omegaData = omegaData;
+        this.sigmaData = sigmaData;
+        this.winCountdown = winCountdown;
+        this.lastWinnerTeam = lastWinnerTeam;
+        this.fatnuke = fatnuke;
+        this.MotD = motD;
+        this.rrplayerlist = playerList;
     }
 
     public void setRoundDistances(int spawnRadius, int spawnDist, int objDist) {
@@ -92,33 +143,69 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         spawnRadius2 = spawnRadius * spawnRadius;
         this.spawnDist = spawnDist;
         this.objDist = objDist;
-        omegaHealth = RRConfig.SERVER.getObjectiveHealth();
-        sigmaHealth = RRConfig.SERVER.getObjectiveHealth();
+        this.omegaData = new TeamData();
+        this.sigmaData = new TeamData();
     }
 
-	public static RivalRebelsRound fromBytes(FriendlyByteBuf buf) {
-        RivalRebelsRound packet = new RivalRebelsRound();
-        packet.roundstarted = buf.readBoolean();
-        packet.cSpawn = buf.readChunkPos();
-        packet.omegaObjPos = buf.readBlockPos();
-        packet.sigmaObjPos = buf.readBlockPos();
-        packet.winCountdown = buf.readInt();
-        packet.omegaWins = buf.readInt();
-        packet.sigmaWins = buf.readInt();
-        packet.lastwinomega = buf.readBoolean();
-        packet.fatnuke = buf.readBoolean();
-        packet.MotD = buf.readUtf();
-        packet.rrplayerlist = RivalRebelsPlayerList.fromBytes(buf);
-        return packet;
+    public static <B, C, T1, T2, T3, T4, T5, T6, T7, T8, T9> StreamCodec<B, C> composite(
+        StreamCodec<? super B, T1> codec1,
+        Function<C, T1> getter1,
+        StreamCodec<? super B, T2> codec2,
+        Function<C, T2> getter2,
+        StreamCodec<? super B, T3> codec3,
+        Function<C, T3> getter3,
+        StreamCodec<? super B, T4> codec4,
+        Function<C, T4> getter4,
+        StreamCodec<? super B, T5> codec5,
+        Function<C, T5> getter5,
+        StreamCodec<? super B, T6> codec6,
+        Function<C, T6> getter6,
+        StreamCodec<? super B, T7> codec7,
+        Function<C, T7> getter7,
+        StreamCodec<? super B, T8> codec8,
+        Function<C, T8> getter8,
+        StreamCodec<? super B, T9> codec9,
+        Function<C, T9> getter9,
+        Function9<T1, T2, T3, T4, T5, T6, T7, T8, T9, C> factory
+    ) {
+        return new StreamCodec<>() {
+            @Override
+            public C decode(B buffer) {
+                T1 t1 = codec1.decode(buffer);
+                T2 t2 = codec2.decode(buffer);
+                T3 t3 = codec3.decode(buffer);
+                T4 t4 = codec4.decode(buffer);
+                T5 t5 = codec5.decode(buffer);
+                T6 t6 = codec6.decode(buffer);
+                T7 t7 = codec7.decode(buffer);
+                T8 t8 = codec8.decode(buffer);
+                T9 t9 = codec9.decode(buffer);
+                return factory.apply(t1, t2, t3, t4, t5, t6, t7, t8, t9);
+            }
+
+            @Override
+            public void encode(B object, C object2) {
+                codec1.encode(object, getter1.apply(object2));
+                codec2.encode(object, getter2.apply(object2));
+                codec3.encode(object, getter3.apply(object2));
+                codec4.encode(object, getter4.apply(object2));
+                codec5.encode(object, getter5.apply(object2));
+                codec6.encode(object, getter6.apply(object2));
+                codec7.encode(object, getter7.apply(object2));
+                codec8.encode(object, getter8.apply(object2));
+                codec9.encode(object, getter9.apply(object2));
+            }
+        };
     }
 
+    @Environment(EnvType.CLIENT)
     public void initClient() {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (roundstarted && winCountdown > 0) {
-                updateClient();
+                updateClient(client);
             }
-            updateInvisible();
         });
+        ClientTickEvents.END_WORLD_TICK.register(this::updateInvisible);
     }
 
     public void init() {
@@ -129,7 +216,8 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         });
         ServerPlayerEvents.AFTER_RESPAWN.register((oldPlayer, newPlayer, alive) -> {
             if (!roundstarted) return;
-            newPlayer.setPosRaw(cSpawn.x, 200, cSpawn.z);
+            BlockPos pos = cSpawn.atY(200);
+            newPlayer.setPosRaw(pos.getX(), pos.getY(), pos.getZ());
             ServerPlayNetworking.send(newPlayer, GuiSpawnPacket.INSTANCE);
         });
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
@@ -138,7 +226,8 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
             if (!rrplayerlist.contains(player.getGameProfile()))
             {
                 player.getInventory().clearContent();
-                player.setPosRaw(cSpawn.x, 200, cSpawn.z);
+                BlockPos pos = cSpawn.atY(200);
+                player.setPosRaw(pos.getX(), pos.getY(), pos.getZ());
                 //rrplayerlist.add(new RivalRebelsPlayer(player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RRConfig.SERVER.getMaximumResets()));
             }
             ServerPlayNetworking.send(player, rrplayerlist);
@@ -151,32 +240,16 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
     public static RivalRebelsRound fromNbt(CompoundTag nbt, HolderLookup.Provider registries) {
         RivalRebelsRound packet = new RivalRebelsRound();
         packet.roundstarted = nbt.getBoolean("roundstarted");
-        packet.cSpawn = new ChunkPos(nbt.getLong("cSpawn"));
-        packet.omegaObjPos = BlockPos.of(nbt.getLong("omegaObjPos"));
-        packet.sigmaObjPos = BlockPos.of(nbt.getLong("sigmaObjPos"));
+        packet.cSpawn = BlockPos.of(nbt.getLong("cSpawn"));
+        packet.omegaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("omega_data")).getOrThrow().getFirst();
+        packet.sigmaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("sigma_data")).getOrThrow().getFirst();
         packet.winCountdown = nbt.getInt("winCountdown");
-        packet.omegaWins = nbt.getInt("omegaWins");
-        packet.sigmaWins = nbt.getInt("sigmaWins");
-        packet.lastwinomega = nbt.getBoolean("lastwinomega");
+        packet.lastWinnerTeam = RivalRebelsTeam.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("lastWinTeam")).getOrThrow().getFirst();
         packet.fatnuke = nbt.getBoolean("fatnuke");
         packet.MotD = nbt.getString("MotD");
-        packet.rrplayerlist = RivalRebelsPlayerList.fromNbt(nbt.getCompound("rrplayerlist"));
+        packet.rrplayerlist = RivalRebelsPlayerList.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("rrplayerlist")).getOrThrow().getFirst();
         return packet;
     }
-
-    public static void toBytes(RivalRebelsRound packet, FriendlyByteBuf buf) {
-        buf.writeBoolean(packet.roundstarted);
-		buf.writeChunkPos(packet.cSpawn);
-        buf.writeBlockPos(packet.omegaObjPos);
-		buf.writeBlockPos(packet.sigmaObjPos);
-		buf.writeInt(packet.winCountdown);
-		buf.writeInt(packet.omegaWins);
-		buf.writeInt(packet.sigmaWins);
-		buf.writeBoolean(packet.lastwinomega);
-		buf.writeBoolean(packet.fatnuke);
-		buf.writeUtf(packet.MotD);
-		RivalRebelsPlayerList.toBytes(packet.rrplayerlist, buf);
-	}
 
     @Override
     public Type<? extends CustomPacketPayload> type() {
@@ -186,18 +259,14 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
     @Override
     public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
         tag.putBoolean("roundstarted", roundstarted);
-        tag.putLong("cSpawn", cSpawn.toLong());
-        tag.putLong("omegaObjPos", omegaObjPos.asLong());
-        tag.putLong("sigmaObjPos", sigmaObjPos.asLong());
+        tag.putLong("cSpawn", cSpawn.asLong());
+        tag.put("omega_data", TeamData.CODEC.encode(omegaData, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
+        tag.put("sigma_data", TeamData.CODEC.encode(sigmaData, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
         tag.putInt("winCountdown", winCountdown);
-        tag.putInt("omegaWins", omegaWins);
-        tag.putInt("sigmaWins", sigmaWins);
-        tag.putBoolean("lastwinomega", lastwinomega);
+        tag.put("lastWinTeam", RivalRebelsTeam.CODEC.encode(lastWinnerTeam, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
         tag.putBoolean("fatnuke", fatnuke);
         tag.putString("MotD", MotD);
-        CompoundTag compound = new CompoundTag();
-        rrplayerlist.toNbt(compound);
-        tag.put("rrplayerlist", compound);
+        tag.put("rrplayerlist", RivalRebelsPlayerList.CODEC.encode(rrplayerlist, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
         return tag;
     }
 
@@ -209,12 +278,10 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	{
 		roundstarted = m.roundstarted;
 		cSpawn = m.cSpawn;
-        omegaObjPos = m.omegaObjPos;
-        sigmaObjPos = m.sigmaObjPos;
+        omegaData = m.omegaData;
+        sigmaData = m.sigmaData;
 		winCountdown = m.winCountdown;
-		omegaWins = m.omegaWins;
-		sigmaWins = m.sigmaWins;
-		lastwinomega = m.lastwinomega;
+        lastWinnerTeam = m.lastWinnerTeam;
 		MotD = m.MotD;
 		rrplayerlist = m.rrplayerlist;
 	}
@@ -232,20 +299,20 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
             player.hurt(world.damageSources().fellOutOfWorld(), 20000);
             player.getInventory().clearContent();
         }
-        cSpawn = new ChunkPos(cSpawn.x, cSpawn.z + spawnDist);
+        cSpawn = new BlockPos(cSpawn.getX(), -1, cSpawn.getZ() + spawnDist);
         if (!world.isClientSide()) {
-            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawn.x, 200, cSpawn.z), 0);
+            ((ServerLevel) world).setDefaultSpawnPos(cSpawn.atY(200), 0);
         }
 		float f = RRConfig.SERVER.getRhodesInRoundsChance();
 		while (f >= 1)
 		{
 			f--;
-			world.addFreshEntity(new EntityRhodes(world, cSpawn.x+world.random.nextDouble()-0.5f, 170, cSpawn.z+world.random.nextDouble()-0.5f,1));
+			world.addFreshEntity(new EntityRhodes(world, cSpawn.getX()+world.random.nextDouble()-0.5f, 170, cSpawn.getZ()+world.random.nextDouble()-0.5f,1));
 		}
-		if (f > world.random.nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawn.x+world.random.nextDouble()-0.5f, 170, cSpawn.z+world.random.nextDouble()-0.5f,1));
+		if (f > world.random.nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawn.getX()+world.random.nextDouble()-0.5f, 170, cSpawn.getZ()+world.random.nextDouble()-0.5f,1));
 		buildSpawn();
-		omegaHealth=RRConfig.SERVER.getObjectiveHealth();
-		sigmaHealth=RRConfig.SERVER.getObjectiveHealth();
+        omegaData.health=RRConfig.SERVER.getObjectiveHealth();
+        sigmaData.health=RRConfig.SERVER.getObjectiveHealth();
         sendUpdatePacket();
 	}
 
@@ -253,7 +320,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	{
 		fatnuke = false;
 		roundstarted = true;
-        cSpawn = new ChunkPos(x, z - spawnDist);
+        cSpawn = new BlockPos(x, -1, z - spawnDist);
 		newRound();
 	}
 
@@ -264,10 +331,10 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 			fatnuke = true;
 			roundstarted = true;
 			rrplayerlist = new RivalRebelsPlayerList();
-			cSpawn = new ChunkPos((omegaObjPos.getX()+sigmaObjPos.getX())/2, (omegaObjPos.getZ()+sigmaObjPos.getZ())/2);
-            ((ServerLevel) world).setDefaultSpawnPos(new BlockPos(cSpawn.x, world.getChunk(new BlockPos(cSpawn.x, 0, cSpawn.z)).getHeight(), cSpawn.z), 0F);
-			omegaHealth=RRConfig.SERVER.getObjectiveHealth();
-			sigmaHealth=RRConfig.SERVER.getObjectiveHealth();
+			cSpawn = new BlockPos((omegaData.objPos().getX()+sigmaData.objPos().getX())/2, -1, (omegaData.objPos().getZ()+sigmaData.objPos().getZ())/2);
+            ((ServerLevel) world).setDefaultSpawnPos(cSpawn.atY(world.getChunk(cSpawn).getHeight()), 0F);
+            omegaData.health=RRConfig.SERVER.getObjectiveHealth();
+            sigmaData.health=RRConfig.SERVER.getObjectiveHealth();
 			sendUpdatePacket();
 		}
 	}
@@ -330,9 +397,9 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	}
 
 	@Environment(EnvType.CLIENT)
-	public void updateInvisible() {
-		if (Minecraft.getInstance().level == null) return;
-        for (Player player : Minecraft.getInstance().level.players()) {
+	public void updateInvisible(ClientLevel level) {
+		if (level == null) return;
+        for (Player player : level.players()) {
             if (player.getItemBySlot(EquipmentSlot.HEAD).is(RRItems.camera))
                 setInvisible(player);
         }
@@ -353,17 +420,19 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	}
 
 	@Environment(EnvType.CLIENT)
-	public void updateClient()
-	{
+	public void updateClient(Minecraft minecraft) {
 		winCountdown--;
-		if (winCountdown == 0 && !fatnuke) RivalRebels.proxy.closeGui();//cleargui
-		else if (winCountdown == 400 && !fatnuke) RivalRebels.proxy.nextBattle();//open vote gui
-		else if (winCountdown == 1000) RivalRebels.proxy.closeGui();//close gui
-		else if (winCountdown == 1200) RivalRebels.proxy.teamWin(lastwinomega);//open winner gui
+        if (winCountdown == 0 && !fatnuke) minecraft.setScreen(null);//cleargui
+		else if (winCountdown == 400 && !fatnuke) minecraft.setScreen(new GuiNextBattle());//open vote gui
+		else if (winCountdown == 1000) minecraft.setScreen(null);//close gui
+		else if (winCountdown == 1200) { //open winner gui
+            if (lastWinnerTeam == RivalRebelsTeam.OMEGA) minecraft.setScreen(new GuiOmegaWin());
+            else if (lastWinnerTeam == RivalRebelsTeam.SIGMA) minecraft.setScreen(new GuiSigmaWin());
+            else minecraft.player.sendSystemMessage(Component.literal("Error No Winner ?").withStyle(ChatFormatting.RED));
+        }
 	}
 
-	public void load(Level world)
-	{
+	public void load(Level world) {
         this.world = world;
 
         Scoreboard scrb = this.world.getScoreboard();
@@ -414,27 +483,27 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 				for (int y1 = -5; y1 < hrs; y1++)
 				{
 					int YY = y1 * y1 + ZZ;
-					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlockAndUpdate(new BlockPos(cSpawn.x + x1, 200 + y1, cSpawn.z + z1), RRBlocks.fshield.defaultBlockState());
+					if ((YY > rs4 && YY < spawnRadius2) || ((y1 == -2 || y1 == -3 || y1 == -4) && YY < rs1)) world.setBlockAndUpdate(cSpawn.atY(200).offset(x1, y1, z1), RRBlocks.fshield.defaultBlockState());
 				}
 			}
 		}
 
-        omegaObjPos = new BlockPos(cSpawn.x + objDist, omegaObjPos.getY(), cSpawn.z);
-        sigmaObjPos = new BlockPos(cSpawn.x - objDist, sigmaObjPos.getY(), cSpawn.z);
+        omegaData.objPos = new BlockPos(cSpawn.getX() + objDist, omegaData.objPos().getY(), cSpawn.getZ());
+        sigmaData.objPos = new BlockPos(cSpawn.getX() - objDist, sigmaData.objPos().getY(), cSpawn.getZ());
 
-		ChunkAccess chunk = world.getChunk(omegaObjPos);
-        for (omegaObjPos = new BlockPos(omegaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, omegaObjPos.getZ()); omegaObjPos.getY() > world.getMinBuildHeight(); omegaObjPos.below())
+		ChunkAccess chunk = world.getChunk(omegaData.objPos());
+        for (omegaData.objPos = new BlockPos(omegaData.objPos().getX(), chunk.getHighestFilledSectionIndex() + 15, omegaData.objPos().getZ()); omegaData.objPos().getY() > world.getMinBuildHeight(); omegaData.objPos().below())
         {
-            if (!chunk.getBlockState(omegaObjPos).isAir())
+            if (!chunk.getBlockState(omegaData.objPos()).isAir())
             {
                 break;
             }
         }
-        chunk = world.getChunk(sigmaObjPos);
-        sigmaObjPos = new BlockPos(sigmaObjPos.getX(), chunk.getHighestFilledSectionIndex() + 15, sigmaObjPos.getZ());
-        for (; sigmaObjPos.getY() > world.getMinBuildHeight(); sigmaObjPos = sigmaObjPos.below())
+        chunk = world.getChunk(sigmaData.objPos());
+        sigmaData.objPos = new BlockPos(sigmaData.objPos().getX(), chunk.getHighestFilledSectionIndex() + 15, sigmaData.objPos().getZ());
+        for (; sigmaData.objPos().getY() > world.getMinBuildHeight(); sigmaData.objPos = sigmaData.objPos().below())
         {
-            if (!chunk.getBlockState(sigmaObjPos).isAir())
+            if (!chunk.getBlockState(sigmaData.objPos()).isAir())
             {
                 break;
             }
@@ -450,65 +519,65 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 				{
 					if (Mth.abs(xx) == 15 && Mth.abs(zz) == 15)
 					{
-						world.setBlockAndUpdate(omegaObjPos.offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
-						world.setBlockAndUpdate(sigmaObjPos.offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
+						world.setBlockAndUpdate(omegaData.objPos().offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
+						world.setBlockAndUpdate(sigmaData.objPos().offset(xx, 0, zz), RRBlocks.fshield.defaultBlockState());
 					}
 					else
 					{
-						world.setBlockAndUpdate(omegaObjPos.offset(xx, 0, zz), RRBlocks.reactive.defaultBlockState());
-						world.setBlockAndUpdate(sigmaObjPos.offset(xx, 0, zz), RRBlocks.reactive.defaultBlockState());
+						world.setBlockAndUpdate(omegaData.objPos().offset(xx, 0, zz), RRBlocks.reactive.defaultBlockState());
+						world.setBlockAndUpdate(sigmaData.objPos().offset(xx, 0, zz), RRBlocks.reactive.defaultBlockState());
 					}
 					for (int yy = 1; yy <= 7; yy++)
 					{
-						world.setBlockAndUpdate(omegaObjPos.offset(xx, yy, zz), Blocks.AIR.defaultBlockState());
-						world.setBlockAndUpdate(sigmaObjPos.offset(xx, yy, zz), Blocks.AIR.defaultBlockState());
+						world.setBlockAndUpdate(omegaData.objPos().offset(xx, yy, zz), Blocks.AIR.defaultBlockState());
+						world.setBlockAndUpdate(sigmaData.objPos().offset(xx, yy, zz), Blocks.AIR.defaultBlockState());
 					}
 				}
 			}
 		}
 
-		world.setBlockAndUpdate(omegaObjPos.offset(21, 0, 21),   RRBlocks.conduit.defaultBlockState());
-		world.setBlockAndUpdate(omegaObjPos.offset(21, 0, -21),  RRBlocks.conduit.defaultBlockState());
-		world.setBlockAndUpdate(omegaObjPos.offset(-21, 0, 21),  RRBlocks.conduit.defaultBlockState());
-		world.setBlockAndUpdate(omegaObjPos.offset(-21, 0, -21), RRBlocks.conduit.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos.offset(21, 0, 21),   RRBlocks.conduit.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos.offset(21, 0, -21),  RRBlocks.conduit.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos.offset(-21, 0, 21),  RRBlocks.conduit.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos.offset(-21, 0, -21), RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(omegaData.objPos().offset(21, 0, 21),   RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(omegaData.objPos().offset(21, 0, -21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(omegaData.objPos().offset(-21, 0, 21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(omegaData.objPos().offset(-21, 0, -21), RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos().offset(21, 0, 21),   RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos().offset(21, 0, -21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos().offset(-21, 0, 21),  RRBlocks.conduit.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos().offset(-21, 0, -21), RRBlocks.conduit.defaultBlockState());
 
 		for (int i = 0; i < 4; i++)
 		{
-			world.setBlockAndUpdate(omegaObjPos.offset(21, 1 + i, 21), Blocks.AIR.defaultBlockState());
-			world.setBlockAndUpdate(omegaObjPos.offset(21, 1 + i, -21), Blocks.AIR.defaultBlockState());
-			world.setBlockAndUpdate(omegaObjPos.offset(-21, 1 + i, 21), Blocks.AIR.defaultBlockState());
-			world.setBlockAndUpdate(omegaObjPos.offset(-21, 1 + i, -21), Blocks.AIR.defaultBlockState());
-			world.setBlockAndUpdate(sigmaObjPos.offset(21, 1 + i, 21), Blocks.AIR.defaultBlockState());
-			world.setBlockAndUpdate(sigmaObjPos.offset(21, 1 + i, -21), Blocks.AIR.defaultBlockState());
-			world.setBlockAndUpdate(sigmaObjPos.offset(-21, 1 + i, 21), Blocks.AIR.defaultBlockState());
-			world.setBlockAndUpdate(sigmaObjPos.offset(-21, 1 + i, -21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(omegaData.objPos().offset(21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(omegaData.objPos().offset(21, 1 + i, -21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(omegaData.objPos().offset(-21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(omegaData.objPos().offset(-21, 1 + i, -21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaData.objPos().offset(21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaData.objPos().offset(21, 1 + i, -21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaData.objPos().offset(-21, 1 + i, 21), Blocks.AIR.defaultBlockState());
+			world.setBlockAndUpdate(sigmaData.objPos().offset(-21, 1 + i, -21), Blocks.AIR.defaultBlockState());
 		}
 
-		world.setBlockAndUpdate(omegaObjPos.above(), RRBlocks.omegaobj.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos.above(), RRBlocks.sigmaobj.defaultBlockState());
+		world.setBlockAndUpdate(omegaData.objPos().above(), RRBlocks.omegaobj.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos().above(), RRBlocks.sigmaobj.defaultBlockState());
 		if (RRConfig.SERVER.isRhodesRoundsBase()) {
-			world.setBlockAndUpdate(omegaObjPos.above(2), RRBlocks.buildrhodes.defaultBlockState());
-			world.setBlockAndUpdate(sigmaObjPos.above(2), RRBlocks.buildrhodes.defaultBlockState());
+			world.setBlockAndUpdate(omegaData.objPos().above(2), RRBlocks.buildrhodes.defaultBlockState());
+			world.setBlockAndUpdate(sigmaData.objPos().above(2), RRBlocks.buildrhodes.defaultBlockState());
 		}
 	}
 
 	private boolean isInSpawn(Player player)
 	{
-		return player.position().y() < 203 && player.position().y() > 198 && player.distanceToSqr(cSpawn.x, 200, cSpawn.z) < spawnRadius2;
+		return player.position().y() < 203 && player.position().y() > 198 && player.distanceToSqr(cSpawn.getX(), 200, cSpawn.getZ()) < spawnRadius2;
 	}
 
 	public void winSigma()
 	{
 		if (!roundstarted) return;
 		winCountdown = 1400;
-		sigmaWins++;
-		lastwinomega = false;
-		world.setBlockAndUpdate(omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
+        sigmaData.winCount++;
+        lastWinnerTeam = RivalRebelsTeam.SIGMA;
+		world.setBlockAndUpdate(omegaData.objPos(), RRBlocks.plasmaexplosion.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos(), RRBlocks.plasmaexplosion.defaultBlockState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++) {
 			int xxpl = xpl * xpl;
 			for (int zpl = -objRadius; zpl < objRadius; zpl++) {
@@ -517,7 +586,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
                     for (int ypl = -1; ypl < 7; ypl++) {
                         for (int i = 0; i < 16; i++)
                         {
-                            world.setBlockAndUpdate(omegaObjPos.offset(xpl, ypl, zpl), Blocks.AIR.defaultBlockState());
+                            world.setBlockAndUpdate(omegaData.objPos().offset(xpl, ypl, zpl), Blocks.AIR.defaultBlockState());
                         }
                     }
                 }
@@ -530,10 +599,10 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	{
 		if (!roundstarted) return;
 		winCountdown = 1400;
-		omegaWins++;
-		lastwinomega = true;
-		world.setBlockAndUpdate(omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
+        omegaData.winCount++;
+        lastWinnerTeam = RivalRebelsTeam.OMEGA;
+		world.setBlockAndUpdate(omegaData.objPos(), RRBlocks.plasmaexplosion.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos(), RRBlocks.plasmaexplosion.defaultBlockState());
 		for (int xpl = -objRadius; xpl < objRadius; xpl++)
 		{
 			int xxpl = xpl * xpl;
@@ -544,7 +613,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 				{
 					for (int i = 0; i < 16; i++)
 					{
-						world.setBlockAndUpdate(sigmaObjPos.offset(xpl, ypl, zpl), Blocks.AIR.defaultBlockState());
+						world.setBlockAndUpdate(sigmaData.objPos().offset(xpl, ypl, zpl), Blocks.AIR.defaultBlockState());
 					}
 				}
 			}
@@ -555,8 +624,8 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	public void stopRounds()
 	{
 		if (!roundstarted) return;
-		world.setBlockAndUpdate(omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
-		world.setBlockAndUpdate(sigmaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
+		world.setBlockAndUpdate(omegaData.objPos(), RRBlocks.plasmaexplosion.defaultBlockState());
+		world.setBlockAndUpdate(sigmaData.objPos(), RRBlocks.plasmaexplosion.defaultBlockState());
 		winCountdown = 0;
 		roundstarted = false;
 		rrplayerlist.clearTeam();
@@ -565,44 +634,44 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 
 	public int takeOmegaHealth(int amnt)
 	{
-		if (amnt > omegaHealth)
+		if (amnt > omegaData.health())
 		{
-			int tmp = omegaHealth;
-			omegaHealth = 0;
+			int tmp = omegaData.health();
+            omegaData.health = 0;
 			winSigma();
 			return tmp;
 		}
 		else
 		{
-			omegaHealth-=amnt;
+            omegaData.health-=amnt;
 			return amnt;
 		}
 	}
 
 	public int takeSigmaHealth(int amnt)
 	{
-		if (amnt > sigmaHealth)
+		if (amnt > sigmaData.health())
 		{
-			int tmp = sigmaHealth;
-			sigmaHealth = 0;
+			int tmp = sigmaData.health();
+            sigmaData.health = 0;
 			winOmega();
 			return tmp;
 		}
 		else
 		{
-			sigmaHealth-=amnt;
+            sigmaData.health-=amnt;
 			return amnt;
 		}
 	}
 
 	public int getOmegaWins()
 	{
-		return omegaWins;
+		return omegaData.winCount;
 	}
 
 	public int getSigmaWins()
 	{
-		return sigmaWins;
+		return sigmaData.winCount;
 	}
 
 	public String getMotD()
@@ -631,11 +700,11 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 
 	public float addOmegaHealth(float power)
 	{
-		omegaHealth += power;
-		if (omegaHealth > RRConfig.SERVER.getObjectiveHealth())
+        omegaData.health += power;
+		if (omegaData.health() > RRConfig.SERVER.getObjectiveHealth())
 		{
-			int tmp = omegaHealth-RRConfig.SERVER.getObjectiveHealth();
-			omegaHealth = RRConfig.SERVER.getObjectiveHealth();
+			int tmp = omegaData.health()-RRConfig.SERVER.getObjectiveHealth();
+            omegaData.health = RRConfig.SERVER.getObjectiveHealth();
 			return tmp;
 		}
 		return 0;
@@ -643,11 +712,11 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 
 	public float addSigmaHealth(float power)
 	{
-		sigmaHealth += power;
-		if (sigmaHealth > RRConfig.SERVER.getObjectiveHealth())
+        sigmaData.health += power;
+		if (sigmaData.health() > RRConfig.SERVER.getObjectiveHealth())
 		{
-			int tmp = sigmaHealth-RRConfig.SERVER.getObjectiveHealth();
-			sigmaHealth = RRConfig.SERVER.getObjectiveHealth();
+			int tmp = sigmaData.health()-RRConfig.SERVER.getObjectiveHealth();
+            sigmaData.health = RRConfig.SERVER.getObjectiveHealth();
 			return tmp;
 		}
 		return 0;

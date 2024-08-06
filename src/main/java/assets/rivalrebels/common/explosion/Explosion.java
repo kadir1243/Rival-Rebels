@@ -167,7 +167,7 @@ public class Explosion
 	private void pushAndHurtEntities(Level world, double x, double y, double z, int radius, DamageSource dmgsrc) {
         AABB aabb = new AABB(x, y, z, x, y, z).inflate(radius + 1, -(radius + 1), radius + 1);
 		List<Entity> var9 = world.getEntities(null, aabb);
-		Vec3 var30 = new Vec3(x, y, z);
+		Vec3 pos = new Vec3(x, y, z);
 
 		radius *= 4;
 
@@ -176,22 +176,15 @@ public class Explosion
                 double var13 = Math.sqrt(entity.distanceToSqr(x, y, z)) / radius;
 
                 if (var13 <= 1.0D) {
-                    double var15 = entity.getX() - x;
-                    double var17 = entity.getY() + entity.getEyeHeight(entity.getPose()) - y;
-                    double var19 = entity.getZ() - z;
-                    double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
+                    Vec3 vector = entity.getEyePosition().subtract(pos);
+                    double var33 = vector.length();
 
                     if (var33 != 0.0D) {
-                        var15 /= var33;
-                        var17 /= var33;
-                        var19 /= var33;
-                        double var32 = net.minecraft.world.level.Explosion.getSeenPercent(var30, entity);
+                        vector = vector.normalize();
+                        double var32 = net.minecraft.world.level.Explosion.getSeenPercent(pos, entity);
                         double var34 = (1.0D - var13) * var32;
                         entity.hurt(dmgsrc, (int) ((var34 * var34 + var34) / 2.0D * radius + 1.0D));
-                        entity.push(
-                            var15 * var34,
-                            var17 * var34,
-                            var19 * var34);
+                        entity.push(vector.scale(var34));
                     }
                 }
             }

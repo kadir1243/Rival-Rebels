@@ -17,12 +17,15 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.lighting.LightEngine;
 
 public class RenderBullet extends EntityRenderer<Entity> {
     private final String path;
@@ -56,5 +59,15 @@ public class RenderBullet extends EntityRenderer<Entity> {
         if (path.equals("flame")) return RRIdentifiers.etflame;
         if (path.equals("fire")) return RRIdentifiers.etfire;
         return null;
+    }
+
+    @Override
+    public boolean shouldRender(Entity entity, Frustum camera, double camX, double camY, double camZ) {
+        return entity.shouldRender(camX, camY, camZ);
+    }
+
+    @Override
+    protected int getBlockLightLevel(Entity entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
     }
 }

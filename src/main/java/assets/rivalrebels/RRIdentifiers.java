@@ -1,37 +1,10 @@
 package assets.rivalrebels;
 
-import net.minecraft.ChatFormatting;
-import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.Level;
 
 public class RRIdentifiers {
-    public static final ResourceLocation WARNING_TRANSLATION = create("warning");
-    public static final ResourceLocation ORDERS_TRANSLATION = create("orders");
-    public static final ResourceLocation STATUS_TRANSLATION = create("status");
-    public static final ResourceLocation NUKE_TRANSLATION = create("nuke_name");
     public static final String MODID = "rivalrebels";
-    private static final MutableComponent WARNING = Component.empty()
-        .append(Component.literal("[").withStyle(ChatFormatting.DARK_RED))
-        .append(Component.translatable(WARNING_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED))
-        .append(Component.literal("]").withStyle(ChatFormatting.DARK_RED));
-    private static final MutableComponent ORDERS = Component.empty()
-        .append(Component.literal("[").withStyle(ChatFormatting.GRAY))
-        .append(Component.translatable(ORDERS_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.DARK_RED))
-        .append(Component.literal("]").withStyle(ChatFormatting.GRAY));
-    private static final MutableComponent STATUS = Component.empty()
-        .append(Component.literal("[").withStyle(ChatFormatting.GRAY))
-        .append(Component.translatable(STATUS_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.GOLD))
-        .append(Component.literal("]").withStyle(ChatFormatting.GRAY));
-    public static final ResourceLocation BOMB_TIMER = create("bomb.timer");
-    public static final ResourceLocation UNBALANCED_BOMB = create("bomb.unbalanced");
-    public static final ResourceLocation BOMB_MEGATONS = create("bomb.megatons");
-    public static final ResourceLocation BOMB_ARMED = create("bomb.armed");
-    public static final ResourceLocation SHIFT_CLICK = create("sneak.click");
 
-    public static final ResourceLocation AMMUNITION_TRANSLATION = create("ammunition");
     public static final ResourceLocation guitrivalrebels = create("textures/gui/h.png");
     public static final ResourceLocation guitbutton = create("textures/gui/a.png");
     public static final ResourceLocation guitspawn = create("textures/gui/b.png");
@@ -141,30 +114,4 @@ public class RRIdentifiers {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
-    public static MutableComponent warning() {
-        return WARNING.copy();
-    }
-
-    public static MutableComponent orders() {
-        return ORDERS.copy();
-    }
-
-    public static MutableComponent status() {
-        return STATUS.copy();
-    }
-
-    public static MutableComponent ammunition() {
-        return Component.translatable(AMMUNITION_TRANSLATION.toLanguageKey());
-    }
-
-    public static void sendWarningBombWillExplodeMessageToPlayers(Level level) {
-        MutableComponent line1 = warning().append(" ").append(Component.translatable(MODID + ".warning_bomb_will_explode_line_1").withStyle(ChatFormatting.RED));
-        MutableComponent line2 = warning().append(" ").append(Component.translatable(MODID + ".warning_bomb_will_explode_line_2").withStyle(ChatFormatting.RED));
-        MutableComponent line3 = warning().append(" ").append(Component.translatable(MODID + ".warning_bomb_will_explode_line_3").withStyle(ChatFormatting.RED));
-        for (Player player : level.players()) {
-            player.displayClientMessage(line1, false);
-            player.displayClientMessage(line2, false);
-            player.displayClientMessage(line3, false);
-        }
-    }
 }

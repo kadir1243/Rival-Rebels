@@ -22,14 +22,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import java.util.List;
-import java.util.Optional;
 
 public class EntityGasGrenade extends EntityInanimate {
     public Entity shootingEntity;
@@ -58,9 +53,9 @@ public class EntityGasGrenade extends EntityInanimate {
         this(par1World);
         shootingEntity = shooting;
 
-        setPosRaw(getX(), shooting.getY() + shooting.getEyeHeight(shooting.getPose()) - 0.10000000149011612D, getZ());
+        setPosRaw(getX(), shooting.getEyeY() - 0.1F, getZ());
         double var6 = par3EntityLiving.getX() - shooting.getX();
-        double var8 = par3EntityLiving.getY() + par3EntityLiving.getEyeHeight(par3EntityLiving.getPose()) - 0.699999988079071D - getY();
+        double var8 = par3EntityLiving.getEyeY() - 0.7 - getY();
         double var10 = par3EntityLiving.getZ() - shooting.getZ();
         double var12 = Math.sqrt(var6 * var6 + var10 * var10);
 
@@ -79,9 +74,9 @@ public class EntityGasGrenade extends EntityInanimate {
         this(par1World);
         shootingEntity = player;
 
-        moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
+        moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
         setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
-        getY() - 0.10000000149011612D,
+        getY() - 0.1F,
         getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F));
         setPos(getX(), getY(), getZ());
         setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
@@ -134,54 +129,20 @@ public class EntityGasGrenade extends EntityInanimate {
         super.tick();
 
         if (xRotO == 0.0F && yRotO == 0.0F) {
-            float var1 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
+            float var1 = (float) this.getDeltaMovement().horizontalDistance();
             setYRot(yRotO = (float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
             setXRot(xRotO = (float) (Math.atan2(getDeltaMovement().y(), var1) * Mth.RAD_TO_DEG));
         }
         ++ticksInAir;
-        Vec3 var17 = position();
-        Vec3 var3 = position().add(getDeltaMovement());
-        HitResult var4 = level().clip(new ClipContext(var17, var3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+        HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, entity -> entity.canBeCollidedWith() && (entity != shootingEntity || ticksInAir >= 5));
 
-        if (var4 != null) {
-            var3 = var4.getLocation();
-        }
-
-        Entity var5 = null;
-        List<Entity> var6 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-        double var7 = 0.0D;
-
-        if (!level().isClientSide()) {
-            for (Entity var10 : var6) {
-                if (var10.canBeCollidedWith() && (var10 != shootingEntity || ticksInAir >= 5)) {
-                    AABB var12 = var10.getBoundingBox().inflate(0.3f, 0.3f, 0.3f);
-                    Optional<Vec3> var13 = var12.clip(var17, var3);
-
-                    if (var13.isPresent()) {
-                        double var14 = var17.distanceTo(var13.get());
-
-                        if (var14 < var7 || var7 == 0.0D) {
-                            var5 = var10;
-                            var7 = var14;
-                        }
-                    }
-                }
-            }
-        }
-
-        if (var5 != null) {
-            var4 = new EntityHitResult(var5);
-        }
-
-        float var20;
-
-        if (var4 != null) {
+        if (hitResult.getType() != HitResult.Type.MISS) {
             pop();
             kill();
         }
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-        var20 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
+        float var20 = (float) this.getDeltaMovement().horizontalDistance();
         setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
         for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var20) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F) {

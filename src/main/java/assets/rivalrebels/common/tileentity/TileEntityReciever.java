@@ -281,7 +281,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	{
 		int yaw = (int) (getYawTo(e, 0) - getBaseRotation() + 360) % 360;
 		if (Mth.abs(yaw) > yawLimit / 2 && Mth.abs(yaw) < 360 - (yawLimit / 2)) return false;
-		Vec3 start = e.position().add(0, e.getEyeHeight(e.getPose()), 0);
+		Vec3 start = e.getEyePosition();
 		Vec3 end = new Vec3(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ()).add(0.5 + xO, 0.5, 0.5 + zO);
 		BlockHitResult mop = level.clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.ANY, CollisionContext.empty()));
 		return mop == null || (mop.getBlockPos().equals(this.getBlockPos()));
@@ -327,7 +327,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
 	public float getPitchTo(Entity t, float off) {
 		double x = getBlockPos().getX() + 0.5 + xO - t.getX() - (t.getX() - prevTpos.x()) * off;
-		double y = getBlockPos().getY() + (0.5 * scale) - t.getY() - t.getEyeHeight(t.getPose()) - (t.getY() - prevTpos.y()) * off;
+		double y = getBlockPos().getY() + (0.5 * scale) - t.getEyeY() - (t.getY() - prevTpos.y()) * off;
 		double z = getBlockPos().getZ() + 0.5 + zO - t.getZ() - (t.getZ() - prevTpos.z()) * off;
 		double d = Math.sqrt(x * x + z * z);
 		double pi = Math.atan2(d, -y);
@@ -338,46 +338,30 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
         return (int) getBlockState().getValue(BlockReciever.FACING).toYRot();
 	}
 
-	/**
-	 * Returns the number of slots in the inventory.
-	 */
 	@Override
 	public int getContainerSize()
 	{
 		return 9;
 	}
 
-	/**
-	 * Returns the stack in slot i
-	 */
 	@Override
-	public ItemStack getItem(int par1)
-	{
+	public ItemStack getItem(int par1) {
 		if (par1 >= getContainerSize()) return ItemStack.EMPTY;
 		return this.chestContents.get(par1);
 	}
 
-	/**
-	 * Removes from an inventory slot (first arg) up to a specified number (second arg) of items and returns them in a new stack.
-	 */
 	@Override
-	public ItemStack removeItem(int par1, int par2)
-	{
-		if (!this.getItem(par1).isEmpty())
-		{
+	public ItemStack removeItem(int par1, int par2) {
+		if (!this.getItem(par1).isEmpty()) {
 			ItemStack var3;
 
-			if (this.getItem(par1).getCount() <= par2)
-			{
+			if (this.getItem(par1).getCount() <= par2) {
 				var3 = this.getItem(par1);
 				this.setItem(par1, ItemStack.EMPTY);
-            }
-			else
-			{
+            } else {
 				var3 = this.getItem(par1).split(par2);
 
-				if (this.getItem(par1).isEmpty())
-				{
+				if (this.getItem(par1).isEmpty()) {
 					this.setItem(par1, ItemStack.EMPTY);
 				}
             }

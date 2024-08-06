@@ -11,8 +11,8 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.crate;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -52,7 +52,7 @@ public class BlockWeapons extends Block
             // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ")");
             player.displayClientMessage((RRItems.knife.getDescription().copy().withStyle(ChatFormatting.GREEN).append(". §9(").append(Component.translatable("RivalRebels.opknife")).append(")")), false);
             player.displayClientMessage(Component.literal((RRItems.gasgrenade.getDescription().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.chemicalweapon") + ")"), false);
-            player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.translatable("RivalRebels.equipweapons")), false);
+            player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.equipweapons")), false);
         }
         if (!level.isClientSide())
         {

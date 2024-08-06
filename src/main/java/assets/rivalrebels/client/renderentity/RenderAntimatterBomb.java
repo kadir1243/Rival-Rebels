@@ -20,6 +20,7 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -45,5 +46,10 @@ public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb> {
     @Override
     public ResourceLocation getTextureLocation(EntityAntimatterBomb entity) {
         return RRIdentifiers.etantimatterbomb;
+    }
+
+    @Override
+    public boolean shouldRender(EntityAntimatterBomb livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
     }
 }

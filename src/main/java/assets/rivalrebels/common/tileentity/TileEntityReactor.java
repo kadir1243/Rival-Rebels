@@ -24,9 +24,9 @@ import assets.rivalrebels.common.item.ItemRodNuclear;
 import assets.rivalrebels.common.item.ItemRodRedstone;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.ReactorMachinesPacket;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.inventory.MenuConstructor;
 import org.jetbrains.annotations.Nullable;
@@ -52,8 +52,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class TileEntityReactor extends BlockEntity implements Container, Tickable, MenuConstructor {
-    public static final ResourceLocation OVERHEAT_TRANSLATION = RRIdentifiers.create("overheat");
-	public double			slide				= 90;
+    public double			slide				= 90;
 	private float test = Mth.PI;
     public ItemStack		core = ItemStack.EMPTY;
 	public ItemStack		fuel = ItemStack.EMPTY;
@@ -175,7 +174,7 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
                 meltTick++;
                 if (meltTick == 300) meltDown(10);
                 else if (meltTick == 1) {
-                    Component text = RRIdentifiers.warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_meltdown").withStyle(ChatFormatting.RED));
+                    Component text = Translations.warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_meltdown").withStyle(ChatFormatting.RED));
                     for (Player player : level.players()) {
                         player.displayClientMessage(text, false);
                     }
@@ -198,7 +197,7 @@ public class TileEntityReactor extends BlockEntity implements Container, Tickabl
             }
             if (tickssincelastrod == 20 && !lastrodwasredstone) {
                 for (Player player : getLevel().players()) {
-                    player.displayClientMessage(RRIdentifiers.warning().append(" ").append(Component.translatable(OVERHEAT_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), false);
+                    player.displayClientMessage(Translations.warning().append(" ").append(Component.translatable(Translations.OVERHEAT_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), false);
                 }
             }
         } else {

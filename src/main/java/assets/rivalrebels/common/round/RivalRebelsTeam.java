@@ -26,8 +26,7 @@ public enum RivalRebelsTeam implements StringRepresentable {
 
 	public final int id;
 
-	RivalRebelsTeam(int i)
-	{
+	RivalRebelsTeam(int i) {
 		id = i;
 	}
 

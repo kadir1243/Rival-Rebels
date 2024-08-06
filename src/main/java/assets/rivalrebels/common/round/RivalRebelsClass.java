@@ -161,13 +161,4 @@ public enum RivalRebelsClass implements StringRepresentable {
         return name;
     }
 
-    public static RivalRebelsClass getForID(int i) {
-        return switch (i) {
-            case 1 -> REBEL;
-            case 2 -> NUKER;
-            case 3 -> INTEL;
-            case 4 -> HACKER;
-            default -> NONE;
-        };
-    }
 }

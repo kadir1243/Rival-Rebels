@@ -11,8 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -73,9 +71,7 @@ public class EntityGoo extends EntityInanimate
 	}
 
 	@Override
-	@Environment(EnvType.CLIENT)
-	public boolean shouldRenderAtSqrDistance(double range)
-	{
+	public boolean shouldRenderAtSqrDistance(double range) {
 		return range < 256;
 	}
 }

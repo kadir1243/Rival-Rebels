@@ -2,16 +2,14 @@ package assets.rivalrebels.datagen;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource.RRDamageTypes;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.weapon.ItemFlameThrower;
 import assets.rivalrebels.common.round.RivalRebelsClass;
-import assets.rivalrebels.common.tileentity.TileEntityReactor;
+import assets.rivalrebels.common.util.Translations;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricLanguageProvider;
 import net.minecraft.core.HolderLookup;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 
@@ -28,7 +26,7 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
     public void generateTranslations(HolderLookup.Provider registryLookup, TranslationBuilder lang) {
         this.translationBuilder = lang;
 
-        lang.add(BuiltInRegistries.CREATIVE_MODE_TAB.getKey(RRItems.rralltab), "Rival Rebels");
+        lang.add(Translations.CREATIVE_TAB, "Rival Rebels");
         lang.add(RRBlocks.radioactivesand, "Radioactive Sand");
         lang.add(RRBlocks.radioactivedirt, "Radioactive Dirt");
         lang.add(RRBlocks.timedbomb, "Timed Bomb");
@@ -61,10 +59,14 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(RRBlocks.sigmaobj, "Sigma Objective");
         lang.add(RRBlocks.bunker, "Bunker");
         lang.add(RRBlocks.steel, "Steel");
+        lang.add(RRBlocks.petrifiedwood, "Petrified Wood");
         lang.add(RRBlocks.petrifiedstone1, "Scorched Stone");
         lang.add(RRBlocks.petrifiedstone2, "Scorched Stone");
         lang.add(RRBlocks.petrifiedstone3, "Scorched Stone");
         lang.add(RRBlocks.petrifiedstone4, "Scorched Stone");
+        lang.add(RRBlocks.controller, "Laptop");
+        lang.add(RRBlocks.reactor, "Reactor");
+        lang.add(RRBlocks.flare, "Flare");
 
 
         lang.add(RRItems.knife, "Cuchillo");
@@ -74,6 +76,8 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(RRItems.NUCLEAR_ROD, "Nuclear Rod");
         lang.add(RRItems.fuse, "Fuse");
         lang.add(RRItems.tesla, "Tesla");
+        lang.add(RRItems.core1, "Cu-Core");
+        lang.add(RRItems.core2, "W-Core");
         lang.add(RRItems.core3, "Ti-Core");
         lang.add(RRItems.rocket, "Rocket");
         lang.add(RRItems.fuel, "Fuel");
@@ -86,30 +90,37 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(RRItems.flamethrower, "Flamethrower");
         lang.add(RRItems.battery, "Battery");
         lang.add(RRItems.plasmacannon, "Plasma Cannon");
+        lang.add(RRItems.hackm202, "M202-Hack");
 
         addDamage(RRDamageTypes.ELECTRICITY, "%1s is Now Electric-Man");
         addDamage(RRDamageTypes.CHARGE, "%1s Charged");
 
         lang.add(ItemFlameThrower.OUT_OF_FUEL, "Out Of Fuel");
-        lang.add(TileEntityReactor.OVERHEAT_TRANSLATION, "Reactor is Overheating");
-        lang.add(RRIdentifiers.WARNING_TRANSLATION, "WARNING");
-        lang.add(RRIdentifiers.ORDERS_TRANSLATION, "ORDERS");
-        lang.add(RRIdentifiers.STATUS_TRANSLATION, "STATUS");
-        lang.add(BlockAutoTemplate.USE_PLIERS_TO_BUILD_TRANSLATION, "Use pliers to build.");
-        lang.add(BlockAutoTemplate.USE_PLIERS_TO_OPEN_TRANSLATION, "Use pliers to open.");
-        lang.add(RRIdentifiers.AMMUNITION_TRANSLATION, "ammunition");
-        lang.add(RRIdentifiers.NUKE_TRANSLATION, "Nuclear Bomb");
-        lang.add(RRIdentifiers.SHIFT_CLICK, "Shift-Click (Sneak).");
+        lang.add(Translations.OVERHEAT_TRANSLATION, "Reactor is Overheating");
+        lang.add(Translations.WARNING_TRANSLATION, "WARNING");
+        lang.add(Translations.ORDERS_TRANSLATION, "ORDERS");
+        lang.add(Translations.STATUS_TRANSLATION, "STATUS");
+        lang.add(Translations.DEFUSE_TRANSLATION, "DEFUSE");
+        lang.add(Translations.USE_PLIERS_TO_BUILD_TRANSLATION, "Use pliers to build.");
+        lang.add(Translations.USE_PLIERS_TO_OPEN_TRANSLATION, "Use pliers to open.");
+        lang.add(Translations.AMMUNITION_TRANSLATION, "ammunition");
+        lang.add(Translations.NUKE_TRANSLATION, "Nuclear Bomb");
+        lang.add(Translations.SHIFT_CLICK, "Shift-Click (Sneak).");
+        lang.add(Translations.BOMB_TIMER, "Timer");
+        lang.add(Translations.UNBALANCED_BOMB, "Unbalanced");
+        lang.add(Translations.BOMB_MEGATONS, "Megatons");
+        lang.add(Translations.BOMB_ARMED, "Armed");
+        lang.add(Translations.LAPTOP_B2_SPIRIT, "B-2 Spirit");
+        lang.add(Translations.BUILDING_TOKAMAK, "Constructing ToKaMaK %s");
+        lang.add(Translations.BUILDING_TOKAMAK, "Constructing %s");
+        lang.add(Translations.SPAWN_RESET_WARNING, "Warning: Resetting will clear your inventory");
+        lang.add(Translations.RHODES_IS_ARMED, "%s Armed");
 
         lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_1", "Radiological Alarm.");
         lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_2", "Nuclear weapon armed.");
         lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_3", "10 seconds left.");
 
         lang.add(RRIdentifiers.MODID + ".warning_meltdown", "Meltdown");
-        lang.add(RRIdentifiers.BOMB_TIMER, "Timer");
-        lang.add(RRIdentifiers.UNBALANCED_BOMB, "Unbalanced");
-        lang.add(RRIdentifiers.BOMB_MEGATONS, "Megatons");
-        lang.add(RRIdentifiers.BOMB_ARMED, "Armed");
 
         lang.add(RivalRebelsClass.NONE.getDescriptionTranslationKey(), "None");
         lang.add(RivalRebelsClass.REBEL.getDescriptionTranslationKey(), "Front line hero, heavy warrior, super soldier, half human half war machine, tank. Team value: essential to achieve victory by holding the enemy and protecting the team. Armor: Heavy, long durability. Speed: +1");

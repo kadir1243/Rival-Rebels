@@ -13,9 +13,6 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -23,15 +20,13 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 
 public class EntityFlameBall extends EntityInanimate
 {
@@ -61,7 +56,7 @@ public class EntityFlameBall extends EntityInanimate
 	public EntityFlameBall(Level par1World, Entity player, float par3)
 	{
 		this(par1World);
-		setPos(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+		setPos(player.getEyePosition());
 		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
             (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
             (-Mth.sin(player.getXRot() / 180.0F * Mth.PI)));
@@ -108,54 +103,13 @@ public class EntityFlameBall extends EntityInanimate
 		if (tickCount % 3 == 0) sequence++;
 		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 
-		Vec3 start = position();
-		Vec3 end = position().add(getDeltaMovement());
-		HitResult mop = level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, Entity::canBeCollidedWith);
 
-		if (mop != null) end = mop.getLocation();
-
-		Entity e = null;
-		List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-		double var6 = 0.0D;
-		Iterator<Entity> var8 = var5.iterator();
-
-		if (!level().isClientSide())
-		{
-			while (var8.hasNext())
-			{
-				Entity var9 = var8.next();
-
-				if (var9.canBeCollidedWith())
-				{
-					float var10 = 0.3F;
-					AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
-					Optional<Vec3> var12 = var11.clip(start, end);
-
-					if (var12.isPresent()) {
-						double var13 = start.distanceTo(var12.get());
-
-						if (var13 < var6 || var6 == 0.0D)
-						{
-							e = var9;
-							var6 = var13;
-						}
-					}
-				}
-			}
-		}
-
-		if (e != null)
-		{
-			mop = new EntityHitResult(e);
-		}
-
-		if (mop != null && tickCount >= 5)
-		{
+		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5) {
 			fire();
 			kill();
-			if (mop.getType() == HitResult.Type.ENTITY)
-			{
-                Entity hitEntity = ((EntityHitResult) mop).getEntity();
+			if (hitResult.getType() == HitResult.Type.ENTITY) {
+                Entity hitEntity = ((EntityHitResult) hitResult).getEntity();
                 hitEntity.igniteForSeconds(3);
 				hitEntity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
 				if (hitEntity instanceof Player player) {
@@ -184,17 +138,6 @@ public class EntityFlameBall extends EntityInanimate
     protected double getDefaultGravity() {
         return 0.01;
     }
-
-    @Override
-	public float getLightLevelDependentMagicValue() {
-		return 1000;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
 
 	@Override
 	public boolean isAttackable()

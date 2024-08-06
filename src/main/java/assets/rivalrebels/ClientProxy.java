@@ -32,19 +32,39 @@ import net.minecraft.world.level.Level;
 
 import static org.lwjgl.glfw.GLFW.*;
 
+@Environment(EnvType.CLIENT)
 public class ClientProxy extends CommonProxy {
-    public static final KeyMapping USE_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".use_key", GLFW_KEY_F, "key." + RRIdentifiers.MODID);
-    public static final KeyMapping TARGET_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".target_key", InputConstants.Type.MOUSE, GLFW_MOUSE_BUTTON_LEFT, "key." + RRIdentifiers.MODID);
-    public static final KeyMapping GUARD_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".guard_key", GLFW_KEY_G, "key." + RRIdentifiers.MODID);
+    public static final KeyMapping USE_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".use", GLFW_KEY_F, "key." + RRIdentifiers.MODID);
+    public static final KeyMapping TARGET_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".target", InputConstants.Type.MOUSE, GLFW_MOUSE_BUTTON_LEFT, "key." + RRIdentifiers.MODID);
+    public static final KeyMapping RHODES_JUMP_KEY = createRhodesKey("jump", GLFW_KEY_SPACE);
+    public static final KeyMapping RHODES_ROCKET_KEY = createRhodesKey("rocket", GLFW_KEY_A);
+    public static final KeyMapping RHODES_LASER_KEY = createRhodesKey("laser", GLFW_KEY_W);
+    public static final KeyMapping RHODES_FIRE_KEY = createRhodesKey("fire", GLFW_KEY_D);
+    public static final KeyMapping RHODES_FORCE_FIELD_KEY = createRhodesKey("force_field", GLFW_KEY_C);
+    public static final KeyMapping RHODES_PLASMA_KEY = createRhodesKey("plasma", GLFW_KEY_F);
+    public static final KeyMapping RHODES_NUKE_KEY = createRhodesKey("nuke", GLFW_KEY_S);
+    public static final KeyMapping RHODES_STOP_KEY = createRhodesKey("stop", GLFW_KEY_X);
+    public static final KeyMapping RHODES_B2SPIRIT_KEY = createRhodesKey("b2spirit", GLFW_KEY_Z);
+    public static final KeyMapping RHODES_GUARD_KEY = createRhodesKey("guard", GLFW_KEY_G);
 
-    @Environment(EnvType.CLIENT)
+    private static KeyMapping createRhodesKey(String translation, int key) {
+        return new KeyMapping("key." + RRIdentifiers.MODID + ".rhodes." + "." + translation, key, "key." + RRIdentifiers.MODID + ".rhodes");
+    }
+
     public static void registerKeyBinding() {
         KeyBindingHelper.registerKeyBinding(USE_KEY);
         KeyBindingHelper.registerKeyBinding(TARGET_KEY);
-        KeyBindingHelper.registerKeyBinding(GUARD_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_GUARD_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_ROCKET_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_LASER_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_FIRE_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_FORCE_FIELD_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_PLASMA_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_NUKE_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_STOP_KEY);
+        KeyBindingHelper.registerKeyBinding(RHODES_B2SPIRIT_KEY);
     }
 
-	@Environment(EnvType.CLIENT)
 	public static void registerRenderInformation() {
 		BlockEntityRenderers.register(RRTileEntities.NUKE_CRATE, TileEntityNukeCrateRenderer::new);
 		BlockEntityRenderers.register(RRTileEntities.NUCLEAR_BOMB, TileEntityNuclearBombRenderer::new);
@@ -106,7 +126,7 @@ public class ClientProxy extends CommonProxy {
 		EntityRendererRegistry.register(RREntities.SPHERE_BLAST, RenderSphereBlast::new);
 		EntityRendererRegistry.register(RREntities.NUKE, RenderNuke::new);
 		EntityRendererRegistry.register(RREntities.TSAR, RenderTsar::new);
-		EntityRendererRegistry.register(RREntities.RODDISK_REP, RenderRoddiskRep::new);
+		EntityRendererRegistry.register(RREntities.RODDISK_REP, RoddiskRenderer::new);
 		EntityRendererRegistry.register(RREntities.HOT_POTATO, RenderHotPotato::new);
 		EntityRendererRegistry.register(RREntities.BOMB, RenderBomb::new);
 		EntityRendererRegistry.register(RREntities.THEORETICAL_TSAR, RenderTheoreticalTsar::new);
@@ -130,24 +150,6 @@ public class ClientProxy extends CommonProxy {
 	}
 
     @Override
-	public void closeGui()
-	{
-		Minecraft.getInstance().setScreen(null);
-	}
-
-	@Override
-	public void nextBattle()
-	{
-		Minecraft.getInstance().setScreen(new GuiNextBattle());
-	}
-
-	@Override
-	public void teamWin(boolean winner)
-	{
-		Minecraft.getInstance().setScreen(winner?new GuiOmegaWin():new GuiSigmaWin());
-	}
-
-	@Override
 	public void guiClass()
 	{
 		Minecraft.getInstance().setScreen(new GuiClass(RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getInstance().player.getGameProfile()).rrclass));
@@ -177,37 +179,7 @@ public class ClientProxy extends CommonProxy {
 		Minecraft.getInstance().particleEngine.add(new EntityBloodFX((ClientLevel) world, g, !greenblood));
 	}
 
-	@Override
-	public boolean spacebar()
-	{
-		return Minecraft.getInstance().options.keyJump.isDown() && Minecraft.getInstance().screen == null;
-	}
-	@Override
-	public boolean w()
-	{
-		return Minecraft.getInstance().options.keyUp.isDown() && Minecraft.getInstance().screen == null;
-	}
-	@Override
-	public boolean a()
-	{
-		return Minecraft.getInstance().options.keyLeft.isDown() && Minecraft.getInstance().screen == null;
-	}
-	@Override
-	public boolean s()
-	{
-		return Minecraft.getInstance().options.keyDown.isDown() && Minecraft.getInstance().screen == null;
-	}
-	@Override
-	public boolean d()
-	{
-		return Minecraft.getInstance().options.keyRight.isDown() && Minecraft.getInstance().screen == null;
-	}
-	@Override
-	public boolean f()
-	{
-		return USE_KEY.isDown() && Minecraft.getInstance().screen == null;
-	}
-	boolean prevc = false;
+    boolean prevc = false;
 	public boolean c()
 	{
 		boolean isdown = glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_C) == GLFW_PRESS && Minecraft.getInstance().screen == null;
@@ -215,26 +187,8 @@ public class ClientProxy extends CommonProxy {
 		prevc = isdown;
 		return x;
 	}
-	boolean prevx = false;
 
     @Override
-	public boolean x() {
-		boolean isdown = glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_X) == GLFW_PRESS && Minecraft.getInstance().screen == null;
-		boolean x = !prevx && isdown;
-		prevx = isdown;
-		return x;
-	}
-
-    @Override
-	public boolean z() {
-		return glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_Z) == GLFW_PRESS && Minecraft.getInstance().screen == null;
-	}
-
-    public boolean g() {
-		return GUARD_KEY.isDown() && Minecraft.getInstance().screen == null;
-	}
-
-	@Override
 	public void setOverlay(EntityRhodes rhodes)
 	{
 		if (rhodes.rider == Minecraft.getInstance().player)

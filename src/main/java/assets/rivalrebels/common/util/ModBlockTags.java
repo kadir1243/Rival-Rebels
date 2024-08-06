@@ -11,5 +11,5 @@ public class ModBlockTags {
     public static final TagKey<Block> GLASS_BLOCKS = ConventionalBlockTags.GLASS_BLOCKS;
     public static final TagKey<Block> GLASS_PANES = ConventionalBlockTags.GLASS_PANES;
     public static final TagKey<Block> SANDSTONE_BLOCKS = ConventionalBlockTags.SANDSTONE_BLOCKS;
-
+    public static final TagKey<Block> GLAZED_TERRACOTTAS = ConventionalBlockTags.GLAZED_TERRACOTTAS;
 }

@@ -68,7 +68,7 @@ public class EntitySeekB83 extends AbstractArrow {
 	public EntitySeekB83(Level par1World, Player entity2, float par3) {
 		this(par1World);
 		fins = false;
-		moveTo(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYRot(), entity2.getXRot());
+		moveTo(entity2.getEyePosition(), entity2.getYRot(), entity2.getXRot());
         setPosRaw(
             getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY(),
@@ -86,7 +86,7 @@ public class EntitySeekB83 extends AbstractArrow {
 	{
 		this(par1World);
 		fins = false;
-		moveTo(entity2.getX(), entity2.getY() + entity2.getEyeHeight(entity2.getPose()), entity2.getZ(), entity2.getYRot() + yawdelta, entity2.getXRot());
+		moveTo(entity2.getEyePosition(), entity2.getYRot() + yawdelta, entity2.getXRot());
         setPosRaw(
             getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY(),
@@ -105,19 +105,6 @@ public class EntitySeekB83 extends AbstractArrow {
 		setPos(x+mx*16, y+my*16, z+mz*16);
 		fins = false;
 		shoot(mx, my, mz, 0.5f, 0.1f);
-	}
-
-    @Override
-    public void shoot(double x, double y, double z, float speed, float divergence) {
-        Vec3 vec3d = new Vec3(x, y, z);
-        double f2 = vec3d.length();
-        vec3d = vec3d.scale(1/f2);
-		vec3d = vec3d.add(random.nextGaussian() * 0.0075 * divergence,
-            random.nextGaussian() * 0.0075 * divergence,
-            random.nextGaussian() * 0.0075 * divergence).scale(speed);
-        setDeltaMovement(vec3d.x(), vec3d.y(), vec3d.z());
-		setYRot(yRotO = (float) (Math.atan2(vec3d.x(), vec3d.z()) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(vec3d.y(), Mth.sqrt((float) (vec3d.x() * vec3d.x() + vec3d.z() * vec3d.z()))) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -196,7 +183,7 @@ public class EntitySeekB83 extends AbstractArrow {
         setDeltaMovement(ddvec);
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
 			;
@@ -295,18 +282,4 @@ public class EntitySeekB83 extends AbstractArrow {
 			kill();
 		}
 	}
-
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
 }

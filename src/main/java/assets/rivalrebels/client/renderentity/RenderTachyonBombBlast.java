@@ -16,17 +16,21 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.model.ModelBlastRing;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ModelTsarBlast;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityTachyonBombBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
+import net.minecraft.world.level.lighting.LightEngine;
 
 public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlast> {
     private final ModelTsarBlast model;
@@ -90,7 +94,7 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
             matrices.scale(0.8f, 0.8f, 0.8f);
             //RenderSystem.enableBlend();
             //RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
-            model.render(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(RRIdentifiers.ettsarflame)), light, OverlayTexture.NO_OVERLAY, tickDelta);
+            model.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(RRIdentifiers.ettsarflame)), light, OverlayTexture.NO_OVERLAY, tickDelta);
             //RenderSystem.disableBlend();
         }
         matrices.popPose();
@@ -101,4 +105,13 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
         return null;
     }
 
+    @Override
+    public boolean shouldRender(EntityTachyonBombBlast livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntityTachyonBombBlast entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
+    }
 }

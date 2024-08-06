@@ -51,12 +51,12 @@ public record LaptopEngagePacket(BlockPos tpos, BlockPos lpos, boolean carpet) i
                     int XX = 11;
                     int ZZ = 10;
                     if (tel.rrteam == RivalRebelsTeam.OMEGA) {
-                        XX = (m.tpos.getX() - RivalRebels.round.omegaObjPos.getX());
-                        ZZ = (m.tpos.getZ() - RivalRebels.round.omegaObjPos.getZ());
+                        XX = (m.tpos.getX() - RivalRebels.round.omegaData.objPos().getX());
+                        ZZ = (m.tpos.getZ() - RivalRebels.round.omegaData.objPos().getZ());
                     }
                     if (tel.rrteam == RivalRebelsTeam.SIGMA) {
-                        XX = (m.tpos.getX() - RivalRebels.round.sigmaObjPos.getX());
-                        ZZ = (m.tpos.getZ() - RivalRebels.round.sigmaObjPos.getZ());
+                        XX = (m.tpos.getX() - RivalRebels.round.sigmaData.objPos().getX());
+                        ZZ = (m.tpos.getZ() - RivalRebels.round.sigmaData.objPos().getZ());
                     }
                     int xx = m.tpos.getX() - m.lpos.getX();
                     int zz = m.tpos.getZ() - m.lpos.getZ();

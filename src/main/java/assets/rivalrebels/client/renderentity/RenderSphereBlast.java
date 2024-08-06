@@ -16,11 +16,14 @@ import assets.rivalrebels.common.entity.EntitySphereBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.lighting.LightEngine;
 
 public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast> {
 	public RenderSphereBlast(EntityRendererProvider.Context manager) {
@@ -58,5 +61,15 @@ public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast> {
     @Override
     public ResourceLocation getTextureLocation(EntitySphereBlast entity) {
         return null;
+    }
+
+    @Override
+    public boolean shouldRender(EntitySphereBlast livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntitySphereBlast entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
     }
 }

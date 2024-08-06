@@ -15,6 +15,7 @@ import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -36,20 +37,17 @@ import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import java.util.List;
-import java.util.Optional;
 
-public class EntityLaserBurst extends EntityInanimate {
-	private LivingEntity shooter;
+public class EntityLaserBurst extends Projectile {
+	private Entity shooter;
 
     public EntityLaserBurst(EntityType<? extends EntityLaserBurst> type, Level world) {
         super(type, world);
@@ -63,7 +61,7 @@ public class EntityLaserBurst extends EntityInanimate {
 	{
 		this(par1World);
 		shooter = player;
-		moveTo(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ(), player.getYRot(), player.getXRot());
+		moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
         setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
             getY() - 0.12D,
             getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
@@ -80,7 +78,7 @@ public class EntityLaserBurst extends EntityInanimate {
 		this(par1World);
 		shooter = player;
 		moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
-            player.getY() + player.getEyeHeight(player.getPose()) - 0.12D,
+            player.getEyeY() - 0.12D,
             player.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F),
             player.getYRot(),
             player.getXRot());
@@ -104,7 +102,7 @@ public class EntityLaserBurst extends EntityInanimate {
 		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
-	public EntityLaserBurst(Level par1World, double x, double y, double z, double mx, double my, double mz, LivingEntity player)
+	public EntityLaserBurst(Level par1World, double x, double y, double z, double mx, double my, double mz, Entity player)
 	{
 		this(par1World);
 		shooter = player;
@@ -130,17 +128,9 @@ public class EntityLaserBurst extends EntityInanimate {
 		setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
 	}
 
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    }
 
     @Override
 	public void tick()
@@ -150,195 +140,14 @@ public class EntityLaserBurst extends EntityInanimate {
 		++tickCount;
 		if (tickCount > 60) kill();
 
-		Vec3 var15 = position();
-		Vec3 var2 = position().add(getDeltaMovement());
-		HitResult var3 = level().clip(new ClipContext(var15, var2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-		var15 = position();
-		var2 = position().add(getDeltaMovement());
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
-		if (var3 != null)
-		{
-			var2 = var3.getLocation();
-		}
-
-		if (!level().isClientSide())
-		{
-			Entity var4 = null;
-			List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-			double var6 = 0.0D;
-
-            for (Entity var9 : var5) {
-                if (var9.canBeCollidedWith() && var9 != shooter) {
-                    float var10 = 0.3F;
-                    AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
-                    Optional<Vec3> var12 = var11.clip(var15, var2);
-
-                    if (var12.isPresent()) {
-                        double var13 = var15.distanceTo(var12.get());
-
-                        if (var13 < var6 || var6 == 0.0D) {
-                            var4 = var9;
-                            var6 = var13;
-                        }
-                    }
-                }
-            }
-
-			if (var4 != null)
-			{
-				var3 = new EntityHitResult(var4);
-			}
-		}
-
-		if (var3 != null)
-		{
-			if (var3.getType() == HitResult.Type.BLOCK)
-			{
-                BlockPos pos = ((BlockHitResult) var3).getBlockPos();
-                BlockState state = level().getBlockState(pos);
-                if (state.is(Blocks.TNT)) {
-					if (!level().isClientSide()) {
-						PrimedTnt entitytntprimed = new PrimedTnt(level(), (pos.getX() + 0.5F), (pos.getY() + 0.5F), (pos.getZ() + 0.5F), shooter);
-						entitytntprimed.setFuse(level().random.nextInt(entitytntprimed.getFuse() / 4) + entitytntprimed.getFuse() / 8);
-						level().addFreshEntity(entitytntprimed);
-						level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-					}
-				} else if (state.is(RRBlocks.remotecharge)) {
-					state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
-				} else if (state.is(RRBlocks.timedbomb)) {
-					state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
-				}
-				kill();
-			}
-			else if (var3.getType() == HitResult.Type.ENTITY)
-			{
-                Entity hitEntity = ((EntityHitResult) var3).getEntity();
-                if (hitEntity instanceof Player player && shooter != hitEntity) {
-                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
-					{
-						player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
-					}
-					player.hurt(RivalRebelsDamageSource.laserBurst(level()), 16);
-					if (player.getHealth() < 3 && player.isAlive())
-					{
-						player.hurt(RivalRebelsDamageSource.laserBurst(level()), 2000000);
-						player.deathTime = 0;
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 0, 0));
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 1, 0));
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 2, 0));
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 2, 0));
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 3, 0));
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 3, 0));
-					}
-					kill();
-				}
-				else if ((hitEntity instanceof LivingEntity entity
-						&& !(hitEntity instanceof Animal)
-						&& !(hitEntity instanceof Bat)
-						&& !(hitEntity instanceof Villager)
-						&& !(hitEntity instanceof Squid))) {
-					entity.hurt(RivalRebelsDamageSource.laserBurst(level()), 6);
-					if (entity.getHealth() < 3)
-					{
-						int legs = -1;
-						int arms = -1;
-						int mobs = -1;
-						entity.kill();
-                        level().playLocalSound(this, RRSounds.BLASTER_FIRE, getSoundSource(), 1, 4);
-						if (entity instanceof Zombie && !(entity instanceof ZombifiedPiglin))
-						{
-							legs = 2;
-							arms = 2;
-							mobs = 1;
-						}
-						else if (entity instanceof ZombifiedPiglin)
-						{
-							legs = 2;
-							arms = 2;
-							mobs = 2;
-						}
-						else if (entity instanceof Skeleton)
-						{
-							legs = 2;
-							arms = 2;
-							mobs = 3;
-						}
-						else if (entity instanceof EnderMan)
-						{
-							legs = 2;
-							arms = 2;
-							mobs = 4;
-						}
-						else if (entity instanceof Creeper)
-						{
-							legs = 4;
-							arms = 0;
-							mobs = 5;
-						}
-                        else if (entity instanceof MagmaCube)
-                        {
-                            legs = 0;
-                            arms = 0;
-                            mobs = 7;
-                        }
-						else if (entity instanceof Slime)
-						{
-							legs = 0;
-							arms = 0;
-							mobs = 6;
-						}
-						else if (entity instanceof Spider && !(entity instanceof CaveSpider))
-						{
-							legs = 8;
-							arms = 0;
-							mobs = 8;
-						}
-						else if (entity instanceof CaveSpider)
-						{
-							legs = 8;
-							arms = 0;
-							mobs = 9;
-						}
-						else if (entity instanceof Ghast)
-						{
-							legs = 9;
-							arms = 0;
-							mobs = 10;
-						}
-						else
-						{
-							legs = (int) (entity.getBoundingBox().getSize() * 2);
-							arms = (int) (entity.getBoundingBox().getSize() * 2);
-							mobs = 11;
-						}
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 0, mobs));
-						level().addFreshEntity(new EntityGore(level(), hitEntity, 1, mobs));
-						for (int i = 0; i < arms; i++)
-							level().addFreshEntity(new EntityGore(level(), hitEntity, 2, mobs));
-						for (int i = 0; i < legs; i++)
-							level().addFreshEntity(new EntityGore(level(), hitEntity, 3, mobs));
-					}
-					kill();
-				}
-				else if((hitEntity instanceof EntityRhodesHead
-					  || hitEntity instanceof EntityRhodesLeftLowerArm
-				      || hitEntity instanceof EntityRhodesLeftLowerLeg
-				      || hitEntity instanceof EntityRhodesLeftUpperArm
-				      || hitEntity instanceof EntityRhodesLeftUpperLeg
-				      || hitEntity instanceof EntityRhodesRightLowerArm
-				      || hitEntity instanceof EntityRhodesRightLowerLeg
-				      || hitEntity instanceof EntityRhodesRightUpperArm
-				      || hitEntity instanceof EntityRhodesRightUpperLeg
-				      || hitEntity instanceof EntityRhodesTorso))
-				{
-					hitEntity.hurt(RivalRebelsDamageSource.laserBurst(level()), 6);
-				}
-			}
+		if (hitResult.getType() != HitResult.Type.MISS) {
+            onHit(hitResult);
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
 		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
@@ -363,4 +172,150 @@ public class EntityLaserBurst extends EntityInanimate {
 		setYRot(yRotO + (getYRot() - yRotO) * 0.2F);
 		setPos(getX(), getY(), getZ());
 	}
+
+    @Override
+    protected void onHitBlock(BlockHitResult result) {
+        super.onHitBlock(result);
+        BlockPos pos = result.getBlockPos();
+        BlockState state = level().getBlockState(pos);
+        if (state.is(Blocks.TNT)) {
+            if (!level().isClientSide()) {
+                PrimedTnt tnt = new PrimedTnt(level(), (pos.getX() + 0.5F), (pos.getY() + 0.5F), (pos.getZ() + 0.5F), shooter instanceof LivingEntity ? (LivingEntity) shooter : null);
+                tnt.setFuse(level().random.nextInt(tnt.getFuse() / 4) + tnt.getFuse() / 8);
+                level().addFreshEntity(tnt);
+                level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+            }
+        } else if (state.is(RRBlocks.remotecharge)) {
+            state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
+        } else if (state.is(RRBlocks.timedbomb)) {
+            state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
+        }
+        kill();
+    }
+
+    @Override
+    protected void onHitEntity(EntityHitResult result) {
+        Entity hitEntity = result.getEntity();
+        if (hitEntity instanceof Player player && shooter != hitEntity) {
+            EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
+            if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
+            {
+                player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
+            }
+            player.hurt(RivalRebelsDamageSource.laserBurst(level()), 16);
+            if (player.getHealth() < 3 && player.isAlive())
+            {
+                player.hurt(RivalRebelsDamageSource.laserBurst(level()), 2000000);
+                player.deathTime = 0;
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 0, 0));
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 1, 0));
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 2, 0));
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 2, 0));
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 3, 0));
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 3, 0));
+            }
+            kill();
+        }
+        else if ((hitEntity instanceof LivingEntity entity
+            && !(hitEntity instanceof Animal)
+            && !(hitEntity instanceof Bat)
+            && !(hitEntity instanceof Villager)
+            && !(hitEntity instanceof Squid))) {
+            entity.hurt(RivalRebelsDamageSource.laserBurst(level()), 6);
+            if (entity.getHealth() < 3)
+            {
+                int legs = -1;
+                int arms = -1;
+                int mobs = -1;
+                entity.kill();
+                level().playLocalSound(this, RRSounds.BLASTER_FIRE, getSoundSource(), 1, 4);
+                if (entity instanceof Zombie && !(entity instanceof ZombifiedPiglin))
+                {
+                    legs = 2;
+                    arms = 2;
+                    mobs = 1;
+                }
+                else if (entity instanceof ZombifiedPiglin)
+                {
+                    legs = 2;
+                    arms = 2;
+                    mobs = 2;
+                }
+                else if (entity instanceof Skeleton)
+                {
+                    legs = 2;
+                    arms = 2;
+                    mobs = 3;
+                }
+                else if (entity instanceof EnderMan)
+                {
+                    legs = 2;
+                    arms = 2;
+                    mobs = 4;
+                }
+                else if (entity instanceof Creeper)
+                {
+                    legs = 4;
+                    arms = 0;
+                    mobs = 5;
+                }
+                else if (entity instanceof MagmaCube)
+                {
+                    legs = 0;
+                    arms = 0;
+                    mobs = 7;
+                }
+                else if (entity instanceof Slime)
+                {
+                    legs = 0;
+                    arms = 0;
+                    mobs = 6;
+                }
+                else if (entity instanceof Spider && !(entity instanceof CaveSpider))
+                {
+                    legs = 8;
+                    arms = 0;
+                    mobs = 8;
+                }
+                else if (entity instanceof CaveSpider)
+                {
+                    legs = 8;
+                    arms = 0;
+                    mobs = 9;
+                }
+                else if (entity instanceof Ghast)
+                {
+                    legs = 9;
+                    arms = 0;
+                    mobs = 10;
+                }
+                else
+                {
+                    legs = (int) (entity.getBoundingBox().getSize() * 2);
+                    arms = (int) (entity.getBoundingBox().getSize() * 2);
+                    mobs = 11;
+                }
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 0, mobs));
+                level().addFreshEntity(new EntityGore(level(), hitEntity, 1, mobs));
+                for (int i = 0; i < arms; i++)
+                    level().addFreshEntity(new EntityGore(level(), hitEntity, 2, mobs));
+                for (int i = 0; i < legs; i++)
+                    level().addFreshEntity(new EntityGore(level(), hitEntity, 3, mobs));
+            }
+            kill();
+        }
+        else if((hitEntity instanceof EntityRhodesHead
+            || hitEntity instanceof EntityRhodesLeftLowerArm
+            || hitEntity instanceof EntityRhodesLeftLowerLeg
+            || hitEntity instanceof EntityRhodesLeftUpperArm
+            || hitEntity instanceof EntityRhodesLeftUpperLeg
+            || hitEntity instanceof EntityRhodesRightLowerArm
+            || hitEntity instanceof EntityRhodesRightLowerLeg
+            || hitEntity instanceof EntityRhodesRightUpperArm
+            || hitEntity instanceof EntityRhodesRightUpperLeg
+            || hitEntity instanceof EntityRhodesTorso))
+        {
+            hitEntity.hurt(RivalRebelsDamageSource.laserBurst(level()), 6);
+        }
+    }
 }

@@ -122,7 +122,7 @@ public class TachyonBomb {
 
 			for (int Y = y; Y > ylimit; Y--)
 			{
-				if (Y == 0) break;
+				if (Y == world.getMinBuildHeight()) break;
 				Block block = world.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
 				if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
 				else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
@@ -134,7 +134,7 @@ public class TachyonBomb {
 			{
 				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--)
 				{
-					if (Y == 0) break;
+					if (Y == world.getMinBuildHeight()) break;
 					Block block = world.getBlockState(new BlockPos(x + posX, Y, z + posZ)).getBlock();
 					if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
 					else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
@@ -188,7 +188,7 @@ public class TachyonBomb {
 
 	private int getTopBlock(int x, int z, double dist)
 	{
-		int foundY = 0;
+		int foundY = world.getMinBuildHeight();
 		boolean found = false;
 		for (int y = world.getMaxBuildHeight(); y > world.getMinBuildHeight(); y--)
 		{

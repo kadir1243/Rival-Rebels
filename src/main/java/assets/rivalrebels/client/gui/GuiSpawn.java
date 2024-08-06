@@ -20,8 +20,8 @@ import assets.rivalrebels.common.packet.ResetPacket;
 import assets.rivalrebels.common.round.RivalRebelsClass;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
+import assets.rivalrebels.common.util.Translations;
 import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
-import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
@@ -31,8 +31,9 @@ import net.minecraft.client.multiplayer.PlayerInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 
-import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class GuiSpawn extends Screen
 {
@@ -156,28 +157,19 @@ public class GuiSpawn extends Screen
             context.fillGradient(mouseX, mouseY, mouseX + 120, mouseY + 20, 0xaa111111, 0xaa111111);
 			float scalefactor = 0.666f;
 			matrices.scale(scalefactor, scalefactor, scalefactor);
-            MultiLineLabel.create(font, Component.translatable("RivalRebels.spawn.resetwarning"), (int) (116 / scalefactor)).renderLeftAlignedNoShadow(context, (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), font.lineHeight, 0xFF0000);
+            MultiLineLabel.create(font, Component.translatable(Translations.SPAWN_RESET_WARNING.toLanguageKey()), (int) (116 / scalefactor)).renderLeftAlignedNoShadow(context, (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), font.lineHeight, 0xFF0000);
 			matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 		}
     }
 
 	protected void drawPanel(GuiGraphics context, int x, int y, int height, int scroll, int scrolllimit, RivalRebelsTeam team) {
-        List<RivalRebelsPlayer> newList = new ArrayList<>();
-		RivalRebelsPlayer[] list = RivalRebels.round.rrplayerlist.getArray();
+        List<RivalRebelsPlayer> newList;
 
-        for (RivalRebelsPlayer player : list) {
-            if (isOnline(player.profile) && player.rrteam.equals(team)) {
-                newList.add(player);
-            }
-        }
-        for (RivalRebelsPlayer player : list) {
-            if (!isOnline(player.profile) && player.rrteam.equals(team)) {
-                newList.add(player);
-            }
-        }
-
+        newList = RivalRebels.round.rrplayerlist.players().stream().filter(player -> player.rrteam.equals(team)).collect(Collectors.toList());
 		if (newList.isEmpty()) return;
-		int dist = (int) (-((float) scroll / (float) scrolllimit) * ((newList.size() * 10) - height));
+        newList.sort(Comparator.comparing(this::isOnline));
+
+        int dist = (int) (-((float) scroll / (float) scrolllimit) * ((newList.size() * 10) - height));
 		boolean shouldScroll = newList.size() * 10 > height;
         for (int i = 0; i < newList.size(); i++) {
             RivalRebelsPlayer player = newList.get(i);
@@ -190,7 +182,7 @@ public class GuiSpawn extends Screen
 				int r = (color & 0xFF0000) >> 16;
 				int g = (color & 0xFF00) >> 8;
 				int b = (color & 0xFF);
-				if (!isOnline(player.profile))
+				if (!isOnline(player))
 				{
 					r /= 2;
 					g /= 2;
@@ -225,11 +217,11 @@ public class GuiSpawn extends Screen
 		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 	}
 
-	protected boolean isOnline(GameProfile user)
+	protected boolean isOnline(RivalRebelsPlayer user)
 	{
         if (minecraft == null || minecraft.getConnection() == null || minecraft.getConnection().getOnlinePlayers().isEmpty()) return false;
         for (PlayerInfo guiPlayerInfo : minecraft.getConnection().getOnlinePlayers()) {
-            if (user.equals(guiPlayerInfo.getProfile())) return true;
+            if (user.profile.equals(guiPlayerInfo.getProfile())) return true;
         }
 		return false;
 	}

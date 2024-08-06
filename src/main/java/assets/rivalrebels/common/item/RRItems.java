@@ -2,6 +2,7 @@ package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.item.weapon.*;
+import assets.rivalrebels.common.util.Translations;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
@@ -21,7 +22,7 @@ import java.util.*;
 public class RRItems {
     public static final Set<Item> ALL = new LinkedHashSet<>();
     public static final Holder<ArmorMaterial> TROLL_MATERIAL = registerMaterial("troll", new int[] {0, 0, 0, 0}, 1000);
-    public static final CreativeModeTab rralltab = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, RRIdentifiers.create("alltab"), FabricItemGroup.builder().icon(() -> RRItems.NUCLEAR_ROD.getDefaultInstance()).title(Component.translatable("itemGroup." + RRIdentifiers.MODID + ".all")).displayItems((displayContext, entries) -> entries.acceptAll(ALL.stream().map(Item::getDefaultInstance).toList())).build());
+    public static final CreativeModeTab rralltab = Registry.register(BuiltInRegistries.CREATIVE_MODE_TAB, RRIdentifiers.create("creative_tab"), FabricItemGroup.builder().icon(() -> RRItems.NUCLEAR_ROD.getDefaultInstance()).title(Component.translatable(Translations.CREATIVE_TAB.toLanguageKey())).displayItems((displayContext, entries) -> entries.acceptAll(ALL.stream().map(Item::getDefaultInstance).toList())).build());
     public static final Item rpg = register("rpg", new ItemRPG());
     public static final Item flamethrower = register("flamethrower", new ItemFlameThrower());
     public static final Item tesla = register("tesla", new ItemTesla());

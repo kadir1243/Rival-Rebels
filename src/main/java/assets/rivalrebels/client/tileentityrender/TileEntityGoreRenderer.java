@@ -12,6 +12,8 @@
 package assets.rivalrebels.client.tileentityrender;
 
 import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.client.renderhelper.RenderHelper;
+import assets.rivalrebels.client.renderhelper.TextureVertice;
 import assets.rivalrebels.common.block.machine.BlockForceField;
 import assets.rivalrebels.common.tileentity.TileEntityGore;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -119,6 +121,6 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
 	}
 
 	private void addVertex(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2, int light, int overlay) {
-		buffer.addVertex(poseStack.last(), v.mul(0.999F, new Vector3f())).setUv(t, t2).setLight(light);
+        RenderHelper.addVertice(poseStack, buffer, v.mul(0.999F, new Vector3f()), new TextureVertice(t, t2), light, overlay);
 	}
 }

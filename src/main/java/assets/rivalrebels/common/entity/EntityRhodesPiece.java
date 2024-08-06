@@ -118,12 +118,6 @@ public class EntityRhodesPiece extends Entity {
 	}
 
 	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
-	@Override
 	public boolean hurt(DamageSource par1DamageSource, float par2)
 	{
 		super.hurt(par1DamageSource, par2);

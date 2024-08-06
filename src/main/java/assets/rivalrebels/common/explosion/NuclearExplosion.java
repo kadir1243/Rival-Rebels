@@ -21,7 +21,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
@@ -95,8 +94,7 @@ public class NuclearExplosion
 				{
 					int YY = Y * Y + ZZ;
 					int yy = y + Y;
-					if (YY < onepointfiveradiussqrd)
-					{
+					if (YY < onepointfiveradiussqrd) {
                         BlockPos pos = new BlockPos(xx, yy, zz);
                         BlockState state = world.getBlockState(pos);
                         Block block = state.getBlock();
@@ -199,44 +197,29 @@ public class NuclearExplosion
 		world.playLocalSound(x, y, z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.MASTER, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F, true);
 	}
 
-	private void pushAndHurtEntities(Level world, int x, int y, int z, int radius)
-	{
+	private void pushAndHurtEntities(Level world, int x, int y, int z, int radius) {
 		radius *= 4;
-		int var3 = Mth.floor(x - (double) radius - 1.0D);
-		int var4 = Mth.floor(x + (double) radius + 1.0D);
-		int var5 = Mth.floor(y - (double) radius - 1.0D);
-		int var28 = Mth.floor(y + (double) radius + 1.0D);
-		int var7 = Mth.floor(z - (double) radius - 1.0D);
-		int var29 = Mth.floor(z + (double) radius + 1.0D);
-		List<Entity> var9 = world.getEntities(null, new AABB(var3, var5, var7, var4, var28, var29));
+        AABB aabb = new AABB(x, y, z, x, y, z).inflate(radius + 1, -(radius + 1), radius + 1);
+		List<Entity> var9 = world.getEntities(null, aabb);
 		Vec3 var30 = new Vec3(x, y, z);
 
-        for (Entity var31 : var9) {
-            double var13 = Math.sqrt(var31.distanceToSqr(x, y, z)) / radius;
+        for (Entity entity : var9) {
+            double distance = Math.sqrt(entity.distanceToSqr(x, y, z)) / radius;
 
-            if (var13 <= 1.0D) {
-                double var15 = var31.getX() - x;
-                double var17 = var31.getY() + var31.getEyeHeight(var31.getPose()) - y;
-                double var19 = var31.getZ() - z;
-                double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
+            if (distance <= 1.0D) {
+                Vec3 vector = entity.getEyePosition().subtract(var30);
 
-                if (var33 != 0.0D) {
-                    var15 /= var33;
-                    var17 /= var33;
-                    var19 /= var33;
-                    double var32 = net.minecraft.world.level.Explosion.getSeenPercent(var30, var31);
-                    double var34 = (1.0D - var13) * var32 * ((var31 instanceof EntityB83 || var31 instanceof EntityHackB83) ? -1 : 1);
-                    if (!(var31 instanceof EntityNuclearBlast) && !(var31 instanceof EntityTsarBlast) && !(var31 instanceof EntityRhodes)) {
-                        if (var31 instanceof FallingBlockEntity) var31.kill();
-                        var31.hurt(RivalRebelsDamageSource.nuclearBlast(world), (int) ((var34 * var34 + var34) / 2.0D * 8.0D * radius + 1.0D) * 4);
-                        var31.setDeltaMovement(var31.getDeltaMovement().subtract(
-                            var15 * var34 * 8,
-                            var17 * var34 * 8,
-                            var19 * var34 * 8
-                        ));
+                if (vector.length() != 0.0D) {
+                    vector = vector.normalize();
+                    double var32 = net.minecraft.world.level.Explosion.getSeenPercent(var30, entity);
+                    double var34 = (1.0D - distance) * var32 * ((entity instanceof EntityB83 || entity instanceof EntityHackB83) ? -1 : 1);
+                    if (!(entity instanceof EntityNuclearBlast) && !(entity instanceof EntityTsarBlast) && !(entity instanceof EntityRhodes)) {
+                        if (entity instanceof FallingBlockEntity) entity.kill();
+                        entity.hurt(RivalRebelsDamageSource.nuclearBlast(world), (int) ((var34 * var34 + var34) / 2.0D * 8.0D * radius + 1.0D) * 4);
+                        entity.setDeltaMovement(entity.getDeltaMovement().subtract(vector.scale(var34 * 8)));
                     }
-                    if (var31 instanceof EntityRhodes) {
-                        var31.hurt(RivalRebelsDamageSource.nuclearBlast(world), (int) (radius * var34 * 0.2f));
+                    if (entity instanceof EntityRhodes) {
+                        entity.hurt(RivalRebelsDamageSource.nuclearBlast(world), (int) (radius * var34 * 0.2f));
                     }
                 }
             }

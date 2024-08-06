@@ -35,7 +35,7 @@ import net.minecraft.world.phys.AABB;
 public class TileEntityForceFieldNode extends TileEntityMachineBase
 {
     public UUID uuid;
-	public RivalRebelsTeam	rrteam		= null;
+	public RivalRebelsTeam	rrteam		= RivalRebelsTeam.NONE;
 	public int				level		= 0;
 
 	public TileEntityForceFieldNode(BlockPos pos, BlockState state)
@@ -80,14 +80,13 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
         super.loadAdditional(nbt, provider);
 
 		rrteam = RivalRebelsTeam.getForID(nbt.getInt("rrteam"));
-		if (rrteam == RivalRebelsTeam.NONE) rrteam = null;
-		if (rrteam == null) uuid = nbt.getUUID("uuid");
+		if (rrteam == RivalRebelsTeam.NONE) uuid = nbt.getUUID("uuid");
 	}
 
     @Override
     public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
 		super.saveAdditional(nbt, provider);
-		if (rrteam != null) nbt.putInt("rrteam", rrteam.ordinal());
+		if (rrteam != RivalRebelsTeam.NONE) nbt.putInt("rrteam", rrteam.ordinal());
 		if (uuid != null) nbt.putUUID("uuid", uuid);
     }
 
@@ -118,8 +117,8 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                     }
                 }
                 if (shouldContinue && e != null) {
-                    double cpx = getBlockPos().getX() + 0.5f - e.position().x;
-                    double cpy = e.getY() + e.getEyeHeight(e.getPose()) - e.getY();
+                    double cpx = getBlockPos().getX() + 0.5f - e.getX();
+                    double cpy = e.getEyeY() - e.getY();
                     double cpz = e.getZ() - e.getZ();
 
                     double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
@@ -168,7 +167,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                 }
                 if (shouldContinue && e != null) {
                     double cpx = getBlockPos().getX() + 0.5f - e.getX();
-                    double cpy = e.getY() + e.getEyeHeight(e.getPose()) - e.getY();
+                    double cpy = e.getEyeY() - e.getY();
                     double cpz = e.getZ() - e.getZ();
 
                     double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
@@ -217,7 +216,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                 }
                 if (shouldContinue && e != null) {
                     double cpx = e.getX() - e.getX();
-                    double cpy = e.getY() + e.getEyeHeight(e.getPose()) - e.getY();
+                    double cpy = e.getEyeY() - e.getY();
                     double cpz = getBlockPos().getZ() + 0.5f - e.getZ();
 
                     double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;
@@ -266,7 +265,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                 }
                 if (shouldContinue && e != null) {
                     double cpx = e.getX() - e.getX();
-                    double cpy = e.getY() + e.getEyeHeight(e.getPose()) - e.getY();
+                    double cpy = e.getEyeY() - e.getY();
                     double cpz = getBlockPos().getZ() + 0.5f - e.getZ();
 
                     double dist = Math.sqrt(cpx * cpx + cpy * cpy + cpz * cpz) / speed;

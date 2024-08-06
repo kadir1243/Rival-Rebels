@@ -13,6 +13,7 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerTachyonBomb;
+import assets.rivalrebels.common.util.Translations;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -40,15 +41,15 @@ public class GuiTachyonBomb extends AbstractContainerScreen<ContainerTachyonBomb
 		matrices.popPose();
 		if (menu.isUnbalanced())
 		{
-            context.drawString(font, Component.translatable(RRIdentifiers.UNBALANCED_BOMB.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
+            context.drawString(font, Component.translatable(Translations.UNBALANCED_BOMB.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
 		}
 		else if (menu.isArmed())
 		{
-            context.drawString(font, Component.translatable(RRIdentifiers.BOMB_ARMED.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
+            context.drawString(font, Component.translatable(Translations.BOMB_ARMED.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
 		}
 		else
 		{
-            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable(RRIdentifiers.BOMB_MEGATONS.toLanguageKey())), 6, imageHeight - 97, 0xFFFFFF, false);
+            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 6, imageHeight - 97, 0xFFFFFF, false);
 		}
     }
 
@@ -62,9 +63,9 @@ public class GuiTachyonBomb extends AbstractContainerScreen<ContainerTachyonBomb
             milli = "" + millis;
         }
         if (menu.getCountdown() % 20 >= 10) {
-            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFFFFFF, false);
+            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFFFFFF, false);
         } else {
-            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFF0000, false);
+            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFF0000, false);
         }
     }
 

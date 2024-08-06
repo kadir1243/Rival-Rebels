@@ -55,10 +55,10 @@ public class ItemTrollHelmet extends ArmorItem {
         if (stack.isEnchanted() || !player.mayUseItemAt(pos, facing, stack)) {
             return InteractionResult.FAIL;
         }
-        if (world.isUnobstructed(RRBlocks.flag2.defaultBlockState(), pos, CollisionContext.of(player))) {
-            BlockState flagState = RRBlocks.flag2.getStateForPlacement(new BlockPlaceContext(player, hand, stack, new BlockHitResult(context.getClickLocation(), facing, pos, false)));
+        if (world.isUnobstructed(RRBlocks.trollFlag.defaultBlockState(), pos, CollisionContext.of(player))) {
+            BlockState flagState = RRBlocks.trollFlag.getStateForPlacement(new BlockPlaceContext(player, hand, stack, new BlockHitResult(context.getClickLocation(), facing, pos, false)));
             world.setBlockAndUpdate(pos, flagState);
-            world.playLocalSound((float) pos.getX() + 0.5F, (float) pos.getY() + 0.5F, (float) pos.getZ() + 0.5F, RRBlocks.flag2.defaultBlockState().getSoundType().getStepSound(), SoundSource.PLAYERS, (RRBlocks.flag2.defaultBlockState().getSoundType().getVolume() + 1.0F) / 2.0F, RRBlocks.flag2.defaultBlockState().getSoundType().getPitch() * 0.8F, false);
+            world.playLocalSound((float) pos.getX() + 0.5F, (float) pos.getY() + 0.5F, (float) pos.getZ() + 0.5F, RRBlocks.trollFlag.defaultBlockState().getSoundType().getStepSound(), SoundSource.PLAYERS, (RRBlocks.trollFlag.defaultBlockState().getSoundType().getVolume() + 1.0F) / 2.0F, RRBlocks.trollFlag.defaultBlockState().getSoundType().getPitch() * 0.8F, false);
             stack.consume(1, context.getPlayer());
             return InteractionResult.SUCCESS;
         }

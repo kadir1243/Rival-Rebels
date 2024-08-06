@@ -14,7 +14,6 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
@@ -55,7 +54,7 @@ public class EntityRoddiskRebel extends RoddiskBase {
 
 	public EntityRoddiskRebel(Level world, LivingEntity shooter, float par3) {
 		super(RREntities.RODDISK_REBEL, world, shooter);
-		this.moveTo(shooter.getX(), shooter.getY() + shooter.getEyeHeight(shooter.getPose()), shooter.getZ(), shooter.getYRot(), shooter.getXRot());
+		this.moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
 		        setPosRaw(getX() - (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY() - 0.1,
             getZ() - (Mth.sin(this.getYRot() / 180.0F * Mth.PI) * 0.16F)
@@ -65,38 +64,20 @@ public class EntityRoddiskRebel extends RoddiskBase {
 		setDeltaMovement((-Mth.sin(this.getYRot() / 180.0F * Mth.PI) * Mth.cos(this.getXRot() / 180.0F * Mth.PI)),
             (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * Mth.cos(this.getXRot() / 180.0F * Mth.PI)),
             (-Mth.sin(this.getXRot() / 180.0F * Mth.PI)));
-		this.setHeading(this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), par3 * 1.5F, 1.0F);
-	}
-
-	public void setHeading(double par1, double par3, double par5, float par7, float par8)
-	{
-		float var9 = Mth.sqrt((float) (par1 * par1 + par3 * par3 + par5 * par5));
-		par1 /= var9;
-		par3 /= var9;
-		par5 /= var9;
-		par1 += this.random.nextGaussian() * 0.0075 * par8;
-		par3 += this.random.nextGaussian() * 0.0075 * par8;
-		par5 += this.random.nextGaussian() * 0.0075 * par8;
-		par1 *= par7;
-		par3 *= par7;
-		par5 *= par7;
-		setDeltaMovement(par1, par3, par5);
-		float var10 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-		this.setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
-		this.setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
+		this.shoot(this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), par3 * 1.5F, 1.0F);
 	}
 
     @Override
 	public void tick() {
-		if (tickCount > 100 && shooter == null && !level().isClientSide())
+		if (tickCount > 100 && getOwner() == null && !level().isClientSide())
 		{
 			//world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), new ItemStack(RivalRebels.roddisk)));
 			kill();
             this.playSound(RRSounds.FORCE_FIELD);
 		}
-		if (tickCount >= 100 && !level().isClientSide && shooter != null)
+		if (tickCount >= 100 && !level().isClientSide && getOwner() != null)
 		{
-			ItemEntity ei = new ItemEntity(level(), shooter.getX(), shooter.getY(), shooter.getZ(), RRItems.roddisk.getDefaultInstance());
+			ItemEntity ei = new ItemEntity(level(), getOwner().getX(), getOwner().getY(), getOwner().getZ(), RRItems.roddisk.getDefaultInstance());
 			level().addFreshEntity(ei);
 			kill();
             this.playSound(RRSounds.RODDISK_UNKNOWN5);
@@ -107,14 +88,9 @@ public class EntityRoddiskRebel extends RoddiskBase {
 		}
 
 		int radius = 2;
-		int nx = Mth.floor(getX() - radius - 1.0D);
-		int px = Mth.floor(getX() + radius + 1.0D);
-		int ny = Mth.floor(getY() - radius - 1.0D);
-		int py = Mth.floor(getY() + radius + 1.0D);
-		int nz = Mth.floor(getZ() - radius - 1.0D);
-		int pz = Mth.floor(getZ() + radius + 1.0D);
+        AABB aabb = new AABB(getX(), getY(), getZ(), getX(), getY(), getZ()).inflate(radius + 1, -(radius + 1), radius + 1);
 
-        level().getEntities((Entity) null, new AABB(nx, ny, nz, px, py, pz), entity -> entity instanceof Arrow).forEach(Entity::kill);
+        level().getEntities((Entity) null, aabb, entity -> entity instanceof Arrow).forEach(Entity::kill);
 
 		Vec3 var15 = position();
 		Vec3 var2 = position().add(getDeltaMovement());
@@ -144,7 +120,7 @@ public class EntityRoddiskRebel extends RoddiskBase {
                     }
                     ItemEntity ei = new ItemEntity(level(), var9.getX(), var9.getY(), var9.getZ(), RRItems.roddisk.getDefaultInstance());
                     level().addFreshEntity(ei);
-                } else if (var9.canBeCollidedWith() && var9 != this.shooter) {
+                } else if (var9.canBeCollidedWith() && var9 != this.getOwner()) {
                     float var10 = 0.3F;
                     AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
                     Optional<Vec3> var12 = var11.clip(var15, var2);
@@ -176,7 +152,7 @@ public class EntityRoddiskRebel extends RoddiskBase {
 			if (var3.getType() == HitResult.Type.ENTITY) {
                 Entity entityHit = ((EntityHitResult) var3).getEntity();
                 this.playSound(RRSounds.ROD_DISK_HIT_ENTITY);
-				if (entityHit instanceof Player entityPlayerHit && shooter instanceof Player && entityHit != shooter)
+				if (entityHit instanceof Player entityPlayerHit && getOwner() instanceof Player && entityHit != getOwner())
 				{
                     for (EquipmentSlot slot : EquipmentSlot.values()) {
                         if (!slot.isArmor()) return;
@@ -232,7 +208,7 @@ public class EntityRoddiskRebel extends RoddiskBase {
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
 		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
@@ -257,12 +233,12 @@ public class EntityRoddiskRebel extends RoddiskBase {
 		this.setXRot((this.xRotO + (this.getXRot() - this.xRotO) * 0.2F));
 		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.2F);
 
-		if (shooter != null)
+		if (getOwner() != null)
 		{
             setDeltaMovement(getDeltaMovement().add(
-                (shooter.getX() - getX()) * 0.01f,
-                ((shooter.getY() + 1.62) - getY()) * 0.01f,
-                (shooter.getZ() - getZ()) * 0.01f
+                (getOwner().getX() - getX()) * 0.01f,
+                ((getOwner().getY() + 1.62) - getY()) * 0.01f,
+                (getOwner().getZ() - getZ()) * 0.01f
             ));
 		}
         setDeltaMovement(getDeltaMovement().scale(0.995f));

@@ -58,9 +58,9 @@ public class EntityPlasmoid extends EntityInanimate
 		this(par1World);
 		this.thrower = thrower;
 
-        setPosRaw(getX(), thrower.getY() + thrower.getEyeHeight(thrower.getPose()) - 0.10000000149011612D, getZ());
+        setPosRaw(getX(), thrower.getEyeY() - 0.1F, getZ());
 		double var6 = par3EntityLiving.getX() - thrower.getX();
-		double var8 = par3EntityLiving.getY() + par3EntityLiving.getEyeHeight(par3EntityLiving.getPose()) - 0.699999988079071D - getY();
+		double var8 = par3EntityLiving.getEyeY() - 0.7 - getY();
 		double var10 = par3EntityLiving.getZ() - thrower.getZ();
 		double var12 = Math.sqrt(var6 * var6 + var10 * var10);
 
@@ -84,9 +84,8 @@ public class EntityPlasmoid extends EntityInanimate
 		this.thrower = thrower;
 		moveTo(
             thrower.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
-            thrower.getY() + thrower.getEyeHeight(thrower.getPose()),
+            thrower.getEyeY(),
             thrower.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F), thrower.getYRot(), thrower.getXRot());
-		reapplyPosition();
 		setDeltaMovement(-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI),
 		 (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
 		 (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
@@ -104,23 +103,11 @@ public class EntityPlasmoid extends EntityInanimate
 	}
 
 	public void setAccurateHeading(Vec3 vec, float speed, float par8) {
-        vec = vec.scale(1/vec.length()).scale(speed);
+        vec = vec.normalize().scale(speed);
         setDeltaMovement(vec);
-		float var10 = Mth.sqrt((float) (vec.x * vec.x + vec.z * vec.z));
+		float var10 = (float) vec.horizontalDistance();
 		setYRot(yRotO = (float) (Math.atan2(vec.x, vec.z) * Mth.RAD_TO_DEG));
 		setXRot(xRotO = (float) (Math.atan2(vec.y, var10) * Mth.RAD_TO_DEG));
-	}
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
 	@Override
@@ -165,7 +152,7 @@ public class EntityPlasmoid extends EntityInanimate
 		if (mop != null) explode();
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = Mth.sqrt((float) (getDeltaMovement().x() * getDeltaMovement().x() + getDeltaMovement().z() * getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
 			;

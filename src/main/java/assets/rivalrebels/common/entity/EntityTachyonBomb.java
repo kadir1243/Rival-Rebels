@@ -20,23 +20,17 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.projectile.ThrowableProjectile;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import java.util.List;
-import java.util.Optional;
 
-public class EntityTachyonBomb extends ThrowableProjectile
+public class EntityTachyonBomb extends Projectile
 {
 	public int	ticksInAir	= 0;
 	public int aoc = 0;
@@ -96,52 +90,20 @@ public class EntityTachyonBomb extends ThrowableProjectile
 			if (ticksInAir == - 100) explode();
 			++this.ticksInAir;
 
-			Vec3 var15 = position();
-			Vec3 var2 = position().add(getDeltaMovement());
-			HitResult var3 = this.level().clip(new ClipContext(var15, var2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+			HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
-			if (var3 != null)
+			if (hitResult.getType() != HitResult.Type.MISS)
 			{
-				var2 = var3.getLocation();
-			}
-			Entity var4 = null;
-			List<Entity> var5 = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D, 1.0D, 1.0D));
-			double var6 = 0.0D;
-
-            for (Entity var9 : var5) {
-                if (var9.canBeCollidedWith()) {
-                    float var10 = 0.3F;
-                    AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
-                    Optional<Vec3> var12 = var11.clip(var15, var2);
-
-                    if (var12.isPresent()) {
-                        double var13 = var15.distanceTo(var12.get());
-
-                        if (var13 < var6 || var6 == 0.0D) {
-                            var4 = var9;
-                            var6 = var13;
-                        }
-                    }
-                }
-            }
-
-			if (var4 != null)
-			{
-				var3 = new EntityHitResult(var4);
-			}
-
-			if (var3 != null)
-			{
-				this.onHit(var3);
+				this.onHit(hitResult);
 			}
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < 0) kill();
+		if (getY() < level().getMinBuildHeight()) kill();
 
 		if (this.isPassenger())
 		{
-		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
 		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
@@ -188,12 +150,6 @@ public class EntityTachyonBomb extends ThrowableProjectile
 		aoc = nbt.getInt("charge");
 		hasTrollface = nbt.getBoolean("troll");
 		setYRot(yRotO = nbt.getFloat("rot"));
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
     @Override

@@ -20,6 +20,7 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -44,5 +45,10 @@ public class RenderHackB83 extends EntityRenderer<EntityHackB83> {
     @Override
     public ResourceLocation getTextureLocation(EntityHackB83 entity) {
         return RRIdentifiers.etb83;
+    }
+
+    @Override
+    public boolean shouldRender(EntityHackB83 livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
     }
 }

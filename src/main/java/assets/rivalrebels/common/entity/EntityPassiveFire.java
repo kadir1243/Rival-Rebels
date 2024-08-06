@@ -44,9 +44,9 @@ public class EntityPassiveFire extends EntityInanimate {
 	public EntityPassiveFire(Level par1World, Mob shootingEntity, Mob par3EntityLiving, float par4, float par5) {
 		this(par1World);
 		this.shootingEntity = shootingEntity;
-        setPosRaw(getX(), (shootingEntity.getY() + shootingEntity.getEyeHeight(shootingEntity.getPose())) - 0.1D, getZ());
+        setPosRaw(getX(), shootingEntity.getEyeY() - 0.1D, getZ());
 		double d = par3EntityLiving.getX() - shootingEntity.getX();
-		double d1 = (par3EntityLiving.getY() + par3EntityLiving.getEyeHeight(par3EntityLiving.getPose())) - 0.7D - getY();
+		double d1 = par3EntityLiving.getEyeY() - 0.7D - getY();
 		double d2 = par3EntityLiving.getZ() - shootingEntity.getZ();
 		double d3 = Math.sqrt(d * d + d2 * d2);
 
@@ -65,7 +65,7 @@ public class EntityPassiveFire extends EntityInanimate {
 	public EntityPassiveFire(Level par1World, Entity entity, float par3) {
 		this(par1World);
 		shootingEntity = entity;
-		moveTo(entity.getX(), entity.getY() + entity.getEyeHeight(entity.getPose()), entity.getZ(), entity.getYRot(), entity.getXRot());
+		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
 		setYRot((getYRot() + 25) % 360);
         setPosRaw(
             getX() - Mth.cos((getYRot() / 180F) * Mth.PI) * 0.16F,
@@ -79,14 +79,7 @@ public class EntityPassiveFire extends EntityInanimate {
 	}
 
 	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
+	public boolean shouldRenderAtSqrDistance(double distance) {
 		return (distance <= 16);
 	}
 

@@ -15,41 +15,41 @@ import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
 import com.mojang.authlib.GameProfile;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import java.util.Arrays;
 
-public class RivalRebelsPlayerList implements CustomPacketPayload {
-    public static final StreamCodec<FriendlyByteBuf, RivalRebelsPlayerList> STREAM_CODEC = StreamCodec.ofMember(RivalRebelsPlayerList::toBytes, RivalRebelsPlayerList::fromBytes);
+import java.util.ArrayList;
+import java.util.List;
+
+public record RivalRebelsPlayerList(List<RivalRebelsPlayer> players) implements CustomPacketPayload {
+    public static final Codec<RivalRebelsPlayerList> CODEC = RecordCodecBuilder.create(
+        i -> i.group(
+            RivalRebelsPlayer.CODEC.listOf().fieldOf("players").forGetter(RivalRebelsPlayerList::players)
+        ).apply(i, RivalRebelsPlayerList::new)
+    );
+    public static final StreamCodec<FriendlyByteBuf, RivalRebelsPlayerList> STREAM_CODEC = StreamCodec.composite(RivalRebelsPlayer.STREAM_CODEC.apply(ByteBufCodecs.list()), RivalRebelsPlayerList::players, RivalRebelsPlayerList::new);
     public static final Type<RivalRebelsPlayerList> PACKET_TYPE = new Type<>(RRIdentifiers.create("rivalrebelsplayerlist"));
-	private int	size = 0;
-	private RivalRebelsPlayer[]	list = new RivalRebelsPlayer[0];
 
-	public RivalRebelsPlayerList()
+	public RivalRebelsPlayerList() {
+        this(new ArrayList<>());
+    }
+
+    public int getSize()
 	{
+		return players.size();
 	}
 
-	public int getSize()
-	{
-		return size;
-	}
-
-	public RivalRebelsPlayer add(RivalRebelsPlayer o)
-	{
-		size++;
-        if (size > list.length) {
-            int nsize = ((list.length * 3) / 2) + 1;
-            if (nsize < size) nsize = size;
-            list = Arrays.copyOf(list, nsize);
-        }
-        list[size - 1] = o;
+	public RivalRebelsPlayer add(RivalRebelsPlayer o) {
+        players.add(o);
         return o;
 	}
 
@@ -58,74 +58,29 @@ public class RivalRebelsPlayerList implements CustomPacketPayload {
         return PACKET_TYPE;
     }
 
-    public void clear()
-	{
-		for (int i = 0; i < size; i++) list[i].clear();
+    public void clear() {
+        players.forEach(RivalRebelsPlayer::clear);
 	}
 
-	public void clearTeam()
-	{
-		for (int i = 0; i < size; i++) list[i].clearTeam();
+	public void clearTeam() {
+        players.forEach(RivalRebelsPlayer::clearTeam);
 	}
 
-	public boolean contains(GameProfile o)
-	{
-		for (int i = 0; i < size; i++) if (list[i].profile.equals(o)) return true;
-		return false;
+	public boolean contains(GameProfile o) {
+		return players.stream().map(rivalRebelsPlayer -> rivalRebelsPlayer.profile).anyMatch(gameProfile -> gameProfile.equals(o));
 	}
 
     public RivalRebelsPlayer getForGameProfile(GameProfile profile) {
-        for (int i = 0; i < size; i++) if (list[i].profile.equals(profile)) return list[i];
-        return add(new RivalRebelsPlayer(profile, RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RRConfig.SERVER.getMaximumResets()));
+        for (RivalRebelsPlayer player : players) if (player.profile.equals(profile)) return player;
+        return add(new RivalRebelsPlayer(profile, RRConfig.SERVER.getMaximumResets()));
     }
 
-	public void clearVotes()
-	{
-		for (int i = 0; i < size; i++)
-		{
-			list[i].voted = false;
-		}
+	public void clearVotes() {
+        players.forEach(rivalRebelsPlayer -> rivalRebelsPlayer.voted = false);
 	}
 
-	public static RivalRebelsPlayerList fromBytes(FriendlyByteBuf buf) {
-        RivalRebelsPlayerList rivalRebelsPlayerList = new RivalRebelsPlayerList();
-        rivalRebelsPlayerList.size = buf.readInt();
-        rivalRebelsPlayerList.list = new RivalRebelsPlayer[rivalRebelsPlayerList.size];
-		for (int i = 0; i < rivalRebelsPlayerList.size; i++) rivalRebelsPlayerList.list[i] = new RivalRebelsPlayer(buf);
-        return rivalRebelsPlayerList;
-	}
-
-    public static RivalRebelsPlayerList fromNbt(CompoundTag nbt) {
-        RivalRebelsPlayerList rivalRebelsPlayerList = new RivalRebelsPlayerList();
-        rivalRebelsPlayerList.size = nbt.getInt("size");
-        rivalRebelsPlayerList.list = new RivalRebelsPlayer[rivalRebelsPlayerList.size];
-        for (int i = 0; i < rivalRebelsPlayerList.size; i++) {
-            rivalRebelsPlayerList.list[i] = new RivalRebelsPlayer(nbt.getCompound("list_" + i));
-        }
-        return rivalRebelsPlayerList;
-    }
-
-	public static void toBytes(RivalRebelsPlayerList playerList, FriendlyByteBuf buf) {
-		buf.writeInt(playerList.size);
-		for (int i = 0; i < playerList.size; i++) playerList.list[i].toBytes(buf);
-	}
-
-    public void toNbt(CompoundTag nbt) {
-        nbt.putInt("size", size);
-        for (int i = 0; i < size; i++) {
-            CompoundTag compound = new CompoundTag();
-            list[i].toNbt(compound);
-            nbt.put("list_" + i, compound);
-        }
-    }
-
-	public static void onMessage(RivalRebelsPlayerList m, ClientPlayNetworking.Context context) {
+    public static void onMessage(RivalRebelsPlayerList m, ClientPlayNetworking.Context context) {
 		RivalRebels.round.rrplayerlist = m;
-	}
-
-	public RivalRebelsPlayer[] getArray()
-	{
-		return list;
 	}
 
     public void refreshForWorld(Level world) {

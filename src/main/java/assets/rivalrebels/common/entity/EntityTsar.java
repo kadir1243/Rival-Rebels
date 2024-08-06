@@ -142,12 +142,12 @@ public class EntityTsar extends ThrowableProjectile
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < 0) kill();
+		if (getY() < level().getMinBuildHeight()) kill();
 
 		if (this.isPassenger())
 		{
 		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 
 		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
 		{
@@ -187,17 +187,10 @@ public class EntityTsar extends ThrowableProjectile
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag nbt)
-	{
+	public void readAdditionalSaveData(CompoundTag nbt) {
 		aoc = nbt.getInt("charge");
 		hasTrollface = nbt.getBoolean("troll");
 		setYRot(yRotO = nbt.getFloat("rot"));
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
     @Override

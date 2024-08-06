@@ -20,6 +20,7 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -57,5 +58,10 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit> {
         } else {
             return RRIdentifiers.etb2spirit;
         }
+    }
+
+    @Override
+    public boolean shouldRender(EntityB2Spirit livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
     }
 }

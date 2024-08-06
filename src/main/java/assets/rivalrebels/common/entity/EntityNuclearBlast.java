@@ -25,6 +25,7 @@ import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityNuclearBlast extends EntityInanimate {
     int			time;
@@ -47,18 +48,6 @@ public class EntityNuclearBlast extends EntityInanimate {
 		this(par1World);
         setDeltaMovement(hasTroll ? 1 : 0, Strength = s, getDeltaMovement().z());
 		setPos(par2, par4, par6);
-	}
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
     @Override
@@ -114,38 +103,24 @@ public class EntityNuclearBlast extends EntityInanimate {
 	{
 		int radius = Strength * RRConfig.SERVER.getNuclearBombStrength();
 		if (radius > 80) radius = 80;
-		int var3 = Mth.floor(getX() - radius - 1.0D);
-		int var4 = Mth.floor(getX() + radius + 1.0D);
-		int var5 = Mth.floor(getY() - radius - 1.0D);
-		int var28 = Mth.floor(getY() + radius + 1.0D);
-		int var7 = Mth.floor(getZ() - radius - 1.0D);
-		int var29 = Mth.floor(getZ() + radius + 1.0D);
-		List<Entity> var9 = level().getEntities(this, new AABB(var3, var5, var7, var4, var28, var29));
+        AABB aabb = new AABB(getX(), getY(), getZ(), getX(), getY(), getZ()).inflate(radius + 1, -(radius + 1), radius + 1);
+		List<Entity> var9 = level().getEntities(this, aabb);
 
         for (Entity entity : var9) {
             double var13 = Math.sqrt(entity.distanceToSqr(getX(), getY(), getZ())) / radius;
 
             if (var13 <= 1.0D) {
-                double var15 = entity.getX() - getX();
-                double var17 = entity.getY() + entity.getEyeHeight(entity.getPose()) - getY();
-                double var19 = entity.getZ() - getZ();
-                double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
+                Vec3 vec3 = entity.getEyePosition().subtract(position());
 
-                if (var33 != 0.0D) {
-                    var15 /= var33;
-                    var17 /= var33;
-                    var19 /= var33;
+                if (vec3.length() != 0.0D) {
+                    vec3 = vec3.normalize();
                     if (!(entity instanceof EntityNuclearBlast) && !(entity instanceof EntityTsarBlast)) {
                         if (entity instanceof FallingBlockEntity) entity.kill();
                         else {
                             if (entity instanceof Player && entity.isInvulnerable())
                                 continue;
                             entity.hurt(RivalRebelsDamageSource.nuclearBlast(level()), 16 * radius);
-                            entity.setDeltaMovement(getDeltaMovement().subtract(
-                                var15 * 8,
-                                var17 * 8,
-                                var19 * 8
-                            ));
+                            entity.setDeltaMovement(getDeltaMovement().subtract(vec3.scale(8)));
                         }
                     }
                 }

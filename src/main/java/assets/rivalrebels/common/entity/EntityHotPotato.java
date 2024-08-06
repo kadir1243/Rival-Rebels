@@ -146,11 +146,11 @@ public class EntityHotPotato extends ThrowableProjectile
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < 0) kill();
+		if (getY() < level().getMinBuildHeight()) kill();
 
 		if (this.isPassenger())
 		{
-		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
 		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
@@ -195,12 +195,6 @@ public class EntityHotPotato extends ThrowableProjectile
 		charges = nbt.getInt("charge");
 		if (charges == 0) charges = RRConfig.SERVER.getTsarBombaStrength() + 9;
 		setYRot(yRotO = nbt.getFloat("rot"));
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
     @Override

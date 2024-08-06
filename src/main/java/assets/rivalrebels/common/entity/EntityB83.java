@@ -78,7 +78,7 @@ public class EntityB83 extends ThrowableProjectile
 
 	@Override
 	public void tick() {
-		if (ticksInAir == - 100 || getY() < 0 || getY() > 256) explode();
+		if (ticksInAir == - 100 || getY() < level().getMinBuildHeight() || getY() > level().getMaxBuildHeight()) explode();
 		++this.ticksInAir;
 
 		Vec3 var15 = position();
@@ -127,7 +127,7 @@ public class EntityB83 extends ThrowableProjectile
         this.setPosRaw(add.x(), add.y(), add.z());
 		if (this.isPassenger())
 		{
-		double var16 = Math.sqrt(this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z());
+		double var16 = this.getDeltaMovement().horizontalDistance();
 		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
 		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
@@ -158,12 +158,6 @@ public class EntityB83 extends ThrowableProjectile
         setDeltaMovement(getDeltaMovement().scale(var17));
         setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
 		this.setPos(this.getX(), this.getY(), this.getZ());
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
     @Override

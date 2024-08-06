@@ -16,16 +16,7 @@ import assets.rivalrebels.common.entity.EntityRhodes;
 import net.minecraft.world.level.Level;
 
 public class CommonProxy {
-    public void closeGui() {
-	}
-
-	public void nextBattle() {
-	}
-
-	public void teamWin(boolean winner) {
-	}
-
-	public void guiClass() {
+    public void guiClass() {
 	}
 
 	public void guiSpawn() {
@@ -40,47 +31,11 @@ public class CommonProxy {
 	public void spawnGore(Level world, EntityGore g, boolean greenblood) {
 	}
 
-	public boolean spacebar()
-	{
-		return false;
-	}
-	public boolean w()
-	{
-		return false;
-	}
-	public boolean a()
-	{
-		return false;
-	}
-	public boolean s()
-	{
-		return false;
-	}
-	public boolean d()
-	{
-		return false;
-	}
-	public boolean f()
-	{
-		return false;
-	}
-	public boolean c()
-	{
-		return false;
-	}
-	public boolean x()
-	{
-		return false;
-	}
-	public boolean z()
-	{
-		return false;
-	}
-	public boolean g()
+    public boolean c()
 	{
 		return false;
 	}
 
-	public void setOverlay(EntityRhodes rhodes) {
+    public void setOverlay(EntityRhodes rhodes) {
 	}
 }

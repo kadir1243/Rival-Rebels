@@ -45,18 +45,6 @@ public class EntityPropulsionFX extends ThrowableProjectile
 		setDeltaMovement(mX, mY, mZ);
 	}
 
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
     }

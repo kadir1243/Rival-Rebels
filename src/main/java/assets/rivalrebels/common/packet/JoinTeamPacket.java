@@ -119,14 +119,14 @@ public record JoinTeamPacket(RivalRebelsClass rrclass, RivalRebelsTeam rrteam) i
             RivalRebels.round.rrplayerlist.refreshForWorld(player.level());
         }
         if (m.rrteam == RivalRebelsTeam.OMEGA) {
-            double sx = RivalRebels.round.omegaObjPos.getX() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
-            double sy = RivalRebels.round.omegaObjPos.getY() + 1;
-            double sz = RivalRebels.round.omegaObjPos.getZ() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
+            double sx = RivalRebels.round.omegaData.objPos().getX() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
+            double sy = RivalRebels.round.omegaData.objPos().getY() + 1;
+            double sz = RivalRebels.round.omegaData.objPos().getZ() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
             player.setPosRaw(sx, sy, sz);
         } else if (m.rrteam == RivalRebelsTeam.SIGMA) {
-            double sx = RivalRebels.round.sigmaObjPos.getX() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
-            double sy = RivalRebels.round.sigmaObjPos.getY() + 1;
-            double sz = RivalRebels.round.sigmaObjPos.getZ() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
+            double sx = RivalRebels.round.sigmaData.objPos().getX() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
+            double sy = RivalRebels.round.sigmaData.objPos().getY() + 1;
+            double sz = RivalRebels.round.sigmaData.objPos().getZ() + (RivalRebels.round.world.random.nextInt(2) - 0.5) * 30 + 0.5f;
             player.setPosRaw(sx, sy, sz);
         }
     }

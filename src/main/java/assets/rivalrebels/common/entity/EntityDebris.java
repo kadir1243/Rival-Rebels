@@ -132,8 +132,9 @@ public class EntityDebris extends EntityInanimate {
 		kill();
         BlockPos pos = BlockPos.containing(x, y, z);
         level().setBlockAndUpdate(pos, getState());
-        if (getBlockEntity() != null) {
-            level().setBlockEntity(getBlockEntity());
+        BlockEntity blockEntity = getBlockEntity();
+        if (blockEntity != null) {
+            level().setBlockEntity(blockEntity);
         }
     }
 

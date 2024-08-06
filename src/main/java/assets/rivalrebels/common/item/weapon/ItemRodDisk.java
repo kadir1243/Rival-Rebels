@@ -13,8 +13,8 @@ package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RRSounds;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.*;
+import assets.rivalrebels.common.round.RivalRebelsRank;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
@@ -65,37 +65,37 @@ public class ItemRodDisk extends Item
         if (!(user instanceof Player player)) return;
         if (!world.isClientSide()) {
             stack.consume(1, user);
-			int rank = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank.id;
+			RivalRebelsRank rank = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank;
 			//float f = (getMaxUseTime(item) - i) / 20.0F;
 			//f = (f * f + f * 2) * 0.33333f;
 			//if (f > 1.0F) f = 1.0F;
 			//f *= 1.0f-rank*0.1f;
 			//f += 0.3f;
-			if (rank == 0)
+			if (rank == RivalRebelsRank.REGULAR)
 			{
 				Entity entity = new EntityRoddiskRegular(world, user, 1);
 				world.addFreshEntity(entity);
                 user.playSound(RRSounds.RODDISK_UNKNOWN7);
             }
-			else if (rank == 1)
+			else if (rank == RivalRebelsRank.REBEL)
 			{
 				Entity entity = new EntityRoddiskRebel(world, user, 1.1f);
 				world.addFreshEntity(entity);
                 user.playSound(RRSounds.RODDISK_UNKNOWN7);
 			}
-			else if (rank == 2)
+			else if (rank == RivalRebelsRank.OFFICER)
 			{
 				Entity entity = new EntityRoddiskOfficer(world, user, 1.2f);
 				world.addFreshEntity(entity);
 				user.playSound(RRSounds.RODDISK_UNKNOWN3);
 			}
-			else if (rank == 3)
+			else if (rank == RivalRebelsRank.LEADER)
 			{
 				Entity entity = new EntityRoddiskLeader(world, user, 4f);
 				world.addFreshEntity(entity);
                 user.playSound(RRSounds.RODDISK_UNKNOWN3);
 			}
-			else if (rank == 4)
+			else if (rank == RivalRebelsRank.REP)
 			{
 				Entity entity = new EntityRoddiskRep(world, user, 4f);
 				world.addFreshEntity(entity);

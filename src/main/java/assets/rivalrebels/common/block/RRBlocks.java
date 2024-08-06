@@ -37,7 +37,7 @@ public class RRBlocks {
     public static Block camo3 = register("camo3", new Block(Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().strength(2F, 25F)), rralltab);
     public static Block steel = register("steel", new BlockSteel(Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().strength(1F, 10F).noOcclusion()), rralltab);
     public static Block flag1 = register("flag1", new BlockFlag(Properties.of().ignitedByLava().noOcclusion().noCollission(), "bi"));
-    public static Block flag2 = register("flag2", new BlockFlag(Properties.of().ignitedByLava().noOcclusion().noCollission(), "dd"));
+    public static Block trollFlag = register("troll_flag", new BlockFlag(Properties.of().ignitedByLava().noOcclusion().noCollission(), "dd"));
     public static Block flag3 = register("flag3", new BlockFlag(Properties.of().ignitedByLava().noOcclusion().noCollission(), "ar"));
     public static Block flag4 = register("flag4", new BlockFlag(Properties.of().ignitedByLava().noOcclusion().noCollission(), "aw"));
     public static Block flag5 = register("flag5", new BlockFlag(Properties.of().ignitedByLava().noOcclusion().noCollission(), "aq"));
@@ -127,10 +127,10 @@ public class RRBlocks {
     public static void registerBlockColors() {
         ColorProviderRegistry.BLOCK.register((state, worldIn, pos, tintIndex) -> {
             BlockCycle block = (BlockCycle) state.getBlock();
-            block.phase += block.phaseadd;
-            int r = (int) ((Mth.sin(block.phase + block.pShiftR) + 1f) * 128f);
-            int g = (int) ((Mth.sin(block.phase + block.pShiftG) + 1f) * 128f);
-            int b = (int) ((Mth.sin(block.phase + block.pShiftB) + 1f) * 128f);
+            block.phase += BlockCycle.phaseadd;
+            int r = (int) ((Mth.sin(block.phase + BlockCycle.pShiftR) + 1f) * 128f);
+            int g = (int) ((Mth.sin(block.phase + BlockCycle.pShiftG) + 1f) * 128f);
+            int b = (int) ((Mth.sin(block.phase + BlockCycle.pShiftB) + 1f) * 128f);
             return (r & 0xff) << 16 | (g & 0xff) << 8 | b & 0xff;
         }, RRBlocks.cycle);
         ColorProviderRegistry.BLOCK.register((state, worldIn, pos, tintIndex) -> state.getValue(BlockPetrifiedStone.META) * 1118481, RRBlocks.petrifiedstone1, RRBlocks.petrifiedstone2, RRBlocks.petrifiedstone3, RRBlocks.petrifiedstone4);

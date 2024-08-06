@@ -95,34 +95,10 @@ public class EntityB2Frag extends EntityInanimate
 	}
 
 	@Override
-	public void tick()
-	{
-		/*if (ticksInAir == 0)
-		{
-			EnvType side = FMLCommonHandler.instance().getEffectiveSide();
-			if (side == EnvType.SERVER)
-			{
-                for (PlayerEntity player : world.playerEntities) {
-                    ByteArrayOutputStream bos = new ByteArrayOutputStream(9);
-                    try (DataOutputStream outputStream = new DataOutputStream(bos)) {
-                        outputStream.writeInt(17);
-                        outputStream.writeInt(getId());
-                        outputStream.writeByte(type);
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
-                    Packet250CustomPayload packet = new Packet250CustomPayload();
-                    packet.data = bos.toByteArray();
-                    packet.length = bos.size();
-                    PacketDispatcher.sendPacketToPlayer(packet, player);
-                }
-			}
-		}*/
-
+	public void tick() {
 		super.tick();
 
-		if (inGround)
-		{
+		if (inGround) {
 			++ticksInGround;
 
 			if (ticksInGround == 1200)
@@ -153,7 +129,7 @@ public class EntityB2Frag extends EntityInanimate
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
-                    ((EntityRocket) var9).explode(null);
+                    ((EntityRocket) var9).explode();
                 }
 
                 if (var9 instanceof EntityPlasmoid) {
@@ -206,12 +182,6 @@ public class EntityB2Frag extends EntityInanimate
 	{
 		type = par1NBTTagCompound.getInt("Type");
 		inGround = par1NBTTagCompound.getBoolean("inGround");
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
 	@Override

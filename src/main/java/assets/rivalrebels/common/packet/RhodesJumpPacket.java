@@ -11,18 +11,46 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
+import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.command.CommandRobot;
 import assets.rivalrebels.common.entity.EntityRhodes;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 
-public record RhodesJumpPacket(int id, boolean jump, boolean rocket, boolean laser, boolean fire, boolean forcefield, boolean plasma, boolean nuke, boolean stop, boolean b2spirit, boolean guard) implements CustomPacketPayload {
+public record RhodesJumpPacket(int id, boolean jump,
+                               boolean rocket,
+                               boolean laser,
+                               boolean fire,
+                               boolean forcefield,
+                               boolean plasma,
+                               boolean nuke,
+                               boolean stop,
+                               boolean b2spirit,
+                               boolean guard) implements CustomPacketPayload {
     public static final StreamCodec<FriendlyByteBuf, RhodesJumpPacket> STREAM_CODEC = StreamCodec.ofMember(RhodesJumpPacket::toBytes, RhodesJumpPacket::fromBytes);
     public static final Type<RhodesJumpPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("rhodesjump"));
+
+    @Environment(EnvType.CLIENT)
+    public RhodesJumpPacket(int id) {
+        this(id,
+            ClientProxy.RHODES_JUMP_KEY.isDown(),
+            ClientProxy.RHODES_ROCKET_KEY.isDown(),
+            ClientProxy.RHODES_LASER_KEY.isDown(),
+            ClientProxy.RHODES_FIRE_KEY.isDown(),
+            ClientProxy.RHODES_FORCE_FIELD_KEY.isDown(),
+            ClientProxy.RHODES_PLASMA_KEY.isDown(),
+            ClientProxy.RHODES_NUKE_KEY.isDown(),
+            ClientProxy.RHODES_STOP_KEY.isDown(),
+            ClientProxy.RHODES_B2SPIRIT_KEY.isDown(),
+            ClientProxy.RHODES_GUARD_KEY.isDown()
+        );
+    }
 
     public static RhodesJumpPacket fromBytes(FriendlyByteBuf buf) {
         return new RhodesJumpPacket(buf.readInt(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean(), buf.readBoolean());

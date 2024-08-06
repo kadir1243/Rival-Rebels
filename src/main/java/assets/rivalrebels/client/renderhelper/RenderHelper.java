@@ -133,12 +133,12 @@ public class RenderHelper {
         addVertice(pose, buffer, v, t, CommonColors.WHITE, light, overlay);
     }
 
-    public static void addVertice(PoseStack poseStack, VertexConsumer buffer, Vector3f v, int color, int light, int overlay) {
-        buffer.addVertex(poseStack.last(), v)
+    public static void addVertice(PoseStack pose, VertexConsumer buffer, Vector3f v, int color, int light, int overlay) {
+        buffer.addVertex(pose.last(), v)
             .setColor(color)
             .setUv(16, 16)
             .setOverlay(overlay)
             .setLight(light)
-            .setNormal(poseStack.last(), 0F, 0F, 1F);
+            .setNormal(pose.last(), 0F, 0F, 1F);
     }
 }

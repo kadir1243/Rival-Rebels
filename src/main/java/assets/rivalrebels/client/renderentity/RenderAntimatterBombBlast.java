@@ -25,13 +25,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.FastColor;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.lighting.LightEngine;
 import org.joml.Vector3f;
 
 public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast> {
@@ -111,5 +114,15 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
     @Override
     public ResourceLocation getTextureLocation(EntityAntimatterBombBlast entity) {
         return null;
+    }
+
+    @Override
+    public boolean shouldRender(EntityAntimatterBombBlast livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntityAntimatterBombBlast entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
     }
 }

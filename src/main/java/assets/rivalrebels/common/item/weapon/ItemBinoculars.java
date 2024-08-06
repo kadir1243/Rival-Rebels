@@ -42,13 +42,13 @@ import java.util.List;
 
 public class ItemBinoculars extends Item {
     private static final List<TileEntityLaptop> ltel = new ArrayList<>();
-    static public float distblock = 0;
-    static public boolean hasLaptop = false;
-    static public boolean tooClose = false;
-    static public boolean tooFar = true;
-    static public boolean ready = false;
-    static public boolean c = false;
-    static public boolean sc = false;
+    public static float distblock = 0;
+    public static boolean hasLaptop = false;
+    public static boolean tooClose = false;
+    public static boolean tooFar = true;
+    public static boolean ready = false;
+    public static boolean c = false;
+    public static boolean sc = false;
     float zoom = 30f;
     float fovset = 0f;
     float senset = 0f;
@@ -159,12 +159,12 @@ public class ItemBinoculars extends Item {
                             int XX = 11;
                             int ZZ = 10;
                             if (t.rrteam == RivalRebelsTeam.OMEGA) {
-                                XX = (pos.getX() - RivalRebels.round.omegaObjPos.getX());
-                                ZZ = (pos.getZ() - RivalRebels.round.omegaObjPos.getZ());
+                                XX = (pos.getX() - RivalRebels.round.omegaData.objPos().getX());
+                                ZZ = (pos.getZ() - RivalRebels.round.omegaData.objPos().getZ());
                             }
                             if (t.rrteam == RivalRebelsTeam.SIGMA) {
-                                XX = (pos.getX() - RivalRebels.round.sigmaObjPos.getX());
-                                ZZ = (pos.getZ() - RivalRebels.round.sigmaObjPos.getZ());
+                                XX = (pos.getX() - RivalRebels.round.sigmaData.objPos().getX());
+                                ZZ = (pos.getZ() - RivalRebels.round.sigmaData.objPos().getZ());
                             }
                             tooClose = (pos.getX() - lpos.getX()) * (pos.getX() - lpos.getX()) + (pos.getZ() - lpos.getZ()) * (pos.getZ() - lpos.getZ()) < 625;
                             if (!tooClose && XX * XX + ZZ * ZZ > 200) {

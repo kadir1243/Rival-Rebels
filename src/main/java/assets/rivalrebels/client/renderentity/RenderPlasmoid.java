@@ -16,13 +16,14 @@ import assets.rivalrebels.common.entity.EntityPlasmoid;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.lighting.LightEngine;
 
-public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid>
-{
-
+public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid> {
     public RenderPlasmoid(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
@@ -60,5 +61,15 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid>
     @Override
     public ResourceLocation getTextureLocation(EntityPlasmoid entity) {
         return null;
+    }
+
+    @Override
+    public boolean shouldRender(EntityPlasmoid livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntityPlasmoid entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
     }
 }

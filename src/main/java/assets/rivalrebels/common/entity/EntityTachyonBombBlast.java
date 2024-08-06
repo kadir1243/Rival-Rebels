@@ -163,18 +163,6 @@ public class EntityTachyonBombBlast extends EntityInanimate
 		nbt.putFloat("radius", (float) radius);
 	}
 
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000F;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
     public EntityTachyonBombBlast setTime()
 	{
 		tickCount = 920;

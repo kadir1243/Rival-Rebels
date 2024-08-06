@@ -11,10 +11,10 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.autobuilds.BlockAutoTemplate;
 import assets.rivalrebels.common.command.CommandHotPotato;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
@@ -59,7 +59,7 @@ public class ItemPliers extends Item
 			{
 				int t = 25;
 				i = i + 1;
-				player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".defuse", i * 100 / t), false);
+				player.displayClientMessage(Translations.defuse().append(" %" + i * 100 / t), false);
 				if (i >= t)
 				{
 					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.remotecharge.asItem().getDefaultInstance());
@@ -73,7 +73,7 @@ public class ItemPliers extends Item
 			{
 				int t = 25;
 				i = i + 1;
-				player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".defuse", i * 100 / t), false);
+				player.displayClientMessage(Translations.defuse().append(" %" + i * 100 / t), false);
 				if (i >= t)
 				{
 					ItemEntity ei = new ItemEntity(world, x + .5, y + .5, z + .5, RRBlocks.timedbomb.asItem().getDefaultInstance());
@@ -87,7 +87,7 @@ public class ItemPliers extends Item
 			if (block instanceof BlockAutoTemplate worldBlock)
 			{
                 i = i + 1;
-				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".building", i * 100 / worldBlock.time)), false);
+				player.displayClientMessage(Translations.status().append(" ").append(Component.translatable(Translations.BUILDING.toLanguageKey(), i * 100 / worldBlock.time)), false);
 				if (i >= worldBlock.time)
 				{
                     world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -99,7 +99,7 @@ public class ItemPliers extends Item
 			if (block == RRBlocks.supplies && world.getBlockState(pos.below()).is(RRBlocks.supplies))
 			{
 				i++;
-				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".building.tokamak ", i * 100 / 15)), false);
+				player.displayClientMessage(Translations.status().append(" ").append(Component.translatable(Translations.BUILDING_TOKAMAK.toLanguageKey(), i * 100 / 15)), false);
 				if (i >= 15)
 				{
                     world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

@@ -22,20 +22,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.TntBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 public class EntityFlameBall2 extends EntityInanimate
 {
@@ -63,7 +58,7 @@ public class EntityFlameBall2 extends EntityInanimate
 	{
 		this(par1World);
 		// par3/=3f;
-		setPos(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+		setPos(player.getEyePosition());
 		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
             (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
             (-Mth.sin(player.getXRot() / 180.0F * Mth.PI)));
@@ -105,49 +100,9 @@ public class EntityFlameBall2 extends EntityInanimate
 
 		if (gonnadie && sequence < 15) sequence++;
 
-		Vec3 start = position();
-		Vec3 end = position().add(getDeltaMovement());
-		HitResult mop = level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, Entity::canBeCollidedWith);
 
-		if (mop != null) end = mop.getLocation();
-
-		Entity e = null;
-		List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-		double var6 = 0.0D;
-		Iterator<Entity> var8 = var5.iterator();
-
-		if (!level().isClientSide())
-		{
-			while (var8.hasNext())
-			{
-				Entity var9 = var8.next();
-
-				if (var9.canBeCollidedWith())
-				{
-					float var10 = 0.3F;
-					AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
-					Optional<Vec3> var12 = var11.clip(start, end);
-
-					if (var12.isPresent())
-					{
-						double var13 = start.distanceTo(var12.get());
-
-						if (var13 < var6 || var6 == 0.0D)
-						{
-							e = var9;
-							var6 = var13;
-						}
-					}
-				}
-			}
-		}
-
-		if (e != null)
-		{
-			mop = new EntityHitResult(e);
-		}
-
-		if (mop != null && tickCount >= 6) {
+		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 6) {
             setPosRaw(getX() - 0.5F, getY() - 0.5, getZ() - 0.5);
 			fire();
             setPosRaw(getX() + 1, getY(), getZ());
@@ -165,9 +120,9 @@ public class EntityFlameBall2 extends EntityInanimate
             setPosRaw(getX(), getY(), getZ() + 1);
             setPosRaw(getX() + 0.5, getY() + 0.5, getZ() + 0.5);
 			kill();
-			if (mop.getType() == HitResult.Type.ENTITY)
+			if (hitResult.getType() == HitResult.Type.ENTITY)
 			{
-                Entity entityHit = ((EntityHitResult) mop).getEntity();
+                Entity entityHit = ((EntityHitResult) hitResult).getEntity();
                 entityHit.igniteForSeconds(3);
 				entityHit.hurt(RivalRebelsDamageSource.cooked(level()), 12);
 				if (entityHit instanceof Player player)
@@ -195,18 +150,6 @@ public class EntityFlameBall2 extends EntityInanimate
 		}
         setDeltaMovement(getDeltaMovement().scale(airFriction));
 		setPos(getX(), getY(), getZ());
-	}
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
 	@Override

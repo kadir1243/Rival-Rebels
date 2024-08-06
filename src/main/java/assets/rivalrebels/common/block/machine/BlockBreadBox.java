@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -43,7 +43,7 @@ public class BlockBreadBox extends Block
             if (!level.isClientSide())
             {
                 level.addFreshEntity(ei);
-                if (level.random.nextInt(64) == 0) player.displayClientMessage(RRIdentifiers.orders().append(" ").append(Component.literal("Shift-click (Sneak) to pack up toaster.").withStyle(ChatFormatting.RED)), false);
+                if (level.random.nextInt(64) == 0) player.displayClientMessage(Translations.orders().append(" ").append(Component.literal("Shift-click (Sneak) to pack up toaster.").withStyle(ChatFormatting.RED)), false);
             }
         }
         else

@@ -20,6 +20,7 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
@@ -31,7 +32,7 @@ public class RenderBomb extends EntityRenderer<EntityBomb> {
 	}
 
     @Override
-    public void render(EntityBomb entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+    public void render(EntityBomb entity, float entityYaw, float partialTick, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
         matrices.pushPose();
         matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
         matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
@@ -56,5 +57,10 @@ public class RenderBomb extends EntityRenderer<EntityBomb> {
     @Override
     public ResourceLocation getTextureLocation(EntityBomb entity) {
         return RRIdentifiers.etnuke;
+    }
+
+    @Override
+    public boolean shouldRender(EntityBomb livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
     }
 }

@@ -18,26 +18,31 @@ import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.DeltaTracker;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.CommonColors;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class TeslaRenderer implements DynamicItemRenderer {
+    private static final DeltaTracker TIMER = Minecraft.getInstance().getTimer();
     private int spin;
 
-	private static int getDegree(ItemStack item) {
+    private static int getDegree(ItemStack item) {
         return item.getOrDefault(RRComponents.TESLA_DIAL, 0);
 	}
 
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+        if (mode == ItemDisplayContext.GUI) {
+            matrices.mulPose(Axis.YP.rotationDegrees(45));
+        }
         if (!stack.isEnchanted()) {
             int degree = getDegree(stack);
-			spin += 5 + (degree / 36f);
+            spin = (int) Mth.lerp(TIMER.getGameTimeDeltaTicks(), spin, spin + (5 + (degree / 36F)));
 			matrices.pushPose();
 			matrices.translate(0.8f, 0.5f, -0.03f);
-			matrices.mulPose(Axis.ZP.rotationDegrees(35));
-			matrices.mulPose(Axis.YP.rotationDegrees(90));
 			matrices.scale(0.12f, 0.12f, 0.12f);
 			// matrices.translate(0.3f, 0.05f, -0.1f);
 
@@ -47,7 +52,6 @@ public class TeslaRenderer implements DynamicItemRenderer {
 
 			matrices.popPose();
 		} else {
-			if (mode.firstPerson()) matrices.popPose();
 			matrices.pushPose();
             VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
 			matrices.scale(1.01f, 1.01f, 1.01f);
@@ -55,68 +59,67 @@ public class TeslaRenderer implements DynamicItemRenderer {
 			matrices.mulPose(Axis.ZP.rotationDegrees(10));
 			matrices.scale(0.6f, 0.2f, 0.2f);
 			matrices.translate(-0.99f, 0.5f, 0.0f);
-            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv1(1, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv1(1, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv1(1, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv1(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv1(1, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv1(1, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv1(1, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv1(1, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
 
-            cellularNoise.addVertex(matrices.last(), -1, -1,  1).setColor(CommonColors.WHITE).setUv1(0, 0).setLight(light);
-            cellularNoise.addVertex(matrices.last(), -1,  1,  1).setColor(CommonColors.WHITE).setUv1(0, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1,  1,  1).setColor(CommonColors.WHITE).setUv1(3, 1).setLight(light);
-            cellularNoise.addVertex(matrices.last(),  1, -1,  1).setColor(CommonColors.WHITE).setUv1(3, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1, -1,  1).setColor(CommonColors.WHITE).setUv(0, 0).setLight(light);
+            cellularNoise.addVertex(matrices.last(), -1,  1,  1).setColor(CommonColors.WHITE).setUv(0, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1,  1,  1).setColor(CommonColors.WHITE).setUv(3, 1).setLight(light);
+            cellularNoise.addVertex(matrices.last(),  1, -1,  1).setColor(CommonColors.WHITE).setUv(3, 0).setLight(light);
 
             matrices.popPose();
-			if (mode.firstPerson()) matrices.pushPose();
 		}
 	}
 

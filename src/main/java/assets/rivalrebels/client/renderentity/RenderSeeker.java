@@ -19,10 +19,13 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.lighting.LightEngine;
 
 @Environment(EnvType.CLIENT)
 public class RenderSeeker extends EntityRenderer<EntitySeekB83> {
@@ -43,5 +46,15 @@ public class RenderSeeker extends EntityRenderer<EntitySeekB83> {
     @Override
     public ResourceLocation getTextureLocation(EntitySeekB83 entity) {
         return RRIdentifiers.etrocketseek202;
+    }
+
+    @Override
+    public boolean shouldRender(EntitySeekB83 livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntitySeekB83 entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
     }
 }

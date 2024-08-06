@@ -43,10 +43,10 @@ public class BlockOmegaObjective extends BaseEntityBlock {
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
-		if (!pos.equals(RivalRebels.round.omegaObjPos)) {
-			world.setBlockAndUpdate(RivalRebels.round.omegaObjPos, RRBlocks.plasmaexplosion.defaultBlockState());
-			RivalRebels.round.omegaObjPos = pos;
-			if (world.getBlockState(RivalRebels.round.sigmaObjPos).is(RRBlocks.sigmaobj))
+		if (!pos.equals(RivalRebels.round.omegaData.objPos())) {
+			world.setBlockAndUpdate(RivalRebels.round.omegaData.objPos(), RRBlocks.plasmaexplosion.defaultBlockState());
+			RivalRebels.round.omegaData.objPos = pos;
+			if (world.getBlockState(RivalRebels.round.sigmaData.objPos()).is(RRBlocks.sigmaobj))
 				RivalRebels.round.roundManualStart();
 		}
 	}

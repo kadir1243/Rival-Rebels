@@ -82,15 +82,14 @@ public class EntityHackB83 extends ThrowableProjectile
     @Override
 	public void tick()
 	{
-		if (ticksInAir == - 100 || getY() < 0 || getY() > 256) explode();
+		if (ticksInAir == - 100 || getY() < level().getMinBuildHeight() || getY() > level().getMaxBuildHeight()) explode();
 		++this.ticksInAir;
 		if (!straight && !level().isClientSide())
 		{
 			mmPos = mmPos.add(level().random.nextGaussian()*0.4,
                 level().random.nextGaussian()*0.4,
                 level().random.nextGaussian()*0.4);
-			double dist = 1/mmPos.length();
-            mmPos = mmPos.scale(dist);
+            mmPos = mmPos.normalize();
 			if (ticksInAir > 35) {
 				setDeltaMovement(getDeltaMovement().add(mmPos.scale(0.2)));
 			} else {
@@ -157,7 +156,7 @@ public class EntityHackB83 extends ThrowableProjectile
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = Mth.sqrt((float) (this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z()));
+		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
 		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
@@ -190,21 +189,11 @@ public class EntityHackB83 extends ThrowableProjectile
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag par1NBTTagCompound)
-	{
-
+	public void addAdditionalSaveData(CompoundTag par1NBTTagCompound) {
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag par1NBTTagCompound)
-	{
-
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
+	public void readAdditionalSaveData(CompoundTag par1NBTTagCompound) {
 	}
 
     @Override

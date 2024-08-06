@@ -13,6 +13,7 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.container.ContainerNuclearBomb;
+import assets.rivalrebels.common.util.Translations;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,13 +35,13 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
 		context.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
 		if (menu.isArmed())
 		{
-            context.drawString(font, Component.translatable(RRIdentifiers.BOMB_ARMED.toLanguageKey()), 80, imageHeight - 96 + 2, 0xffffff, false);
+            context.drawString(font, Component.translatable(Translations.BOMB_ARMED.toLanguageKey()), 80, imageHeight - 96 + 2, 0xffffff, false);
 		}
 		else
 		{
 			if (!menu.hasTrollFace())
 			{
-                context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable(RRIdentifiers.BOMB_MEGATONS.toLanguageKey())), 80, imageHeight - 96 + 2, 0xffffff, false);
+                context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 80, imageHeight - 96 + 2, 0xffffff, false);
 			}
 			else
 			{
@@ -59,9 +60,9 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
             milli = "" + millis;
         }
         if (menu.getCountDown() % 20 >= 10) {
-            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
+            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
         } else {
-            graphics.drawString(font, Component.translatable(RRIdentifiers.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 0xFF0000, false);
+            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 16711680, false);
         }
     }
 

@@ -186,10 +186,10 @@ public class AntimatterBomb {
 
 	private int getTopBlock(int x, int z, double dist)
 	{
-		int foundY = 0;
+		int foundY = world.getMinBuildHeight();
 		boolean found = false;
-        BlockPos pos = new BlockPos(x, 256, z);
-        while (pos.getY() > 0) {
+        BlockPos pos = new BlockPos(x, world.getMaxBuildHeight(), z);
+        while (pos.getY() > world.getMinBuildHeight()) {
             BlockState state = world.getBlockState(pos);
             Block block = state.getBlock();
             if (block != Blocks.AIR)

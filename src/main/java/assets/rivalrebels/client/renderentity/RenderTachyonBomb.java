@@ -20,6 +20,7 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -40,6 +41,11 @@ public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
         matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
         ObjModels.renderSolid(ObjModels.bomb, RRIdentifiers.ettachyonbomb, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
         matrices.popPose();
+    }
+
+    @Override
+    public boolean shouldRender(EntityTachyonBomb livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
     }
 
     @Override

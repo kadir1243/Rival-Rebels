@@ -12,26 +12,46 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityLightningLink;
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.lighting.LightEngine;
 
 @Environment(EnvType.CLIENT)
-public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
-{
-	static float	red		= 0.65F;
+public class RenderLightningLink extends EntityRenderer<EntityLightningLink> {
+    private static final RenderType RENDER_TYPE = RenderType.create(
+        RRIdentifiers.MODID + "_lightning_link",
+        DefaultVertexFormat.POSITION_COLOR,
+        VertexFormat.Mode.QUADS,
+        1536,
+        false,
+        true,
+        RenderType.CompositeState.builder()
+            .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
+            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
+            .createCompositeState(false)
+    );
+    static float	red		= 0.65F;
 	static float	green	= 0.75F;
 	static float	blue	= 1F;
+    private static final int COLOR = FastColor.ARGB32.colorFromFloat(0.95F, red, green, blue);
 
     public RenderLightningLink(EntityRendererProvider.Context renderManager) {
         super(renderManager);
@@ -53,7 +73,7 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 		{
 			RandomSource random = entity.level().random;
 			float radius = 0.07F;
-            VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
+            VertexConsumer buffer = vertexConsumers.getBuffer(RENDER_TYPE);
 
             matrices.pushPose();
 			matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
@@ -83,15 +103,25 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
 				}
 
 				for (float o = 0; o <= radius; o += radius / 8) {
-					buffer.addVertex(matrices.last(), AddedX + o, AddedY - o, addedZ).setColor(red, green, blue, 0.95f);
-					buffer.addVertex(matrices.last(), AddedX + o, AddedY + o, addedZ).setColor(red, green, blue, 0.95f);
-					buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
-					buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
+                    buffer.addVertex(matrices.last(), AddedX + o, AddedY - o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), AddedX + o, AddedY + o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
 
-                    buffer.addVertex(matrices.last(), AddedX - o, AddedY - o, addedZ).setColor(red, green, blue, 0.95f);
-					buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
-					buffer.addVertex(matrices.last(), AddedX - o, AddedY + o, addedZ).setColor(red, green, blue, 0.95f);
-					buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).setColor(red, green, blue, 0.95f);
+                    buffer.addVertex(matrices.last(), AddedX - o, AddedY - o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), AddedX + o, AddedY - o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
+
+                    buffer.addVertex(matrices.last(), AddedX - o, AddedY + o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), AddedX - o, AddedY - o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
+
+                    buffer.addVertex(matrices.last(), AddedX + o, AddedY + o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), AddedX - o, AddedY + o, addedZ).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
+                    buffer.addVertex(matrices.last(), prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
 				}
 			}
 
@@ -102,5 +132,15 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink>
     @Override
     public ResourceLocation getTextureLocation(EntityLightningLink entity) {
         return null;
+    }
+
+    @Override
+    public boolean shouldRender(EntityLightningLink livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
+
+    @Override
+    protected int getBlockLightLevel(EntityLightningLink entity, BlockPos pos) {
+        return LightEngine.MAX_LEVEL;
     }
 }

@@ -37,10 +37,9 @@ public class RocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.translate(0.22f, -0.025f, 0f);
 		matrices.mulPose(Axis.ZP.rotationDegrees(90));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
-        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
         ModelRocketLauncherHandle.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlauncherhandle)), light, overlay);
 		if (stack.isEnchanted()) {
-			ModelRocketLauncherHandle.render(matrices, cellularNoise, light, overlay);
+			ModelRocketLauncherHandle.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, overlay);
 		}
 		matrices.popPose();
 

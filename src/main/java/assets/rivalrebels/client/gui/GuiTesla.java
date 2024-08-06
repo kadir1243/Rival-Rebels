@@ -18,14 +18,16 @@ import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.item.weapon.ItemTesla;
 import assets.rivalrebels.common.packet.ItemUpdate;
 import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
-public class GuiTesla extends Screen
-{
+@Environment(EnvType.CLIENT)
+public class GuiTesla extends Screen {
 	private final int	xSizeOfTexture	= 256;
 	private final int	ySizeOfTexture	= 256;
 	private int			posX;
@@ -33,8 +35,7 @@ public class GuiTesla extends Screen
 	private GuiKnob		knob;
 	private final int s;
 
-	public GuiTesla(int start)
-	{
+	public GuiTesla(int start) {
         super(Component.empty());
         s = start - 90;
 	}

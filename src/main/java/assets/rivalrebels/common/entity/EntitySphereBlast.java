@@ -12,19 +12,18 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import java.util.List;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 
 public class EntitySphereBlast extends EntityTsarBlast {
     public EntitySphereBlast(EntityType<? extends EntitySphereBlast> type, Level world) {
@@ -63,46 +62,31 @@ public class EntitySphereBlast extends EntityTsarBlast {
 	}
 
 	@Override
-	public void pushAndHurtEntities()
-	{
-		int var3 = Mth.floor(getX() - radius - 1.0D);
-		int var4 = Mth.floor(getX() + radius + 1.0D);
-		int var5 = Mth.floor(getY() - radius - 1.0D);
-		int var28 = Mth.floor(getY() + radius + 1.0D);
-		int var7 = Mth.floor(getZ() - radius - 1.0D);
-		int var29 = Mth.floor(getZ() + radius + 1.0D);
-		List<Entity> var9 = level().getEntities(this, new AABB(var3, var5, var7, var4, var28, var29));
+	public void pushAndHurtEntities() {
+        AABB aabb = new AABB(getX(), getY(), getZ(), getX(), getY(), getZ()).inflate(radius + 1, -(radius + 1), radius + 1);
+		List<Entity> var9 = level().getEntities(this, aabb);
 
-        for (Entity var31 : var9) {
-            if (var31 instanceof LivingEntity) {
-                if (var31 instanceof Player && ((Player) var31).isCreative()) continue;
+        for (Entity entity : var9) {
+            if (entity instanceof LivingEntity) {
+                if (entity instanceof Player && ((Player) entity).isCreative()) continue;
 
-                double var13 = Math.sqrt(var31.distanceToSqr(getX(), getY(), getZ())) / radius;
+                double var13 = Math.sqrt(entity.distanceToSqr(getX(), getY(), getZ())) / radius;
 
                 if (var13 <= 1.0D) {
-                    double var15 = var31.getX() - getX();
-                    double var17 = var31.getY() + var31.getEyeHeight(var31.getPose()) - getY();
-                    double var19 = var31.getZ() - getZ();
-                    double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
+                    Vec3 vec3 = entity.getEyePosition().subtract(position());
 
-                    if (var33 != 0.0D) {
-                        var15 /= var33;
-                        var17 /= var33;
-                        var19 /= var33;
+                    if (vec3.length() != 0.0D) {
+                        vec3 = vec3.normalize();
                         double var34 = (1.0D - var13);
-                        var31.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) ((var34 * var34 + var34) * 20 * radius + 20) * 200);
-                        var31.setDeltaMovement(
-                            var31.getDeltaMovement().subtract(
-                                var15 * var34 * 8,
-                                var17 * var34 * 8,
-                                var19 * var34 * 8
-                            )
+                        entity.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) ((var34 * var34 + var34) * 20 * radius + 20) * 200);
+                        entity.setDeltaMovement(
+                            entity.getDeltaMovement().subtract(vec3.scale(var34 * 8))
                         );
                     }
                 }
             }
-            if (var31 instanceof EntityRhodes) {
-                var31.hurt(RivalRebelsDamageSource.nuclearBlast(level()), 30);
+            if (entity instanceof EntityRhodes) {
+                entity.hurt(RivalRebelsDamageSource.nuclearBlast(level()), 30);
             }
         }
 	}

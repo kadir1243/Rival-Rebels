@@ -14,8 +14,6 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
-import java.util.List;
-import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
@@ -23,19 +21,15 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
 
-public class EntityFlameBall1 extends EntityInanimate
-{
+public class EntityFlameBall1 extends EntityInanimate {
 	public int		sequence;
 	public float	rotation;
 	public float	motionr;
@@ -57,7 +51,7 @@ public class EntityFlameBall1 extends EntityInanimate
 
 	public EntityFlameBall1(Level par1World, Entity player, float par3) {
 		this(par1World);
-		setPos(player.getX(), player.getY() + player.getEyeHeight(player.getPose()), player.getZ());
+		setPos(player.getEyePosition());
 		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
             (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
             (-Mth.sin(player.getXRot() / 180.0F * Mth.PI)));
@@ -97,77 +91,39 @@ public class EntityFlameBall1 extends EntityInanimate
 		if (tickCount > 5) sequence++;
 		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 
-		Vec3 start = position();
-		Vec3 end = position().add(getDeltaMovement());
-		HitResult mop = level().clip(new ClipContext(start, end, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-		start = position();
-		end = position().add(getDeltaMovement());
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, Entity::canBeCollidedWith);
 
-		if (mop != null) end = mop.getLocation();
-
-		Entity e = null;
-		List<Entity> var5 = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-		double var6 = 0.0D;
-
-		if (!level().isClientSide())
-		{
-            for (Entity var9 : var5) {
-                if (var9.canBeCollidedWith()) {
-                    float var10 = 0.3F;
-                    AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
-                    Optional<Vec3> var12 = var11.clip(start, end);
-
-                    if (var12.isPresent()) {
-                        double var13 = start.distanceTo(var12.get());
-
-                        if (var13 < var6 || var6 == 0.0D) {
-                            e = var9;
-                            var6 = var13;
-                        }
-                    }
-                }
-            }
-		}
-
-		if (e != null)
-		{
-			mop = new EntityHitResult(e, mop.getLocation());
-		}
-
-		if (mop != null && mop.getType() == HitResult.Type.ENTITY && tickCount >= 5)
-		{
+		if (hitResult.getType() == HitResult.Type.ENTITY && tickCount >= 5) {
 			fire();
 			kill();
-			if (((EntityHitResult) mop).getEntity() != null)
-			{
-				((EntityHitResult) mop).getEntity().igniteForSeconds(3);
-				((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cooked(level()), 12);
-				if (((EntityHitResult) mop).getEntity() instanceof Player player) {
+            Entity entity = ((EntityHitResult) hitResult).getEntity();
+            if (entity != null) {
+				entity.igniteForSeconds(3);
+				entity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
+				if (entity instanceof Player player) {
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
 					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
 					{
 						player.getItemBySlot(slot).hurtAndBreak(8, player, slot);
 					}
 				}
-			}
-			else if (mop.getType() == BlockHitResult.Type.ENTITY)
-			{
-				level().addFreshEntity(new EntityLightningLink(level(), this, this.distanceTo(((EntityHitResult) mop).getEntity())));
-				if (((EntityHitResult) mop).getEntity() instanceof Player player)
+			} else {
+				level().addFreshEntity(new EntityLightningLink(level(), this, this.distanceTo(entity)));
+				if (entity instanceof Player player)
 				{
                     EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
 					if (!player.getItemBySlot(slot).isEmpty()) {
 						player.getItemBySlot(slot).hurtAndBreak(44, player, slot);
 					}
-					player.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					player.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
 				}
-				else if (((EntityHitResult) mop).getEntity() instanceof EntityB2Spirit)
+				else if (entity instanceof EntityB2Spirit)
 				{
-					((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					entity.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
 				}
-				else if (((EntityHitResult) mop).getEntity().isAttackable())
+				else if (entity.isAttackable())
 				{
-					((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) ((EntityHitResult) mop).getEntity().distanceTo(this) + 1));
+					entity.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
 				}
 			}
 		}
@@ -182,18 +138,6 @@ public class EntityFlameBall1 extends EntityInanimate
         setDeltaMovement(getDeltaMovement().scale(airFriction));
         setDeltaMovement(getDeltaMovement().subtract(0, gravity, 0));
 		setPos(getX(), getY(), getZ());
-	}
-
-	@Override
-	public float getLightLevelDependentMagicValue()
-	{
-		return 1000;
-	}
-
-	@Override
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
 	}
 
 	@Override

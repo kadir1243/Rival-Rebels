@@ -17,12 +17,13 @@ import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityB83;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
@@ -46,4 +47,9 @@ public class RenderB83 extends EntityRenderer<EntityB83> {
 	{
 		return RRIdentifiers.etb83;
 	}
+
+    @Override
+    public boolean shouldRender(EntityB83 livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
 }

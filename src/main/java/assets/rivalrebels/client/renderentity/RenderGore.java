@@ -12,18 +12,20 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.common.entity.EntityGore;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-
-import java.util.Objects;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.resources.ResourceLocation;
+
+import java.util.Objects;
 
 public class RenderGore extends EntityRenderer<EntityGore>
 {
@@ -103,9 +105,9 @@ public class RenderGore extends EntityRenderer<EntityGore>
 		else if (mob == 6)
 		{
 			if (type == 0) {
-				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(getTextureLocation(entity))), 8, 8, 8, 0, 0, 64, 32, 16, light);
+				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(getTextureLocation(entity))), 8, 8, 8, 0, 0, 64, 32, 16, light);
 			} else if (type == 1) {
-				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(RenderType.entityTranslucent(getTextureLocation(entity))), 6, 6, 6, 0, 16, 64, 32, 16, light);
+				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(getTextureLocation(entity))), 6, 6, 6, 0, 16, 64, 32, 16, light);
 			}
 		}
 		else if (mob == 7)
@@ -171,4 +173,9 @@ public class RenderGore extends EntityRenderer<EntityGore>
             default -> null;
         };
 	}
+
+    @Override
+    public boolean shouldRender(EntityGore livingEntity, Frustum camera, double camX, double camY, double camZ) {
+        return true;
+    }
 }

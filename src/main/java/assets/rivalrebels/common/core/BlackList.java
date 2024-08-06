@@ -24,6 +24,19 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public class BlackList {
+    public static final Set<Predicate<BlockState>> explosion = createSet(
+        RRBlocks.fshield,
+        RRBlocks.nuclearBomb,
+        RRBlocks.tsarbombablock,
+        RRBlocks.omegaobj,
+        RRBlocks.sigmaobj,
+        RRBlocks.forcefieldnode,
+        RRBlocks.reactor,
+        RRBlocks.loader,
+        RRBlocks.meltdown,
+        RRBlocks.forcefield,
+        RRBlocks.ffreciever
+    );
     private static final Set<Predicate<BlockState>> tesla = new HashSet<>(Set.of(
         of(RRBlocks.omegaobj),
         of(RRBlocks.sigmaobj),
@@ -44,28 +57,6 @@ public class BlackList {
         of(RRBlocks.meltdown),
         of(RRBlocks.ffreciever)
     ));
-
-    private static Predicate<BlockState> of(Block block) {
-        return state -> state.is(block);
-    }
-
-    private static Predicate<BlockState> of(TagKey<Block> tag) {
-        return state -> state.is(tag);
-    }
-
-    public static final Set<Predicate<BlockState>> explosion = createSet(
-            RRBlocks.fshield,
-            RRBlocks.nuclearBomb,
-            RRBlocks.tsarbombablock,
-            RRBlocks.omegaobj,
-            RRBlocks.sigmaobj,
-            RRBlocks.forcefieldnode,
-            RRBlocks.reactor,
-            RRBlocks.loader,
-            RRBlocks.meltdown,
-            RRBlocks.forcefield,
-            RRBlocks.ffreciever
-        );
     private static final Set<Predicate<BlockState>> plasmaExplosion =
         createSet(
             RRBlocks.omegaobj,
@@ -97,7 +88,15 @@ public class BlackList {
             Blocks.BEDROCK
         );
 
-    private static Set<Predicate<BlockState>> createSet(Block... blocks) {
+    public static Predicate<BlockState> of(Block block) {
+        return state -> state.is(block);
+    }
+
+    public static Predicate<BlockState> of(TagKey<Block> tag) {
+        return state -> state.is(tag);
+    }
+
+    public static Set<Predicate<BlockState>> createSet(Block... blocks) {
         return new HashSet<>(Arrays.stream(blocks).map(BlackList::of).toList());
     }
 

@@ -28,7 +28,6 @@ public class RhodesPacket implements CustomPacketPayload {
     public float bodyyaw;
     int id = 0;
     boolean forcefield = false;
-    float scale = 0;
     float headyaw = 0;
     float headpitch = 0;
     float leftarmyaw = 0;
@@ -39,7 +38,6 @@ public class RhodesPacket implements CustomPacketPayload {
     float rightthighpitch = 0;
     float leftshinpitch = 0;
     float rightshinpitch = 0;
-    int health;
     byte laserOn;
     byte colorType;
     int b2energy;
@@ -69,7 +67,6 @@ public class RhodesPacket implements CustomPacketPayload {
         rightthighpitch = er.rightthighpitch;
         leftshinpitch = er.leftshinpitch;
         rightshinpitch = er.rightshinpitch;
-        health = er.health;
         laserOn = er.laserOn;
         forcefield = er.forcefield;
         colorType = er.colorType;
@@ -83,7 +80,6 @@ public class RhodesPacket implements CustomPacketPayload {
         nukecount = er.nukecount;
         texloc = er.itexloc;
         texfolder = er.itexfolder;
-        scale = er.scale;
     }
 
     public static RhodesPacket fromBytes(FriendlyByteBuf buf) {
@@ -101,14 +97,12 @@ public class RhodesPacket implements CustomPacketPayload {
         packet.rightthighpitch = buf.readFloat();
         packet.leftshinpitch = buf.readFloat();
         packet.rightshinpitch = buf.readFloat();
-        packet.health = buf.readInt();
         packet.laserOn = buf.readByte();
         packet.colorType = buf.readByte();
         packet.b2energy = buf.readInt();
         packet.riderid = buf.readInt();
         packet.pass1id = buf.readInt();
         packet.pass2id = buf.readInt();
-        packet.scale = buf.readFloat();
         packet.rocketcount = buf.readInt();
         packet.energy = buf.readInt();
         packet.flamecount = buf.readInt();
@@ -158,7 +152,6 @@ public class RhodesPacket implements CustomPacketPayload {
             er.rightthighpitch = m.rightthighpitch;
             er.leftshinpitch = m.leftshinpitch;
             er.rightshinpitch = m.rightshinpitch;
-            er.health = m.health;
             er.laserOn = m.laserOn;
             er.forcefield = m.forcefield;
             er.colorType = m.colorType;
@@ -170,8 +163,7 @@ public class RhodesPacket implements CustomPacketPayload {
             er.nukecount = m.nukecount;
             er.itexloc = m.texloc;
             er.itexfolder = m.texfolder;
-            er.scale = m.scale;
-            if (er.health <= 0 && er.rider != null) {
+            if (er.getHealth() <= 0 && er.rider != null) {
                 er.rider.setPos(er.getX() + 5, er.getY() - 12, er.getZ());
                 er.rider.getAbilities().invulnerable = false;
                 er.rider = null;
@@ -202,14 +194,12 @@ public class RhodesPacket implements CustomPacketPayload {
         buf.writeFloat(rightthighpitch);
         buf.writeFloat(leftshinpitch);
         buf.writeFloat(rightshinpitch);
-        buf.writeInt(health);
         buf.writeByte(laserOn);
         buf.writeByte(colorType);
         buf.writeInt(b2energy);
         buf.writeInt(riderid);
         buf.writeInt(pass1id);
         buf.writeInt(pass2id);
-        buf.writeFloat(scale);
         buf.writeInt(rocketcount);
         buf.writeInt(energy);
         buf.writeInt(flamecount);

@@ -440,13 +440,6 @@ public class EntityGore extends EntityInanimate {
 	}
 
     @Override
-	@Environment(EnvType.CLIENT)
-	public boolean shouldRenderAtSqrDistance(double distance)
-	{
-		return true;
-	}
-
-    @Override
     protected void addAdditionalSaveData(CompoundTag nbt) {
 		nbt.putInt("Mob", getMob());
 		nbt.putInt("TypeOfGore", getTypeOfGore());

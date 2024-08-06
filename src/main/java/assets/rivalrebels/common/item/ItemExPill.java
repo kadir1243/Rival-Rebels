@@ -11,9 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
-import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
@@ -46,7 +46,7 @@ public class ItemExPill extends Item
 			int random = world.random.nextInt(100);
 			if (random >= 40)
 			{
-				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.literal("The experiment turned out a success.").withStyle(ChatFormatting.YELLOW)), true);
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("The experiment turned out a success.").withStyle(ChatFormatting.YELLOW)), true);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
@@ -55,7 +55,7 @@ public class ItemExPill extends Item
 			}
 			else if (random >= 30)
 			{
-				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.literal("Begrüßen Sie den Uber-Soldat.").withStyle(ChatFormatting.YELLOW)), true);
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Begrüßen Sie den Uber-Soldat.").withStyle(ChatFormatting.YELLOW)), true);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
@@ -71,14 +71,14 @@ public class ItemExPill extends Item
 			}
 			else if (random >= 20)
 			{
-				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.literal("The test subject has perished.").withStyle(ChatFormatting.YELLOW)), true);
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("The test subject has perished.").withStyle(ChatFormatting.YELLOW)), true);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
 				player.hurt(RivalRebelsDamageSource.cyanide(world), 2000);
 			}
 			else
 			{
-				player.displayClientMessage(RRIdentifiers.status().append(" ").append(Component.literal("Unexpected results have occurred.").withStyle(ChatFormatting.YELLOW)), true);
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Unexpected results have occurred.").withStyle(ChatFormatting.YELLOW)), true);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
 				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 1500, 20));

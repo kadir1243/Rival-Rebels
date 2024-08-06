@@ -110,7 +110,7 @@ public class EntityB2Spirit extends EntityInanimate
 		if (rhodeswing != null) {
             setDeltaMovement(rhodeswing.position().subtract(position()));
 			double t = getDeltaMovement().length();
-            setDeltaMovement(getDeltaMovement().scale(1/t));
+            setDeltaMovement(getDeltaMovement().normalize());
             setYRot(rhodeswing.getYRot());
 			setXRot((float) (Math.min(t, 90.0)));
 			if (t < 25.0 || tickCount > 100)
@@ -170,7 +170,7 @@ public class EntityB2Spirit extends EntityInanimate
 
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRocket) {
-                    ((EntityRocket) var9).explode(null);
+                    ((EntityRocket) var9).explode();
                 }
 
                 if (var9 instanceof EntityPlasmoid) {
@@ -198,7 +198,7 @@ public class EntityB2Spirit extends EntityInanimate
         setPosRaw(vec3d.x(), vec3d.y(), vec3d.z());
 		if (rhodeswing == null)
 		{
-			double var16 = Math.sqrt(this.getDeltaMovement().x() * this.getDeltaMovement().x() + this.getDeltaMovement().z() * this.getDeltaMovement().z());
+			double var16 = this.getDeltaMovement().horizontalDistance();
 			this.setYRot((float) (Math.atan2(this.getDeltaMovement().x(), this.getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 
 			for (this.setXRot((float) (Math.atan2(-this.getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
@@ -233,8 +233,7 @@ public class EntityB2Spirit extends EntityInanimate
 	Entity rhodes = null;
 	public void startBombRun(double x, double z)
 	{
-		if (rhodes != null)
-		{
+		if (rhodes != null) {
 			tx = rhodes.getX();
 			ty = rhodes.getY();
 			tz = rhodes.getZ();
@@ -279,11 +278,6 @@ public class EntityB2Spirit extends EntityInanimate
 			startBombRun(dx, dy);
 		}
 	}
-
-    @Override
-    public boolean shouldRenderAtSqrDistance(double distance) {
-        return true;
-    }
 
     @Override
 	public boolean hurt(DamageSource par1DamageSource, float par2)

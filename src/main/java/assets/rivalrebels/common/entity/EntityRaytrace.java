@@ -68,9 +68,7 @@ public class EntityRaytrace extends EntityInanimate
 		c = chance;
 		range = distance;
 		shootingEntity = player;
-		moveTo(player.getX(),
-            player.getY() + player.getEyeHeight(player.getPose()),
-            player.getZ(),
+		moveTo(player.getEyePosition(),
             player.getYRot(),
             player.getXRot()
         );

@@ -18,13 +18,11 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 
 @Environment(EnvType.CLIENT)
-public class RenderRhodesRightUpperArm extends EntityRenderer<EntityRhodesRightUpperArm> {
+public class RenderRhodesRightUpperArm extends RhodesPartRenderer<EntityRhodesRightUpperArm> {
     public RenderRhodesRightUpperArm(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
@@ -38,9 +36,4 @@ public class RenderRhodesRightUpperArm extends EntityRenderer<EntityRhodesRightU
 		ObjModels.renderSolid(ObjModels.upperarm, RenderRhodes.texture, matrices, vertexConsumers, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityRhodesRightUpperArm entity) {
-        return RenderRhodes.texture;
-    }
 }

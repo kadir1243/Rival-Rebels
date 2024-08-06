@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
+import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
@@ -51,7 +52,7 @@ public class RivalRebelsRenderOverlay {
 	public int		tic	= 0;
 	public boolean	r	= false;
 	public EntityRhodes rhodes = null;
-	public long counter = 0;
+	public float counter = 0;
 
 	public void init() {
         HudRenderCallback.EVENT.register((graphics, tracker) -> {
@@ -72,9 +73,9 @@ public class RivalRebelsRenderOverlay {
 	}
 
 	private void renderRhodes(GuiGraphics graphics, Player player, EntityRhodes rhodes, DeltaTracker tracker) {
-        counter--;
-        if (counter <= 0)
-        {
+        float deltaTicks = tracker.getGameTimeDeltaPartialTick(true);
+        counter = Mth.lerp(deltaTicks, counter, counter - 1);
+        if (counter <= 0) {
             counter = 0;
             RivalRebels.rrro.rhodes = null;
         }
@@ -153,8 +154,8 @@ public class RivalRebelsRenderOverlay {
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.05), 0xffffff, false);
         text = Component.literal("Robot: ").append(rhodes.getName());
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.1), 0xffffff, false);
-        text = RRBlocks.reactor.getName().append(": " + rhodes.health);
-        float val = (rhodes.health / (float) RRConfig.SERVER.getRhodesHealth());
+        text = RRBlocks.reactor.getName().append(": " + rhodes.getHealth());
+        float val = (rhodes.getHealth() / (float) RRConfig.SERVER.getRhodesHealth());
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.15), (((int)((1-val)*255)&255)<<16) | (((int)(val*255)&255)<<8), false);
         float yaw = (player.getYRot() + 360000) % 360;
         text = (yaw >= 315 || yaw < 45) ? Component.translatable("RivalRebels.binoculars.south") : (yaw >= 45 && yaw < 135) ? Component.translatable("RivalRebels.binoculars.west") : (yaw >= 135 && yaw < 225) ? Component.translatable("RivalRebels.binoculars.north") : (yaw >= 225 && yaw < 315) ? Component.translatable("RivalRebels.binoculars.east") : Component.nullToEmpty("Whut");
@@ -163,7 +164,7 @@ public class RivalRebelsRenderOverlay {
         text = RRItems.einsten.getDescription().copy().append(": " + rhodes.energy);
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.05), (rhodes.laserOn>0)?0xff3333:0xffffff, false);
         text = Component.nullToEmpty("Jet: " + rhodes.energy);
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.1), RivalRebels.proxy.spacebar()?0x6666ff:0xffffff, false);
+        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.1), ClientProxy.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
         text = RRBlocks.forcefieldnode.getName().append(": " + rhodes.energy);
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.forcefield?0xBB88FF:0xffffff, false);
         text = RRItems.seekm202.getDescription().copy().append(": " + rhodes.rocketcount);
@@ -171,7 +172,7 @@ public class RivalRebelsRenderOverlay {
         text = (rhodes.isPlasma()?Component.nullToEmpty("Plasma: " + rhodes.flamecount) : (((MutableComponent)RRItems.fuel.getDescription()).append(": " + rhodes.flamecount)));
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.25), 0xffffff, false);
         graphics.drawString(fr, RRBlocks.nuclearBomb.getName().copy().append(": " + rhodes.nukecount), (int) (w * 0.8), (int) (h * 0.3), 0xffffff, false);
-        graphics.drawString(fr, Component.nullToEmpty("Guard"), (int) (w * 0.8), (int) (h * 0.35), RivalRebels.proxy.g() ? 0xffff00 : 0xffffff, false);
+        graphics.drawString(fr, Component.nullToEmpty("Guard"), (int) (w * 0.8), (int) (h * 0.35), ClientProxy.RHODES_GUARD_KEY.isDown() ? 0xffff00 : 0xffffff, false);
         text = rhodes.getName().copy().append(" ").append(RRBlocks.controller.getName()).append(": H");
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.95), glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_H) == GLFW_PRESS ? 0xffff00 : 0xffffff, false);
         if (rhodes.forcefield) {
