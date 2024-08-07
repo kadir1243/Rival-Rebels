@@ -10,7 +10,6 @@
     "defaultRequire": 1
   },
   "client": [
-    "LibraryMixin",
     "client.ArmorFeatureRendererMixin",
     "client.BlockEntityRenderersAccessor",
     "client.BufferBuilderAccessor",
