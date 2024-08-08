@@ -11,22 +11,22 @@
  *******************************************************************************/
 package assets.rivalrebels.client.guihelper;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.joml.Vector2i;
 
-public class Rectangle
-{
+@Environment(EnvType.CLIENT)
+public class Rectangle {
 	public int xMin, xMax, yMin, yMax;
 
-	public Rectangle(int x, int y, int w, int h)
-	{
+	public Rectangle(int x, int y, int w, int h) {
 		xMin = x;
 		xMax = x + w;
 		yMin = y;
 		yMax = y + h;
 	}
 
-	public boolean isVecInside(Vector2i vec)
-	{
+	public boolean isVecInside(Vector2i vec) {
         return vec.x >= xMin && vec.x <= xMax && vec.y >= yMin && vec.y <= yMax;
     }
 }

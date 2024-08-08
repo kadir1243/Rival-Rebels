@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
@@ -285,7 +286,7 @@ public class EntityRhodes extends Entity {
 			ticksSinceLastPacket++;
 			setPos(getX(), getY(), getZ());
 
-			if (level().isClientSide()) RivalRebels.rrro.setOverlay(this);
+			if (level().isClientSide()) RRClient.rrro.setOverlay(this);
 
 			if (rider!=null) {
 				rider.setPos(((getX()+syaw*5.5*getScale()) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*getScale() - (level().isClientSide?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*getScale()) - rider.getZ()) * 0.33f + rider.getZ());

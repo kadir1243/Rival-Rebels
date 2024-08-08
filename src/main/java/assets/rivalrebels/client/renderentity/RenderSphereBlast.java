@@ -15,6 +15,8 @@ import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.entity.EntitySphereBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -25,6 +27,7 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.lighting.LightEngine;
 
+@Environment(EnvType.CLIENT)
 public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast> {
 	public RenderSphereBlast(EntityRendererProvider.Context manager) {
         super(manager);

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiKnob;
 import assets.rivalrebels.common.item.components.RRComponents;
@@ -74,7 +74,7 @@ public class GuiTesla extends Screen {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (ClientProxy.USE_KEY.matches(keyCode, scanCode)) {
+        if (RRClient.USE_KEY.matches(keyCode, scanCode)) {
             onClose();
             this.minecraft.setWindowActive(true);
             ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));

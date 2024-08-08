@@ -5,6 +5,8 @@ import assets.rivalrebels.common.entity.*;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -15,6 +17,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.lighting.LightEngine;
 
+@Environment(EnvType.CLIENT)
 public abstract class FlameBallRenderer<T extends FlameBallProjectile> extends EntityRenderer<T> {
     public FlameBallRenderer(EntityRendererProvider.Context context) {
         super(context);

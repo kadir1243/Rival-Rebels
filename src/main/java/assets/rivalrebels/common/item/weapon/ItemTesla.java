@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.client.gui.GuiTesla;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -97,7 +97,7 @@ public class ItemTesla extends TieredItem {
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         if (selected && level.isClientSide()) {
-            if (ClientProxy.USE_KEY.isDown() && Minecraft.getInstance().screen == null) {
+            if (RRClient.USE_KEY.isDown() && Minecraft.getInstance().screen == null) {
                 Minecraft.getInstance().setScreen(new GuiTesla(getDegree(stack)));
             }
         }

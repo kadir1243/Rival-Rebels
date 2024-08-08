@@ -13,7 +13,7 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiCustomButton;
-import assets.rivalrebels.client.guihelper.ReactorDockScroll;
+import assets.rivalrebels.client.guihelper.ReactorConnectedMachinesList;
 import assets.rivalrebels.client.guihelper.Rectangle;
 import assets.rivalrebels.common.container.ContainerReactor;
 import assets.rivalrebels.common.item.ItemCore;
@@ -51,7 +51,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 	private GuiCustomButton			power;
 	private GuiCustomButton			eject;
 	private float melttick = 30;
-    private ReactorDockScroll dockWidget;
+    private ReactorConnectedMachinesList dockWidget;
 
     public GuiReactor(ContainerReactor containerReactor, Inventory playerInventory, Component title) {
 		super(containerReactor, playerInventory, title);
@@ -77,10 +77,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 		power.isPressed = menu.isOn();
 		this.addRenderableWidget(power);
 		this.addRenderableWidget(eject);
-        dockWidget = new ReactorDockScroll(minecraft, 20, 70, 89 + width / 2, height / 2, 18);
+        dockWidget = new ReactorConnectedMachinesList(minecraft, 20, 70, 89 + width / 2, height / 2, 18);
         this.addRenderableWidget(dockWidget);
         for (ReactorMachinesPacket.MachineEntry entry : machineEntries) {
-            dockWidget.addEntry(new ReactorDockScroll.WidgetEntry(entry.pos(), entry.block(), entry.enabled()));
+            dockWidget.addEntry(new ReactorConnectedMachinesList.WidgetEntry(entry.pos(), entry.block(), entry.enabled()));
         }
         machineEntries.clear();
 	}

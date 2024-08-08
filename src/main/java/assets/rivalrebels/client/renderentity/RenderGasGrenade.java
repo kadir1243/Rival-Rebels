@@ -16,6 +16,8 @@ import assets.rivalrebels.common.entity.EntityGasGrenade;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -24,6 +26,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 
+@Environment(EnvType.CLIENT)
 public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade> {
     private static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etgasgrenade);
 

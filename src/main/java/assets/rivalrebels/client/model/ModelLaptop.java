@@ -17,10 +17,13 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelLaptop
 {
 	private static final TextureVertice	t1		= new TextureVertice(0.03125f * 1, 0.03125f * 0);

@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.guihelper.GuiFTKnob;
 import assets.rivalrebels.common.item.RRItems;
@@ -76,7 +76,7 @@ public class GuiFlameThrower extends Screen {
 
     @Override
     public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (ClientProxy.USE_KEY.matches(keyCode, scanCode)) {
+        if (RRClient.USE_KEY.matches(keyCode, scanCode)) {
             onClose();
             minecraft.setWindowActive(true);
             ItemStack itemstack = minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);

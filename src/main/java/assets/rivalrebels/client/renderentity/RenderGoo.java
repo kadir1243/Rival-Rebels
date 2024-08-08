@@ -15,6 +15,8 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityGoo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -23,8 +25,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 
-public class RenderGoo extends EntityRenderer<EntityGoo>
-{
+@Environment(EnvType.CLIENT)
+public class RenderGoo extends EntityRenderer<EntityGoo> {
     public RenderGoo(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }

@@ -16,10 +16,13 @@ import assets.rivalrebels.client.objfileloader.WavefrontObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.CommonColors;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class RenderHelper {
     public static WavefrontObject getModel(String modelName) {
         return WavefrontObject.loadModel(RRIdentifiers.create("models/" + modelName + ".obj"));

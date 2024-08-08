@@ -1,5 +1,7 @@
 package assets.rivalrebels.client.guihelper;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
@@ -10,8 +12,9 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
-public class ReactorDockScroll extends AbstractSelectionList<ReactorDockScroll.WidgetEntry> {
-    public ReactorDockScroll(Minecraft minecraft, int width, int height, int x, int y, int itemHeight) {
+@Environment(EnvType.CLIENT)
+public class ReactorConnectedMachinesList extends AbstractSelectionList<ReactorConnectedMachinesList.WidgetEntry> {
+    public ReactorConnectedMachinesList(Minecraft minecraft, int width, int height, int x, int y, int itemHeight) {
         super(minecraft, width, height, y, itemHeight);
         this.setX(x);
         this.setRenderHeader(false, 0);
@@ -31,6 +34,7 @@ public class ReactorDockScroll extends AbstractSelectionList<ReactorDockScroll.W
         return super.addEntry(entry);
     }
 
+    @Environment(EnvType.CLIENT)
     public static class WidgetEntry extends AbstractSelectionList.Entry<WidgetEntry> {
         private final BlockPos machinePos;
         private final Block machine;

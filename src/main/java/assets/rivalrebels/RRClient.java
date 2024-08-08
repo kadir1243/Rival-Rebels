@@ -11,16 +11,20 @@
  *******************************************************************************/
 package assets.rivalrebels;
 
+import assets.rivalrebels.client.gui.RivalRebelsRenderOverlay;
 import assets.rivalrebels.client.itemrenders.*;
 import assets.rivalrebels.client.renderentity.*;
 import assets.rivalrebels.client.tileentityrender.*;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
 import assets.rivalrebels.common.entity.*;
 import assets.rivalrebels.common.item.RRItems;
+import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
 import com.google.common.base.Supplier;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
@@ -39,7 +43,7 @@ import net.minecraft.world.level.ItemLike;
 import static org.lwjgl.glfw.GLFW.*;
 
 @Environment(EnvType.CLIENT)
-public class ClientProxy {
+public class RRClient implements ClientModInitializer {
     public static final KeyMapping USE_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".use", GLFW_KEY_R, "key." + RRIdentifiers.MODID);
     public static final KeyMapping TARGET_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".target", InputConstants.Type.MOUSE, GLFW_MOUSE_BUTTON_LEFT, "key." + RRIdentifiers.MODID);
     public static final KeyMapping RHODES_JUMP_KEY = createRhodesKey("jump", GLFW_KEY_SPACE);
@@ -53,6 +57,7 @@ public class ClientProxy {
     public static final KeyMapping RHODES_B2SPIRIT_KEY = createRhodesKey("b2spirit", GLFW_KEY_Z);
     public static final KeyMapping RHODES_GUARD_KEY = createRhodesKey("guard", GLFW_KEY_G);
     public static final KeyMapping USE_BINOCULARS_ITEM = new KeyMapping("key." + RRIdentifiers.MODID + ".use_binoculars", GLFW_KEY_C, "key." + RRIdentifiers.MODID);
+    public static RivalRebelsRenderOverlay rrro;
 
     private static KeyMapping createRhodesKey(String translation, int key) {
         return new KeyMapping("key." + RRIdentifiers.MODID + ".rhodes." + "." + translation, key, "key." + RRIdentifiers.MODID + ".rhodes");
@@ -182,6 +187,19 @@ public class ClientProxy {
         addItemRenderer(RRItems.roda, RodaRenderer::new);
         addItemRenderer(RRItems.roddisk, RodDiskRenderer::new);
         addItemRenderer(RRItems.seekm202, SeekRocketLauncherRenderer::new);
+    }
+
+    @Override
+    public void onInitializeClient() {
+        PacketDispatcher.registerClientPackets();
+        RivalRebels.round.initClient();
+        rrro = new RivalRebelsRenderOverlay();
+        rrro.init();
+        RivalRebelsGuiHandler.registerClientGuiBinds();
+        registerRenderInformation();
+        registerKeyBinding();
+        RRBlocks.registerBlockColors();
+        registerCustomRenderers();
     }
 
     @Environment(EnvType.CLIENT)

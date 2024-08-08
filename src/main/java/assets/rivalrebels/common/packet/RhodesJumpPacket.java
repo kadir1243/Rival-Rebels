@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.packet;
 
-import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.command.CommandRobot;
 import assets.rivalrebels.common.entity.EntityRhodes;
@@ -39,16 +39,16 @@ public record RhodesJumpPacket(int id, boolean jump,
     @Environment(EnvType.CLIENT)
     public RhodesJumpPacket(int id) {
         this(id,
-            ClientProxy.RHODES_JUMP_KEY.isDown(),
-            ClientProxy.RHODES_ROCKET_KEY.isDown(),
-            ClientProxy.RHODES_LASER_KEY.isDown(),
-            ClientProxy.RHODES_FIRE_KEY.isDown(),
-            ClientProxy.RHODES_FORCE_FIELD_KEY.isDown(),
-            ClientProxy.RHODES_PLASMA_KEY.isDown(),
-            ClientProxy.RHODES_NUKE_KEY.isDown(),
-            ClientProxy.RHODES_STOP_KEY.isDown(),
-            ClientProxy.RHODES_B2SPIRIT_KEY.isDown(),
-            ClientProxy.RHODES_GUARD_KEY.isDown()
+            RRClient.RHODES_JUMP_KEY.isDown(),
+            RRClient.RHODES_ROCKET_KEY.isDown(),
+            RRClient.RHODES_LASER_KEY.isDown(),
+            RRClient.RHODES_FIRE_KEY.isDown(),
+            RRClient.RHODES_FORCE_FIELD_KEY.isDown(),
+            RRClient.RHODES_PLASMA_KEY.isDown(),
+            RRClient.RHODES_NUKE_KEY.isDown(),
+            RRClient.RHODES_STOP_KEY.isDown(),
+            RRClient.RHODES_B2SPIRIT_KEY.isDown(),
+            RRClient.RHODES_GUARD_KEY.isDown()
         );
     }
 

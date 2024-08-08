@@ -16,12 +16,15 @@ import assets.rivalrebels.client.guihelper.GuiButton;
 import assets.rivalrebels.common.packet.VotePacket;
 import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
+@Environment(EnvType.CLIENT)
 public class GuiNextBattle extends Screen {
 	private static final int	xSizeOfTexture	= 256;
 	private static final int	ySizeOfTexture	= 256;

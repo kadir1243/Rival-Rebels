@@ -11,10 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.client.gui;
 
-import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.renderentity.RenderRhodes;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.EntityRhodes;
@@ -85,7 +84,7 @@ public class RivalRebelsRenderOverlay {
         counter = Mth.lerp(deltaTicks, counter, counter - 1);
         if (counter <= 0) {
             counter = 0;
-            RivalRebels.rrro.rhodes = null;
+            RRClient.rrro.rhodes = null;
         }
         RenderSystem.depthMask(false);
         Minecraft client = Minecraft.getInstance();
@@ -172,7 +171,7 @@ public class RivalRebelsRenderOverlay {
         text = RRItems.einsten.getDescription().copy().append(": " + rhodes.energy);
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.05), (rhodes.laserOn>0)?0xff3333:0xffffff, false);
         text = Component.nullToEmpty("Jet: " + rhodes.energy);
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.1), ClientProxy.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
+        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.1), RRClient.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
         text = RRBlocks.forcefieldnode.getName().append(": " + rhodes.energy);
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.forcefield?0xBB88FF:0xffffff, false);
         text = RRItems.seekm202.getDescription().copy().append(": " + rhodes.rocketcount);
@@ -180,7 +179,7 @@ public class RivalRebelsRenderOverlay {
         text = (rhodes.isPlasma()?Component.nullToEmpty("Plasma: " + rhodes.flamecount) : (((MutableComponent)RRItems.fuel.getDescription()).append(": " + rhodes.flamecount)));
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.25), 0xffffff, false);
         graphics.drawString(fr, RRBlocks.nuclearBomb.getName().copy().append(": " + rhodes.nukecount), (int) (w * 0.8), (int) (h * 0.3), 0xffffff, false);
-        graphics.drawString(fr, Component.nullToEmpty("Guard"), (int) (w * 0.8), (int) (h * 0.35), ClientProxy.RHODES_GUARD_KEY.isDown() ? 0xffff00 : 0xffffff, false);
+        graphics.drawString(fr, Component.nullToEmpty("Guard"), (int) (w * 0.8), (int) (h * 0.35), RRClient.RHODES_GUARD_KEY.isDown() ? 0xffff00 : 0xffffff, false);
         text = rhodes.getName().copy().append(" ").append(RRBlocks.controller.getName()).append(": H");
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.95), glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_H) == GLFW_PRESS ? 0xffff00 : 0xffffff, false);
         if (rhodes.forcefield) {

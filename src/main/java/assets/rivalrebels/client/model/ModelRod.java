@@ -16,9 +16,12 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelRod {
     private static final int numOfSegs = 16;
     private static final float deg = Mth.TWO_PI / numOfSegs;

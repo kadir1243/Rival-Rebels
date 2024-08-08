@@ -12,12 +12,14 @@
 package assets.rivalrebels.client.guihelper;
 
 import assets.rivalrebels.RRIdentifiers;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
-public class GuiScroll extends GuiButton
-{
+@Environment(EnvType.CLIENT)
+public class GuiScroll extends GuiButton {
 	/** Scroll limit */
 	public int		limit;
 

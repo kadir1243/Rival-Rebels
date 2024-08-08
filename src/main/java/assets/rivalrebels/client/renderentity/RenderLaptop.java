@@ -16,12 +16,15 @@ import assets.rivalrebels.client.model.ModelLaptop;
 import assets.rivalrebels.common.entity.EntityLaptop;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 
+@Environment(EnvType.CLIENT)
 public class RenderLaptop extends EntityRenderer<EntityLaptop> {
     public RenderLaptop(EntityRendererProvider.Context manager) {
         super(manager);

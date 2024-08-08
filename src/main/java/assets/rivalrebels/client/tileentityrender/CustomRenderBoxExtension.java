@@ -1,5 +1,7 @@
 package assets.rivalrebels.client.tileentityrender;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -7,6 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import org.jetbrains.annotations.ApiStatus;
 
+@Environment(EnvType.CLIENT)
 public interface CustomRenderBoxExtension<T extends BlockEntity> {
     AABB getRenderBoundingBox(T blockEntity);
 

@@ -16,8 +16,11 @@ import assets.rivalrebels.client.renderhelper.TextureFace;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelAstroBlasterHandle {
 	private static final TextureFace	handleside		= new TextureFace(
 										new TextureVertice(0f / 64f, 11f / 32f),

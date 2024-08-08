@@ -20,6 +20,8 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -27,8 +29,8 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 
-public class GuiClass extends Screen
-{
+@Environment(EnvType.CLIENT)
+public class GuiClass extends Screen {
 	private static final int xSizeOfTexture	= 256;
 	private static final int ySizeOfTexture	= 256;
 	private int			posX;

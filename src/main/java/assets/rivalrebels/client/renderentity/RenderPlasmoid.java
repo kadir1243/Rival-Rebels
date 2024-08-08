@@ -15,6 +15,8 @@ import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -23,6 +25,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.lighting.LightEngine;
 
+@Environment(EnvType.CLIENT)
 public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid> {
     public RenderPlasmoid(EntityRendererProvider.Context renderManager) {
         super(renderManager);

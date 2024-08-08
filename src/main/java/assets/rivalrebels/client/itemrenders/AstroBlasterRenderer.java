@@ -16,6 +16,8 @@ import assets.rivalrebels.client.model.*;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
 import net.minecraft.client.renderer.RenderType;
@@ -26,6 +28,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
+@Environment(EnvType.CLIENT)
 public class AstroBlasterRenderer implements DynamicItemRenderer {
     private static final RenderType LIGHTNING = RenderType.create(
         RRIdentifiers.MODID+"_lightning_astro_blast",

@@ -7,6 +7,8 @@ import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexFormat;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.Util;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderStateShard;
@@ -16,9 +18,9 @@ import net.minecraft.util.CommonColors;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.BiFunction;
 import java.util.function.Function;
 
+@Environment(EnvType.CLIENT)
 public class ObjModels {
     public static final WavefrontObject b2jetForRhodes = RenderHelper.getModel("s");
     public static final WavefrontObject head = RenderHelper.getModel("rhodes/head");

@@ -23,6 +23,8 @@ import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.util.Translations;
 import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -35,8 +37,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class GuiSpawn extends Screen
-{
+@Environment(EnvType.CLIENT)
+public class GuiSpawn extends Screen {
 	private final int	xSizeOfTexture	= 256;
 	private final int	ySizeOfTexture	= 256;
 	private int			posX;

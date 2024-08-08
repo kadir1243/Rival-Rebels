@@ -18,6 +18,8 @@ import assets.rivalrebels.common.entity.EntityGore;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -27,8 +29,8 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.Objects;
 
-public class RenderGore extends EntityRenderer<EntityGore>
-{
+@Environment(EnvType.CLIENT)
+public class RenderGore extends EntityRenderer<EntityGore> {
 	private static final ResourceLocation	player			= ResourceLocation.withDefaultNamespace("textures/entity/steve.png");
 	private static final ResourceLocation	creeper			= ResourceLocation.withDefaultNamespace("textures/entity/creeper/creeper.png");
 	private static final ResourceLocation	enderman		= ResourceLocation.withDefaultNamespace("textures/entity/enderman/enderman.png");

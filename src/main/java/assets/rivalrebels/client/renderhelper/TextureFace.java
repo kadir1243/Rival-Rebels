@@ -11,5 +11,9 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderhelper;
 
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+
+@Environment(EnvType.CLIENT)
 public record TextureFace(TextureVertice v1, TextureVertice v2, TextureVertice v3, TextureVertice v4) {
 }

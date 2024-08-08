@@ -11,7 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item.weapon;
 
-import assets.rivalrebels.ClientProxy;
+import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.item.components.BinocularData;
 import assets.rivalrebels.common.item.components.RRComponents;
@@ -89,8 +89,8 @@ public class ItemBinoculars extends Item {
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (entity instanceof Player player && world.isClientSide && entity == Minecraft.getInstance().player) {
             boolean strike = isMousePressed() && !prevmclick;
-            c ^= ClientProxy.USE_BINOCULARS_ITEM.isDown() && !sc;
-            sc = ClientProxy.USE_BINOCULARS_ITEM.isDown();
+            c ^= RRClient.USE_BINOCULARS_ITEM.isDown() && !sc;
+            sc = RRClient.USE_BINOCULARS_ITEM.isDown();
             prevzoomed = zoomed;
             zoomed = ((Minecraft.getInstance().mouseHandler.isRightPressed() && (selected || zoomed))) && !Minecraft.getInstance().options.keyDrop.isDown() && Minecraft.getInstance().screen == null;
             if (zoomed) {
@@ -186,6 +186,6 @@ public class ItemBinoculars extends Item {
 
     @Environment(EnvType.CLIENT)
     public boolean isMousePressed() {
-        return ClientProxy.TARGET_KEY.isDown();
+        return RRClient.TARGET_KEY.isDown();
     }
 }

@@ -19,10 +19,13 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelTheoreticalTsarBomba {
     private static final float[] tsarx = {0.5f, 0.5f, 0.875f, 1f, 1f, 0.875f, 0.5f, 0f};
     private static final float[] tsary = {-5f, -3.5f, -2f, -1f, 1f, 2f, 2.75f, 3f};

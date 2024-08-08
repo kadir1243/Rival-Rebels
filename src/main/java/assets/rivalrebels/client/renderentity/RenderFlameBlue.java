@@ -12,8 +12,11 @@
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.common.entity.EntityFlameBall2;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
+@Environment(EnvType.CLIENT)
 public class RenderFlameBlue extends FlameBallRenderer<EntityFlameBall2> {
     public RenderFlameBlue(EntityRendererProvider.Context renderManager) {
         super(renderManager);

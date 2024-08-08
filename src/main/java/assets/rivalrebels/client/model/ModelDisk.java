@@ -16,9 +16,12 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelDisk
 {
 	private static final TextureVertice	t1			= new TextureVertice(0.03125f * 0, 0.03125f * 0);

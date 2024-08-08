@@ -18,6 +18,8 @@ import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -31,8 +33,8 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.lighting.LightEngine;
 import org.joml.Vector3f;
 
-public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast>
-{
+@Environment(EnvType.CLIENT)
+public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast> {
 	private float	ring1			= 0;
 	private float	ring2			= 0;
 	private float	ring3			= 0;

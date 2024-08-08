@@ -13,12 +13,14 @@ package assets.rivalrebels.client.gui;
 
 import assets.rivalrebels.RivalRebels;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
-public class GuiSigmaWin extends Screen
-{
+@Environment(EnvType.CLIENT)
+public class GuiSigmaWin extends Screen {
 	public GuiSigmaWin() {
         super(Component.empty());
     }

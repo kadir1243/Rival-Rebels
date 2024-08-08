@@ -15,6 +15,8 @@ import assets.rivalrebels.common.entity.EntityLaserBurst;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -24,8 +26,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.lighting.LightEngine;
 
-public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst>
-{
+@Environment(EnvType.CLIENT)
+public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst> {
 	private static final float red = 1F;
 
     public RenderLaserBurst(EntityRendererProvider.Context renderManager) {

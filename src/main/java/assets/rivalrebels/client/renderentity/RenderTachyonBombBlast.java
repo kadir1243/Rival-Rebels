@@ -21,6 +21,8 @@ import assets.rivalrebels.common.entity.EntityTachyonBombBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -32,6 +34,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.lighting.LightEngine;
 
+@Environment(EnvType.CLIENT)
 public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlast> {
     private final ModelTsarBlast model;
 

@@ -11,7 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels;
 
-import assets.rivalrebels.client.gui.RivalRebelsRenderOverlay;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.command.*;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -25,9 +24,6 @@ import assets.rivalrebels.common.round.RivalRebelsRound;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
 import com.mojang.logging.LogUtils;
 import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
-import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
@@ -43,13 +39,10 @@ import org.slf4j.Logger;
 import java.util.Collections;
 import java.util.List;
 
-public class RivalRebels implements ModInitializer, ClientModInitializer {
+public class RivalRebels implements ModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
 
     public static RivalRebelsRound round;
-
-    @Environment(EnvType.CLIENT)
-    public static RivalRebelsRenderOverlay rrro;
 
     @Override
     public void onInitialize() {
@@ -74,19 +67,6 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
         RRComponents.init();
         RRItems.init();
         RREntities.TYPES.forEach((name, type) -> Registry.register(BuiltInRegistries.ENTITY_TYPE, RRIdentifiers.create(name), type));
-    }
-
-    @Override
-    public void onInitializeClient() {
-        PacketDispatcher.registerClientPackets();
-        round.initClient();
-        rrro = new RivalRebelsRenderOverlay();
-        rrro.init();
-        RivalRebelsGuiHandler.registerClientGuiBinds();
-        ClientProxy.registerRenderInformation();
-        ClientProxy.registerKeyBinding();
-        RRBlocks.registerBlockColors();
-        ClientProxy.registerCustomRenderers();
     }
 
     private void registerCommand() {

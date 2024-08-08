@@ -15,9 +15,12 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.FastColor;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelAstroBlasterBody {
 	private static final Vector3f vx = new Vector3f(1, 0, 0).normalize();
 	private static final Vector3f vy = new Vector3f(0, 1, 0).normalize();

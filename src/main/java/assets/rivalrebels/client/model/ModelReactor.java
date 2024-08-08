@@ -15,8 +15,11 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelReactor {
 	private static final TextureVertice	t1		= new TextureVertice(0.015625f * 0, 0.015625f * 0);
 	private static final TextureVertice	t2		= new TextureVertice(0.015625f * 16, 0.015625f * 0);

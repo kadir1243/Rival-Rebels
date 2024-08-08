@@ -17,9 +17,12 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelNukeCloud
 {
 	private static final float[]	topx		= { 0.7f, 1.2f, 1.2f, 1.2f, 1.75f, 2.5f, 3f, 3.5f, 3.5f, 3f, 2.25f, 2f, 1.75f, 1.25f, 0f };

@@ -15,6 +15,8 @@ import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.common.entity.EntityBlood;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
@@ -23,8 +25,8 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.CommonColors;
 
-public class RenderBlood extends EntityRenderer<EntityBlood>
-{
+@Environment(EnvType.CLIENT)
+public class RenderBlood extends EntityRenderer<EntityBlood> {
     public RenderBlood(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }

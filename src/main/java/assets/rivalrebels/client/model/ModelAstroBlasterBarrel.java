@@ -17,11 +17,14 @@ import assets.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
 import java.util.stream.IntStream;
 
+@Environment(EnvType.CLIENT)
 public class ModelAstroBlasterBarrel {
 	private static final float	i			= 0.035714286f;
 	private static final float[]	barrelx		= { 0f, 0.2f, 0.2f, 0.25f, 0.25f, 0.2f, 0f };

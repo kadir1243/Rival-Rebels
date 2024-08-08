@@ -14,6 +14,8 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.common.entity.EntityDebris;
 import assets.rivalrebels.mixin.client.BlockEntityRenderersAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -31,14 +33,13 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
+@Environment(EnvType.CLIENT)
 public class RenderDebris extends EntityRenderer<EntityDebris> {
-
     private final BlockRenderDispatcher dispatcher;
     private final BlockEntityRendererProvider.Context context;
     private BlockEntityRenderer<BlockEntity> blockEntityRenderer;
 
-    public RenderDebris(EntityRendererProvider.Context manager)
-	{
+    public RenderDebris(EntityRendererProvider.Context manager) {
         super(manager);
         this.shadowRadius = 0.5F;
         dispatcher = manager.getBlockRenderDispatcher();

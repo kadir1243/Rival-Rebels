@@ -23,6 +23,8 @@ import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -37,6 +39,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.lighting.LightEngine;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast> {
     private final ModelAntimatterBombBlast modelabomb = new ModelAntimatterBombBlast();
 

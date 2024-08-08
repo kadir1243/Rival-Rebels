@@ -15,11 +15,14 @@ import assets.rivalrebels.client.renderhelper.RenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
+@Environment(EnvType.CLIENT)
 public class ModelBlastRing {
     public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int color, int light, int overlay) {
 		matrices.pushPose();
