@@ -54,27 +54,18 @@ public class RivalRebelsCellularNoise {
 		return (Math.sqrt(result) * 4) - 0.75d;
 	}
 
-    private static double getDist(Vec3 point, double xin, double yin, double zin)
-	{
-		double result = 1;
-		for (int x = -1; x <= 1; x++)
-		{
-			double xx = point.x - (xin + x);
-			double X = xx * xx;
-			for (int y = -1; y <= 1; y++)
-			{
-				double yy = point.y - (yin + y);
-				double Y = yy * yy + X;
-				for (int z = -1; z <= 1; z++)
-				{
-					double zz = point.z - (zin + z);
-					double Z = zz * zz + Y;
-					if (Z < result) result = Z;
-				}
-			}
-		}
-		return result;
-	}
+    private static double getDist(Vec3 point, double xin, double yin, double zin) {
+        double result = 1;
+        for (int x = -1; x <= 1; x++) {
+            for (int y = -1; y <= 1; y++) {
+                for (int z = -1; z <= 1; z++) {
+                    Vec3 vec = point.subtract(xin + x, yin + y, zin + z);
+                    if (vec.lengthSqr() < result) result = vec.lengthSqr();
+                }
+            }
+        }
+        return result;
+    }
 
     private static int[] genTexture(int xs, int zs, int ys) {
 		int[] ids = new int[ys];

@@ -32,11 +32,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class EntityFlameBall2 extends EntityInanimate
-{
-	public int		sequence;
-	public float	rotation;
-	public float	motionr;
+public class EntityFlameBall2 extends FlameBallProjectile {
 	public boolean	gonnadie;
 
     public EntityFlameBall2(EntityType<? extends EntityFlameBall2> type, Level world) {
@@ -45,17 +41,9 @@ public class EntityFlameBall2 extends EntityInanimate
 
 	public EntityFlameBall2(Level par1World) {
 		this(RREntities.FLAME_BALL2, par1World);
-		rotation = (float) (random.nextDouble() * 360);
-		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
 
-	public EntityFlameBall2(Level par1World, double par2, double par4, double par6) {
-		this(par1World);
-		setPos(par2, par4, par6);
-	}
-
-	public EntityFlameBall2(Level par1World, Entity player, float par3)
-	{
+    public EntityFlameBall2(Level par1World, Entity player, float par3) {
 		this(par1World);
 		// par3/=3f;
 		setPos(player.getEyePosition());
@@ -93,14 +81,13 @@ public class EntityFlameBall2 extends EntityInanimate
 	@Override
 	public void tick() {
 		super.tick();
-		tickCount++;
 		sequence++;
 		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 		if (tickCount > 5 && random.nextDouble() > 0.5) gonnadie = true;
 
 		if (gonnadie && sequence < 15) sequence++;
 
-		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, Entity::canBeCollidedWith);
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
 		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 6) {
             setPosRaw(getX() - 0.5F, getY() - 0.5, getZ() - 0.5);
@@ -152,16 +139,8 @@ public class EntityFlameBall2 extends EntityInanimate
 		setPos(getX(), getY(), getZ());
 	}
 
-	@Override
-	public boolean isAttackable()
-	{
-		return false;
-	}
-
-	private void fire()
-	{
-		if (!level().isClientSide())
-		{
+    private void fire() {
+		if (!level().isClientSide()) {
             BlockState state = level().getBlockState(blockPosition());
             Block id = state.getBlock();
 			if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());

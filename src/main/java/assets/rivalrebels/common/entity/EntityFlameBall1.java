@@ -29,27 +29,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class EntityFlameBall1 extends EntityInanimate {
-	public int		sequence;
-	public float	rotation;
-	public float	motionr;
-
+public class EntityFlameBall1 extends FlameBallProjectile {
     public EntityFlameBall1(EntityType<? extends EntityFlameBall1> type, Level world) {
         super(type, world);
     }
 
 	public EntityFlameBall1(Level par1World) {
 		this(RREntities.FLAME_BALL1, par1World);
-		rotation = (float) (random.nextDouble() * 360);
-		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
 
-	public EntityFlameBall1(Level par1World, double par2, double par4, double par6) {
-		this(par1World);
-		setPos(par2, par4, par6);
-	}
-
-	public EntityFlameBall1(Level par1World, Entity player, float par3) {
+    public EntityFlameBall1(Level par1World, Entity player, float par3) {
 		this(par1World);
 		setPos(player.getEyePosition());
 		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
@@ -87,11 +76,10 @@ public class EntityFlameBall1 extends EntityInanimate {
 	@Override
 	public void tick() {
 		super.tick();
-		tickCount++;
 		if (tickCount > 5) sequence++;
 		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 
-		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, Entity::canBeCollidedWith);
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
 		if (hitResult.getType() == HitResult.Type.ENTITY && tickCount >= 5) {
 			fire();
@@ -140,13 +128,7 @@ public class EntityFlameBall1 extends EntityInanimate {
 		setPos(getX(), getY(), getZ());
 	}
 
-	@Override
-	public boolean isAttackable()
-	{
-		return false;
-	}
-
-	private void fire()
+    private void fire()
 	{
 		if (!level().isClientSide())
 		{

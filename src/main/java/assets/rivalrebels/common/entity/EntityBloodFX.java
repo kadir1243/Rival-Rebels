@@ -26,22 +26,16 @@ import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
 public class EntityBloodFX extends TextureSheetParticle {
-	boolean	isBlood;
-
-	public EntityBloodFX(ClientLevel w, double x, double y, double z, boolean b)
-	{
+	public EntityBloodFX(ClientLevel w, double x, double y, double z, boolean b) {
 		this(w, x, y, z, w.random.nextGaussian() * 0.1, w.random.nextGaussian() * 0.1, w.random.nextGaussian() * 0.1, b);
 	}
 
-	public EntityBloodFX(ClientLevel w, double x, double y, double z, double r, double g, double b, boolean bl) {
+	public EntityBloodFX(ClientLevel w, double x, double y, double z, double r, double g, double b, boolean isBlood) {
 		super(w, x, y, z, r, g, b);
 
-		xd = r;
-		yd = g;
-		zd = b;
+        this.setParticleSpeed(r, g, b);
 		gravity = 0.75F;
 		lifetime = 20;
-		isBlood = bl;
         setSprite(Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(isBlood ? RRIdentifiers.etblood : RRIdentifiers.etgoo));
 	}
 

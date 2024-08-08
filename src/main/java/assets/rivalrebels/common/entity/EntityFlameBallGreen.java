@@ -27,31 +27,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class EntityFlameBallGreen extends EntityInanimate
-{
-	public int		sequence;
-	public float	rotation;
-	public float	motionr;
-
+public class EntityFlameBallGreen extends FlameBallProjectile {
     public EntityFlameBallGreen(EntityType<? extends EntityFlameBallGreen> type, Level world) {
         super(type, world);
     }
 
-	public EntityFlameBallGreen(Level par1World)
-	{
+	public EntityFlameBallGreen(Level par1World) {
 		this(RREntities.FLAME_BALL_GREEN, par1World);
-		rotation = (float) (random.nextDouble() * 360);
-		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
 
-	public EntityFlameBallGreen(Level par1World, double par2, double par4, double par6)
-	{
+	public EntityFlameBallGreen(Level par1World, double par2, double par4, double par6) {
 		this(par1World);
 		setPos(par2, par4, par6);
 	}
 
-	public EntityFlameBallGreen(Level par1World, Player player, float par3)
-	{
+	public EntityFlameBallGreen(Level par1World, Player player, float par3) {
 		this(par1World);
 		setPos(player.getEyePosition());
 		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
@@ -65,8 +55,7 @@ public class EntityFlameBallGreen extends EntityInanimate
         setDeltaMovement(getDeltaMovement().scale(par3));
     }
 
-	public EntityFlameBallGreen(Level par1World, TileEntityReciever ter, float f)
-	{
+	public EntityFlameBallGreen(Level par1World, TileEntityReciever ter, float f) {
 		this(par1World);
 		setYRot(180 - ter.yaw);
 		setXRot(-ter.pitch);
@@ -78,15 +67,13 @@ public class EntityFlameBallGreen extends EntityInanimate
         setDeltaMovement(getDeltaMovement().scale(f));
 	}
 
-	public EntityFlameBallGreen(Level world, double x, double y, double z, double mx, double my, double mz)
-	{
+	public EntityFlameBallGreen(Level world, double x, double y, double z, double mx, double my, double mz) {
 		this(world);
 		setPos(x, y, z);
         setDeltaMovement(mx, my, mz);
 	}
 
-	public EntityFlameBallGreen(Level world, double x, double y, double z, double mx, double my, double mz, double d, double r)
-	{
+	public EntityFlameBallGreen(Level world, double x, double y, double z, double mx, double my, double mz, double d, double r) {
 		this(world);
 		setPos(x+mx*d+random.nextGaussian()*r, y+my*d+random.nextGaussian()*r, z+mz*d+random.nextGaussian()*r);
         setDeltaMovement(mx, my, mz);
@@ -95,7 +82,6 @@ public class EntityFlameBallGreen extends EntityInanimate
 	@Override
 	public void tick() {
 		super.tick();
-		tickCount++;
 		if (tickCount > 100) kill();
 		if (tickCount % 3 == 0) sequence++;
 		if (sequence > 3) sequence = 0;
@@ -128,21 +114,11 @@ public class EntityFlameBallGreen extends EntityInanimate
 		setPos(getX(), getY(), getZ());
 	}
 
-	@Override
-	public boolean isAttackable() {
-		return false;
-	}
-
-	private void fire()
-	{
-		if (!level().isClientSide())
-		{
-			for (int x = -3; x < 4; x++)
-			{
-				for (int y = -1; y < 2; y++)
-				{
-					for (int z = -3; z < 4; z++)
-					{
+    private void fire() {
+		if (!level().isClientSide()) {
+			for (int x = -3; x < 4; x++) {
+				for (int y = -1; y < 2; y++) {
+					for (int z = -3; z < 4; z++) {
                         BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
                         BlockState state = level().getBlockState(pos);
 						if (level().isEmptyBlock(pos) || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());

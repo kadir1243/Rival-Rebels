@@ -49,9 +49,9 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.ambient.Bat;
+import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Squid;
+import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.CaveSpider;
@@ -67,8 +67,7 @@ import net.minecraft.world.entity.monster.ZombifiedPiglin;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.entity.vehicle.Boat;
-import net.minecraft.world.entity.vehicle.Minecart;
+import net.minecraft.world.entity.vehicle.VehicleEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -286,7 +285,7 @@ public class EntityRhodes extends Entity {
 			ticksSinceLastPacket++;
 			setPos(getX(), getY(), getZ());
 
-			if (level().isClientSide()) RivalRebels.proxy.setOverlay(this);
+			if (level().isClientSide()) RivalRebels.rrro.setOverlay(this);
 
 			if (rider!=null) {
 				rider.setPos(((getX()+syaw*5.5*getScale()) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*getScale() - (level().isClientSide?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*getScale()) - rider.getZ()) * 0.33f + rider.getZ());
@@ -869,8 +868,7 @@ public class EntityRhodes extends Entity {
                                 !(e instanceof Projectile
                                         || e instanceof EntityInanimate
                                         || e instanceof ItemEntity
-                                        || e instanceof Boat
-                                        || e instanceof Minecart)
+                                        || e instanceof VehicleEntity)
                                 && e != rider) {
                             Vec3 entity = new Vec3(e.getX(), e.getY(), e.getZ());
                             double bbx = 1;
@@ -1372,10 +1370,9 @@ public class EntityRhodes extends Entity {
                             || e instanceof ItemEntity
                             || e instanceof Animal
                             || e instanceof Villager
-                            || e instanceof Bat
-                            || e instanceof Squid
-                            || e instanceof Boat
-                            || e instanceof Minecart)) {
+                            || e instanceof AmbientCreature
+                            || e instanceof WaterAnimal
+                            || e instanceof VehicleEntity)) {
                 double prio = getPriority(e) - distanceTo(e);
                 if (prio > priority) {
                     target = e;
@@ -1579,10 +1576,9 @@ public class EntityRhodes extends Entity {
                         || e instanceof ItemEntity
                         || e instanceof Animal
                         || e instanceof Villager
-                        || e instanceof Bat
-                        || e instanceof Squid
-                        || e instanceof Boat
-                        || e instanceof Minecart)) {
+                        || e instanceof AmbientCreature
+                        || e instanceof WaterAnimal
+                        || e instanceof VehicleEntity)) {
                     float dx = (float) e.getX() - px;
                     float dz = (float) e.getZ() - pz;
                     float dot = (cyaw * dx + syaw * dz);
@@ -1749,10 +1745,9 @@ public class EntityRhodes extends Entity {
                         || e instanceof ItemEntity
                         || e instanceof Animal
                         || e instanceof Villager
-                        || e instanceof Bat
-                        || e instanceof Squid
-                        || e instanceof Boat
-                        || e instanceof Minecart)) {
+                        || e instanceof AmbientCreature
+                        || e instanceof WaterAnimal
+                        || e instanceof VehicleEntity)) {
                     float dx = (float) e.getX() - px;
                     float dz = (float) e.getZ() - pz;
                     float dot = (-cyaw * dx + -syaw * dz);
@@ -1837,10 +1832,9 @@ public class EntityRhodes extends Entity {
                                 || e instanceof ItemEntity
                                 || e instanceof Animal
                                 || e instanceof Villager
-                                || e instanceof Bat
-                                || e instanceof Squid
-                                || e instanceof Boat
-                                || e instanceof Minecart)) {
+                                || e instanceof AmbientCreature
+                                || e instanceof WaterAnimal
+                                || e instanceof VehicleEntity)) {
                     float x = (float) (e.getX() - getX());
                     float z = (float) (e.getZ() - getZ());
                     if (Mth.abs(cyaw * x + syaw * z) < 2) {

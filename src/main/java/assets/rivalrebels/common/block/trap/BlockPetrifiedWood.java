@@ -60,42 +60,4 @@ public class BlockPetrifiedWood extends Block {
 			world.setBlockAndUpdate(pos, state.setValue(META, 7));
 		}
 	}
-
-	/*@Environment(EnvType.CLIENT)
-	IIcon	icon1;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon2;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon3;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon4;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon5;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon6;
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:bh"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:bh"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:bg"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:bg"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:bg"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:bg"); // SIDE E
-	}*/
 }

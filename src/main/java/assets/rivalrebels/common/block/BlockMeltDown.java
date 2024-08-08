@@ -31,8 +31,8 @@ import org.jetbrains.annotations.Nullable;
 public class BlockMeltDown extends BaseEntityBlock {
     public static final MapCodec<BlockMeltDown> CODEC = simpleCodec(BlockMeltDown::new);
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
-	public BlockMeltDown(Properties settings)
-	{
+
+    public BlockMeltDown(Properties settings) {
 		super(settings);
         this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
     }
@@ -52,6 +52,7 @@ public class BlockMeltDown extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityMeltDown(pos, state);
 	}
+
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {

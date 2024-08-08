@@ -12,9 +12,10 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RivalRebels;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -431,11 +432,9 @@ public class EntityGore extends EntityInanimate {
 	}
 
 	@Environment(EnvType.CLIENT)
-	private void spawnBlood()
-	{
-		for (int i = 0; i < 3; ++i)
-		{
-			RivalRebels.proxy.spawnGore(level(), this, !isGreen());
+	private void spawnBlood() {
+		for (int i = 0; i < 3; ++i) {
+            Minecraft.getInstance().particleEngine.add(new EntityBloodFX((ClientLevel) level(), this, !isGreen()));
 		}
 	}
 

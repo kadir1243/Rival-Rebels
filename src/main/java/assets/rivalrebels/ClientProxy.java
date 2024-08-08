@@ -11,30 +11,36 @@
  *******************************************************************************/
 package assets.rivalrebels;
 
-import assets.rivalrebels.client.gui.*;
+import assets.rivalrebels.client.itemrenders.*;
 import assets.rivalrebels.client.renderentity.*;
 import assets.rivalrebels.client.tileentityrender.*;
+import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.*;
+import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
+import com.google.common.base.Supplier;
 import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.KeyMapping;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 
 import static org.lwjgl.glfw.GLFW.*;
 
 @Environment(EnvType.CLIENT)
-public class ClientProxy extends CommonProxy {
-    public static final KeyMapping USE_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".use", GLFW_KEY_F, "key." + RRIdentifiers.MODID);
+public class ClientProxy {
+    public static final KeyMapping USE_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".use", GLFW_KEY_R, "key." + RRIdentifiers.MODID);
     public static final KeyMapping TARGET_KEY = new KeyMapping("key." + RRIdentifiers.MODID + ".target", InputConstants.Type.MOUSE, GLFW_MOUSE_BUTTON_LEFT, "key." + RRIdentifiers.MODID);
     public static final KeyMapping RHODES_JUMP_KEY = createRhodesKey("jump", GLFW_KEY_SPACE);
     public static final KeyMapping RHODES_ROCKET_KEY = createRhodesKey("rocket", GLFW_KEY_A);
@@ -46,6 +52,7 @@ public class ClientProxy extends CommonProxy {
     public static final KeyMapping RHODES_STOP_KEY = createRhodesKey("stop", GLFW_KEY_X);
     public static final KeyMapping RHODES_B2SPIRIT_KEY = createRhodesKey("b2spirit", GLFW_KEY_Z);
     public static final KeyMapping RHODES_GUARD_KEY = createRhodesKey("guard", GLFW_KEY_G);
+    public static final KeyMapping USE_BINOCULARS_ITEM = new KeyMapping("key." + RRIdentifiers.MODID + ".use_binoculars", GLFW_KEY_C, "key." + RRIdentifiers.MODID);
 
     private static KeyMapping createRhodesKey(String translation, int key) {
         return new KeyMapping("key." + RRIdentifiers.MODID + ".rhodes." + "." + translation, key, "key." + RRIdentifiers.MODID + ".rhodes");
@@ -63,6 +70,7 @@ public class ClientProxy extends CommonProxy {
         KeyBindingHelper.registerKeyBinding(RHODES_NUKE_KEY);
         KeyBindingHelper.registerKeyBinding(RHODES_STOP_KEY);
         KeyBindingHelper.registerKeyBinding(RHODES_B2SPIRIT_KEY);
+        KeyBindingHelper.registerKeyBinding(USE_BINOCULARS_ITEM);
     }
 
 	public static void registerRenderInformation() {
@@ -149,52 +157,44 @@ public class ClientProxy extends CommonProxy {
         });
 	}
 
-    @Override
-	public void guiClass()
-	{
-		Minecraft.getInstance().setScreen(new GuiClass(RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getInstance().player.getGameProfile()).rrclass));
-	}
+    private static void addItemRenderer(ItemLike item, Supplier<DynamicItemRenderer> renderer) {
+        BuiltinItemRendererRegistry.INSTANCE.register(item, new DynamicItemRendererWrapper(renderer));
+    }
 
-	@Override
-	public void guiSpawn()
-	{
-		Minecraft.getInstance().setScreen(new GuiSpawn(RivalRebels.round.rrplayerlist.getForGameProfile(Minecraft.getInstance().player.getGameProfile()).rrclass));
-	}
+    static void registerCustomRenderers() {
+        addItemRenderer(RRItems.NUCLEAR_ROD, NuclearRodRenderer::new);
+        addItemRenderer(RRItems.tesla, TeslaRenderer::new);
+        addItemRenderer(RRItems.einsten, AstroBlasterRenderer::new);
+        addItemRenderer(RRItems.battery, BatteryRenderer::new);
+        addItemRenderer(RRItems.binoculars, BinocularsRenderer::new);
+        addItemRenderer(RRItems.emptyrod, EmptyRodRenderer::new);
+        addItemRenderer(RRItems.flamethrower, FlamethrowerRenderer::new);
+        addItemRenderer(RRItems.fuel, GasRenderer::new);
+        addItemRenderer(RRItems.hackm202, HackRocketLauncherRenderer::new);
+        addItemRenderer(RRItems.hydrod, HydrogenRodRenderer::new);
+        addItemRenderer(RRBlocks.controller, LaptopRenderer::new);
+        addItemRenderer(RRBlocks.loader, LoaderRenderer::new);
+        addItemRenderer(RRItems.plasmacannon, PlasmaCannonRenderer::new);
+        addItemRenderer(RRBlocks.reactor, ReactorRenderer::new);
+        addItemRenderer(RRItems.redrod, RedstoneRodRenderer::new);
+        addItemRenderer(RRItems.rpg, RocketLauncherRenderer::new);
+        addItemRenderer(RRItems.rocket, RocketRenderer::new);
+        addItemRenderer(RRItems.roda, RodaRenderer::new);
+        addItemRenderer(RRItems.roddisk, RodDiskRenderer::new);
+        addItemRenderer(RRItems.seekm202, SeekRocketLauncherRenderer::new);
+    }
 
-	@Override
-	public void flamethrowerGui(int i)
-	{
-		Minecraft.getInstance().setScreen(new GuiFlameThrower(i));
-	}
+    @Environment(EnvType.CLIENT)
+    private static class DynamicItemRendererWrapper implements BuiltinItemRendererRegistry.DynamicItemRenderer {
+        private final DynamicItemRenderer itemRenderer;
 
-	@Override
-	public void teslaGui(int i)
-	{
-		Minecraft.getInstance().setScreen(new GuiTesla(i));
-	}
+        public DynamicItemRendererWrapper(Supplier<DynamicItemRenderer> renderer) {
+            itemRenderer = renderer.get();
+        }
 
-	@Override
-	public void spawnGore(Level world, EntityGore g, boolean greenblood)
-	{
-		Minecraft.getInstance().particleEngine.add(new EntityBloodFX((ClientLevel) world, g, !greenblood));
-	}
-
-    boolean prevc = false;
-	public boolean c()
-	{
-		boolean isdown = glfwGetKey(Minecraft.getInstance().getWindow().getWindow(), GLFW_KEY_C) == GLFW_PRESS && Minecraft.getInstance().screen == null;
-		boolean x = !prevc && isdown;
-		prevc = isdown;
-		return x;
-	}
-
-    @Override
-	public void setOverlay(EntityRhodes rhodes)
-	{
-		if (rhodes.rider == Minecraft.getInstance().player)
-		{
-			RivalRebels.rrro.counter = 10;
-			RivalRebels.rrro.rhodes = rhodes;
-		}
-	}
+        @Override
+        public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+            itemRenderer.render(stack, mode, matrices, vertexConsumers, light, overlay);
+        }
+    }
 }

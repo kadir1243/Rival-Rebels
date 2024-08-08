@@ -25,8 +25,8 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlockPlasmaExplosion extends BaseEntityBlock {
     public static final MapCodec<BlockPlasmaExplosion> CODEC = simpleCodec(BlockPlasmaExplosion::new);
-	public BlockPlasmaExplosion(Properties settings)
-	{
+
+    public BlockPlasmaExplosion(Properties settings) {
 		super(settings);
 	}
 

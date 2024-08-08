@@ -12,7 +12,6 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.item.RRItems;

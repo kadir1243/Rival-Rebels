@@ -14,7 +14,6 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.RRIdentifiers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
@@ -43,8 +42,7 @@ public class RenderBullet extends EntityRenderer<Entity> {
             float var7 = 1.0F;
             float var8 = 0.5F;
             float var9 = 0.25F;
-            matrices.mulPose(Axis.YP.rotationDegrees((float) (180.0F - this.entityRenderDispatcher.camera.getPosition().y())));
-            matrices.mulPose(Axis.XP.rotationDegrees((float) -this.entityRenderDispatcher.camera.getPosition().x()));
+            matrices.mulPose(this.entityRenderDispatcher.cameraOrientation());
             VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(getTextureLocation(entity)));
             buffer.addVertex(matrices.last(), (0.0F - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
             buffer.addVertex(matrices.last(), (var7 - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);

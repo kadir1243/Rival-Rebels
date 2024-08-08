@@ -56,6 +56,7 @@ public class GuiTesla extends Screen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
+        super.render(context, mouseX, mouseY, delta);
         float f = 0.00390625F;
         ((GuiGraphicsAccessor) context).blit(
             RRIdentifiers.guitesla,
@@ -69,16 +70,19 @@ public class GuiTesla extends Screen {
             0,
             ySizeOfTexture * f
         );
-        super.render(context, mouseX, mouseY, delta);
-		if (!(ClientProxy.USE_KEY.isDown()))
-		{
-            onClose();
-			this.minecraft.setWindowActive(true);
-            ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
-			ItemStack stack = minecraft.player.getInventory().getItem(minecraft.player.getInventory().selected);
-			if (stack.getItem() instanceof ItemTesla) {
-                stack.set(RRComponents.TESLA_DIAL, knob.getDegree());
-			}
-		}
 	}
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (ClientProxy.USE_KEY.matches(keyCode, scanCode)) {
+            onClose();
+            this.minecraft.setWindowActive(true);
+            ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
+            ItemStack stack = minecraft.player.getInventory().getItem(minecraft.player.getInventory().selected);
+            if (stack.getItem() instanceof ItemTesla) {
+                stack.set(RRComponents.TESLA_DIAL, knob.getDegree());
+            }
+        }
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
 }

@@ -30,8 +30,8 @@ import org.jetbrains.annotations.Nullable;
 public class BlockReactive extends BaseEntityBlock {
     public static final MapCodec<BlockReactive> CODEC = simpleCodec(BlockReactive::new);
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
-	public BlockReactive(Properties settings)
-	{
+
+    public BlockReactive(Properties settings) {
 		super(settings);
 
         this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));

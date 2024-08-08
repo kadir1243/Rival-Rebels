@@ -13,7 +13,7 @@ package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.gui.GuiTesla;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRaytrace;
@@ -21,6 +21,8 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.util.ItemUtil;
 import assets.rivalrebels.common.util.Translations;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
@@ -91,11 +93,12 @@ public class ItemTesla extends TieredItem {
 	}
 	boolean message = true;
 
+    @Environment(EnvType.CLIENT)
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (world.isClientSide()) {
-            if (ClientProxy.USE_KEY.isDown() && selected && Minecraft.getInstance().screen == null) {
-                RivalRebels.proxy.teslaGui(getDegree(stack));
+    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
+        if (selected && level.isClientSide()) {
+            if (ClientProxy.USE_KEY.isDown() && Minecraft.getInstance().screen == null) {
+                Minecraft.getInstance().setScreen(new GuiTesla(getDegree(stack)));
             }
         }
     }
@@ -122,8 +125,7 @@ public class ItemTesla extends TieredItem {
                 world.addFreshEntity(new EntityRaytrace(world, user, dist, randomness, chance, !stack.isEnchanted()));
 	}
 
-	public static int getDegree(ItemStack item)
-	{
+	public static int getDegree(ItemStack item) {
 		if (!item.has(RRComponents.TESLA_DIAL)) return 0;
 		else return item.get(RRComponents.TESLA_DIAL) + 90;
 	}

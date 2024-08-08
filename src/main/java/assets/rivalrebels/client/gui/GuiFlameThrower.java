@@ -58,7 +58,8 @@ public class GuiFlameThrower extends Screen {
 
     @Override
     public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		float f = 0.00390625F;
+        super.render(context, mouseX, mouseY, delta);
+        float f = 0.00390625F;
         ((GuiGraphicsAccessor) context).blit(
             RRIdentifiers.guiflamethrower,
             posX,
@@ -71,16 +72,20 @@ public class GuiFlameThrower extends Screen {
             ySizeOfTexture * f,
             0
         );
-        super.render(context, mouseX, mouseY, delta);
-		if (!(ClientProxy.USE_KEY.isDown())) {
+	}
+
+    @Override
+    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
+        if (ClientProxy.USE_KEY.matches(keyCode, scanCode)) {
             onClose();
-			minecraft.setWindowActive(true);
-			ItemStack itemstack = minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
+            minecraft.setWindowActive(true);
+            ItemStack itemstack = minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
             if (itemstack.getItem() != RRItems.flamethrower) {
                 itemstack = minecraft.player.getItemInHand(InteractionHand.OFF_HAND);
             }
             itemstack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(knob.getDegree(), itemstack.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).isReady()));
             ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
-		}
-	}
+        }
+        return super.keyReleased(keyCode, scanCode, modifiers);
+    }
 }

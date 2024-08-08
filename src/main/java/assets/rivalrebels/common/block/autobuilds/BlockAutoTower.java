@@ -98,42 +98,4 @@ public class BlockAutoTower extends BlockAutoTemplate {
 		}
 		placeBlockCarefully(world, x, y - 1, z, RRBlocks.jump);
 	}
-
-	/*@Environment(EnvType.CLIENT)
-	IIcon	icon1;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon2;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon3;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon4;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon5;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon6;
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ah"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ai"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:cy"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:cy"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:cy"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:cy"); // SIDE E
-	}*/
 }

@@ -28,12 +28,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
-public class EntityFlameBall extends EntityInanimate
-{
-	public int		sequence;
-	public float	rotation;
-	public float	motionr;
-
+public class EntityFlameBall extends FlameBallProjectile {
     public EntityFlameBall(EntityType<? extends EntityFlameBall> entityType, Level world) {
         super(entityType, world);
     }
@@ -41,19 +36,9 @@ public class EntityFlameBall extends EntityInanimate
 	public EntityFlameBall(Level par1World)
 	{
 		this(RREntities.FLAME_BALL, par1World);
-		rotation = (float) (random.nextDouble() * 360);
-		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
 
-	public EntityFlameBall(Level par1World, double par2, double par4, double par6)
-	{
-		this(par1World);
-		setPos(par2, par4, par6);
-		rotation = (float) (random.nextDouble() * 360);
-		motionr = (float) (random.nextDouble() - 0.5f) * 5;
-	}
-
-	public EntityFlameBall(Level par1World, Entity player, float par3)
+    public EntityFlameBall(Level par1World, Entity player, float par3)
 	{
 		this(par1World);
 		setPos(player.getEyePosition());
@@ -66,8 +51,6 @@ public class EntityFlameBall extends EntityInanimate
             getZ() - (Mth.sin(player.getYRot() / 180.0F * Mth.PI) * 0.2F)
         );
         setDeltaMovement(getDeltaMovement().scale(par3));
-		rotation = (float) (random.nextDouble() * 360);
-		motionr = (float) (random.nextDouble() - 0.5f) * 5;
 	}
 
 	public EntityFlameBall(Level par1World, TileEntityReciever ter, float f)
@@ -99,11 +82,10 @@ public class EntityFlameBall extends EntityInanimate
 	@Override
 	public void tick() {
 		super.tick();
-		tickCount++;
 		if (tickCount % 3 == 0) sequence++;
 		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
 
-		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, Entity::canBeCollidedWith);
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
 		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5) {
 			fire();
@@ -139,13 +121,7 @@ public class EntityFlameBall extends EntityInanimate
         return 0.01;
     }
 
-	@Override
-	public boolean isAttackable()
-	{
-		return false;
-	}
-
-	private void fire()
+    private void fire()
 	{
 		if (!level().isClientSide())
 		{

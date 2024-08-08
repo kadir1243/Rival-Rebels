@@ -14,7 +14,7 @@ package assets.rivalrebels.common.item.weapon;
 import assets.rivalrebels.ClientProxy;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.gui.GuiFlameThrower;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityFlameBall;
 import assets.rivalrebels.common.entity.EntityFlameBall1;
@@ -132,9 +132,8 @@ public class ItemFlameThrower extends TieredItem {
 
     @Environment(EnvType.CLIENT)
     public void openGui(ItemStack item) {
-		if (ClientProxy.USE_KEY.isDown() && Minecraft.getInstance().screen == null)
-		{
-			RivalRebels.proxy.flamethrowerGui(getMode(item));
+		if (ClientProxy.USE_KEY.isDown() && Minecraft.getInstance().screen == null) {
+            Minecraft.getInstance().setScreen(new GuiFlameThrower(getMode(item)));
 		}
 	}
 

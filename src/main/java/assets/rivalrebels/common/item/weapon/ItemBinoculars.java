@@ -89,8 +89,8 @@ public class ItemBinoculars extends Item {
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
         if (entity instanceof Player player && world.isClientSide && entity == Minecraft.getInstance().player) {
             boolean strike = isMousePressed() && !prevmclick;
-            c ^= RivalRebels.proxy.c() && !sc;
-            sc = RivalRebels.proxy.c();
+            c ^= ClientProxy.USE_BINOCULARS_ITEM.isDown() && !sc;
+            sc = ClientProxy.USE_BINOCULARS_ITEM.isDown();
             prevzoomed = zoomed;
             zoomed = ((Minecraft.getInstance().mouseHandler.isRightPressed() && (selected || zoomed))) && !Minecraft.getInstance().options.keyDrop.isDown() && Minecraft.getInstance().screen == null;
             if (zoomed) {

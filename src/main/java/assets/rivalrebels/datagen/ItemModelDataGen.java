@@ -44,14 +44,6 @@ public class ItemModelDataGen extends FabricModelProvider {
         simpleItem(RRItems.chip, "bd");
         //simpleItem(RRItems.battery, "ac");
         simpleItem(RRItems.antenna, "aa");
-        simpleItem(RRItems.camohat, "oh");
-        simpleItem(RRItems.camohat2, "sh");
-        simpleItem(RRItems.camoshirt, "ov");
-        simpleItem(RRItems.camoshirt2, "sv");
-        simpleItem(RRItems.camopants, "op");
-        simpleItem(RRItems.camopants2, "sp");
-        simpleItem(RRItems.camoshoes, "ob");
-        simpleItem(RRItems.camoshoes2, "sb");
         simpleItem(RRItems.armyshovel, "aw");
         //simpleItem(RRItems.einsten, "ab");
         //simpleItem(RRItems.binoculars, "bb");
@@ -86,6 +78,56 @@ public class ItemModelDataGen extends FabricModelProvider {
         customModel(RRItems.roddisk);
         customModel(RRItems.seekm202);
         customModel(RRItems.flamethrower);
+
+        simpleItem(RRItems.camohat, "oh");
+        simpleItem(RRItems.camoshirt, "ov");
+        simpleItem(RRItems.camopants, "op");
+        simpleItem(RRItems.camoshoes, "ob");
+
+        simpleItem(RRItems.camohat2, "sh");
+        simpleItem(RRItems.camoshirt2, "sv");
+        simpleItem(RRItems.camopants2, "sp");
+        simpleItem(RRItems.camoshoes2, "sb");
+
+        simpleItem(RRItems.orebelhelmet, "roh");
+        simpleItem(RRItems.orebelchest, "roc");
+        simpleItem(RRItems.orebelpants, "rop");
+        simpleItem(RRItems.orebelboots, "rob");
+
+        simpleItem(RRItems.onukerhelmet, "noh");
+        simpleItem(RRItems.onukerchest, "noc");
+        simpleItem(RRItems.onukerpants, "nop");
+        simpleItem(RRItems.onukerboots, "nob");
+
+        simpleItem(RRItems.ointelhelmet, "ioh");
+        simpleItem(RRItems.ointelchest, "ioc");
+        simpleItem(RRItems.ointelpants, "iop");
+        simpleItem(RRItems.ointelboots, "iob");
+
+        simpleItem(RRItems.ohackerhelmet, "hoh");
+        simpleItem(RRItems.ohackerchest, "hoc");
+        simpleItem(RRItems.ohackerpants, "hop");
+        simpleItem(RRItems.ohackerboots, "hob");
+
+        simpleItem(RRItems.srebelhelmet, "rsh");
+        simpleItem(RRItems.srebelchest, "rsc");
+        simpleItem(RRItems.srebelpants, "rsp");
+        simpleItem(RRItems.srebelboots, "rsb");
+
+        simpleItem(RRItems.snukerhelmet, "nsh");
+        simpleItem(RRItems.snukerchest, "nsc");
+        simpleItem(RRItems.snukerpants, "nsp");
+        simpleItem(RRItems.snukerboots, "nsb");
+
+        simpleItem(RRItems.sintelhelmet, "ish");
+        simpleItem(RRItems.sintelchest, "isc");
+        simpleItem(RRItems.sintelpants, "isp");
+        simpleItem(RRItems.sintelboots, "isb");
+
+        simpleItem(RRItems.shackerhelmet, "hsh");
+        simpleItem(RRItems.shackerchest, "hsc");
+        simpleItem(RRItems.shackerpants, "hsp");
+        simpleItem(RRItems.shackerboots, "hsb");
     }
 
     @Override

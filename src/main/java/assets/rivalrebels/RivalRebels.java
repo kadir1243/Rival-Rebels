@@ -12,7 +12,6 @@
 package assets.rivalrebels;
 
 import assets.rivalrebels.client.gui.RivalRebelsRenderOverlay;
-import assets.rivalrebels.client.itemrenders.*;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.command.*;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
@@ -24,27 +23,19 @@ import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.packet.PacketDispatcher;
 import assets.rivalrebels.common.round.RivalRebelsRound;
 import assets.rivalrebels.common.tileentity.RRTileEntities;
-import com.google.common.base.Supplier;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.logging.LogUtils;
 import fuzs.forgeconfigapiport.fabric.api.forge.v4.ForgeConfigRegistry;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.api.ModInitializer;
-import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.loader.api.FabricLoader;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.Holder;
 import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.fml.config.ModConfig;
 import org.slf4j.Logger;
@@ -54,7 +45,6 @@ import java.util.List;
 
 public class RivalRebels implements ModInitializer, ClientModInitializer {
     public static final Logger LOGGER = LogUtils.getLogger();
-    public static CommonProxy proxy;
 
     public static RivalRebelsRound round;
 
@@ -63,7 +53,6 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
 
     @Override
     public void onInitialize() {
-        proxy = FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT ? new ClientProxy() : new CommonProxy();
         PacketDispatcher.registerPackets();
 
         ForgeConfigRegistry.INSTANCE.register(RRIdentifiers.MODID, ModConfig.Type.COMMON, RRConfig.COMMON_SPEC);
@@ -97,7 +86,7 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
         ClientProxy.registerRenderInformation();
         ClientProxy.registerKeyBinding();
         RRBlocks.registerBlockColors();
-        registerCustomRenderers();
+        ClientProxy.registerCustomRenderers();
     }
 
     private void registerCommand() {
@@ -116,36 +105,4 @@ public class RivalRebels implements ModInitializer, ClientModInitializer {
         return BuiltInRegistries.BLOCK.asTagAddingLookup().get(tagKey).map(HolderSet.ListBacked::stream).map(s -> s.map(Holder::value).toList()).orElse(Collections.emptyList());
     }
 
-    private static void addItemRenderer(ItemLike item, Supplier<DynamicItemRenderer> renderer) {
-        BuiltinItemRendererRegistry.INSTANCE.register(item, new BuiltinItemRendererRegistry.DynamicItemRenderer() {
-            private final DynamicItemRenderer itemRenderer = renderer.get();
-            @Override
-            public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-                itemRenderer.render(stack, mode, matrices, vertexConsumers, light, overlay);
-            }
-        });
-    }
-
-    private static void registerCustomRenderers() {
-        addItemRenderer(RRItems.NUCLEAR_ROD, NuclearRodRenderer::new);
-        addItemRenderer(RRItems.tesla, TeslaRenderer::new);
-        addItemRenderer(RRItems.einsten, AstroBlasterRenderer::new);
-        addItemRenderer(RRItems.battery, BatteryRenderer::new);
-        addItemRenderer(RRItems.binoculars, BinocularsRenderer::new);
-        addItemRenderer(RRItems.emptyrod, EmptyRodRenderer::new);
-        addItemRenderer(RRItems.flamethrower, FlamethrowerRenderer::new);
-        addItemRenderer(RRItems.fuel, GasRenderer::new);
-        addItemRenderer(RRItems.hackm202, HackRocketLauncherRenderer::new);
-        addItemRenderer(RRItems.hydrod, HydrogenRodRenderer::new);
-        addItemRenderer(RRBlocks.controller, LaptopRenderer::new);
-        addItemRenderer(RRBlocks.loader, LoaderRenderer::new);
-        addItemRenderer(RRItems.plasmacannon, PlasmaCannonRenderer::new);
-        addItemRenderer(RRBlocks.reactor, ReactorRenderer::new);
-        addItemRenderer(RRItems.redrod, RedstoneRodRenderer::new);
-        addItemRenderer(RRItems.rpg, RocketLauncherRenderer::new);
-        addItemRenderer(RRItems.rocket, RocketRenderer::new);
-        addItemRenderer(RRItems.roda, RodaRenderer::new);
-        addItemRenderer(RRItems.roddisk, RodDiskRenderer::new);
-        addItemRenderer(RRItems.seekm202, SeekRocketLauncherRenderer::new);
-    }
 }

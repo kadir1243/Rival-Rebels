@@ -161,15 +161,15 @@ public class EntityRoddiskLeader extends RoddiskBase {
                 Entity entityHit = ((EntityHitResult) var3).getEntity();
                 this.playSound(RRSounds.ROD_DISK_HIT_ENTITY);
 
-				if (entityHit instanceof Player entityPlayerHit && getOwner() instanceof Player && entityHit != getOwner()) {
+				if (entityHit instanceof Player player && getOwner() instanceof Player && entityHit != getOwner()) {
                     for (EquipmentSlot slot : EquipmentSlot.values()) {
                         if (!slot.isArmor()) return;
-                        ItemStack armorStack = entityPlayerHit.getItemBySlot(slot);
+                        ItemStack armorStack = player.getItemBySlot(slot);
                         if (!armorStack.isEmpty()) {
-							armorStack.hurtAndBreak(30, entityPlayerHit, slot);
-							entityPlayerHit.hurt(RivalRebelsDamageSource.tron(level()), 1);
+							armorStack.hurtAndBreak(30, player, slot);
+							player.hurt(RivalRebelsDamageSource.tron(level()), 1);
 						} else {
-							entityPlayerHit.hurt(RivalRebelsDamageSource.tron(level()), 15);
+							player.hurt(RivalRebelsDamageSource.tron(level()), 15);
 						}
 					}
 				}

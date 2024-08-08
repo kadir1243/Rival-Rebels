@@ -54,42 +54,4 @@ public class BlockJump extends Block implements EntityBlock
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return new TileEntityJumpBlock(pos, state);
     }
-
-    /*@Environment(EnvType.CLIENT)
-	IIcon	icon1;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon2;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon3;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon4;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon5;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon6;
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ah"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:au"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:at"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:at"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:at"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:at"); // SIDE E
-	}*/
 }

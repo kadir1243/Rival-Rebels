@@ -112,7 +112,7 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(Translations.BOMB_ARMED, "Armed");
         lang.add(Translations.LAPTOP_B2_SPIRIT, "B-2 Spirit");
         lang.add(Translations.BUILDING_TOKAMAK, "Constructing ToKaMaK %s");
-        lang.add(Translations.BUILDING_TOKAMAK, "Constructing %s");
+        lang.add(Translations.BUILDING, "Constructing %s");
         lang.add(Translations.SPAWN_RESET_WARNING, "Warning: Resetting will clear your inventory");
         lang.add(Translations.RHODES_IS_ARMED, "%s Armed");
 

@@ -106,44 +106,6 @@ public class BlockTimedBomb extends FallingBlock {
 		}
 	}
 
-	/*@Environment(EnvType.CLIENT)
-	IIcon	icon1;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon2;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon3;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon4;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon5;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon6;
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@Environment(EnvType.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ac"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:ae"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:ac"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:ac"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:ab"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:ab"); // SIDE E
-	}*/
-
 	/*public void onFinishFalling(Level par1World, int par2, int par3, int par4, int par5)
 	{
 		par1World.setBlock(par2, par3, par4, Blocks.AIR);

@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class BlockConduit extends Block
 {
-    public static final IntegerProperty VARIANT = IntegerProperty.create("variant", 0, 8);
+    public static final IntegerProperty VARIANT = IntegerProperty.create("variant", 0, 9);
 	public BlockConduit(Properties settings)
 	{
 		super(settings);
@@ -36,52 +36,4 @@ public class BlockConduit extends Block
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
         return super.getStateForPlacement(ctx).setValue(VARIANT, ctx.getLevel().getRandom().nextInt(9));
     }
-
-    /*@Environment(EnvType.CLIENT)
-	IIcon	icon1;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon2;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon3;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon4;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon5;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon6;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon7;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon8;
-	@Environment(EnvType.CLIENT)
-	IIcon	icon9;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (meta == 1) return icon1;
-		if (meta == 2) return icon2;
-		if (meta == 3) return icon3;
-		if (meta == 4) return icon4;
-		if (meta == 5) return icon5;
-		if (meta == 6) return icon6;
-		if (meta == 7) return icon7;
-		if (meta == 8) return icon8;
-		if (meta == 9) return icon9;
-		return icon1;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:co");
-		icon2 = iconregister.registerIcon("RivalRebels:cp");
-		icon3 = iconregister.registerIcon("RivalRebels:cq");
-		icon4 = iconregister.registerIcon("RivalRebels:cr");
-		icon5 = iconregister.registerIcon("RivalRebels:cs");
-		icon6 = iconregister.registerIcon("RivalRebels:ct");
-		icon7 = iconregister.registerIcon("RivalRebels:cu");
-		icon8 = iconregister.registerIcon("RivalRebels:cv");
-		icon9 = iconregister.registerIcon("RivalRebels:cw");
-	}*/
 }

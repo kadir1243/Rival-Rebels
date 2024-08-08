@@ -13,8 +13,12 @@ package assets.rivalrebels.common.packet;
 
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.client.gui.GuiClass;
+import assets.rivalrebels.client.gui.GuiSpawn;
+import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import io.netty.buffer.ByteBuf;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.Minecraft;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 
@@ -29,10 +33,11 @@ public record GuiSpawnPacket() implements CustomPacketPayload {
     }
 
     public static void onMessage(GuiSpawnPacket packet, ClientPlayNetworking.Context context) {
-        if (RivalRebels.round.rrplayerlist.getForGameProfile(context.player().getGameProfile()).isreset) {
-            RivalRebels.proxy.guiClass();
+        RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(context.player().getGameProfile());
+        if (player.isreset) {
+            Minecraft.getInstance().setScreen(new GuiClass(player.rrclass));
         } else {
-            RivalRebels.proxy.guiSpawn();
+            Minecraft.getInstance().setScreen(new GuiSpawn(player.rrclass));
         }
 	}
 }

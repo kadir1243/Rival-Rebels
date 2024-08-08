@@ -23,6 +23,7 @@ import assets.rivalrebels.common.item.components.BinocularData;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.item.weapon.ItemBinoculars;
 import assets.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import assets.rivalrebels.common.util.Translations;
 import assets.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
@@ -63,6 +64,13 @@ public class RivalRebelsRenderOverlay {
             }
         });
 	}
+
+    public void setOverlay(EntityRhodes rhodes) {
+        if (rhodes.rider == Minecraft.getInstance().player) {
+            this.counter = 10;
+            this.rhodes = rhodes;
+        }
+    }
 
 	private void renderItems(GuiGraphics graphics) {
         Minecraft client = Minecraft.getInstance();
@@ -277,7 +285,7 @@ public class RivalRebelsRenderOverlay {
             else if (ItemBinoculars.ready)
                 graphics.drawString(tr, Component.translatable("RivalRebels.binoculars.target"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.binoculars.target")) / 2f)), (int) (h * 0.85), 0xff0000, false);
 
-            graphics.drawString(tr, Component.translatable("RivalRebels.message.use").append(" ").append(Component.translatable("RRIdentifiers.SHIFT_CLICK.toLanguageKey()")).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
+            graphics.drawString(tr, Component.translatable("RivalRebels.message.use").append(" ").append(Component.translatable(Translations.SHIFT_CLICK.toLanguageKey())).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
             graphics.drawString(tr, "Press C to select bomb type", (int) (w * 0.60), (int) (h * 0.95), 0xff0000, false);
 
             if ((tasks > 0 || carpet > 0) && dist < 10) {
