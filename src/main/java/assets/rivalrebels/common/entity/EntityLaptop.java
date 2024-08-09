@@ -29,8 +29,8 @@ public class EntityLaptop extends EntityInanimate
         super(type, world);
     }
 
-	public EntityLaptop(Level par1World) {
-		this(RREntities.LAPTOP, par1World);
+	public EntityLaptop(Level level) {
+		this(RREntities.LAPTOP, level);
 		setBoundingBox(new AABB(-0.21875, 0, -0.28125, 0.21875, 0.125, 0.28125));
 	}
 

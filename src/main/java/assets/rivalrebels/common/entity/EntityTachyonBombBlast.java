@@ -20,11 +20,11 @@ import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 
 public class EntityTachyonBombBlast extends EntityInanimate
@@ -124,14 +124,9 @@ public class EntityTachyonBombBlast extends EntityInanimate
 				remove.add(e);
 				continue;
 			}
-			float dx = (float) (e.getX() - getX());
-			float dy = (float) (e.getY() - getY());
-			float dz = (float) (e.getZ() - getZ());
-			float dist = Mth.sqrt(dx * dx + dy * dy + dz * dz);
-			float rsqrt = 1.0f / (dist + 0.0001f);
-			dx *= rsqrt;
-			dy *= rsqrt;
-			dz *= rsqrt;
+            Vec3 vec3 = e.position().subtract(position());
+			float dist = (float) vec3.length();
+            vec3 = vec3.normalize();
 			double f = 40.0f * (1.0f - dist * invrad) * ((e instanceof EntityB83 || e instanceof EntityHackB83) ? -1.0f : 1.0f);
 			if (e instanceof EntityRhodes)
 			{
@@ -140,11 +135,7 @@ public class EntityTachyonBombBlast extends EntityInanimate
 			else
 			{
 				e.hurt(RivalRebelsDamageSource.nuclearBlast(level()), (int) (f * f * 2.0f * radius + 20.0f));
-                e.setDeltaMovement(e.getDeltaMovement().subtract(
-                    dx * f,
-                    dy * f,
-                    dz * f
-                ));
+                e.setDeltaMovement(e.getDeltaMovement().subtract(vec3.scale(f)));
             }
 		}
 		for (Entity e : remove)

@@ -33,7 +33,7 @@ public class ItemRodDisk extends Item
 	}
 
     @Override
-	public UseAnim getUseAnimation(ItemStack par1ItemStack)
+	public UseAnim getUseAnimation(ItemStack stack)
 	{
 		return UseAnim.BOW;
 	}

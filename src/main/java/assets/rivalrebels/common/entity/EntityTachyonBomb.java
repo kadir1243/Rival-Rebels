@@ -130,24 +130,24 @@ public class EntityTachyonBomb extends Projectile
 		this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.05F);
 		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.05F);
 		float var17 = 0.98f;
-		float var18 = (float) this.getGravity();
 
         setDeltaMovement(getDeltaMovement().scale(var17));
-        setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
-		this.setPos(this.getX(), this.getY(), this.getZ());
+        applyGravity();
+        this.reapplyPosition();
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag nbt)
-	{
-		nbt.putInt("charge", aoc);
+	public void addAdditionalSaveData(CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
+        nbt.putInt("charge", aoc);
 		nbt.putBoolean("troll", hasTrollface);
+        nbt.putFloat("rot", getYRot());
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag nbt)
-	{
-		aoc = nbt.getInt("charge");
+	public void readAdditionalSaveData(CompoundTag nbt) {
+        super.readAdditionalSaveData(nbt);
+        aoc = nbt.getInt("charge");
 		hasTrollface = nbt.getBoolean("troll");
 		setYRot(yRotO = nbt.getFloat("rot"));
 	}

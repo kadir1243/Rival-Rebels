@@ -94,9 +94,9 @@ public class TileEntityOmegaObjective extends BlockEntity implements Container, 
 	}
 
     @Override
-	public ItemStack getItem(int par1)
+	public ItemStack getItem(int slot)
 	{
-		return this.chestContents.get(par1);
+		return this.chestContents.get(slot);
 	}
 
     @Override

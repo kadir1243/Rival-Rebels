@@ -50,6 +50,9 @@ public class RRSounds {
     public static final SoundEvent RODDISK_UNKNOWN5 = register("roddisk_unknown5"); // 7.1
     public static final SoundEvent RODDISK_UNKNOWN6 = register("roddisk_unknown6"); // 7.2
     public static final SoundEvent RODDISK_UNKNOWN7 = register("roddisk_unknown7"); // 7.3
+    public static final SoundEvent FLAME_THROWER_USE = register("flame_thrower_use"); // 8.0
+    public static final SoundEvent FLAME_THROWER_EXTINGUISH = register("flame_thrower_extinguish"); // 8.1
+    public static final SoundEvent FLAME_THROWER_UNKNOWN = register("flame_thrower_extinguish"); // 8.2
 
     public static void init() {
     }

@@ -284,7 +284,7 @@ public class EntityRhodes extends Entity {
             setPosRaw(add.x(), add.y(), add.z());
 			if (tickCount % 3 == 0) doCollisions();
 			ticksSinceLastPacket++;
-			setPos(getX(), getY(), getZ());
+            reapplyPosition();
 
 			if (level().isClientSide()) RRClient.rrro.setOverlay(this);
 
@@ -632,72 +632,86 @@ public class EntityRhodes extends Entity {
                 if (e != this && !(e instanceof FallingBlockEntity) && !(e instanceof EntityDebris)) {
                     if (e.getY() > getY() + 15) {
                         e.setDeltaMovement(getDeltaMovement().multiply(1, -0.5, 1));
-                        e.setPosRaw(getX(), getY() + bbh, getZ());
+                        e.setPos(getX(), getY() + bbh, getZ());
                     } else if (e.getY() < getY() - 15) {
                         e.setDeltaMovement(getDeltaMovement().multiply(1, -0.5, 1));
-                        e.setPosRaw(getX(), getY() - bbh, getZ());
+                        e.setPos(getX(), getY() - bbh, getZ());
                     } else {
                         e.setDeltaMovement(getDeltaMovement().multiply(-1, 1, -1));
                         double d3 = bbd / Math.sqrt(dist);
-                        e.setPosRaw(getX() + (e.getX() - getX()) * d3,
+                        e.setPos(getX() + (e.getX() - getX()) * d3,
                              e.getY(),
                             getZ() + (e.getZ() - getZ()) * d3);
                     }
-                    e.setPos(e.getX(), e.getY(), e.getZ());
                 }
 
-                if (e instanceof EntityRocket) {
-                    e.tickCount = RRConfig.SERVER.getRpgDecay();
-                    this.hurt(level().damageSources().generic(), 20);
-                } else if (e instanceof EntitySeekB83) {
-                    e.tickCount = 800;
-                    this.hurt(level().damageSources().generic(), 24);
-                } else if (e instanceof EntityHackB83) {
-                    ((EntityHackB83) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 40);
-                } else if (e instanceof EntityB83) {
-                    ((EntityB83) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 40);
-                } else if (e instanceof EntityBomb) {
-                    ((EntityBomb) e).explode(true);
-                    for (int i = 0; i < RRConfig.SERVER.getBombDamageToRhodes(); i++)
-                        this.hurt(level().damageSources().generic(), 50);
-                } else if (e instanceof EntityNuke) {
-                    ((EntityNuke) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 80);
-                } else if (e instanceof EntityTsar) {
-                    ((EntityTsar) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 100);
-                } else if (e instanceof EntityTheoreticalTsar) {
-                    ((EntityTheoreticalTsar) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 100);
-                } else if (e instanceof EntityAntimatterBomb) {
-                    ((EntityAntimatterBomb) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 100);
-                } else if (e instanceof EntityTachyonBomb) {
-                    ((EntityTachyonBomb) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 100);
-                } else if (e instanceof EntityHotPotato) {
-                    e.tickCount = -100;
-                    this.hurt(level().damageSources().generic(), 100);
-                } else if (e instanceof EntityB83NoShroom) {
-                    ((EntityB83NoShroom) e).ticksInAir = -100;
-                    this.hurt(level().damageSources().generic(), 40);
-                } else if (e instanceof EntityPlasmoid) {
-                    ((EntityPlasmoid) e).explode();
-                    this.hurt(level().damageSources().generic(), 8);
-                } else if (e instanceof EntityFlameBall) {
-                    e.kill();
-                    this.hurt(level().damageSources().generic(), 3);
-                } else if (e instanceof EntityFlameBall1) {
-                    e.kill();
-                    this.hurt(level().damageSources().generic(), 4);
-                } else if (e instanceof EntityFlameBall2) {
-                    e.kill();
-                    this.hurt(level().damageSources().generic(), 2);
-                } else if (e instanceof EntityLaserBurst) {
-                    e.kill();
-                    this.hurt(level().damageSources().generic(), 4);
+                switch (e) {
+                    case EntityRocket ignored -> {
+                        e.tickCount = RRConfig.SERVER.getRpgDecay();
+                        this.hurt(level().damageSources().generic(), 20);
+                    }
+                    case EntitySeekB83 ignored -> {
+                        e.tickCount = 800;
+                        this.hurt(level().damageSources().generic(), 24);
+                    }
+                    case EntityHackB83 entity -> {
+                        entity.ticksInAir = -100;
+                        this.hurt(level().damageSources().generic(), 40);
+                    }
+                    case EntityB83 entity -> {
+                        entity.ticksInAir = -100;
+                        this.hurt(level().damageSources().generic(), 40);
+                    }
+                    case EntityBomb entityBomb -> {
+                        entityBomb.explode(true);
+                        for (int i = 0; i < RRConfig.SERVER.getBombDamageToRhodes(); i++)
+                            this.hurt(level().damageSources().generic(), 50);
+                    }
+                    case EntityNuke entityNuke -> {
+                        entityNuke.ticksInAir = -100;
+                        this.hurt(level().damageSources().generic(), 80);
+                    }
+                    case EntityTsar entityTsar -> {
+                        entityTsar.ticksInAir = -100;
+                        this.hurt(level().damageSources().generic(), 100);
+                    }
+                    case EntityTheoreticalTsar entityTheoreticalTsar -> {
+                        entityTheoreticalTsar.ticksInAir = -100;
+                        this.hurt(level().damageSources().generic(), 100);
+                    }
+                    case EntityAntimatterBomb entityAntimatterBomb -> {
+                        entityAntimatterBomb.ticksInAir = -100;
+                        this.hurt(level().damageSources().generic(), 100);
+                    }
+                    case EntityTachyonBomb entityTachyonBomb -> {
+                        entityTachyonBomb.ticksInAir = -100;
+                        this.hurt(level().damageSources().generic(), 100);
+                    }
+                    case EntityHotPotato ignored -> {
+                        e.tickCount = -100;
+                        this.hurt(level().damageSources().generic(), 100);
+                    }
+                    case EntityPlasmoid entityPlasmoid -> {
+                        entityPlasmoid.explode();
+                        this.hurt(level().damageSources().generic(), 8);
+                    }
+                    case EntityFlameBall ignored -> {
+                        e.kill();
+                        this.hurt(level().damageSources().generic(), 3);
+                    }
+                    case EntityFlameBall1 ignored -> {
+                        e.kill();
+                        this.hurt(level().damageSources().generic(), 4);
+                    }
+                    case EntityFlameBall2 ignored -> {
+                        e.kill();
+                        this.hurt(level().damageSources().generic(), 2);
+                    }
+                    case EntityLaserBurst ignored -> {
+                        e.kill();
+                        this.hurt(level().damageSources().generic(), 4);
+                    }
+                    default -> {}
                 }
             }
         }
@@ -893,9 +907,9 @@ public class EntityRhodes extends Entity {
                                     }
                                 } else {
                                     if (!e.isAlive() || (e instanceof LivingEntity && ((LivingEntity) e).getHealth() < 3)) {
-                                        int legs = -1;
-                                        int arms = -1;
-                                        int mobs = -1;
+                                        int legs;
+                                        int arms;
+                                        int mobs;
                                         level().playLocalSound(this, RRSounds.BLASTER_FIRE, getSoundSource(), 1, 4);
                                         if (e instanceof ZombifiedPiglin) {
                                             legs = 2;
@@ -1010,7 +1024,7 @@ public class EntityRhodes extends Entity {
 					if (Mth.abs(rightarmyaw-yaw) < 3f && Mth.abs(rightarmpitch-pitch) < 3f)
 					{
 						flamecount--;
-						RivalRebelsSoundPlayer.playSound(this, 8, 1, 1f);
+                        this.playSound(RRSounds.FLAME_THROWER_EXTINGUISH);
 						float cp = -1f/ Mth.sqrt(x*x+y*y+z*z);
 						x*=cp;
 						y*=cp;
@@ -1790,7 +1804,7 @@ public class EntityRhodes extends Entity {
 
 			if (pointing)
 			{
-				RivalRebelsSoundPlayer.playSound(this, 8, 1, 1f);
+                this.playSound(RRSounds.FLAME_THROWER_EXTINGUISH);
 				float cp = -1f/ Mth.sqrt(x*x+y*y+z*z);
 				x*=cp;
 				y*=cp;

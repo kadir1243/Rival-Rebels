@@ -37,20 +37,17 @@ public class EntityLightningLink extends EntityInanimate {
             0.12,
             (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
         );
-        setPosRaw(vec3d.x(), vec3d.y(), vec3d.z());
-		setPos(getX(), getY(), getZ());
+        setPos(vec3d.x(), vec3d.y(), vec3d.z());
 	}
 
 	public EntityLightningLink(Level par1World, double x, double y, double z, float yaw, float pitch, double distance) {
 		this(par1World);
 		moveTo(x, y, z, yaw, pitch);
         setDeltaMovement(distance / 100, getDeltaMovement().y(), getDeltaMovement().z());
-		setPos(getX(), getY(), getZ());
 	}
 
 	@Override
-	public void tick()
-	{
+	public void tick() {
 		super.tick();
 		if (tickCount > 1) kill();
 		tickCount++;

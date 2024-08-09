@@ -48,24 +48,22 @@ public class EntityRocket extends AbstractArrow
         this(RREntities.ROCKET, world);
     }
 
-	public EntityRocket(Level par1World, double par2, double par4, double par6) {
+	public EntityRocket(Level par1World, double x, double y, double z) {
 		this(par1World);
-		setPos(par2, par4, par6);
+		setPos(x, y, z);
 	}
 
-	public EntityRocket(Level level, Player entity2, float par3) {
+	public EntityRocket(Level level, Player entity, float inaccuracy) {
 		this(level);
         fins = false;
-		moveTo(entity2.getEyePosition(), entity2.getYRot(), entity2.getXRot());
+        this.setOwner(entity);
+		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(
             getX() - Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F,
             getY(),
             getZ() - Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F
         );
-		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-		(Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-		(-Mth.sin(getXRot() / 180.0F * Mth.PI)));
-        shoot(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 0.5f, 0.1f);
+        shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, inaccuracy);
 	}
 
 	public EntityRocket(Level par1World, double x, double y,double z, double mx, double my, double mz) {
@@ -110,18 +108,7 @@ public class EntityRocket extends AbstractArrow
 		if (hitResult.getType() != HitResult.Type.MISS) onHit(hitResult);
 
         setPosRaw(getX() + getDeltaMovement().y(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = (float) this.getDeltaMovement().horizontalDistance();
-		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
-			;
-		while (getXRot() - xRotO >= 180.0F)
-			xRotO += 360.0F;
-		while (getYRot() - yRotO < -180.0F)
-			yRotO -= 360.0F;
-		while (getYRot() - yRotO >= 180.0F)
-			yRotO += 360.0F;
-		setXRot(xRotO + (getXRot() - xRotO) * 0.2F);
-		setYRot(yRotO + (getYRot() - yRotO) * 0.2F);
+		this.updateRotation();
 		float var17 = 1.1f;
 		if (tickCount > 25) var17 = 0.9999F;
 
@@ -150,7 +137,7 @@ public class EntityRocket extends AbstractArrow
 			fins = true;
             setXRot(getXRot() + 22.5F);
 		}
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 	}
 
     @Override

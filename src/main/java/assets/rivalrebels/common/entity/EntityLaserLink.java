@@ -38,7 +38,7 @@ public class EntityLaserLink extends EntityInanimate {
         setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
 		getY() - 0.08,
 		getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 	}
 
 	public EntityLaserLink(Level par1World, double x, double y, double z, float yaw, float pitch, double distance)
@@ -47,7 +47,7 @@ public class EntityLaserLink extends EntityInanimate {
 		moveTo(x, y, z, yaw, pitch);
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
 		tickCount = 0;
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 	}
 
 	@Override

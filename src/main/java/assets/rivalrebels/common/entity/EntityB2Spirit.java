@@ -13,7 +13,6 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.core.RRSounds;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
@@ -105,7 +104,7 @@ public class EntityB2Spirit extends EntityInanimate
 	{
 		super.tick();
 
-		if (random.nextDouble() > 0.8f) RivalRebelsSoundPlayer.playSound(this, 8, 0, 4.5f, 1.3f);
+		if (random.nextDouble() > 0.8f) this.playSound(RRSounds.FLAME_THROWER_USE, 4.5f, 1.3f);
 
 		if (rhodeswing != null) {
             setDeltaMovement(rhodeswing.position().subtract(position()));
@@ -223,7 +222,7 @@ public class EntityB2Spirit extends EntityInanimate
 			this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.2F);
 			this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.2F);
 		}
-		this.setPos(this.getX(), this.getY(), this.getZ());
+        this.reapplyPosition();
 	}
 
 	public void dropNuke()
@@ -280,18 +279,17 @@ public class EntityB2Spirit extends EntityInanimate
 	}
 
     @Override
-	public boolean hurt(DamageSource par1DamageSource, float par2)
-	{
-		super.hurt(par1DamageSource, par2);
+	public boolean hurt(DamageSource damageSource, float amount) {
+		super.hurt(damageSource, amount);
 		if (this.isAlive() && !this.level().isClientSide()) {
-			this.health -= par2;
+			this.health -= amount;
 			if (this.health <= 0) {
 				this.kill();
 				this.level().explode(null, this.getX(), this.getY(), this.getZ(), 6.0F, Level.ExplosionInteraction.MOB);
 				level().addFreshEntity(new EntityB2Frag(level(), this, 0));
 				level().addFreshEntity(new EntityB2Frag(level(), this, 1));
 				Zombie pz = new Zombie(level());
-				pz.setPos(getX(), getY(), getZ());
+				pz.setPos(position());
 				level().addFreshEntity(pz);
                 level().playLocalSound(this, RRSounds.ARTILLERY_EXPLODE, getSoundSource(), 30, 1);
 			}

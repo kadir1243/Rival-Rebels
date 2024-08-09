@@ -20,21 +20,15 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import java.util.List;
-import java.util.Optional;
 
 public class EntityTsar extends ThrowableProjectile
 {
@@ -46,13 +40,13 @@ public class EntityTsar extends ThrowableProjectile
         super(type, world);
     }
 
-	public EntityTsar(Level par1World) {
-		this(RREntities.TSAR, par1World);
+	public EntityTsar(Level level) {
+		this(RREntities.TSAR, level);
 	}
 
-	public EntityTsar(Level par1World, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
+	public EntityTsar(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
 	{
-		this(par1World);
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
 		this.setYRot(yRotO = yaw);
 		this.setXRot(xRotO = pitch);
@@ -64,16 +58,16 @@ public class EntityTsar extends ThrowableProjectile
 		}
 	}
 
-	public EntityTsar(Level world, float px, float py, float pz, float f, float g, float h)
+	public EntityTsar(Level level, float px, float py, float pz, float f, float g, float h)
 	{
-		this(world);
+		this(level);
 		setPos(px, py, pz);
         setDeltaMovement(f, g, h);
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityTsar(Level par1World, double x, double y,double z, double mx, double my, double mz, int charges) {
-		this(par1World);
+	public EntityTsar(Level level, double x, double y,double z, double mx, double my, double mz, int charges) {
+		this(level);
 		setPos(x,y,z);
 		aoc = charges;
 		setAnglesMotion(mx, my, mz);
@@ -99,45 +93,10 @@ public class EntityTsar extends ThrowableProjectile
 			if (ticksInAir == - 100) explode();
 			++this.ticksInAir;
 
-			Vec3 var15 = position();
-			Vec3 var2 = position().add(getDeltaMovement());
-			HitResult var3 = this.level().clip(new ClipContext(var15, var2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-			var15 = position();
-			var2 = position().add(getDeltaMovement());
+			HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
-			if (var3 != null)
-			{
-				var2 = var3.getLocation();
-			}
-			Entity var4 = null;
-			List<Entity> var5 = this.level().getEntities(this, this.getBoundingBox().expandTowards(this.getDeltaMovement()).inflate(1.0D, 1.0D, 1.0D));
-			double var6 = 0.0D;
-
-            for (Entity var9 : var5) {
-                if (var9.canBeCollidedWith()) {
-                    float var10 = 0.3F;
-                    AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
-                    Optional<Vec3> var12 = var11.clip(var15, var2);
-
-                    if (var12.isPresent()) {
-                        double var13 = var15.distanceTo(var12.get());
-
-                        if (var13 < var6 || var6 == 0.0D) {
-                            var4 = var9;
-                            var6 = var13;
-                        }
-                    }
-                }
-            }
-
-			if (var4 != null)
-			{
-				var3 = new EntityHitResult(var4);
-			}
-
-			if (var3 != null)
-			{
-				this.onHit(var3);
+			if (hitResult.getType() != HitResult.Type.MISS) {
+				this.onHit(hitResult);
 			}
 		}
 
@@ -149,22 +108,20 @@ public class EntityTsar extends ThrowableProjectile
 		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 		float var16 = (float) this.getDeltaMovement().horizontalDistance();
 
-		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
-		{
+        this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG));
+        while (this.getXRot() - this.xRotO < -180.0F) {
+            this.xRotO -= 360.0F;
         }
 
-		while (this.getXRot() - this.xRotO >= 180.0F)
-		{
+        while (this.getXRot() - this.xRotO >= 180.0F) {
 			this.xRotO += 360.0F;
 		}
 
-		while (this.getYRot() - this.yRotO < -180.0F)
-		{
+		while (this.getYRot() - this.yRotO < -180.0F) {
 			this.yRotO -= 360.0F;
 		}
 
-		while (this.getYRot() - this.yRotO >= 180.0F)
-		{
+		while (this.getYRot() - this.yRotO >= 180.0F) {
 			this.yRotO += 360.0F;
 		}
 
@@ -172,23 +129,23 @@ public class EntityTsar extends ThrowableProjectile
 		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.05F);
 		}
 		float var17 = 0.98f;
-		float var18 = (float) this.getGravity();
 
         setDeltaMovement(getDeltaMovement().scale(var17));
-        setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
-		this.setPos(this.getX(), this.getY(), this.getZ());
+        applyGravity();
+        this.reapplyPosition();
 	}
 
 	@Override
-	public void addAdditionalSaveData(CompoundTag nbt)
-	{
-		nbt.putInt("charge", aoc);
+	public void addAdditionalSaveData(CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
+        nbt.putInt("charge", aoc);
 		nbt.putBoolean("troll", hasTrollface);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
-		aoc = nbt.getInt("charge");
+        super.readAdditionalSaveData(nbt);
+        aoc = nbt.getInt("charge");
 		hasTrollface = nbt.getBoolean("troll");
 		setYRot(yRotO = nbt.getFloat("rot"));
 	}

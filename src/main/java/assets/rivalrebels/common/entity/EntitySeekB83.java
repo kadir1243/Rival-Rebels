@@ -26,8 +26,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -37,8 +37,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.Shapes;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
 
 public class EntitySeekB83 extends AbstractArrow {
     public boolean				fins			= false;
@@ -60,44 +58,38 @@ public class EntitySeekB83 extends AbstractArrow {
         return ItemStack.EMPTY;
     }
 
-    public EntitySeekB83(Level par1World, double par2, double par4, double par6) {
+    public EntitySeekB83(Level par1World, double x, double y, double z) {
 		this(par1World);
-		setPos(par2, par4, par6);
+		setPos(x, y, z);
 	}
 
-	public EntitySeekB83(Level par1World, Player entity2, float par3) {
-		this(par1World);
+	public EntitySeekB83(Level level, Player entity, float par3) {
+		this(level);
 		fins = false;
-		moveTo(entity2.getEyePosition(), entity2.getYRot(), entity2.getXRot());
-        setPosRaw(
+        this.setOwner(entity);
+		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
+        setPos(
             getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY(),
             getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
         );
-		setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
-        shoot(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 0.5f, 1f);
+        shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, 1f);
 	}
 
-	public EntitySeekB83(Level par1World, Player entity2, float par3, float yawdelta)
+	public EntitySeekB83(Level par1World, Player entity, float par3, float yawdelta)
 	{
 		this(par1World);
+        this.setOwner(entity);
 		fins = false;
-		moveTo(entity2.getEyePosition(), entity2.getYRot() + yawdelta, entity2.getXRot());
-        setPosRaw(
+		moveTo(entity.getEyePosition(), entity.getYRot() + yawdelta, entity.getXRot());
+        setPos(
             getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY(),
             getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
         );
-		setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
-        shoot(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 0.5f, 1f);
+        shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, 1f);
 	}
 
 	public EntitySeekB83(Level w, double x, double y, double z, double mx, double my, double mz) {
@@ -134,31 +126,8 @@ public class EntitySeekB83 extends AbstractArrow {
 		{
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x() * 0.5, -getDeltaMovement().y() * 0.5 - 0.1, -getDeltaMovement().z() * 0.5));
 		}
-		Vec3 vec31 = position();
-		Vec3 vec3 = position().add(getDeltaMovement());
-		HitResult mop = level().clip(new ClipContext(vec31, vec3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-		if (!level().isClientSide())
-		{
-			vec31 = position();
-			if (mop != null) vec3 = mop.getLocation();
-			else vec3 = position().add(getDeltaMovement());
-
-			List<Entity> list = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-			double d0 = Double.MAX_VALUE;
-            for (Entity entity : list) {
-                if ((entity.canBeCollidedWith() && tickCount >= 7 && entity != getOwner()) || entity instanceof EntityHackB83 || entity instanceof EntityB83) {
-                    Optional<Vec3> mop1 = entity.getBoundingBox().inflate(0.5f, 0.5f, 0.5f).clip(vec31, vec3);
-                    if (mop1.isPresent()) {
-                        double d1 = vec31.distanceToSqr(mop1.get());
-                        if (d1 < d0) {
-                            mop = new EntityHitResult(entity, mop1.get());
-                            d0 = d1;
-                        }
-                    }
-                }
-            }
-		}
-		if (mop != null) explode(mop);
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
+		if (hitResult.getType() != HitResult.Type.MISS) explode(hitResult);
 
 		Iterator<Entity> iter = level().getEntities(this, Shapes.INFINITY.bounds()).iterator();
         Vec3 ddvec = getDeltaMovement();
@@ -183,18 +152,7 @@ public class EntitySeekB83 extends AbstractArrow {
         setDeltaMovement(ddvec);
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = (float) this.getDeltaMovement().horizontalDistance();
-		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
-			;
-		while (getXRot() - xRotO >= 180.0F)
-			xRotO += 360.0F;
-		while (getYRot() - yRotO < -180.0F)
-			yRotO -= 360.0F;
-		while (getYRot() - yRotO >= 180.0F)
-			yRotO += 360.0F;
-		setXRot(xRotO + (getXRot() - xRotO) * 0.2F);
-		setYRot(yRotO + (getYRot() - yRotO) * 0.2F);
+		updateRotation();
 		float var17 = 1.1f;
 		if (tickCount > 25) var17 = 0.9999F;
 
@@ -223,7 +181,7 @@ public class EntitySeekB83 extends AbstractArrow {
 			fins = true;
             setXRot(getXRot() + 22.5F);
 		}
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 		++tickCount;
 	}
 
@@ -282,4 +240,9 @@ public class EntitySeekB83 extends AbstractArrow {
 			kill();
 		}
 	}
+
+    @Override
+    protected boolean canHitEntity(Entity target) {
+        return super.canHitEntity(target) || target instanceof EntityHackB83 || target instanceof EntityB83;
+    }
 }

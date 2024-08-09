@@ -19,11 +19,13 @@ import java.util.List;
 import java.util.Optional;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -33,11 +35,9 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 
-public class EntityRaytrace extends EntityInanimate
-{
-	public Entity	shootingEntity;
-    private float	range		= 0;
-	private float	c;
+public class EntityRaytrace extends Projectile {
+    private float range = 0;
+	private float chance;
 
     public EntityRaytrace(EntityType<? extends EntityRaytrace> type, Level world) {
         super(type, world);
@@ -51,7 +51,7 @@ public class EntityRaytrace extends EntityInanimate
 		this(par1World);
 		setPos(x,y,z);
 		setAnglesMotion(mx, my, mz);
-		c = 1.0f;
+		chance = 1.0f;
 		range = Mth.sqrt((float) (mx*mx+my*my+mz*mz));
 	}
 
@@ -62,21 +62,16 @@ public class EntityRaytrace extends EntityInanimate
         setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
-	public EntityRaytrace(Level par1World, Entity player, float distance, float randomness, float chance, boolean shift)
+	public EntityRaytrace(Level par1World, Entity entity, float distance, float randomness, float chance, boolean shift)
 	{
 		this(par1World);
-		c = chance;
+		this.chance = chance;
 		range = distance;
-		shootingEntity = player;
-		moveTo(player.getEyePosition(),
-            player.getYRot(),
-            player.getXRot()
+        this.setOwner(entity);
+		moveTo(entity.getEyePosition(),
+            entity.getYRot(),
+            entity.getXRot()
         );
-
-        setDeltaMovement(
-            (-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
         if (shift) {
             setPosRaw(
@@ -92,26 +87,12 @@ public class EntityRaytrace extends EntityInanimate
                 getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.3F)
             );
 		}
-		setArrowHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), range, randomness);
+        shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, range, randomness);
 	}
 
-    public void setArrowHeading(double par1, double par3, double par5, float par7, float par8)
-	{
-		float var9 = Mth.sqrt((float) (par1 * par1 + par3 * par3 + par5 * par5));
-		par1 /= var9;
-		par3 /= var9;
-		par5 /= var9;
-		par1 += level().random.nextGaussian() * par8;
-		par3 += level().random.nextGaussian() * par8;
-		par5 += level().random.nextGaussian() * par8;
-		par1 *= par7;
-		par3 *= par7;
-		par5 *= par7;
-		setDeltaMovement(par1, par3, par5);
-		float var10 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-		setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
-	}
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    }
 
     @Override
 	public void tick()
@@ -120,14 +101,12 @@ public class EntityRaytrace extends EntityInanimate
 		Vec3 vec31 = position();
 		Vec3 vec3 = position().add(getDeltaMovement());
 		HitResult MOP = level().clip(new ClipContext(vec31, vec3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-		vec31 = position();
 		if (MOP != null) vec3 = MOP.getLocation();
-		else vec3 = position().add(getDeltaMovement());
 
 		List<Entity> list = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 30.0D, 1.0D));
 		double d0 = Double.MAX_VALUE;
         for (Entity entity : list) {
-            if ((entity.canBeCollidedWith() || entity instanceof EntityRhodes) && entity != shootingEntity) {
+            if (canHitEntity(entity)) {
                 Optional<Vec3> mop1 = entity.getBoundingBox().inflate(0.5f, 0.5f, 0.5f).clip(vec31, vec3);
                 if (mop1.isPresent()) {
                     double d1 = vec31.distanceToSqr(mop1.get());
@@ -149,7 +128,7 @@ public class EntityRaytrace extends EntityInanimate
 				float r = level().random.nextFloat();
 				if (BlockHit.is(RRBlocks.camo1) || BlockHit.is(RRBlocks.camo2) || BlockHit.is(RRBlocks.camo3))
 				{
-					if (r * 10 <= c)
+					if (r * 10 <= chance)
 					{
 						if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						for (int i = 0; i < 4; i++)
@@ -160,7 +139,7 @@ public class EntityRaytrace extends EntityInanimate
 				}
 				else if (BlockHit.is(RRBlocks.reactive))
 				{
-					if (r * 15 <= c)
+					if (r * 15 <= chance)
 					{
 						if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						for (int i = 0; i < 4; i++)
@@ -169,7 +148,7 @@ public class EntityRaytrace extends EntityInanimate
 						}
 					}
 				}
-				else if (!BlackList.tesla(BlockHit) && r <= c)
+				else if (!BlackList.tesla(BlockHit) && r <= chance)
 				{
 					if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					for (int i = 0; i < 4; i++)
@@ -212,4 +191,9 @@ public class EntityRaytrace extends EntityInanimate
 		}
 		kill();
 	}
+
+    @Override
+    protected boolean canHitEntity(Entity target) {
+        return super.canHitEntity(target) || target instanceof EntityRhodes;
+    }
 }

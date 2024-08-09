@@ -27,8 +27,8 @@ public class GuiFTKnob extends GuiButton
 	protected int		mode;
 	protected boolean	pressed;
 
-	public GuiFTKnob(int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, Component par6Str) {
-		super(x, y, 36, 36, par6Str);
+	public GuiFTKnob(int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, Component message) {
+		super(x, y, 36, 36, message);
 		mode = startDegree;
 	}
 

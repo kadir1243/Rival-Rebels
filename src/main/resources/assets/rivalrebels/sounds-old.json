@@ -1,8 +1,4 @@
 {
-  "8.0":  {"sounds": ["ag/a1","ag/a2"]},
-  "8.1":  {"sounds": ["ag/b"]},
-  "8.2":  {"sounds": ["ag/c"]},
-
   "9.0":  {"sounds": ["ah/a1","ah/a2"]},
   "9.1":  {"sounds": ["ah/b"]},
   "9.2":  {"sounds": ["ah/c"]},

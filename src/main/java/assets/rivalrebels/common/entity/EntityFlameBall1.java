@@ -122,11 +122,15 @@ public class EntityFlameBall1 extends FlameBallProjectile {
 
 		if (isInWaterOrBubble()) kill();
 		float airFriction = 0.97F;
-		float gravity = 0.01F;
         setDeltaMovement(getDeltaMovement().scale(airFriction));
-        setDeltaMovement(getDeltaMovement().subtract(0, gravity, 0));
-		setPos(getX(), getY(), getZ());
+        applyGravity();
+        reapplyPosition();
 	}
+
+    @Override
+    protected double getDefaultGravity() {
+        return 0.01F;
+    }
 
     private void fire()
 	{

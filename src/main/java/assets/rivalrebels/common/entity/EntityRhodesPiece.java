@@ -118,12 +118,12 @@ public class EntityRhodesPiece extends Entity {
 	}
 
 	@Override
-	public boolean hurt(DamageSource par1DamageSource, float par2)
+	public boolean hurt(DamageSource damageSource, float amount)
 	{
-		super.hurt(par1DamageSource, par2);
+		super.hurt(damageSource, amount);
 		if (isAlive() && !level().isClientSide())
 		{
-			health -= par2;
+			health -= amount;
 			if (health <= 0)
 			{
 				kill();

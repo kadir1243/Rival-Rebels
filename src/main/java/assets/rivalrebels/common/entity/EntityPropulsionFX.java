@@ -20,27 +20,23 @@ public class EntityPropulsionFX extends ThrowableProjectile
 {
 	private int	ticksInAir;
 
-    public EntityPropulsionFX(EntityType<? extends EntityPropulsionFX> type, Level world) {
-        super(type, world);
+    public EntityPropulsionFX(EntityType<? extends EntityPropulsionFX> type, Level level) {
+        super(type, level);
         setNoGravity(true);
     }
 
-	public EntityPropulsionFX(Level par1World)
-	{
-		this(RREntities.PROPULSION_FX, par1World);
+	public EntityPropulsionFX(Level level) {
+		this(RREntities.PROPULSION_FX, level);
 		ticksInAir = 0;
 	}
 
-	public EntityPropulsionFX(Level par1World, double par2, double par4, double par6)
-	{
-		this(par1World);
-        par4 -= 0.2;
-		setPos(par2, par4, par6);
+	public EntityPropulsionFX(Level level, double x, double y, double z) {
+		this(level);
+		setPos(x, y - 0.2, z);
 	}
 
-	public EntityPropulsionFX(Level world2, double x, double y, double z, double mX, double mY, double mZ)
-	{
-		this(world2);
+	public EntityPropulsionFX(Level level, double x, double y, double z, double mX, double mY, double mZ) {
+		this(level);
 		setPos(x, y, z);
 		setDeltaMovement(mX, mY, mZ);
 	}
@@ -50,17 +46,14 @@ public class EntityPropulsionFX extends ThrowableProjectile
     }
 
     @Override
-	public void tick()
-	{
+	public void tick() {
 		super.tick();
 		ticksInAir++;
-		if ((ticksInAir >= 5 && level().random.nextInt(2) == 1) || this.isInWaterOrBubble())
-		{
+		if ((ticksInAir >= 5 && level().random.nextInt(2) == 1) || this.isInWaterOrBubble()) {
 			kill();
 		}
-        setPosRaw(getX() + getDeltaMovement().x() + (level().random.nextDouble() - 0.5) * 0.07,
+        setPos(getX() + getDeltaMovement().x() + (level().random.nextDouble() - 0.5) * 0.07,
             getY() + getDeltaMovement().y() + (level().random.nextDouble() - 0.5) * 0.07 + 0.005,
             getZ() + getDeltaMovement().z() + (level().random.nextDouble() - 0.5) * 0.07);
-		setPos(getX(), getY(), getZ());
 	}
 }

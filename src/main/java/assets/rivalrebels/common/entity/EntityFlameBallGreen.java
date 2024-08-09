@@ -36,9 +36,9 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 		this(RREntities.FLAME_BALL_GREEN, par1World);
 	}
 
-	public EntityFlameBallGreen(Level par1World, double par2, double par4, double par6) {
+	public EntityFlameBallGreen(Level par1World, double x, double y, double z) {
 		this(par1World);
-		setPos(par2, par4, par6);
+		setPos(x, y, z);
 	}
 
 	public EntityFlameBallGreen(Level par1World, Player player, float par3) {
@@ -111,7 +111,7 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 		rotation += motionr;
 
 		if (isInWaterOrBubble()) kill();
-		setPos(getX(), getY(), getZ());
+		reapplyPosition();
 	}
 
     private void fire() {

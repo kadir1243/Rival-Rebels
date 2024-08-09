@@ -26,9 +26,9 @@ public class GuiRotor extends GuiButton
 	protected int		degree;
 	protected boolean	pressed;
 
-	public GuiRotor(int x, int y, int yawLimit, Component par6Str)
+	public GuiRotor(int x, int y, int yawLimit, Component message)
 	{
-		super(x, y, 32, 32, par6Str);
+		super(x, y, 32, 32, message);
 		degree = yawLimit / 2;
 	}
 

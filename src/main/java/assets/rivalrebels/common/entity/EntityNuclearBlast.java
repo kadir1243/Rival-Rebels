@@ -43,11 +43,11 @@ public class EntityNuclearBlast extends EntityInanimate {
 		time = 0;
 	}
 
-	public EntityNuclearBlast(Level par1World, double par2, double par4, double par6, int s, boolean hasTroll)
+	public EntityNuclearBlast(Level par1World, double x, double y, double z, int s, boolean hasTroll)
 	{
 		this(par1World);
         setDeltaMovement(hasTroll ? 1 : 0, Strength = s, getDeltaMovement().z());
-		setPos(par2, par4, par6);
+		setPos(x, y, z);
 	}
 
     @Override

@@ -52,19 +52,15 @@ public class EntityRoddiskRebel extends RoddiskBase {
         this(RREntities.RODDISK_REBEL, par1World);
     }
 
-	public EntityRoddiskRebel(Level world, LivingEntity shooter, float par3) {
+	public EntityRoddiskRebel(Level world, LivingEntity shooter, float speed) {
 		super(RREntities.RODDISK_REBEL, world, shooter);
 		this.moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
-		        setPosRaw(getX() - (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * 0.16F),
+        setPos(getX() - (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY() - 0.1,
             getZ() - (Mth.sin(this.getYRot() / 180.0F * Mth.PI) * 0.16F)
         );
 
-		this.setPos(this.getX(), this.getY(), this.getZ());
-		setDeltaMovement((-Mth.sin(this.getYRot() / 180.0F * Mth.PI) * Mth.cos(this.getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * Mth.cos(this.getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(this.getXRot() / 180.0F * Mth.PI)));
-		this.shoot(this.getDeltaMovement().x(), this.getDeltaMovement().y(), this.getDeltaMovement().z(), par3 * 1.5F, 1.0F);
+        this.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0, speed * 1.5F, 1.0F);
 	}
 
     @Override
@@ -120,7 +116,7 @@ public class EntityRoddiskRebel extends RoddiskBase {
                     }
                     ItemEntity ei = new ItemEntity(level(), var9.getX(), var9.getY(), var9.getZ(), RRItems.roddisk.getDefaultInstance());
                     level().addFreshEntity(ei);
-                } else if (var9.canBeCollidedWith() && var9 != this.getOwner()) {
+                } else if (var9.canBeCollidedWith() && !this.ownedBy(var9)) {
                     float var10 = 0.3F;
                     AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
                     Optional<Vec3> var12 = var11.clip(var15, var2);
@@ -208,30 +204,7 @@ public class EntityRoddiskRebel extends RoddiskBase {
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = (float) this.getDeltaMovement().horizontalDistance();
-		this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-
-		for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
-		{
-        }
-
-		while (this.getXRot() - this.xRotO >= 180.0F)
-		{
-			this.xRotO += 360.0F;
-		}
-
-		while (this.getYRot() - this.yRotO < -180.0F)
-		{
-			this.yRotO -= 360.0F;
-		}
-
-		while (this.getYRot() - this.yRotO >= 180.0F)
-		{
-			this.yRotO += 360.0F;
-		}
-
-		this.setXRot((this.xRotO + (this.getXRot() - this.xRotO) * 0.2F));
-		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.2F);
+        this.updateRotation();
 
 		if (getOwner() != null)
 		{
@@ -243,7 +216,7 @@ public class EntityRoddiskRebel extends RoddiskBase {
 		}
         setDeltaMovement(getDeltaMovement().scale(0.995f));
 
-		this.setPos(this.getX(), this.getY(), this.getZ());
+        this.reapplyPosition();
 	}
 
     @Override

@@ -113,7 +113,7 @@ public class EntityFlameBall extends FlameBallProjectile {
 		float airFriction = 0.96F;
         setDeltaMovement(getDeltaMovement().scale(airFriction));
         applyGravity();
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 	}
 
     @Override

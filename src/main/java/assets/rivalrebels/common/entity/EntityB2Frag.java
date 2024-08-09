@@ -68,18 +68,16 @@ public class EntityB2Frag extends EntityInanimate
 
 		if (Type == 1)
 		{
-            setPosRaw(getX() - (Mth.cos(((-getYRot()) / 180.0F) * Mth.PI) * 7.5F),
+            setPos(getX() - (Mth.cos(((-getYRot()) / 180.0F) * Mth.PI) * 7.5F),
                 getY(),
                 getZ() - (Mth.sin(((-getYRot()) / 180.0F) * Mth.PI) * 7.5F));
 		}
 		else if (Type == 0)
 		{
-            setPosRaw(getX() - (Mth.cos(((-getYRot() + 180) / 180.0F) * Mth.PI) * 7.5F),
+            setPos(getX() - (Mth.cos(((-getYRot() + 180) / 180.0F) * Mth.PI) * 7.5F),
                 getY(),
                 getZ() - (Mth.sin(((-getYRot() + 180) / 180.0F) * Mth.PI) * 7.5F));
 		}
-
-		setPos(getX(), getY(), getZ());
 
         setDeltaMovement(toBeGibbed.getDeltaMovement());
 
@@ -151,37 +149,37 @@ public class EntityB2Frag extends EntityInanimate
 		setYRot(yRotO + (getYRot() - yRotO) * 0.5F);
 
 		float f2 = 0.99F;
-		float f3 = 0.05F;
 
-		if (isSliding)
-		{
+		if (isSliding) {
 			motionpitch = 0;
 			motionyaw = 0;
             setDeltaMovement(getDeltaMovement().x(), 0, getDeltaMovement().z());
 			f2 = 0.7f;
-			f3 = 0.0f;
 		}
 
 		motionpitch *= (double) f2;
 		motionyaw *= (double) f2;
         setDeltaMovement(getDeltaMovement().scale(f2));
-        setDeltaMovement(getDeltaMovement().subtract(0, f3, 0));
+        applyGravity();
 
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 	}
 
     @Override
-	public void addAdditionalSaveData(CompoundTag par1NBTTagCompound)
-	{
-		par1NBTTagCompound.putInt("Type", type);
-		par1NBTTagCompound.putBoolean("inGround", inGround);
+    protected double getDefaultGravity() {
+        return isSliding ? super.getDefaultGravity() : 0.05F;
+    }
+
+    @Override
+	public void addAdditionalSaveData(CompoundTag nbt) {
+		nbt.putInt("Type", type);
+		nbt.putBoolean("inGround", inGround);
 	}
 
 	@Override
-	public void readAdditionalSaveData(CompoundTag par1NBTTagCompound)
-	{
-		type = par1NBTTagCompound.getInt("Type");
-		inGround = par1NBTTagCompound.getBoolean("inGround");
+	public void readAdditionalSaveData(CompoundTag nbt) {
+		type = nbt.getInt("Type");
+		inGround = nbt.getBoolean("inGround");
 	}
 
 	@Override

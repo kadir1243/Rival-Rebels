@@ -16,12 +16,8 @@ import assets.rivalrebels.common.explosion.NuclearExplosion;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
-public class EntityB83NoShroom extends EntityB83
-{
-	public int	ticksInAir	= 0;
-
-	public EntityB83NoShroom(EntityType<? extends EntityB83NoShroom> entityType, Level par1World)
-	{
+public class EntityB83NoShroom extends EntityB83 {
+	public EntityB83NoShroom(EntityType<? extends EntityB83NoShroom> entityType, Level par1World) {
 		super(entityType, par1World);
 	}
 

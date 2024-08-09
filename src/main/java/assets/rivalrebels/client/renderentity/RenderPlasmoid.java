@@ -39,24 +39,10 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid> {
 		matrices.scale(0.4f, 2.5f, 0.4f);
 		matrices.pushPose();
 
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.4f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.6f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.8f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, 1f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, 1.2f, 0.65f, 0.55f, 0.95f, 0.9f);
-		matrices.popPose();
-		matrices.popPose();
-		matrices.popPose();
-		matrices.popPose();
+        for (int i = 0; i < 5; i++) {
+            matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
+            ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.4F + 0.2F * i, 0.65f, 0.55f, 0.95f, 0.9f);
+        }
 		matrices.popPose();
 		matrices.popPose();
 	}

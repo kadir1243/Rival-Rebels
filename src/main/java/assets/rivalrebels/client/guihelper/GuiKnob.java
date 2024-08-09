@@ -29,9 +29,9 @@ public class GuiKnob extends GuiButton
 	protected int		mindegreelimit	= 0;
 	protected boolean	pressed;
 
-	public GuiKnob(int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, Component par6Str)
+	public GuiKnob(int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, Component message)
 	{
-		super(x, y, 36, 36, par6Str);
+		super(x, y, 36, 36, message);
 		if (respectLimits)
 		{
 			maxdegreelimit = maxDegree;

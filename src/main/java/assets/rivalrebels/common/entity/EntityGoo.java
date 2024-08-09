@@ -32,7 +32,7 @@ public class EntityGoo extends EntityInanimate
 	{
 		this(par1World);
 		moveTo(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 		shoot(0.1f);
 		isGore = true;
 	}
@@ -41,7 +41,7 @@ public class EntityGoo extends EntityInanimate
 	{
 		this(par1World);
 		moveTo(x, y, z, 0, 0);
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 		shoot(0f);
 		isGore = false;
 	}
@@ -67,7 +67,7 @@ public class EntityGoo extends EntityInanimate
 
         setDeltaMovement(getDeltaMovement().scale(0.99F));
         push(0, -0.03F, 0);
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 	}
 
 	@Override

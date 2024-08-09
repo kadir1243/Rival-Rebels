@@ -17,29 +17,25 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import java.util.List;
-import java.util.Optional;
 
-public class EntityCuchillo extends EntityInanimate
-{
-	public Entity	shootingEntity;
-	private boolean	inGround;
+public class EntityCuchillo extends Projectile {
+    private boolean	inGround;
 	private int		ticksInGround;
 
     public EntityCuchillo(EntityType<? extends EntityCuchillo> type, Level par1World) {
@@ -50,92 +46,58 @@ public class EntityCuchillo extends EntityInanimate
 		this(RREntities.CUCHILLO, par1World);
 	}
 
-	public EntityCuchillo(Level par1World, Player player, float par3)
-	{
+	public EntityCuchillo(Level par1World, Player player, float speed) {
 		this(par1World);
-		shootingEntity = player;
+        this.setOwner(player);
 		moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+        setPos(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
             getY() - 0.1f,
             getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F));
-		setPos(getX(), getY(), getZ());
-		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)) * par3,
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)) * par3,
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)) * par3);
-	}
-	public EntityCuchillo(Level par1World, double x, double y,double z, double mx, double my, double mz)
-	{
-		this(par1World);
-		setPos(x,y,z);
-		setAnglesMotion(mx, my, mz);
+		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)) * speed,
+            (-Mth.sin(getXRot() / 180.0F * Mth.PI)) * speed,
+            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)) * speed);
 	}
 
-	public void setAnglesMotion(double mx, double my, double mz) {
+    public EntityCuchillo(Level par1World, double x, double y,double z, double mx, double my, double mz) {
+		this(par1World);
+		setPos(x,y,z);
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    }
 
     @Override
 	public void tick()
 	{
 		super.tick();
 		tickCount++;
-		if (!inGround)
-		{
-			Vec3 vec31 = position();
-			Vec3 vec3 = position().add(getDeltaMovement());
-			HitResult mop = level().clip(new ClipContext(vec31, vec3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-			vec31 = position();
-			if (mop != null) vec3 = mop.getLocation();
-			else vec3 = position().add(getDeltaMovement());
+		if (!inGround) {
+			HitResult mop = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
-			List<Entity> list = level().getEntities(this, getBoundingBox().expandTowards(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z()).inflate(1.0D, 1.0D, 1.0D));
-			double d0 = Double.MAX_VALUE;
-            for (Entity entity : list) {
-                if (entity.canBeCollidedWith() && (tickCount >= 10 || entity != shootingEntity)) {
-                    Optional<Vec3> mop1 = entity.getBoundingBox().inflate(0.5f, 0.5f, 0.5f).clip(vec31, vec3);
-                    if (mop1.isPresent()) {
-                        double d1 = vec31.distanceToSqr(mop1.get());
-                        if (d1 < d0) {
-                            mop = new EntityHitResult(entity, mop1.get());
-                            d0 = d1;
-                        }
-                    }
-                }
-            }
-
-			if (mop != null)
-			{
-				if (!level().isClientSide())
-				{
-					if (mop.getType() == HitResult.Type.ENTITY)
-					{
+			if (mop.getType() != HitResult.Type.MISS) {
+				if (!level().isClientSide()) {
+					if (mop.getType() == HitResult.Type.ENTITY) {
                         ((EntityHitResult) mop).getEntity().hurt(RivalRebelsDamageSource.cuchillo(level()), 7);
 						kill();
-					}
-					else if (mop.getType() == HitResult.Type.BLOCK)
-					{
+					} else if (mop.getType() == HitResult.Type.BLOCK) {
                         BlockPos pos = ((BlockHitResult) mop).getBlockPos();
                         BlockState state = level().getBlockState(pos);
 						if (state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES)) {
 							level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                             this.playSound(RRSounds.CUCHILLO_GLASS_BREAK, 5F, 0.3F);
-                        }
-						else if (state.is(BlockTags.BASE_STONE_OVERWORLD))
-						{
+                        } else if (state.is(BlockTags.BASE_STONE_OVERWORLD)) {
 							level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.knife.getDefaultInstance()));
 							kill();
-						}
-						else
-						{
+						} else {
 							inGround = true;
 						}
 					}
 				}
-			}
-			else
-			{
+			} else {
                 setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 				setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 				while (getYRot() - yRotO < -180.0F)
@@ -147,23 +109,19 @@ public class EntityCuchillo extends EntityInanimate
 
 				float friction = 0.98f;
 
-				if (isInWaterOrBubble())
-				{
+				if (isInWaterOrBubble()) {
 					for (int var26 = 0; var26 < 4; ++var26)
 						level().addParticle(ParticleTypes.BUBBLE, getX() - getDeltaMovement().x() * 0.25F, getY() - getDeltaMovement().y() * 0.25F, getZ() - getDeltaMovement().z() * 0.25F, getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z());
 					friction = 0.8F;
 				}
                 setDeltaMovement(getDeltaMovement().scale(friction));
-                setDeltaMovement(getDeltaMovement().subtract(0, 0.026F, 0));
-				setPos(getX(), getY(), getZ());
+                applyGravity();
+                reapplyPosition();
 			}
-		}
-		else
-		{
+		} else {
             setDeltaMovement(getDeltaMovement().scale(0.2));
 			ticksInGround++;
-			if (ticksInGround == 60)
-			{
+			if (ticksInGround == 60) {
 				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.knife.getDefaultInstance()));
 				kill();
 			}
@@ -179,7 +137,12 @@ public class EntityCuchillo extends EntityInanimate
 		}
 	}
 
-	@Override
+    @Override
+    protected double getDefaultGravity() {
+        return 0.026;
+    }
+
+    @Override
 	public boolean isAttackable()
 	{
 		return false;

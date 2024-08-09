@@ -55,14 +55,11 @@ public class EntityBomb extends ThrowableProjectile {
 		setAnglesMotion(mx, my, mz);
 	}
 
-	public EntityBomb(Level par1World, Player entity, float par3) {
+	public EntityBomb(Level par1World, Player entity, float inaccuracy) {
 		this(par1World);
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
-		setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
-        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-        shoot(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 2.5f, 0.1f);
+        setPos(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
+        shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 2.5f, inaccuracy);
 	}
 
 	public void setAnglesMotion(double mx, double my, double mz)
@@ -94,37 +91,13 @@ public class EntityBomb extends ThrowableProjectile {
 			}
 
             setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-			float var16 = (float) this.getDeltaMovement().horizontalDistance();
-			this.setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-
-			for (this.setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
-			{
-            }
-
-			while (this.getXRot() - this.xRotO >= 180.0F)
-			{
-				this.xRotO += 360.0F;
-			}
-
-			while (this.getYRot() - this.yRotO < -180.0F)
-			{
-				this.yRotO -= 360.0F;
-			}
-
-			while (this.getYRot() - this.yRotO >= 180.0F)
-			{
-				this.yRotO += 360.0F;
-			}
-
-			this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.2F);
-			this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.2F);
+            this.updateRotation();
 			float var17 = 0.95f;
-			float var18 = (float) this.getGravity();
 
             setDeltaMovement(getDeltaMovement().scale(var17));
-            setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
+            applyGravity();
 		}
-		this.setPos(this.getX(), this.getY(), this.getZ());
+        this.reapplyPosition();
 	}
 
     @Override

@@ -40,9 +40,9 @@ public class EntityRhodesHead extends EntityRhodesPiece
 	}
 
 	@Override
-	public boolean hurt(DamageSource par1DamageSource, float par2) {
+	public boolean hurt(DamageSource damageSource, float amount) {
 		if (isAlive() && !level().isClientSide()) {
-			health -= par2;
+			health -= amount;
 			if (health <= 0)
 			{
 				kill();

@@ -15,7 +15,7 @@ import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
 import assets.rivalrebels.client.gui.GuiFlameThrower;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.EntityFlameBall;
 import assets.rivalrebels.common.entity.EntityFlameBall1;
 import assets.rivalrebels.common.entity.EntityFlameBall2;
@@ -93,9 +93,9 @@ public class ItemFlameThrower extends TieredItem {
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
 		if (!world.isClientSide()) {
             if (world.random.nextInt(10) == 0 && !user.isInWaterOrBubble()) {
-                RivalRebelsSoundPlayer.playSound(user, 8, 0, 0.03f);
+                user.playSound(RRSounds.FLAME_THROWER_USE, 0.03f, 1F);
                 if (world.random.nextInt(3) == 0 && !user.isInWaterOrBubble()) {
-                    RivalRebelsSoundPlayer.playSound(user, 8, 1, 0.1f);
+                    user.playSound(RRSounds.FLAME_THROWER_EXTINGUISH, 0.1F, 1F);
                 }
             }
             if (!stack.isEnchanted()) {
@@ -122,7 +122,7 @@ public class ItemFlameThrower extends TieredItem {
 		}
 		if (entity instanceof Player) {
             if (selected && world.random.nextInt(10) == 0 && !entity.isInWaterOrBubble()) {
-                RivalRebelsSoundPlayer.playSound(entity, 8, 0, 0.03f);
+                entity.playSound(RRSounds.FLAME_THROWER_USE, 0.03f, 1F);
             }
         }
         if (world.isClientSide()) {

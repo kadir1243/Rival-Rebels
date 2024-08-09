@@ -129,22 +129,22 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 		this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.05F);
 		}
 		float var17 = 0.98f;
-		float var18 = (float) this.getGravity();
 
         setDeltaMovement(getDeltaMovement().scale(var17));
-        setDeltaMovement(getDeltaMovement().subtract(0, var18, 0));
-		this.setPos(this.getX(), this.getY(), this.getZ());
+        applyGravity();
+		this.reapplyPosition();
 	}
 
     @Override
-	public void addAdditionalSaveData(CompoundTag nbt)
-	{
+	public void addAdditionalSaveData(CompoundTag nbt) {
+        super.addAdditionalSaveData(nbt);
 		nbt.putInt("charge", aoc);
 		nbt.putBoolean("troll", hasTrollface);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
+        super.readAdditionalSaveData(nbt);
 		aoc = nbt.getInt("charge");
 		hasTrollface = nbt.getBoolean("troll");
 	}

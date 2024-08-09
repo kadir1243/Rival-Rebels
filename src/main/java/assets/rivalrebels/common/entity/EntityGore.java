@@ -170,7 +170,7 @@ public class EntityGore extends EntityInanimate {
 		motionpitch = (float) ((random.nextDouble() - 0.5) * 135);
 
 		moveTo(toBeGibbed.getX() + x, toBeGibbed.getY() + y, toBeGibbed.getZ() + z, rotYaw, rotPitch);
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 		shoot(0.3f);
 	}
 
@@ -384,7 +384,6 @@ public class EntityGore extends EntityInanimate {
 		setYRot(yRotO + (getYRot() - yRotO) * 0.5F);
 
 		float f2 = 0.99F;
-		float f3 = 0.05F;
 
 		if (isInWaterOrBubble())
 		{
@@ -410,7 +409,7 @@ public class EntityGore extends EntityInanimate {
 		motionpitch *= (double) f2;
 		motionyaw *= (double) f2;
         setDeltaMovement(getDeltaMovement().scale(f2));
-        setDeltaMovement(getDeltaMovement().subtract(0, f3, 0));
+        applyGravity();
 
 		if (isSliding)
 		{
@@ -428,10 +427,15 @@ public class EntityGore extends EntityInanimate {
 			setXRot(pitchLock);
 		}
 
-		setPos(getX(), getY(), getZ());
+        reapplyPosition();
 	}
 
-	@Environment(EnvType.CLIENT)
+    @Override
+    protected double getDefaultGravity() {
+        return 0.05;
+    }
+
+    @Environment(EnvType.CLIENT)
 	private void spawnBlood() {
 		for (int i = 0; i < 3; ++i) {
             Minecraft.getInstance().particleEngine.add(new EntityBloodFX((ClientLevel) level(), this, !isGreen()));

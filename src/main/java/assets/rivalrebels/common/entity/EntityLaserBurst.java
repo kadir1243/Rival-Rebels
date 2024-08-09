@@ -47,8 +47,6 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class EntityLaserBurst extends Projectile {
-	private Entity shooter;
-
     public EntityLaserBurst(EntityType<? extends EntityLaserBurst> type, Level world) {
         super(type, world);
     }
@@ -57,38 +55,30 @@ public class EntityLaserBurst extends Projectile {
 		this(RREntities.LASER_BURST, par1World);
 	}
 
-	public EntityLaserBurst(Level par1World, LivingEntity player)
-	{
+	public EntityLaserBurst(Level par1World, LivingEntity player) {
 		this(par1World);
-		shooter = player;
-		moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
-            getY() - 0.12D,
-            getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
-		setPos(getX(), getY(), getZ());
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
+        this.setOwner(player);
+        moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
+            player.getEyeY() - 0.12D,
+            player.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F),
+            player.getYRot(),
+            player.getXRot());
 
-        setAccurateHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 4F, 0.075f);
+        shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 4F, 0.075f);
 	}
 
-	public EntityLaserBurst(Level par1World, LivingEntity player, boolean accurate)
-	{
+	public EntityLaserBurst(Level par1World, LivingEntity player, boolean accurate) {
 		this(par1World);
-		shooter = player;
+        this.setOwner(player);
 		moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
             player.getEyeY() - 0.12D,
             player.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F),
             player.getYRot(),
             player.getXRot());
 
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
-
-        setAccurateHeading(getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z(), 4F * (float)random.nextDouble() + 1.0F, accurate?0.001F:0.075F);
+        shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 4F * (float)random.nextDouble() + 1.0F, accurate?0.001F:0.075F);
 	}
+
 	public EntityLaserBurst(Level par1World, double x, double y,double z, double mx, double my, double mz) {
 		this(par1World);
 		setPos(x,y,z);
@@ -105,27 +95,9 @@ public class EntityLaserBurst extends Projectile {
 	public EntityLaserBurst(Level par1World, double x, double y, double z, double mx, double my, double mz, Entity player)
 	{
 		this(par1World);
-		shooter = player;
+        this.setOwner(player);
 		setPos(x, y, z);
         setDeltaMovement(mx, my, mz);
-	}
-
-	public void setAccurateHeading(double par1, double par3, double par5, float par7, float par8)
-	{
-		float var9 = Mth.sqrt((float) (par1 * par1 + par3 * par3 + par5 * par5));
-		par1 /= var9;
-		par3 /= var9;
-		par5 /= var9;
-		par1 += random.nextGaussian() * par8;
-		par3 += random.nextGaussian() * par8;
-		par5 += random.nextGaussian() * par8;
-		par1 *= par7;
-		par3 *= par7;
-		par5 *= par7;
-        setDeltaMovement(par1, par3, par5);
-		float var10 = Mth.sqrt((float) (par1 * par1 + par5 * par5));
-		setYRot(yRotO = (float) (Math.atan2(par1, par5) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(par3, var10) * Mth.RAD_TO_DEG));
 	}
 
     @Override
@@ -147,30 +119,8 @@ public class EntityLaserBurst extends Projectile {
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		float var16 = (float) this.getDeltaMovement().horizontalDistance();
-		setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-
-		for (setXRot((float) (Math.atan2(getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); getXRot() - xRotO < -180.0F; xRotO -= 360.0F)
-		{
-        }
-		while (getXRot() - xRotO >= 180.0F)
-		{
-			xRotO += 360.0F;
-		}
-
-		while (getYRot() - yRotO < -180.0F)
-		{
-			yRotO -= 360.0F;
-		}
-
-		while (getYRot() - yRotO >= 180.0F)
-		{
-			yRotO += 360.0F;
-		}
-
-		setXRot(xRotO + (getXRot() - xRotO) * 0.2F);
-		setYRot(yRotO + (getYRot() - yRotO) * 0.2F);
-		setPos(getX(), getY(), getZ());
+		this.updateRotation();
+        reapplyPosition();
 	}
 
     @Override
@@ -180,7 +130,7 @@ public class EntityLaserBurst extends Projectile {
         BlockState state = level().getBlockState(pos);
         if (state.is(Blocks.TNT)) {
             if (!level().isClientSide()) {
-                PrimedTnt tnt = new PrimedTnt(level(), (pos.getX() + 0.5F), (pos.getY() + 0.5F), (pos.getZ() + 0.5F), shooter instanceof LivingEntity ? (LivingEntity) shooter : null);
+                PrimedTnt tnt = new PrimedTnt(level(), (pos.getX() + 0.5F), (pos.getY() + 0.5F), (pos.getZ() + 0.5F), getOwner() instanceof LivingEntity entity ? entity : null);
                 tnt.setFuse(level().random.nextInt(tnt.getFuse() / 4) + tnt.getFuse() / 8);
                 level().addFreshEntity(tnt);
                 level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -196,7 +146,7 @@ public class EntityLaserBurst extends Projectile {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         Entity hitEntity = result.getEntity();
-        if (hitEntity instanceof Player player && shooter != hitEntity) {
+        if (hitEntity instanceof Player player) {
             EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
             if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
             {
@@ -224,76 +174,67 @@ public class EntityLaserBurst extends Projectile {
             entity.hurt(RivalRebelsDamageSource.laserBurst(level()), 6);
             if (entity.getHealth() < 3)
             {
-                int legs = -1;
-                int arms = -1;
-                int mobs = -1;
+                int legs;
+                int arms;
+                int mobs;
                 entity.kill();
                 level().playLocalSound(this, RRSounds.BLASTER_FIRE, getSoundSource(), 1, 4);
-                if (entity instanceof Zombie && !(entity instanceof ZombifiedPiglin))
-                {
-                    legs = 2;
-                    arms = 2;
-                    mobs = 1;
-                }
-                else if (entity instanceof ZombifiedPiglin)
-                {
-                    legs = 2;
-                    arms = 2;
-                    mobs = 2;
-                }
-                else if (entity instanceof Skeleton)
-                {
-                    legs = 2;
-                    arms = 2;
-                    mobs = 3;
-                }
-                else if (entity instanceof EnderMan)
-                {
-                    legs = 2;
-                    arms = 2;
-                    mobs = 4;
-                }
-                else if (entity instanceof Creeper)
-                {
-                    legs = 4;
-                    arms = 0;
-                    mobs = 5;
-                }
-                else if (entity instanceof MagmaCube)
-                {
-                    legs = 0;
-                    arms = 0;
-                    mobs = 7;
-                }
-                else if (entity instanceof Slime)
-                {
-                    legs = 0;
-                    arms = 0;
-                    mobs = 6;
-                }
-                else if (entity instanceof Spider && !(entity instanceof CaveSpider))
-                {
-                    legs = 8;
-                    arms = 0;
-                    mobs = 8;
-                }
-                else if (entity instanceof CaveSpider)
-                {
-                    legs = 8;
-                    arms = 0;
-                    mobs = 9;
-                }
-                else if (entity instanceof Ghast)
-                {
-                    legs = 9;
-                    arms = 0;
-                    mobs = 10;
-                }
-                else
-                {
-                    legs = (int) (entity.getBoundingBox().getSize() * 2);
-                    arms = (int) (entity.getBoundingBox().getSize() * 2);
-                    mobs = 11;
+                switch (entity) {
+                    case ZombifiedPiglin ignored -> {
+                        legs = 2;
+                        arms = 2;
+                        mobs = 2;
+                    }
+                    case Zombie ignored -> {
+                        legs = 2;
+                        arms = 2;
+                        mobs = 1;
+                    }
+                    case Skeleton ignored -> {
+                        legs = 2;
+                        arms = 2;
+                        mobs = 3;
+                    }
+                    case EnderMan ignored -> {
+                        legs = 2;
+                        arms = 2;
+                        mobs = 4;
+                    }
+                    case Creeper ignored -> {
+                        legs = 4;
+                        arms = 0;
+                        mobs = 5;
+                    }
+                    case MagmaCube ignored -> {
+                        legs = 0;
+                        arms = 0;
+                        mobs = 7;
+                    }
+                    case Slime ignored -> {
+                        legs = 0;
+                        arms = 0;
+                        mobs = 6;
+                    }
+                    case CaveSpider ignored -> {
+                        legs = 8;
+                        arms = 0;
+                        mobs = 9;
+                    }
+                    case Spider ignored -> {
+                        legs = 8;
+                        arms = 0;
+                        mobs = 8;
+                    }
+                    case Ghast ignored -> {
+                        legs = 9;
+                        arms = 0;
+                        mobs = 10;
+                    }
+                    default -> {
+                        legs = (int) (entity.getBoundingBox().getSize() * 2);
+                        arms = (int) (entity.getBoundingBox().getSize() * 2);
+                        mobs = 11;
+                    }
                 }
                 level().addFreshEntity(new EntityGore(level(), hitEntity, 0, mobs));
                 level().addFreshEntity(new EntityGore(level(), hitEntity, 1, mobs));

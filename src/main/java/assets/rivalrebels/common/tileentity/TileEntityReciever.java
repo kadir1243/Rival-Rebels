@@ -15,7 +15,7 @@ import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.machine.BlockReciever;
 import assets.rivalrebels.common.container.ContainerReciever;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.ChipData;
@@ -32,6 +32,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -183,9 +184,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 					lookAt(target);
 					if (hasAmmo())
 					{
-						if (level.random.nextInt(3) == 0)
-						{
-							RivalRebelsSoundPlayer.playSound(level, 8, 1, getBlockPos(), 0.1f);
+						if (level.random.nextInt(3) == 0) {
+							getLevel().playSound(null, getBlockPos(), RRSounds.FLAME_THROWER_EXTINGUISH, SoundSource.BLOCKS, 0.1F, 1F);
 						}
 						float yaw = 180 - this.yaw;
 						float pitch = -this.pitch;
@@ -345,24 +345,24 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	}
 
 	@Override
-	public ItemStack getItem(int par1) {
-		if (par1 >= getContainerSize()) return ItemStack.EMPTY;
-		return this.chestContents.get(par1);
+	public ItemStack getItem(int slot) {
+		if (slot >= getContainerSize()) return ItemStack.EMPTY;
+		return this.chestContents.get(slot);
 	}
 
 	@Override
-	public ItemStack removeItem(int par1, int par2) {
-		if (!this.getItem(par1).isEmpty()) {
+	public ItemStack removeItem(int slot, int amount) {
+		if (!this.getItem(slot).isEmpty()) {
 			ItemStack var3;
 
-			if (this.getItem(par1).getCount() <= par2) {
-				var3 = this.getItem(par1);
-				this.setItem(par1, ItemStack.EMPTY);
+			if (this.getItem(slot).getCount() <= amount) {
+				var3 = this.getItem(slot);
+				this.setItem(slot, ItemStack.EMPTY);
             } else {
-				var3 = this.getItem(par1).split(par2);
+				var3 = this.getItem(slot).split(amount);
 
-				if (this.getItem(par1).isEmpty()) {
-					this.setItem(par1, ItemStack.EMPTY);
+				if (this.getItem(slot).isEmpty()) {
+					this.setItem(slot, ItemStack.EMPTY);
 				}
             }
             return var3;
@@ -371,22 +371,22 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	}
 
     @Override
-    public ItemStack removeItemNoUpdate(int index) {
-		if (index >= getContainerSize()) return ItemStack.EMPTY;
-		if (!this.getItem(index).isEmpty())
+    public ItemStack removeItemNoUpdate(int slot) {
+		if (slot >= getContainerSize()) return ItemStack.EMPTY;
+		if (!this.getItem(slot).isEmpty())
 		{
-			ItemStack var2 = this.getItem(index);
-			this.setItem(index, ItemStack.EMPTY);
+			ItemStack var2 = this.getItem(slot);
+			this.setItem(slot, ItemStack.EMPTY);
 			return var2;
 		}
 		return ItemStack.EMPTY;
 	}
 
     @Override
-	public void setItem(int index, ItemStack stack)
+	public void setItem(int slot, ItemStack stack)
 	{
-		if (index >= getContainerSize()) return;
-		this.chestContents.set(index, stack);
+		if (slot >= getContainerSize()) return;
+		this.chestContents.set(slot, stack);
 
         stack.limitSize(this.getMaxStackSize(stack));
 	}
