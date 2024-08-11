@@ -92,12 +92,8 @@ java {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 }
 
-if (System.getenv("MODRINTH_TOKEN") != null) {
-    project.setProperty("MODRINTH_TOKEN", System.getenv("MODRINTH_TOKEN"))
-}
-
 modrinth {
-    token = project.findProperty("MODRINTH_TOKEN")
+    token = findModrinthToken()
     projectId = "rival-rebels"
     versionType = "alpha"
     uploadFile = remapJar
@@ -107,4 +103,14 @@ modrinth {
         required.project "fabric-api"
         required.project "forge-config-api-port"
     }
+}
+
+String findModrinthToken() {
+    if (project.hasProperty("MODRINTH_TOKEN")) {
+        return project.findProperty("MODRINTH_TOKEN")
+    }
+    if (System.getenv("MODRINTH_TOKEN") != null) {
+        return System.getenv("MODRINTH_TOKEN")
+    }
+    return null
 }
