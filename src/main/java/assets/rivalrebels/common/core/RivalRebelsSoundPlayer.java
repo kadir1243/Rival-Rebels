@@ -226,7 +226,7 @@ public class RivalRebelsSoundPlayer
 			String sound = dir + "." + num;
             SoundEvent event = RRSounds.SOUNDS.get(sound);
             if (event == null) {
-                RivalRebels.LOGGER.error("Sound not found: {}", sound);
+                RivalRebels.LOGGER.debug("Sound not found: {}", sound);
                 return false;
             }
             world.playLocalSound(x, y, z, event, SoundSource.MASTER, volume, pitch, false);

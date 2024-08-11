@@ -117,9 +117,8 @@ public class EntityB2Spirit extends Projectile {
             setDeltaMovement(getDeltaMovement().normalize());
             setYRot(rhodeswing.getYRot());
 			setXRot((float) (Math.min(t, 90.0)));
-			if (t < 25.0 || tickCount > 100)
-			{
-				rhodeswing.b2energy = 8000;
+			if (t < 25.0 || tickCount > 100) {
+                rhodeswing.setB2Energy(8000);
 				rhodeswing.freeze = false;
 				kill();
 			}

@@ -182,7 +182,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 				matrices.mulPose(Axis.XP.rotationDegrees(-90));
 				matrices.translate(0, 4, -2);
 				matrices.scale(2.2f, 2.2f, 2.2f);
-				if (entity.b2energy > 0) ObjModels.renderSolid(ObjModels.shuttle, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+				if (entity.getB2Energy() > 0) ObjModels.renderSolid(ObjModels.shuttle, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 				matrices.popPose();
 				matrices.popPose();
 			} else {
@@ -204,13 +204,13 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 				matrices.pushPose();
 				matrices.mulPose(Axis.XP.rotationDegrees(-90));
 				matrices.translate(0, 4, -2);
-				if (entity.b2energy > 0) {
+				if (entity.getB2Energy() > 0) {
                     matrices.pushPose();
                     matrices.scale(2.5F, 2.5F, 2.5F);
                     ObjModels.renderSolid(ObjModels.b2ForSpirit, RRIdentifiers.etb2spirit, matrices, vertexConsumers, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
                     matrices.popPose();
                 }
-				if (entity.jet && entity.b2energy > 0) {
+				if (entity.jet && entity.getB2Energy() > 0) {
                     matrices.pushPose();
                     matrices.scale(2.5F, 2.5F, 2.5F);
                     ObjModels.b2jetForRhodes.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(flame)), colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
@@ -318,7 +318,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 						} catch (Exception ignored) {
 						}
 					}
-			    	if (entity.forcefield) {
+			    	if (entity.isForceFieldEnabled()) {
 			    		ObjModels.renderNoise(ObjModels.fftorso, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 						//RIGHT UPPERARM
 						matrices.pushPose();

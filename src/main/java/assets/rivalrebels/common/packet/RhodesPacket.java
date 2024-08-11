@@ -27,7 +27,6 @@ public class RhodesPacket implements CustomPacketPayload {
     public static final Type<RhodesPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("rhodes_packet"));
     public float bodyyaw;
     int id = 0;
-    boolean forcefield = false;
     float headyaw = 0;
     float headpitch = 0;
     float leftarmyaw = 0;
@@ -40,12 +39,9 @@ public class RhodesPacket implements CustomPacketPayload {
     float rightshinpitch = 0;
     byte laserOn;
     byte colorType;
-    int b2energy;
     int riderid;
     int pass1id;
     int pass2id;
-    int rocketcount;
-    int flamecount;
     String texloc;
     int texfolder;
 
@@ -66,14 +62,10 @@ public class RhodesPacket implements CustomPacketPayload {
         leftshinpitch = er.leftshinpitch;
         rightshinpitch = er.rightshinpitch;
         laserOn = er.laserOn;
-        forcefield = er.forcefield;
         colorType = er.colorType;
-        b2energy = er.b2energy;
         riderid = er.rider != null ? er.rider.getId() : -1;
         pass1id = er.passenger1 != null ? er.passenger1.getId() : -1;
         pass2id = er.passenger2 != null ? er.passenger2.getId() : -1;
-        rocketcount = er.rocketcount;
-        flamecount = er.flamecount;
         texloc = er.itexloc;
         texfolder = er.itexfolder;
     }
@@ -81,7 +73,6 @@ public class RhodesPacket implements CustomPacketPayload {
     public static RhodesPacket fromBytes(FriendlyByteBuf buf) {
         RhodesPacket packet = new RhodesPacket();
         packet.id = buf.readInt();
-        packet.forcefield = buf.readBoolean();
         packet.bodyyaw = buf.readFloat();
         packet.headyaw = buf.readFloat();
         packet.headpitch = buf.readFloat();
@@ -95,12 +86,9 @@ public class RhodesPacket implements CustomPacketPayload {
         packet.rightshinpitch = buf.readFloat();
         packet.laserOn = buf.readByte();
         packet.colorType = buf.readByte();
-        packet.b2energy = buf.readInt();
         packet.riderid = buf.readInt();
         packet.pass1id = buf.readInt();
         packet.pass2id = buf.readInt();
-        packet.rocketcount = buf.readInt();
-        packet.flamecount = buf.readInt();
         packet.texfolder = buf.readByte();
         packet.texloc = buf.readUtf();
 
@@ -142,12 +130,8 @@ public class RhodesPacket implements CustomPacketPayload {
             er.leftshinpitch = m.leftshinpitch;
             er.rightshinpitch = m.rightshinpitch;
             er.laserOn = m.laserOn;
-            er.forcefield = m.forcefield;
             er.colorType = m.colorType;
-            er.b2energy = m.b2energy;
             er.ticksSinceLastPacket = 0;
-            er.rocketcount = m.rocketcount;
-            er.flamecount = m.flamecount;
             er.itexloc = m.texloc;
             er.itexfolder = m.texfolder;
             if (er.getHealth() <= 0 && er.rider != null) {
@@ -169,7 +153,6 @@ public class RhodesPacket implements CustomPacketPayload {
 
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(id);
-        buf.writeBoolean(forcefield);
         buf.writeFloat(bodyyaw);
         buf.writeFloat(headyaw);
         buf.writeFloat(headpitch);
@@ -183,12 +166,9 @@ public class RhodesPacket implements CustomPacketPayload {
         buf.writeFloat(rightshinpitch);
         buf.writeByte(laserOn);
         buf.writeByte(colorType);
-        buf.writeInt(b2energy);
         buf.writeInt(riderid);
         buf.writeInt(pass1id);
         buf.writeInt(pass2id);
-        buf.writeInt(rocketcount);
-        buf.writeInt(flamecount);
         buf.writeInt(texfolder);
         buf.writeUtf(texloc);
     }

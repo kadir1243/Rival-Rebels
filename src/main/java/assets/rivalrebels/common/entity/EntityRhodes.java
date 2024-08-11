@@ -87,6 +87,10 @@ public class EntityRhodes extends Entity {
     public static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Integer> ENERGY = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> NUKE_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> B2_ENERGY = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> ROCKET_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> FLAME_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Boolean> FORCE_FIELD = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
 
     private int damageUntilWake = 100;
     private static final Set<Predicate<BlockState>> blocklist = new HashSet<>(Set.of(
@@ -166,14 +170,10 @@ public class EntityRhodes extends Entity {
 	public static final int eclaser = 6+recharge;
 	public static final int ecshield = 8+recharge;
 	public static final int MAX_ENERGY = 800;
-    public int b2energy = 0;
-    public int rocketcount = 5000;
-	public int flamecount = 10000;
-	public boolean rocket = false;
+    public boolean rocket = false;
 	public boolean laser = false;
 	public boolean prevflame = false;
 	public boolean flame = false;
-	public boolean forcefield = false;
     public boolean bomb = false;
 	public boolean jet = false;
 	public boolean stop = true;
@@ -193,8 +193,7 @@ public class EntityRhodes extends Entity {
         super(type, world);
     }
 
-	public EntityRhodes(Level w)
-	{
+	public EntityRhodes(Level w) {
 		this(RREntities.RHODES, w);
 		noCulling = true;
 		setBoundingBox(new AABB(-5*getScale(), -15*getScale(), -5*getScale(), 5*getScale(), 15*getScale(), 5*getScale()));
@@ -224,8 +223,8 @@ public class EntityRhodes extends Entity {
 		RandomSource random = RandomSource.create(RRConfig.SERVER.getRhodesRandomSeed());
 		setNukeCount(RRConfig.SERVER.getRhodesNukes());
         setNukeCount((int) (getNukeCount() + getNukeCount() * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus()));
-		rocketcount += rocketcount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
-		flamecount += flamecount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
+        setRocketCount((int) (getRocketCount() + getRocketCount() * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus()));
+        setFlameCount((int) (getFlameCount() + getFlameCount() * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus()));
 	}
 
 	public EntityRhodes(Level w, double x, double y, double z, float s)
@@ -234,7 +233,7 @@ public class EntityRhodes extends Entity {
         setScale(s);
 		if (getScale() >= 2.0) {
             setNukeCount((int) (getNukeCount() * 0.25));
-			rocketcount *= 0.004;
+            setRocketCount((int) (getRocketCount() * 0.004));
 		}
         setHealth(getHealth() - 5000 + (int)(5000 * Math.min(getScale(),4)));
 		setBoundingBox(new AABB(-5*getScale(), -15*getScale(), -5*getScale(), 5*getScale(), 15*getScale(), 5*getScale()));
@@ -717,14 +716,12 @@ public class EntityRhodes extends Entity {
         }
 	}
 
-	private static class RhodesAction
-	{
+	private static class RhodesAction {
 		public int action;
 		public int duration;
-		public RhodesAction(int a, int d)
-		{
-			action = a;
-			duration = d;
+		public RhodesAction(int action, int duration) {
+			this.action = action;
+			this.duration = duration;
 		}
 	}
 
@@ -742,7 +739,7 @@ public class EntityRhodes extends Entity {
 		}
 		if (rider != null)
 		{
-			if (b2spirit && !freeze && b2energy == 0 && getScale() < 1.5f && getScale() > 0.5f)
+			if (b2spirit && !freeze && getB2Energy() == 0 && getScale() < 1.5f && getScale() > 0.5f)
 			{
 				freeze = true;
                 setNukeCount(getNukeCount() - 1);
@@ -753,19 +750,19 @@ public class EntityRhodes extends Entity {
 			if (getEnergy() < MAX_ENERGY) setEnergy(getEnergy() + recharge);
 			if (!RRConfig.SERVER.isInfiniteAmmo())
 			{
-				rocket &= rocketcount > 0;
-				flame &= flamecount > 0;
+				rocket &= getRocketCount() > 0;
+				flame &= getFlameCount() > 0;
 			}
 			if (!RRConfig.SERVER.isInfiniteNukes())
 			{
 				bomb &= getNukeCount() > 0;
 			}
-			forcefield &= getEnergy() > ecshield;
+            setForceField(isForceFieldEnabled() && getEnergy() > ecshield);
 			laser &= getEnergy() > eclaser;
-			jet &= (getEnergy()+b2energy) > ecjet;
-			b2spirit &= b2energy > 0;
+			jet &= (getEnergy()+getB2Energy()) > ecjet;
+			b2spirit &= getB2Energy() > 0;
 
-			if (forcefield)
+			if (isForceFieldEnabled())
 			{
                 setEnergy(getEnergy() - ecshield);
 				if (tickCount%8==0) {
@@ -775,12 +772,10 @@ public class EntityRhodes extends Entity {
 			if (laser) setEnergy(getEnergy() - eclaser);
 			if (jet || b2spirit)
 			{
-				if (b2energy > 0)
-				{
-					b2energy -= ecjet;
-					if (b2energy <= 0)
-					{
-						b2energy = 0;
+				if (getB2Energy() > 0) {
+                    setB2Energy(getB2Energy() - ecjet);
+					if (getB2Energy() <= 0) {
+                        setB2Energy(0);
 						level().explode(null, this.getX(), this.getY(), this.getZ(), 6.0F, Level.ExplosionInteraction.MOB);
 						level().addFreshEntity(new EntityB2Frag(level(), this, 0));
 						level().addFreshEntity(new EntityB2Frag(level(), this, 1));
@@ -1010,7 +1005,7 @@ public class EntityRhodes extends Entity {
 							z*=cp;
 							level().addFreshEntity(new EntityPlasmoid(level(), px, py, pz,
 									x, y, z, 8));
-							flamecount -= plasmacharge;
+                            setFlameCount(getFlameCount() - plasmacharge);
 							plasmacharge = 0;
 						}
 					}
@@ -1023,7 +1018,7 @@ public class EntityRhodes extends Entity {
 				{
 					if (Mth.abs(rightarmyaw-yaw) < 3f && Mth.abs(rightarmpitch-pitch) < 3f)
 					{
-						flamecount--;
+                        setFlameCount(getFlameCount() - 1);
                         this.playSound(RRSounds.FLAME_THROWER_EXTINGUISH);
 						float cp = -1f/ Mth.sqrt(x*x+y*y+z*z);
 						x*=cp;
@@ -1074,7 +1069,7 @@ public class EntityRhodes extends Entity {
 
 					if (rocket && tickCount-lastshot > ((getScale() >= 2.0)?30:((shotstaken == 21)?80:5)))
 					{
-						rocketcount--;
+                        setRocketCount(getRocketCount() - 1);
 						lastshot = tickCount;
 						if (shotstaken == 21) shotstaken = 0;
 						shotstaken++;
@@ -1558,7 +1553,7 @@ public class EntityRhodes extends Entity {
 	boolean nuke = false;
 	private void shootRocketsAtBestTarget(float syaw, float cyaw)
 	{
-		if (rocketcount < 0) return;
+		if (getRocketCount() < 0) return;
 		float px = (float)getX()+cyaw*6.4f*getScale();
 		float py = (float)getY()+6.26759f*getScale();
 		float pz = (float)getZ()+syaw*6.4f*getScale();
@@ -1654,7 +1649,7 @@ public class EntityRhodes extends Entity {
 
 			if (pointing && tickCount-lastshot > ((getScale() >= 2.0)?30:((shotstaken == 21)?80:5)))
 			{
-				rocketcount--;
+                setRocketCount(getRocketCount() - 1);
 				lastshot = tickCount;
 				if (shotstaken == 21) shotstaken = 0;
 				shotstaken++;
@@ -1707,7 +1702,7 @@ public class EntityRhodes extends Entity {
 			{
 				if (pointing && tickCount-lastshot > ((getScale() >= 2.0)?30:((shotstaken == 21)?80:5)))
 				{
-					rocketcount--;
+                    setRocketCount(getRocketCount() - 1);
 					lastshot = tickCount;
 					if (shotstaken == 21) shotstaken = 0;
 					shotstaken++;
@@ -2147,10 +2142,10 @@ public class EntityRhodes extends Entity {
 		nbt.putInt("health", getHealth());
 		nbt.putInt("damageuntilwake", damageUntilWake);
 		nbt.putByte("color", colorType);
-		nbt.putInt("rocketcount", rocketcount);
+		nbt.putInt("rocketcount", getRocketCount());
 		nbt.putInt("energy", getEnergy());
-		nbt.putInt("b2energy", b2energy);
-		nbt.putInt("flamecount", flamecount);
+		nbt.putInt("b2energy", getB2Energy());
+		nbt.putInt("flamecount", getFlameCount());
 		nbt.putInt("nukecount", getNukeCount());
 		nbt.putInt("texfolder", itexfolder);
 		nbt.putFloat("scale", getScale());
@@ -2178,10 +2173,10 @@ public class EntityRhodes extends Entity {
 		setHealth(nbt.getInt("health"));
 		damageUntilWake = nbt.getInt("damageuntilwake");
 		colorType = nbt.getByte("color");
-		rocketcount = nbt.getInt("rocketcount");
+		setRocketCount(nbt.getInt("rocketcount"));
 		setEnergy(nbt.getInt("energy"));
-		b2energy = nbt.getInt("b2energy");
-		flamecount = nbt.getInt("flamecount");
+		setB2Energy(nbt.getInt("b2energy"));
+		setFlameCount(nbt.getInt("flamecount"));
 		setNukeCount(nbt.getInt("nukecount"));
 		itexfolder = nbt.getInt("texfolder");
 		setScale(nbt.getFloat("scale"));
@@ -2189,19 +2184,14 @@ public class EntityRhodes extends Entity {
 	}
 
 	@Override
-	public boolean hurt(DamageSource damageSource, float amount)
-	{
+	public boolean hurt(DamageSource damageSource, float amount) {
 		super.hurt(damageSource, amount);
-		if (isAlive() && !level().isClientSide && getHealth() > 0 && !forcefield)
-		{
-			if (amount > 50)
-			{
+		if (isAlive() && !level().isClientSide && getHealth() > 0 && !isForceFieldEnabled()) {
+			if (amount > 50) {
                 setHealth(getHealth() - 50);
 				if (rider == null) damageUntilWake -= 50;
 				endangered = true;
-			}
-			else
-			{
+			} else {
                 setHealth((int) (getHealth() - amount));
 				if (rider == null) damageUntilWake -= amount;
 			}
@@ -2223,6 +2213,42 @@ public class EntityRhodes extends Entity {
         builder.define(SCALE, 1F);
         builder.define(ENERGY, MAX_ENERGY);
         builder.define(NUKE_COUNT, 8);
+        builder.define(B2_ENERGY, 0);
+        builder.define(ROCKET_COUNT, 5000);
+        builder.define(FLAME_COUNT, 10000);
+        builder.define(FORCE_FIELD, false);
+    }
+
+    public boolean isForceFieldEnabled() {
+        return entityData.get(FORCE_FIELD);
+    }
+
+    public void setForceField(boolean forceField) {
+        entityData.set(FORCE_FIELD, forceField);
+    }
+
+    public int getFlameCount() {
+        return this.entityData.get(FLAME_COUNT);
+    }
+
+    public void setFlameCount(int flameCount) {
+        this.entityData.set(FLAME_COUNT, flameCount);
+    }
+
+    public int getRocketCount() {
+        return entityData.get(ROCKET_COUNT);
+    }
+
+    public void setRocketCount(int rocketCount) {
+        entityData.set(ROCKET_COUNT, rocketCount);
+    }
+
+    public int getB2Energy() {
+        return entityData.get(B2_ENERGY);
+    }
+
+    public void setB2Energy(int b2energy) {
+        entityData.set(B2_ENERGY, b2energy);
     }
 
     public int getEnergy() {

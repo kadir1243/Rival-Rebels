@@ -82,7 +82,7 @@ public record RhodesJumpPacket(int id, boolean jump,
             er.rocket = m.rocket;
             er.laser = m.laser;
             er.flame = m.fire;
-            er.forcefield = m.forcefield;
+            er.setForceField(m.forcefield);
             er.setPlasma(er.isPlasma() ^ m.plasma);
             er.bomb = m.nuke;
             er.jet = m.jump;

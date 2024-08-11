@@ -157,7 +157,7 @@ public class RivalRebelsRenderOverlay {
             );
         }
 
-        Component text = Component.nullToEmpty("Rival Rebels");
+        Component text = Component.literal("Rival Rebels");
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.05), 0xffffff, false);
         text = Component.literal("Robot: ").append(rhodes.getName());
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.1), 0xffffff, false);
@@ -173,16 +173,16 @@ public class RivalRebelsRenderOverlay {
         text = Component.nullToEmpty("Jet: " + rhodes.getEnergy());
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.1), RRClient.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
         text = RRBlocks.forcefieldnode.getName().append(": " + rhodes.getEnergy());
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.forcefield?0xBB88FF:0xffffff, false);
-        text = RRItems.seekm202.getDescription().copy().append(": " + rhodes.rocketcount);
+        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.isForceFieldEnabled()?0xBB88FF:0xffffff, false);
+        text = RRItems.seekm202.getDescription().copy().append(": " + rhodes.getRocketCount());
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.2), 0xffffff, false);
-        text = (rhodes.isPlasma()?Component.nullToEmpty("Plasma: " + rhodes.flamecount) : (((MutableComponent)RRItems.fuel.getDescription()).append(": " + rhodes.flamecount)));
+        text = (rhodes.isPlasma()?Component.nullToEmpty("Plasma: " + rhodes.getFlameCount()) : (((MutableComponent)RRItems.fuel.getDescription()).append(": " + rhodes.getFlameCount())));
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.25), 0xffffff, false);
         graphics.drawString(fr, RRBlocks.nuclearBomb.getName().copy().append(": " + rhodes.getNukeCount()), (int) (w * 0.8), (int) (h * 0.3), 0xffffff, false);
         graphics.drawString(fr, Component.nullToEmpty("Guard"), (int) (w * 0.8), (int) (h * 0.35), RRClient.RHODES_GUARD_KEY.isDown() ? 0xffff00 : 0xffffff, false);
         text = rhodes.getName().copy().append(" ").append(RRBlocks.controller.getName()).append(": H");
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.95), glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_H) == GLFW_PRESS ? 0xffff00 : 0xffffff, false);
-        if (rhodes.forcefield) {
+        if (rhodes.isForceFieldEnabled()) {
             RenderSystem.setShader(GameRenderer::getPositionTexColorShader);
             Tesselator t = Tesselator.getInstance();
             RenderSystem.bindTexture(RivalRebelsCellularNoise.getCurrentRandomId());
