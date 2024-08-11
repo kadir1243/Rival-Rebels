@@ -1,0 +1,43 @@
+name: Publish on GitHub, Modrinth
+
+on: [ push, workflow_dispatch ]
+
+env:
+  MINECRAFT_VERSION: 1.21.1
+  JAVA_VERSION: 21
+  RELEASE_NAME: Rival Rebels Alpha for Minecraft 1.21.1
+  MODRINTH_TOKEN: ${{ secrets.MODRINTH_TOKEN }}
+  GITHUB_TOKEN: ${{ secrets.RR_GIT_TOKEN }}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+            distribution: temurin
+            java-version: 21
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Build
+        run: ./gradlew clean build
+      - name: Publish (Modrinth/GitHub)
+        uses: Kir-Antipov/mc-publish@v3.3
+        with:
+          modrinth-id: 2RF6gKzx
+          modrinth-token: "${{env.MODRINTH_TOKEN}}"
+
+          github-token: "${{env.GITHUB_TOKEN}}"
+
+          name: "${{env.RELEASE_NAME}}"
+          version-type: alpha
+
+          loaders: fabric
+          game-versions: "${{env.MINECRAFT_VERSION}}"
+          java: "${{env.JAVA_VERSION}}"

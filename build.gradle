@@ -92,9 +92,13 @@ java {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
 }
 
+if (System.getenv("MODRINTH_TOKEN") != null) {
+    project.setProperty("MODRINTH_TOKEN", System.getenv("MODRINTH_TOKEN"))
+}
+
 modrinth {
-    token = project.findProperty("MODRINTH_TOKEN") // Remember to have the MODRINTH_TOKEN environment variable set or else this will fail - just make sure it stays private!
-    projectId = "rival-rebels" // This can be the project ID or the slug. Either will work!
+    token = project.findProperty("MODRINTH_TOKEN")
+    projectId = "rival-rebels"
     versionType = "alpha"
     uploadFile = remapJar
     gameVersions = ["1.21.1"]
