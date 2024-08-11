@@ -19,9 +19,9 @@ import net.minecraft.world.level.Level;
 
 public class EntityInanimate extends Entity
 {
-	public EntityInanimate(EntityType<? extends EntityInanimate> type, Level world)
+	public EntityInanimate(EntityType<? extends EntityInanimate> type, Level level)
 	{
-		super(type, world);
+		super(type, level);
 	}
 
     @Override

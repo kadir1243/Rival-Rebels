@@ -106,10 +106,10 @@ public class BlockTimedBomb extends FallingBlock {
 		}
 	}
 
-	/*public void onFinishFalling(Level par1World, int par2, int par3, int par4, int par5)
+	/*public void onFinishFalling(Level level, int par2, int par3, int par4, int par5)
 	{
-		par1World.setBlock(par2, par3, par4, Blocks.AIR);
-		new Explosion(par1World, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timebomb);
-		RivalRebelsSoundPlayer.playSound(par1World, 26, 0, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, 2f, 0.3f);
+		level.setBlock(par2, par3, par4, Blocks.AIR);
+		new Explosion(level, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timebomb);
+		RivalRebelsSoundPlayer.playSound(level, 26, 0, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, 2f, 0.3f);
 	}*/
 }

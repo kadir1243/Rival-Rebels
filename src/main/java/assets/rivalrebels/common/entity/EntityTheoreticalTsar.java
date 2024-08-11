@@ -40,12 +40,12 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
         super(type, world);
     }
 
-	public EntityTheoreticalTsar(Level par1World) {
-		this(RREntities.THEORETICAL_TSAR, par1World);
+	public EntityTheoreticalTsar(Level level) {
+		this(RREntities.THEORETICAL_TSAR, level);
 	}
 
-	public EntityTheoreticalTsar(Level par1World, double x, double y, double z, float yaw, float pitch, int charges, boolean troll) {
-		this(par1World);
+	public EntityTheoreticalTsar(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll) {
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
 		this.setYRot(yRotO = yaw);
 		this.setXRot(xRotO = pitch);
@@ -65,9 +65,9 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityTheoreticalTsar(Level par1World, double x, double y,double z, double mx, double my, double mz, int charges)
+	public EntityTheoreticalTsar(Level level, double x, double y,double z, double mx, double my, double mz, int charges)
 	{
-		this(par1World);
+		this(level);
 		setPos(x,y,z);
 		aoc = charges;
 		setAnglesMotion(mx, my, mz);

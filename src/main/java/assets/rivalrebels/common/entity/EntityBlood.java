@@ -19,25 +19,25 @@ public class EntityBlood extends EntityInanimate
 {
 	private boolean	isGore	= true;
 
-	public EntityBlood(EntityType<? extends EntityBlood> type, Level par1World) {
-		super(type, par1World);
+	public EntityBlood(EntityType<? extends EntityBlood> type, Level level) {
+		super(type, level);
 	}
 
-    public EntityBlood(Level world) {
-        this(RREntities.BLOOD, world);
+    public EntityBlood(Level level) {
+        this(RREntities.BLOOD, level);
     }
 
-	public EntityBlood(Level par1World, EntityGore bloodEmitter) {
-		this(par1World);
+	public EntityBlood(Level level, EntityGore bloodEmitter) {
+		this(level);
 		moveTo(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
         reapplyPosition();
 		shoot(0.1f);
 		isGore = true;
 	}
 
-	public EntityBlood(Level par1World, double x, double y, double z)
+	public EntityBlood(Level level, double x, double y, double z)
 	{
-		this(par1World);
+		this(level);
 		moveTo(x, y, z, 0, 0);
         reapplyPosition();
 		shoot(0f);

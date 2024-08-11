@@ -36,31 +36,31 @@ public class EntityDebris extends EntityInanimate {
     public static final EntityDataAccessor<Optional<BlockState>> STATE = SynchedEntityData.defineId(EntityDebris.class, EntityDataSerializers.OPTIONAL_BLOCK_STATE);
     public static final EntityDataAccessor<CompoundTag> TILE_ENTITY_DATA = SynchedEntityData.defineId(EntityDebris.class, EntityDataSerializers.COMPOUND_TAG);
 
-    public EntityDebris(EntityType<? extends EntityDebris> type, Level w) {
-		super(type, w);
+    public EntityDebris(EntityType<? extends EntityDebris> type, Level level) {
+		super(type, level);
 	}
 
-    public EntityDebris(Level w) {
-        super(RREntities.DEBRIS, w);
+    public EntityDebris(Level level) {
+        super(RREntities.DEBRIS, level);
     }
 
-	public EntityDebris(Level w, BlockPos pos) {
-		this(w);
-        setState(w.getBlockState(pos));
+	public EntityDebris(Level level, BlockPos pos) {
+		this(level);
+        setState(level.getBlockState(pos));
         {
-            BlockEntity blockEntity = w.getBlockEntity(pos);
+            BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity != null) {
-                setTileEntityData(blockEntity.saveWithFullMetadata(w.registryAccess()));
+                setTileEntityData(blockEntity.saveWithFullMetadata(level.registryAccess()));
             }
         }
-		w.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+		level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		setPos(Vec3.atLowerCornerOf(pos).add(0.5, 0.5, 0.5));
         setOldPosAndRot();
 	}
 
-    public EntityDebris(Level w, double x, double y, double z, double mx, double my, double mz, Block b) {
-		this(w);
-        setState(b.defaultBlockState());
+    public EntityDebris(Level level, double x, double y, double z, double mx, double my, double mz, Block block) {
+		this(level);
+        setState(block.defaultBlockState());
 		setPos(x, y, z);
         setOldPosAndRot();
         setDeltaMovement(mx, my, mz);

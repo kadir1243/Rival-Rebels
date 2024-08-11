@@ -51,12 +51,12 @@ public class EntityLaserBurst extends Projectile {
         super(type, world);
     }
 
-	public EntityLaserBurst(Level par1World) {
-		this(RREntities.LASER_BURST, par1World);
+	public EntityLaserBurst(Level level) {
+		this(RREntities.LASER_BURST, level);
 	}
 
-	public EntityLaserBurst(Level par1World, LivingEntity player) {
-		this(par1World);
+	public EntityLaserBurst(Level level, Entity player) {
+		this(level);
         this.setOwner(player);
         moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
             player.getEyeY() - 0.12D,
@@ -67,8 +67,8 @@ public class EntityLaserBurst extends Projectile {
         shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 4F, 0.075f);
 	}
 
-	public EntityLaserBurst(Level par1World, LivingEntity player, boolean accurate) {
-		this(par1World);
+	public EntityLaserBurst(Level level, Entity player, boolean accurate) {
+		this(level);
         this.setOwner(player);
 		moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
             player.getEyeY() - 0.12D,
@@ -79,8 +79,8 @@ public class EntityLaserBurst extends Projectile {
         shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 4F * (float)random.nextDouble() + 1.0F, accurate?0.001F:0.075F);
 	}
 
-	public EntityLaserBurst(Level par1World, double x, double y,double z, double mx, double my, double mz) {
-		this(par1World);
+	public EntityLaserBurst(Level level, double x, double y,double z, double mx, double my, double mz) {
+		this(level);
 		setPos(x,y,z);
 		setAnglesMotion(mx, my, mz);
 	}
@@ -92,9 +92,9 @@ public class EntityLaserBurst extends Projectile {
 		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
-	public EntityLaserBurst(Level par1World, double x, double y, double z, double mx, double my, double mz, Entity player)
+	public EntityLaserBurst(Level level, double x, double y, double z, double mx, double my, double mz, Entity player)
 	{
-		this(par1World);
+		this(level);
         this.setOwner(player);
 		setPos(x, y, z);
         setDeltaMovement(mx, my, mz);
@@ -118,9 +118,8 @@ public class EntityLaserBurst extends Projectile {
             onHit(hitResult);
 		}
 
-        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
+        setPos(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		this.updateRotation();
-        reapplyPosition();
 	}
 
     @Override

@@ -2,6 +2,7 @@ plugins {
     id 'idea'
     id 'fabric-loom' version '1.7-SNAPSHOT'
     id 'maven-publish'
+    id "com.modrinth.minotaur" version "2.+"
 }
 
 version = mod_version
@@ -89,4 +90,17 @@ sourceSets {
 
 java {
     sourceCompatibility = targetCompatibility = JavaVersion.VERSION_21
+}
+
+modrinth {
+    token = project.findProperty("MODRINTH_TOKEN") // Remember to have the MODRINTH_TOKEN environment variable set or else this will fail - just make sure it stays private!
+    projectId = "rival-rebels" // This can be the project ID or the slug. Either will work!
+    versionType = "alpha"
+    uploadFile = remapJar
+    gameVersions = ["1.21.1"]
+    loaders = ["fabric"]
+    dependencies {
+        required.project "fabric-api"
+        required.project "forge-config-api-port"
+    }
 }

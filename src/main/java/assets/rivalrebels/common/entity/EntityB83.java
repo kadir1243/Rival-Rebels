@@ -32,29 +32,29 @@ public class EntityB83 extends ThrowableProjectile
 {
 	public int	ticksInAir	= 0;
 
-	public EntityB83(EntityType<? extends EntityB83> entityType, Level par1World) {
-		super(entityType, par1World);
+	public EntityB83(EntityType<? extends EntityB83> entityType, Level level) {
+		super(entityType, level);
 	}
 
-	public EntityB83(Level par1World, double x, double y, double z, float yaw, float pitch) {
-		this(RREntities.B83, par1World);
+	public EntityB83(Level level, double x, double y, double z, float yaw, float pitch) {
+		this(RREntities.B83, level);
 		moveTo(x, y, z, yaw, pitch);
         setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (-Mth.sin(pitch / 180.0F * Mth.PI)));
+            (-Mth.sin(pitch / 180.0F * Mth.PI)),
+            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)));
     }
 
-	public EntityB83(Level par1World, double x, double y, double z, float yaw, float pitch, float strength)
+	public EntityB83(Level level, double x, double y, double z, float yaw, float pitch, float strength)
 	{
-        this(RREntities.B83, par1World);
+        this(RREntities.B83, level);
 		moveTo(x, y, z, yaw, pitch);
 		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)) * strength,
-		(Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)) * strength,
-		(-Mth.sin(pitch / 180.0F * Mth.PI)) * strength);
+            (-Mth.sin(pitch / 180.0F * Mth.PI)) * strength,
+            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)) * strength);
 	}
-	public EntityB83(Level par1World, double x, double y,double z, double mx, double my, double mz)
+	public EntityB83(Level level, double x, double y,double z, double mx, double my, double mz)
 	{
-        this(RREntities.B83, par1World);
+        this(RREntities.B83, level);
 		setPos(x,y,z);
 		setAnglesMotion(mx, my, mz);
 	}

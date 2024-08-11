@@ -17,12 +17,12 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
 public class EntityB83NoShroom extends EntityB83 {
-	public EntityB83NoShroom(EntityType<? extends EntityB83NoShroom> entityType, Level par1World) {
-		super(entityType, par1World);
+	public EntityB83NoShroom(EntityType<? extends EntityB83NoShroom> entityType, Level level) {
+		super(entityType, level);
 	}
 
-	public EntityB83NoShroom(Level par1World, double x, double y, double z, double mx, double my, double mz) {
-		this(RREntities.B83_NO_SHROOM, par1World);
+	public EntityB83NoShroom(Level level, double x, double y, double z, double mx, double my, double mz) {
+		this(RREntities.B83_NO_SHROOM, level);
 		setPos(x, y, z);
         shoot(mx, my, mz, 5, 1);
 	}

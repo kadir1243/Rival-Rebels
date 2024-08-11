@@ -11,46 +11,46 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 
-public class EntityLaserLink extends EntityInanimate {
-	public Player	shooter;
-
+public class EntityLaserLink extends Projectile {
     public EntityLaserLink(EntityType<? extends EntityLaserLink> type, Level world) {
         super(type, world);
     }
 
-	public EntityLaserLink(Level par1World) {
-		this(RREntities.LASER_LINK, par1World);
+	public EntityLaserLink(Level level) {
+		this(RREntities.LASER_LINK, level);
 		noCulling = true;
 	}
 
-	public EntityLaserLink(Level par1World, Player player, double distance)
-	{
-		this(par1World);
-		shooter = player;
+	public EntityLaserLink(Level level, Entity entity, double distance) {
+		this(level);
+        this.setOwner(entity);
 		tickCount = 0;
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
-		moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
-        setPosRaw(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
+		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
+        setPos(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
 		getY() - 0.08,
 		getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
-        reapplyPosition();
 	}
 
-	public EntityLaserLink(Level par1World, double x, double y, double z, float yaw, float pitch, double distance)
-	{
-		this(par1World);
+	public EntityLaserLink(Level level, double x, double y, double z, float yaw, float pitch, double distance) {
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
 		tickCount = 0;
-        reapplyPosition();
 	}
 
-	@Override
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    }
+
+    @Override
 	public void tick() {
         super.tick();
         if (tickCount == 1) kill();

@@ -32,31 +32,32 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
         super(type, world);
     }
 
-	public EntityFlameBallGreen(Level par1World) {
-		this(RREntities.FLAME_BALL_GREEN, par1World);
+	public EntityFlameBallGreen(Level level) {
+		this(RREntities.FLAME_BALL_GREEN, level);
 	}
 
-	public EntityFlameBallGreen(Level par1World, double x, double y, double z) {
-		this(par1World);
+	public EntityFlameBallGreen(Level level, double x, double y, double z) {
+		this(level);
 		setPos(x, y, z);
 	}
 
-	public EntityFlameBallGreen(Level par1World, Player player, float par3) {
-		this(par1World);
-		setPos(player.getEyePosition());
-		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(player.getXRot() / 180.0F * Mth.PI)));
+	public EntityFlameBallGreen(Level level, Entity entity, float speed) {
+		this(level);
+        this.setOwner(entity);
+		setPos(entity.getEyePosition());
+		setDeltaMovement((-Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(entity.getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)));
 		setPosRaw(
-            getX() - (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * 0.2F),
+            getX() - (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * 0.2F),
             getY() - 0.13,
-            getZ() - (Mth.sin(player.getYRot() / 180.0F * Mth.PI) * 0.2F)
+            getZ() - (Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * 0.2F)
         );
-        setDeltaMovement(getDeltaMovement().scale(par3));
+        setDeltaMovement(getDeltaMovement().scale(speed));
     }
 
-	public EntityFlameBallGreen(Level par1World, TileEntityReciever ter, float f) {
-		this(par1World);
+	public EntityFlameBallGreen(Level level, TileEntityReciever ter, float speed) {
+		this(level);
 		setYRot(180 - ter.yaw);
 		setXRot(-ter.pitch);
 		setPos(ter.getBlockPos().getX() + ter.xO + 0.5, ter.getBlockPos().getY() + 0.5, ter.getBlockPos().getZ() + ter.zO + 0.5);
@@ -64,7 +65,7 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
             (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
             (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
-        setDeltaMovement(getDeltaMovement().scale(f));
+        setDeltaMovement(getDeltaMovement().scale(speed));
 	}
 
 	public EntityFlameBallGreen(Level world, double x, double y, double z, double mx, double my, double mz) {

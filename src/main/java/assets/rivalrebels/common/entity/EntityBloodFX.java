@@ -26,22 +26,22 @@ import net.minecraft.world.inventory.InventoryMenu;
 
 @Environment(EnvType.CLIENT)
 public class EntityBloodFX extends TextureSheetParticle {
-	public EntityBloodFX(ClientLevel w, double x, double y, double z, boolean b) {
-		this(w, x, y, z, w.random.nextGaussian() * 0.1, w.random.nextGaussian() * 0.1, w.random.nextGaussian() * 0.1, b);
+	public EntityBloodFX(ClientLevel level, double x, double y, double z, boolean b) {
+		this(level, x, y, z, level.random.nextGaussian() * 0.1, level.random.nextGaussian() * 0.1, level.random.nextGaussian() * 0.1, b);
 	}
 
-	public EntityBloodFX(ClientLevel w, double x, double y, double z, double r, double g, double b, boolean isBlood) {
-		super(w, x, y, z, r, g, b);
+	public EntityBloodFX(ClientLevel level, double x, double y, double z, double dx, double dy, double dz, boolean isBlood) {
+		super(level, x, y, z, dx, dy, dz);
 
-        this.setParticleSpeed(r, g, b);
+        this.setParticleSpeed(dx, dy, dz);
 		gravity = 0.75F;
 		lifetime = 20;
         setSprite(Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(isBlood ? RRIdentifiers.etblood : RRIdentifiers.etgoo));
 	}
 
-	public EntityBloodFX(ClientLevel w, EntityGore g, boolean b)
+	public EntityBloodFX(ClientLevel level, EntityGore gore, boolean isBlood)
 	{
-		this(w, g.getX(), g.getY(), g.getZ(), b);
+		this(level, gore.getX(), gore.getY(), gore.getZ(), isBlood);
 	}
 
     @Override

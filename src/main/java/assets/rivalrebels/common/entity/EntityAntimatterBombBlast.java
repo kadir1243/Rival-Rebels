@@ -32,19 +32,19 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	public AntimatterBomb	tsar		= null;
 	public double		radius;
 
-	public EntityAntimatterBombBlast(EntityType<? extends EntityAntimatterBombBlast> entityType, Level par1World) {
-		super(entityType, par1World);
+	public EntityAntimatterBombBlast(EntityType<? extends EntityAntimatterBombBlast> entityType, Level level) {
+		super(entityType, level);
 		noCulling = true;
 	}
 
-    public EntityAntimatterBombBlast(Level par1World) {
-        super(RREntities.ANTIMATTER_BOMB_BLAST, par1World);
+    public EntityAntimatterBombBlast(Level level) {
+        super(RREntities.ANTIMATTER_BOMB_BLAST, level);
         noCulling = true;
     }
 
-	public EntityAntimatterBombBlast(Level par1World, float x, float y, float z, AntimatterBomb tsarBomba, int rad)
+	public EntityAntimatterBombBlast(Level level, float x, float y, float z, AntimatterBomb tsarBomba, int rad)
 	{
-		this(par1World);
+		this(level);
 		noCulling = true;
 		tsar = tsarBomba;
 		radius = rad;
@@ -52,9 +52,9 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 		setPos(x, y, z);
 	}
 
-	public EntityAntimatterBombBlast(Level par1World, double x, double y, double z, float rad)
+	public EntityAntimatterBombBlast(Level level, double x, double y, double z, float rad)
 	{
-		this(par1World);
+		this(level);
 		noCulling = true;
 		radius = rad;
 		setDeltaMovement(Math.sqrt(rad - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());

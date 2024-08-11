@@ -45,9 +45,7 @@ public class RhodesPacket implements CustomPacketPayload {
     int pass1id;
     int pass2id;
     int rocketcount;
-    int energy;
     int flamecount;
-    int nukecount;
     String texloc;
     int texfolder;
 
@@ -75,9 +73,7 @@ public class RhodesPacket implements CustomPacketPayload {
         pass1id = er.passenger1 != null ? er.passenger1.getId() : -1;
         pass2id = er.passenger2 != null ? er.passenger2.getId() : -1;
         rocketcount = er.rocketcount;
-        energy = er.energy;
         flamecount = er.flamecount;
-        nukecount = er.nukecount;
         texloc = er.itexloc;
         texfolder = er.itexfolder;
     }
@@ -104,17 +100,10 @@ public class RhodesPacket implements CustomPacketPayload {
         packet.pass1id = buf.readInt();
         packet.pass2id = buf.readInt();
         packet.rocketcount = buf.readInt();
-        packet.energy = buf.readInt();
         packet.flamecount = buf.readInt();
-        packet.nukecount = buf.readByte();
         packet.texfolder = buf.readByte();
-        if (packet.texfolder != 0) {
-            packet.texloc = buf.readUtf();
-            packet.texfolder -= packet.texfolder % 10;
-            packet.texfolder /= 10;
-        } else {
-            packet.texfolder = -1;
-        }
+        packet.texloc = buf.readUtf();
+
         return packet;
     }
 
@@ -158,9 +147,7 @@ public class RhodesPacket implements CustomPacketPayload {
             er.b2energy = m.b2energy;
             er.ticksSinceLastPacket = 0;
             er.rocketcount = m.rocketcount;
-            er.energy = m.energy;
             er.flamecount = m.flamecount;
-            er.nukecount = m.nukecount;
             er.itexloc = m.texloc;
             er.itexfolder = m.texfolder;
             if (er.getHealth() <= 0 && er.rider != null) {
@@ -201,14 +188,8 @@ public class RhodesPacket implements CustomPacketPayload {
         buf.writeInt(pass1id);
         buf.writeInt(pass2id);
         buf.writeInt(rocketcount);
-        buf.writeInt(energy);
         buf.writeInt(flamecount);
-        buf.writeByte(nukecount);
-        if (texfolder == -1) {
-            buf.writeByte(0);
-        } else {
-            buf.writeByte(texfolder * 10 + texloc.length());
-            buf.writeUtf(texloc);
-        }
+        buf.writeInt(texfolder);
+        buf.writeUtf(texloc);
     }
 }

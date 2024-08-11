@@ -33,30 +33,31 @@ public class EntityBomb extends ThrowableProjectile {
 	public boolean exploded = false;
 	public boolean hit = false;
 
-	public EntityBomb(EntityType<? extends EntityBomb> type, Level par1World) {
-		super(type, par1World);
+	public EntityBomb(EntityType<? extends EntityBomb> type, Level level) {
+		super(type, level);
 	}
 
-    public EntityBomb(Level par1World) {
-        this(RREntities.BOMB, par1World);
+    public EntityBomb(Level level) {
+        this(RREntities.BOMB, level);
     }
 
-	public EntityBomb(Level par1World, double x, double y, double z, float yaw, float pitch) {
-		this(par1World);
+	public EntityBomb(Level level, double x, double y, double z, float yaw, float pitch) {
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
 		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (-Mth.sin(pitch / 180.0F * Mth.PI)));
+            (-Mth.sin(pitch / 180.0F * Mth.PI)),
+            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)));
 	}
 
-	public EntityBomb(Level par1World, double x, double y,double z, double mx, double my, double mz) {
-		this(par1World);
+	public EntityBomb(Level level, double x, double y,double z, double mx, double my, double mz) {
+		this(level);
 		setPos(x+mx*1.4f,y+my*1.4f,z+mz*1.4f);
 		setAnglesMotion(mx, my, mz);
 	}
 
-	public EntityBomb(Level par1World, Player entity, float inaccuracy) {
-		this(par1World);
+	public EntityBomb(Level level, Entity entity, float inaccuracy) {
+		this(level);
+        this.setOwner(entity);
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 2.5f, inaccuracy);

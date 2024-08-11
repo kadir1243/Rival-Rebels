@@ -63,13 +63,13 @@ public class EntityGore extends EntityInanimate {
         super(type, world);
     }
 
-	public EntityGore(Level par1World)
+	public EntityGore(Level level)
 	{
-		this(RREntities.GORE, par1World);
+		this(RREntities.GORE, level);
 	}
-	public EntityGore(Level par1World, double x, double y,double z, double mx, double my, double mz, int Type, int Mob)
+	public EntityGore(Level level, double x, double y,double z, double mx, double my, double mz, int Type, int Mob)
 	{
-		this(par1World);
+		this(level);
 		setPos(x,y,z);
 		setAnglesMotion(mx, my, mz);
 		setTypeOfGore(Type);
@@ -99,9 +99,9 @@ public class EntityGore extends EntityInanimate {
 		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
-	public EntityGore(Level par1World, Entity toBeGibbed, int Type, int mob)
+	public EntityGore(Level level, Entity toBeGibbed, int Type, int mob)
 	{
-		this(par1World);
+		this(level);
 		origin = toBeGibbed;
 		isSliding = false;
 		slideCount = 0;
@@ -170,7 +170,6 @@ public class EntityGore extends EntityInanimate {
 		motionpitch = (float) ((random.nextDouble() - 0.5) * 135);
 
 		moveTo(toBeGibbed.getX() + x, toBeGibbed.getY() + y, toBeGibbed.getZ() + z, rotYaw, rotPitch);
-        reapplyPosition();
 		shoot(0.3f);
 	}
 

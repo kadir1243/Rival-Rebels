@@ -35,39 +35,39 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 	public int aoc = 0;
 	public boolean hasTrollface;
 
-	public EntityAntimatterBomb(EntityType<? extends EntityAntimatterBomb> entityType, Level world) {
-		super(entityType, world);
+	public EntityAntimatterBomb(EntityType<? extends EntityAntimatterBomb> entityType, Level level) {
+		super(entityType, level);
 	}
 
-    public EntityAntimatterBomb(Level world) {
-        this(RREntities.ANTIMATTER_BOMB, world);
+    public EntityAntimatterBomb(Level level) {
+        this(RREntities.ANTIMATTER_BOMB, level);
     }
 
-	public EntityAntimatterBomb(Level world, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
+	public EntityAntimatterBomb(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
 	{
-		this(world);
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
 		yRotO = yaw;
 		xRotO = pitch;
 		aoc = charges;
 		hasTrollface = troll;
-		if (!RRConfig.SERVER.isNukedrop() && !world.isClientSide())
+		if (!RRConfig.SERVER.isNukedrop() && !level.isClientSide())
 		{
 			explode();
 		}
 	}
 
-	public EntityAntimatterBomb(Level world, float px, float py, float pz, float f, float g, float h)
+	public EntityAntimatterBomb(Level level, float px, float py, float pz, float dx, float dy, float dz)
 	{
-		this(world);
+		this(level);
 		setPos(px, py, pz);
-        setDeltaMovement(f, g, h);
+        setDeltaMovement(dx, dy, dz);
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityAntimatterBomb(Level par1World, double x, double y,double z, double mx, double my, double mz, int charges)
+	public EntityAntimatterBomb(Level level, double x, double y,double z, double mx, double my, double mz, int charges)
 	{
-		this(par1World);
+		this(level);
 		setPos(x,y,z);
 		aoc = charges;
 		setAnglesMotion(mx, my, mz);

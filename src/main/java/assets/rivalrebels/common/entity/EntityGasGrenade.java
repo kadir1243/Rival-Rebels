@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
@@ -31,25 +32,25 @@ public class EntityGasGrenade extends Projectile {
         super(type, world);
     }
 
-    public EntityGasGrenade(Level par1World) {
-        this(RREntities.GAS_GRENADE, par1World);
+    public EntityGasGrenade(Level level) {
+        this(RREntities.GAS_GRENADE, level);
     }
 
-    public EntityGasGrenade(Level par1World, double x, double y, double z) {
-        this(par1World);
+    public EntityGasGrenade(Level level, double x, double y, double z) {
+        this(level);
         setPos(x, y, z);
     }
 
-    public EntityGasGrenade(Level par1World, double x, double y, double z, double mx, double my, double mz) {
-        this(par1World);
+    public EntityGasGrenade(Level level, double x, double y, double z, double mx, double my, double mz) {
+        this(level);
         setPos(x, y, z);
         setDeltaMovement(mx, my, mz);
         setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
         setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
     }
 
-    public EntityGasGrenade(Level par1World, Player player, float speed) {
-        this(par1World);
+    public EntityGasGrenade(Level level, Entity player, float speed) {
+        this(level);
         this.setOwner(player);
 
         moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());

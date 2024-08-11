@@ -48,17 +48,15 @@ public class ItemGasGrenade extends Item
 
     @Override
     public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
-        if (!(user instanceof Player player)) return;
-
-        ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.gasgrenade);
-        if (player.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteGrenades())
+        ItemStack itemStack = ItemUtil.getItemStack(user, RRItems.gasgrenade);
+        if (user.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteGrenades())
 		{
-			float f = (getUseDuration(stack, player) - remainingUseTicks) / 20.0F;
+			float f = (getUseDuration(stack, user) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
-			EntityGasGrenade entitysuperarrow = new EntityGasGrenade(world, player, 0.3f + f * 0.5f);
-            stack.consume(1, player);
-            player.playSound(RRSounds.CUCHILLO_UNKNOWN3, 1, 0.9F);
+			EntityGasGrenade entitysuperarrow = new EntityGasGrenade(world, user, 0.3f + f * 0.5f);
+            stack.consume(1, user);
+            user.playSound(RRSounds.CUCHILLO_UNKNOWN3, 1, 0.9F);
 			if (!world.isClientSide())
 			{
 				world.addFreshEntity(entitysuperarrow);

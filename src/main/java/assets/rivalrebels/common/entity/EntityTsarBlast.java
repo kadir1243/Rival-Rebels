@@ -36,22 +36,22 @@ public class EntityTsarBlast extends EntityInanimate
         super(type, world);
     }
 
-	public EntityTsarBlast(Level par1World)
+	public EntityTsarBlast(Level level)
 	{
-		this(RREntities.TSAR_BLAST, par1World);
+		this(RREntities.TSAR_BLAST, level);
 		noCulling = true;
 	}
 
-	public EntityTsarBlast(Level par1World, float x, float y, float z, TsarBomba tsarBomba, int rad) {
-		this(par1World);
+	public EntityTsarBlast(Level level, float x, float y, float z, TsarBomba tsarBomba, int rad) {
+		this(level);
 		tsar = tsarBomba;
 		radius = rad;
 		setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
 	}
 
-	public EntityTsarBlast(Level par1World, double x, double y, double z, float rad) {
-		this(par1World);
+	public EntityTsarBlast(Level level, double x, double y, double z, float rad) {
+		this(level);
 		radius = rad;
 		setDeltaMovement(Math.sqrt(rad - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
         setPos(x, y, z);

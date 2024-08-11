@@ -22,14 +22,14 @@ public class EntityLightningLink extends EntityInanimate {
         super(type, world);
     }
 
-	public EntityLightningLink(Level par1World) {
-		this(RREntities.LIGHTNING_LINK, par1World);
+	public EntityLightningLink(Level level) {
+		this(RREntities.LIGHTNING_LINK, level);
 		noCulling = true;
 		tickCount = 0;
 	}
 
-	public EntityLightningLink(Level par1World, Entity player, double distance) {
-		this(par1World);
+	public EntityLightningLink(Level level, Entity player, double distance) {
+		this(level);
         setDeltaMovement(distance / 100, getDeltaMovement().y(), getDeltaMovement().z());
 		moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         Vec3 vec3d = position().subtract(
@@ -40,8 +40,8 @@ public class EntityLightningLink extends EntityInanimate {
         setPos(vec3d.x(), vec3d.y(), vec3d.z());
 	}
 
-	public EntityLightningLink(Level par1World, double x, double y, double z, float yaw, float pitch, double distance) {
-		this(par1World);
+	public EntityLightningLink(Level level, double x, double y, double z, float yaw, float pitch, double distance) {
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
         setDeltaMovement(distance / 100, getDeltaMovement().y(), getDeltaMovement().z());
 	}

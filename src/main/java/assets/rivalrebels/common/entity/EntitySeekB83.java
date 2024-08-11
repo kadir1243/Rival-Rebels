@@ -49,8 +49,8 @@ public class EntitySeekB83 extends AbstractArrow {
         super(type, world);
     }
 
-	public EntitySeekB83(Level par1World) {
-		this(RREntities.SEEK_B83, par1World);
+	public EntitySeekB83(Level level) {
+		this(RREntities.SEEK_B83, level);
 	}
 
     @Override
@@ -58,12 +58,12 @@ public class EntitySeekB83 extends AbstractArrow {
         return ItemStack.EMPTY;
     }
 
-    public EntitySeekB83(Level par1World, double x, double y, double z) {
-		this(par1World);
+    public EntitySeekB83(Level level, double x, double y, double z) {
+		this(level);
 		setPos(x, y, z);
 	}
 
-	public EntitySeekB83(Level level, Player entity, float par3) {
+	public EntitySeekB83(Level level, Entity entity, float par3) {
 		this(level);
 		fins = false;
         this.setOwner(entity);
@@ -77,9 +77,9 @@ public class EntitySeekB83 extends AbstractArrow {
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, 1f);
 	}
 
-	public EntitySeekB83(Level par1World, Player entity, float par3, float yawdelta)
+	public EntitySeekB83(Level level, Entity entity, float par3, float yawdelta)
 	{
-		this(par1World);
+		this(level);
         this.setOwner(entity);
 		fins = false;
 		moveTo(entity.getEyePosition(), entity.getYRot() + yawdelta, entity.getXRot());

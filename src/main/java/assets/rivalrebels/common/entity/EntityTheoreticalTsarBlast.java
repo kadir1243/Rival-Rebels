@@ -22,13 +22,13 @@ public class EntityTheoreticalTsarBlast extends EntityTsarBlast {
         super(type, world);
     }
 
-    public EntityTheoreticalTsarBlast(Level par1World) {
-        this(RREntities.THEORETICAL_TSAR_BLAST, par1World);
+    public EntityTheoreticalTsarBlast(Level level) {
+        this(RREntities.THEORETICAL_TSAR_BLAST, level);
         noCulling = true;
     }
 
-    public EntityTheoreticalTsarBlast(Level par1World, float x, float y, float z, TsarBomba tsarBomba, int rad) {
-        this(par1World);
+    public EntityTheoreticalTsarBlast(Level level, float x, float y, float z, TsarBomba tsarBomba, int rad) {
+        this(level);
         tsar = tsarBomba;
         radius = rad;
         setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());

@@ -29,29 +29,28 @@ public class EntityPassiveFire extends Projectile {
         super(type, world);
     }
 
-	public EntityPassiveFire(Level par1World) {
-		this(RREntities.PASSIVE_FIRE, par1World);
+	public EntityPassiveFire(Level level) {
+		this(RREntities.PASSIVE_FIRE, level);
         inGround = false;
 		ticksInAir = 0;
 		damage = 2;
 	}
 
-	public EntityPassiveFire(Level par1World, double x, double y, double z) {
-		this(par1World);
+	public EntityPassiveFire(Level level, double x, double y, double z) {
+		this(level);
 		setPos(x, y, z);
 	}
 
-    public EntityPassiveFire(Level par1World, Entity entity, float par3) {
-		this(par1World);
+    public EntityPassiveFire(Level level, Entity entity, float par3) {
+		this(level);
         this.setOwner(entity);
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
 		setYRot((getYRot() + 25) % 360);
-        setPosRaw(
+        setPos(
             getX() - Mth.cos((getYRot() / 180F) * Mth.PI) * 0.16F,
             getY() - 0.2D,
             getZ() - Mth.sin((getYRot() / 180F) * Mth.PI) * 0.16F
         );
-        reapplyPosition();
         super.setDeltaMovement(-Mth.sin((getYRot() / 180F) * Mth.PI) * Mth.cos((getXRot() / 180F) * Mth.PI),
 		 Mth.cos((getYRot() / 180F) * Mth.PI) * Mth.cos((getXRot() / 180F) * Mth.PI),
 		 -Mth.sin((getXRot() / 180F) * Mth.PI));

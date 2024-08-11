@@ -23,25 +23,23 @@ public class EntityGoo extends EntityInanimate
         super(type, world);
     }
 
-	public EntityGoo(Level par1World)
+	public EntityGoo(Level level)
 	{
-		this(RREntities.GOO, par1World);
+		this(RREntities.GOO, level);
 	}
 
-	public EntityGoo(Level par1World, EntityGore bloodEmitter)
+	public EntityGoo(Level level, EntityGore bloodEmitter)
 	{
-		this(par1World);
+		this(level);
 		moveTo(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
-        reapplyPosition();
 		shoot(0.1f);
 		isGore = true;
 	}
 
-	public EntityGoo(Level par1World, double x, double y, double z)
+	public EntityGoo(Level level, double x, double y, double z)
 	{
-		this(par1World);
+		this(level);
 		moveTo(x, y, z, 0, 0);
-        reapplyPosition();
 		shoot(0f);
 		isGore = false;
 	}

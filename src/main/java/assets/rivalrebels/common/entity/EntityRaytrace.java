@@ -43,12 +43,12 @@ public class EntityRaytrace extends Projectile {
         super(type, world);
     }
 
-	public EntityRaytrace(Level par1World) {
-		this(RREntities.RAYTRACE, par1World);
+	public EntityRaytrace(Level level) {
+		this(RREntities.RAYTRACE, level);
 	}
 
-	public EntityRaytrace(Level par1World, double x, double y,double z, double mx, double my, double mz) {
-		this(par1World);
+	public EntityRaytrace(Level level, double x, double y,double z, double mx, double my, double mz) {
+		this(level);
 		setPos(x,y,z);
 		setAnglesMotion(mx, my, mz);
 		chance = 1.0f;
@@ -62,9 +62,9 @@ public class EntityRaytrace extends Projectile {
         setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
-	public EntityRaytrace(Level par1World, Entity entity, float distance, float randomness, float chance, boolean shift)
+	public EntityRaytrace(Level level, Entity entity, float distance, float randomness, float chance, boolean shift)
 	{
-		this(par1World);
+		this(level);
 		this.chance = chance;
 		range = distance;
         this.setOwner(entity);

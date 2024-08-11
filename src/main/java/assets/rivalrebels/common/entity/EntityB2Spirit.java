@@ -16,17 +16,18 @@ import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.item.weapon.ItemRoda;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
+import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class EntityB2Spirit extends EntityInanimate
-{
+public class EntityB2Spirit extends Projectile {
 	private int					ticksSinceStart	= 0;
 	private int					timeLeft	= -1;
 	private double				tx				= 0;
@@ -44,20 +45,20 @@ public class EntityB2Spirit extends EntityInanimate
 
 	public int mode = 0; //0=straight 1=left 2=right
 
-	public EntityB2Spirit(EntityType<? extends EntityB2Spirit> entityType, Level par1World) {
-		super(entityType, par1World);
+	public EntityB2Spirit(EntityType<? extends EntityB2Spirit> entityType, Level level) {
+		super(entityType, level);
 		noCulling = true;
 		setBoundingBox(new AABB(-10, -3, -10, 10, 4, 10));
 		health = RRConfig.SERVER.getB2spirithealth();
 	}
 
-    public EntityB2Spirit(Level par1World) {
-        this(RREntities.B2SPIRIT, par1World);
+    public EntityB2Spirit(Level level) {
+        this(RREntities.B2SPIRIT, level);
     }
 
-	public EntityB2Spirit(Level par1World, double x, double y, double z, double x1, double y1, double z1, boolean c, boolean da)
+	public EntityB2Spirit(Level level, double x, double y, double z, double x1, double y1, double z1, boolean c, boolean da)
 	{
-		this(par1World);
+		this(level);
 		carpet = c;
 		tx = x;
 		ty = y;
@@ -98,6 +99,10 @@ public class EntityB2Spirit extends EntityInanimate
 	{
 		return true;
 	}
+
+    @Override
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+    }
 
     @Override
 	public void tick()
@@ -197,30 +202,7 @@ public class EntityB2Spirit extends EntityInanimate
         setPosRaw(vec3d.x(), vec3d.y(), vec3d.z());
 		if (rhodeswing == null)
 		{
-			double var16 = this.getDeltaMovement().horizontalDistance();
-			this.setYRot((float) (Math.atan2(this.getDeltaMovement().x(), this.getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-
-			for (this.setXRot((float) (Math.atan2(-this.getDeltaMovement().y(), var16) * Mth.RAD_TO_DEG)); this.getXRot() - this.xRotO < -180.0F; this.xRotO -= 360.0F)
-			{
-            }
-
-			while (this.getXRot() - this.xRotO >= 180.0F)
-			{
-				this.xRotO += 360.0F;
-			}
-
-			while (this.getYRot() - this.yRotO < -180.0F)
-			{
-				this.yRotO -= 360.0F;
-			}
-
-			while (this.getYRot() - this.yRotO >= 180.0F)
-			{
-				this.yRotO += 360.0F;
-			}
-
-			this.setXRot(this.xRotO + (this.getXRot() - this.xRotO) * 0.2F);
-			this.setYRot(this.yRotO + (this.getYRot() - this.yRotO) * 0.2F);
+			this.updateRotation();
 		}
         this.reapplyPosition();
 	}

@@ -38,9 +38,9 @@ public class ContainerLoader extends AbstractContainerMenu
 	}
 
 	@Override
-	public boolean stillValid(Player par1EntityPlayer)
+	public boolean stillValid(Player player)
 	{
-		return this.loader.stillValid(par1EntityPlayer);
+		return this.loader.stillValid(player);
 	}
 
     public int size() {

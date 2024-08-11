@@ -29,33 +29,33 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 
 public class EntityFlameBall extends FlameBallProjectile {
-    public EntityFlameBall(EntityType<? extends EntityFlameBall> entityType, Level world) {
-        super(entityType, world);
+    public EntityFlameBall(EntityType<? extends EntityFlameBall> entityType, Level level) {
+        super(entityType, level);
     }
 
-	public EntityFlameBall(Level par1World)
+	public EntityFlameBall(Level level)
 	{
-		this(RREntities.FLAME_BALL, par1World);
+		this(RREntities.FLAME_BALL, level);
 	}
 
-    public EntityFlameBall(Level par1World, Entity player, float par3)
+    public EntityFlameBall(Level level, Entity entity, float speed)
 	{
-		this(par1World);
-		setPos(player.getEyePosition());
-		setDeltaMovement((-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(player.getXRot() / 180.0F * Mth.PI)));
+		this(level);
+		setPos(entity.getEyePosition());
+		setDeltaMovement((-Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)),
+            (-Mth.sin(entity.getXRot() / 180.0F * Mth.PI)),
+            (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)));
 		setPosRaw(
-            getX() - (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * 0.2F),
+            getX() - (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * 0.2F),
             getY() - 0.13,
-            getZ() - (Mth.sin(player.getYRot() / 180.0F * Mth.PI) * 0.2F)
+            getZ() - (Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * 0.2F)
         );
-        setDeltaMovement(getDeltaMovement().scale(par3));
+        setDeltaMovement(getDeltaMovement().scale(speed));
 	}
 
-	public EntityFlameBall(Level par1World, TileEntityReciever ter, float f)
+	public EntityFlameBall(Level level, TileEntityReciever ter, float speed)
 	{
-		this(par1World);
+		this(level);
 		setYRot(180 - ter.yaw);
 		setXRot(-ter.pitch);
 		setPos(ter.getBlockPos().getX() + ter.xO + 0.5, ter.getBlockPos().getY() + 0.5, ter.getBlockPos().getZ() + ter.zO + 0.5);
@@ -63,18 +63,18 @@ public class EntityFlameBall extends FlameBallProjectile {
             (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
             (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
 
-        setDeltaMovement(getDeltaMovement().scale(f));
+        setDeltaMovement(getDeltaMovement().scale(speed));
 	}
 
-	public EntityFlameBall(Level world, double x, double y, double z, double mx, double my, double mz)
+	public EntityFlameBall(Level level, double x, double y, double z, double mx, double my, double mz)
 	{
-		this(world);
+		this(level);
 		setPos(x, y, z);
         setDeltaMovement(mx, my, mz);
 	}
 
-	public EntityFlameBall(Level world, double x, double y, double z, double mx, double my, double mz, double d, double r) {
-		this(world);
+	public EntityFlameBall(Level level, double x, double y, double z, double mx, double my, double mz, double d, double r) {
+		this(level);
 		setPos(x+mx*d+random.nextGaussian()*r, y+my*d+random.nextGaussian()*r, z+mz*d+random.nextGaussian()*r);
         setDeltaMovement(mx, my, mz);
 	}

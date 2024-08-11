@@ -32,25 +32,25 @@ public class EntityTachyonBombBlast extends EntityInanimate
 	public TachyonBomb	tsar		= null;
 	public double		radius;
 
-    public EntityTachyonBombBlast(EntityType<? extends EntityTachyonBombBlast> type, Level par1World) {
-        super(type, par1World);
+    public EntityTachyonBombBlast(EntityType<? extends EntityTachyonBombBlast> type, Level level) {
+        super(type, level);
     }
 
-	public EntityTachyonBombBlast(Level par1World) {
-		this(RREntities.TACHYON_BOMB_BLAST, par1World);
+	public EntityTachyonBombBlast(Level level) {
+		this(RREntities.TACHYON_BOMB_BLAST, level);
 		noCulling = true;
 	}
 
-	public EntityTachyonBombBlast(Level par1World, float x, float y, float z, TachyonBomb tsarBomba, int rad) {
-		this(par1World);
+	public EntityTachyonBombBlast(Level level, float x, float y, float z, TachyonBomb tsarBomba, int rad) {
+		this(level);
 		tsar = tsarBomba;
 		radius = rad;
 		setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
 	}
 
-	public EntityTachyonBombBlast(Level par1World, double x, double y, double z, float rad) {
-		this(par1World);
+	public EntityTachyonBombBlast(Level level, double x, double y, double z, float rad) {
+		this(level);
 		radius = rad;
 		setDeltaMovement(Math.sqrt(rad - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);

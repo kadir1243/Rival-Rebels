@@ -20,6 +20,7 @@ import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.AbstractArrow;
@@ -40,20 +41,20 @@ public class EntityRocket extends AbstractArrow
 	private boolean inwaterprevtick	= false;
 	private int soundfile = 0;
 
-	public EntityRocket(EntityType<? extends EntityRocket> type, Level par1World) {
-		super(type, par1World);
+	public EntityRocket(EntityType<? extends EntityRocket> type, Level level) {
+		super(type, level);
 	}
 
     public EntityRocket(Level world) {
         this(RREntities.ROCKET, world);
     }
 
-	public EntityRocket(Level par1World, double x, double y, double z) {
-		this(par1World);
+	public EntityRocket(Level level, double x, double y, double z) {
+		this(level);
 		setPos(x, y, z);
 	}
 
-	public EntityRocket(Level level, Player entity, float inaccuracy) {
+	public EntityRocket(Level level, Entity entity, float inaccuracy) {
 		this(level);
         fins = false;
         this.setOwner(entity);
@@ -66,8 +67,8 @@ public class EntityRocket extends AbstractArrow
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, inaccuracy);
 	}
 
-	public EntityRocket(Level par1World, double x, double y,double z, double mx, double my, double mz) {
-		this(par1World);
+	public EntityRocket(Level level, double x, double y,double z, double mx, double my, double mz) {
+		this(level);
 		fins = false;
 		setPos(x,y,z);
         setDeltaMovement(mx, my, mz);

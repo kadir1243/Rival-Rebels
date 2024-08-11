@@ -44,8 +44,8 @@ public class EntityLaptop extends EntityInanimate
         return true;
     }
 
-    public EntityLaptop(Level par1World, float x, float y, float z, float yaw) {
-		this(par1World);
+    public EntityLaptop(Level level, float x, float y, float z, float yaw) {
+		this(level);
 		setPos(x, y, z);
         this.setYRot(yaw);
 	}

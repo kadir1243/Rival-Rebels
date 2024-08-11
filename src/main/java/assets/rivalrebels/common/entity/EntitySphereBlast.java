@@ -30,13 +30,13 @@ public class EntitySphereBlast extends EntityTsarBlast {
         super(type, world);
     }
 
-	public EntitySphereBlast(Level par1World) {
-		this(RREntities.SPHERE_BLAST, par1World);
+	public EntitySphereBlast(Level level) {
+		this(RREntities.SPHERE_BLAST, level);
 		noCulling = true;
 	}
 
-	public EntitySphereBlast(Level par1World, double x, double y, double z, float rad) {
-		this(par1World);
+	public EntitySphereBlast(Level level, double x, double y, double z, float rad) {
+		this(level);
 		radius = rad;
 		setDeltaMovement(Math.sqrt(rad - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);

@@ -87,7 +87,7 @@ public class ItemBinoculars extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof Player player && world.isClientSide && entity == Minecraft.getInstance().player) {
+        if (world.isClientSide && entity == Minecraft.getInstance().player) {
             boolean strike = isMousePressed() && !prevmclick;
             c ^= RRClient.USE_BINOCULARS_ITEM.isDown() && !sc;
             sc = RRClient.USE_BINOCULARS_ITEM.isDown();
@@ -117,17 +117,17 @@ public class ItemBinoculars extends Item {
                 Minecraft.getInstance().options.sensitivity().set((double) (senset * Mth.sqrt(zoom) * 0.1f));
 
                 if (Minecraft.getInstance().mouseHandler.isRightPressed()) {
-                    double cospitch = Mth.cos(player.getXRot() / 180.0F * Mth.PI);
-                    double sinpitch = Mth.sin(player.getXRot() / 180.0F * Mth.PI);
-                    double cosyaw = Mth.cos(player.getYRot() / 180.0F * Mth.PI);
-                    double sinyaw = Mth.sin(player.getYRot() / 180.0F * Mth.PI);
+                    double cospitch = Mth.cos(entity.getXRot() / 180.0F * Mth.PI);
+                    double sinpitch = Mth.sin(entity.getXRot() / 180.0F * Mth.PI);
+                    double cosyaw = Mth.cos(entity.getYRot() / 180.0F * Mth.PI);
+                    double sinyaw = Mth.sin(entity.getYRot() / 180.0F * Mth.PI);
 
                     double dx = (-sinyaw * cospitch) * 130;
                     double dz = (cosyaw * cospitch) * 130;
                     double dy = (-sinpitch) * 130;
 
-                    Vec3 var3 = player.position().add(dx, dy, dz);
-                    BlockHitResult MOP = world.clip(new ClipContext(player.position(), var3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
+                    Vec3 var3 = entity.position().add(dx, dy, dz);
+                    BlockHitResult MOP = world.clip(new ClipContext(entity.position(), var3, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, CollisionContext.empty()));
 
                     TileEntityLaptop t = null;
                     double d = 100;
@@ -135,7 +135,7 @@ public class ItemBinoculars extends Item {
                         t = tileEntityLaptop;
                         if (t.b2spirit > 0 || t.b2carpet > 0) {
                             hasLaptop = true;
-                            double temp = player.distanceToSqr(t.getBlockPos().getX() + 0.5, t.getBlockPos().getY() + 0.5, t.getBlockPos().getZ() + 0.5);
+                            double temp = entity.distanceToSqr(t.getBlockPos().getX() + 0.5, t.getBlockPos().getY() + 0.5, t.getBlockPos().getZ() + 0.5);
                             if (temp < d) {
                                 d = temp;
                                 stack.set(RRComponents.BINOCULAR_DATA, stack.get(RRComponents.BINOCULAR_DATA).withLPos(t.getBlockPos()));
@@ -146,7 +146,7 @@ public class ItemBinoculars extends Item {
                         BlockPos pos = MOP.getBlockPos();
                         stack.set(RRComponents.BINOCULAR_DATA, stack.get(RRComponents.BINOCULAR_DATA).withTPos(pos));
                         BlockPos lpos = stack.get(RRComponents.BINOCULAR_DATA).lpos();
-                        distblock = Mth.sqrt((float) player.distanceToSqr(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f));
+                        distblock = Mth.sqrt((float) entity.distanceToSqr(pos.getX() + 0.5f, pos.getY() + 0.5f, pos.getZ() + 0.5f));
                         tooFar = false;
                         if (t != null) {
                             stack.set(RRComponents.BINOCULAR_DATA,

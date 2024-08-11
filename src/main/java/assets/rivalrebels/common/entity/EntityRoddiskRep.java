@@ -61,14 +61,8 @@ public class EntityRoddiskRep extends RoddiskBase {
         super(type, world);
     }
 
-	public EntityRoddiskRep(Level par1World, LivingEntity shooter, float speed) {
-		super(RREntities.RODDISK_REP, par1World, shooter);
-		this.moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
-        setPos(getX() - (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * 0.16F),
-            getY() - 0.1,
-            getZ() - (Mth.sin(this.getYRot() / 180.0F * Mth.PI) * 0.16F)
-        );
-        this.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0, speed * 1.5F, 1.0F);
+	public EntityRoddiskRep(Level level, Entity shooter, float speed) {
+		super(RREntities.RODDISK_REP, level, shooter, speed);
 	}
 
     @Override
@@ -111,8 +105,6 @@ public class EntityRoddiskRep extends RoddiskBase {
 		Vec3 var15 = position();
 		Vec3 var2 = position().add(getDeltaMovement());
 		HitResult var3 = this.level().clip(new ClipContext(var15, var2, ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, this));
-		var15 = position();
-		var2 = position().add(getDeltaMovement());
 
 		if (var3 != null)
 		{

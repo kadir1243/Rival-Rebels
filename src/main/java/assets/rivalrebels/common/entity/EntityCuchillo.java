@@ -22,6 +22,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -38,16 +39,16 @@ public class EntityCuchillo extends Projectile {
     private boolean	inGround;
 	private int		ticksInGround;
 
-    public EntityCuchillo(EntityType<? extends EntityCuchillo> type, Level par1World) {
-        super(type, par1World);
+    public EntityCuchillo(EntityType<? extends EntityCuchillo> type, Level level) {
+        super(type, level);
     }
 
-	public EntityCuchillo(Level par1World) {
-		this(RREntities.CUCHILLO, par1World);
+	public EntityCuchillo(Level level) {
+		this(RREntities.CUCHILLO, level);
 	}
 
-	public EntityCuchillo(Level par1World, Player player, float speed) {
-		this(par1World);
+	public EntityCuchillo(Level level, Entity player, float speed) {
+		this(level);
         this.setOwner(player);
 		moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
         setPos(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
@@ -58,8 +59,8 @@ public class EntityCuchillo extends Projectile {
             (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)) * speed);
 	}
 
-    public EntityCuchillo(Level par1World, double x, double y,double z, double mx, double my, double mz) {
-		this(par1World);
+    public EntityCuchillo(Level level, double x, double y,double z, double mx, double my, double mz) {
+		this(level);
 		setPos(x,y,z);
         setDeltaMovement(mx, my, mz);
         setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));

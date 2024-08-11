@@ -37,20 +37,20 @@ public class EntityB2Frag extends EntityInanimate
 	float				offset		= 0;
     public int			health;
 
-    public EntityB2Frag(EntityType<? extends EntityB2Frag> type, Level world) {
-        super(type, world);
+    public EntityB2Frag(EntityType<? extends EntityB2Frag> type, Level level) {
+        super(type, level);
     }
 
-	public EntityB2Frag(Level par1World) {
-		this(RREntities.B2FRAG, par1World);
+	public EntityB2Frag(Level level) {
+		this(RREntities.B2FRAG, level);
 		health = 300;
 		setBoundingBox(new AABB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
 		noCulling = true;
 	}
 
-	public EntityB2Frag(Level par1World, Entity toBeGibbed, int Type)
+	public EntityB2Frag(Level level, Entity toBeGibbed, int Type)
 	{
-		this(par1World);
+		this(level);
 		health = 300;
 		setBoundingBox(new AABB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
 		noCulling = true;

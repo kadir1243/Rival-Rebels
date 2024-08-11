@@ -45,18 +45,16 @@ public class ItemCuchillo extends TieredItem
 
     @Override
     public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
-        if (!(user instanceof Player player)) return;
-
-        ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.knife);
-        if (player.hasInfiniteMaterials() || !itemStack.isEmpty())
+        ItemStack itemStack = ItemUtil.getItemStack(user, RRItems.knife);
+        if (user.hasInfiniteMaterials() || !itemStack.isEmpty())
 		{
-			float f = (getUseDuration(stack, player) - remainingUseTicks) / 20.0F;
+			float f = (getUseDuration(stack, user) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
 			if (f < 0.1D) return;
 			if (f > 1.0F) f = 1.0F;
-            stack.consume(1, player);
-            player.playSound(RRSounds.CUCHILLO_UNKNOWN3);
-			if (!world.isClientSide()) world.addFreshEntity(new EntityCuchillo(world, player, 0.5f + f));
+            stack.consume(1, user);
+            user.playSound(RRSounds.CUCHILLO_UNKNOWN3);
+			if (!world.isClientSide()) world.addFreshEntity(new EntityCuchillo(world, user, 0.5f + f));
 		}
 	}
 

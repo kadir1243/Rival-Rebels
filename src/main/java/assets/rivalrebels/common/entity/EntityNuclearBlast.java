@@ -35,17 +35,17 @@ public class EntityNuclearBlast extends EntityInanimate {
         super(type, world);
     }
 
-	public EntityNuclearBlast(Level par1World)
+	public EntityNuclearBlast(Level level)
 	{
-		this(RREntities.NUCLEAR_BLAST, par1World);
+		this(RREntities.NUCLEAR_BLAST, level);
 		noCulling = true;
 		tickCount = 0;
 		time = 0;
 	}
 
-	public EntityNuclearBlast(Level par1World, double x, double y, double z, int s, boolean hasTroll)
+	public EntityNuclearBlast(Level level, double x, double y, double z, int s, boolean hasTroll)
 	{
-		this(par1World);
+		this(level);
         setDeltaMovement(hasTroll ? 1 : 0, Strength = s, getDeltaMovement().z());
 		setPos(x, y, z);
 	}

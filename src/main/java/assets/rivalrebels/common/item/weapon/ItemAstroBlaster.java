@@ -21,7 +21,6 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.LivingEntity;
@@ -89,8 +88,8 @@ public class ItemAstroBlaster extends TieredItem {
 				}
 			}
 
-			if (isA) world.playLocalSound(user, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS, SoundSource.PLAYERS, 0.5f, 0.3f);
-			else world.playLocalSound(user, RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS2, SoundSource.PLAYERS, 0.4f, 1.7f);
+			if (isA) user.playSound(RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS, 0.5f, 0.3f);
+			else user.playSound(RRSounds.BLASTER_MESSAGE_FROM_OTHER_PLANETS2, 0.4f, 1.7f);
 
 			isA = !isA;
 			world.addFreshEntity(new EntityLaserBurst(world, user, stack.isEnchanted()));

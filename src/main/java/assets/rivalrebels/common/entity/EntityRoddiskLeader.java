@@ -19,13 +19,11 @@ import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Skeleton;
 import net.minecraft.world.entity.monster.Zombie;
@@ -46,24 +44,18 @@ import java.util.List;
 import java.util.Optional;
 
 public class EntityRoddiskLeader extends RoddiskBase {
-    public EntityRoddiskLeader(EntityType<? extends EntityRoddiskLeader> type, Level par1World)
+    public EntityRoddiskLeader(EntityType<? extends EntityRoddiskLeader> type, Level level)
     {
-        super(type, par1World);
+        super(type, level);
     }
 
-    public EntityRoddiskLeader(Level par1World)
+    public EntityRoddiskLeader(Level level)
 	{
-		this(RREntities.RODDISK_LEADER, par1World);
+		this(RREntities.RODDISK_LEADER, level);
 	}
 
-	public EntityRoddiskLeader(Level par1World, LivingEntity shooter, float speed) {
-		super(RREntities.RODDISK_LEADER, par1World, shooter);
-		this.moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
-        setPos(getX() - (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * 0.16F),
-            getY() - 0.1,
-            getZ() - (Mth.sin(this.getYRot() / 180.0F * Mth.PI) * 0.16F)
-        );
-        this.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0, speed * 1.5F, 1.0F);
+	public EntityRoddiskLeader(Level level, Entity shooter, float speed) {
+		super(RREntities.RODDISK_LEADER, level, shooter, speed);
 	}
 
     @Override

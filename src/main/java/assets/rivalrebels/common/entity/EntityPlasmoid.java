@@ -40,14 +40,14 @@ public class EntityPlasmoid extends Projectile {
         slide = level.random.nextInt(21) - 10;
     }
 
-	public EntityPlasmoid(Level par1World, double x, double y, double z) {
-		this(par1World);
+	public EntityPlasmoid(Level level, double x, double y, double z) {
+		this(level);
 		setPos(x, y, z);
 	}
 
-    public EntityPlasmoid(Level par1World, Entity thrower, float speed, boolean drop)
+    public EntityPlasmoid(Level level, Entity thrower, float speed, boolean drop)
 	{
-		this(par1World);
+		this(level);
         setNoGravity(!drop);
         speed *= (isNoGravity() ? 1 : 3);
         this.setOwner(thrower);

@@ -38,13 +38,13 @@ public class EntityNuke extends ThrowableProjectile {
         super(type, world);
     }
 
-	public EntityNuke(Level par1World) {
-		this(RREntities.NUKE, par1World);
+	public EntityNuke(Level level) {
+		this(RREntities.NUKE, level);
 	}
 
-	public EntityNuke(Level par1World, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
+	public EntityNuke(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
 	{
-		this(par1World);
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
 		this.setYRot(yRotO = yaw);
 		this.setXRot(xRotO = pitch);
@@ -55,9 +55,9 @@ public class EntityNuke extends ThrowableProjectile {
 			explode();
 		}
 	}
-	public EntityNuke(Level par1World, double x, double y,double z, double mx, double my, double mz)
+	public EntityNuke(Level level, double x, double y,double z, double mx, double my, double mz)
 	{
-		this(par1World);
+		this(level);
 		setPos(x,y,z);
 		aoc = 1;
 		setAnglesMotion(mx, my, mz);

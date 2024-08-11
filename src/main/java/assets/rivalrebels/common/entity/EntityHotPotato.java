@@ -43,14 +43,14 @@ public class EntityHotPotato extends ThrowableProjectile {
         super(type, world);
     }
 
-	public EntityHotPotato(Level par1World)
+	public EntityHotPotato(Level level)
 	{
-		this(RREntities.HOT_POTATO, par1World);
+		this(RREntities.HOT_POTATO, level);
 	}
 
-	public EntityHotPotato(Level par1World, int x, int y, int z, int count)
+	public EntityHotPotato(Level level, int x, int y, int z, int count)
 	{
-		this(par1World);
+		this(level);
 		setPos(x+0.5f, y+0.5f, z+0.5f);
 		round = count;
 		nextx = x;

@@ -85,6 +85,8 @@ public class EntityRhodes extends Entity {
     public static final EntityDataAccessor<Boolean> PLASMA = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Integer> HEALTH = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.FLOAT);
+    public static final EntityDataAccessor<Integer> ENERGY = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Integer> NUKE_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
 
     private int damageUntilWake = 100;
     private static final Set<Predicate<BlockState>> blocklist = new HashSet<>(Set.of(
@@ -163,11 +165,9 @@ public class EntityRhodes extends Entity {
 	public static final int ecjet = 10+recharge;
 	public static final int eclaser = 6+recharge;
 	public static final int ecshield = 8+recharge;
-	public static final int maxenergy = 800;
-	public int energy = maxenergy;
-	public int b2energy = 0;
-	public int nukecount = 8;
-	public int rocketcount = 5000;
+	public static final int MAX_ENERGY = 800;
+    public int b2energy = 0;
+    public int rocketcount = 5000;
 	public int flamecount = 10000;
 	public boolean rocket = false;
 	public boolean laser = false;
@@ -222,8 +222,8 @@ public class EntityRhodes extends Entity {
 			colorType = (byte) forcecolor;
 		}
 		RandomSource random = RandomSource.create(RRConfig.SERVER.getRhodesRandomSeed());
-		nukecount = RRConfig.SERVER.getRhodesNukes();
-		nukecount += nukecount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
+		setNukeCount(RRConfig.SERVER.getRhodesNukes());
+        setNukeCount((int) (getNukeCount() + getNukeCount() * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus()));
 		rocketcount += rocketcount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
 		flamecount += flamecount * random.nextFloat() * RRConfig.SERVER.getRhodesRandomAmmoBonus();
 	}
@@ -233,7 +233,7 @@ public class EntityRhodes extends Entity {
 		this(w);
         setScale(s);
 		if (getScale() >= 2.0) {
-			nukecount *= 0.25;
+            setNukeCount((int) (getNukeCount() * 0.25));
 			rocketcount *= 0.004;
 		}
         setHealth(getHealth() - 5000 + (int)(5000 * Math.min(getScale(),4)));
@@ -745,12 +745,12 @@ public class EntityRhodes extends Entity {
 			if (b2spirit && !freeze && b2energy == 0 && getScale() < 1.5f && getScale() > 0.5f)
 			{
 				freeze = true;
-				nukecount--;
+                setNukeCount(getNukeCount() - 1);
                 setHealth(getHealth() - 1000);
 				level().addFreshEntity(new EntityB2Spirit(this));
 			}
 			if (CommandRobot.rhodesHold) return;
-			if (energy < maxenergy) energy += recharge;
+			if (getEnergy() < MAX_ENERGY) setEnergy(getEnergy() + recharge);
 			if (!RRConfig.SERVER.isInfiniteAmmo())
 			{
 				rocket &= rocketcount > 0;
@@ -758,21 +758,21 @@ public class EntityRhodes extends Entity {
 			}
 			if (!RRConfig.SERVER.isInfiniteNukes())
 			{
-				bomb &= nukecount > 0;
+				bomb &= getNukeCount() > 0;
 			}
-			forcefield &= energy > ecshield;
-			laser &= energy > eclaser;
-			jet &= (energy+b2energy) > ecjet;
+			forcefield &= getEnergy() > ecshield;
+			laser &= getEnergy() > eclaser;
+			jet &= (getEnergy()+b2energy) > ecjet;
 			b2spirit &= b2energy > 0;
 
 			if (forcefield)
 			{
-				energy -= ecshield;
+                setEnergy(getEnergy() - ecshield);
 				if (tickCount%8==0) {
                     this.playSound(RRSounds.FORCE_FIELD, 10, 1);
                 }
 			}
-			if (laser) energy -= eclaser;
+			if (laser) setEnergy(getEnergy() - eclaser);
 			if (jet || b2spirit)
 			{
 				if (b2energy > 0)
@@ -788,7 +788,7 @@ public class EntityRhodes extends Entity {
 				}
 				else
 				{
-					energy -= ecjet;
+                    setEnergy(getEnergy() - ecjet);
 				}
 				flying = 3;
 			}
@@ -850,10 +850,10 @@ public class EntityRhodes extends Entity {
 				endy = hit.y;
 				endz = hit.z;
 			}
-			/*if (b2spirit && tickssincenuke >= 40 && nukecount > 0 && getHealth() > 2000)
+			/*if (b2spirit && tickssincenuke >= 40 && getNukeCount() > 0 && getHealth() > 2000)
  			{
 				tickssincenuke = 0;
-				nukecount--;
+				setNukeCount(getNukeCount() - 1);
 				setHealth(getHealth() - 1000);
 				world.spawnEntity(new EntityB2Spirit(world, endx, endy, endz, getX(), getY(), getZ(), null, false, false));
  			}*/
@@ -1057,7 +1057,7 @@ public class EntityRhodes extends Entity {
 						if (tickssincenuke >= 10)
 						{
 							tickssincenuke = 0;
-							nukecount--;
+                            setNukeCount(getNukeCount() - 1);
 							RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 							float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 							if (getScale() >= 3.0)
@@ -2148,10 +2148,10 @@ public class EntityRhodes extends Entity {
 		nbt.putInt("damageuntilwake", damageUntilWake);
 		nbt.putByte("color", colorType);
 		nbt.putInt("rocketcount", rocketcount);
-		nbt.putInt("energy", energy);
+		nbt.putInt("energy", getEnergy());
 		nbt.putInt("b2energy", b2energy);
 		nbt.putInt("flamecount", flamecount);
-		nbt.putInt("nukecount", nukecount);
+		nbt.putInt("nukecount", getNukeCount());
 		nbt.putInt("texfolder", itexfolder);
 		nbt.putFloat("scale", getScale());
 		if (itexfolder != -1) nbt.putString("texloc", itexloc);
@@ -2179,10 +2179,10 @@ public class EntityRhodes extends Entity {
 		damageUntilWake = nbt.getInt("damageuntilwake");
 		colorType = nbt.getByte("color");
 		rocketcount = nbt.getInt("rocketcount");
-		energy = nbt.getInt("energy");
+		setEnergy(nbt.getInt("energy"));
 		b2energy = nbt.getInt("b2energy");
 		flamecount = nbt.getInt("flamecount");
-		nukecount = nbt.getInt("nukecount");
+		setNukeCount(nbt.getInt("nukecount"));
 		itexfolder = nbt.getInt("texfolder");
 		setScale(nbt.getFloat("scale"));
 		if (itexfolder != -1) itexloc = nbt.getString("texloc");
@@ -2221,6 +2221,24 @@ public class EntityRhodes extends Entity {
         builder.define(PLASMA, false);
         builder.define(HEALTH, RRConfig.SERVER.getRhodesHealth());
         builder.define(SCALE, 1F);
+        builder.define(ENERGY, MAX_ENERGY);
+        builder.define(NUKE_COUNT, 8);
+    }
+
+    public int getEnergy() {
+        return entityData.get(ENERGY);
+    }
+
+    public void setEnergy(int energy) {
+        entityData.set(ENERGY, energy);
+    }
+
+    public int getNukeCount() {
+        return entityData.get(NUKE_COUNT);
+    }
+
+    public void setNukeCount(int nukeCount) {
+        entityData.set(NUKE_COUNT, nukeCount);
     }
 
     public boolean isFire() {

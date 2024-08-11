@@ -39,23 +39,23 @@ public class EntityHackB83 extends ThrowableProjectile
         super(entityType, world);
     }
 
-	public EntityHackB83(Level par1World)
+	public EntityHackB83(Level level)
 	{
-		this(RREntities.HACK_B83, par1World);
+		this(RREntities.HACK_B83, level);
 	}
 
-	public EntityHackB83(Level par1World, double x, double y, double z, float yaw, float pitch, boolean flystraight)
+	public EntityHackB83(Level level, double x, double y, double z, float yaw, float pitch, boolean flystraight)
 	{
-		this(par1World);
+		this(level);
 		straight = flystraight;
 		moveTo(x, y, z, yaw, pitch);
         setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (-Mth.sin(pitch / 180.0F * Mth.PI)));
+            (-Mth.sin(pitch / 180.0F * Mth.PI)),
+            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)));
     }
-	public EntityHackB83(Level par1World, double x, double y,double z, double mx, double my, double mz, boolean flystraight)
+	public EntityHackB83(Level level, double x, double y,double z, double mx, double my, double mz, boolean flystraight)
 	{
-		this(par1World);
+		this(level);
 		setPos(x,y,z);
 		setAnglesMotion(mx, my, mz);
 		straight = flystraight;

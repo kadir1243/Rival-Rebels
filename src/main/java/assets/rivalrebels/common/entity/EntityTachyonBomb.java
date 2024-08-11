@@ -40,18 +40,18 @@ public class EntityTachyonBomb extends Projectile
         super(type, world);
     }
 
-	public EntityTachyonBomb(Level par1World) {
-		this(RREntities.TACHYON_BOMB, par1World);
+	public EntityTachyonBomb(Level level) {
+		this(RREntities.TACHYON_BOMB, level);
 	}
 
-	public EntityTachyonBomb(Level par1World, double x, double y, double z, float yaw, float pitch, int charges, boolean troll) {
-		this(par1World);
+	public EntityTachyonBomb(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll) {
+		this(level);
 		moveTo(x, y, z, yaw, pitch);
 		this.setYRot(yRotO = yaw);
 		this.setXRot(xRotO = pitch);
 		aoc = charges;
 		hasTrollface = troll;
-		if (!RRConfig.SERVER.isNukedrop() && !par1World.isClientSide())
+		if (!RRConfig.SERVER.isNukedrop() && !level.isClientSide())
 		{
 			explode();
 		}
@@ -65,9 +65,9 @@ public class EntityTachyonBomb extends Projectile
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityTachyonBomb(Level par1World, double x, double y,double z, double mx, double my, double mz, int charges)
+	public EntityTachyonBomb(Level level, double x, double y,double z, double mx, double my, double mz, int charges)
 	{
-		this(par1World);
+		this(level);
 		setPos(x,y,z);
 		aoc = charges;
 		setAnglesMotion(mx, my, mz);
