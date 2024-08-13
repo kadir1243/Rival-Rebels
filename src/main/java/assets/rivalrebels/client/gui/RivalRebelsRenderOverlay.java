@@ -14,7 +14,6 @@ package assets.rivalrebels.client.gui;
 import assets.rivalrebels.RRClient;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.renderentity.RenderRhodes;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.item.RRItems;
@@ -138,13 +137,13 @@ public class RivalRebelsRenderOverlay {
             );
         }
 
-        if (rhodes.itexfolder > -1 && rhodes.itexfolder < 4) {
+        if (!rhodes.getTextureLocation().isBlank()) {
             RenderSystem.defaultBlendFunc();
             float s = 8;
             float wl = w*0.5f;
             float hl = h*0.05f;
             ((GuiGraphicsAccessor) graphics).blit(
-                RRIdentifiers.create("textures/" + RenderRhodes.texfolders[rhodes.itexfolder] + rhodes.itexloc + ".png"),
+                RRIdentifiers.create("textures/" + rhodes.getTextureLocation() + ".png"),
                     Mth.floor(wl-s),
                     Mth.floor(wl+s),
                     Mth.floor(hl-s),

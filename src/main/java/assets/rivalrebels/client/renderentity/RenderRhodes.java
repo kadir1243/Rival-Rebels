@@ -82,12 +82,6 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 
     public static final ResourceLocation texture = RRIdentifiers.create("textures/entity/rhodes.png");
     private static final ResourceLocation flame = RRIdentifiers.create("textures/entity/flame.png");
-    public static String[] texfolders = {
-			"blocks/",
-			"entity/",
-			"items/",
-			"flags/",
-	};
     private static final RenderType TEXTURE_RENDER_TYPE = RHODES_TEXTURE_RENDER_TYPE.apply(RenderRhodes.texture);
 
     public RenderRhodes(EntityRendererProvider.Context manager) {
@@ -190,11 +184,11 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 				matrices.mulPose(Axis.YP.rotationDegrees(entity.getbodyyaw(ptt)));
 
 				float leftlegheight = 7.26756f - 15
-						+ (Mth.cos((entity.getleftthighpitch(ptt)+11.99684962f)*0.01745329252f) * 7.331691240f)
-						+ (Mth.cos((entity.getleftthighpitch(ptt)+entity.getleftshinpitch(ptt)-12.2153067f)*0.01745329252f) * 8.521366426f);
+						+ (Mth.cos((entity.getleftthighpitch(ptt)+11.99684962f)*Mth.DEG_TO_RAD) * 7.331691240f)
+						+ (Mth.cos((entity.getleftthighpitch(ptt)+entity.getleftshinpitch(ptt)-12.2153067f)*Mth.DEG_TO_RAD) * 8.521366426f);
 				float rightlegheight = 7.26756f - 15
-						+ (Mth.cos((entity.getrightthighpitch(ptt)+11.99684962f)*0.01745329252f) * 7.331691240f)
-						+ (Mth.cos((entity.getrightthighpitch(ptt)+entity.getrightshinpitch(ptt)-12.2153067f)*0.01745329252f) * 8.521366426f);
+						+ (Mth.cos((entity.getrightthighpitch(ptt)+11.99684962f)*Mth.DEG_TO_RAD) * 7.331691240f)
+						+ (Mth.cos((entity.getrightthighpitch(ptt)+entity.getrightshinpitch(ptt)-12.2153067f)*Mth.DEG_TO_RAD) * 8.521366426f);
 
 				//TORSO
 				matrices.pushPose();
@@ -312,9 +306,9 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 				//TORSO
 				matrices.pushPose();
 					matrices.translate(0, Math.max(leftlegheight, rightlegheight), 0);
-					if (entity.itexfolder != -1) {
+					if (!entity.getTextureLocation().isBlank()) {
 						try {
-					    	ObjModels.renderSolid(ObjModels.flag, RRIdentifiers.create(texfolders[entity.itexfolder] + entity.itexloc + ".png"), matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+					    	ObjModels.renderSolid(ObjModels.flag, RRIdentifiers.create(entity.getTextureLocation() + ".png"), matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
 						} catch (Exception ignored) {
 						}
 					}

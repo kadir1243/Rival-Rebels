@@ -105,26 +105,8 @@ public class CommandRobot {
                 .then(Commands.argument("pathToTexture", StringArgumentType.string())
                     .executes(context -> {
                         String pathToTexture = StringArgumentType.getString(context, "pathToTexture");
-                        EntityRhodes.texfolder = -1;
-                        int i;
-                        if (pathToTexture.startsWith("blocks/")) i = 0;
-                        else if (pathToTexture.startsWith("entity/")) i = 1;
-                        else if (pathToTexture.startsWith("items/")) i = 2;
-                        else i = 3;
-                        if (!pathToTexture.contains("/") && pathToTexture.length() < 11) {
-                            EntityRhodes.texfolder = i;
-                            EntityRhodes.texloc = pathToTexture;
-                            context.getSource().sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes Flag is " + pathToTexture), true);
-                        } else {
-                            String toFirstSlash = pathToTexture.substring(pathToTexture.indexOf("/") + 1);
-                            if (!toFirstSlash.contains("/") && toFirstSlash.length() < 11) {
-                                EntityRhodes.texfolder = i;
-                                EntityRhodes.texloc = toFirstSlash;
-                                context.getSource().sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes Flag is " + pathToTexture), true);
-                            } else {
-                                context.getSource().sendFailure(Component.nullToEmpty("§cUsage: /rrrobot logo [flags|blocks|items|entity]/{texturename}"));
-                            }
-                        }
+                        EntityRhodes.texloc = pathToTexture;
+                        context.getSource().sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes Flag is " + pathToTexture), true);
                         return 0;
                     })
                 )

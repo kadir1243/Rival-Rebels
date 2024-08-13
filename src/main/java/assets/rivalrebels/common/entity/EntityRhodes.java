@@ -83,7 +83,7 @@ import java.util.function.Predicate;
 public class EntityRhodes extends Entity {
     public static final EntityDataAccessor<Boolean> FIRE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> PLASMA = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Integer> HEALTH = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<Float> HEALTH = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Integer> ENERGY = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> NUKE_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
@@ -91,6 +91,7 @@ public class EntityRhodes extends Entity {
     public static final EntityDataAccessor<Integer> ROCKET_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> FLAME_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Boolean> FORCE_FIELD = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
+    public static final EntityDataAccessor<String> TEXTURE_LOCATION = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.STRING);
 
     private int damageUntilWake = 100;
     private static final Set<Predicate<BlockState>> blocklist = new HashSet<>(Set.of(
@@ -182,10 +183,7 @@ public class EntityRhodes extends Entity {
 	public boolean freeze = false;
 	public int plasmacharge = 0;
 	public int tickssincenuke = 10;
-	public static String texloc;
-	public static int texfolder = -1;
-	public String itexloc;
-	public int itexfolder;
+	public static String texloc = "";
 
     public BlockPos wakePos = new BlockPos(-1, -1, -1);
 
@@ -202,11 +200,7 @@ public class EntityRhodes extends Entity {
 		//setMaxUpStep(0);
 		actionqueue.add(new RhodesAction(0, 1));
 		RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
-		itexfolder = texfolder;
-		if (texfolder != -1)
-		{
-			itexloc = texloc;
-		}
+        setTextureLocation(texloc);
 		if (forcecolor == CommonColors.WHITE) {
             int[] rhodesTeams = RRConfig.SERVER.getRhodesTeams();
             colorType = (byte) rhodesTeams[lastct];
@@ -258,14 +252,14 @@ public class EntityRhodes extends Entity {
         fallDistance = 0.0F;
 		if (getHealth() > 0) {
 			float headY = 0;
-			float syaw = Mth.sin(bodyyaw * 0.01745329252f);
-			float cyaw = Mth.cos(bodyyaw * 0.01745329252f);
+			float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
+			float cyaw = Mth.cos(bodyyaw * Mth.DEG_TO_RAD);
 			float leftlegheight = 7.26756f
-					+ (Mth.cos((leftthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-					+ (Mth.cos((leftthighpitch+leftshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
+					+ (Mth.cos((leftthighpitch+11.99684962f)*Mth.DEG_TO_RAD) * 7.331691240f)
+					+ (Mth.cos((leftthighpitch+leftshinpitch-12.2153067f)*Mth.DEG_TO_RAD) * 8.521366426f);
 			float rightlegheight = 7.26756f
-					+ (Mth.cos((rightthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-					+ (Mth.cos((rightthighpitch+rightshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
+					+ (Mth.cos((rightthighpitch+11.99684962f)*Mth.DEG_TO_RAD) * 7.331691240f)
+					+ (Mth.cos((rightthighpitch+rightshinpitch-12.2153067f)*Mth.DEG_TO_RAD) * 8.521366426f);
 			leftlegheight *= getScale();
 			rightlegheight *= getScale();
 			float bodyY = Math.max(leftlegheight, rightlegheight);
@@ -349,8 +343,8 @@ public class EntityRhodes extends Entity {
 				}
 				if (getHealth() == 0)
 				{
-					float syaw = Mth.sin(bodyyaw * 0.01745329252f);
-					float cyaw = Mth.cos(bodyyaw * 0.01745329252f);
+					float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
+					float cyaw = Mth.cos(bodyyaw * Mth.DEG_TO_RAD);
 					level().addFreshEntity(new EntityRhodesHead(level(), getX(), getY()+13*getScale(), getZ(), getScale(), colorType));
 					level().addFreshEntity(new EntityRhodesTorso(level(), getX(), getY()+7*getScale(), getZ(), getScale(), colorType));
 					level().addFreshEntity(new EntityRhodesLeftUpperArm(level(), getX()+cyaw*6.4*getScale(), getY()+7*getScale(), getZ()+syaw*6.4*getScale(),getScale(), colorType));
@@ -427,10 +421,10 @@ public class EntityRhodes extends Entity {
 
 	private void breakBlocks(float syaw, float cyaw, float leftlegheight, float rightlegheight, float bodyY)
 	{
-		float leftlegstride = (Mth.sin((leftthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-				+ (Mth.sin((leftthighpitch+leftshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
-		float rightlegstride = (Mth.sin((rightthighpitch+11.99684962f)*0.01745329252f) * 7.331691240f)
-				+ (Mth.sin((rightthighpitch+rightshinpitch-12.2153067f)*0.01745329252f) * 8.521366426f);
+		float leftlegstride = (Mth.sin((leftthighpitch+11.99684962f)*Mth.DEG_TO_RAD) * 7.331691240f)
+				+ (Mth.sin((leftthighpitch+leftshinpitch-12.2153067f)*Mth.DEG_TO_RAD) * 8.521366426f);
+		float rightlegstride = (Mth.sin((rightthighpitch+11.99684962f)*Mth.DEG_TO_RAD) * 7.331691240f)
+				+ (Mth.sin((rightthighpitch+rightshinpitch-12.2153067f)*Mth.DEG_TO_RAD) * 8.521366426f);
 		leftlegstride *= getScale();
 		rightlegstride *= getScale();
 
@@ -728,7 +722,7 @@ public class EntityRhodes extends Entity {
 	private int ac = 0;
 	private int counter = 0;
 	private Queue<RhodesAction> actionqueue = new LinkedList<>();
-	private int teamToRaid;
+	private RivalRebelsTeam teamToRaid;
 	private boolean raidedOmegaAlready = false;
 	private boolean raidedSigmaAlready = false;
 	private void doAITick(float syaw, float cyaw)
@@ -1160,10 +1154,10 @@ public class EntityRhodes extends Entity {
 			if (raidedOmegaAlready == raidedSigmaAlready) raidedSigmaAlready = raidedOmegaAlready = false;
 			if (endangered && RivalRebels.round.isStarted())
 			{
-				if (teamToRaid == 0)
+				if (teamToRaid == RivalRebelsTeam.NONE)
 				{
-					if (raidedOmegaAlready && RivalRebels.round.sigmaData.health > 0) teamToRaid = 2;
-					else if (raidedSigmaAlready && RivalRebels.round.omegaData.health > 0) teamToRaid = 1;
+					if (raidedOmegaAlready && RivalRebels.round.sigmaData.health > 0) teamToRaid = RivalRebelsTeam.SIGMA;
+					else if (raidedSigmaAlready && RivalRebels.round.omegaData.health > 0) teamToRaid = RivalRebelsTeam.OMEGA;
 					else if (RivalRebels.round.omegaData.health > 0 && RivalRebels.round.sigmaData.health > 0)
 					{
                         int o = 0;
@@ -1174,26 +1168,25 @@ public class EntityRhodes extends Entity {
                         }
 						if (o>s)
 						{
-							teamToRaid = 1;
+							teamToRaid = RivalRebelsTeam.OMEGA;
 							raidedOmegaAlready = true;
 						}
 						if (o<s)
 						{
-							teamToRaid = 2;
+							teamToRaid = RivalRebelsTeam.SIGMA;
 							raidedSigmaAlready = true;
 						}
 						if (o==s)
 						{
-							teamToRaid = random.nextBoolean()?2:1;
-							if (teamToRaid == 1) raidedOmegaAlready = true;
+							teamToRaid = random.nextBoolean()?RivalRebelsTeam.SIGMA:RivalRebelsTeam.OMEGA;
+							if (teamToRaid == RivalRebelsTeam.OMEGA) raidedOmegaAlready = true;
 							else raidedSigmaAlready = true;
 						}
 					}
 				}
-				if (teamToRaid != 0)
-				{
-					float dx = (float) ((teamToRaid==1?RivalRebels.round.omegaData.objPos().getX():RivalRebels.round.sigmaData.objPos().getX())-getX());
-					float dz = (float) ((teamToRaid==1?RivalRebels.round.omegaData.objPos().getZ():RivalRebels.round.sigmaData.objPos().getZ())-getZ());
+				if (teamToRaid != RivalRebelsTeam.NONE) {
+					float dx = (float) ((teamToRaid==RivalRebelsTeam.OMEGA?RivalRebels.round.omegaData.objPos().getX():RivalRebels.round.sigmaData.objPos().getX())-getX());
+					float dz = (float) ((teamToRaid==RivalRebelsTeam.OMEGA?RivalRebels.round.omegaData.objPos().getZ():RivalRebels.round.sigmaData.objPos().getZ())-getZ());
 					float angle = ((atan2(dx, dz) - bodyyaw)%360);
 					if (angle > 1f)
 					{
@@ -1307,7 +1300,7 @@ public class EntityRhodes extends Entity {
 			leftshinpitch   = approach(leftshinpitch,  60);
 			break;
 		case 10:
-			if (teamToRaid == 1 && RivalRebels.round.omegaData.health > 0 && level().getBlockState(RivalRebels.round.omegaData.objPos()).is(RRBlocks.omegaobj) || teamToRaid != 1 && (teamToRaid == 2 && RivalRebels.round.sigmaData.health > 0 && level().getBlockState(RivalRebels.round.sigmaData.objPos()).is(RRBlocks.sigmaobj)))
+			if (teamToRaid == RivalRebelsTeam.OMEGA && RivalRebels.round.omegaData.health > 0 && level().getBlockState(RivalRebels.round.omegaData.objPos()).is(RRBlocks.omegaobj) || teamToRaid != RivalRebelsTeam.OMEGA && (teamToRaid == RivalRebelsTeam.SIGMA && RivalRebels.round.sigmaData.health > 0 && level().getBlockState(RivalRebels.round.sigmaData.objPos()).is(RRBlocks.sigmaobj)))
 			{
 				rightthighpitch = approach(rightthighpitch,0);
 				leftthighpitch  = approach(leftthighpitch, 0);
@@ -1319,11 +1312,11 @@ public class EntityRhodes extends Entity {
 				leftarmyaw   = approach(leftarmyaw,    0);
 				headpitch   = approach(headpitch, 0);
 				laserOn = 0;
-				if (teamToRaid == 1)
+				if (teamToRaid == RivalRebelsTeam.OMEGA)
 				{
                     setHealth(getHealth() + RivalRebels.round.takeOmegaHealth(Math.min(50, RRConfig.SERVER.getRhodesHealth()-getHealth())));
 				}
-				if (teamToRaid == 2)
+				if (teamToRaid == RivalRebelsTeam.SIGMA)
 				{
                     setHealth(getHealth() + RivalRebels.round.takeSigmaHealth(Math.min(50, RRConfig.SERVER.getRhodesHealth()-getHealth())));
 				}
@@ -1331,7 +1324,7 @@ public class EntityRhodes extends Entity {
 				else
 				{
 					endangered = false;
-					teamToRaid = 0;
+					teamToRaid = RivalRebelsTeam.NONE;
 					actionqueue.add(new RhodesAction(2, 1));
 				}
 			} else {
@@ -1347,11 +1340,11 @@ public class EntityRhodes extends Entity {
 		counter--;
 	}
 
-    public int getHealth() {
+    public float getHealth() {
         return entityData.get(HEALTH);
     }
 
-    public void setHealth(int health) {
+    public void setHealth(float health) {
         this.entityData.set(HEALTH, health);
     }
 
@@ -2139,7 +2132,7 @@ public class EntityRhodes extends Entity {
 		nbt.putInt("ac", ac);
 		nbt.putInt("counter", counter);
 		nbt.putInt("walkstate", walkstate);
-		nbt.putInt("health", getHealth());
+		nbt.putFloat("health", getHealth());
 		nbt.putInt("damageuntilwake", damageUntilWake);
 		nbt.putByte("color", colorType);
 		nbt.putInt("rocketcount", getRocketCount());
@@ -2147,9 +2140,8 @@ public class EntityRhodes extends Entity {
 		nbt.putInt("b2energy", getB2Energy());
 		nbt.putInt("flamecount", getFlameCount());
 		nbt.putInt("nukecount", getNukeCount());
-		nbt.putInt("texfolder", itexfolder);
 		nbt.putFloat("scale", getScale());
-		if (itexfolder != -1) nbt.putString("texloc", itexloc);
+        nbt.putString("texloc", getTextureLocation());
 	}
 
 	@Override
@@ -2170,7 +2162,7 @@ public class EntityRhodes extends Entity {
 		ac = nbt.getInt("ac");
 		counter = nbt.getInt("counter");
 		walkstate = nbt.getInt("walkstate");
-		setHealth(nbt.getInt("health"));
+		setHealth(nbt.getFloat("health"));
 		damageUntilWake = nbt.getInt("damageuntilwake");
 		colorType = nbt.getByte("color");
 		setRocketCount(nbt.getInt("rocketcount"));
@@ -2178,9 +2170,8 @@ public class EntityRhodes extends Entity {
 		setB2Energy(nbt.getInt("b2energy"));
 		setFlameCount(nbt.getInt("flamecount"));
 		setNukeCount(nbt.getInt("nukecount"));
-		itexfolder = nbt.getInt("texfolder");
 		setScale(nbt.getFloat("scale"));
-		if (itexfolder != -1) itexloc = nbt.getString("texloc");
+        setTextureLocation(nbt.getString("texloc"));
 	}
 
 	@Override
@@ -2209,7 +2200,7 @@ public class EntityRhodes extends Entity {
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(FIRE, false);
         builder.define(PLASMA, false);
-        builder.define(HEALTH, RRConfig.SERVER.getRhodesHealth());
+        builder.define(HEALTH, (float)RRConfig.SERVER.getRhodesHealth());
         builder.define(SCALE, 1F);
         builder.define(ENERGY, MAX_ENERGY);
         builder.define(NUKE_COUNT, 8);
@@ -2217,6 +2208,15 @@ public class EntityRhodes extends Entity {
         builder.define(ROCKET_COUNT, 5000);
         builder.define(FLAME_COUNT, 10000);
         builder.define(FORCE_FIELD, false);
+        builder.define(TEXTURE_LOCATION, "");
+    }
+
+    public String getTextureLocation() {
+        return entityData.get(TEXTURE_LOCATION);
+    }
+
+    public void setTextureLocation(String textureLocation) {
+        entityData.set(TEXTURE_LOCATION, textureLocation);
     }
 
     public boolean isForceFieldEnabled() {

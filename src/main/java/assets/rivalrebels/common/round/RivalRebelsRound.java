@@ -632,37 +632,29 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         sendUpdatePacket();
 	}
 
-	public int takeOmegaHealth(int amnt)
-	{
-		if (amnt > omegaData.health())
-		{
-			int tmp = omegaData.health();
+    public float takeOmegaHealth(float amnt) {
+        if (amnt > omegaData.health()) {
+            int tmp = omegaData.health();
             omegaData.health = 0;
-			winSigma();
-			return tmp;
-		}
-		else
-		{
-            omegaData.health-=amnt;
-			return amnt;
-		}
-	}
+            winSigma();
+            return tmp;
+        } else {
+            omegaData.health -= amnt;
+            return amnt;
+        }
+    }
 
-	public int takeSigmaHealth(int amnt)
-	{
-		if (amnt > sigmaData.health())
-		{
-			int tmp = sigmaData.health();
+    public float takeSigmaHealth(float amnt) {
+        if (amnt > sigmaData.health()) {
+            int tmp = sigmaData.health();
             sigmaData.health = 0;
-			winOmega();
-			return tmp;
-		}
-		else
-		{
-            sigmaData.health-=amnt;
-			return amnt;
-		}
-	}
+            winOmega();
+            return tmp;
+        } else {
+            sigmaData.health -= amnt;
+            return amnt;
+        }
+    }
 
 	public int getOmegaWins()
 	{

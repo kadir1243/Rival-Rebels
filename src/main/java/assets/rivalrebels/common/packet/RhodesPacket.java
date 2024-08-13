@@ -42,8 +42,6 @@ public class RhodesPacket implements CustomPacketPayload {
     int riderid;
     int pass1id;
     int pass2id;
-    String texloc;
-    int texfolder;
 
     public RhodesPacket() {
     }
@@ -66,8 +64,6 @@ public class RhodesPacket implements CustomPacketPayload {
         riderid = er.rider != null ? er.rider.getId() : -1;
         pass1id = er.passenger1 != null ? er.passenger1.getId() : -1;
         pass2id = er.passenger2 != null ? er.passenger2.getId() : -1;
-        texloc = er.itexloc;
-        texfolder = er.itexfolder;
     }
 
     public static RhodesPacket fromBytes(FriendlyByteBuf buf) {
@@ -89,8 +85,6 @@ public class RhodesPacket implements CustomPacketPayload {
         packet.riderid = buf.readInt();
         packet.pass1id = buf.readInt();
         packet.pass2id = buf.readInt();
-        packet.texfolder = buf.readByte();
-        packet.texloc = buf.readUtf();
 
         return packet;
     }
@@ -132,8 +126,6 @@ public class RhodesPacket implements CustomPacketPayload {
             er.laserOn = m.laserOn;
             er.colorType = m.colorType;
             er.ticksSinceLastPacket = 0;
-            er.itexloc = m.texloc;
-            er.itexfolder = m.texfolder;
             if (er.getHealth() <= 0 && er.rider != null) {
                 er.rider.setPos(er.getX() + 5, er.getY() - 12, er.getZ());
                 er.rider.getAbilities().invulnerable = false;
@@ -169,7 +161,5 @@ public class RhodesPacket implements CustomPacketPayload {
         buf.writeInt(riderid);
         buf.writeInt(pass1id);
         buf.writeInt(pass2id);
-        buf.writeInt(texfolder);
-        buf.writeUtf(texloc);
     }
 }
