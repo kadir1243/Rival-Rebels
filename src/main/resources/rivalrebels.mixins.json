@@ -3,7 +3,8 @@
   "package": "assets.rivalrebels.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "BlockEntityAccessor"
+    "BlockEntityAccessor",
+    "HashCacheMixin"
   ],
   "injectors": {
     "defaultRequire": 1
