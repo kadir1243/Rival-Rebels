@@ -17,6 +17,8 @@ import assets.rivalrebels.common.core.BlackList;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import java.util.List;
 import java.util.Optional;
+
+import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -26,6 +28,9 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
@@ -125,7 +130,7 @@ public class EntityRaytrace extends Projectile {
                 if (!level().isClientSide()) level().addFreshEntity(new EntityLightningLink(level(), this, Math.sqrt(distanceToSqr(MOP.getLocation().x, MOP.getLocation().y, MOP.getLocation().z))));
 				// world.spawnEntity(new EntityNuclearBlast(world, MOP.blockX, pos.getY(), pos.getZ(), 5, false));
 				BlockState BlockHit = level().getBlockState(pos);
-				float r = level().random.nextFloat();
+				float r = random.nextFloat();
 				if (BlockHit.is(RRBlocks.camo1) || BlockHit.is(RRBlocks.camo2) || BlockHit.is(RRBlocks.camo3))
 				{
 					if (r * 10 <= chance)
@@ -133,7 +138,7 @@ public class EntityRaytrace extends Projectile {
 						if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						for (int i = 0; i < 4; i++)
 						{
-							level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (level().random.nextFloat() - 0.5F) * 0.1, level().random.nextFloat() * 0.05, (level().random.nextFloat() - 0.5F) * 0.1);
+							level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (random.nextFloat() - 0.5F) * 0.1, random.nextFloat() * 0.05, (random.nextFloat() - 0.5F) * 0.1);
 						}
 					}
 				}
@@ -144,7 +149,7 @@ public class EntityRaytrace extends Projectile {
 						if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						for (int i = 0; i < 4; i++)
 						{
-							level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (level().random.nextFloat() - 0.5F) * 0.1, level().random.nextFloat() * 0.05, (level().random.nextFloat() - 0.5F) * 0.1);
+							level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (random.nextFloat() - 0.5F) * 0.1, random.nextFloat() * 0.05, (random.nextFloat() - 0.5F) * 0.1);
 						}
 					}
 				}
@@ -153,7 +158,7 @@ public class EntityRaytrace extends Projectile {
 					if (!level().isClientSide()) level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					for (int i = 0; i < 4; i++)
 					{
-						level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (level().random.nextFloat() - 0.5F) * 0.1, level().random.nextFloat() * 0.05, (level().random.nextFloat() - 0.5F) * 0.1);
+						level().addParticle(ParticleTypes.EXPLOSION, pos.getX(), pos.getY() - 1 + i * 0.5, pos.getZ(), (random.nextFloat() - 0.5F) * 0.1, random.nextFloat() * 0.05, (random.nextFloat() - 0.5F) * 0.1);
 					}
 				}
 			}
@@ -161,20 +166,16 @@ public class EntityRaytrace extends Projectile {
 			{
                 Entity entityHit = ((EntityHitResult) MOP).getEntity();
                 if (!level().isClientSide()) level().addFreshEntity(new EntityLightningLink(level(), this, distanceTo(entityHit)));
-				if (entityHit instanceof Player entityPlayerHit)
-				{
-                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
+				if (entityHit instanceof Player entityPlayerHit) {
+                    EquipmentSlot slot = ItemUtil.damageRandomArmor(entityPlayerHit, 14, random);
 					int i = slot.getIndex();
-					if (!entityPlayerHit.getItemBySlot(slot).isEmpty())
-					{
-						entityPlayerHit.getItemBySlot(slot).hurtAndBreak(14, entityPlayerHit, slot);
+                    ItemStack stack = entityPlayerHit.getItemBySlot(slot);
+                    if (stack.isEmpty() || (stack.getItem() instanceof ArmorItem armor && armor.getMaterial() == ArmorMaterials.IRON)) {
+                        entityPlayerHit.hurt(RivalRebelsDamageSource.electricity(level()), (RRConfig.SERVER.getTeslaDecay() / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
+                    } else {
 						entityPlayerHit.hurt(RivalRebelsDamageSource.electricity(level()), 1);
 					}
-					else
-					{
-						entityPlayerHit.hurt(RivalRebelsDamageSource.electricity(level()), (RRConfig.SERVER.getTeslaDecay() / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
-					}
-				}
+                }
 				else if (entityHit instanceof EntityB2Spirit)
 				{
 					entityHit.hurt(RivalRebelsDamageSource.electricity(level()), (RRConfig.SERVER.getTeslaDecay() / 1.5f) / ((int) entityHit.distanceTo(this) + 1));

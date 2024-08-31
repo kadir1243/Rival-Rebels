@@ -28,8 +28,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jetbrains.annotations.Nullable;
 
-public class BlockJump extends Block implements EntityBlock
-{
+public class BlockJump extends Block implements EntityBlock {
 	public BlockJump(Properties settings)
 	{
 		super(settings);

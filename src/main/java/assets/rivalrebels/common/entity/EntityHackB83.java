@@ -79,9 +79,9 @@ public class EntityHackB83 extends ThrowableProjectile
 		++this.ticksInAir;
 		if (!straight && !level().isClientSide())
 		{
-			mmPos = mmPos.add(level().random.nextGaussian()*0.4,
-                level().random.nextGaussian()*0.4,
-                level().random.nextGaussian()*0.4);
+			mmPos = mmPos.add(random.nextGaussian()*0.4,
+                random.nextGaussian()*0.4,
+                random.nextGaussian()*0.4);
             mmPos = mmPos.normalize();
 			if (ticksInAir > 35) {
 				setDeltaMovement(getDeltaMovement().add(mmPos.scale(0.2)));

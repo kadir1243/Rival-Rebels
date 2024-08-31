@@ -12,8 +12,8 @@
 package assets.rivalrebels.common.container;
 
 import assets.rivalrebels.common.core.RivalRebelsGuiHandler;
-import assets.rivalrebels.common.item.ItemCore;
 import assets.rivalrebels.common.item.ItemRod;
+import assets.rivalrebels.common.item.components.RRComponents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -40,7 +40,7 @@ public class ContainerReactor extends AbstractContainerMenu
         super(RivalRebelsGuiHandler.REACTOR_SCREEN_HANDLER_TYPE, syncId);
         this.reactor = reactor;
 		fuel = new SlotRR(reactor, 0, 58, 139, 1, ItemRod.class);
-		core = new SlotRR(reactor, 1, 103, 139, 1, ItemCore.class);
+		core = new SlotRR(reactor, 1, 103, 139, 1, RRComponents.CORE_TIME_MULTIPLIER);
         this.containerData = containerData;
         addSlot(fuel);
 		addSlot(core);

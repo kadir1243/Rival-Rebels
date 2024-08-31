@@ -25,7 +25,6 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 @Environment(EnvType.CLIENT)
@@ -79,12 +78,12 @@ public class GuiFlameThrower extends Screen {
         if (RRClient.USE_KEY.matches(keyCode, scanCode)) {
             onClose();
             minecraft.setWindowActive(true);
-            ItemStack itemstack = minecraft.player.getItemInHand(InteractionHand.MAIN_HAND);
-            if (itemstack.getItem() != RRItems.flamethrower) {
-                itemstack = minecraft.player.getItemInHand(InteractionHand.OFF_HAND);
+            for (ItemStack stack : minecraft.player.getHandSlots()) {
+                if (stack.isEmpty() || !stack.is(RRItems.flamethrower)) continue;
+                stack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(knob.getDegree()));
+                ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
+                break;
             }
-            itemstack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(knob.getDegree(), itemstack.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).isReady()));
-            ClientPlayNetworking.send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
     }

@@ -183,9 +183,6 @@ public class ModelObjective
 	}
 
 	private static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x, float y, int light, int overlay) {
-		RenderHelper.addVertice(pose, buffer, v1, new TextureVertice(x + 0.078125f, y + 0.15625f), light, overlay);
-		RenderHelper.addVertice(pose, buffer, v2, new TextureVertice(x + 0.078125f, y - 0.15625f), light, overlay);
-		RenderHelper.addVertice(pose, buffer, v3, new TextureVertice(x - 0.078125f, y - 0.15625f), light, overlay);
-		RenderHelper.addVertice(pose, buffer, v4, new TextureVertice(x - 0.078125f, y + 0.15625f), light, overlay);
-	}
+        RenderHelper.addFace(pose, buffer, v1, v2, v3, v4, x + 0.078125f, x - 0.15625f, y - 0.15625f, y + 0.15625f, light, overlay);
+    }
 }

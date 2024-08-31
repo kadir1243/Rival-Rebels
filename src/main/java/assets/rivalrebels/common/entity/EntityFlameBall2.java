@@ -14,16 +14,15 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import assets.rivalrebels.common.util.ItemUtil;
 import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -112,14 +111,8 @@ public class EntityFlameBall2 extends FlameBallProjectile {
                 Entity entityHit = ((EntityHitResult) hitResult).getEntity();
                 entityHit.igniteForSeconds(3);
 				entityHit.hurt(RivalRebelsDamageSource.cooked(level()), 12);
-				if (entityHit instanceof Player player)
-				{
-                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-                    ItemStack equippedStack = player.getItemBySlot(slot);
-                    if (!equippedStack.isEmpty() && !level().isClientSide())
-					{
-						equippedStack.hurtAndBreak(8, player, slot);
-					}
+				if (entityHit instanceof Player player) {
+                    ItemUtil.damageRandomArmor(player, 8, random);
 				}
 			}
 		}
@@ -144,18 +137,18 @@ public class EntityFlameBall2 extends FlameBallProjectile {
             BlockState state = level().getBlockState(blockPosition());
             Block id = state.getBlock();
 			if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
-			else if (state.is(BlockTags.SAND) && level().random.nextInt(60) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.GLASS.defaultBlockState());
-			else if (state.is(ModBlockTags.GLASS_BLOCKS) && level().random.nextInt(120) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
-			else if (state.is(Blocks.OBSIDIAN) && level().random.nextInt(90) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if ((state.is(BlockTags.BASE_STONE_OVERWORLD) || state.is(Blocks.COBBLESTONE)) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(BlockTags.IRON_ORES) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(BlockTags.COAL_ORES) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(BlockTags.GOLD_ORES) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(BlockTags.LAPIS_ORES) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(Blocks.GRAVEL) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(ModBlockTags.SANDSTONE_BLOCKS) && level().random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(Blocks.IRON_BLOCK) && level().random.nextInt(50) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(Blocks.BEDROCK) && level().random.nextInt(500) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
+			else if (state.is(BlockTags.SAND) && random.nextInt(60) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.GLASS.defaultBlockState());
+			else if (state.is(ModBlockTags.GLASS_BLOCKS) && random.nextInt(120) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
+			else if (state.is(Blocks.OBSIDIAN) && random.nextInt(90) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if ((state.is(BlockTags.BASE_STONE_OVERWORLD) || state.is(Blocks.COBBLESTONE)) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(BlockTags.IRON_ORES) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(BlockTags.COAL_ORES) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(BlockTags.GOLD_ORES) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(BlockTags.LAPIS_ORES) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(Blocks.GRAVEL) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(ModBlockTags.SANDSTONE_BLOCKS) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(Blocks.IRON_BLOCK) && random.nextInt(50) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(Blocks.BEDROCK) && random.nextInt(500) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());
 			else if (state.getFluidState().is(FluidTags.LAVA)) level().setBlockAndUpdate(blockPosition(), Blocks.AIR.defaultBlockState());
 			else if (state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
 			else if (state.is(BlockTags.DIRT)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
@@ -169,9 +162,9 @@ public class EntityFlameBall2 extends FlameBallProjectile {
                 level().removeBlock(blockPosition(), false);
 			}
 			else if (state.is(RRBlocks.conduit)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
-			else if (state.is(RRBlocks.reactive) && level().random.nextInt(20) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if ((state.is(RRBlocks.camo1) || state.is(RRBlocks.camo2) || state.is(RRBlocks.camo3)) && level().random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), RRBlocks.steel.defaultBlockState());
-			else if (state.is(RRBlocks.steel) && level().random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
+			else if (state.is(RRBlocks.reactive) && random.nextInt(20) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if ((state.is(RRBlocks.camo1) || state.is(RRBlocks.camo2) || state.is(RRBlocks.camo3)) && random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), RRBlocks.steel.defaultBlockState());
+			else if (state.is(RRBlocks.steel) && random.nextInt(40) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());
 		}
 	}
 }

@@ -13,12 +13,12 @@ package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
@@ -99,10 +99,7 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
                 entity.igniteForSeconds(3);
 				entity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
 				if (entity instanceof Player player) {
-                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide()) {
-						player.getItemBySlot(slot).hurtAndBreak(8, player, slot);
-					}
+                    ItemUtil.damageRandomArmor(player, 8, random);
 				}
 			}
 		}

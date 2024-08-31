@@ -11,8 +11,6 @@
  *******************************************************************************/
 package assets.rivalrebels.client.renderhelper;
 
-import assets.rivalrebels.RRIdentifiers;
-import assets.rivalrebels.client.objfileloader.WavefrontObject;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -24,12 +22,7 @@ import org.joml.Vector3f;
 
 @Environment(EnvType.CLIENT)
 public class RenderHelper {
-    public static WavefrontObject getModel(String modelName) {
-        return WavefrontObject.loadModel(RRIdentifiers.create("models/" + modelName + ".obj"));
-    }
-
-    public static void renderBox(PoseStack pose, VertexConsumer buffer, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light)
-	{
+    public static void renderBox(PoseStack pose, VertexConsumer buffer, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light) {
 		pose.mulPose(Axis.YP.rotationDegrees(90));
 		texLocX /= texXsize;
 		texLocY /= texYsize;

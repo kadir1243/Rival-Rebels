@@ -28,20 +28,18 @@ import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityLaptop extends BlockEntity implements Container, Tickable, MenuProvider
-{
+public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickable {
     public RivalRebelsTeam	rrteam			= null;
-	private final NonNullList<ItemStack> chestContents = NonNullList.withSize(14, ItemStack.EMPTY);
+	private NonNullList<ItemStack> chestContents = NonNullList.withSize(14, ItemStack.EMPTY);
 
 	public double			slide			= 0;
 	private float test = Mth.PI;
@@ -56,62 +54,6 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 	public int getContainerSize()
 	{
 		return 14;
-	}
-
-    @Override
-    public boolean isEmpty() {
-        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
-    }
-
-    @Override
-	public ItemStack getItem(int index)
-	{
-		return this.chestContents.get(index);
-	}
-
-	@Override
-	public ItemStack removeItem(int index, int count)
-	{
-		if (!this.getItem(index).isEmpty())
-		{
-			ItemStack var3;
-
-			if (this.getItem(index).getCount() <= count)
-			{
-				var3 = this.getItem(index);
-				this.setItem(index, ItemStack.EMPTY);
-            }
-			else
-			{
-				var3 = this.getItem(index).split(count);
-
-				if (this.getItem(index).isEmpty())
-				{
-					this.setItem(index, ItemStack.EMPTY);
-				}
-
-            }
-            return var3;
-        }
-		return ItemStack.EMPTY;
-	}
-
-    @Override
-    public ItemStack removeItemNoUpdate(int index) {
-		if (!this.getItem(index).isEmpty()) {
-			ItemStack var2 = this.getItem(index);
-			this.setItem(index, ItemStack.EMPTY);
-			return var2;
-		}
-		return ItemStack.EMPTY;
-	}
-
-	@Override
-	public void setItem(int index, ItemStack stack)
-	{
-		this.chestContents.set(index, stack);
-
-        stack.limitSize(this.getMaxStackSize(stack));
 	}
 
     @Override
@@ -225,13 +167,18 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 	}
 
     @Override
-    public void clearContent() {
-        this.chestContents.clear();
+    protected Component getDefaultName() {
+        return Component.literal("Laptop");
     }
 
     @Override
-    public Component getDisplayName() {
-        return Component.nullToEmpty("Laptop");
+    protected NonNullList<ItemStack> getItems() {
+        return this.chestContents;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.chestContents = items;
     }
 
     public boolean isReady()
@@ -243,10 +190,9 @@ public class TileEntityLaptop extends BlockEntity implements Container, Tickable
 				&& !getItem(10).isEmpty();
 	}
 
-    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerLaptop(syncId, inv, this, propertyDelegate);
+    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+        return new ContainerLaptop(containerId, inventory, this, propertyDelegate);
     }
 
     private final ContainerData propertyDelegate = new ContainerData() {

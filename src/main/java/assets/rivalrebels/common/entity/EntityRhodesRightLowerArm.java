@@ -21,7 +21,7 @@ public class EntityRhodesRightLowerArm extends EntityRhodesPiece
 		super(type, w);
 	}
 
-	public EntityRhodesRightLowerArm(Level w, double x, double y, double z, float scale, int color)
+	public EntityRhodesRightLowerArm(Level w, double x, double y, double z, float scale, RhodesType color)
 	{
 		super(RREntities.RHODES_RIGHT_LOWER_ARM, w, x, y, z, scale, color);
 		health = 600;

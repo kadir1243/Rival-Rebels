@@ -54,24 +54,15 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable {
             double var13 = Math.sqrt(e.distanceToSqr(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ())) / fsize;
 
             if (var13 <= 1.0D) {
-                double var15 = e.getX() - getBlockPos().getX();
-                double var17 = e.getEyeY() - getBlockPos().getY();
-                double var19 = e.getZ() - getBlockPos().getZ();
-                double var33 = Math.sqrt(var15 * var15 + var17 * var17 + var19 * var19);
+                Vec3 vec3 = e.getEyePosition().subtract(Vec3.atLowerCornerOf(getBlockPos()));
 
-                if (var33 != 0.0D) {
-                    var15 /= var33;
-                    var17 /= var33;
-                    var19 /= var33;
+                if (vec3.length() != 0.0D) {
+                    vec3 = vec3.normalize();
                     double var32 = net.minecraft.world.level.Explosion.getSeenPercent(Vec3.atLowerCornerOf(getBlockPos()), e);
                     double var34 = (1.0D - var13) * var32;
                     if (!(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityRhodes)) {
                         e.hurt(RivalRebelsDamageSource.plasmaExplosion(level), (int) ((var34 * var34 + var34) / 16.0D * fsize + 1.0D));
-                        e.push(
-                            var15 * var34 * 4,
-                            var17 * var34 * 4,
-                            var19 * var34 * 4
-                        );
+                        e.push(vec3.scale(var34 * 4));
                     }
                 }
             }

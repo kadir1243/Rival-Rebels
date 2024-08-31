@@ -37,8 +37,6 @@ public class RhodesPacket implements CustomPacketPayload {
     float rightthighpitch = 0;
     float leftshinpitch = 0;
     float rightshinpitch = 0;
-    byte laserOn;
-    byte colorType;
     int riderid;
     int pass1id;
     int pass2id;
@@ -59,8 +57,6 @@ public class RhodesPacket implements CustomPacketPayload {
         rightthighpitch = er.rightthighpitch;
         leftshinpitch = er.leftshinpitch;
         rightshinpitch = er.rightshinpitch;
-        laserOn = er.laserOn;
-        colorType = er.colorType;
         riderid = er.rider != null ? er.rider.getId() : -1;
         pass1id = er.passenger1 != null ? er.passenger1.getId() : -1;
         pass2id = er.passenger2 != null ? er.passenger2.getId() : -1;
@@ -80,8 +76,6 @@ public class RhodesPacket implements CustomPacketPayload {
         packet.rightthighpitch = buf.readFloat();
         packet.leftshinpitch = buf.readFloat();
         packet.rightshinpitch = buf.readFloat();
-        packet.laserOn = buf.readByte();
-        packet.colorType = buf.readByte();
         packet.riderid = buf.readInt();
         packet.pass1id = buf.readInt();
         packet.pass2id = buf.readInt();
@@ -123,8 +117,6 @@ public class RhodesPacket implements CustomPacketPayload {
             er.rightthighpitch = m.rightthighpitch;
             er.leftshinpitch = m.leftshinpitch;
             er.rightshinpitch = m.rightshinpitch;
-            er.laserOn = m.laserOn;
-            er.colorType = m.colorType;
             er.ticksSinceLastPacket = 0;
             if (er.getHealth() <= 0 && er.rider != null) {
                 er.rider.setPos(er.getX() + 5, er.getY() - 12, er.getZ());
@@ -156,8 +148,6 @@ public class RhodesPacket implements CustomPacketPayload {
         buf.writeFloat(rightthighpitch);
         buf.writeFloat(leftshinpitch);
         buf.writeFloat(rightshinpitch);
-        buf.writeByte(laserOn);
-        buf.writeByte(colorType);
         buf.writeInt(riderid);
         buf.writeInt(pass1id);
         buf.writeInt(pass2id);

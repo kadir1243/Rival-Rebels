@@ -71,7 +71,7 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink> {
 
 		if (distance > 0)
 		{
-			RandomSource random = entity.level().random;
+			RandomSource random = entity.getRandom();
 			float radius = 0.07F;
             VertexConsumer buffer = vertexConsumers.getBuffer(RENDER_TYPE);
 

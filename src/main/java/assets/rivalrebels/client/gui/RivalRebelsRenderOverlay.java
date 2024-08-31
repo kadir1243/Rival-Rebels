@@ -168,7 +168,7 @@ public class RivalRebelsRenderOverlay {
         graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.2), 0xffffff, false);
 
         text = RRItems.einsten.getDescription().copy().append(": " + rhodes.getEnergy());
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.05), (rhodes.laserOn>0)?0xff3333:0xffffff, false);
+        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.05), rhodes.isAnyLaserEnabled()?0xff3333:0xffffff, false);
         text = Component.nullToEmpty("Jet: " + rhodes.getEnergy());
         graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.1), RRClient.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
         text = RRBlocks.forcefieldnode.getName().append(": " + rhodes.getEnergy());

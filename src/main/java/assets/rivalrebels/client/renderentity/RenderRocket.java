@@ -19,20 +19,26 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @Environment(EnvType.CLIENT)
 public class RenderRocket extends EntityRenderer<EntityRocket> {
-    public RenderRocket(EntityRendererProvider.Context manager)
-	{
+    private final ModelManager modelManager;
+    private final ModelBlockRenderer modelRenderer;
+
+    public RenderRocket(EntityRendererProvider.Context manager) {
         super(manager);
-	}
+        modelManager = manager.getModelManager();
+        modelRenderer = manager.getBlockRenderDispatcher().getModelRenderer();
+    }
 
     @Override
     public void render(EntityRocket entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
@@ -40,7 +46,7 @@ public class RenderRocket extends EntityRenderer<EntityRocket> {
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
 		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelRocket.render(matrices, vertexConsumers, RRIdentifiers.etrocket, entity.fins, light, OverlayTexture.NO_OVERLAY);
+		ModelRocket.render(modelManager, modelRenderer, matrices, vertexConsumers, RRIdentifiers.etrocket, entity.fins, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
 

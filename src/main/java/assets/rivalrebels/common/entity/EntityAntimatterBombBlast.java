@@ -66,13 +66,13 @@ public class EntityAntimatterBombBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (level().random.nextInt(30) == 0)
+		if (random.nextInt(30) == 0)
 		{
 			level().playLocalSound(this.getX(), this.getY(), this.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.AMBIENT, 10.0F, 0.5F, false);
 		}
 		else
 		{
-			if (level().random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
+			if (random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
 		}
 
 		tickCount++;

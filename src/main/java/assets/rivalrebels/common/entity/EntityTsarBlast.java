@@ -62,13 +62,13 @@ public class EntityTsarBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (level().random.nextInt(10) == 0)
+		if (random.nextInt(10) == 0)
 		{
 			level().playLocalSound(getX(), getY(), getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.AMBIENT, 10.0F, 0.50F, true);
 		}
 		else
 		{
-			if (level().random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
+			if (random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
 		}
 
 		tickCount++;

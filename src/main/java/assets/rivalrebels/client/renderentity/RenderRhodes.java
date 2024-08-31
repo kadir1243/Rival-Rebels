@@ -16,6 +16,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.client.model.ModelBlastSphere;
 import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodes;
+import assets.rivalrebels.common.entity.RhodesType;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -167,7 +168,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
                 this.renderNameTag(entity, name, matrices, vertexConsumers, light, tickDelta);
             }
 
-			if (entity.colorType == 16) {
+			if (entity.getVariant() == RhodesType.Space) {
 				matrices.pushPose();
                 matrices.mulPose(Axis.YP.rotationDegrees(entity.getbodyyaw(ptt)));
 				matrices.translate(0, 10f, 0);
@@ -192,7 +193,8 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 
 				//TORSO
 				matrices.pushPose();
-                int colorOfRhodes = FastColor.ARGB32.colorFromFloat(1F, colors[entity.colorType*3], colors[entity.colorType*3+1], colors[entity.colorType*3+2]);
+                int colorType = entity.getVariant().ordinal();
+                int colorOfRhodes = FastColor.ARGB32.colorFromFloat(1F, colors[colorType *3], colors[colorType *3+1], colors[colorType *3+2]);
 				matrices.translate(0, Math.max(leftlegheight, rightlegheight), 0);
 
 				matrices.pushPose();
@@ -292,9 +294,9 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes> {
 					matrices.mulPose(Axis.XP.rotationDegrees(entity.getheadpitch(ptt)));
 					matrices.mulPose(Axis.YP.rotationDegrees(entity.getheadyaw(ptt)));
 			    	ObjModels.head.render(matrices, textureBuffer, colorOfRhodes, light, OverlayTexture.NO_OVERLAY);
-			    	if ((entity.laserOn & 1) == 1) {
+			    	if (entity.isTopLaserEnabled()) {
 			    		ObjModels.rhodes_laser.render(matrices, vertexConsumers.getBuffer(LASER_RENDER_TYPE), FastColor.ARGB32.colorFromFloat(0.5F, 1, 0, 0), light, OverlayTexture.NO_OVERLAY);
-			    	} else if ((entity.laserOn & 2) == 2) {
+			    	} else if (entity.isBottomLaserEnabled()) {
 						matrices.scale(1, -1, 1);
 						//GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
 			    		ObjModels.rhodes_laser.render(matrices, vertexConsumers.getBuffer(LASER_RENDER_TYPE), FastColor.ARGB32.colorFromFloat(0.5F, 1, 0, 0), light, OverlayTexture.NO_OVERLAY);

@@ -51,24 +51,23 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast> {
     public void render(EntityNuclearBlast entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
 		matrices.pushPose();
 		if (entity.tickCount == 0) {
-			textureCoordx = entity.level().random.nextInt(64);
+			textureCoordx = entity.getRandom().nextInt(64);
 		}
 
-		ring1 += 0.02F;
         ring1 = Mth.lerp(tickDelta, ring1, ring1 + 0.02F);
 		ring2 += Mth.sin(ring1) * 0.01F;
 		ring3 -= Mth.sin(ring1) * 0.01F;
 
 		if (ring2 < 6) {
-			ring2 += 0.1F;
+            ring2 = Mth.lerp(tickDelta, ring2, ring2 + 0.1F);
 		}
 
 		if (ring3 < 8) {
-			ring3 += 0.1F;
+            ring3 = Mth.lerp(tickDelta, ring3, ring3 + 0.1F);
 		}
 
 		if (height < 8) {
-			height += 0.1F;
+            height = Mth.lerp(tickDelta, height, height + 0.1F);
 		}
 
         if (entity.tickCount < 600) {

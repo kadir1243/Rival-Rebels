@@ -1,18 +1,8 @@
-/*******************************************************************************
- * Copyright (c) 2012, 2016 Rodol Phito.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Mozilla Public License Version 2.0
- * which accompanies this distribution, and is available at
- * https://www.mozilla.org/en-US/MPL/2.0/
- *
- * Rival Rebels Mod. All code, art, and design by Rodol Phito.
- *
- * http://RivalRebels.com/
- *******************************************************************************/
 package assets.rivalrebels;
 
 import assets.rivalrebels.client.gui.RivalRebelsRenderOverlay;
 import assets.rivalrebels.client.itemrenders.*;
+import assets.rivalrebels.client.model.RRModelLoadingPlugin;
 import assets.rivalrebels.client.renderentity.*;
 import assets.rivalrebels.client.tileentityrender.*;
 import assets.rivalrebels.common.block.RRBlocks;
@@ -28,6 +18,7 @@ import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.model.loading.v1.ModelLoadingPlugin;
 import net.fabricmc.fabric.api.client.rendering.v1.BuiltinItemRendererRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.EntityRendererRegistry;
 import net.minecraft.client.KeyMapping;
@@ -85,8 +76,8 @@ public class RRClient implements ClientModInitializer {
 		BlockEntityRenderers.register(RRTileEntities.REACTOR, TileEntityReactorRenderer::new);
 		BlockEntityRenderers.register(RRTileEntities.JUMP_BLOCK, TileEntityJumpBlockRenderer::new);
 		BlockEntityRenderers.register(RRTileEntities.LOADER, TileEntityLoaderRenderer::new);
-		BlockEntityRenderers.register(RRTileEntities.OMEGA_OBJECTIVE, TileEntityOmegaObjectiveRenderer::new);
-		BlockEntityRenderers.register(RRTileEntities.SIGMA_OBJECTIVE, TileEntitySigmaObjectiveRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.OMEGA_OBJECTIVE, OmegaObjectiveBlockEntityRenderer::new);
+		BlockEntityRenderers.register(RRTileEntities.SIGMA_OBJECTIVE, SigmaObjectiveBlockEntityRenderer::new);
 		BlockEntityRenderers.register(RRTileEntities.TSAR_BOMB, TileEntityTsarBombaRenderer::new);
 		BlockEntityRenderers.register(RRTileEntities.FORCE_FIELD_NODE, TileEntityForceFieldNodeRenderer::new);
 		BlockEntityRenderers.register(RRTileEntities.GORE, TileEntityGoreRenderer::new);
@@ -200,6 +191,7 @@ public class RRClient implements ClientModInitializer {
         registerKeyBinding();
         RRBlocks.registerBlockColors();
         registerCustomRenderers();
+        ModelLoadingPlugin.register(new RRModelLoadingPlugin());
     }
 
     @Environment(EnvType.CLIENT)

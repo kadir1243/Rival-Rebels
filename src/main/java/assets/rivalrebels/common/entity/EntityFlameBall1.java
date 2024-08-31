@@ -14,12 +14,12 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
+import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
@@ -90,20 +90,13 @@ public class EntityFlameBall1 extends FlameBallProjectile {
 				entity.igniteForSeconds(3);
 				entity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
 				if (entity instanceof Player player) {
-                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
-					{
-						player.getItemBySlot(slot).hurtAndBreak(8, player, slot);
-					}
+                    ItemUtil.damageRandomArmor(player, 8, random);
 				}
 			} else {
 				level().addFreshEntity(new EntityLightningLink(level(), this, this.distanceTo(entity)));
 				if (entity instanceof Player player)
 				{
-                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty()) {
-						player.getItemBySlot(slot).hurtAndBreak(44, player, slot);
-					}
+                    ItemUtil.damageRandomArmor(player, 44, random);
 					player.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
 				}
 				else if (entity instanceof EntityB2Spirit)
@@ -148,7 +141,7 @@ public class EntityFlameBall1 extends FlameBallProjectile {
                         Block id = state.getBlock();
 						if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 						else if (state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
-						else if (id == Blocks.GRASS_BLOCK && level().random.nextInt(5) == 0) level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+						else if (id == Blocks.GRASS_BLOCK && random.nextInt(5) == 0) level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
 						else if (state.is(RRBlocks.flare)) id.destroy(level(), pos, state);
 					}
 				}

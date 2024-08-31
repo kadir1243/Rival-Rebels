@@ -2,6 +2,8 @@ package assets.rivalrebels.common.util;
 
 import java.util.function.Predicate;
 
+import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -43,5 +45,18 @@ public class ItemUtil {
                 return stack;
         }
         return ItemStack.EMPTY;
+    }
+
+    public static EquipmentSlot getRandomArmorSlot(RandomSource random) {
+        return EquipmentSlot.values()[2 + random.nextIntBetweenInclusive(0, 4)];
+    }
+
+    public static EquipmentSlot damageRandomArmor(LivingEntity entity, int amount, RandomSource random) {
+        EquipmentSlot slot = getRandomArmorSlot(random);
+        ItemStack stack = entity.getItemBySlot(slot);
+        if (!stack.isEmpty()) {
+            stack.hurtAndBreak(amount, entity, slot);
+        }
+        return slot;
     }
 }

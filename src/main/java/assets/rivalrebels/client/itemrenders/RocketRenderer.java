@@ -16,19 +16,22 @@ import assets.rivalrebels.client.model.ModelRocket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 @Environment(EnvType.CLIENT)
 public class RocketRenderer implements DynamicItemRenderer {
+
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(0.8f, 0.3f, -0.03f);
 		matrices.scale(2, 2, 2);
 
-		ModelRocket.render(matrices, vertexConsumers, RRIdentifiers.etrocket, true, light, overlay);
+        Minecraft instance = Minecraft.getInstance();
+        ModelRocket.render(instance.getModelManager(), instance.getBlockRenderer().getModelRenderer(), matrices, vertexConsumers, RRIdentifiers.etrocket, true, light, overlay);
 
 		matrices.popPose();
 	}

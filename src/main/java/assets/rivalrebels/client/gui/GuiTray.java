@@ -76,6 +76,7 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
         super.render(context, mouseX, mouseY, delta);
         this.xSize_lo = mouseX;
         this.ySize_lo = mouseY;
+        this.renderTooltip(context, mouseX, mouseY);
     }
 
     @Override

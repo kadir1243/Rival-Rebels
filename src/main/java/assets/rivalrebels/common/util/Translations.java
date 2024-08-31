@@ -33,6 +33,8 @@ public class Translations {
     public static final ResourceLocation BUILDING = RRIdentifiers.create("building_crate");
     public static final ResourceLocation SPAWN_RESET_WARNING = RRIdentifiers.create("spawn_reset_warning");
     public static final ResourceLocation RHODES_IS_ARMED = RRIdentifiers.create("rhodes_is_armed");
+    public static final ResourceLocation TSAR_NAME = RRIdentifiers.create("tsar_name");
+
     private static final MutableComponent WARNING = Component.empty()
         .append(Component.literal("[").withStyle(ChatFormatting.DARK_RED))
         .append(Component.translatable(WARNING_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED))

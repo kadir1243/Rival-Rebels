@@ -11,15 +11,27 @@
  *******************************************************************************/
 package assets.rivalrebels.common.command;
 
+import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.entity.EntityRhodes;
+import assets.rivalrebels.common.entity.RhodesType;
 import com.google.common.hash.Hashing;
 import com.mojang.brigadier.CommandDispatcher;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
+import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.*;
+import com.mojang.brigadier.context.CommandContext;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
+import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
+import com.mojang.brigadier.suggestion.Suggestions;
+import com.mojang.brigadier.suggestion.SuggestionsBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 
@@ -86,18 +98,18 @@ public class CommandRobot {
                 )
             )
             .then(Commands.literal("model")
-                .then(Commands.argument("color", IntegerArgumentType.integer(0, EntityRhodes.names.length))
+                .then(Commands.argument("type", RhodesTypeArgumentType.argumentType())
                     .executes(context -> {
-                        int color = IntegerArgumentType.getInteger(context, "color");
-                        EntityRhodes.forcecolor = color;
-                        context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: " + EntityRhodes.names[color]).withStyle(ChatFormatting.RED), true);
+                        RhodesType type = RhodesTypeArgumentType.get(context, "type");
+                        EntityRhodes.forcecolor = type;
+                        context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: " + type.getSerializedName()).withStyle(ChatFormatting.RED), true);
 
                         return 0;
                     })
                 )
                 .executes(context -> {
-                    EntityRhodes.forcecolor = -1;
-                    context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: " + EntityRhodes.names[EntityRhodes.lastct]).withStyle(ChatFormatting.RED), true);
+                    EntityRhodes.forcecolor = RhodesType.Rhodes;
+                    context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: " + RRConfig.SERVER.getRhodesTeams()[EntityRhodes.lastct].getSerializedName()).withStyle(ChatFormatting.RED), true);
                     return 0;
                 })
             )
@@ -112,5 +124,36 @@ public class CommandRobot {
                 )
             )
         );
+    }
+
+    public static class RhodesTypeArgumentType implements ArgumentType<RhodesType> {
+        public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(
+            o -> Component.translatableEscape("argument.id.unknown", o)
+        );
+        private static final List<String> STRINGS = Arrays.stream(RhodesType.values()).map(Enum::toString).toList();
+
+        public static RhodesTypeArgumentType argumentType() {
+            return new RhodesTypeArgumentType();
+        }
+
+        public static RhodesType get(final CommandContext<?> context, final String name) {
+            return context.getArgument(name, RhodesType.class);
+        }
+
+        @Override
+        public RhodesType parse(StringReader reader) throws CommandSyntaxException {
+            String string = reader.readUnquotedString();
+            RhodesType rhodesType = Arrays.stream(RhodesType.values()).filter(type -> type.getSerializedName().equalsIgnoreCase(string)).findFirst().orElse(null);
+            if (rhodesType != null) {
+                return rhodesType;
+            } else {
+                throw ERROR_INVALID_VALUE.createWithContext(reader, string);
+            }
+        }
+
+        @Override
+        public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
+            return SharedSuggestionProvider.suggest(STRINGS, builder);
+        }
     }
 }

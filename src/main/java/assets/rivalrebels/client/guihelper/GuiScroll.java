@@ -21,10 +21,10 @@ import net.minecraft.util.Mth;
 @Environment(EnvType.CLIENT)
 public class GuiScroll extends GuiButton {
 	/** Scroll limit */
-	public int		limit;
+	public float limit;
 
 	/** Current scroll amount (from the top down) */
-	public int		scroll;
+	public float scroll;
 
     public GuiScroll(int x, int y, int limit) {
 		super(x, y, 5, 11, Component.empty());
@@ -33,19 +33,18 @@ public class GuiScroll extends GuiButton {
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
-        scroll = Mth.clamp(scroll, 0, limit);
 		int state = 0;
 		if (mouseClicked(mouseX, mouseY, 0)) state = 11;
-		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY() + scroll, 0, state, this.width, this.height);
+		context.blit(RRIdentifiers.guitbutton, this.getX(), (int) (this.getY() + scroll), 0, state, this.width, this.height);
 	}
 
     @Override
     protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-        scroll = (int) (mouseY - getY() - 5);
-	}
+        scroll = (float) (mouseY - getY() - 5);
+        scroll = Mth.clamp(scroll, 0, limit);
+    }
 
-	public int getScroll() {
+	public float getScroll() {
 		return scroll;
 	}
 }

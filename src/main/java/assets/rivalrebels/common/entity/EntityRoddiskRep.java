@@ -86,8 +86,8 @@ public class EntityRoddiskRep extends RoddiskBase {
 		}
 		if (!level().isClientSide())
 		{
-			double randx = level().random.nextGaussian();
-			double randy = level().random.nextGaussian();
+			double randx = random.nextGaussian();
+			double randy = random.nextGaussian();
 			double d = 1.0f/Math.sqrt(randx*randx+randy*randy);
 			level().addFreshEntity(new EntityLaserBurst(level(), getX(), getY(), getZ(), randx*d, -Mth.abs((float) getDeltaMovement().y()), randy*d, getOwner()));
 		}

@@ -37,7 +37,7 @@ public class GuiTheoreticalTsar extends AbstractContainerScreen<ContainerTheoret
         float scalef = 0.666f;
 		matrices.pushPose();
 		matrices.scale(scalef, scalef, scalef);
-		context.drawString(font, Component.translatable("RivalRebels.tsar.tsar"), 18, 16, 4210752, false);
+		context.drawString(font, Component.translatable(Translations.TSAR_NAME.toLanguageKey()), 18, 16, 4210752, false);
 		matrices.popPose();
 		if (menu.isArmed())
 		{
@@ -71,4 +71,10 @@ public class GuiTheoreticalTsar extends AbstractContainerScreen<ContainerTheoret
 		int y = (height - imageHeight) / 2;
         context.blit(RRIdentifiers.guitheoreticaltsar, x, y, 0, 0, imageWidth, imageHeight);
 	}
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
 }

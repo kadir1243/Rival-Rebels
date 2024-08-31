@@ -15,6 +15,7 @@ public class RRComponents {
     public static final DataComponentType<Integer> HAPPY_NEW_YEAR = register("happy_new_year", Codec.INT);
     public static final DataComponentType<BinocularData> BINOCULAR_DATA = register("binocular_data", BinocularData.CODEC);
     public static final DataComponentType<BlockPos> REMOTE_CONTROLLED_BOMB_POS = register("remote_controlled_bomb_pos", BlockPos.CODEC);
+    public static final DataComponentType<Float> CORE_TIME_MULTIPLIER = register("core_time_multiplier", Codec.FLOAT);
 
     public static void init() {
     }

@@ -72,18 +72,18 @@ public class EntityNuclearBlast extends EntityInanimate {
 		}
 		if (tickCount < 30)
 		{
-			level().playLocalSound(getX(), getY() + tickCount - 5, getZ(), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), 4.0f, level().random.nextFloat() * 0.1f + 0.9f, true);
+			level().playLocalSound(getX(), getY() + tickCount - 5, getZ(), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), 4.0f, random.nextFloat() * 0.1f + 0.9f, true);
 		}
 		if (tickCount % 3 == 0 && tickCount < 40 && tickCount > 30)
 		{
 			for (int i = 0; i < 21; i++)
 			{
-				level().playLocalSound(getX() + Mth.sin(i) * (i / 0.5), getY() + 17, getZ() + Mth.cos(i) * (i / 0.5), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), 4.0f, level().random.nextFloat() + 1.0f, true);
+				level().playLocalSound(getX() + Mth.sin(i) * (i / 0.5), getY() + 17, getZ() + Mth.cos(i) * (i / 0.5), SoundEvents.GENERIC_EXPLODE.value(), getSoundSource(), 4.0f, random.nextFloat() + 1.0f, true);
 			}
 		}
 		if (tickCount < 600)
 		{
-			if (tickCount % 5 == level().random.nextInt(5))
+			if (tickCount % 5 == random.nextInt(5))
 			{
                 for (Player p : level().players()) {
                     level().playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 10.0F, 0.50F);

@@ -75,4 +75,10 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
 		graphics.setColor(1, 1, 1, 1);
         graphics.blit(RRIdentifiers.guitnuke, x, y + 81, 0, 81, imageWidth, imageHeight - 81);
 	}
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
 }

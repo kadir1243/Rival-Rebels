@@ -16,7 +16,6 @@ import assets.rivalrebels.client.guihelper.GuiCustomButton;
 import assets.rivalrebels.client.guihelper.ReactorConnectedMachinesList;
 import assets.rivalrebels.client.guihelper.Rectangle;
 import assets.rivalrebels.common.container.ContainerReactor;
-import assets.rivalrebels.common.item.ItemCore;
 import assets.rivalrebels.common.item.ItemRod;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.item.components.RRComponents;
@@ -113,9 +112,12 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 		long time = System.currentTimeMillis();
 		// 1f, 1f, 1f, 0.7f, 0f, 1f, HYDROGEN
 		// 1f, 0.8f, 0f, 1f, 0f, 0f REDSTONE
-        if (menu.isOn() && menu.fuel.hasItem() && menu.core.hasItem()) {
+        if (menu.isOn() && menu.fuel.hasItem() && menu.core.getItem().has(RRComponents.CORE_TIME_MULTIPLIER)) {
 			float radius = 10;
-			if (menu.fuel.getItem().has(RRComponents.REACTOR_FUEL_LEFT)) radius += (((((ItemRod) menu.fuel.getItem().getItem()).power * ((ItemCore) menu.core.getItem().getItem()).timemult) - menu.fuel.getItem().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0)) / (((ItemRod) menu.fuel.getItem().getItem()).power * ((ItemCore) menu.core.getItem().getItem()).timemult)) * 30;
+			if (menu.fuel.getItem().has(RRComponents.REACTOR_FUEL_LEFT)) {
+                float timemult = menu.core.getItem().get(RRComponents.CORE_TIME_MULTIPLIER);
+                radius += (((((ItemRod) menu.fuel.getItem().getItem()).power * timemult) - menu.fuel.getItem().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0)) / (((ItemRod) menu.fuel.getItem().getItem()).power * timemult)) * 30;
+            }
 			melttick = 30;
 			float brightness = 0;
 			if (menu.core.getItem().is(RRItems.core1)) brightness = -0.4f;
@@ -289,4 +291,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
         BufferUploader.drawWithShader(buffer.buildOrThrow());
 		pose.popPose();
 	}
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
 }

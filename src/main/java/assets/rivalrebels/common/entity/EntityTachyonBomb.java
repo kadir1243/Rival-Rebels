@@ -162,7 +162,7 @@ public class EntityTachyonBomb extends Projectile
             setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
             return;
         }
-        if (hasTrollface && level().random.nextInt(10)!=0)
+        if (hasTrollface && random.nextInt(10)!=0)
         {
             setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
             return;

@@ -42,7 +42,6 @@ public class GuiKnob extends GuiButton
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 		if (degree > maxdegreelimit) degree = maxdegreelimit;
 		if (degree < mindegreelimit) degree = mindegreelimit;
 		int state = 0;

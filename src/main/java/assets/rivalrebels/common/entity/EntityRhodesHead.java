@@ -27,7 +27,7 @@ public class EntityRhodesHead extends EntityRhodesPiece
 		super(type, w);
 	}
 
-	public EntityRhodesHead(Level w, double x, double y, double z, float scale, int color)
+	public EntityRhodesHead(Level w, double x, double y, double z, float scale, RhodesType color)
 	{
 		super(RREntities.RHODES_HEAD, w, x, y, z, scale, color);
 		health = 700;

@@ -164,14 +164,14 @@ public class GuiSpawn extends Screen {
 		}
     }
 
-	protected void drawPanel(GuiGraphics context, int x, int y, int height, int scroll, int scrolllimit, RivalRebelsTeam team) {
+	protected void drawPanel(GuiGraphics context, int x, int y, int height, float scroll, float scrolllimit, RivalRebelsTeam team) {
         List<RivalRebelsPlayer> newList;
 
         newList = RivalRebels.round.rrplayerlist.players().stream().filter(player -> player.rrteam.equals(team)).collect(Collectors.toList());
 		if (newList.isEmpty()) return;
         newList.sort(Comparator.comparing(this::isOnline));
 
-        int dist = (int) (-((float) scroll / (float) scrolllimit) * ((newList.size() * 10) - height));
+        int dist = (int) (-(scroll / scrolllimit) * ((newList.size() * 10) - height));
 		boolean shouldScroll = newList.size() * 10 > height;
         for (int i = 0; i < newList.size(); i++) {
             RivalRebelsPlayer player = newList.get(i);
@@ -196,9 +196,9 @@ public class GuiSpawn extends Screen {
 		}
 	}
 
-	protected void drawPanel(GuiGraphics context, int x, int y, int height, int scroll, int scrolllimit, String[] display, int[] color)
+	protected void drawPanel(GuiGraphics context, int x, int y, int height, float scroll, float scrolllimit, String[] display, int[] color)
 	{
-		int dist = (int) (-((float) scroll / (float) scrolllimit) * (((display.length) * 10) - height));
+		int dist = (int) (-(scroll / scrolllimit) * (((display.length) * 10) - height));
 		boolean shouldScroll = (display.length) * 10 > height;
 		for (int i = 0; i < display.length; i++)
 		{
@@ -208,11 +208,11 @@ public class GuiSpawn extends Screen {
 		}
 	}
 
-	protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, int scroll, int scrolllimit, String display)
+	protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, float scroll, float scrolllimit, String display)
 	{
         PoseStack matrices = context.pose();
         int length = 10;
-		int dist = (int) (-((float) scroll / (float) scrolllimit) * (((length) * 10) - height));
+		int dist = (int) (-(scroll / scrolllimit) * (((length) * 10) - height));
 		float scalefactor = 0.6666f;
 		matrices.scale(scalefactor, scalefactor, scalefactor);
         MultiLineLabel.create(font, Component.nullToEmpty(display), (int) (width * 1.5)).renderLeftAlignedNoShadow(context, (int) (x * 1.5), (int) ((y + dist) * 1.5), font.lineHeight, 0xffffff);

@@ -59,8 +59,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuProvider
-{
+public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuProvider {
 	public float			yaw;
 	public float			pitch;
 	public Entity			target;

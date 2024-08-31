@@ -108,7 +108,7 @@ public class ItemTesla extends TieredItem {
 		if (user.isInWaterRainOrBubble() && !user.isInvulnerableTo(RivalRebelsDamageSource.electricity(world))) {
 			user.hurt(RivalRebelsDamageSource.electricity(world), 2);
 		}
-		if (user.level().random.nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);
+		if (user.getRandom().nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);
 
 		int degree = getDegree(stack);
 		float chance = Mth.abs(degree - 90) / 90f;

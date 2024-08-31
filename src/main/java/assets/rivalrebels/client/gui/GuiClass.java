@@ -186,9 +186,9 @@ public class GuiClass extends Screen {
 		super.render(graphics, mouseX, mouseY, delta);
 	}
 
-    protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, int scroll, int scrolllimit, RivalRebelsClass rrclass) {
+    protected void drawPanel(GuiGraphics context, int x, int y, int width, int height, float scroll, float scrolllimit, RivalRebelsClass rrclass) {
 		int length = 10;
-		int dist = (int) (-((float) scroll / (float) scrolllimit) * (((length) * 10) - height));
+		int dist = (int) (-(scroll / scrolllimit) * (((length) * 10) - height));
 		float scalefactor = 0.6666f;
         PoseStack matrices = context.pose();
         matrices.scale(scalefactor, scalefactor, scalefactor);

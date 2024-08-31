@@ -376,7 +376,7 @@ public class ItemRoda extends Item
     @Override
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		if (attacker.level().isClientSide()) return true;
-		RandomSource r = attacker.level().random;
+		RandomSource r = attacker.getRandom();
 		double x = target.getX() - attacker.getX();
 		double y = target.getY() - attacker.getY();
 		double z = target.getZ() - attacker.getZ();

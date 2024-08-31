@@ -1,10 +1,11 @@
 package assets.rivalrebels;
 
+import assets.rivalrebels.common.entity.RhodesType;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.IntStream;
 
 public class RRConfig {
     public static class Server {
@@ -20,7 +21,7 @@ public class RRConfig {
         private final ForgeConfigSpec.IntValue chargeExplosionSize;
         private final ForgeConfigSpec.IntValue timedbombExplosionSize;
         private final ForgeConfigSpec.BooleanValue infiniteGrenades;
-        private final ForgeConfigSpec.ConfigValue<List<? extends Integer>> rhodesTeams;
+        private final ForgeConfigSpec.ConfigValue<List<? extends RhodesType>> rhodesTeams;
         private final ForgeConfigSpec.BooleanValue prefillrhodes;
         private final ForgeConfigSpec.ConfigValue<Integer> rhodesNukes;
         private final ForgeConfigSpec.ConfigValue<Integer> objectiveHealth;
@@ -78,7 +79,7 @@ public class RRConfig {
             infiniteAmmo = builder.define("infiniteAmmo", false);
             infiniteNukes = builder.define("infiniteNukes", false);
             infiniteGrenades = builder.define("infiniteGrenades", false);
-            rhodesTeams = builder.comment("Range: 0-15. Repeat the numbers for multiple occurences of the same rhodes. 0:Rhodes 1:Magnesium 2:Arsenic 3:Vanadium 4:Aurum 5:Iodine 6:Iron 7:Astatine 8:Cobalt 9:Strontium 10:Bismuth 11:Zinc 12:Osmium 13:Neon 14:Argent, 15:Wolfram").defineList("rhodesTeams", IntStream.range(0, 16).boxed().toList(), o -> o instanceof Integer);
+            rhodesTeams = builder.comment("Repeat the type for multiple occurences of the same rhodes.").defineList("rhodesTeams", Arrays.stream(RhodesType.values()).toList(), o -> Arrays.stream(RhodesType.values()).anyMatch(type -> type.getSerializedName().equalsIgnoreCase(o.toString())));
             prefillrhodes = builder.define("prefillrhodes", true);
             rhodesNukes = builder.define("rhodesNukes", 8);
             rhodesInRoundsChance = builder.define("rhodesInRoundsChance", 0);
@@ -274,8 +275,8 @@ public class RRConfig {
             return infiniteGrenades.get();
         }
 
-        public int[] getRhodesTeams() {
-            return rhodesTeams.get().stream().mapToInt(i -> (int) i).toArray();
+        public RhodesType[] getRhodesTeams() {
+            return rhodesTeams.get().toArray(new RhodesType[0]);
         }
 
         public boolean isPrefillrhodes() {

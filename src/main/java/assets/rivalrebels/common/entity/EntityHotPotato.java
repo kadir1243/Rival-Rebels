@@ -161,7 +161,7 @@ public class EntityHotPotato extends ThrowableProjectile {
 			setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
 			return;
 		}
-		if (level().random.nextInt(10)!=0) {
+		if (random.nextInt(10)!=0) {
 			setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
 			return;
 		}

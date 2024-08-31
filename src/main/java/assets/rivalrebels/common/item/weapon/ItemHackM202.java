@@ -42,7 +42,7 @@ public class ItemHackM202 extends TieredItem
 		user.setItemInHand(hand, ItemStack.EMPTY);
 		if (!world.isClientSide())
 		{
-			world.addFreshEntity(new EntityHackB83(world, user.getX(), user.getY(), user.getZ(), -user.yHeadRot, user.getXRot(), stack.isEnchanted()));
+			world.addFreshEntity(new EntityHackB83(world, user.getX(), user.getY(), user.getZ(), -user.getYHeadRot(), user.getXRot(), stack.isEnchanted()));
 		}
 		RivalRebelsSoundPlayer.playSound(user, 23, 2, 0.4f);
 		new Explosion(world, user.getX(), user.getY(), user.getZ(), 2, true, false, RivalRebelsDamageSource.flare(world));

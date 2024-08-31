@@ -19,19 +19,26 @@ import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @Environment(EnvType.CLIENT)
 public class RenderSeeker extends EntityRenderer<EntitySeekB83> {
-	public RenderSeeker(EntityRendererProvider.Context manager) {
+    private final ModelBlockRenderer modelRenderer;
+    private final ModelManager modelManager;
+
+    public RenderSeeker(EntityRendererProvider.Context manager) {
         super(manager);
-	}
+        modelManager = manager.getModelManager();
+        modelRenderer = manager.getBlockRenderDispatcher().getModelRenderer();
+    }
 
     @Override
     public void render(EntitySeekB83 entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
@@ -39,7 +46,7 @@ public class RenderSeeker extends EntityRenderer<EntitySeekB83> {
 		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
 		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
 		matrices.scale(2.0f, 2.0f, 2.0f);
-		ModelRocket.render(matrices, vertexConsumers, RRIdentifiers.etrocketseek202, true, light, OverlayTexture.NO_OVERLAY);
+		ModelRocket.render(modelManager, modelRenderer, matrices, vertexConsumers, RRIdentifiers.etrocketseek202, true, light, OverlayTexture.NO_OVERLAY);
 		matrices.popPose();
 	}
 

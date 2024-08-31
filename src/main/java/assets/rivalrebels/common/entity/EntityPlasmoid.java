@@ -36,8 +36,8 @@ public class EntityPlasmoid extends Projectile {
 
 	public EntityPlasmoid(Level level) {
 		this(RREntities.PLASMOID, level);
-        rotation = level.random.nextInt(360);
-        slide = level.random.nextInt(21) - 10;
+        rotation = random.nextInt(360);
+        slide = random.nextInt(21) - 10;
     }
 
 	public EntityPlasmoid(Level level, double x, double y, double z) {

@@ -3,6 +3,7 @@
   "package": "assets.rivalrebels.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "ArgumentTypesMixin",
     "BlockEntityAccessor",
     "HashCacheMixin"
   ],
@@ -12,7 +13,6 @@
   "client": [
     "client.ArmorFeatureRendererMixin",
     "client.BlockEntityRenderersAccessor",
-    "client.BufferBuilderAccessor",
     "client.GuiGraphicsAccessor",
     "client.KeyMappingAccessor",
     "client.KeyMappingMixin",

@@ -1,6 +1,7 @@
 package assets.rivalrebels.common.item;
 
 import assets.rivalrebels.RRIdentifiers;
+import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.item.weapon.*;
 import assets.rivalrebels.common.util.Translations;
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup;
@@ -55,9 +56,9 @@ public class RRItems {
     public static final Item roddisk = register("rod_disk", new ItemRodDisk());
     public static final Item antenna = register("antenna", new Item(new Item.Properties().stacksTo(1)));
     public static final Item emptyrod = register("empty_rod", new Item(new Item.Properties()));
-    public static final Item core1 = register("copper_core", new ItemCoreCopper());
-    public static final Item core2 = register("tungsten_core", new ItemCoreTungsten());
-    public static final Item core3 = register("titanium_core", new ItemCoreTitanium());
+    public static final Item core1 = register("copper_core", new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 0.25F).stacksTo(1)));
+    public static final Item core2 = register("tungsten_core", new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 0.75F).stacksTo(1)));
+    public static final Item core3 = register("titanium_core", new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 1F).stacksTo(1)));
     public static final Item binoculars = register("binoculars", new ItemBinoculars());
     public static final Item camera = register("camera", new ItemCamera());
     public static final Item chip = register("chip", new ItemChip());

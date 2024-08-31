@@ -14,12 +14,12 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
+import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.Animal;
@@ -130,7 +130,7 @@ public class EntityLaserBurst extends Projectile {
         if (state.is(Blocks.TNT)) {
             if (!level().isClientSide()) {
                 PrimedTnt tnt = new PrimedTnt(level(), (pos.getX() + 0.5F), (pos.getY() + 0.5F), (pos.getZ() + 0.5F), getOwner() instanceof LivingEntity entity ? entity : null);
-                tnt.setFuse(level().random.nextInt(tnt.getFuse() / 4) + tnt.getFuse() / 8);
+                tnt.setFuse(random.nextInt(tnt.getFuse() / 4) + tnt.getFuse() / 8);
                 level().addFreshEntity(tnt);
                 level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             }
@@ -146,11 +146,7 @@ public class EntityLaserBurst extends Projectile {
     protected void onHitEntity(EntityHitResult result) {
         Entity hitEntity = result.getEntity();
         if (hitEntity instanceof Player player) {
-            EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-            if (!player.getItemBySlot(slot).isEmpty() && !level().isClientSide())
-            {
-                player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
-            }
+            ItemUtil.damageRandomArmor(player, 24, random);
             player.hurt(RivalRebelsDamageSource.laserBurst(level()), 16);
             if (player.getHealth() < 3 && player.isAlive())
             {

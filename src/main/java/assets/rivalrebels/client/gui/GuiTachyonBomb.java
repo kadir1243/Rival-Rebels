@@ -75,4 +75,10 @@ public class GuiTachyonBomb extends AbstractContainerScreen<ContainerTachyonBomb
 		int y = (height - imageHeight) / 2;
 		context.blit(RRIdentifiers.guitachyonbomb, x, y, 0, 0, imageWidth, imageHeight);
 	}
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
 }

@@ -35,7 +35,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -44,15 +43,13 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 
-public class TileEntityTsarBomba extends BlockEntity implements Container, Tickable, MenuProvider
-{
+public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tickable {
 	public GameProfile player = null;
 	public RivalRebelsTeam	rrteam			= null;
-	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
+	private NonNullList<ItemStack> chestContents = NonNullList.withSize(36, ItemStack.EMPTY);
     public int				countdown		= RRConfig.SERVER.getNuclearBombCountdown() * 20;
 	public int				nuclear			= 0;
 	public int				hydrogen		= 0;
@@ -71,51 +68,6 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
 	public int getContainerSize()
 	{
 		return 21;
-	}
-
-    @Override
-	public ItemStack getItem(int slot)
-	{
-		return this.chestContents.get(slot);
-	}
-
-    @Override
-    public ItemStack removeItem(int slot, int amount) {
-		if (!this.getItem(slot).isEmpty()) {
-			ItemStack var3;
-
-			if (this.getItem(slot).getCount() <= amount) {
-				var3 = this.getItem(slot);
-				this.setItem(slot, ItemStack.EMPTY);
-            } else {
-				var3 = this.getItem(slot).split(amount);
-
-				if (this.getItem(slot).isEmpty()) {
-					this.setItem(slot, ItemStack.EMPTY);
-				}
-            }
-            return var3;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int slot) {
-		if (!this.getItem(slot).isEmpty()) {
-			ItemStack var2 = this.getItem(slot);
-			this.setItem(slot, ItemStack.EMPTY);
-			return var2;
-		}
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public void setItem(int slot, ItemStack stack) {
-		this.chestContents.set(slot, stack);
-
-        stack.limitSize(this.getMaxStackSize(stack));
-
-        setChanged();
 	}
 
     @Override
@@ -144,72 +96,42 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
 	}
 
     @Override
-	public void tick() {
-		nuclear = 0;
-		hydrogen = 0;
-		for (int i = 3; i <= 18; i++)
-		{
-			if (!getItem(i).isEmpty())
-			{
-				Item item = getItem(i).getItem();
-				if (i < 11 && item == RRItems.NUCLEAR_ROD)
-				{
-					nuclear++;
-				}
-				else if (i > 10 && item == RRItems.hydrod)
-				{
-					hydrogen++;
-				}
-				if (item == RRItems.trollmask)
-				{
-					hasTrollface = true;
-				}
-			}
-		}
-		if (nuclear == hydrogen) megaton = nuclear * 6.25f;
+    public void setChanged() {
+        super.setChanged();
+        nuclear = 0;
+        hydrogen = 0;
+        for (int i = 3; i <= 18; i++) {
+            if (!getItem(i).isEmpty()) {
+                Item item = getItem(i).getItem();
+                if (i < 11 && item == RRItems.NUCLEAR_ROD) {
+                    nuclear++;
+                } else if (i > 10 && item == RRItems.hydrod) {
+                    hydrogen++;
+                }
+                if (item == RRItems.trollmask) {
+                    hasTrollface = true;
+                }
+            }
+        }
+        if (nuclear == hydrogen) megaton = nuclear * 6.25f;
 
-		if (!getItem(0).isEmpty())
-		{
-			hasFuse = getItem(0).is(RRItems.fuse);
-		}
-		else
-		{
-			hasFuse = false;
-		}
+        hasFuse = getItem(0).is(RRItems.fuse);
 
         ItemStack chipSlotStack = getItem(20);
-        if (!chipSlotStack.isEmpty())
-		{
-			hasChip = chipSlotStack.is(RRItems.chip);
-			if (hasChip && chipSlotStack.has(RRComponents.CHIP_DATA)) {
-                ChipData chipData = chipSlotStack.get(RRComponents.CHIP_DATA);
-                rrteam = chipData.team();
-				player = chipData.gameProfile();
-			}
-		}
-		else
-		{
-			hasChip = false;
-		}
+        hasChip = chipSlotStack.is(RRItems.chip);
+        if (hasChip && chipSlotStack.has(RRComponents.CHIP_DATA)) {
+            ChipData chipData = chipSlotStack.get(RRComponents.CHIP_DATA);
+            rrteam = chipData.team();
+            player = chipData.gameProfile();
+        }
 
-		if (!getItem(1).isEmpty() && !getItem(2).isEmpty())
-		{
-			hasAntennae = getItem(1).is(RRItems.antenna) && getItem(2).is(RRItems.antenna);
-		}
-		else
-		{
-			hasAntennae = false;
-		}
+        hasAntennae = getItem(1).is(RRItems.antenna) && getItem(2).is(RRItems.antenna);
 
-		if (!getItem(19).isEmpty())
-		{
-			hasExplosive = true;// getStack(19).func_150998_b(RivalRebels.timedbomb);
-		}
-		else
-		{
-			hasExplosive = false;
-		}
+        hasExplosive = !getItem(19).isEmpty();// getStack(19).func_150998_b(RivalRebels.timedbomb);
+    }
 
+    @Override
+	public void tick() {
 		boolean sp;
         if (level.isClientSide()) {
             sp = Minecraft.getInstance().isLocalServer();
@@ -278,24 +200,23 @@ public class TileEntityTsarBomba extends BlockEntity implements Container, Ticka
     }
 
     @Override
-    public Component getDisplayName() {
-        return Component.nullToEmpty("Tsar Bomba");
+    protected Component getDefaultName() {
+        return Component.literal("Tsar Bomba");
     }
 
     @Override
-    public void clearContent() {
-        this.chestContents.clear();
+    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+        return new ContainerTsar(containerId, inventory, this, propertyDelegate);
     }
 
     @Override
-    public boolean isEmpty() {
-        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
+    protected NonNullList<ItemStack> getItems() {
+        return this.chestContents;
     }
 
-    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerTsar(syncId, inv, this, propertyDelegate);
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.chestContents = items;
     }
 
     private final ContainerData propertyDelegate = new ContainerData() {

@@ -71,9 +71,9 @@ public class EntityPassiveFire extends Projectile {
     @Override
 	public void setDeltaMovement(double x, double y, double z) {
         super.setDeltaMovement(
-            x + (level().random.nextFloat() - 0.5) / 50,
-            y + (level().random.nextFloat() - 0.5) / 50,
-            z + (level().random.nextFloat() - 0.5) / 50);
+            x + (random.nextFloat() - 0.5) / 50,
+            y + (random.nextFloat() - 0.5) / 50,
+            z + (random.nextFloat() - 0.5) / 50);
 	}
 
     @Override

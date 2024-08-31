@@ -74,38 +74,30 @@ public class ContainerTsar extends AbstractContainerMenu {
 	}
 
     @Override
-    public ItemStack quickMoveStack(Player player, int slot) {
-		ItemStack var3 = ItemStack.EMPTY;
-		Slot var4 = this.slots.get(slot);
+    public ItemStack quickMoveStack(Player player, int index) {
+		ItemStack stack = ItemStack.EMPTY;
+		Slot slot = this.slots.get(index);
 
-		if (var4 != null && var4.hasItem())
-		{
-			ItemStack var5 = var4.getItem();
-			var3 = var5.copy();
+		if (slot != null && slot.hasItem()) {
+			ItemStack slotItem = slot.getItem();
+			stack = slotItem.copy();
 
-			if (slot <= 19)
-			{
-				if (!this.moveItemStackTo(var5, 19, this.slots.size(), true))
-				{
+			if (index <= 19) {
+				if (!this.moveItemStackTo(slotItem, 19, this.slots.size(), true)) {
 					return ItemStack.EMPTY;
 				}
-			}
-			else if (!this.moveItemStackTo(var5, 0, 19, false))
-			{
+			} else if (!this.moveItemStackTo(slotItem, 0, 19, false)) {
 				return ItemStack.EMPTY;
 			}
 
-			if (var5.isEmpty())
-			{
-				var4.setByPlayer(ItemStack.EMPTY);
-			}
-			else
-			{
-				var4.setChanged();
+			if (slotItem.isEmpty()) {
+				slot.setByPlayer(ItemStack.EMPTY);
+			} else {
+				slot.setChanged();
 			}
 		}
 
-		return var3;
+		return stack;
 	}
 
     public int getCountdown() {

@@ -50,7 +50,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 
     @Override
     public void render(EntityAntimatterBombBlast entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        RandomSource random = entity.getCommandSenderWorld().random;
+        RandomSource random = entity.getRandom();
 		double radius = (((entity.getDeltaMovement().x() * 10) - 1) * ((entity.getDeltaMovement().x() * 10) - 1) * 2) + RRConfig.SERVER.getTsarBombaStrength();
 		matrices.pushPose();
 		matrices.pushPose();

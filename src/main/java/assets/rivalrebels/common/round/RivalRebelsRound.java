@@ -22,6 +22,7 @@ import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.packet.GuiSpawnPacket;
 import com.mojang.datafixers.util.Function9;
+import com.mojang.datafixers.util.Pair;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -223,12 +224,11 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         ServerPlayConnectionEvents.JOIN.register((handler, sender, server) -> {
             ServerPlayer player = handler.getPlayer();
             if (!roundstarted) return;
-            if (!rrplayerlist.contains(player.getGameProfile()))
-            {
+            if (!rrplayerlist.contains(player.getGameProfile())) {
                 player.getInventory().clearContent();
                 BlockPos pos = cSpawn.atY(200);
                 player.setPosRaw(pos.getX(), pos.getY(), pos.getZ());
-                //rrplayerlist.add(new RivalRebelsPlayer(player.getCommandSenderName(), RivalRebelsTeam.NONE, RivalRebelsClass.NONE, RivalRebelsRank.REGULAR, RRConfig.SERVER.getMaximumResets()));
+                rrplayerlist.add(new RivalRebelsPlayer(player.getGameProfile(), RRConfig.SERVER.getMaximumResets()));
             }
             ServerPlayNetworking.send(player, rrplayerlist);
             if (isInSpawn(player)) ServerPlayNetworking.send(player, GuiSpawnPacket.INSTANCE);
@@ -241,13 +241,13 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         RivalRebelsRound packet = new RivalRebelsRound();
         packet.roundstarted = nbt.getBoolean("roundstarted");
         packet.cSpawn = BlockPos.of(nbt.getLong("cSpawn"));
-        packet.omegaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("omega_data")).getOrThrow().getFirst();
-        packet.sigmaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("sigma_data")).getOrThrow().getFirst();
+        packet.omegaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("omega_data")).map(Pair::getFirst).getOrThrow();
+        packet.sigmaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("sigma_data")).map(Pair::getFirst).getOrThrow();
         packet.winCountdown = nbt.getInt("winCountdown");
-        packet.lastWinnerTeam = RivalRebelsTeam.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("lastWinTeam")).getOrThrow().getFirst();
+        packet.lastWinnerTeam = RivalRebelsTeam.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("lastWinTeam")).map(Pair::getFirst).getOrThrow();
         packet.fatnuke = nbt.getBoolean("fatnuke");
         packet.MotD = nbt.getString("MotD");
-        packet.rrplayerlist = RivalRebelsPlayerList.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("rrplayerlist")).getOrThrow().getFirst();
+        packet.rrplayerlist = RivalRebelsPlayerList.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("rrplayerlist")).map(Pair::getFirst).getOrThrow();
         return packet;
     }
 
@@ -274,8 +274,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         RivalRebels.round.copy(m);
     }
 
-	public void copy(RivalRebelsRound m)
-	{
+	public void copy(RivalRebelsRound m) {
 		roundstarted = m.roundstarted;
 		cSpawn = m.cSpawn;
         omegaData = m.omegaData;

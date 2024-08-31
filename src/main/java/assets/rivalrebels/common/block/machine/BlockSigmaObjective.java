@@ -15,7 +15,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
-import assets.rivalrebels.common.tileentity.TileEntitySigmaObjective;
+import assets.rivalrebels.common.tileentity.SigmaObjectiveBlockEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -70,7 +70,7 @@ public class BlockSigmaObjective extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return new TileEntitySigmaObjective(pos, state);
+        return new SigmaObjectiveBlockEntity(pos, state);
     }
     @Nullable
     @Override

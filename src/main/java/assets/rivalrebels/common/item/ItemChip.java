@@ -32,13 +32,13 @@ import net.minecraft.world.level.Level;
 public class ItemChip extends Item {
 	public ItemChip()
 	{
-		super(new Properties().stacksTo(1).component(RRComponents.CHIP_DATA, ChipData.DEFAULT));
+		super(new Properties().stacksTo(1));
 	}
 
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-		if (RivalRebels.round.isStarted() && !stack.get(RRComponents.CHIP_DATA).isReady() && entity instanceof Player player) {
-            stack.set(RRComponents.CHIP_DATA, new ChipData(player.getGameProfile(), RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam, true));
+		if (RivalRebels.round.isStarted() && !stack.has(RRComponents.CHIP_DATA) && entity instanceof Player player) {
+            stack.set(RRComponents.CHIP_DATA, new ChipData(player.getGameProfile(), RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam));
 		}
 	}
 
@@ -72,9 +72,9 @@ public class ItemChip extends Item {
 
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
-        ChipData chipData = stack.get(RRComponents.CHIP_DATA);
-        if (chipData.isReady()) {
-			tooltipComponents.add(Component.nullToEmpty(chipData.team().name()));
+        if (stack.has(RRComponents.CHIP_DATA)) {
+            ChipData chipData = stack.get(RRComponents.CHIP_DATA);
+            tooltipComponents.add(Component.literal(chipData.team().name()));
             tooltipComponents.add(Component.literal("Player with name " + chipData.gameProfile().getName() + ", and uuid " + chipData.gameProfile().getId()));
 		}
 	}

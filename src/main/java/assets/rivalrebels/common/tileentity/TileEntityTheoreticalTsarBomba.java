@@ -35,7 +35,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -43,18 +42,17 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Container, Tickable, MenuProvider {
+public class TileEntityTheoreticalTsarBomba extends BaseContainerBlockEntity implements Tickable {
 	public GameProfile player = null;
 	public RivalRebelsTeam	rrteam			= null;
-	private final NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
+	private NonNullList<ItemStack> chestContents	= NonNullList.withSize(36, ItemStack.EMPTY);
 	public int				countdown		= RRConfig.SERVER.getNuclearBombCountdown() * 20;
 	public int				nuclear			= 0;
 	public boolean			hasAntennae		= false;
@@ -72,57 +70,6 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
 	public int getContainerSize()
 	{
 		return 21;
-	}
-
-    @Override
-	public ItemStack getItem(int slot)
-	{
-		return this.chestContents.get(slot);
-	}
-
-	@Override
-	public ItemStack removeItem(int index, int count) {
-		if (!this.getItem(index).isEmpty())
-		{
-			ItemStack var3;
-
-			if (this.getItem(index).getCount() <= count)
-			{
-				var3 = this.getItem(index);
-				this.setItem(index, ItemStack.EMPTY);
-            }
-			else
-			{
-				var3 = this.getItem(index).split(count);
-
-				if (this.getItem(index).isEmpty())
-				{
-					this.setItem(index, ItemStack.EMPTY);
-				}
-
-            }
-            return var3;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    @Override
-    public ItemStack removeItemNoUpdate(int index) {
-		if (!this.getItem(index).isEmpty())
-		{
-			ItemStack var2 = this.getItem(index);
-			this.setItem(index, ItemStack.EMPTY);
-			return var2;
-		}
-        return ItemStack.EMPTY;
-    }
-
-	@Override
-	public void setItem(int index, ItemStack stack) {
-		this.chestContents.set(index, stack);
-
-        stack.limitSize(this.getMaxStackSize(stack));
-        setChanged();
 	}
 
     @Override
@@ -257,24 +204,23 @@ public class TileEntityTheoreticalTsarBomba extends BlockEntity implements Conta
     }
 
     @Override
-    public Component getDisplayName() {
+    protected Component getDefaultName() {
         return Component.literal("Theoretical Tsar Bomba");
     }
 
     @Override
-    public void clearContent() {
-        this.chestContents.clear();
+    protected NonNullList<ItemStack> getItems() {
+        return this.chestContents;
     }
 
     @Override
-    public boolean isEmpty() {
-        return this.chestContents.stream().allMatch(ItemStack::isEmpty);
+    protected void setItems(NonNullList<ItemStack> items) {
+        this.chestContents = items;
     }
 
-    @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int syncId, Inventory inv, Player player) {
-        return new ContainerTheoreticalTsar(syncId, inv, this, containerData);
+    protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+        return new ContainerTheoreticalTsar(containerId, inventory, this, containerData);
     }
 
     private final ContainerData containerData = new ContainerData() {

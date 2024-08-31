@@ -36,7 +36,6 @@ public class GuiButton extends Button {
 			this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
 			int k = this.getYImage(this.isHovered);
 			context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 5, k * 11, this.width, this.height);
-			this.mouseDragged(mouseX, mouseY, 0, 0, 0);
 			int l = 0xffffff;
 
 			if (!this.active) {

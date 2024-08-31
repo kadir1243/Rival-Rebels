@@ -1,11 +1,8 @@
 package assets.rivalrebels.client.objfileloader;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.mixin.client.BufferBuilderAccessor;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
@@ -323,20 +320,6 @@ public class WavefrontObject {
             String[] tokens = trimmedLine.split(" ");
             String[] subTokens;
 
-            if (tokens.length == 3) {
-                if (currentGroupObject.glDrawingMode == null) {
-                    currentGroupObject.glDrawingMode = VertexFormat.Mode.TRIANGLES;
-                } else if (currentGroupObject.glDrawingMode != VertexFormat.Mode.TRIANGLES) {
-                    throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName + "' - Invalid number of points for face (expected 4, found " + tokens.length + ")");
-                }
-            } else if (tokens.length == 4) {
-                if (currentGroupObject.glDrawingMode == null) {
-                    currentGroupObject.glDrawingMode = VertexFormat.Mode.QUADS;
-                } else if (currentGroupObject.glDrawingMode != VertexFormat.Mode.QUADS) {
-                    throw new ModelFormatException("Error parsing entry ('" + line + "'" + ", line " + lineCount + ") in file '" + fileName + "' - Invalid number of points for face (expected 3, found " + tokens.length + ")");
-                }
-            }
-
             // f v1/vt1/vn1 v2/vt2/vn2 v3/vt3/vn3 ...
             if (isValidFace_V_VT_VN_Line(line)) {
                 face.vertices = new Vector3f[tokens.length];
@@ -420,25 +403,13 @@ public class WavefrontObject {
     public static class GroupObject {
         public String name;
         public List<Face> faces = new ArrayList<>();
-        public VertexFormat.Mode glDrawingMode;
 
         public GroupObject(String name) {
-            this(name, null);
-        }
-
-        public GroupObject(String name, VertexFormat.Mode glDrawingMode) {
             this.name = name;
-            this.glDrawingMode = glDrawingMode;
         }
 
         public void render(PoseStack pose, VertexConsumer buffer, int color, int light, int overlay) {
             if (!faces.isEmpty()) {
-                if (buffer instanceof BufferBuilder) {
-                    VertexFormat.Mode mode = ((BufferBuilderAccessor) buffer).getMode();
-                    if (mode != glDrawingMode) {
-                        RivalRebels.LOGGER.error("Drawing Mode is not correct expected: {}, found: {}", glDrawingMode, mode, new IllegalArgumentException("Drawing Mode is wrong"));
-                    }
-                }
                 for (Face face : faces) {
                     face.addFaceForRender(pose, buffer, color, light, overlay);
                 }

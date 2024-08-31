@@ -44,7 +44,7 @@ public record ItemUpdate(int item, int value) implements CustomPacketPayload {
             itemstack.set(RRComponents.TESLA_DIAL, message.value());
         }
         if (itemstack.getItem() instanceof ItemFlameThrower) {
-            itemstack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(message.value(), itemstack.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).isReady()));
+            itemstack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(message.value()));
         }
     }
 }

@@ -33,7 +33,7 @@ import net.minecraft.world.phys.AABB;
 
 public class EntityRhodesPiece extends Entity {
     public static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(EntityRhodesPiece.class, EntityDataSerializers.FLOAT);
-    public static final EntityDataAccessor<Integer> COLOR = SynchedEntityData.defineId(EntityRhodesPiece.class, EntityDataSerializers.INT);
+    public static final EntityDataAccessor<RhodesType> TYPE = SynchedEntityData.defineId(EntityRhodesPiece.class, RhodesType.DATA_SERIALIZER);
     protected double health;
 	private float myaw;
 	private float mpitch;
@@ -44,7 +44,7 @@ public class EntityRhodesPiece extends Entity {
 		setBoundingBox(new AABB(-1.5, -1.5, -1.5, 1.5, 1.5, 1.5));
 	}
 
-	public EntityRhodesPiece(EntityType<? extends EntityRhodesPiece> type, Level w, double x, double y, double z, float scale, int color)
+	public EntityRhodesPiece(EntityType<? extends EntityRhodesPiece> type, Level w, double x, double y, double z, float scale, RhodesType color)
 	{
 		this(type, w);
 		setPos(x, y, z);
@@ -65,17 +65,18 @@ public class EntityRhodesPiece extends Entity {
         entityData.set(SCALE, scale);
     }
 
-    public int getColor() {
-        return entityData.get(COLOR);
+    public RhodesType getColor() {
+        return entityData.get(TYPE);
     }
 
     @Environment(EnvType.CLIENT)
     public int getColorRGBA() {
-        return FastColor.ARGB32.colorFromFloat(1F, RenderRhodes.colors[getColor()*3], RenderRhodes.colors[getColor()*3+1], RenderRhodes.colors[getColor()*3+2]);
+        int rhodesType = getColor().ordinal();
+        return FastColor.ARGB32.colorFromFloat(1F, RenderRhodes.colors[rhodesType *3], RenderRhodes.colors[rhodesType *3+1], RenderRhodes.colors[rhodesType *3+2]);
     }
 
-    public void setColor(int color) {
-        entityData.set(COLOR, color);
+    public void setColor(RhodesType color) {
+        entityData.set(TYPE, color);
     }
 
     @Override
@@ -92,7 +93,7 @@ public class EntityRhodesPiece extends Entity {
 	@Override
 	public void tick() {
 		super.tick();
-		if (level().random.nextInt(Math.max(getMaxAge()*(RRConfig.SERVER.isRhodesPromode() ?1:30) - tickCount, RRConfig.SERVER.isRhodesPromode()?100:1))==0) {
+		if (random.nextInt(Math.max(getMaxAge()*(RRConfig.SERVER.isRhodesPromode() ?1:30) - tickCount, RRConfig.SERVER.isRhodesPromode()?100:1))==0) {
 			kill();
 		}
         setDeltaMovement(getDeltaMovement().scale(0.999));
@@ -138,7 +139,7 @@ public class EntityRhodesPiece extends Entity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(SCALE, 1F);
-        builder.define(COLOR, 0);
+        builder.define(TYPE, RhodesType.Rhodes);
     }
 
     @Override

@@ -44,7 +44,7 @@ public class GuiTsar extends AbstractContainerScreen<ContainerTsar> {
         float scalef = 0.666f;
 		matrices.pushPose();
 		matrices.scale(scalef, scalef, scalef);
-        context.drawString(font, Component.translatable("RivalRebels.tsar.tsar"), 18, 16, 4210752, false);
+        context.drawString(font, Component.translatable(Translations.TSAR_NAME.toLanguageKey()), 18, 16, 4210752, false);
 		matrices.popPose();
 		if (menu.isUnbalanced())
 		{
@@ -74,5 +74,11 @@ public class GuiTsar extends AbstractContainerScreen<ContainerTsar> {
         } else {
             graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFF0000, false);
         }
+    }
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
     }
 }

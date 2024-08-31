@@ -75,4 +75,10 @@ public class GuiAntimatterBomb extends AbstractContainerScreen<ContainerAntimatt
 		int y = (height - imageHeight) / 2;
         context.blit(RRIdentifiers.guitantimatterbomb, x, y, 0, 0, imageWidth, imageHeight);
 	}
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
 }

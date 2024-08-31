@@ -67,6 +67,7 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(RRBlocks.controller, "Laptop");
         lang.add(RRBlocks.reactor, "Reactor");
         lang.add(RRBlocks.flare, "Flare");
+        lang.add(RRBlocks.buildrhodes, "Rhodes Supply Crate");
 
 
         lang.add(RRItems.knife, "Cuchillo");
@@ -91,6 +92,9 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(RRItems.battery, "Battery");
         lang.add(RRItems.plasmacannon, "Plasma Cannon");
         lang.add(RRItems.hackm202, "M202-Hack");
+        lang.add(RRItems.emptyrod, "Empty Rod");
+        lang.add(RRItems.roda, "Roda");
+        lang.add(RRItems.armyshovel, "Sapper Shovel");
 
         addDamage(RRDamageTypes.ELECTRICITY, "%1s is Now Electric-Man");
         addDamage(RRDamageTypes.CHARGE, "%1s Charged");
@@ -115,6 +119,7 @@ public class LangGen extends FabricLanguageProvider { // TODO: Add Every Transla
         lang.add(Translations.BUILDING, "Constructing %s");
         lang.add(Translations.SPAWN_RESET_WARNING, "Warning: Resetting will clear your inventory");
         lang.add(Translations.RHODES_IS_ARMED, "%s Armed");
+        lang.add(Translations.TSAR_NAME, "Tsar Bomb");
 
         lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_1", "Radiological Alarm.");
         lang.add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_2", "Nuclear weapon armed.");

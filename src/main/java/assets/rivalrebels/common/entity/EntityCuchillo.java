@@ -34,6 +34,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityCuchillo extends Projectile {
     private boolean	inGround;
@@ -100,13 +101,7 @@ public class EntityCuchillo extends Projectile {
 				}
 			} else {
                 setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-				setYRot((float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
-				while (getYRot() - yRotO < -180.0F)
-					yRotO -= 360.0F;
-				while (getYRot() - yRotO >= 180.0F)
-					yRotO += 360.0F;
-                setXRot(getXRot() - 30);
-				setYRot(yRotO + (getYRot() - yRotO) * 0.2F);
+                this.updateRotation();
 
 				float friction = 0.98f;
 
@@ -129,7 +124,14 @@ public class EntityCuchillo extends Projectile {
 		}
 	}
 
-	@Override
+    @Override
+    protected void updateRotation() {
+        Vec3 vec3 = this.getDeltaMovement();
+        this.setXRot(getXRot() - 30);
+        this.setYRot(lerpRotation(this.yRotO, (float)(Mth.atan2(vec3.x, vec3.z) * 180.0F / (float)Math.PI)));
+    }
+
+    @Override
 	public void playerTouch(Player player) {
 		if (!level().isClientSide && inGround) {
 			if (!player.hasInfiniteMaterials()) player.getInventory().add(RRItems.knife.getDefaultInstance());

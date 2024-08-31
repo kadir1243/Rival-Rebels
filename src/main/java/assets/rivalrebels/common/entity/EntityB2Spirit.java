@@ -136,15 +136,15 @@ public class EntityB2Spirit extends Projectile {
 
 				if (distfromtarget > 80.0f)
 				{
-					mode = level().random.nextBoolean() ? 1 : 2;
+					mode = random.nextBoolean() ? 1 : 2;
 					if (trash)
 					{
 						carpet = true;
-						entityIndex = level().random.nextInt(ItemRoda.rodaindex);
+						entityIndex = random.nextInt(ItemRoda.rodaindex);
 					}
 					if (leave)
 					{
-						if (ticksSinceStart > 1000 && level().random.nextInt(4) == 1)
+						if (ticksSinceStart > 1000 && random.nextInt(4) == 1)
 						{
                             setDeltaMovement(getDeltaMovement().x(), 2F, getDeltaMovement().z());
 						}

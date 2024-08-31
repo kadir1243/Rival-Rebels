@@ -14,6 +14,8 @@ package assets.rivalrebels.common.container;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.item.RRItems;
 import java.util.function.Predicate;
+
+import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
@@ -21,9 +23,8 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
-public class SlotRR extends Slot
-{
-	private final int	maxStack;
+public class SlotRR extends Slot {
+	private final int maxStack;
     private final Predicate<ItemStack> stackLock;
     boolean acceptsTrollFace = false;
 	boolean acceptsTimedBomb = false;
@@ -42,6 +43,11 @@ public class SlotRR extends Slot
         this.maxStack = mstack;
         this.stackLock = stackLock;
     }
+
+    public SlotRR(Container inv, int id, int x, int y, int mstack, DataComponentType<?> only) {
+        this(inv, id, x, y, mstack, stack -> stack.has(only));
+    }
+
 
     @Override
     public boolean mayPickup(Player player) {

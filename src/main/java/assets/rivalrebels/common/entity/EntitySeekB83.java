@@ -106,11 +106,11 @@ public class EntitySeekB83 extends AbstractArrow {
 
 		if (tickCount == 0)
 		{
-			rotation = level().random.nextInt(360);
-			slide = level().random.nextInt(21) - 10;
+			rotation = random.nextInt(360);
+			slide = random.nextInt(21) - 10;
 			for (int i = 0; i < 10; i++)
 			{
-				level().addParticle(ParticleTypes.EXPLOSION, getX() - getDeltaMovement().x() * 2, getY() - getDeltaMovement().y() * 2, getZ() - getDeltaMovement().z() * 2, -getDeltaMovement().x() + (level().random.nextFloat() - 0.5f) * 0.1f, -getDeltaMovement().y() + (level().random.nextFloat() - 0.5) * 0.1f, -getDeltaMovement().z() + (level().random.nextFloat() - 0.5f) * 0.1f);
+				level().addParticle(ParticleTypes.EXPLOSION, getX() - getDeltaMovement().x() * 2, getY() - getDeltaMovement().y() * 2, getZ() - getDeltaMovement().z() * 2, -getDeltaMovement().x() + (random.nextFloat() - 0.5f) * 0.1f, -getDeltaMovement().y() + (random.nextFloat() - 0.5) * 0.1f, -getDeltaMovement().z() + (random.nextFloat() - 0.5f) * 0.1f);
 			}
 		}
 		rotation += (int) slide;

@@ -15,10 +15,9 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
-import assets.rivalrebels.common.tileentity.TileEntityOmegaObjective;
+import assets.rivalrebels.common.tileentity.OmegaObjectiveBlockEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -70,7 +69,7 @@ public class BlockOmegaObjective extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-		return new TileEntityOmegaObjective(pos, state);
+		return new OmegaObjectiveBlockEntity(pos, state);
 	}
     @Nullable
     @Override

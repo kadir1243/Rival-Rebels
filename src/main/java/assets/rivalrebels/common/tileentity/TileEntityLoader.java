@@ -117,9 +117,9 @@ public class TileEntityLoader extends BaseContainerBlockEntity implements Tickab
 					{
                         if (ter.on) {
                             for (int q = 0; q < items.size(); q++) {
-                                if (ter.fuel.isEmpty()) {
+                                if (ter.getFuel().isEmpty()) {
                                     if (!getItem(q).isEmpty() && getItem(q).getItem() instanceof ItemRod && getItem(q).getItem() != RRItems.emptyrod) {
-                                        ter.fuel = getItem(q);
+                                        ter.setFuel(getItem(q));
                                         setItem(q, RRItems.emptyrod.getDefaultInstance());
                                     }
                                 } else {

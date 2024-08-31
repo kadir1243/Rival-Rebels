@@ -412,7 +412,7 @@ public class EntityGore extends EntityInanimate {
 
 		if (isSliding)
 		{
-			if (bounces == -1) bounces = level().random.nextInt(2) + 2;
+			if (bounces == -1) bounces = random.nextInt(2) + 2;
 			if (bounces > 0)
 			{
 				bounces--;

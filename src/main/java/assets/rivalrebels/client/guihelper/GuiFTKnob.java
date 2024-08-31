@@ -22,8 +22,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 @Environment(EnvType.CLIENT)
-public class GuiFTKnob extends GuiButton
-{
+public class GuiFTKnob extends GuiButton {
 	protected int		mode;
 	protected boolean	pressed;
 
@@ -35,7 +34,6 @@ public class GuiFTKnob extends GuiButton
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         PoseStack matrices = context.pose();
-        this.mouseDragged(mouseX, mouseY, 0, 0,  0);
 		if (mode > 2) mode = 2;
 		if (mode < 0) mode = 0;
 		int state = 0;

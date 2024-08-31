@@ -117,9 +117,6 @@ public class ItemFlameThrower extends TieredItem {
 
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-		if (!stack.getOrDefault(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT).isReady()) {
-			stack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(2, true));
-		}
 		if (entity instanceof Player) {
             if (selected && world.random.nextInt(10) == 0 && !entity.isInWaterOrBubble()) {
                 entity.playSound(RRSounds.FLAME_THROWER_USE, 0.03f, 1F);

@@ -49,11 +49,11 @@ public class EntityPropulsionFX extends ThrowableProjectile
 	public void tick() {
 		super.tick();
 		ticksInAir++;
-		if ((ticksInAir >= 5 && level().random.nextInt(2) == 1) || this.isInWaterOrBubble()) {
+		if ((ticksInAir >= 5 && random.nextInt(2) == 1) || this.isInWaterOrBubble()) {
 			kill();
 		}
-        setPos(getX() + getDeltaMovement().x() + (level().random.nextDouble() - 0.5) * 0.07,
-            getY() + getDeltaMovement().y() + (level().random.nextDouble() - 0.5) * 0.07 + 0.005,
-            getZ() + getDeltaMovement().z() + (level().random.nextDouble() - 0.5) * 0.07);
+        setPos(getX() + getDeltaMovement().x() + (random.nextDouble() - 0.5) * 0.07,
+            getY() + getDeltaMovement().y() + (random.nextDouble() - 0.5) * 0.07 + 0.005,
+            getZ() + getDeltaMovement().z() + (random.nextDouble() - 0.5) * 0.07);
 	}
 }

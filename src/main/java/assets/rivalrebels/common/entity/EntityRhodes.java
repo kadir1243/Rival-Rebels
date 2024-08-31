@@ -28,6 +28,7 @@ import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.TileEntityNukeCrate;
 import assets.rivalrebels.common.tileentity.TileEntityReactor;
 import assets.rivalrebels.common.tileentity.TileEntityRhodesActivator;
+import assets.rivalrebels.common.util.ItemUtil;
 import assets.rivalrebels.common.util.ModBlockTags;
 import assets.rivalrebels.common.util.Translations;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -42,14 +43,13 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.VariantHolder;
 import net.minecraft.world.entity.ambient.AmbientCreature;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
@@ -80,7 +80,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import java.util.*;
 import java.util.function.Predicate;
 
-public class EntityRhodes extends Entity {
+public class EntityRhodes extends Entity implements VariantHolder<RhodesType> {
     public static final EntityDataAccessor<Boolean> FIRE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> PLASMA = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Float> HEALTH = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.FLOAT);
@@ -92,6 +92,8 @@ public class EntityRhodes extends Entity {
     public static final EntityDataAccessor<Integer> FLAME_COUNT = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Boolean> FORCE_FIELD = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<String> TEXTURE_LOCATION = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.STRING);
+    public static final EntityDataAccessor<RhodesType> TYPE = SynchedEntityData.defineId(EntityRhodes.class, RhodesType.DATA_SERIALIZER);
+    public static final EntityDataAccessor<Integer> ON_LASERS = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
 
     private int damageUntilWake = 100;
     private static final Set<Predicate<BlockState>> blocklist = new HashSet<>(Set.of(
@@ -113,27 +115,7 @@ public class EntityRhodes extends Entity {
         BlackList.of(ModBlockTags.GLAZED_TERRACOTTAS),
         BlackList.of(RRBlocks.reactive)
     ));
-	public static String[] names =
-	{
-		"Rhodes",
-		"Magnesium",
-		"Arsenic",
-		"Vanadium",
-		"Aurum",
-		"Iodine",
-		"Iron",
-		"Astatine",
-		"Cobalt",
-		"Strontium",
-		"Bismuth",
-		"Zinc",
-		"Osmium",
-		"Neon",
-		"Argent",
-		"Wolfram",
-		"Space"
-	};
-	public float bodyyaw = 0;
+    public float bodyyaw = 0;
 	public float headyaw = 0;
 	public float headpitch = 0;
 	public float leftarmyaw = 0;
@@ -159,10 +141,8 @@ public class EntityRhodes extends Entity {
 	public int flying = 0;
 
 	public int ticksSinceLastPacket = 0;
-	public byte laserOn = 0; // 0 = off, 1 = top, 2 = bottom, 3 = both
-	public byte colorType = 0;
-	public static byte lastct = 0;
-	public static int forcecolor = CommonColors.WHITE;
+    public static byte lastct = 0;
+	public static RhodesType forcecolor = RhodesType.Rhodes;
 	public Player rider;
 	public Player passenger1;
 	public Player passenger2;
@@ -201,18 +181,17 @@ public class EntityRhodes extends Entity {
 		actionqueue.add(new RhodesAction(0, 1));
 		RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
         setTextureLocation(texloc);
-		if (forcecolor == CommonColors.WHITE) {
-            int[] rhodesTeams = RRConfig.SERVER.getRhodesTeams();
-            colorType = (byte) rhodesTeams[lastct];
-			if (!w.isClientSide())
-			{
+		if (forcecolor == RhodesType.Rhodes) {
+            RhodesType[] rhodesTeams = RRConfig.SERVER.getRhodesTeams();
+            setVariant(rhodesTeams[lastct]);
+			if (!w.isClientSide()) {
 				lastct++;
 				if (lastct == rhodesTeams.length) lastct = 0;
 			}
 		}
 		else
 		{
-			colorType = (byte) forcecolor;
+			setVariant(forcecolor);
 		}
 		RandomSource random = RandomSource.create(RRConfig.SERVER.getRhodesRandomSeed());
 		setNukeCount(RRConfig.SERVER.getRhodesNukes());
@@ -345,16 +324,16 @@ public class EntityRhodes extends Entity {
 				{
 					float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
 					float cyaw = Mth.cos(bodyyaw * Mth.DEG_TO_RAD);
-					level().addFreshEntity(new EntityRhodesHead(level(), getX(), getY()+13*getScale(), getZ(), getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesTorso(level(), getX(), getY()+7*getScale(), getZ(), getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesLeftUpperArm(level(), getX()+cyaw*6.4*getScale(), getY()+7*getScale(), getZ()+syaw*6.4*getScale(),getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesRightUpperArm(level(), getX()-cyaw*6.4*getScale(), getY()+7*getScale(), getZ()-syaw*6.4*getScale(),getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesLeftLowerArm(level(), getX()+cyaw*6.4*getScale(), getY()+3*getScale(), getZ()+syaw*6.4*getScale(),getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesRightLowerArm(level(), getX()-cyaw*6.4*getScale(), getY()+3*getScale(), getZ()-syaw*6.4*getScale(),getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesLeftUpperLeg(level(), getX()+cyaw*3*getScale(), getY()-3*getScale(), getZ()+syaw*3*getScale(),getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesRightUpperLeg(level(), getX()-cyaw*3*getScale(), getY()-3*getScale(), getZ()-syaw*3*getScale(),getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesLeftLowerLeg(level(), getX()+cyaw*3*getScale(), getY()-10*getScale(), getZ()+syaw*3*getScale(),getScale(), colorType));
-					level().addFreshEntity(new EntityRhodesRightLowerLeg(level(), getX()-cyaw*3*getScale(), getY()-10*getScale(), getZ()-syaw*3*getScale(),getScale(), colorType));
+					level().addFreshEntity(new EntityRhodesHead(level(), getX(), getY()+13*getScale(), getZ(), getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesTorso(level(), getX(), getY()+7*getScale(), getZ(), getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesLeftUpperArm(level(), getX()+cyaw*6.4*getScale(), getY()+7*getScale(), getZ()+syaw*6.4*getScale(),getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesRightUpperArm(level(), getX()-cyaw*6.4*getScale(), getY()+7*getScale(), getZ()-syaw*6.4*getScale(),getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesLeftLowerArm(level(), getX()+cyaw*6.4*getScale(), getY()+3*getScale(), getZ()+syaw*6.4*getScale(),getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesRightLowerArm(level(), getX()-cyaw*6.4*getScale(), getY()+3*getScale(), getZ()-syaw*6.4*getScale(),getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesLeftUpperLeg(level(), getX()+cyaw*3*getScale(), getY()-3*getScale(), getZ()+syaw*3*getScale(),getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesRightUpperLeg(level(), getX()-cyaw*3*getScale(), getY()-3*getScale(), getZ()-syaw*3*getScale(),getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesLeftLowerLeg(level(), getX()+cyaw*3*getScale(), getY()-10*getScale(), getZ()+syaw*3*getScale(),getScale(), getVariant()));
+					level().addFreshEntity(new EntityRhodesRightLowerLeg(level(), getX()-cyaw*3*getScale(), getY()-10*getScale(), getZ()-syaw*3*getScale(),getScale(), getVariant()));
 				}
 			}
             setHealth(getHealth() - 1);
@@ -785,10 +764,10 @@ public class EntityRhodes extends Entity {
 			{
 				flying = 0;
 			}
-			laserOn = 0;
+			setOnLaserData(0);
 			if (!stop)
 			{
-				float goal = ((((rider.yHeadRot+bodyyaw)%360)+360+360)%360)-180;
+				float goal = ((((rider.getYHeadRot()+bodyyaw)%360)+360+360)%360)-180;
 				bodyyaw += Math.max(Math.min(goal, 2), -2);
 				if (flying > 0)
 				{
@@ -849,7 +828,7 @@ public class EntityRhodes extends Entity {
 
 			if (laser)
 			{
-				laserOn = (byte)(level().random.nextInt(2)+1);
+				setOnLaserData(random.nextInt(2)+1);
 				RivalRebelsSoundPlayer.playSound(this, 22, 1, 30f, 0f);
 				float x = (float) (getX() - endx);
 				float y = (float) (getY() + 13*getScale() - endy);
@@ -880,10 +859,7 @@ public class EntityRhodes extends Entity {
                             if (entity.subtract(start).cross(entity.subtract(end)).distanceToSqr(0, 0, 0) < 10000 * bbx) {
                                 e.hurt(RivalRebelsDamageSource.laserBurst(level()), 24);
                                 if (e instanceof Player player) {
-                                    EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-                                    if (!player.getItemBySlot(slot).isEmpty()) {
-                                        player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
-                                    }
+                                    ItemUtil.damageRandomArmor(player, 24, random);
                                     if (player.getHealth() < 3 && player.isAlive()) {
                                         player.hurt(RivalRebelsDamageSource.laserBurst(level()), 2000000);
                                         player.deathTime = 0;
@@ -1311,7 +1287,7 @@ public class EntityRhodes extends Entity {
 				rightarmyaw  = approach(rightarmyaw,   0);
 				leftarmyaw   = approach(leftarmyaw,    0);
 				headpitch   = approach(headpitch, 0);
-				laserOn = 0;
+                setOnLaserData(0);
 				if (teamToRaid == RivalRebelsTeam.OMEGA)
 				{
                     setHealth(getHealth() + RivalRebels.round.takeOmegaHealth(Math.min(50, RRConfig.SERVER.getRhodesHealth()-getHealth())));
@@ -1367,7 +1343,7 @@ public class EntityRhodes extends Entity {
 		double priority = 0;
         List<Entity> otherEntities = level().getEntities(this, Shapes.INFINITY.bounds());
         for (Entity e : otherEntities) {
-            if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) && (!(e instanceof EntityRhodes) || (RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || ((EntityRhodes) e).colorType != colorType))) &&
+            if (e.isAlive() && (!(e instanceof LivingEntity) || ((LivingEntity) e).getHealth() > 0) && (!(e instanceof EntityRhodes) || (RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || ((EntityRhodes) e).getVariant() != getVariant()))) &&
                     !(e instanceof Projectile
                             || e instanceof EntityInanimate
                             || e instanceof ItemEntity
@@ -1857,7 +1833,7 @@ public class EntityRhodes extends Entity {
             }
 		}
 
-		laserOn = (byte) 0;
+        setOnLaserData(0);
 		if (lastLaserTarget != null && lastLaserTarget.isAlive())
 		{
 			float x = (float) (getX() - lastLaserTarget.getX());
@@ -1875,14 +1851,11 @@ public class EntityRhodes extends Entity {
 
 			if (pointing)
 			{
-				laserOn = (byte) (endangered?3:random.nextInt(2)+1);
+				setOnLaserData(endangered?3:random.nextInt(2)+1);
 				RivalRebelsSoundPlayer.playSound(this, 22, 1, 30f, 0f);
 				if (lastLaserTarget instanceof Player player) {
-					EquipmentSlot slot = EquipmentSlot.values()[level().random.nextInt(4) + 2];
-					if (!player.getItemBySlot(slot).isEmpty()) {
-                        player.getItemBySlot(slot).hurtAndBreak(24, player, slot);
-					}
-					lastLaserTarget.hurt(RivalRebelsDamageSource.laserBurst(level()), laserOn==3?16:8);
+                    ItemUtil.damageRandomArmor(player, 24, random);
+					lastLaserTarget.hurt(RivalRebelsDamageSource.laserBurst(level()), isAllLaserEnabled()?16:8);
 					if (player.getHealth() < 3 && player.isAlive()) {
 						player.hurt(RivalRebelsDamageSource.laserBurst(level()), 2000000);
 						player.deathTime = 0;
@@ -1896,7 +1869,7 @@ public class EntityRhodes extends Entity {
 				}
 				else
 				{
-					lastLaserTarget.hurt(RivalRebelsDamageSource.laserBurst(level()), laserOn==3?16:8);
+					lastLaserTarget.hurt(RivalRebelsDamageSource.laserBurst(level()), isAllLaserEnabled()?16:8);
 					if (!lastLaserTarget.isAlive() || (lastLaserTarget instanceof LivingEntity && ((LivingEntity)lastLaserTarget).getHealth() < 3))
 					{
 						int legs;
@@ -1992,7 +1965,7 @@ public class EntityRhodes extends Entity {
 	private float getPriority(Entity e) {
 		if (e instanceof Player) return e.isInvulnerable()?-100:600;
 		if (e instanceof LivingEntity) return ((LivingEntity)e).getMaxHealth()+100;
-		if ((e instanceof EntityRhodes && (RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || ((EntityRhodes)e).colorType != colorType))) || e instanceof EntityB2Spirit) return 800;
+		if ((e instanceof EntityRhodes && (RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || ((EntityRhodes)e).getVariant() != getVariant()))) || e instanceof EntityB2Spirit) return 800;
 		if (e.getBoundingBox().getSize() > 3) return (float) (e.getBoundingBox().getSize()*3 + 500 + e.getBbHeight());
 		return 0;
 	}
@@ -2109,9 +2082,8 @@ public class EntityRhodes extends Entity {
 		return lastrightshinpitch + (rightshinpitch - lastrightshinpitch) * f;
 	}
 
-	public Component getName()
-	{
-        return Component.literal(names[colorType]);
+	public Component getName() {
+        return Component.literal(getVariant().getSerializedName());
 	}
 
 	@Override
@@ -2134,7 +2106,7 @@ public class EntityRhodes extends Entity {
 		nbt.putInt("walkstate", walkstate);
 		nbt.putFloat("health", getHealth());
 		nbt.putInt("damageuntilwake", damageUntilWake);
-		nbt.putByte("color", colorType);
+		nbt.putInt("type", getVariant().ordinal());
 		nbt.putInt("rocketcount", getRocketCount());
 		nbt.putInt("energy", getEnergy());
 		nbt.putInt("b2energy", getB2Energy());
@@ -2164,7 +2136,7 @@ public class EntityRhodes extends Entity {
 		walkstate = nbt.getInt("walkstate");
 		setHealth(nbt.getFloat("health"));
 		damageUntilWake = nbt.getInt("damageuntilwake");
-		colorType = nbt.getByte("color");
+		setVariant(RhodesType.values()[nbt.getInt("type")]);
 		setRocketCount(nbt.getInt("rocketcount"));
 		setEnergy(nbt.getInt("energy"));
 		setB2Energy(nbt.getInt("b2energy"));
@@ -2209,6 +2181,18 @@ public class EntityRhodes extends Entity {
         builder.define(FLAME_COUNT, 10000);
         builder.define(FORCE_FIELD, false);
         builder.define(TEXTURE_LOCATION, "");
+        builder.define(TYPE, RhodesType.Rhodes);
+        builder.define(ON_LASERS, 0);
+    }
+
+    @Override
+    public RhodesType getVariant() {
+        return entityData.get(TYPE);
+    }
+
+    @Override
+    public void setVariant(RhodesType variant) {
+        entityData.set(TYPE, variant);
     }
 
     public String getTextureLocation() {
@@ -2301,5 +2285,33 @@ public class EntityRhodes extends Entity {
 
     private BlockState getBlockState(int x, int y, int z) {
         return level().getBlockState(new BlockPos(x, y, z));
+    }
+
+    public void enableTopLaser() {
+        entityData.set(ON_LASERS, entityData.get(ON_LASERS) | 1);
+    }
+
+    public void enableBottomLaser() {
+        entityData.set(ON_LASERS, entityData.get(ON_LASERS) | 2);
+    }
+
+    public void setOnLaserData(int data) {
+        entityData.set(ON_LASERS, data);
+    }
+
+    public boolean isTopLaserEnabled() {
+        return (entityData.get(ON_LASERS) & 1) != 0;
+    }
+
+    public boolean isBottomLaserEnabled() {
+        return (entityData.get(ON_LASERS) & 2) != 0;
+    }
+
+    public boolean isAnyLaserEnabled() {
+        return isTopLaserEnabled() || isBottomLaserEnabled();
+    }
+
+    public boolean isAllLaserEnabled() {
+        return isTopLaserEnabled() && isBottomLaserEnabled();
     }
 }

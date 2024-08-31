@@ -45,4 +45,10 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
 		context.blit(RRIdentifiers.guitloader, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
 	}
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
 }
