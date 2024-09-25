@@ -25,9 +25,9 @@ public class RoddiskBase extends Projectile {
     public RoddiskBase(EntityType<? extends RoddiskBase> type, Level world, Entity shooter, float speed) {
         this(type, world, shooter);
         this.moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
-        setPos(getX() - (Mth.cos(this.getYRot() / 180.0F * Mth.PI) * 0.16F),
+        setPos(getX() - (Mth.cos(this.getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             getY() - 0.1,
-            getZ() - (Mth.sin(this.getYRot() / 180.0F * Mth.PI) * 0.16F)
+            getZ() - (Mth.sin(this.getYRot() * Mth.DEG_TO_RAD) * 0.16F)
         );
 
         this.shootFromRotation(shooter, shooter.getXRot(), shooter.getYRot(), 0, speed * 1.5F, 1.0F);

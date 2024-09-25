@@ -14,10 +14,12 @@ package assets.rivalrebels.common.item.weapon;
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.entity.*;
-import assets.rivalrebels.common.explosion.NuclearExplosion;
 import assets.rivalrebels.common.item.components.RRComponents;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsRank;
+import assets.rivalrebels.common.util.ModBlockTags;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -26,6 +28,7 @@ import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -182,8 +185,8 @@ public class ItemRoda extends Item
 	public static int rodaindex = 23;
 
 	public static void spawn(int index, Level world, double x, double y, double z, double mx, double my, double mz, double speed, double random) {
-		if ("roda".equals(entities[index]))
-		{
+        if (world.isClientSide()) return;
+        if ("roda".equals(entities[index])) {
 			int newindex = world.random.nextInt(index);
 			spawn(newindex, world, x,y,z,mx,my,mz,speed,random);
 			return;
@@ -197,139 +200,60 @@ public class ItemRoda extends Item
         mx = velocity.x();
         my = velocity.y();
         mz = velocity.z();
-		Entity e = null;
-		switch(index)
-		{
-		case 0:
-			e = new EntityFlameBall(world, x,y,z,mx,my,mz);
-		break;
-		case 1:
-			e = new EntityFlameBall1(world, x,y,z,mx,my,mz);
-		break;
-		case 2:
-			e = new EntityFlameBall2(world, x,y,z,mx,my,mz);
-		break;
-		case 3:
-			e = new EntityPlasmoid(world, x,y,z,mx,my,mz,1.0f);
-		break;
-		case 4:
-			e = new EntityGasGrenade(world, x,y,z,mx,my,mz);
-		break;
-		case 5:
-			e = new EntityRaytrace(world, x,y,z,mx,my,mz);
-		break;
-		case 6:
-			e = new EntityCuchillo(world, x,y,z,mx,my,mz);
-		break;
-		case 7:
-			e = new EntityRocket(world, x,y,z,mx,my,mz);
-		break;
-		case 8:
-			e = new EntityLaserBurst(world, x,y,z,mx,my,mz);
-		break;
-		case 9:
-			e = new EntityGore(world, x,y,z,mx,my,mz,world.random.nextInt(3), world.random.nextInt(11)+1);
-		break;
-		case 10:
-			e = new EntityBomb(world, x,y,z,mx,my,mz);
-		break;
-		case 11:
-			e = EntityType.CREEPER.create(world);
-			e.setPos(x,y,z);
+		Entity e = switch (index) {
+            case 0 -> new EntityFlameBall(world);
+            case 1 -> new EntityFlameBall1(world);
+            case 2 -> new EntityFlameBall2(world);
+            case 3 -> new EntityPlasmoid(world, x, y, z, mx, my, mz, 1.0f);
+            case 4 -> new EntityGasGrenade(world, mx, my, mz);
+            case 5 -> new EntityRaytrace(world, mx, my, mz);
+            case 6 -> new EntityCuchillo(world, mx, my, mz);
+            case 7 -> new EntityRocket(world, mx, my, mz);
+            case 8 -> new EntityLaserBurst(world, mx, my, mz);
+            case 9 -> new EntityGore(world, mx, my, mz, world.random.nextInt(3), world.random.nextInt(11) + 1);
+            case 10 -> new EntityBomb(world, x, y, z, mx, my, mz);
+            case 11 -> EntityType.CREEPER.create(world);
+            case 12 -> EntityType.SNOW_GOLEM.create(world);
+            case 13 -> new EntityRoddiskRebel(world);
+            case 14 -> new EntitySeekB83(world);
+            case 15 -> EntityType.ZOMBIFIED_PIGLIN.create(world);
+            case 16 -> EntityType.ZOMBIE.create(world);
+            case 17 -> new PrimedTnt(world, x, y, z, null);
+            case 18 -> EntityType.IRON_GOLEM.create(world);
+            case 19 -> {
+                Entity zomb = EntityType.ZOMBIFIED_PIGLIN.create(world);
+                zomb.setPos(x, y, z);
+                zomb.setDeltaMovement(velocity);
+                world.addFreshEntity(zomb);
+                Chicken chicken = EntityType.CHICKEN.create(world);
+                zomb.startRiding(chicken);
+                yield chicken;
+            }
+            case 20 -> new EntityDebris(world, world.registryAccess().registryOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR));
+            case 21 -> {
+                Block[] blocks2 = new Block[]{RRBlocks.ammunition, RRBlocks.supplies, RRBlocks.weapons, RRBlocks.explosives, RRBlocks.omegaarmor, RRBlocks.sigmaarmor};
+                Block b2 = blocks2[world.random.nextInt(blocks2.length)];
+                yield new EntityDebris(world, b2);
+            }
+            case 22 -> {
+                Block[] blocks3 = new Block[]{Blocks.SAND, Blocks.GRAVEL, Blocks.COBBLESTONE, Blocks.DIRT};
+                Block b3 = blocks3[world.random.nextInt(blocks3.length)];
+                yield new EntityDebris(world, b3);
+            }
+            case 24 -> new EntityB83(world, mx, my, mz);
+            case 25 -> new EntityHackB83(world, mx, my, mz, false);
+            case 26 -> new EntityHackB83(world, mx, my, mz, true);
+            case 27 -> new EntityNuke(world, mx, my, mz);
+            case 28 -> new EntityTsar(world, mx, my, mz, 1);
+            case 29 -> new EntityTheoreticalTsar(world, mx, my, mz, 1);
+            case 30 -> new EntityHotPotato(world, x, y, z);
+            case 31 -> new EntityAntimatterBomb(world, mx, my, mz, 1);
+            case 32 -> new EntityTachyonBomb(world, mx, my, mz, 1);
+            default -> null;
+        };
+        if (e != null) {
+            e.setPos(x, y, z);
             e.setDeltaMovement(velocity);
-		break;
-		case 12:
-			e = EntityType.SNOW_GOLEM.create(world);
-			e.setPos(x,y,z);
-            e.setDeltaMovement(velocity);
-		break;
-		case 13:
-			e = new EntityRoddiskRebel(world);
-			e.setPos(x,y,z);
-            e.setDeltaMovement(velocity);
-		break;
-		case 14:
-			e = new EntitySeekB83(world);
-			e.setPos(x,y,z);
-            e.setDeltaMovement(velocity);
-		break;
-		case 15:
-			e = EntityType.ZOMBIFIED_PIGLIN.create(world);
-			e.setPos(x,y,z);
-            e.setDeltaMovement(velocity);
-		break;
-		case 16:
-			e = EntityType.ZOMBIE.create(world);
-			e.setPos(x,y,z);
-            e.setDeltaMovement(velocity);
-		break;
-		case 17:
-			e = new PrimedTnt(world, x, y, z, null);
-            e.setDeltaMovement(velocity);
-		break;
-		case 18:
-			e = EntityType.IRON_GOLEM.create(world);
-			e.setPos(x,y,z);
-            e.setDeltaMovement(velocity);
-		break;
-		case 19:
-			Entity zomb = EntityType.ZOMBIFIED_PIGLIN.create(world);
-			zomb.setPos(x,y,z);
-            zomb.setDeltaMovement(velocity);
-			world.addFreshEntity(zomb);
-			e = EntityType.CHICKEN.create(world);
-			e.setPos(x,y,z);
-            e.setDeltaMovement(velocity);
-			zomb.startRiding(e);
-		break;
-		case 20:
-			Block[] blocks1 = NuclearExplosion.prblocks;
-			Block b1 = blocks1[world.random.nextInt(blocks1.length)];
-			e = new EntityDebris(world,x,y,z,mx,my,mz,b1);
-		break;
-		case 21:
-			Block[] blocks2 = new Block[]{RRBlocks.ammunition, RRBlocks.supplies, RRBlocks.weapons, RRBlocks.explosives, RRBlocks.omegaarmor, RRBlocks.sigmaarmor};
-			Block b2 = blocks2[world.random.nextInt(blocks2.length)];
-			e = new EntityDebris(world,x,y,z,mx,my,mz,b2);
-		break;
-		case 22:
-			Block[] blocks3 = new Block[]{Blocks.SAND,Blocks.GRAVEL,Blocks.COBBLESTONE,Blocks.DIRT};
-			Block b3 = blocks3[world.random.nextInt(blocks3.length)];
-			e = new EntityDebris(world,x,y,z,mx,my,mz,b3);
-		break;
-		case 23:
-		break;
-		case 24:
-			e = new EntityB83(world, x,y,z,mx,my,mz);
-		break;
-		case 25:
-			e = new EntityHackB83(world, x,y,z,mx,my,mz,false);
-		break;
-		case 26:
-			e = new EntityHackB83(world, x,y,z,mx,my,mz,true);
-		break;
-		case 27:
-			e = new EntityNuke(world, x,y,z,mx,my,mz);
-		break;
-		case 28:
-			e = new EntityTsar(world, x,y,z,mx,my,mz,1);
-		break;
-		case 29:
-			e = new EntityTheoreticalTsar(world, x,y,z,mx,my,mz,1);
-		break;
-		case 30:
-			e = new EntityHotPotato(world, x,y,z,mx,my,mz);
-		break;
-		case 31:
-			e = new EntityAntimatterBomb(world, x,y,z,mx,my,mz,1);
-		break;
-		case 32:
-			e = new EntityTachyonBomb(world, x,y,z,mx,my,mz,1);
-		break;
-		}
-		if (world.isClientSide()) return;
-		if (e != null)
-		{
 			world.addFreshEntity(e);
 		}
 	}
@@ -358,9 +282,9 @@ public class ItemRoda extends Item
 				player.setItemInHand(hand, ItemStack.EMPTY);
 				return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 			}
-			double motionX = (-Mth.sin(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI));
-			double motionZ = (Mth.cos(player.getYRot() / 180.0F * Mth.PI) * Mth.cos(player.getXRot() / 180.0F * Mth.PI));
-			double motionY = (-Mth.sin(player.getXRot() / 180.0F * Mth.PI));
+			double motionX = (-Mth.sin(player.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(player.getXRot() * Mth.DEG_TO_RAD));
+			double motionZ = (Mth.cos(player.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(player.getXRot() * Mth.DEG_TO_RAD));
+			double motionY = (-Mth.sin(player.getXRot() * Mth.DEG_TO_RAD));
 			spawn(rodaindex, world, player.getX(), player.getY() + 3.0, player.getZ(),motionX,motionY,motionZ, 1.0,0.0);
             return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
         }
@@ -377,35 +301,27 @@ public class ItemRoda extends Item
     public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
 		if (attacker.level().isClientSide()) return true;
 		RandomSource r = attacker.getRandom();
-		double x = target.getX() - attacker.getX();
-		double y = target.getY() - attacker.getY();
-		double z = target.getZ() - attacker.getZ();
+        Vec3 vector = target.position().subtract(attacker.position());
 
-		double dist = Math.sqrt(x * x + y * y + z * z);
+        switch (r.nextInt(4)) {
+            case 0 -> {
+                vector = vector.normalize().reverse();
 
-		switch (r.nextInt(4))
-		{
-			case 0:
-				x /= -dist;
-				y /= -dist;
-				z /= -dist;
+                target.setDeltaMovement(
+                    vector.x * 3 + (r.nextFloat() - 0.5f) * 0.1,
+                    vector.y * 3 + (r.nextFloat() - 0.5f) * 0.1,
+                    vector.z * 3 + (r.nextFloat() - 0.5f) * 0.1);
+            }
+            case 1 -> {
+                vector = vector.normalize().reverse();
 
-				target.setDeltaMovement(
-                    x * 3 + (r.nextFloat() - 0.5f) * 0.1,
-                    y * 3 + (r.nextFloat() - 0.5f) * 0.1,
-                    z * 3 + (r.nextFloat() - 0.5f) * 0.1);
-			break;
-			case 1:
-				x /= dist;
-				y /= dist;
-				z /= dist;
-
-				target.setDeltaMovement(
-                    x * 2 + (r.nextFloat() - 0.5f) * 0.1,
-                    y * 2 + (r.nextFloat() - 0.5f) * 0.1,
-                    z * 2 + (r.nextFloat() - 0.5f) * 0.1);
-			break;
-		}
+                target.setDeltaMovement(
+                    vector.x * 2 + (r.nextFloat() - 0.5f) * 0.1,
+                    vector.y * 2 + (r.nextFloat() - 0.5f) * 0.1,
+                    vector.z * 2 + (r.nextFloat() - 0.5f) * 0.1);
+            }
+            default -> {}
+        }
 		return true;
 	}
 }

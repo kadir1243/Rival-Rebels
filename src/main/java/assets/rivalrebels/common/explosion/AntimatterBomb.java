@@ -102,7 +102,7 @@ public class AntimatterBomb {
 		}
 		else
 		{
-			tsarblast.tsar = null;
+			tsarblast.bomb = null;
 			tsarblast.kill();
 		}
 	}
@@ -121,7 +121,7 @@ public class AntimatterBomb {
 
 			for (int Y = y; Y > ylimit; Y--)
 			{
-				if (Y == 0) break;
+				if (Y == world.getMinBuildHeight()) break;
 				BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
 				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
@@ -133,7 +133,7 @@ public class AntimatterBomb {
 			{
 				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--)
 				{
-					if (Y == 0) break;
+					if (Y == world.getMinBuildHeight()) break;
 					BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();

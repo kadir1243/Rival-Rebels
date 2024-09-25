@@ -16,7 +16,6 @@ import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -42,8 +41,8 @@ public class ItemSafePill extends Item
 			player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Regenerating...").withStyle(ChatFormatting.YELLOW)), true);
 			RivalRebelsSoundPlayer.playSound(player, 15, 1);
 			RivalRebelsSoundPlayer.playSound(player, 28, 18);
-			world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
-			world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+			player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
+			player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 			player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 10, 20));
 			player.getFoodData().eat(10, 200);
 			player.heal(10);

@@ -25,6 +25,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 
 public class EntityPlasmoid extends Projectile {
     public int				rotation	= 45;
@@ -52,9 +53,9 @@ public class EntityPlasmoid extends Projectile {
         speed *= (isNoGravity() ? 1 : 3);
         this.setOwner(thrower);
 		moveTo(
-            thrower.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+            thrower.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             thrower.getEyeY(),
-            thrower.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F),
+            thrower.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             thrower.getYRot(),
             thrower.getXRot());
 		shootFromRotation(thrower, thrower.getXRot(), thrower.getYRot(), 0, speed * 1.5F, 1.0F);
@@ -62,10 +63,10 @@ public class EntityPlasmoid extends Projectile {
 
 	public EntityPlasmoid(Level world, double px, double py, double pz, double x, double y, double z, float d) {
 		this(world);
-		double f = d/Math.sqrt(x*x+y*y+z*z);
-		setPos(px+x*f, py+y*f, pz+z*f);
+        Vec3 vector = new Vec3(x, y, z);
+		setPos(vector.add(px, py, pz).normalize().scale(d));
         setDeltaMovement(x, y, z);
-		float var10 = Mth.sqrt((float) (x * x + z * z));
+		double var10 = vector.horizontalDistance();
 		setYRot(yRotO = (float) (Math.atan2(x, z) * Mth.RAD_TO_DEG));
 		setXRot(xRotO = (float) (Math.atan2(y, var10) * Mth.RAD_TO_DEG));
 	}

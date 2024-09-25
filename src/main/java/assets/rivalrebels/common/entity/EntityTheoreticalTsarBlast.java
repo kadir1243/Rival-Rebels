@@ -12,7 +12,6 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.explosion.TsarBomba;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
@@ -29,7 +28,7 @@ public class EntityTheoreticalTsarBlast extends EntityTsarBlast {
 
     public EntityTheoreticalTsarBlast(Level level, float x, float y, float z, TsarBomba tsarBomba, int rad) {
         this(level);
-        tsar = tsarBomba;
+        bomb = tsarBomba;
         radius = rad;
         setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
         setPos(x, y, z);

@@ -14,7 +14,6 @@ package assets.rivalrebels.client.renderentity;
 import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodesHead;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,12 +27,7 @@ public class RenderRhodesHead extends RhodesPartRenderer<EntityRhodesHead> {
     }
 
     @Override
-    public void render(EntityRhodesHead entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        matrices.pushPose();
-        matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
-        matrices.mulPose(Axis.YP.rotationDegrees(yaw));
-        matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
-        ObjModels.renderSolid(ObjModels.head, RenderRhodes.texture, matrices, vertexConsumers, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
-        matrices.popPose();
+    public void renderParts(EntityRhodesHead entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        ObjModels.renderSolid(ObjModels.head, getTextureLocation(entity), poseStack, bufferSource, entity.getColorRGBA(), packedLight, OverlayTexture.NO_OVERLAY);
     }
 }

@@ -16,7 +16,6 @@ import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import java.util.List;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -47,7 +46,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
 	{
 		if (random.nextInt(10) == 0)
 		{
-			level().playLocalSound(this.getX(), getY(), getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 10.0F, 0.50F, true);
+			this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
 		}
 		else
 		{

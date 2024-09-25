@@ -49,29 +49,22 @@ public class EntityRocket extends AbstractArrow
         this(RREntities.ROCKET, world);
     }
 
-	public EntityRocket(Level level, double x, double y, double z) {
-		this(level);
-		setPos(x, y, z);
-	}
-
-	public EntityRocket(Level level, Entity entity, float inaccuracy) {
+    public EntityRocket(Level level, Entity entity, float inaccuracy) {
 		this(level);
         fins = false;
         this.setOwner(entity);
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(
-            getX() - Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F,
+            getX() - Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F,
             getY(),
-            getZ() - Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F
+            getZ() - Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F
         );
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, inaccuracy);
 	}
 
-	public EntityRocket(Level level, double x, double y,double z, double mx, double my, double mz) {
+	public EntityRocket(Level level, double mx, double my, double mz) {
 		this(level);
 		fins = false;
-		setPos(x,y,z);
-        setDeltaMovement(mx, my, mz);
         this.setYRot((float)(Mth.atan2(mx, mz) * 180.0F / Mth.PI));
         this.setXRot((float)(Mth.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0F / Mth.PI));
         this.yRotO = this.getYRot();

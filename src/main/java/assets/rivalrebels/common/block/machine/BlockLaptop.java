@@ -30,7 +30,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
-import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,8 +59,7 @@ public class BlockLaptop extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        TileEntityLaptop laptop = (TileEntityLaptop) level.getBlockEntity(pos);
-        player.openMenu(laptop);
+        player.openMenu(getMenuProvider(state, level, pos));
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 
 		return InteractionResult.sidedSuccess(level.isClientSide());

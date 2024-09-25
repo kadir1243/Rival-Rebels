@@ -38,7 +38,7 @@ public class BlockJump extends Block implements EntityBlock {
     public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
         if (entity instanceof LivingEntity) {
             entity.push(0, 2, 0);
-			world.playLocalSound(pos.getX(), pos.getY(), pos.getZ(), SoundEvents.ARROW_HIT, SoundSource.BLOCKS, 3F, 2, true);
+			world.playLocalSound(pos, SoundEvents.ARROW_HIT, SoundSource.BLOCKS, 3F, 2, true);
 		}
 	}
 

@@ -55,20 +55,14 @@ public class EntityNuke extends ThrowableProjectile {
 			explode();
 		}
 	}
-	public EntityNuke(Level level, double x, double y,double z, double mx, double my, double mz)
-	{
-		this(level);
-		setPos(x,y,z);
-		aoc = 1;
-		setAnglesMotion(mx, my, mz);
-	}
 
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
+	public EntityNuke(Level level, double mx, double my, double mz) {
+		this(level);
+		aoc = 1;
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {

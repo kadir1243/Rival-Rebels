@@ -65,19 +65,14 @@ public class EntityTachyonBomb extends Projectile
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityTachyonBomb(Level level, double x, double y,double z, double mx, double my, double mz, int charges)
-	{
-		this(level);
-		setPos(x,y,z);
-		aoc = charges;
-		setAnglesMotion(mx, my, mz);
-	}
 
-	public void setAnglesMotion(double mx, double my, double mz) {
+    public EntityTachyonBomb(Level level, double mx, double my, double mz, int charges) {
+		this(level);
+		aoc = charges;
         setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
@@ -165,12 +160,10 @@ public class EntityTachyonBomb extends Projectile
         if (hasTrollface && random.nextInt(10)!=0)
         {
             setDeltaMovement(getDeltaMovement().x(), Math.max(-getDeltaMovement().y(), 0.2F), getDeltaMovement().z());
-            return;
         }
         else if (!hasTrollface && (state.is(BlockTags.LEAVES) || color == MapColor.COLOR_GREEN || color == MapColor.DIRT || state.is(BlockTags.FLOWERS) || state.is(BlockTags.CROPS) || state.is(Blocks.CAKE) || state.getBlock().getExplosionResistance() < 1 || state.is(BlockTags.WOOL) || state.is(Blocks.SNOW_BLOCK) || state.is(ModBlockTags.GLASS_BLOCKS) || state.is(BlockTags.SAND) || state.is(BlockTags.SNOW) || state.ignitedByLava() || state.canBeReplaced() || state.getFluidState().is(FluidTags.WATER) || state.is(Blocks.SPONGE) || state.is(BlockTags.ICE)))
         {
             level().setBlockAndUpdate(blockHitResult.getBlockPos(), Blocks.AIR.defaultBlockState());
-            return;
         }
     }
 

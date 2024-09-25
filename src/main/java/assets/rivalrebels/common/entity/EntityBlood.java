@@ -29,8 +29,7 @@ public class EntityBlood extends EntityInanimate
 
 	public EntityBlood(Level level, EntityGore bloodEmitter) {
 		this(level);
-		moveTo(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
-        reapplyPosition();
+        setPos(bloodEmitter.position());
 		shoot(0.1f);
 		isGore = true;
 	}
@@ -38,8 +37,7 @@ public class EntityBlood extends EntityInanimate
 	public EntityBlood(Level level, double x, double y, double z)
 	{
 		this(level);
-		moveTo(x, y, z, 0, 0);
-        reapplyPosition();
+		setPos(x, y, z);
 		shoot(0f);
 		isGore = false;
 	}

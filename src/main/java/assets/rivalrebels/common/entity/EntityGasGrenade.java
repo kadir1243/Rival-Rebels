@@ -21,7 +21,6 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.level.Level;
@@ -36,15 +35,8 @@ public class EntityGasGrenade extends Projectile {
         this(RREntities.GAS_GRENADE, level);
     }
 
-    public EntityGasGrenade(Level level, double x, double y, double z) {
+    public EntityGasGrenade(Level level, double mx, double my, double mz) {
         this(level);
-        setPos(x, y, z);
-    }
-
-    public EntityGasGrenade(Level level, double x, double y, double z, double mx, double my, double mz) {
-        this(level);
-        setPos(x, y, z);
-        setDeltaMovement(mx, my, mz);
         setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
         setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
     }
@@ -54,9 +46,9 @@ public class EntityGasGrenade extends Projectile {
         this.setOwner(player);
 
         moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
-        setPos(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+        setPos(getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
         getY() - 0.1F,
-        getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F));
+        getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F));
         shootFromRotation(player, player.getXRot(), player.getYRot(), 0, speed * 1.5F, 1.0F);
     }
 

@@ -161,9 +161,9 @@ public class EntityB2Spirit extends Projectile {
                     setYRot(getYRot() + 10.0f);
 				else if (mode == 2)
                     setYRot(getYRot() - 10.0f);
-				setDeltaMovement(Mth.sin(getYRot() / 180.0F * Mth.PI),
+				setDeltaMovement(Mth.sin(getYRot() * Mth.DEG_TO_RAD),
                     getDeltaMovement().y(),
-                    Mth.cos(getYRot() / 180.0F * Mth.PI)
+                    Mth.cos(getYRot() * Mth.DEG_TO_RAD)
                 );
 				if (distfromtarget < 80.0f)
 					mode = 0;

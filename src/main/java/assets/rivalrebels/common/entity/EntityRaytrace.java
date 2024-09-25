@@ -52,22 +52,15 @@ public class EntityRaytrace extends Projectile {
 		this(RREntities.RAYTRACE, level);
 	}
 
-	public EntityRaytrace(Level level, double x, double y,double z, double mx, double my, double mz) {
+	public EntityRaytrace(Level level, double mx, double my, double mz) {
 		this(level);
-		setPos(x,y,z);
-		setAnglesMotion(mx, my, mz);
-		chance = 1.0f;
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+        chance = 1.0f;
 		range = Mth.sqrt((float) (mx*mx+my*my+mz*mz));
 	}
 
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
-        setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
-
-	public EntityRaytrace(Level level, Entity entity, float distance, float randomness, float chance, boolean shift)
+    public EntityRaytrace(Level level, Entity entity, float distance, float randomness, float chance, boolean shift)
 	{
 		this(level);
 		this.chance = chance;
@@ -80,16 +73,16 @@ public class EntityRaytrace extends Projectile {
 
         if (shift) {
             setPosRaw(
-                getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+                getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
                 getY(),
-                getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
+                getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F)
             );
             setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		} else {
             setPosRaw(
-                getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.3F),
+                getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.3F),
                 getY() - 0.05f,
-                getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.3F)
+                getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.3F)
             );
 		}
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, range, randomness);

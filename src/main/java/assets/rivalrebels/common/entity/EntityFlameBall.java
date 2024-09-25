@@ -41,13 +41,13 @@ public class EntityFlameBall extends FlameBallProjectile {
 	{
 		this(level);
 		setPos(entity.getEyePosition());
-		setDeltaMovement((-Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(entity.getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)));
+		setDeltaMovement((-Mth.sin(entity.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(entity.getXRot() * Mth.DEG_TO_RAD)),
+            (-Mth.sin(entity.getXRot() * Mth.DEG_TO_RAD)),
+            (Mth.cos(entity.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(entity.getXRot() * Mth.DEG_TO_RAD)));
 		setPosRaw(
-            getX() - (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * 0.2F),
+            getX() - (Mth.cos(entity.getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             getY() - 0.13,
-            getZ() - (Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * 0.2F)
+            getZ() - (Mth.sin(entity.getYRot() * Mth.DEG_TO_RAD) * 0.2F)
         );
         setDeltaMovement(getDeltaMovement().scale(speed));
 	}
@@ -58,21 +58,14 @@ public class EntityFlameBall extends FlameBallProjectile {
 		setYRot(180 - ter.yaw);
 		setXRot(-ter.pitch);
 		setPos(ter.getBlockPos().getX() + ter.xO + 0.5, ter.getBlockPos().getY() + 0.5, ter.getBlockPos().getZ() + ter.zO + 0.5);
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() * Mth.DEG_TO_RAD) * Mth.cos(getXRot() * Mth.DEG_TO_RAD)),
+            (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * Mth.cos(getXRot() * Mth.DEG_TO_RAD)),
+            (-Mth.sin(getXRot() * Mth.DEG_TO_RAD)));
 
         setDeltaMovement(getDeltaMovement().scale(speed));
 	}
 
-	public EntityFlameBall(Level level, double x, double y, double z, double mx, double my, double mz)
-	{
-		this(level);
-		setPos(x, y, z);
-        setDeltaMovement(mx, my, mz);
-	}
-
-	public EntityFlameBall(Level level, double x, double y, double z, double mx, double my, double mz, double d, double r) {
+    public EntityFlameBall(Level level, double x, double y, double z, double mx, double my, double mz, double d, double r) {
 		this(level);
 		setPos(x+mx*d+random.nextGaussian()*r, y+my*d+random.nextGaussian()*r, z+mz*d+random.nextGaussian()*r);
         setDeltaMovement(mx, my, mz);
@@ -116,22 +109,15 @@ public class EntityFlameBall extends FlameBallProjectile {
         return 0.01;
     }
 
-    private void fire()
-	{
-		if (!level().isClientSide())
-		{
-			for (int x = -1; x < 2; x++)
-			{
-				for (int y = -1; y < 2; y++)
-				{
-					for (int z = -1; z < 2; z++)
-					{
-                        BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
-                        BlockState state = level().getBlockState(pos);
-						if (level().isEmptyBlock(pos) || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
-					}
-				}
-			}
+    private void fire() {
+		if (!level().isClientSide()) {
+            BlockPos.betweenClosedStream(-1, -1, -1, 2, 2, 2)
+                .map(BlockPos::immutable)
+                .map(blockPos -> blockPos.offset(blockPosition()))
+                .forEach(pos -> {
+                    BlockState state = level().getBlockState(pos);
+                    if (level().isEmptyBlock(pos) || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+                });
 		}
 	}
 }

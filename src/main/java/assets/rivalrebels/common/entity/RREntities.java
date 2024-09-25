@@ -41,7 +41,7 @@ public class RREntities {
     public static final EntityType<EntityPlasmoid> PLASMOID = create(EntityPlasmoid::new, "plasmoid", 0.5F, 0.5F);
     public static final EntityType<EntityPropulsionFX> PROPULSION_FX = create(EntityPropulsionFX::new, "propulsion_fx", 0.5F, 0.5F);
     public static final EntityType<EntityRaytrace> RAYTRACE = create(EntityRaytrace::new, "raytrace", 0.5F, 0.5F);
-    public static final EntityType<EntityRhodes> RHODES = create(EntityRhodes::new, "rhodes", 0.5F, 0.5F);
+    public static final EntityType<EntityRhodes> RHODES = create(EntityRhodes::new, "rhodes", 5F, 15F);
     public static final EntityType<EntityRhodesHead> RHODES_HEAD = create(EntityRhodesHead::new, "rhodes_head", 4F, 2F);
     public static final EntityType<EntityRhodesLeftLowerArm> RHODES_LEFT_LOWER_ARM = create(EntityRhodesLeftLowerArm::new, "rhodes_left_lower_arm", 4F, 2F);
     public static final EntityType<EntityRhodesLeftLowerLeg> RHODES_LEFT_LOWER_LEG = create(EntityRhodesLeftLowerLeg::new, "rhodes_left_lower_leg", 4F, 2F);
@@ -74,9 +74,7 @@ public class RREntities {
     }
 
     private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, Level, T> function, String id, float width, float height) {
-        EntityType<T> type = EntityType.Builder.of(function::apply, MobCategory.MISC).noSummon().sized(width, height).build(id);
-        TYPES.put(id, type);
-        return type;
+        return create(function, id, width, height, t -> {});
     }
 
     private static <T extends Entity> EntityType<T> create(BiFunction<EntityType<T>, Level, T> function, String id, float width, float height, Consumer<EntityType.Builder<T>> extensions) {

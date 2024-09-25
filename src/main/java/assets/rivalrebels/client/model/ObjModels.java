@@ -27,15 +27,15 @@ public class ObjModels {
     public static final WavefrontObject flag = getModel("rhodes/flag");
     public static final WavefrontObject upperarm = getModel("rhodes/upperarm");
     public static final WavefrontObject lowerarm = getModel("rhodes/lowerarm");
-    public static final WavefrontObject rhodes_flamethrower = getModel(("rhodes/flamethrower"));
-    public static final WavefrontObject rhodes_rocketlauncher = getModel(("rhodes/rocketlauncher"));
-    public static final WavefrontObject thigh = getModel(("rhodes/thigh"));
-    public static final WavefrontObject shin = getModel(("rhodes/shin"));
-    public static final WavefrontObject booster = getModel(("booster"));
-    public static final WavefrontObject rhodes_flame = getModel(("rhodes/flame"));
-    public static final WavefrontObject rhodes_laser = getModel(("rhodes/laser"));
-    public static final WavefrontObject ffhead = getModel(("rhodes/ffhead"));
-    public static final WavefrontObject fftorso = getModel(("rhodes/fftorso"));
+    public static final WavefrontObject rhodes_flamethrower = getModel("rhodes/flamethrower");
+    public static final WavefrontObject rhodes_rocketlauncher = getModel("rhodes/rocketlauncher");
+    public static final WavefrontObject thigh = getModel("rhodes/thigh");
+    public static final WavefrontObject shin = getModel("rhodes/shin");
+    public static final WavefrontObject booster = getModel("booster");
+    public static final WavefrontObject rhodes_flame = getModel("rhodes/flame");
+    public static final WavefrontObject rhodes_laser = getModel("rhodes/laser");
+    public static final WavefrontObject ffhead = getModel("rhodes/ffhead");
+    public static final WavefrontObject fftorso = getModel("rhodes/fftorso");
     public static final WavefrontObject ffupperarm = getModel("rhodes/ffupperarm");
     public static final WavefrontObject fflowerarm = getModel("rhodes/fflowerarm");
     public static final WavefrontObject ffthigh = getModel("rhodes/ffthigh");
@@ -74,7 +74,7 @@ public class ObjModels {
         }
     );
     public static final Function<ResourceLocation, RenderType> RENDER_TRANSLUCENT_TRIANGLES = Util.memoize(
-        (resourceLocation) -> {
+        resourceLocation -> {
             RenderType.CompositeState compositeState = RenderType.CompositeState.builder()
                 .setShaderState(RenderType.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
                 .setTextureState(new RenderStateShard.TextureStateShard(resourceLocation, false, false))

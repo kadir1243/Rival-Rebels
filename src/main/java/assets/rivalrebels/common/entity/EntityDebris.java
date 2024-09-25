@@ -58,12 +58,9 @@ public class EntityDebris extends EntityInanimate {
         setOldPosAndRot();
 	}
 
-    public EntityDebris(Level level, double x, double y, double z, double mx, double my, double mz, Block block) {
+    public EntityDebris(Level level, Block block) {
 		this(level);
         setState(block.defaultBlockState());
-		setPos(x, y, z);
-        setOldPosAndRot();
-        setDeltaMovement(mx, my, mz);
 	}
 
     public BlockState getState() {

@@ -1,20 +1,8 @@
-/*******************************************************************************
- * Copyright (c) 2012, 2016 Rodol Phito.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Mozilla Public License Version 2.0
- * which accompanies this distribution, and is available at
- * https://www.mozilla.org/en-US/MPL/2.0/
- *
- * Rival Rebels Mod. All code, art, and design by Rodol Phito.
- *
- * http://RivalRebels.com/
- *******************************************************************************/
 package assets.rivalrebels.client.renderentity;
 
 import assets.rivalrebels.client.model.ObjModels;
 import assets.rivalrebels.common.entity.EntityRhodesLeftUpperArm;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,13 +16,8 @@ public class RenderRhodesLeftUpperArm extends RhodesPartRenderer<EntityRhodesLef
     }
 
     @Override
-    public void render(EntityRhodesLeftUpperArm entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        matrices.pushPose();
-        matrices.scale(entity.getScale(), entity.getScale(), entity.getScale());
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
-        matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
-        matrices.scale(-1, 1, 1);
-        ObjModels.renderSolid(ObjModels.upperarm, RenderRhodes.texture, matrices, vertexConsumers, entity.getColorRGBA(), light, OverlayTexture.NO_OVERLAY);
-        matrices.popPose();
+    public void renderParts(EntityRhodesLeftUpperArm entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        poseStack.scale(-1, 1, 1);
+        ObjModels.renderSolid(ObjModels.upperarm, getTextureLocation(entity), poseStack, bufferSource, entity.getColorRGBA(), packedLight, OverlayTexture.NO_OVERLAY);
     }
 }

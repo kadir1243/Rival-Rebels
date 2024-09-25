@@ -21,7 +21,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.ItemInteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -67,7 +66,7 @@ public class BlockAntimatterBomb extends BaseEntityBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!stack.isEmpty() && stack.is(RRItems.pliers))
 		{
-            player.openMenu((MenuProvider) level.getBlockEntity(pos));
+            player.openMenu(getMenuProvider(state, level, pos));
             return ItemInteractionResult.sidedSuccess(level.isClientSide());
 		} else if (!level.isClientSide()) {
 			player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), true);

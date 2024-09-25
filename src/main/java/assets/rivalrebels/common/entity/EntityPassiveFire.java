@@ -20,8 +20,6 @@ import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 
 public class EntityPassiveFire extends Projectile {
-    private boolean	inGround;
-
     private int		ticksInAir;
 	private double	damage;
 
@@ -31,7 +29,6 @@ public class EntityPassiveFire extends Projectile {
 
 	public EntityPassiveFire(Level level) {
 		this(RREntities.PASSIVE_FIRE, level);
-        inGround = false;
 		ticksInAir = 0;
 		damage = 2;
 	}
@@ -47,13 +44,13 @@ public class EntityPassiveFire extends Projectile {
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
 		setYRot((getYRot() + 25) % 360);
         setPos(
-            getX() - Mth.cos((getYRot() / 180F) * Mth.PI) * 0.16F,
+            getX() - Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F,
             getY() - 0.2D,
-            getZ() - Mth.sin((getYRot() / 180F) * Mth.PI) * 0.16F
+            getZ() - Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F
         );
-        super.setDeltaMovement(-Mth.sin((getYRot() / 180F) * Mth.PI) * Mth.cos((getXRot() / 180F) * Mth.PI),
-		 Mth.cos((getYRot() / 180F) * Mth.PI) * Mth.cos((getXRot() / 180F) * Mth.PI),
-		 -Mth.sin((getXRot() / 180F) * Mth.PI));
+        super.setDeltaMovement(-Mth.sin(getYRot() * Mth.DEG_TO_RAD) * Mth.cos(getXRot() * Mth.DEG_TO_RAD),
+		 Mth.cos(getYRot() * Mth.DEG_TO_RAD) * Mth.cos(getXRot() * Mth.DEG_TO_RAD),
+		 -Mth.sin(getXRot() * Mth.DEG_TO_RAD));
 	}
 
 	@Override
@@ -109,14 +106,12 @@ public class EntityPassiveFire extends Projectile {
     @Override
 	public void addAdditionalSaveData(CompoundTag nbt) {
         super.addAdditionalSaveData(nbt);
-		nbt.putBoolean("inGround", inGround);
 		nbt.putDouble("damage", damage);
 	}
 
     @Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
         super.readAdditionalSaveData(nbt);
-        inGround = nbt.getBoolean("inGround");
         damage = nbt.getDouble("damage");
 	}
 

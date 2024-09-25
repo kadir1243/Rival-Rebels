@@ -24,6 +24,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 
 public class TsarBomba
 {
@@ -42,7 +43,6 @@ public class TsarBomba
 	private int		repeatCount	= 0;
 	private boolean isTree;
 	private int 	treeHeight;
-	public int processedchunks = 0;
 
 	public TsarBomba(int x, int y, int z, Level world, int rad)
 	{
@@ -51,30 +51,21 @@ public class TsarBomba
 		posZ = z;
         this.world = world;
 		radius = rad;
-		//int radiussmaller = (radius >> 2) + 45;
-		//if (radiussmaller < radius) radius = radiussmaller;
+		//int radiussmaller = (radius / 4) + 45;
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
-		rad = rad*rad;
 		if (world.isClientSide()) return;
-		int clamprad = radius;
-		//if (clamprad > 50) clamprad = 50;
-		for (int X = -clamprad; X < clamprad; X++)
-		{
-			int x2 = X * X;
-			for (int Z = -clamprad; Z < clamprad; Z++)
-			{
-				if (x2 + Z * Z < rad)
-				{
-					for (int Y = 70; Y > world.getMinBuildHeight(); Y--)
-					{
-                        BlockState state = world.getBlockState(new BlockPos(X + posX, Y, Z + posZ));
-						if (!state.getFluidState().isEmpty()) {
-							world.setBlockAndUpdate(new BlockPos(X + posX, Y, Z + posZ), Blocks.AIR.defaultBlockState());
-						}
-					}
-				}
-			}
-		}
+		int clamprad = radius; //Mth.clamp(radius, radiussmaller, 50);
+
+        BlockPos.betweenClosedStream(-clamprad, world.getMinBuildHeight(), -clamprad, clamprad, posY + 70, clamprad)
+            .map(BlockPos::immutable)
+            .filter(blockPos -> Vec3.atLowerCornerOf(blockPos).horizontalDistanceSqr() < radius * radius)
+            .map(pos -> pos.offset(x, 0, z))
+            .forEach(offset -> {
+                BlockState state = world.getBlockState(offset);
+                if (!state.getFluidState().isEmpty() && !state.is(BlockTags.FEATURES_CANNOT_REPLACE)) {
+                    world.destroyBlock(offset, false);
+                }
+            });
 	}
 
 	public void tick(EntityTsarBlast tsarblast)
@@ -103,36 +94,31 @@ public class TsarBomba
 		}
 		else
 		{
-			tsarblast.tsar = null;
+			tsarblast.bomb = null;
 			tsarblast.kill();
 		}
 	}
 
-	private boolean processChunk(int x, int z)
-	{
-		processedchunks++;
+	private boolean processChunk(int x, int z) {
 		double dist = x * x + z * z;
-		if (dist < radius * radius)
-		{
+		if (dist < radius * radius) {
 			dist = Math.sqrt(dist);
 			int y = getTopBlock(x + posX, z + posZ, dist);
 			float yele = posY + (y - posY) * 0.5f;
 			if (RRConfig.SERVER.isElevation()) yele = y;
 			int ylimit = Mth.floor(yele - ((radius - dist) / 2) + (Math.sin(dist * 0.5) * 1.15));
 
-			for (int Y = y; Y > ylimit; Y--)
-			{
-				if (Y == 0) break;
+			for (int Y = y; Y > ylimit; Y--) {
+				if (Y == world.getMinBuildHeight()) break;
                 BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
-                Block block = world.getBlockState(pos).getBlock();
-				if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
-				else if (block == RRBlocks.sigmaobj) RivalRebels.round.winOmega();
-				world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                BlockState state = world.getBlockState(pos);
+				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
+				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
+				world.destroyBlock(pos, false);
 			}
 
 			double limit = (radius / 2) + world.random.nextInt(radius / 4) + 7.5;
-			if (dist < limit)
-			{
+			if (dist < limit) {
 				int blockType = world.random.nextInt(4) + 1;
 				if (x >= 0 && z < 0) blockType = 1;
 				if (x > 0 && z >= 0) blockType = 2;
@@ -143,9 +129,8 @@ public class TsarBomba
 				if (metadata < 0) metadata = -metadata;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--)
-				{
-					if (Y == 0) break;
+				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--) {
+					if (Y == world.getMinBuildHeight()) break;
                     BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
                     Block block = world.getBlockState(pos).getBlock();
 					if (block == RRBlocks.omegaobj) RivalRebels.round.winSigma();
@@ -157,16 +142,14 @@ public class TsarBomba
 				}
 			}
 
-			if (isTree)
-			{
+			if (isTree) {
 				isTree = false;
 				int metadata = Mth.floor((16d / radius) * dist);
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y > ylimit - treeHeight; Y--)
-				{
-					if (Y == 0) break;
+				for (int Y = ylimit; Y > ylimit - treeHeight; Y--) {
+					if (Y == world.getMinBuildHeight()) break;
 					world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), RRBlocks.petrifiedwood.defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 				}
 			}
@@ -211,8 +194,7 @@ public class TsarBomba
 				if (state.is(Blocks.BEDROCK))
 				;
 				else if (!state.canOcclude()) world.setBlockAndUpdate(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.defaultBlockState());
-				if (isTree)
-				{
+				if (isTree) {
 					isTree = false;
 					int metadata = Mth.floor((16d / radius) * dist);
 					if (metadata < 0) metadata = 0;

@@ -17,7 +17,6 @@ import assets.rivalrebels.common.explosion.NuclearExplosion;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -86,8 +85,8 @@ public class EntityNuclearBlast extends EntityInanimate {
 			if (tickCount % 5 == random.nextInt(5))
 			{
                 for (Player p : level().players()) {
-                    level().playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 10.0F, 0.50F);
-                    level().playSound(p, p.getX(), p.getY(), p.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.MASTER, 5.0F, 0.10F);
+                    p.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
+                    p.playSound(SoundEvents.GENERIC_EXPLODE.value(), 5.0F, 0.10F);
                 }
 			}
 		}

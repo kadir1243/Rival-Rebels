@@ -12,7 +12,6 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.Explosion;
 import net.fabricmc.api.EnvType;
@@ -56,7 +55,7 @@ public class BlockFlare extends WallTorchBlock {
 		world.addParticle(ParticleTypes.FLAME, x + .5, y + 1.2, z + .5, (-0.5 + random.nextFloat()) * 0.1, 0.5 + random.nextFloat() * 0.5, (-0.5 + random.nextFloat()) * 0.1);
 		world.addParticle(ParticleTypes.FLAME, x + .5, y + 1.4, z + .5, (-0.5 + random.nextFloat()) * 0.1, 0.5 + random.nextFloat() * 0.5, (-0.5 + random.nextFloat()) * 0.1);
 		world.addParticle(ParticleTypes.SMOKE, x + .5, y + 1.6, z + .5, (-0.5 + random.nextFloat()) * 0.1, 0.5 + random.nextFloat() * 0.5, (-0.5 + random.nextFloat()) * 0.1);
-		world.playLocalSound(x, y, z, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 3F, 2, true);
+		world.playLocalSound(pos, SoundEvents.LAVA_EXTINGUISH, SoundSource.BLOCKS, 3F, 2, true);
 	}
 
     @Override
@@ -68,7 +67,7 @@ public class BlockFlare extends WallTorchBlock {
             int z = pos.getZ();
             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			new Explosion(world, x, y, z, 3, true, false, RivalRebelsDamageSource.flare(world));
-			world.playLocalSound(x, y, z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.5f, 0.3f, true);
+			world.playLocalSound(pos, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.BLOCKS, 0.5f, 0.3f, true);
 		}
         return state;
     }

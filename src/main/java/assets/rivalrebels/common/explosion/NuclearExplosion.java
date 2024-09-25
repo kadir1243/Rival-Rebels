@@ -18,6 +18,9 @@ import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.entity.*;
 import assets.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
@@ -29,15 +32,15 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static assets.rivalrebels.RivalRebels.getBlocks;
 
-public class NuclearExplosion
-{
-	public static Block[]	prblocks;
+public class NuclearExplosion {
     public static Block[]	pgblocks;
 
     static {
@@ -45,16 +48,6 @@ public class NuclearExplosion
         pgblocks.add(Blocks.COBBLESTONE);
         pgblocks.addAll(getBlocks(BlockTags.DIRT));
         NuclearExplosion.pgblocks = pgblocks.toArray(new Block[0]);
-        Set<Block> prblocks = new HashSet<>();
-        prblocks.addAll(getBlocks(BlockTags.COAL_ORES));
-        prblocks.addAll(getBlocks(BlockTags.IRON_ORES));
-        prblocks.addAll(getBlocks(BlockTags.REDSTONE_ORES));
-        prblocks.addAll(getBlocks(BlockTags.GOLD_ORES));
-        prblocks.addAll(getBlocks(BlockTags.LAPIS_ORES));
-        prblocks.addAll(getBlocks(BlockTags.DIAMOND_ORES));
-        prblocks.addAll(getBlocks(BlockTags.EMERALD_ORES));
-
-        NuclearExplosion.prblocks = prblocks.toArray(new Block[0]);
     }
 
 	public NuclearExplosion(Level world, int x, int y, int z, int strength) {
@@ -239,18 +232,13 @@ public class NuclearExplosion
 					int zz = z + Z;
                     BlockPos pos = new BlockPos(xx, yy, zz);
                     if (world.isEmptyBlock(pos) && world.getMaxLocalRawBrightness(pos) == 0) {
-						if (!world.isEmptyBlock(pos.above()) &&
-                            !world.isEmptyBlock(pos.below()) &&
-                            !world.isEmptyBlock(pos.south()) &&
-                            !world.isEmptyBlock(pos.east()) &&
-                            !world.isEmptyBlock(pos.west()) &&
-                            !world.isEmptyBlock(pos.north()))
-						{
+                        boolean isEmptyNotSideAvailable = Arrays.stream(Direction.values()).map(pos::relative).noneMatch(world::isEmptyBlock);
+                        if (isEmptyNotSideAvailable) {
 							int r = world.random.nextInt(50);
 							Block id;
 							if (r == 0)
 							{
-								id = prblocks[world.random.nextInt(prblocks.length)];
+                                id = world.registryAccess().registryOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);
 							}
 							else
 							{

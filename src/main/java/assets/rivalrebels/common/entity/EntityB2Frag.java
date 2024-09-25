@@ -28,8 +28,7 @@ import net.minecraft.world.phys.Vec3;
 
 public class EntityB2Frag extends EntityInanimate
 {
-    protected boolean	inGround;
-	private int			ticksInGround;
+    private int			ticksInGround;
     private boolean		isSliding	= false;
 	public int			type		= 0;
 	float				motionyaw	= 0;
@@ -68,15 +67,15 @@ public class EntityB2Frag extends EntityInanimate
 
 		if (Type == 1)
 		{
-            setPos(getX() - (Mth.cos(((-getYRot()) / 180.0F) * Mth.PI) * 7.5F),
+            setPos(getX() - (Mth.cos(-getYRot() * Mth.DEG_TO_RAD) * 7.5F),
                 getY(),
-                getZ() - (Mth.sin(((-getYRot()) / 180.0F) * Mth.PI) * 7.5F));
+                getZ() - (Mth.sin((-getYRot()) * Mth.DEG_TO_RAD) * 7.5F));
 		}
 		else if (Type == 0)
 		{
-            setPos(getX() - (Mth.cos(((-getYRot() + 180) / 180.0F) * Mth.PI) * 7.5F),
+            setPos(getX() - (Mth.cos((-getYRot() + 180) * Mth.DEG_TO_RAD) * 7.5F),
                 getY(),
-                getZ() - (Mth.sin(((-getYRot() + 180) / 180.0F) * Mth.PI) * 7.5F));
+                getZ() - (Mth.sin((-getYRot() + 180) * Mth.DEG_TO_RAD) * 7.5F));
 		}
 
         setDeltaMovement(toBeGibbed.getDeltaMovement());
@@ -96,7 +95,7 @@ public class EntityB2Frag extends EntityInanimate
 	public void tick() {
 		super.tick();
 
-		if (inGround) {
+		if (onGround()) {
 			++ticksInGround;
 
 			if (ticksInGround == 1200)
@@ -104,7 +103,7 @@ public class EntityB2Frag extends EntityInanimate
 				kill();
 			}
 
-			inGround = false;
+            setOnGround(false);
 			setDeltaMovement(getDeltaMovement().multiply((random.nextFloat() * 0.2F),
                 (random.nextFloat() * 0.2F),
                 (random.nextFloat() * 0.2F)));
@@ -173,13 +172,11 @@ public class EntityB2Frag extends EntityInanimate
     @Override
 	public void addAdditionalSaveData(CompoundTag nbt) {
 		nbt.putInt("Type", type);
-		nbt.putBoolean("inGround", inGround);
 	}
 
 	@Override
 	public void readAdditionalSaveData(CompoundTag nbt) {
 		type = nbt.getInt("Type");
-		inGround = nbt.getBoolean("inGround");
 	}
 
 	@Override

@@ -27,7 +27,6 @@ public class RhodesPacket implements CustomPacketPayload {
     public static final Type<RhodesPacket> PACKET_TYPE = new Type<>(RRIdentifiers.create("rhodes_packet"));
     public float bodyyaw;
     int id = 0;
-    float headyaw = 0;
     float headpitch = 0;
     float leftarmyaw = 0;
     float leftarmpitch = 0;
@@ -47,7 +46,6 @@ public class RhodesPacket implements CustomPacketPayload {
     public RhodesPacket(EntityRhodes er) {
         id = er.getId();
         bodyyaw = er.bodyyaw;
-        headyaw = er.headyaw;
         headpitch = er.headpitch;
         leftarmyaw = er.leftarmyaw;
         leftarmpitch = er.leftarmpitch;
@@ -66,7 +64,6 @@ public class RhodesPacket implements CustomPacketPayload {
         RhodesPacket packet = new RhodesPacket();
         packet.id = buf.readInt();
         packet.bodyyaw = buf.readFloat();
-        packet.headyaw = buf.readFloat();
         packet.headpitch = buf.readFloat();
         packet.leftarmyaw = buf.readFloat();
         packet.leftarmpitch = buf.readFloat();
@@ -87,7 +84,6 @@ public class RhodesPacket implements CustomPacketPayload {
         Entity e = context.player().level().getEntity(m.id);
         if (e instanceof EntityRhodes er) {
             er.lastbodyyaw = er.bodyyaw;
-            er.lastheadyaw = er.headyaw;
             er.lastheadpitch = er.headpitch;
             er.lastleftarmyaw = er.leftarmyaw;
             er.lastleftarmpitch = er.leftarmpitch;
@@ -107,7 +103,6 @@ public class RhodesPacket implements CustomPacketPayload {
                 er.lastleftarmyaw = m.leftarmyaw;
             }
             er.bodyyaw = m.bodyyaw;
-            er.headyaw = m.headyaw;
             er.headpitch = m.headpitch;
             er.leftarmyaw = m.leftarmyaw;
             er.leftarmpitch = m.leftarmpitch;
@@ -138,7 +133,6 @@ public class RhodesPacket implements CustomPacketPayload {
     public void write(FriendlyByteBuf buf) {
         buf.writeInt(id);
         buf.writeFloat(bodyyaw);
-        buf.writeFloat(headyaw);
         buf.writeFloat(headpitch);
         buf.writeFloat(leftarmyaw);
         buf.writeFloat(leftarmpitch);

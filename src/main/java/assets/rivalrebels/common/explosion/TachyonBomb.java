@@ -103,7 +103,7 @@ public class TachyonBomb {
 		}
 		else
 		{
-			tsarblast.tsar = null;
+			tsarblast.bomb = null;
 			tsarblast.kill();
 		}
 	}

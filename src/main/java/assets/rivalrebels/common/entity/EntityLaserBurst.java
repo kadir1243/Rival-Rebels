@@ -58,9 +58,9 @@ public class EntityLaserBurst extends Projectile {
 	public EntityLaserBurst(Level level, Entity player) {
 		this(level);
         this.setOwner(player);
-        moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
+        moveTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getEyeY() - 0.12D,
-            player.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F),
+            player.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getYRot(),
             player.getXRot());
 
@@ -70,29 +70,22 @@ public class EntityLaserBurst extends Projectile {
 	public EntityLaserBurst(Level level, Entity player, boolean accurate) {
 		this(level);
         this.setOwner(player);
-		moveTo(player.getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
+		moveTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getEyeY() - 0.12D,
-            player.getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F),
+            player.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getYRot(),
             player.getXRot());
 
         shootFromRotation(player, player.getXRot(), player.getYRot(), 0, 4F * (float)random.nextDouble() + 1.0F, accurate?0.001F:0.075F);
 	}
 
-	public EntityLaserBurst(Level level, double x, double y,double z, double mx, double my, double mz) {
+	public EntityLaserBurst(Level level, double mx, double my, double mz) {
 		this(level);
-		setPos(x,y,z);
-		setAnglesMotion(mx, my, mz);
-	}
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
 
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
-        setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
-
-	public EntityLaserBurst(Level level, double x, double y, double z, double mx, double my, double mz, Entity player)
+    public EntityLaserBurst(Level level, double x, double y, double z, double mx, double my, double mz, Entity player)
 	{
 		this(level);
         this.setOwner(player);

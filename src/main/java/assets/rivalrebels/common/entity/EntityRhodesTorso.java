@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.entity;
 
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
@@ -21,7 +22,7 @@ public class EntityRhodesTorso extends EntityRhodesPiece
 		super(type, w);
 	}
 
-	public EntityRhodesTorso(Level w, double x, double y, double z, float scale, RhodesType color)
+	public EntityRhodesTorso(Level w, double x, double y, double z, float scale, Holder<RhodesType> color)
 	{
 		super(RREntities.RHODES_TORSO, w, x, y, z, scale, color);
 		health = 2000;

@@ -18,7 +18,6 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
@@ -65,7 +64,7 @@ public class BlockLoader extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        player.openMenu((MenuProvider) level.getBlockEntity(pos));
+        player.openMenu(getMenuProvider(state, level, pos));
 
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 

@@ -21,6 +21,6 @@ public abstract class ArgumentTypesMixin {
 
     @Inject(method = "bootstrap", at = @At("RETURN"))
     private static void register(Registry<ArgumentTypeInfo<?, ?>> registry, CallbackInfoReturnable<ArgumentTypeInfo<?, ?>> cir) {
-        register(registry, "rhodes_type", CommandRobot.RhodesTypeArgumentType.class, SingletonArgumentInfo.contextFree(CommandRobot.RhodesTypeArgumentType::new));
+        register(registry, "rhodes_type", CommandRobot.RhodesTypeArgumentType.class, SingletonArgumentInfo.contextAware(CommandRobot.RhodesTypeArgumentType::argumentType));
     }
 }

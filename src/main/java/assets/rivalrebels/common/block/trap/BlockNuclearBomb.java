@@ -83,7 +83,7 @@ public class BlockNuclearBomb extends BaseEntityBlock {
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		if (!player.isShiftKeyDown()) {
             if (!stack.isEmpty() && stack.is(RRItems.pliers)) {
-                player.openMenu((MenuProvider) level.getBlockEntity(pos));
+                player.openMenu(getMenuProvider(state, level, pos));
                 return ItemInteractionResult.sidedSuccess(level.isClientSide());
 			} else if (!level.isClientSide()) {
 				player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), true);

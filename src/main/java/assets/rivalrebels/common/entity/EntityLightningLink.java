@@ -33,9 +33,9 @@ public class EntityLightningLink extends EntityInanimate {
         setDeltaMovement(distance / 100, getDeltaMovement().y(), getDeltaMovement().z());
 		moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         Vec3 vec3d = position().subtract(
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+            (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             0.12,
-            (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
+            (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F)
         );
         setPos(vec3d.x(), vec3d.y(), vec3d.z());
 	}

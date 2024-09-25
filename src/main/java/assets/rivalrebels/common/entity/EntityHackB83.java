@@ -49,23 +49,16 @@ public class EntityHackB83 extends ThrowableProjectile
 		this(level);
 		straight = flystraight;
 		moveTo(x, y, z, yaw, pitch);
-        setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (-Mth.sin(pitch / 180.0F * Mth.PI)),
-            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)));
+        setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)),
+            (-Mth.sin(pitch * Mth.DEG_TO_RAD)),
+            (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)));
     }
-	public EntityHackB83(Level level, double x, double y,double z, double mx, double my, double mz, boolean flystraight)
-	{
-		this(level);
-		setPos(x,y,z);
-		setAnglesMotion(mx, my, mz);
-		straight = flystraight;
-	}
 
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
-        setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    public EntityHackB83(Level level, double mx, double my, double mz, boolean flystraight) {
+		this(level);
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+        straight = flystraight;
 	}
 
     @Override
@@ -113,8 +106,7 @@ public class EntityHackB83 extends ThrowableProjectile
 
         this.updateRotation();
 		float var17 = 0.9f;
-		if (!straight && !level().isClientSide())
-		{
+		if (!straight && !level().isClientSide()) {
             setDeltaMovement(getDeltaMovement().scale(var17));
 		}
         this.reapplyPosition();

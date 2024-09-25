@@ -58,7 +58,7 @@ public class ItemTrollHelmet extends ArmorItem {
         if (world.isUnobstructed(RRBlocks.trollFlag.defaultBlockState(), pos, CollisionContext.of(player))) {
             BlockState flagState = RRBlocks.trollFlag.getStateForPlacement(new BlockPlaceContext(player, hand, stack, new BlockHitResult(context.getClickLocation(), facing, pos, false)));
             world.setBlockAndUpdate(pos, flagState);
-            world.playLocalSound((float) pos.getX() + 0.5F, (float) pos.getY() + 0.5F, (float) pos.getZ() + 0.5F, RRBlocks.trollFlag.defaultBlockState().getSoundType().getStepSound(), SoundSource.PLAYERS, (RRBlocks.trollFlag.defaultBlockState().getSoundType().getVolume() + 1.0F) / 2.0F, RRBlocks.trollFlag.defaultBlockState().getSoundType().getPitch() * 0.8F, false);
+            world.playLocalSound(pos, RRBlocks.trollFlag.defaultBlockState().getSoundType().getStepSound(), SoundSource.PLAYERS, (RRBlocks.trollFlag.defaultBlockState().getSoundType().getVolume() + 1.0F) / 2.0F, RRBlocks.trollFlag.defaultBlockState().getSoundType().getPitch() * 0.8F, false);
             stack.consume(1, context.getPlayer());
             return InteractionResult.SUCCESS;
         }

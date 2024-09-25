@@ -17,34 +17,28 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TsarBomba;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.nbt.CompoundTag;
+
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
 
-public class EntityTsarBlast extends EntityInanimate
-{
-	public TsarBomba	tsar		= null;
-	public double		radius;
-
+public class EntityTsarBlast extends AbstractBlastEntity<TsarBomba> {
     public EntityTsarBlast(EntityType<? extends EntityTsarBlast> type, Level world) {
         super(type, world);
     }
 
-	public EntityTsarBlast(Level level)
-	{
+	public EntityTsarBlast(Level level) {
 		this(RREntities.TSAR_BLAST, level);
 		noCulling = true;
 	}
 
 	public EntityTsarBlast(Level level, float x, float y, float z, TsarBomba tsarBomba, int rad) {
 		this(level);
-		tsar = tsarBomba;
+        bomb = tsarBomba;
 		radius = rad;
 		setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
@@ -62,12 +56,9 @@ public class EntityTsarBlast extends EntityInanimate
 	{
 		super.tick();
 
-		if (random.nextInt(10) == 0)
-		{
-			level().playLocalSound(getX(), getY(), getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.AMBIENT, 10.0F, 0.50F, true);
-		}
-		else
-		{
+		if (random.nextInt(10) == 0) {
+			this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
+		} else {
 			if (random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
 		}
 
@@ -75,17 +66,17 @@ public class EntityTsarBlast extends EntityInanimate
 
 		if (!level().isClientSide())
 		{
-			if (tsar == null && tickCount > 1200) kill();
+			if (bomb == null && tickCount > 1200) kill();
 			if (tickCount % 20 == 0) updateEntityList();
 			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RRConfig.SERVER.getTsarBombaSpeed() * 2; i++)
 			{
-				if (tsar != null)
+				if (bomb != null)
 				{
-					tsar.tick(this);
-					/*if (tsar.tick())
+                    bomb.tick(this);
+					/*if (bomb.tick())
 					{
-						tsar = null;
+						bomb = null;
 					}*/
 				}
 				else
@@ -102,16 +93,15 @@ public class EntityTsarBlast extends EntityInanimate
 	{
 		entitylist.clear();
 		double ldist = radius*radius;
-		for (int i = 0; i < level().getEntities(this, Shapes.INFINITY.bounds()).size(); i++)
-		{
-			Entity e = level().getEntities(this, Shapes.INFINITY.bounds()).get(i);
-			double dist = e.distanceToSqr(getX(),getY(),getZ());
-			if (dist < ldist)
-			{
-				if ((e instanceof Player && ((Player) e).isCreative()) || e instanceof EntityNuclearBlast || e instanceof EntityTsarBlast || e == this) continue;
-				entitylist.add(e);
-			}
-		}
+        List<Entity> entities = level().getEntities(this, AABB.of(BoundingBox.infinite()));
+        for (Entity e : entities) {
+            double dist = e.distanceToSqr(getX(), getY(), getZ());
+            if (dist < ldist) {
+                if (e.isInvulnerable() || e instanceof EntityNuclearBlast || e instanceof EntityTsarBlast)
+                    continue;
+                entitylist.add(e);
+            }
+        }
 	}
 
 	public void pushAndHurtEntities()
@@ -144,18 +134,6 @@ public class EntityTsarBlast extends EntityInanimate
 		{
 			entitylist.remove(e);
 		}
-	}
-
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt)
-	{
-		radius = nbt.getFloat("radius");
-	}
-
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt)
-	{
-		nbt.putFloat("radius", (float) radius);
 	}
 
     public EntityTsarBlast setTime()

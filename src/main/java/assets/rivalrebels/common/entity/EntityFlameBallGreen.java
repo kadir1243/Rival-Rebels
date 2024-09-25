@@ -45,13 +45,13 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 		this(level);
         this.setOwner(entity);
 		setPos(entity.getEyePosition());
-		setDeltaMovement((-Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(entity.getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * Mth.cos(entity.getXRot() / 180.0F * Mth.PI)));
+		setDeltaMovement((-Mth.sin(entity.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(entity.getXRot() * Mth.DEG_TO_RAD)),
+            (-Mth.sin(entity.getXRot() * Mth.DEG_TO_RAD)),
+            (Mth.cos(entity.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(entity.getXRot() * Mth.DEG_TO_RAD)));
 		setPosRaw(
-            getX() - (Mth.cos(entity.getYRot() / 180.0F * Mth.PI) * 0.2F),
+            getX() - (Mth.cos(entity.getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             getY() - 0.13,
-            getZ() - (Mth.sin(entity.getYRot() / 180.0F * Mth.PI) * 0.2F)
+            getZ() - (Mth.sin(entity.getYRot() * Mth.DEG_TO_RAD) * 0.2F)
         );
         setDeltaMovement(getDeltaMovement().scale(speed));
     }
@@ -61,9 +61,9 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 		setYRot(180 - ter.yaw);
 		setXRot(-ter.pitch);
 		setPos(ter.getBlockPos().getX() + ter.xO + 0.5, ter.getBlockPos().getY() + 0.5, ter.getBlockPos().getZ() + ter.zO + 0.5);
-        setDeltaMovement((-Mth.sin(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (Mth.cos(getYRot() / 180.0F * Mth.PI) * Mth.cos(getXRot() / 180.0F * Mth.PI)),
-            (-Mth.sin(getXRot() / 180.0F * Mth.PI)));
+        setDeltaMovement((-Mth.sin(getYRot() * Mth.DEG_TO_RAD) * Mth.cos(getXRot() * Mth.DEG_TO_RAD)),
+            (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * Mth.cos(getXRot() * Mth.DEG_TO_RAD)),
+            (-Mth.sin(getXRot() * Mth.DEG_TO_RAD)));
 
         setDeltaMovement(getDeltaMovement().scale(speed));
 	}

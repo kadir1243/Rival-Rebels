@@ -47,8 +47,6 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
 	public EntityTheoreticalTsar(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll) {
 		this(level);
 		moveTo(x, y, z, yaw, pitch);
-		this.setYRot(yRotO = yaw);
-		this.setXRot(xRotO = pitch);
 		aoc = charges;
 		hasTrollface = troll;
 		if (!RRConfig.SERVER.isNukedrop())
@@ -57,29 +55,21 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
 		}
 	}
 
-	public EntityTheoreticalTsar(Level world, float px, float py, float pz, float f, float g, float h)
-	{
+	public EntityTheoreticalTsar(Level world, float px, float py, float pz, float f, float g, float h) {
 		this(world);
 		setPos(px, py, pz);
         setDeltaMovement(f, g, h);
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityTheoreticalTsar(Level level, double x, double y,double z, double mx, double my, double mz, int charges)
-	{
-		this(level);
-		setPos(x,y,z);
-		aoc = charges;
-		setAnglesMotion(mx, my, mz);
-	}
 
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
-        setDeltaMovement(mx, my, mz);
-		if (mx*mx+my*my+mz*mz<0.01) return;
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
+    public EntityTheoreticalTsar(Level level, double mx, double my, double mz, int charges) {
+		this(level);
+		aoc = charges;
+        if (mx * mx + my * my + mz * mz <0.01) return;
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {

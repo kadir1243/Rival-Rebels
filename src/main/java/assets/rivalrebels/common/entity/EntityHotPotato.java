@@ -59,11 +59,8 @@ public class EntityHotPotato extends ThrowableProjectile {
 		dorounds = true;
 	}
 
-	public EntityHotPotato(Level world, double px, double py, double pz, double f, double g, double h)
-	{
+	public EntityHotPotato(Level world, double px, double py, double pz) {
 		this(world);
-		setPos(px, py, pz);
-        setDeltaMovement(f, g, h);
 		round = 1;
 		nextx = (int)px;
 		nexty = (int)py;

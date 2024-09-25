@@ -39,7 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickable {
     public RivalRebelsTeam	rrteam			= null;
-	private NonNullList<ItemStack> chestContents = NonNullList.withSize(14, ItemStack.EMPTY);
+	private NonNullList<ItemStack> items = NonNullList.withSize(14, ItemStack.EMPTY);
 
 	public double			slide			= 0;
 	private float test = Mth.PI;
@@ -60,7 +60,7 @@ public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickab
     public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.loadAdditional(nbt, provider);
 
-        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
+        ContainerHelper.loadAllItems(nbt, this.items, provider);
 		b2spirit = nbt.getInt("b2spirit");
 		b2carpet = nbt.getInt("b2carpet");
 	}
@@ -69,7 +69,7 @@ public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickab
     public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
         super.saveAdditional(nbt, provider);
 
-        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
+        ContainerHelper.saveAllItems(nbt, this.items, provider);
 		nbt.putInt("b2spirit", b2spirit);
 		nbt.putInt("b2carpet", b2carpet);
     }
@@ -173,12 +173,12 @@ public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickab
 
     @Override
     protected NonNullList<ItemStack> getItems() {
-        return this.chestContents;
+        return this.items;
     }
 
     @Override
     protected void setItems(NonNullList<ItemStack> items) {
-        this.chestContents = items;
+        this.items = items;
     }
 
     public boolean isReady()

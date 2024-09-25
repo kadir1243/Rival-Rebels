@@ -31,12 +31,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.EntityHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
-import java.util.Iterator;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.*;
 
 public class EntitySeekB83 extends AbstractArrow {
     public boolean				fins			= false;
@@ -58,20 +54,15 @@ public class EntitySeekB83 extends AbstractArrow {
         return ItemStack.EMPTY;
     }
 
-    public EntitySeekB83(Level level, double x, double y, double z) {
-		this(level);
-		setPos(x, y, z);
-	}
-
-	public EntitySeekB83(Level level, Entity entity, float par3) {
+    public EntitySeekB83(Level level, Entity entity, float par3) {
 		this(level);
 		fins = false;
         this.setOwner(entity);
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(
-            getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+            getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             getY(),
-            getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
+            getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F)
         );
 
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, 1f);
@@ -84,9 +75,9 @@ public class EntitySeekB83 extends AbstractArrow {
 		fins = false;
 		moveTo(entity.getEyePosition(), entity.getYRot() + yawdelta, entity.getXRot());
         setPos(
-            getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.16F),
+            getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             getY(),
-            getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.16F)
+            getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F)
         );
 
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, 1f);
@@ -129,26 +120,22 @@ public class EntitySeekB83 extends AbstractArrow {
 		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 		if (hitResult.getType() != HitResult.Type.MISS) explode(hitResult);
 
-		Iterator<Entity> iter = level().getEntities(this, Shapes.INFINITY.bounds()).iterator();
         Vec3 ddvec = getDeltaMovement();
-		double dist = 1000000;
-		while (iter.hasNext())
-		{
-			Entity e = iter.next();
-			if (e instanceof EntityB83 || e instanceof EntityHackB83)
-			{
+        double dist = 1000000;
+        for (Entity e : level().getEntities(this, AABB.of(BoundingBox.infinite()))) {
+            if (e instanceof EntityB83 || e instanceof EntityHackB83) {
                 Vec3 dpos = e.position().subtract(position());
-				double temp = dpos.lengthSqr();
-				if (temp < dist) {
+                double temp = dpos.lengthSqr();
+                if (temp < dist) {
                     Vec3 d = dpos.multiply(getDeltaMovement());
-                    if (d.x()+d.y()+d.z()>0f) {
-						dist = temp;
-						temp = Math.sqrt(temp)*0.9f;
-                        ddvec = dpos.scale(1/temp);
-					}
-				}
-			}
-		}
+                    if (d.x() + d.y() + d.z() > 0f) {
+                        dist = temp;
+                        temp = Math.sqrt(temp) * 0.9f;
+                        ddvec = dpos.scale(1 / temp);
+                    }
+                }
+            }
+        }
         setDeltaMovement(ddvec);
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());

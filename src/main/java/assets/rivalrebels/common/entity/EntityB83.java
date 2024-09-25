@@ -39,32 +39,25 @@ public class EntityB83 extends ThrowableProjectile
 	public EntityB83(Level level, double x, double y, double z, float yaw, float pitch) {
 		this(RREntities.B83, level);
 		moveTo(x, y, z, yaw, pitch);
-        setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (-Mth.sin(pitch / 180.0F * Mth.PI)),
-            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)));
+        setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)),
+            (-Mth.sin(pitch * Mth.DEG_TO_RAD)),
+            (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)));
     }
 
 	public EntityB83(Level level, double x, double y, double z, float yaw, float pitch, float strength)
 	{
         this(RREntities.B83, level);
 		moveTo(x, y, z, yaw, pitch);
-		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)) * strength,
-            (-Mth.sin(pitch / 180.0F * Mth.PI)) * strength,
-            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)) * strength);
-	}
-	public EntityB83(Level level, double x, double y,double z, double mx, double my, double mz)
-	{
-        this(RREntities.B83, level);
-		setPos(x,y,z);
-		setAnglesMotion(mx, my, mz);
+		setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)) * strength,
+            (-Mth.sin(pitch * Mth.DEG_TO_RAD)) * strength,
+            (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)) * strength);
 	}
 
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
-        setDeltaMovement(mx, my, mz);
+    public EntityB83(Level level, double mx, double my, double mz) {
+        this(RREntities.B83, level);
         setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {

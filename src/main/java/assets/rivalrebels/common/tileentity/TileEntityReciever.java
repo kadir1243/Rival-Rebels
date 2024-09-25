@@ -30,13 +30,11 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -49,6 +47,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
@@ -59,7 +58,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import org.jetbrains.annotations.Nullable;
 
-public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuProvider {
+public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuConstructor {
 	public float			yaw;
 	public float			pitch;
 	public Entity			target;
@@ -81,7 +80,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	private Entity			le						= null;
 	public int				wepSelected;
 	public static int		staticEntityIndex		= 1;
-	public int				entityIndex				= 1;
+	public int				entityIndex;
 	public GameProfile player = new GameProfile(FakePlayer.DEFAULT_UUID, "nobody");
 	private int ticksincepacket;
 	int ticksSinceLastShot = 0;
@@ -184,13 +183,13 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 					if (hasAmmo())
 					{
 						if (level.random.nextInt(3) == 0) {
-							getLevel().playSound(null, getBlockPos(), RRSounds.FLAME_THROWER_EXTINGUISH, SoundSource.BLOCKS, 0.1F, 1F);
+							getLevel().playLocalSound(getBlockPos(), RRSounds.FLAME_THROWER_EXTINGUISH, SoundSource.BLOCKS, 0.1F, 1F, false);
 						}
 						float yaw = 180 - this.yaw;
 						float pitch = -this.pitch;
-						double motionX = (-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI));
-						double motionZ = (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI));
-						double motionY = (-Mth.sin(pitch / 180.0F * Mth.PI));
+						double motionX = (-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD));
+						double motionZ = (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD));
+						double motionY = (-Mth.sin(pitch * Mth.DEG_TO_RAD));
 						ItemRoda.spawn(entityIndex,level,getBlockPos().getX() + xO + 0.5, getBlockPos().getY() + 0.75, getBlockPos().getZ() + zO + 0.5,motionX,motionY,motionZ,1.0f,0.0f);
 						useAmmo();
 					}
@@ -425,11 +424,6 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
         nbt.putUUID("uuid", player.getId());
 		nbt.putInt("entityIndex", entityIndex);
 		if (team != null) nbt.putInt("team", team.ordinal());
-    }
-
-    @Override
-    public Component getDisplayName() {
-        return Component.nullToEmpty("Automated Defense System");
     }
 
     @Override

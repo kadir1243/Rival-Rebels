@@ -65,19 +65,13 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 		aoc = 5;
 		hasTrollface = true;
 	}
-	public EntityAntimatterBomb(Level level, double x, double y,double z, double mx, double my, double mz, int charges)
-	{
-		this(level);
-		setPos(x,y,z);
-		aoc = charges;
-		setAnglesMotion(mx, my, mz);
-	}
 
-    public void setAnglesMotion(double mx, double my, double mz) {
-        setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
+    public EntityAntimatterBomb(Level level, double mx, double my, double mz, int charges) {
+		this(level);
+		aoc = charges;
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
 
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {

@@ -44,16 +44,17 @@ public class EntityBomb extends ThrowableProjectile {
 	public EntityBomb(Level level, double x, double y, double z, float yaw, float pitch) {
 		this(level);
 		moveTo(x, y, z, yaw, pitch);
-		setDeltaMovement(-(-Mth.sin(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)),
-            (-Mth.sin(pitch / 180.0F * Mth.PI)),
-            (Mth.cos(yaw / 180.0F * Mth.PI) * Mth.cos(pitch / 180.0F * Mth.PI)));
+		setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)),
+            (-Mth.sin(pitch * Mth.DEG_TO_RAD)),
+            (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)));
 	}
 
 	public EntityBomb(Level level, double x, double y,double z, double mx, double my, double mz) {
 		this(level);
 		setPos(x+mx*1.4f,y+my*1.4f,z+mz*1.4f);
-		setAnglesMotion(mx, my, mz);
-	}
+        setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+    }
 
 	public EntityBomb(Level level, Entity entity, float inaccuracy) {
 		this(level);
@@ -61,13 +62,6 @@ public class EntityBomb extends ThrowableProjectile {
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 2.5f, inaccuracy);
-	}
-
-	public void setAnglesMotion(double mx, double my, double mz)
-	{
-        setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Math.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
 	}
 
     @Override

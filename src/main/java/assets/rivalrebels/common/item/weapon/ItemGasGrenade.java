@@ -17,7 +17,6 @@ import assets.rivalrebels.common.entity.EntityGasGrenade;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -68,7 +67,7 @@ public class ItemGasGrenade extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
 		user.startUsingItem(hand);
-		world.playSound(user, user.getX(), user.getY(), user.getZ(), SoundEvents.SLIME_ATTACK, SoundSource.PLAYERS, 1.0F, 1.0F);
+		user.playSound(SoundEvents.SLIME_ATTACK, 1.0F, 1.0F);
 		return super.use(world, user, hand);
 	}
 
@@ -76,11 +75,11 @@ public class ItemGasGrenade extends Item
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
 		int time = 75 - remainingUseTicks;
 		if (time == 15 || time == 30 || time == 45 || time == 60) {
-			world.playLocalSound(user.getX(), user.getY(), user.getZ(), SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.PLAYERS, 1.0F, 1.0F, true);
+			user.playSound(SoundEvents.NOTE_BLOCK_SNARE.value());
 		}
 
         if (time == 75) {
-			world.playLocalSound(user.getX(), user.getY(), user.getZ(), SoundEvents.NOTE_BLOCK_SNARE.value(), SoundSource.PLAYERS, 1.0F, 1.0F, true);
+			user.playSound(SoundEvents.NOTE_BLOCK_SNARE.value());
 			user.addEffect(new MobEffectInstance(MobEffects.POISON, 80, 1));
 			user.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
 			user.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 0));

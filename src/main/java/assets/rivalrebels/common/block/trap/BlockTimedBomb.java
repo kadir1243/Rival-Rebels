@@ -90,18 +90,18 @@ public class BlockTimedBomb extends FallingBlock {
 		if (world.getBlockState(pos.above()).is(RRBlocks.light) && ticksSincePlaced <= 93)
 		{
 			world.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());
-			world.playLocalSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 1, 1, true);
+			world.playLocalSound(pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 1, 1, true);
 		}
 		else
 		{
 			if (ticksSincePlaced <= 93)
 			{
 				world.setBlockAndUpdate(pos.above(), RRBlocks.light.defaultBlockState());
-				world.playLocalSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 1, 0.7F, true);
+				world.playLocalSound(pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 1, 0.7F, true);
 			}
 			else
 			{
-				world.playLocalSound(x + 0.5, y + 0.5, z + 0.5, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 2F, 2F, true);
+				world.playLocalSound(pos, SoundEvents.UI_BUTTON_CLICK.value(), SoundSource.BLOCKS, 2F, 2F, true);
 			}
 		}
 	}

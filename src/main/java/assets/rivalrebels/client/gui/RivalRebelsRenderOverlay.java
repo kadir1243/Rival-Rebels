@@ -137,13 +137,13 @@ public class RivalRebelsRenderOverlay {
             );
         }
 
-        if (!rhodes.getTextureLocation().isBlank()) {
+        if (!rhodes.getFlagTextureLocation().isBlank()) {
             RenderSystem.defaultBlendFunc();
             float s = 8;
             float wl = w*0.5f;
             float hl = h*0.05f;
             ((GuiGraphicsAccessor) graphics).blit(
-                RRIdentifiers.create("textures/" + rhodes.getTextureLocation() + ".png"),
+                RRIdentifiers.create("textures/" + rhodes.getFlagTextureLocation() + ".png"),
                     Mth.floor(wl-s),
                     Mth.floor(wl+s),
                     Mth.floor(hl-s),

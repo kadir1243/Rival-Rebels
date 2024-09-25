@@ -17,9 +17,12 @@ import assets.rivalrebels.common.tileentity.TileEntityReciever;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -68,12 +71,18 @@ public class BlockReciever extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        player.openMenu((MenuProvider) level.getBlockEntity(pos));
+        player.openMenu(getMenuProvider(state, level, pos));
 
 		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
 
 		return InteractionResult.sidedSuccess(level.isClientSide());
 	}
+
+    @Override
+    protected @Nullable MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
+        return new SimpleMenuProvider((MenuConstructor) level.getBlockEntity(pos), Component.literal("Automated Defense System"));
+    }
+
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);

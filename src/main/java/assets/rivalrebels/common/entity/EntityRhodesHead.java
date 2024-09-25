@@ -14,6 +14,7 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.item.RRItems;
+import net.minecraft.core.Holder;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -27,7 +28,7 @@ public class EntityRhodesHead extends EntityRhodesPiece
 		super(type, w);
 	}
 
-	public EntityRhodesHead(Level w, double x, double y, double z, float scale, RhodesType color)
+	public EntityRhodesHead(Level w, double x, double y, double z, float scale, Holder<RhodesType> color)
 	{
 		super(RREntities.RHODES_HEAD, w, x, y, z, scale, color);
 		health = 700;

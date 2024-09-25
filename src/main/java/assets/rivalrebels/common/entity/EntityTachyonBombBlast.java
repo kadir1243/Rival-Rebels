@@ -17,21 +17,16 @@ import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TachyonBomb;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.nbt.CompoundTag;
+
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.world.phys.shapes.Shapes;
 
-public class EntityTachyonBombBlast extends EntityInanimate
-{
-	public TachyonBomb	tsar		= null;
-	public double		radius;
-
+public class EntityTachyonBombBlast extends AbstractBlastEntity<TachyonBomb> {
     public EntityTachyonBombBlast(EntityType<? extends EntityTachyonBombBlast> type, Level level) {
         super(type, level);
     }
@@ -43,7 +38,7 @@ public class EntityTachyonBombBlast extends EntityInanimate
 
 	public EntityTachyonBombBlast(Level level, float x, float y, float z, TachyonBomb tsarBomba, int rad) {
 		this(level);
-		tsar = tsarBomba;
+		bomb = tsarBomba;
 		radius = rad;
 		setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
@@ -63,7 +58,7 @@ public class EntityTachyonBombBlast extends EntityInanimate
 
 		if (random.nextInt(30) == 0)
 		{
-			level().playLocalSound(getX(), getY(), getZ(), SoundEvents.LIGHTNING_BOLT_THUNDER, SoundSource.MASTER, 10.0F, 0.5F, true);
+			this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.5F);
 		}
 		else
 		{
@@ -74,17 +69,17 @@ public class EntityTachyonBombBlast extends EntityInanimate
 
 		if (!level().isClientSide())
 		{
-			if (tsar == null && tickCount > 1200) kill();
+			if (bomb == null && tickCount > 1200) kill();
 			if (tickCount % 20 == 0) updateEntityList();
 			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RRConfig.SERVER.getTsarBombaSpeed() * 2; i++)
 			{
-				if (tsar != null)
+				if (bomb != null)
 				{
-					tsar.tick(this);
-					/*if (tsar.tick())
+                    bomb.tick(this);
+					/*if (bomb.tick())
 					{
-						tsar = null;
+						bomb = null;
 					}*/
 				}
 				else
@@ -97,20 +92,18 @@ public class EntityTachyonBombBlast extends EntityInanimate
 
 	List<Entity> entitylist = new ArrayList<>();
 
-	public void updateEntityList()
-	{
+	public void updateEntityList() {
 		entitylist.clear();
 		double ldist = radius*radius;
-		for (int i = 0; i < level().getEntities(this, Shapes.INFINITY.bounds()).size(); i++)
-		{
-			Entity e = level().getEntities(this, Shapes.INFINITY.bounds()).get(i);
-			double dist = e.distanceToSqr(getX(),getY(),getZ());
-			if (dist < ldist)
-			{
-				if ((e instanceof Player && ((Player) e).isCreative()) || e instanceof EntityNuclearBlast || e instanceof EntityTachyonBombBlast || e == this) continue;
-				entitylist.add(e);
-			}
-		}
+        List<Entity> entities = level().getEntities(this, AABB.of(BoundingBox.infinite()));
+        for (Entity e : entities) {
+            double dist = e.distanceToSqr(getX(), getY(), getZ());
+            if (dist < ldist) {
+                if (e.isInvulnerable() || e instanceof EntityNuclearBlast || e instanceof EntityTachyonBombBlast)
+                    continue;
+                entitylist.add(e);
+            }
+        }
 	}
 
 	public void pushAndHurtEntities()
@@ -142,16 +135,6 @@ public class EntityTachyonBombBlast extends EntityInanimate
 		{
 			entitylist.remove(e);
 		}
-	}
-
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-		radius = nbt.getFloat("radius");
-	}
-
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-		nbt.putFloat("radius", (float) radius);
 	}
 
     public EntityTachyonBombBlast setTime()

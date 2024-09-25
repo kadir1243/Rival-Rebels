@@ -12,26 +12,27 @@
 package assets.rivalrebels.common.command;
 
 import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.entity.RhodesType;
+import assets.rivalrebels.common.entity.RhodesTypes;
 import com.google.common.hash.Hashing;
 import com.mojang.brigadier.CommandDispatcher;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.*;
 import com.mojang.brigadier.context.CommandContext;
-import com.mojang.brigadier.exceptions.CommandSyntaxException;
-import com.mojang.brigadier.exceptions.DynamicCommandExceptionType;
 import com.mojang.brigadier.suggestion.Suggestions;
 import com.mojang.brigadier.suggestion.SuggestionsBuilder;
+import com.mojang.serialization.Codec;
 import net.minecraft.ChatFormatting;
+import net.minecraft.commands.CommandBuildContext;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.SharedSuggestionProvider;
+import net.minecraft.commands.arguments.ResourceOrIdArgument;
+import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.phys.Vec3;
 
@@ -40,7 +41,7 @@ public class CommandRobot {
     public static boolean rhodesExit = true;
     public static boolean rhodesHold;
 
-    public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
+    public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext) {
         dispatcher.register(Commands.literal("rrrobot")
             .requires(arg -> arg.hasPermission(3))
             .then(Commands.literal("spawn")
@@ -56,8 +57,13 @@ public class CommandRobot {
                             CommandSourceStack source = context.getSource();
                             float scale = FloatArgumentType.getFloat(context, "scale");
                             Vec3 cc = source.getPosition();
-                            EntityRhodes er = new EntityRhodes(source.getLevel(), cc.x, cc.y, cc.z, scale / 30.0f);
-                            source.getLevel().addFreshEntity(er);
+                            try {
+                                EntityRhodes er = new EntityRhodes(source.getLevel(), cc.x, cc.y, cc.z, scale / 30.0f);
+                                source.getLevel().addFreshEntity(er);
+                            } catch (Throwable e) {
+                                RivalRebels.LOGGER.error("Unexpected error:", e);
+                                throw e;
+                            }
                             return 0;
                         })))
             .then(Commands.literal("exit")
@@ -98,18 +104,19 @@ public class CommandRobot {
                 )
             )
             .then(Commands.literal("model")
-                .then(Commands.argument("type", RhodesTypeArgumentType.argumentType())
+                .then(Commands.argument("type", RhodesTypeArgumentType.argumentType(commandBuildContext))
                     .executes(context -> {
-                        RhodesType type = RhodesTypeArgumentType.get(context, "type");
+                        Holder<RhodesType> type = RhodesTypeArgumentType.get(context, "type");
                         EntityRhodes.forcecolor = type;
-                        context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: " + type.getSerializedName()).withStyle(ChatFormatting.RED), true);
+                        context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: ").append(type.value().getName()).withStyle(ChatFormatting.RED), true);
 
                         return 0;
                     })
                 )
                 .executes(context -> {
-                    EntityRhodes.forcecolor = RhodesType.Rhodes;
-                    context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: " + RRConfig.SERVER.getRhodesTeams()[EntityRhodes.lastct].getSerializedName()).withStyle(ChatFormatting.RED), true);
+                    EntityRhodes.forcecolor = RivalRebels.RHODES_TYPE_REGISTRY.wrapAsHolder(RhodesTypes.Rhodes);
+                    context.getSource().sendSuccess(() -> Component.literal("Rhodes Type Forcing Has Been Reset"), true);
+                    context.getSource().sendSuccess(() -> Component.literal("Next Rhodes: ").append(RRConfig.SERVER.getRhodesTeams()[EntityRhodes.lastct].getName()).withStyle(ChatFormatting.RED), true);
                     return 0;
                 })
             )
@@ -126,34 +133,29 @@ public class CommandRobot {
         );
     }
 
-    public static class RhodesTypeArgumentType implements ArgumentType<RhodesType> {
-        public static final DynamicCommandExceptionType ERROR_INVALID_VALUE = new DynamicCommandExceptionType(
-            o -> Component.translatableEscape("argument.id.unknown", o)
-        );
-        private static final List<String> STRINGS = Arrays.stream(RhodesType.values()).map(Enum::toString).toList();
+    public static class RhodesTypeArgumentType extends ResourceOrIdArgument<RhodesType> {
+        private static final Codec<Holder<RhodesType>> codec = RivalRebels.RHODES_TYPE_REGISTRY.holderByNameCodec();
 
-        public static RhodesTypeArgumentType argumentType() {
-            return new RhodesTypeArgumentType();
+        protected RhodesTypeArgumentType(CommandBuildContext context) {
+            super(context, RivalRebels.RHODES_TYPE_REGISTRY_KEY, codec);
         }
 
-        public static RhodesType get(final CommandContext<?> context, final String name) {
-            return context.getArgument(name, RhodesType.class);
+        public static RhodesTypeArgumentType argumentType(CommandBuildContext context) {
+            return new RhodesTypeArgumentType(context);
         }
 
-        @Override
-        public RhodesType parse(StringReader reader) throws CommandSyntaxException {
-            String string = reader.readUnquotedString();
-            RhodesType rhodesType = Arrays.stream(RhodesType.values()).filter(type -> type.getSerializedName().equalsIgnoreCase(string)).findFirst().orElse(null);
-            if (rhodesType != null) {
-                return rhodesType;
-            } else {
-                throw ERROR_INVALID_VALUE.createWithContext(reader, string);
-            }
+        public static Holder<RhodesType> get(final CommandContext<CommandSourceStack> context, final String name) {
+            return getResource(context, name);
+        }
+
+        @SuppressWarnings("unchecked")
+        private static <T> Holder<T> getResource(CommandContext<CommandSourceStack> context, String name) {
+            return context.getArgument(name, Holder.class);
         }
 
         @Override
         public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-            return SharedSuggestionProvider.suggest(STRINGS, builder);
+            return SharedSuggestionProvider.suggestResource(RivalRebels.RHODES_TYPE_REGISTRY.stream(), builder, RivalRebels.RHODES_TYPE_REGISTRY::getKey, rhodesType -> RivalRebels.RHODES_TYPE_REGISTRY.getKey(rhodesType)::toString);
         }
     }
 }

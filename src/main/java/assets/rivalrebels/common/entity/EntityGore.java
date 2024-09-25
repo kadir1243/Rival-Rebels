@@ -67,12 +67,11 @@ public class EntityGore extends EntityInanimate {
 	{
 		this(RREntities.GORE, level);
 	}
-	public EntityGore(Level level, double x, double y,double z, double mx, double my, double mz, int Type, int Mob)
-	{
+	public EntityGore(Level level, double mx, double my, double mz, int Type, int Mob) {
 		this(level);
-		setPos(x,y,z);
-		setAnglesMotion(mx, my, mz);
-		setTypeOfGore(Type);
+        setYRot(yRotO = (float) (Mth.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
+        setTypeOfGore(Type);
 		setMob(Mob);
 	}
 
@@ -92,14 +91,7 @@ public class EntityGore extends EntityInanimate {
         entityData.set(IS_GREEN, green);
     }
 
-    public void setAnglesMotion(double mx, double my, double mz)
-	{
-        setDeltaMovement(mx, my, mz);
-		setYRot(yRotO = (float) (Mth.atan2(mx, mz) * Mth.RAD_TO_DEG));
-		setXRot(xRotO = (float) (Math.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
-	}
-
-	public EntityGore(Level level, Entity toBeGibbed, int Type, int mob)
+    public EntityGore(Level level, Entity toBeGibbed, int Type, int mob)
 	{
 		this(level);
 		origin = toBeGibbed;

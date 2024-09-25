@@ -12,44 +12,41 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.client.renderentity.RenderRhodes;
+import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.explosion.Explosion;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
+import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.util.FastColor;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MoverType;
+import net.minecraft.world.entity.VariantHolder;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
 
-public class EntityRhodesPiece extends Entity {
+public class EntityRhodesPiece extends Entity implements VariantHolder<Holder<RhodesType>> {
     public static final EntityDataAccessor<Float> SCALE = SynchedEntityData.defineId(EntityRhodesPiece.class, EntityDataSerializers.FLOAT);
-    public static final EntityDataAccessor<RhodesType> TYPE = SynchedEntityData.defineId(EntityRhodesPiece.class, RhodesType.DATA_SERIALIZER);
+    public static final EntityDataAccessor<Holder<RhodesType>> TYPE = SynchedEntityData.defineId(EntityRhodesPiece.class, RhodesTypes.HOLDER_DATA_SERIALIZER);
     protected double health;
 	private float myaw;
 	private float mpitch;
-    public int color = 0;
 
 	public EntityRhodesPiece(EntityType<? extends EntityRhodesPiece> type, Level w) {
 		super(type, w);
 		setBoundingBox(new AABB(-1.5, -1.5, -1.5, 1.5, 1.5, 1.5));
 	}
 
-	public EntityRhodesPiece(EntityType<? extends EntityRhodesPiece> type, Level w, double x, double y, double z, float scale, RhodesType color)
-	{
+	public EntityRhodesPiece(EntityType<? extends EntityRhodesPiece> type, Level w, double x, double y, double z, float scale, Holder<RhodesType> rhodesTypeHolder) {
 		this(type, w);
 		setPos(x, y, z);
 		setScale(scale);
-		setColor(color);
+		setVariant(rhodesTypeHolder);
 		myaw = (float) (random.nextGaussian()*20);
 		mpitch = (float) (random.nextGaussian()*20);
 		setDeltaMovement((float) (random.nextGaussian()*0.75),
@@ -65,18 +62,17 @@ public class EntityRhodesPiece extends Entity {
         entityData.set(SCALE, scale);
     }
 
-    public RhodesType getColor() {
+    public Holder<RhodesType> getVariant() {
         return entityData.get(TYPE);
     }
 
-    @Environment(EnvType.CLIENT)
-    public int getColorRGBA() {
-        int rhodesType = getColor().ordinal();
-        return FastColor.ARGB32.colorFromFloat(1F, RenderRhodes.colors[rhodesType *3], RenderRhodes.colors[rhodesType *3+1], RenderRhodes.colors[rhodesType *3+2]);
+    @Override
+    public void setVariant(Holder<RhodesType> variant) {
+        entityData.set(TYPE, variant);
     }
 
-    public void setColor(RhodesType color) {
-        entityData.set(TYPE, color);
+    public int getColorRGBA() {
+        return getVariant().value().getColor();
     }
 
     @Override
@@ -139,7 +135,7 @@ public class EntityRhodesPiece extends Entity {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(SCALE, 1F);
-        builder.define(TYPE, RhodesType.Rhodes);
+        builder.define(TYPE, RivalRebels.RHODES_TYPE_REGISTRY.wrapAsHolder(RhodesTypes.Rhodes));
     }
 
     @Override

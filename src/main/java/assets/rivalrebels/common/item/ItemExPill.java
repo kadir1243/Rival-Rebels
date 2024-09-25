@@ -17,7 +17,6 @@ import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffectInstance;
@@ -47,8 +46,8 @@ public class ItemExPill extends Item
 			if (random >= 40)
 			{
 				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("The experiment turned out a success.").withStyle(ChatFormatting.YELLOW)), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+				player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
+				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
 				player.getFoodData().eat(20, 200);
 				player.heal(20);
@@ -56,8 +55,8 @@ public class ItemExPill extends Item
 			else if (random >= 30)
 			{
 				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Begrüßen Sie den Uber-Soldat.").withStyle(ChatFormatting.YELLOW)), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+                player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
+				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
 				player.getFoodData().eat(20, 200);
 				player.heal(20);
@@ -72,15 +71,15 @@ public class ItemExPill extends Item
 			else if (random >= 20)
 			{
 				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("The test subject has perished.").withStyle(ChatFormatting.YELLOW)), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+				player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
+				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.hurt(RivalRebelsDamageSource.cyanide(world), 2000);
 			}
 			else
 			{
 				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Unexpected results have occurred.").withStyle(ChatFormatting.YELLOW)), true);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.MAGMA_CUBE_JUMP, SoundSource.PLAYERS, 1.0F, 1.0F);
-				world.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GHAST_SCREAM, SoundSource.PLAYERS, 1.0F, 1.0F);
+				player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
+				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 1500, 20));
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 1500, 20));
 				player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1500, 20));

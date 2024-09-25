@@ -34,9 +34,9 @@ public class EntityLaserLink extends Projectile {
 		tickCount = 0;
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
 		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
-        setPos(getX() - (Mth.cos(getYRot() / 180.0F * Mth.PI) * 0.2F),
+        setPos(getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
 		getY() - 0.08,
-		getZ() - (Mth.sin(getYRot() / 180.0F * Mth.PI) * 0.2F));
+		getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F));
 	}
 
 	public EntityLaserLink(Level level, double x, double y, double z, float yaw, float pitch, double distance) {

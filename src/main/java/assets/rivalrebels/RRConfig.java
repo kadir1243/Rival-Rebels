@@ -1,11 +1,13 @@
 package assets.rivalrebels;
 
 import assets.rivalrebels.common.entity.RhodesType;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 public class RRConfig {
     public static class Server {
@@ -21,7 +23,7 @@ public class RRConfig {
         private final ForgeConfigSpec.IntValue chargeExplosionSize;
         private final ForgeConfigSpec.IntValue timedbombExplosionSize;
         private final ForgeConfigSpec.BooleanValue infiniteGrenades;
-        private final ForgeConfigSpec.ConfigValue<List<? extends RhodesType>> rhodesTeams;
+        private final ForgeConfigSpec.ConfigValue<List<? extends String>> rhodesTeams;
         private final ForgeConfigSpec.BooleanValue prefillrhodes;
         private final ForgeConfigSpec.ConfigValue<Integer> rhodesNukes;
         private final ForgeConfigSpec.ConfigValue<Integer> objectiveHealth;
@@ -79,7 +81,7 @@ public class RRConfig {
             infiniteAmmo = builder.define("infiniteAmmo", false);
             infiniteNukes = builder.define("infiniteNukes", false);
             infiniteGrenades = builder.define("infiniteGrenades", false);
-            rhodesTeams = builder.comment("Repeat the type for multiple occurences of the same rhodes.").defineList("rhodesTeams", Arrays.stream(RhodesType.values()).toList(), o -> Arrays.stream(RhodesType.values()).anyMatch(type -> type.getSerializedName().equalsIgnoreCase(o.toString())));
+            rhodesTeams = builder.comment("Repeat the type for multiple occurences of the same rhodes. Leave Empty For Random Rhodes Types").defineList("rhodesTeams", List.of(), o -> RivalRebels.RHODES_TYPE_REGISTRY.containsKey(ResourceLocation.tryParse(o.toString())));
             prefillrhodes = builder.define("prefillrhodes", true);
             rhodesNukes = builder.define("rhodesNukes", 8);
             rhodesInRoundsChance = builder.define("rhodesInRoundsChance", 0);
@@ -276,9 +278,19 @@ public class RRConfig {
         }
 
         public RhodesType[] getRhodesTeams() {
-            return rhodesTeams.get().toArray(new RhodesType[0]);
+            List<? extends String> list = rhodesTeams.get();
+            if (list.isEmpty()) {
+                return RivalRebels.RHODES_TYPE_REGISTRY.stream().collect(RHODES_TYPES_SHUFFLER).toArray(new RhodesType[0]);
+            }
+            return list.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).map(RivalRebels.RHODES_TYPE_REGISTRY::get).filter(Objects::nonNull).toArray(RhodesType[]::new);
         }
-
+        private static final Collector<RhodesType, RhodesType, List<RhodesType>> RHODES_TYPES_SHUFFLER = Collectors.collectingAndThen(
+            Collectors.toCollection(ArrayList::new),
+            list -> {
+                Collections.shuffle(list);
+                return list;
+            }
+        );
         public boolean isPrefillrhodes() {
             return prefillrhodes.get();
         }
