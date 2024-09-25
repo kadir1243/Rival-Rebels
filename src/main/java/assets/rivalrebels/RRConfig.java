@@ -284,8 +284,8 @@ public class RRConfig {
             }
             return list.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).map(RivalRebels.RHODES_TYPE_REGISTRY::get).filter(Objects::nonNull).toArray(RhodesType[]::new);
         }
-        private static final Collector<RhodesType, RhodesType, List<RhodesType>> RHODES_TYPES_SHUFFLER = Collectors.collectingAndThen(
-            Collectors.toCollection(ArrayList::new),
+        private static final Collector<RhodesType, ?, List<RhodesType>> RHODES_TYPES_SHUFFLER = Collectors.collectingAndThen(
+            Collectors.<RhodesType>toList(),
             list -> {
                 Collections.shuffle(list);
                 return list;
