@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityReciever;
@@ -18,6 +19,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
@@ -73,7 +75,7 @@ public class BlockReciever extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         player.openMenu(getMenuProvider(state, level, pos));
 
-		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
+        level.playSound(player, pos, RRSounds.GUI_UNKNOWN4, SoundSource.PLAYERS);
 
 		return InteractionResult.sidedSuccess(level.isClientSide());
 	}

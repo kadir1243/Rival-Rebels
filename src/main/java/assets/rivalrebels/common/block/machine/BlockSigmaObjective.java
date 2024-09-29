@@ -13,11 +13,13 @@ package assets.rivalrebels.common.block.machine;
 
 import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.SigmaObjectiveBlockEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -62,7 +64,7 @@ public class BlockSigmaObjective extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
+        level.playSound(player, pos, RRSounds.GUI_UNKNOWN4, SoundSource.PLAYERS);
 
 		return InteractionResult.sidedSuccess(level.isClientSide());
 	}

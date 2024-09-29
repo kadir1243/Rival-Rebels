@@ -243,27 +243,12 @@ public class RivalRebelsSoundPlayer
         return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ(), volume, pitch);
     }
 
-	public static boolean playSound(Level world, int dir, int num, double x, double y, double z, float volume)
-	{
-		return playSound(world, dir, num, x, y, z, volume, 1);
-	}
-
-    public static boolean playSound(Level world, int dir, int num, BlockPos pos, float volume)
-    {
-        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ(), volume);
-    }
-
-	public static boolean playSound(Level world, int dir, int num, double x, double y, double z)
+    public static boolean playSound(Level world, int dir, int num, double x, double y, double z)
 	{
 		return playSound(world, dir, num, x, y, z, 1, 1);
 	}
 
-    public static boolean playSound(Level world, int dir, int num, BlockPos pos)
-    {
-        return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ());
-    }
-
-	public static boolean playSound(Entity entity, int dir, int num, float volume, float pitch)
+    public static boolean playSound(Entity entity, int dir, int num, float volume, float pitch)
 	{
 		if (entity != null)
 		{

@@ -12,7 +12,7 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.BlockPos;
@@ -119,15 +119,10 @@ public class EntityGasGrenade extends Projectile {
     }
 
     private void pop() {
-        RivalRebelsSoundPlayer.playSound(this, 9, 1);
-        for (int x = -4; x <= 4; x++) {
-            for (int y = -4; y <= 4; y++) {
-                for (int z = -4; z <= 4; z++) {
-                    if (level().isEmptyBlock(new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z))) {
-                        level().setBlockAndUpdate(new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z), RRBlocks.toxicgas.defaultBlockState());
-                    }
-                }
-            }
-        }
+        this.playSound(RRSounds.GRENADE_UNKNOWN2);
+        BlockPos.betweenClosedStream(-4, -4, -4, 4, 4, 4)
+            .map(pos -> pos.offset(blockPosition()))
+            .filter(pos -> level().isEmptyBlock(pos))
+            .forEach(pos -> level().setBlockAndUpdate(pos, RRBlocks.toxicgas.defaultBlockState()));
     }
 }

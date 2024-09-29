@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityBomb;
 import assets.rivalrebels.common.entity.EntityRocket;
@@ -56,7 +57,7 @@ public class ItemRPG extends TieredItem
                 itemStack.consume(1, player);
 			}
 			if (!stack.isEnchanted()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
-			else RivalRebelsSoundPlayer.playSound(player, 10, 4, 1.0f);
+			else player.playSound(RRSounds.GUI_UNKNOWN5);
 			if (!world.isClientSide()) {
                 Projectile projectile = stack.isEnchanted() ? new EntityBomb(world, player, 0.1F) : new EntityRocket(world, player, 0.1F);
                 projectile.setOwner(player);

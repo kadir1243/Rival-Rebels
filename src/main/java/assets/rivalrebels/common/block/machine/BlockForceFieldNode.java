@@ -12,7 +12,7 @@
 package assets.rivalrebels.common.block.machine;
 
 import assets.rivalrebels.RivalRebels;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.item.ItemChip;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import assets.rivalrebels.common.tileentity.Tickable;
@@ -67,7 +67,8 @@ public class BlockForceFieldNode extends BaseEntityBlock {
 				if (teffn.rrteam == RivalRebelsTeam.NONE) {
 					teffn.uuid = player.getGameProfile().getId();
 				}
-				RivalRebelsSoundPlayer.playSound(level, 10, 5, pos);
+
+                player.playSound(RRSounds.GUI_UNKNOWN6);
 			}
 		}
 		return ItemInteractionResult.sidedSuccess(level.isClientSide());

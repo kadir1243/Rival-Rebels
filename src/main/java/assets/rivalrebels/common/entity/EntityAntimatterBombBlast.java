@@ -12,6 +12,7 @@
 package assets.rivalrebels.common.entity;
 
 import assets.rivalrebels.RRConfig;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.AntimatterBomb;
@@ -65,7 +66,7 @@ public class EntityAntimatterBombBlast extends AbstractBlastEntity<AntimatterBom
 		if (random.nextInt(30) == 0) {
             this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.5F);
 		} else {
-			if (random.nextInt(30) == 0) RivalRebelsSoundPlayer.playSound(this, 13, 0, 100, 0.8f);
+			if (random.nextInt(30) == 0) this.playSound(RRSounds.MANDELEED, 100, 0.8f);
 		}
 
 		tickCount++;

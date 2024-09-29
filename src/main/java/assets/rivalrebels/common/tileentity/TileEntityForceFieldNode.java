@@ -15,7 +15,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.machine.BlockForceField;
 import assets.rivalrebels.common.block.machine.BlockForceFieldNode;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
 import assets.rivalrebels.common.round.RivalRebelsTeam;
 import java.util.List;
@@ -132,7 +132,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                     cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
-                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    e.playSound(RRSounds.GUI_UNKNOWN8, 1, 2);
                     if (e.getBoundingBox() != null) hits += e.getBoundingBox().getSize();
                 }
             }
@@ -181,7 +181,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                     cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
-                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    e.playSound(RRSounds.GUI_UNKNOWN8, 1, 2);
                     if (e.getBoundingBox() != null) hits += e.getBoundingBox().getSize();
                 }
             }
@@ -230,7 +230,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                     cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
-                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    e.playSound(RRSounds.GUI_UNKNOWN8, 1, 2);
                     if (e.getBoundingBox() != null) hits += e.getBoundingBox().getSize();
                 }
             }
@@ -279,7 +279,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                     cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
-                    RivalRebelsSoundPlayer.playSound(e, 10, 7, 1, 2f);
+                    e.playSound(RRSounds.GUI_UNKNOWN8, 1, 2);
                     if (e.getBoundingBox() != null) hits += e.getBoundingBox().getSize();
                 }
             }

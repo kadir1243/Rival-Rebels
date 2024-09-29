@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
@@ -36,10 +37,9 @@ public class ItemSafePill extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
 		player.startUsingItem(hand);
-		if (!world.isClientSide())
-		{
+		if (!world.isClientSide()) {
 			player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Regenerating...").withStyle(ChatFormatting.YELLOW)), true);
-			RivalRebelsSoundPlayer.playSound(player, 15, 1);
+            player.playSound(RRSounds.PILL2);
 			RivalRebelsSoundPlayer.playSound(player, 28, 18);
 			player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
 			player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);

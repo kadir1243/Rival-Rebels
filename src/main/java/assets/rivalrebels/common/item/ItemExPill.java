@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.item;
 
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.util.Translations;
@@ -37,7 +38,7 @@ public class ItemExPill extends Item
     @Override
     public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
-		RivalRebelsSoundPlayer.playSound(player, 15, 0);
+        player.playSound(RRSounds.PILL);
 		RivalRebelsSoundPlayer.playSound(player, 28, 18, 1.0f, 0.6f);
 		player.startUsingItem(hand);
 		if (!world.isClientSide())

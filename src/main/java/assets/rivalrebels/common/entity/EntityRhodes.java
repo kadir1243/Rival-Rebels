@@ -176,7 +176,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 		noCulling = true;
 		noPhysics = true;
 		//pushSpeedReduction = 100;
-		RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
+        this.playSound(RRSounds.LAPTOP2, 90, 1);
         setFlagTextureLocation(texloc);
 		if (forcecolor.value() == RhodesTypes.Rhodes) {
             RhodesType[] rhodesTeams = RRConfig.SERVER.getRhodesTeams();
@@ -588,13 +588,13 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
             if ((getBrain().getActiveNonCoreActivity().isEmpty() || !RRConfig.SERVER.isRhodesAIEnabled()) && e instanceof Player && dist < bbd * bbd * 0.25f && e.getY() < getY() + bbh + 1 && e.getY() > getY() - bbh + 1) {
                 if (rider == null) {
                     rider = (Player) e;
-                    RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
+                    this.playSound(RRSounds.LAPTOP2, 90, 1);
                 } else if (passenger1 == null) {
                     passenger1 = (Player) e;
-                    RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
+                    this.playSound(RRSounds.LAPTOP2, 90, 1);
                 } else if (passenger2 == null) {
                     passenger2 = (Player) e;
-                    RivalRebelsSoundPlayer.playSound(this, 12, 1, 90f, 1f);
+                    this.playSound(RRSounds.LAPTOP2, 90, 1);
                 }
             } else if (dist < bbd * bbd && e.getY() > getY() - bbh && e.getY() < getY() + bbh) {
                 if (e != this && !(e instanceof FallingBlockEntity) && !(e instanceof EntityDebris)) {
@@ -1057,7 +1057,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 							f = (f * f + f * 2) * 0.3333f;
 							if (f > 1.0F) f = 1.0F;
 							f+=0.7f;
-							RivalRebelsSoundPlayer.playSound(this, 16, 2, 1, 0.5f);
+                            this.playSound(RRSounds.PLASMA3, 1, 0.5F);
 							float cp = -f/ Mth.sqrt(x*x+y*y+z*z) *getScale();
 							x*=cp;
 							y*=cp;
@@ -1068,9 +1068,8 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 							plasmacharge = 0;
 						}
 					}
-					if (flame && !prevflame)
-					{
-						RivalRebelsSoundPlayer.playSound(this, 16, 1, 0.0f);
+					if (flame && !prevflame) {
+                        this.playSound(RRSounds.PLASMA2, 0, 1);
 					}
 				}
 				else

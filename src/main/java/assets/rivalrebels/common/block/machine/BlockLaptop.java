@@ -11,12 +11,13 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.tileentity.Tickable;
 import assets.rivalrebels.common.tileentity.TileEntityLaptop;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -60,7 +61,7 @@ public class BlockLaptop extends BaseEntityBlock {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         player.openMenu(getMenuProvider(state, level, pos));
-		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
+        level.playSound(player, pos, RRSounds.GUI_UNKNOWN4, SoundSource.PLAYERS);
 
 		return InteractionResult.sidedSuccess(level.isClientSide());
 	}

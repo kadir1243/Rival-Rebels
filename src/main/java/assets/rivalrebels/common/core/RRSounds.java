@@ -52,7 +52,40 @@ public class RRSounds {
     public static final SoundEvent RODDISK_UNKNOWN7 = register("roddisk_unknown7"); // 7.3
     public static final SoundEvent FLAME_THROWER_USE = register("flame_thrower_use"); // 8.0
     public static final SoundEvent FLAME_THROWER_EXTINGUISH = register("flame_thrower_extinguish"); // 8.1
-    public static final SoundEvent FLAME_THROWER_UNKNOWN = register("flame_thrower_extinguish"); // 8.2
+    public static final SoundEvent FLAME_THROWER_UNKNOWN = register("flame_thrower_unknown"); // 8.2
+    public static final SoundEvent GRENADE_UNKNOWN = register("grenade_unknown"); // 9.0
+    public static final SoundEvent GRENADE_UNKNOWN2 = register("grenade_unknown2"); // 9.1
+    public static final SoundEvent GRENADE_UNKNOWN3 = register("grenade_unknown3"); // 9.2
+    public static final SoundEvent GRENADE_UNKNOWN4 = register("grenade_unknown4"); // 9.3
+    public static final SoundEvent GUI_UNKNOWN = register("gui_unknown"); // 10.0
+    public static final SoundEvent GUI_UNKNOWN2 = register("gui_unknown2"); // 10.1
+    public static final SoundEvent GUI_UNKNOWN3 = register("gui_unknown3"); // 10.2
+    public static final SoundEvent GUI_UNKNOWN4 = register("gui_unknown4"); // 10.3
+    public static final SoundEvent GUI_UNKNOWN5 = register("gui_unknown5"); // 10.4
+    public static final SoundEvent GUI_UNKNOWN6 = register("gui_unknown6"); // 10.5
+    public static final SoundEvent GUI_UNKNOWN7 = register("gui_unknown7"); // 10.6
+    public static final SoundEvent GUI_UNKNOWN8 = register("gui_unknown8"); // 10.7
+    public static final SoundEvent GUI_UNKNOWN9 = register("gui_unknown9"); // 10.8
+    public static final SoundEvent LAND_MINE = register("land_mine"); // 11.0
+    public static final SoundEvent LAND_MINE2 = register("land_mine2"); // 11.1
+    public static final SoundEvent LAPTOP = register("laptop"); // 12.0
+    public static final SoundEvent LAPTOP2 = register("laptop2"); // 12.1
+    public static final SoundEvent LAPTOP3 = register("laptop3"); // 12.2
+    public static final SoundEvent MANDELEED = register("mendeleed"); // 13.0
+    public static final SoundEvent MANDELEED2 = register("mendeleed2"); // 13.1
+    public static final SoundEvent NUKE = register("nuke"); // 14.0
+    public static final SoundEvent PILL = register("pill"); // 15.0
+    public static final SoundEvent PILL2 = register("pill2"); // 15.1
+    public static final SoundEvent PLASMA = register("plasma"); // 16.0
+    public static final SoundEvent PLASMA2 = register("plasma2"); // 16.1
+    public static final SoundEvent PLASMA3 = register("plasma3"); // 16.2
+    public static final SoundEvent PLIERS = register("pliers"); // 17.0
+    public static final SoundEvent PRECURSOR = register("precursor"); // 18.0
+    public static final SoundEvent PRECURSOR2 = register("precursor2"); // 18.1
+    public static final SoundEvent PRINTER = register("printer"); // 19.0
+    public static final SoundEvent PRINTER2 = register("printer2"); // 19.1
+    public static final SoundEvent PRINTER3 = register("printer3"); // 19.2
+    public static final SoundEvent QUICK_SAND = register("quick_sand"); // 20.0
 
     public static void init() {
     }

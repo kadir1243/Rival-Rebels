@@ -12,7 +12,7 @@
 package assets.rivalrebels.common.item.weapon;
 
 import assets.rivalrebels.RRConfig;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.item.RRItems;
 import assets.rivalrebels.common.util.ItemUtil;
@@ -74,7 +74,7 @@ public class ItemPlasmaCannon extends TieredItem
 					return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
 				}
 			}
-			RivalRebelsSoundPlayer.playSound(user, 16, 1, 0.25f);
+            user.playSound(RRSounds.PLASMA2, 0.25F, 1);
 		}
 		else if (!world.isClientSide())
 		{
@@ -90,7 +90,7 @@ public class ItemPlasmaCannon extends TieredItem
 			f = (f * f + f * 2) * 0.3333f;
 			if (f > 1.0F) f = 1.0F;
 			f+=0.2f;
-			RivalRebelsSoundPlayer.playSound(user, 16, 2);
+            user.playSound(RRSounds.PLASMA3);
 			Entity entity = new EntityPlasmoid(world, user, f+0.5f, stack.isEnchanted());
 			world.addFreshEntity(entity);
 		}

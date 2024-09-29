@@ -11,14 +11,15 @@
  *******************************************************************************/
 package assets.rivalrebels.common.tileentity;
 
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsDamageSource;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityNuclearBlast;
 import assets.rivalrebels.common.entity.EntityPlasmoid;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.entity.EntityTsarBlast;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.block.Blocks;
@@ -42,7 +43,7 @@ public class TileEntityPlasmaExplosion extends BlockEntity implements Tickable
 		size += increment;
 		if (prevsize == 0)
 		{
-			RivalRebelsSoundPlayer.playSound(level, 16, 0, getBlockPos(), 4);
+            level.playSound(null, getBlockPos(), RRSounds.PLASMA, SoundSource.BLOCKS, 4, 1);
 		}
 		if (size > 3.1f)
 		{

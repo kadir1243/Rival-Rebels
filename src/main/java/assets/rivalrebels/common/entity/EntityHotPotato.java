@@ -14,6 +14,7 @@ package assets.rivalrebels.common.entity;
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.command.CommandHotPotato;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.explosion.TsarBomba;
 import net.minecraft.core.BlockPos;
@@ -78,9 +79,8 @@ public class EntityHotPotato extends ThrowableProjectile {
 	{
 		if (tickCount == -100) explode();
 		++this.tickCount;
-		if (tickCount < 2 && dorounds)
-		{
-			RivalRebelsSoundPlayer.playSound(level(), 14, 0, getX(), getY(), getZ(), 100);
+		if (tickCount < 2 && dorounds) {
+            this.playSound(RRSounds.NUKE, 100, 1);
             setDeltaMovement(Vec3.ZERO);
 			setPos(nextx+0.5f, nexty+0.5f, nextz+0.5f);
 			level().setBlockAndUpdate(new BlockPos(nextx, nexty-400, nextz), RRBlocks.jump.defaultBlockState());

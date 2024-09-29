@@ -17,6 +17,7 @@ import assets.rivalrebels.RivalRebels;
 import assets.rivalrebels.common.block.RRBlocks;
 import assets.rivalrebels.common.block.trap.BlockTheoreticalTsarBomba;
 import assets.rivalrebels.common.container.ContainerTheoreticalTsar;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityTheoreticalTsar;
 import assets.rivalrebels.common.item.RRItems;
@@ -33,6 +34,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
@@ -183,7 +185,7 @@ public class TileEntityTheoreticalTsarBomba extends BaseContainerBlockEntity imp
             Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}
 
-		if (countdown % 20 == 0 && countdown <= 200 && RRConfig.SERVER.getNuclearBombCountdown() > 10) RivalRebelsSoundPlayer.playSound(level, 14, 0, getBlockPos(), 100);
+		if (countdown % 20 == 0 && countdown <= 200 && RRConfig.SERVER.getNuclearBombCountdown() > 10) level.playSound(null, getBlockPos(), RRSounds.NUKE, SoundSource.BLOCKS, 100, 1);
 
 		if (countdown == 0 && nuclear != 0 && !level.isClientSide())
 		{

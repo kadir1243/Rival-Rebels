@@ -1,6 +1,6 @@
 package assets.rivalrebels.common.entity.brain;
 
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.behavior.Behavior;
@@ -31,6 +31,6 @@ public class StartingBrain extends Behavior<EntityRhodes> {
     @Override
     protected void stop(ServerLevel level, EntityRhodes entity, long gameTime) {
         super.stop(level, entity, gameTime);
-        RivalRebelsSoundPlayer.playSound(entity, 12, 1, 90f, 1f);
+        entity.playSound(RRSounds.LAPTOP2, 90, 1);
     }
 }

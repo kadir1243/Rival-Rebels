@@ -63,7 +63,7 @@ public class ItemAstroBlaster extends TieredItem {
         if (player.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
 			if (world.isClientSide()) stack.set(DataComponents.REPAIR_COST, 1);
 			player.startUsingItem(hand);
-			RivalRebelsSoundPlayer.playSound(player, 12, 0, 0.7f, 0.7f);
+            player.playSound(RRSounds.LAPTOP, 0.7F, 0.7F);
 		} else if (!world.isClientSide()) {
 			player.displayClientMessage(Component.nullToEmpty("§cNot enough redstone rods"), false);
 		}

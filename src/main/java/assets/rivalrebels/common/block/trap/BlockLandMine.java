@@ -13,7 +13,7 @@ package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.RRConfig;
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.entity.EntityRoddiskLeader;
 import assets.rivalrebels.common.entity.EntityRoddiskOfficer;
 import assets.rivalrebels.common.entity.EntityRoddiskRebel;
@@ -24,7 +24,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.Mob;
-import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -82,10 +81,10 @@ public class BlockLandMine extends FallingBlock
 
     @Override
     public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
-		if (entity instanceof Player || entity instanceof Animal || entity instanceof Mob || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
+		if (entity instanceof Player || entity instanceof Mob || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
 			world.setBlockAndUpdate(pos, state.setValue(UNSTABLE, true));
 			world.scheduleTick(pos, this, 5);
-			RivalRebelsSoundPlayer.playSound(world, 11, 1, pos, 3, 2);
+            entity.playSound(RRSounds.LAND_MINE2, 3, 2);
 		}
 	}
 

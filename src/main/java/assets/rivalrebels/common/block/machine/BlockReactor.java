@@ -11,6 +11,7 @@
  *******************************************************************************/
 package assets.rivalrebels.common.block.machine;
 
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.packet.ReactorMachinesPacket;
 import assets.rivalrebels.common.tileentity.Tickable;
@@ -21,6 +22,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
@@ -94,7 +96,7 @@ public class BlockReactor extends BaseEntityBlock {
             ServerPlayNetworking.send((ServerPlayer) player, new ReactorMachinesPacket(pos, List.copyOf(((TileEntityReactor) level.getBlockEntity(pos)).entries.values())));
         }
 
-		RivalRebelsSoundPlayer.playSound(level, 10, 3, pos);
+        level.playSound(player, pos, RRSounds.GUI_UNKNOWN4, SoundSource.PLAYERS);
 
 		return InteractionResult.sidedSuccess(level.isClientSide());
 	}

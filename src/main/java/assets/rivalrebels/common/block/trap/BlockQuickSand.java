@@ -12,8 +12,9 @@
 package assets.rivalrebels.common.block.trap;
 
 import assets.rivalrebels.common.block.RRBlocks;
-import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import assets.rivalrebels.common.core.RRSounds;
 import net.minecraft.core.BlockPos;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -32,7 +33,7 @@ public class BlockQuickSand extends Block
     public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
 		entity.fallDistance = 0.0F;
         entity.setDeltaMovement(entity.getDeltaMovement().multiply(1, 0.005, 1));
-		if (world.random.nextFloat() > 0.95) RivalRebelsSoundPlayer.playSound(world, 20, 0, pos, 0.2f);
+		if (world.random.nextFloat() > 0.95) world.playSound(entity, pos, RRSounds.QUICK_SAND, SoundSource.BLOCKS, 0.2F, 1);
 	}
 
 	/*@Override

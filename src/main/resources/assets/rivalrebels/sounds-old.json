@@ -1,49 +1,4 @@
 {
-  "9.0":  {"sounds": ["ah/a1","ah/a2"]},
-  "9.1":  {"sounds": ["ah/b"]},
-  "9.2":  {"sounds": ["ah/c"]},
-  "9.3":  {"sounds": ["ah/d1","ah/d2","ah/d3"]},
-
-  "10.0": {"sounds": ["ai/a"]},
-  "10.1": {"sounds": ["ai/b"]},
-  "10.2": {"sounds": ["ai/c"]},
-  "10.3": {"sounds": ["ai/d"]},
-  "10.4": {"sounds": ["ai/e"]},
-  "10.5": {"sounds": ["ai/f"]},
-  "10.6": {"sounds": ["ai/g"]},
-  "10.7": {"sounds": ["ai/h"]},
-  "10.8": {"sounds": ["ai/i"]},
-
-  "11.0": {"sounds": ["aj/a"]},
-  "11.1": {"sounds": ["aj/b"]},
-
-  "12.0": {"sounds": ["ak/a"]},
-  "12.1": {"sounds": ["ak/b"]},
-  "12.2": {"sounds": ["ak/c"]},
-
-  "13.0": {"sounds": ["al/a"]},
-  "13.1": {"sounds": ["al/b"]},
-
-  "14.0": {"sounds": ["am/a"]},
-
-  "15.0": {"sounds": ["an/a1","an/a2"]},
-  "15.1": {"sounds": ["an/b1","an/b2"]},
-
-  "16.0": {"sounds": ["ao/a"]},
-  "16.1": {"sounds": ["ao/b"]},
-  "16.2": {"sounds": ["ao/c"]},
-
-  "17.0": {"sounds": ["ap/a1","ap/a2","ap/a3","ap/a4"]},
-
-  "18.0": {"sounds": ["aq/a"]},
-  "18.1": {"sounds": ["aq/b"]},
-
-  "19.0": {"sounds": ["ar/a"]},
-  "19.1": {"sounds": ["ar/b"]},
-  "19.2": {"sounds": ["ar/c"]},
-
-  "20.0": {"sounds": ["as/a1","as/a2"]},
-
   "21.0": {"sounds": ["at/a"]},
   "21.1": {"sounds": ["at/b"]},
   "21.2": {"sounds": ["at/c"]},

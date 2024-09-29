@@ -1,6 +1,7 @@
 package assets.rivalrebels.common.entity.brain;
 
 import assets.rivalrebels.RivalRebels;
+import assets.rivalrebels.common.core.RRSounds;
 import assets.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import assets.rivalrebels.common.entity.EntityRhodes;
 import assets.rivalrebels.common.round.RivalRebelsPlayer;
@@ -67,7 +68,7 @@ public class IdleBrain extends Behavior<EntityRhodes> {
                 } else {
                     float d = Mth.abs(dx) + Mth.abs(dz);
                     if (d < 5) {
-                        RivalRebelsSoundPlayer.playSound(owner, 13, 0, 900f, 1f);
+                        owner.playSound(RRSounds.MANDELEED, 900, 1);
                         brain.setActiveActivityIfPossible(Activity.RAID);
                     } else {
                         if (d > 50 && random.nextBoolean()) {

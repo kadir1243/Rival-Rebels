@@ -52,6 +52,52 @@ public class SoundDataGen extends FabricSoundProvider {
         soundGenerator.add(RRSounds.FLAME_THROWER_USE, sounds("ag/a1","ag/a2"));
         soundGenerator.add(RRSounds.FLAME_THROWER_EXTINGUISH, sounds("ag/b"));
         soundGenerator.add(RRSounds.FLAME_THROWER_UNKNOWN, sounds("ag/c"));
+
+        soundGenerator.add(RRSounds.GRENADE_UNKNOWN, sounds("ah/a1","ah/a2"));
+        soundGenerator.add(RRSounds.GRENADE_UNKNOWN2, sounds("ah/b"));
+        soundGenerator.add(RRSounds.GRENADE_UNKNOWN3, sounds("ah/c"));
+        soundGenerator.add(RRSounds.GRENADE_UNKNOWN4, sounds("ah/d1","ah/d2","ah/d3"));
+
+        soundGenerator.add(RRSounds.GUI_UNKNOWN,  sounds("ai/a"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN2, sounds("ai/b"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN3, sounds("ai/c"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN4, sounds("ai/d"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN5, sounds("ai/e"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN6, sounds("ai/f"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN7, sounds("ai/g"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN8, sounds("ai/h"));
+        soundGenerator.add(RRSounds.GUI_UNKNOWN9, sounds("ai/i"));
+
+        soundGenerator.add(RRSounds.LAND_MINE, sounds("aj/a"));
+        soundGenerator.add(RRSounds.LAND_MINE2, sounds("aj/b"));
+
+        soundGenerator.add(RRSounds.LAPTOP,  sounds("ak/a"));
+        soundGenerator.add(RRSounds.LAPTOP2, sounds("ak/b"));
+        soundGenerator.add(RRSounds.LAPTOP3, sounds("ak/c"));
+
+        soundGenerator.add(RRSounds.MANDELEED,  sounds("al/a"));
+        soundGenerator.add(RRSounds.MANDELEED2, sounds("al/b"));
+
+        soundGenerator.add(RRSounds.NUKE, sounds("am/a"));
+
+        soundGenerator.add(RRSounds.PILL,  sounds("an/a1","an/a2"));
+        soundGenerator.add(RRSounds.PILL2, sounds("an/b1","an/b2"));
+
+        soundGenerator.add(RRSounds.PLASMA,  sounds("ao/a"));
+        soundGenerator.add(RRSounds.PLASMA2, sounds("ao/b"));
+        soundGenerator.add(RRSounds.PLASMA3, sounds("ao/c"));
+
+        soundGenerator.add(RRSounds.PLIERS, sounds("ap/a1","ap/a2","ap/a3","ap/a4"));
+
+        soundGenerator.add(RRSounds.PRECURSOR,  sounds("aq/a"));
+        soundGenerator.add(RRSounds.PRECURSOR2, sounds("aq/b"));
+
+        soundGenerator.add(RRSounds.PRINTER,  sounds("ar/a"));
+        soundGenerator.add(RRSounds.PRINTER2, sounds("ar/b"));
+        soundGenerator.add(RRSounds.PRINTER3, sounds("ar/c"));
+
+        soundGenerator.add(RRSounds.QUICK_SAND, sounds("as/a1","as/a2"));
+
     }
 
     private static SoundBuilder[] sounds(String... sounds) {
