@@ -1,0 +1,345 @@
+{
+  "artillery_destroy": {
+    "sounds": [
+      "rivalrebels:aa/c"
+    ]
+  },
+  "artillery_explode": {
+    "sounds": [
+      "rivalrebels:aa/a1",
+      "rivalrebels:aa/a2"
+    ]
+  },
+  "artillery_fire": {
+    "sounds": [
+      "rivalrebels:aa/d1",
+      "rivalrebels:aa/d2",
+      "rivalrebels:aa/d3"
+    ]
+  },
+  "artillery_fly": {
+    "sounds": [
+      "rivalrebels:aa/b1",
+      "rivalrebels:aa/b2",
+      "rivalrebels:aa/b3"
+    ]
+  },
+  "auto_build": {
+    "sounds": [
+      "rivalrebels:ab/a1",
+      "rivalrebels:ab/a2"
+    ]
+  },
+  "blaster_fire_off": {
+    "sounds": [
+      "rivalrebels:ac/b1",
+      "rivalrebels:ac/b2",
+      "rivalrebels:ac/b3"
+    ]
+  },
+  "blaster_message_from_other_planets": {
+    "sounds": [
+      "rivalrebels:ac/c"
+    ]
+  },
+  "blaster_message_from_other_planets2": {
+    "sounds": [
+      "rivalrebels:ac/d"
+    ]
+  },
+  "blaster_warming_up": {
+    "sounds": [
+      "rivalrebels:ac/a"
+    ]
+  },
+  "crate": {
+    "sounds": [
+      "rivalrebels:ad/a1",
+      "rivalrebels:ad/a2",
+      "rivalrebels:ad/a3",
+      "rivalrebels:ad/a4"
+    ]
+  },
+  "cuchillo_glass_break": {
+    "sounds": [
+      "rivalrebels:ae/a1",
+      "rivalrebels:ae/a2",
+      "rivalrebels:ae/a3"
+    ]
+  },
+  "cuchillo_unknown": {
+    "sounds": [
+      "rivalrebels:ae/b1",
+      "rivalrebels:ae/b2",
+      "rivalrebels:ae/b3",
+      "rivalrebels:ae/b4"
+    ]
+  },
+  "cuchillo_unknown2": {
+    "sounds": [
+      "rivalrebels:ae/c1",
+      "rivalrebels:ae/c2",
+      "rivalrebels:ae/c3"
+    ]
+  },
+  "cuchillo_unknown3": {
+    "sounds": [
+      "rivalrebels:ae/d1",
+      "rivalrebels:ae/d2",
+      "rivalrebels:ae/d3"
+    ]
+  },
+  "cuchillo_unknown4": {
+    "sounds": [
+      "rivalrebels:ae/e"
+    ]
+  },
+  "flame_thrower_extinguish": {
+    "sounds": [
+      "rivalrebels:ag/b"
+    ]
+  },
+  "flame_thrower_unknown": {
+    "sounds": [
+      "rivalrebels:ag/c"
+    ]
+  },
+  "flame_thrower_use": {
+    "sounds": [
+      "rivalrebels:ag/a1",
+      "rivalrebels:ag/a2"
+    ]
+  },
+  "force_field": {
+    "sounds": [
+      "rivalrebels:af/a"
+    ]
+  },
+  "grenade_unknown": {
+    "sounds": [
+      "rivalrebels:ah/a1",
+      "rivalrebels:ah/a2"
+    ]
+  },
+  "grenade_unknown2": {
+    "sounds": [
+      "rivalrebels:ah/b"
+    ]
+  },
+  "grenade_unknown3": {
+    "sounds": [
+      "rivalrebels:ah/c"
+    ]
+  },
+  "grenade_unknown4": {
+    "sounds": [
+      "rivalrebels:ah/d1",
+      "rivalrebels:ah/d2",
+      "rivalrebels:ah/d3"
+    ]
+  },
+  "gui_unknown": {
+    "sounds": [
+      "rivalrebels:ai/a"
+    ]
+  },
+  "gui_unknown2": {
+    "sounds": [
+      "rivalrebels:ai/b"
+    ]
+  },
+  "gui_unknown3": {
+    "sounds": [
+      "rivalrebels:ai/c"
+    ]
+  },
+  "gui_unknown4": {
+    "sounds": [
+      "rivalrebels:ai/d"
+    ]
+  },
+  "gui_unknown5": {
+    "sounds": [
+      "rivalrebels:ai/e"
+    ]
+  },
+  "gui_unknown6": {
+    "sounds": [
+      "rivalrebels:ai/f"
+    ]
+  },
+  "gui_unknown7": {
+    "sounds": [
+      "rivalrebels:ai/g"
+    ]
+  },
+  "gui_unknown8": {
+    "sounds": [
+      "rivalrebels:ai/h"
+    ]
+  },
+  "gui_unknown9": {
+    "sounds": [
+      "rivalrebels:ai/i"
+    ]
+  },
+  "land_mine": {
+    "sounds": [
+      "rivalrebels:aj/a"
+    ]
+  },
+  "land_mine2": {
+    "sounds": [
+      "rivalrebels:aj/b"
+    ]
+  },
+  "laptop": {
+    "sounds": [
+      "rivalrebels:ak/a"
+    ]
+  },
+  "laptop2": {
+    "sounds": [
+      "rivalrebels:ak/b"
+    ]
+  },
+  "laptop3": {
+    "sounds": [
+      "rivalrebels:ak/c"
+    ]
+  },
+  "mendeleed": {
+    "sounds": [
+      "rivalrebels:al/a"
+    ]
+  },
+  "mendeleed2": {
+    "sounds": [
+      "rivalrebels:al/b"
+    ]
+  },
+  "nuke": {
+    "sounds": [
+      "rivalrebels:am/a"
+    ]
+  },
+  "pill": {
+    "sounds": [
+      "rivalrebels:an/a1",
+      "rivalrebels:an/a2"
+    ]
+  },
+  "pill2": {
+    "sounds": [
+      "rivalrebels:an/b1",
+      "rivalrebels:an/b2"
+    ]
+  },
+  "plasma": {
+    "sounds": [
+      "rivalrebels:ao/a"
+    ]
+  },
+  "plasma2": {
+    "sounds": [
+      "rivalrebels:ao/b"
+    ]
+  },
+  "plasma3": {
+    "sounds": [
+      "rivalrebels:ao/c"
+    ]
+  },
+  "pliers": {
+    "sounds": [
+      "rivalrebels:ap/a1",
+      "rivalrebels:ap/a2",
+      "rivalrebels:ap/a3",
+      "rivalrebels:ap/a4"
+    ]
+  },
+  "precursor": {
+    "sounds": [
+      "rivalrebels:aq/a"
+    ]
+  },
+  "precursor2": {
+    "sounds": [
+      "rivalrebels:aq/b"
+    ]
+  },
+  "printer": {
+    "sounds": [
+      "rivalrebels:ar/a"
+    ]
+  },
+  "printer2": {
+    "sounds": [
+      "rivalrebels:ar/b"
+    ]
+  },
+  "printer3": {
+    "sounds": [
+      "rivalrebels:ar/c"
+    ]
+  },
+  "quick_sand": {
+    "sounds": [
+      "rivalrebels:as/a1",
+      "rivalrebels:as/a2"
+    ]
+  },
+  "rod_disk_hit_entity": {
+    "sounds": [
+      "rivalrebels:af/b1",
+      "rivalrebels:af/b2",
+      "rivalrebels:af/b3",
+      "rivalrebels:af/b4"
+    ]
+  },
+  "rod_disk_mirror_from_object": {
+    "sounds": [
+      "rivalrebels:af/c"
+    ]
+  },
+  "roddisk_unknown0": {
+    "sounds": [
+      "rivalrebels:af/a/a"
+    ]
+  },
+  "roddisk_unknown1": {
+    "sounds": [
+      "rivalrebels:af/a/b"
+    ]
+  },
+  "roddisk_unknown2": {
+    "sounds": [
+      "rivalrebels:af/a/c"
+    ]
+  },
+  "roddisk_unknown3": {
+    "sounds": [
+      "rivalrebels:af/a/d"
+    ]
+  },
+  "roddisk_unknown4": {
+    "sounds": [
+      "rivalrebels:af/b/a"
+    ]
+  },
+  "roddisk_unknown5": {
+    "sounds": [
+      "rivalrebels:af/b/b"
+    ]
+  },
+  "roddisk_unknown6": {
+    "sounds": [
+      "rivalrebels:af/b/c"
+    ]
+  },
+  "roddisk_unknown7": {
+    "sounds": [
+      "rivalrebels:af/b/d"
+    ]
+  }
+}

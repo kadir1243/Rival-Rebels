@@ -1,22 +1,15 @@
 {
   "required": true,
-  "package": "assets.rivalrebels.mixin",
+  "package": "io.github.kadir1243.rivalrebels.mixin",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
-    "ArgumentTypesMixin",
-    "AttributesMixin",
-    "BlockEntityAccessor",
-    "HashCacheMixin"
+    "AttributesMixin"
   ],
   "injectors": {
     "defaultRequire": 1
   },
   "client": [
     "client.ArmorFeatureRendererMixin",
-    "client.BlockEntityRenderersAccessor",
-    "client.GuiGraphicsAccessor",
-    "client.KeyMappingAccessor",
-    "client.KeyMappingMixin",
-    "client.LevelRendererMixin"
+    "client.GuiGraphicsAccessor"
   ]
 }

@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "textures": {
+    "bottom": "rivalrebels:block/bh",
+    "side": "rivalrebels:block/bg",
+    "top": "rivalrebels:block/bh"
+  }
+}

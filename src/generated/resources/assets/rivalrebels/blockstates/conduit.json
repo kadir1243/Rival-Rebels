@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "variant=0": {
+      "model": "rivalrebels:block/conduit"
+    },
+    "variant=1": {
+      "model": "rivalrebels:block/conduit"
+    },
+    "variant=2": {
+      "model": "rivalrebels:block/conduit_variant_2"
+    },
+    "variant=3": {
+      "model": "rivalrebels:block/conduit_variant_3"
+    },
+    "variant=4": {
+      "model": "rivalrebels:block/conduit_variant_4"
+    },
+    "variant=5": {
+      "model": "rivalrebels:block/conduit_variant_5"
+    },
+    "variant=6": {
+      "model": "rivalrebels:block/conduit_variant_6"
+    },
+    "variant=7": {
+      "model": "rivalrebels:block/conduit_variant_7"
+    },
+    "variant=8": {
+      "model": "rivalrebels:block/conduit_variant_8"
+    },
+    "variant=9": {
+      "model": "rivalrebels:block/conduit_variant_9"
+    }
+  }
+}

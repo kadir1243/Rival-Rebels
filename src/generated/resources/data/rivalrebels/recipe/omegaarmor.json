@@ -1,0 +1,30 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bone"
+    },
+    "C": {
+      "tag": "minecraft:stone_crafting_materials"
+    },
+    "D": {
+      "tag": "minecraft:dirt"
+    },
+    "P": {
+      "item": "rivalrebels:pliers"
+    },
+    "S": {
+      "item": "rivalrebels:steel"
+    }
+  },
+  "pattern": [
+    "SSD",
+    "SPB",
+    "SSC"
+  ],
+  "result": {
+    "count": 1,
+    "id": "rivalrebels:omegaarmor"
+  }
+}

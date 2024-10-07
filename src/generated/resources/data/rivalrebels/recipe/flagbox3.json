@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": {
+      "item": "rivalrebels:pliers"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    }
+  },
+  "pattern": [
+    "PW"
+  ],
+  "result": {
+    "count": 1,
+    "id": "rivalrebels:flagbox3"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "C": {
+      "tag": "minecraft:stone_crafting_materials"
+    },
+    "D": {
+      "tag": "minecraft:dirt"
+    },
+    "G": {
+      "item": "minecraft:gravel"
+    },
+    "S": {
+      "tag": "minecraft:sand"
+    }
+  },
+  "pattern": [
+    "GD",
+    "CS"
+  ],
+  "result": {
+    "count": 6,
+    "id": "rivalrebels:gas_grenade"
+  }
+}
