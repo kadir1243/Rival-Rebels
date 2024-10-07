@@ -35,6 +35,6 @@ jobs:
           name: "${{env.RELEASE_NAME}}"
           version-type: alpha
 
-          loaders: fabric
+          loaders: neoforge
           game-versions: "${{env.MINECRAFT_VERSION}}"
           java: "21"
