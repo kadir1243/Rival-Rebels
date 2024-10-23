@@ -13,7 +13,7 @@ public class RhodesAi {
 
     );
     private static final ImmutableList<MemoryModuleType<?>> MEMORY_TYPES = ImmutableList.of(
-        MemoryModuleTypes.RHODES_AWAKEN.get(),
+        MemoryModuleType.UNIVERSAL_ANGER,
         MemoryModuleType.HURT_BY,
         MemoryModuleType.ATTACK_TARGET
     );

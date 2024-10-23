@@ -95,10 +95,7 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
             float horizontal = elev * 0.025f + 1.0f;
             matrices.scale((float) (horizontal * radius * 0.116f), (float) (radius * 0.065f), (float) (horizontal * radius * 0.116f));
             matrices.scale(0.8f, 0.8f, 0.8f);
-            //RenderSystem.enableBlend();
-            //RenderSystem.blendFunc(SrcFactor.ONE, DstFactor.ONE);
             model.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(RRIdentifiers.ettsarflame)), light, OverlayTexture.NO_OVERLAY, tickDelta);
-            //RenderSystem.disableBlend();
         }
         matrices.popPose();
     }

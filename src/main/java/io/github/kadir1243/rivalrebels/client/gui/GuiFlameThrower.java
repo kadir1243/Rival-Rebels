@@ -20,6 +20,7 @@ import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.packet.ItemUpdate;
 import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -45,9 +46,10 @@ public class GuiFlameThrower extends Screen {
 	public void init() {
 		posX = (width - xSizeOfTexture) / 2;
 		posY = (height - ySizeOfTexture) / 2;
-		clearWidgets();
-		knob = new GuiFTKnob(posX + 108, posY + 176, -90, 90, start, true, Component.literal("Knob"));
-		addRenderableWidget(knob);
+		knob = (GuiFTKnob) Button.builder(Component.literal("Knob"), button -> {})
+            .bounds(posX + 108, posY + 176, 36, 36)
+            .build(builder -> new GuiFTKnob(builder, start));
+        addRenderableWidget(knob);
 	}
 
     @Override

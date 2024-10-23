@@ -24,6 +24,7 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.components.Button;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -62,11 +63,9 @@ public class GuiSpawn extends Screen {
 	}
 
 	@Override
-	public void init()
-	{
+	public void init() {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-        this.clearWidgets();
 
 		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, Component.translatable("RivalRebels.spawn.class"), button -> this.minecraft.setScreen(new GuiClass(rrclass)));
 		resetButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.spawn.reset"), button -> {
@@ -81,10 +80,10 @@ public class GuiSpawn extends Screen {
             Minecraft.getInstance().getConnection().send(new JoinTeamPacket(rrclass, RivalRebelsTeam.SIGMA));
             onClose();
         });
-		omegaScroll = new GuiScroll(posX + 118, posY + 140, 80);
-		sigmaScroll = new GuiScroll(posX + 243, posY + 140, 80);
-		playerScroll = new GuiScroll(posX + 154, posY + 103, 16);
-		gameScroll = new GuiScroll(posX + 243, posY + 66, 16);
+		omegaScroll = (GuiScroll) Button.builder(Component.empty(), button -> {}).bounds(posX + 118, posY + 140, 5, 11).build(builder -> new GuiScroll(builder, 80));
+		sigmaScroll = (GuiScroll) Button.builder(Component.empty(), button -> {}).bounds(posX + 243, posY + 140, 5, 11).build(builder -> new GuiScroll(builder, 80));
+		playerScroll = (GuiScroll) Button.builder(Component.empty(), button -> {}).bounds(posX + 154, posY + 103, 5, 11).build(builder -> new GuiScroll(builder, 16));
+		gameScroll = (GuiScroll) Button.builder(Component.empty(), button -> {}).bounds(posX + 243, posY + 66, 5, 11).build(builder -> new GuiScroll(builder, 16));
 		RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(minecraft.player.getGameProfile());
 		resetButton.active = nw.resets > 0 && !nw.isreset;
 		omegaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
@@ -119,7 +118,7 @@ public class GuiSpawn extends Screen {
 		drawPanel(context, posX + 10, posY + 142, 80, omegaScroll.getScroll(), omegaScroll.limit, RivalRebelsTeam.OMEGA);
 		drawPanel(context, posX + 135, posY + 142, 80, sigmaScroll.getScroll(), sigmaScroll.limit, RivalRebelsTeam.SIGMA);
 		drawPanel(context, posX + 10, posY + 68, 228, 50, gameScroll.getScroll(), gameScroll.limit, RivalRebels.round.getMotD() + "\nMod by Rodolphito. \nVisit www.RivalRebels.com for official downloads.");
-        context.fillGradient(posX + 6, posY + 99, posX + 161, posY + 131, 0xFF000000, 0xFF000000);
+        context.fillGradient(posX + 6, posY + 99, posX + 161, posY + 131, CommonColors.BLACK, CommonColors.BLACK);
 		drawPanel(context, posX + 10, posY + 105, 50, playerScroll.getScroll(), playerScroll.limit, new String[] { rrclass.name }, new int[] { rrclass.color });
 
         ((GuiGraphicsAccessor) context).blit(

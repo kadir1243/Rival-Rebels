@@ -20,7 +20,6 @@ import io.github.kadir1243.rivalrebels.common.core.BlackList;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import io.github.kadir1243.rivalrebels.common.entity.brain.*;
 import io.github.kadir1243.rivalrebels.common.entity.brain.MemoryModuleTypes;
 import io.github.kadir1243.rivalrebels.common.entity.brain.RhodesAi;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
@@ -221,7 +220,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 		}
         makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
         fallDistance = 0.0F;
-		if (getHealth() > 0) {
+		if (!isDeadOrDying()) {
 			float headY = 0;
 			float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
 			float cyaw = Mth.cos(bodyyaw * Mth.DEG_TO_RAD);
@@ -297,7 +296,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 		{
 			if (!level().isClientSide())
 			{
-				if (getHealth() == 0) {
+				if (isDeadOrDying()) {
                     MutableComponent text = Translations.status().append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
                     for (Player player : level().players()) {
                         player.sendSystemMessage(text);
@@ -308,12 +307,10 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                         ((ServerPlayer) player).connection.send(new RhodesPacket(this));
                     }
                 }
-				if (getHealth() < -100)
-				{
+				if (getHealth() < -100) {
 					kill();
 				}
-				if (getHealth() == 0)
-				{
+				if (isDeadOrDying()) {
 					float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
 					float cyaw = Mth.cos(bodyyaw * Mth.DEG_TO_RAD);
 					level().addFreshEntity(new EntityRhodesHead(level(), getX(), getY()+13*getScale(), getZ(), getScale(), getVariant()));
@@ -1527,7 +1524,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
         }
 
         if (damageUntilWake <= 0) {
-            this.getBrain().setMemory(MemoryModuleTypes.RHODES_AWAKEN.get(), Unit.INSTANCE);
+            this.getBrain().setMemory(MemoryModuleType.UNIVERSAL_ANGER, true);
         }
         this.getBrain().setMemory(MemoryModuleType.HURT_BY, damageSource);
     }

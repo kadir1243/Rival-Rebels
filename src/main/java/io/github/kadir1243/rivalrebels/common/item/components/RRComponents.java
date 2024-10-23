@@ -19,6 +19,7 @@ public class RRComponents {
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BinocularData>> BINOCULAR_DATA = register("binocular_data", BinocularData.CODEC);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<BlockPos>> REMOTE_CONTROLLED_BOMB_POS = register("remote_controlled_bomb_pos", BlockPos.CODEC);
     public static final DeferredHolder<DataComponentType<?>, DataComponentType<Float>> CORE_TIME_MULTIPLIER = register("core_time_multiplier", Codec.FLOAT);
+    public static final DeferredHolder<DataComponentType<?>, DataComponentType<Integer>> ROD_POWER = register("rod_power", Codec.INT);
 
     public static void init(IEventBus modEventBus) {
         DATA_COMPONENTS.register(modEventBus);

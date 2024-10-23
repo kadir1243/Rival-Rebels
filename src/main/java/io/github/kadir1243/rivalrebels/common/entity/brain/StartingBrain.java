@@ -4,13 +4,14 @@ import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 
 import java.util.Map;
 
 public class StartingBrain extends Behavior<EntityRhodes> {
     public StartingBrain() {
-        super(Map.of(MemoryModuleTypes.RHODES_AWAKEN.get(), MemoryStatus.VALUE_ABSENT), 1);
+        super(Map.of(MemoryModuleType.UNIVERSAL_ANGER, MemoryStatus.VALUE_ABSENT), 1);
     }
 
     @Override
@@ -26,6 +27,11 @@ public class StartingBrain extends Behavior<EntityRhodes> {
         owner.rightarmyaw     = EntityRhodes.approach(owner.rightarmyaw,     0);
         owner.leftarmyaw      = EntityRhodes.approach(owner.leftarmyaw,      0);
         owner.headpitch       = EntityRhodes.approach(owner.headpitch,       0);
+    }
+
+    @Override
+    protected boolean canStillUse(ServerLevel level, EntityRhodes entity, long gameTime) {
+        return super.canStillUse(level, entity, gameTime) || entity.getBrain().isMemoryValue(MemoryModuleType.UNIVERSAL_ANGER, true);
     }
 
     @Override

@@ -33,8 +33,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 
 public class ItemTrollHelmet extends ArmorItem {
-    public ItemTrollHelmet() {
-		super(RRItems.TROLL_MATERIAL, Type.HELMET, new Properties().durability(5000));
+    public ItemTrollHelmet(Properties properties) {
+		super(RRItems.TROLL_MATERIAL, Type.HELMET, properties);
 	}
 
     @Override

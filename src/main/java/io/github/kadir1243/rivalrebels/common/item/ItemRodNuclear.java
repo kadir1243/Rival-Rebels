@@ -12,15 +12,16 @@
 package io.github.kadir1243.rivalrebels.common.item;
 
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
+import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
-public class ItemRodNuclear extends ItemRod {
-	public ItemRodNuclear() {
-		super();
-		power = 3000000;
-	}
+public class ItemRodNuclear extends Item {
+	public ItemRodNuclear(Properties properties) {
+        super(properties);
+    }
 
     @Override
     public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {

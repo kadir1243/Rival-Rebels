@@ -11,7 +11,10 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
+import com.mojang.blaze3d.systems.RenderSystem;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import net.minecraft.client.gui.components.WidgetSprites;
+import net.minecraft.util.Mth;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -21,6 +24,11 @@ import net.minecraft.network.chat.Component;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiButton extends Button {
+    protected static final WidgetSprites SPRITES = new WidgetSprites(
+        RRIdentifiers.button_enabled,
+        RRIdentifiers.button_disabled,
+        RRIdentifiers.button_hovered
+    );
     public GuiButton(int x, int y, int width, int height, Component message) {
         this(x, y, width, height, message, button -> {});
     }
@@ -29,34 +37,18 @@ public class GuiButton extends Button {
         super(x, y, width, height, message, onPress, DEFAULT_NARRATION);
     }
 
+    public GuiButton(Builder builder) {
+        super(builder);
+    }
+
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		if (this.visible) {
-            Minecraft client = Minecraft.getInstance();
-			this.isHovered = mouseX >= this.getX() && mouseY >= this.getY() && mouseX < this.getX() + this.width && mouseY < this.getY() + this.height;
-			int k = this.getYImage(this.isHovered);
-			context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 5, k * 11, this.width, this.height);
-			int l = 0xffffff;
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        Minecraft client = Minecraft.getInstance();
+        RenderSystem.enableBlend();
+        RenderSystem.enableDepthTest();
+        graphics.blitSprite(SPRITES.get(this.active, this.isHoveredOrFocused()), this.getX(), this.getY(), this.getWidth(), this.getHeight());
 
-			if (!this.active) {
-				l = 0xcccccc;
-			} else if (this.isHovered) {
-				l = 0x88e8ff;
-			}
-
-            context.drawCenteredString(client.font, this.getMessage(), this.getX() + this.width / 2, this.getY() + (this.height - 7) / 2, l);
-		}
-	}
-
-    protected int getYImage(boolean mouseOver) {
-        int i = 1;
-
-        if (!this.active) {
-            i = 0;
-        } else if (mouseOver) {
-            i = 2;
-        }
-
-        return i;
+        int i = getFGColor();
+        this.renderString(graphics, client.font, i | Mth.ceil(this.alpha * 255.0F) << 24);
     }
 }

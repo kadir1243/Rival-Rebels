@@ -12,8 +12,8 @@
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
 import io.github.kadir1243.rivalrebels.common.container.ContainerLoader;
-import io.github.kadir1243.rivalrebels.common.item.ItemRod;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
+import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
@@ -118,7 +118,7 @@ public class TileEntityLoader extends BaseContainerBlockEntity implements Tickab
                         if (ter.on) {
                             for (int q = 0; q < items.size(); q++) {
                                 if (ter.getFuel().isEmpty()) {
-                                    if (!getItem(q).isEmpty() && getItem(q).getItem() instanceof ItemRod && !getItem(q).is(RRItems.emptyrod)) {
+                                    if (getItem(q).has(RRComponents.ROD_POWER)) {
                                         ter.setFuel(getItem(q));
                                         setItem(q, RRItems.emptyrod.toStack());
                                     }

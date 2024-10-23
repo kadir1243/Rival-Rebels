@@ -17,7 +17,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
 
 public class ItemArmorCamo extends ArmorItem {
-	public ItemArmorCamo(Holder<ArmorMaterial> material, Type type, int team) {
+	public ItemArmorCamo(Holder<ArmorMaterial> material, Type type) {
 		super(material, type, new Item.Properties().durability(material.value().getDefense(type) * 2));
 	}
 }

@@ -25,8 +25,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class BlockOmegaArmor extends Block
-{
+public class BlockOmegaArmor extends Block {
 	public BlockOmegaArmor(Properties settings)
 	{
 		super(settings);
@@ -42,14 +41,10 @@ public class BlockOmegaArmor extends Block
 			player.displayClientMessage(Component.nullToEmpty("§7[§2Inventory§7]"), false);
 			player.displayClientMessage(Component.nullToEmpty("§aArmor. §9(Omega's color armor.)"), false);
 			player.displayClientMessage(Translations.orders().append(" ").append(Component.literal("Equip your set of armor.").withStyle(ChatFormatting.RED)), false);
-			ItemEntity ei7 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camohat.toStack());
-			ItemEntity ei8 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camoshirt.toStack());
-			ItemEntity ei9 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camopants.toStack());
-			ItemEntity ei10 = new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camoshoes.toStack());
-			level.addFreshEntity(ei7);
-			level.addFreshEntity(ei8);
-			level.addFreshEntity(ei9);
-			level.addFreshEntity(ei10);
+            level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camohat.toStack()));
+			level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camoshirt.toStack()));
+			level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camopants.toStack()));
+			level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camoshoes.toStack()));
 			level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 		}
 		return InteractionResult.sidedSuccess(level.isClientSide());

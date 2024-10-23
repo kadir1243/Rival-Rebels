@@ -14,15 +14,16 @@ package io.github.kadir1243.rivalrebels.client.gui;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.container.ContainerNuclearBomb;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb> {
+public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     public GuiNuclearBomb(ContainerNuclearBomb containerNuclearBomb, Inventory inventoryPlayer, Component title) {
 		super(containerNuclearBomb, inventoryPlayer, title);
 	}
@@ -30,40 +31,39 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
     @Override
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         super.renderLabels(context, mouseX, mouseY);
-        showTime(context);
-        //context.drawString(font, Component.translatable(NUKE_TRANSLATION.toLanguageKey()), 8, 6, 0xffffff, false);
-		context.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
-		if (menu.isArmed())
-		{
+		if (menu.isArmed()) {
             context.drawString(font, Component.translatable(Translations.BOMB_ARMED.toLanguageKey()), 80, imageHeight - 96 + 2, 0xffffff, false);
-		}
-		else
-		{
-			if (!menu.hasTrollFace())
-			{
-                context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 80, imageHeight - 96 + 2, 0xffffff, false);
-			}
-			else
-			{
-                context.drawString(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
-			}
-		}
+		} else if (!menu.hasTrollFace()) {
+            context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 80, imageHeight - 96 + 2, 0xffffff, false);
+        } else {
+            context.drawString(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
+        }
     }
 
-    private void showTime(GuiGraphics graphics) {
-        int seconds = (menu.getCountDown() / 20);
-        int millis = (menu.getCountDown() % 20) * 3;
-        String milli;
-        if (millis < 10) {
-            milli = "0" + millis;
-        } else {
-            milli = "" + millis;
-        }
-        if (menu.getCountDown() % 20 >= 10) {
-            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 0x000000, false);
-        } else {
-            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 80, 6, 16711680, false);
-        }
+    @Override
+    public boolean scaleName() {
+        return false;
+    }
+
+    @Override
+    public void renderName(GuiGraphics graphics) {
+        // graphics.drawString(font, Component.translatable(NUKE_TRANSLATION.toLanguageKey()), 8, 6, 0xffffff, false);
+        graphics.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
+    }
+
+    @Override
+    public Vec2 getTimerPos() {
+        return new Vec2(80, 6);
+    }
+
+    @Override
+    public int getTimerColor() {
+        return getCountdown() % 20 >= 10 ? 0x000000 : 0xff0000;
+    }
+
+    @Override
+    public ResourceLocation getBackgroundTexture() {
+        return RRIdentifiers.guitnuke;
     }
 
     @Override
@@ -75,10 +75,4 @@ public class GuiNuclearBomb extends AbstractContainerScreen<ContainerNuclearBomb
 		graphics.setColor(1, 1, 1, 1);
         graphics.blit(RRIdentifiers.guitnuke, x, y + 81, 0, 81, imageWidth, imageHeight - 81);
 	}
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
 }

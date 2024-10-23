@@ -23,12 +23,14 @@ public class DataGen {
         CompletableFuture<HolderLookup.Provider> lookupProvider = event.getLookupProvider();
         ExistingFileHelper existingFileHelper = event.getExistingFileHelper();
         PackOutput output = generator.getPackOutput();
-        generator.addProvider(event.includeServer(), new RecipeDataGen(output, lookupProvider));
         generator.addProvider(event.includeClient(), new BlockStateDataGen(output, existingFileHelper));
         generator.addProvider(event.includeClient(), new ItemModelDataGen(output, existingFileHelper));
+        generator.addProvider(event.includeClient(), (DataProvider.Factory<?>) LangGen::new);
+
+        generator.addProvider(event.includeServer(), new RecipeDataGen(output, lookupProvider));
         generator.addProvider(event.includeServer(), new LootTableDataGen(output, lookupProvider));
         generator.addProvider(event.includeServer(), new SoundDataGen(output, existingFileHelper));
-        generator.addProvider(event.includeClient(), (DataProvider.Factory<?>) LangGen::new);
+        generator.addProvider(event.includeServer(), new EntityTypeTagsGen(output, lookupProvider, existingFileHelper));
 
         DatapackBuiltinEntriesProvider provider = new DatapackBuiltinEntriesProvider(output, lookupProvider, new RegistrySetBuilder()
             .add(Registries.DAMAGE_TYPE, bootstrap -> {
@@ -39,5 +41,8 @@ public class DataGen {
             , Set.of(RRIdentifiers.MODID));
         generator.addProvider(event.includeServer(), provider);
         generator.addProvider(event.includeServer(), new DamageSourceTags(output, provider.getRegistryProvider(), existingFileHelper));
+        BlockTagsGen blockTagsGen = new BlockTagsGen(output, lookupProvider, existingFileHelper);
+        generator.addProvider(event.includeServer(), blockTagsGen);
+        generator.addProvider(event.includeServer(), new ItemTagsGen(output, lookupProvider, blockTagsGen.contentsGetter(), existingFileHelper));
     }
 }

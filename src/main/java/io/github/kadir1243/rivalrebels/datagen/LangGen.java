@@ -61,6 +61,14 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addBlock(RRBlocks.reactor, "Reactor");
         addBlock(RRBlocks.flare, "Flare");
         addBlock(RRBlocks.buildrhodes, "Rhodes Supply Crate");
+        addBlock(RRBlocks.light, "Light");
+        addBlock(RRBlocks.light2, "Light");
+        addBlock(RRBlocks.nuclearBomb, "Nuke");
+        addBlock(RRBlocks.minetrap, "Landmine Trap");
+        addBlock(RRBlocks.landmine, "Landmine");
+        addBlock(RRBlocks.alandmine, "Landmine");
+        addBlock(RRBlocks.plasmaexplosion, "Plasma");
+        addBlock(RRBlocks.remotecharge, "Plastic explosives");
 
         addItem(RRItems.knife, "Cuchillo");
         addItem(RRItems.hydrod, "Hydrogen Rod");

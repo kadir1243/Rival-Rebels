@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import java.util.function.Predicate;
 
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
@@ -48,6 +49,9 @@ public class SlotRR extends Slot {
         this(inv, id, x, y, mstack, stack -> stack.has(only));
     }
 
+    public SlotRR(Container inv, int id, int x, int y, int mstack, Holder<Item> only) {
+        this(inv, id, x, y, mstack, stack -> stack.is(only));
+    }
 
     @Override
     public boolean mayPickup(Player player) {

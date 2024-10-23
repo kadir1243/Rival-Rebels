@@ -6,7 +6,10 @@ public class RRIdentifiers {
     public static final String MODID = "rivalrebels";
 
     public static final ResourceLocation guitrivalrebels = create("textures/gui/h.png");
-    public static final ResourceLocation guitbutton = create("textures/gui/a.png");
+    public static final ResourceLocation guitbutton = create("textures/gui/camo2_layer_1.png");
+    public static final ResourceLocation button_disabled = create("textures/gui/button_disabled.png");
+    public static final ResourceLocation button_enabled = create("textures/gui/button_enabled.png");
+    public static final ResourceLocation button_hovered = create("textures/gui/button_hovered.png");
     public static final ResourceLocation guitspawn = create("textures/gui/b.png");
     public static final ResourceLocation guitclass = create("textures/gui/c.png");
     public static final ResourceLocation guitrebel = create("textures/gui/d.png");
@@ -19,7 +22,7 @@ public class RRIdentifiers {
     public static final ResourceLocation guitwarning1 = create("textures/gui/m.png");
     public static final ResourceLocation guitloader = create("textures/gui/i.png");
     public static final ResourceLocation guittokamak = create("textures/gui/n.png");
-    public static final ResourceLocation guibinoculars = create("textures/gui/o.png");
+    public static final ResourceLocation guibinoculars = create("textures/gui/troll_layer_1.png");
     public static final ResourceLocation guibinocularsoverlay = create("textures/gui/p.png");
     public static final ResourceLocation guilaptopnuke = create("textures/gui/q.png");
     public static final ResourceLocation guitesla = create("textures/gui/r.png");

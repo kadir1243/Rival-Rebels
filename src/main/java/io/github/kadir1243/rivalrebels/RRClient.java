@@ -10,7 +10,6 @@ import io.github.kadir1243.rivalrebels.common.entity.EntityRaytrace;
 import io.github.kadir1243.rivalrebels.common.entity.RREntities;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
-import com.google.common.base.Supplier;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -31,6 +30,8 @@ import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+
+import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.*;
 

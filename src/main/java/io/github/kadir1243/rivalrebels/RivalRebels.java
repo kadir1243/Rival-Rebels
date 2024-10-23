@@ -23,14 +23,12 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.synchronization.ArgumentTypeInfo;
 import net.minecraft.commands.synchronization.ArgumentTypeInfos;
 import net.minecraft.commands.synchronization.SingletonArgumentInfo;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderSet;
 import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -46,9 +44,6 @@ import net.neoforged.neoforge.registries.NewRegistryEvent;
 import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.slf4j.Logger;
 
-import java.util.Collections;
-import java.util.List;
-
 @Mod(RRIdentifiers.MODID)
 public class RivalRebels {
     public static final Logger LOGGER = LogUtils.getLogger();
@@ -56,6 +51,22 @@ public class RivalRebels {
     private static final DeferredRegister<ArgumentTypeInfo<?, ?>> ARGUMENT_TYPE_INFOS = DeferredRegister.create(Registries.COMMAND_ARGUMENT_TYPE, RRIdentifiers.MODID);
     public static final ResourceKey<Registry<RhodesType>> RHODES_TYPE_REGISTRY_KEY = ResourceKey.createRegistryKey(RRIdentifiers.create("rhodes_type"));
     public static final Registry<RhodesType> RHODES_TYPE_REGISTRY = new RegistryBuilder<>(RHODES_TYPE_REGISTRY_KEY).defaultKey(RRIdentifiers.create("rhodes")).sync(true).create();
+    public static final TagKey<Block> MINEABLE_WITH_ARMY_SHOVEL = TagKey.create(
+        Registries.BLOCK,
+        RRIdentifiers.create("mineable/army_shovel")
+    );
+    public static final TagKey<Block> NUCLEAR_STONE_GENERATEABLE = TagKey.create(
+        Registries.BLOCK,
+        RRIdentifiers.create("nuclear_stone_generateable")
+    );
+    public static final TagKey<Item> OMEGA_ARMOR = TagKey.create(
+        Registries.ITEM,
+        RRIdentifiers.create("armor/omega")
+    );
+    public static final TagKey<Item> SIGMA_ARMOR = TagKey.create(
+        Registries.ITEM,
+        RRIdentifiers.create("armor/sigma")
+    );
 
     public static RivalRebelsRound round;
 
@@ -108,10 +119,6 @@ public class RivalRebels {
         CommandMotD.register(dispatcher);
         CommandRobot.register(dispatcher, context);
         CommandHotPotato.register(dispatcher);
-    }
-
-    public static List<Block> getBlocks(TagKey<Block> tagKey) {
-        return BuiltInRegistries.BLOCK.asTagAddingLookup().get(tagKey).map(HolderSet.ListBacked::stream).map(s -> s.map(Holder::value).toList()).orElse(Collections.emptyList());
     }
 
     static {

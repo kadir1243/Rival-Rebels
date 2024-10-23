@@ -20,6 +20,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Button;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -36,8 +37,8 @@ public class GuiClass extends Screen {
 	private int			posX;
 	private int			posY;
     private static final float[]		sizelookup		= new float[] { 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
-	private GuiButton	nextButton;
-	private GuiButton	doneButton;
+	private Button nextButton;
+	private Button doneButton;
 	private GuiScroll	gameScroll;
 	private RivalRebelsClass rrclass;
 
@@ -49,13 +50,11 @@ public class GuiClass extends Screen {
 	}
 
 	@Override
-	public void init()
-	{
+	public void init() {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-		this.clearWidgets();
 
-		nextButton = new GuiButton(posX + 188, posY + 102, 60, 11, Component.translatable("RivalRebels.class.next"), button -> {
+        nextButton = Button.builder(Component.translatable("RivalRebels.class.next"), button -> {
             switch (rrclass) {
                 case HACKER:
                     rrclass = RivalRebelsClass.REBEL;
@@ -73,10 +72,15 @@ public class GuiClass extends Screen {
                     rrclass = RivalRebelsClass.NUKER;
                     break;
             }
-        });
-		doneButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.class.done"), button -> this.minecraft.setScreen(new GuiSpawn(rrclass)));
-		gameScroll = new GuiScroll(posX + 243, posY + 9, 74);
-		this.addRenderableWidget(nextButton);
+        }).bounds(posX + 188, posY + 102, 60, 11).build(GuiButton::new);
+		doneButton = Button.builder(Component.translatable("RivalRebels.class.done"), button -> this.minecraft.setScreen(new GuiSpawn(rrclass)))
+            .bounds(posX + 188, posY + 119, 60, 11)
+            .build(GuiButton::new);
+        gameScroll = (GuiScroll) Button.builder(Component.empty(), button -> {})
+            .bounds(posX + 243, posY + 9, 5, 11)
+            .build(builder -> new GuiScroll(builder, 74));
+
+        this.addRenderableWidget(nextButton);
 		this.addRenderableWidget(doneButton);
 		this.addRenderableWidget(gameScroll);
 	}
@@ -94,7 +98,7 @@ public class GuiClass extends Screen {
         renderTransparentBackground(graphics);
         graphics.fillGradient(posX, posY, posX + xSizeOfTexture, posY + ySizeOfTexture, CommonColors.BLACK, CommonColors.BLACK);
 		drawPanel(graphics, posX + 162, posY + 40, 80, 74, gameScroll.getScroll(), gameScroll.limit, rrclass);
-        graphics.fillGradient(posX + 160, posY + 9, posX + 244, posY + 38, 0xFF000000, 0xFF000000);
+        graphics.fillGradient(posX + 160, posY + 9, posX + 244, posY + 38, CommonColors.BLACK, CommonColors.BLACK);
 
         ((GuiGraphicsAccessor) graphics).blit(
             RRIdentifiers.guitclass,
@@ -136,24 +140,19 @@ public class GuiClass extends Screen {
         graphics.drawCenteredString(font, Component.translatable("RivalRebels.class.description"), (int) ((posX + 181) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
         pose.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
 
-		for (int i = 0; i < sizelookup.length; i++)
-		{
-			int X = posX + 18 + (i % 9) * 22;
-			int Y = posY + 158 + 22 * Mth.floor(i / 9D);
-			float size = sizelookup[i];
-			if (mouseX >= X && mouseY >= Y && mouseX < X + 16 && mouseY < Y + 16)
-			{
-				if (size < 1.5)
-				{
-					size += 0.1F;
-				}
-			}
-			else if (size > 1)
-			{
-				size -= 0.1F;
-			}
-			sizelookup[i] = size;
-		}
+        for (int i = 0; i < sizelookup.length; i++) {
+            int X = posX + 18 + (i % 9) * 22;
+            int Y = posY + 158 + 22 * Mth.floor(i / 9D);
+            float size = sizelookup[i];
+            if (mouseX >= X && mouseY >= Y && mouseX < X + 16 && mouseY < Y + 16) {
+                if (size < 1.5) {
+                    size += 0.1F;
+                }
+            } else if (size > 1) {
+                size -= 0.1F;
+            }
+            sizelookup[i] = size;
+        }
 		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
 		for (int i = rrclass.getInventory().size() - 1; i >= 0; i--) {
 			int X = posX + 18 + (i % 9) * 22;

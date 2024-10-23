@@ -34,22 +34,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import static io.github.kadir1243.rivalrebels.RivalRebels.getBlocks;
 
 public class NuclearExplosion {
-    public static Block[]	pgblocks;
-
-    static {
-        Set<Block> pgblocks = new HashSet<>(getBlocks(BlockTags.BASE_STONE_OVERWORLD));
-        pgblocks.add(Blocks.COBBLESTONE);
-        pgblocks.addAll(getBlocks(BlockTags.DIRT));
-        NuclearExplosion.pgblocks = pgblocks.toArray(new Block[0]);
-    }
-
 	public NuclearExplosion(Level world, int x, int y, int z, int strength) {
 		if (!world.isClientSide()) {
 			createHole(world, x, y, z, strength, true);
@@ -59,69 +46,52 @@ public class NuclearExplosion {
 	}
 
 	public NuclearExplosion(Level world, int x, int y, int z, int strength, boolean breakobj) {
-		if (!world.isClientSide())
-		{
+		if (!world.isClientSide()) {
 			createHole(world, x, y, z, strength, breakobj);
 			pushAndHurtEntities(world, x, y, z, strength);
 			fixLag(world, x, y, z, strength);
 		}
 	}
 
-	private void createHole(Level world, int x, int y, int z, int radius, boolean breakobj)
-	{
+	private void createHole(Level world, int x, int y, int z, int radius, boolean breakobj) {
         int halfradius = radius / 2;
 		int onepointfiveradius = halfradius * 3;
 		int AOC = radius / RRConfig.SERVER.getNuclearBombStrength();
 		int onepointfiveradiussqrd = onepointfiveradius * onepointfiveradius;
 		int twoAOC = AOC * 2; // twoaoc its a twoAOC
 
-		for (int X = -onepointfiveradius; X <= onepointfiveradius; X++)
-		{
+		for (int X = -onepointfiveradius; X <= onepointfiveradius; X++) {
 			int xx = x + X;
 			int XX = X * X;
-			for (int Z = -onepointfiveradius; Z <= onepointfiveradius; Z++)
-			{
+			for (int Z = -onepointfiveradius; Z <= onepointfiveradius; Z++) {
 				int ZZ = Z * Z + XX;
 				int zz = z + Z;
-				for (int Y = -onepointfiveradius; Y <= onepointfiveradius; Y++)
-				{
+				for (int Y = -onepointfiveradius; Y <= onepointfiveradius; Y++) {
 					int YY = Y * Y + ZZ;
 					int yy = y + Y;
 					if (YY < onepointfiveradiussqrd) {
                         BlockPos pos = new BlockPos(xx, yy, zz);
                         BlockState state = world.getBlockState(pos);
                         Block block = state.getBlock();
-						if (!world.isEmptyBlock(pos))
-						{
+						if (!world.isEmptyBlock(pos)) {
 							int dist = (int) Math.sqrt(YY);
-							if (dist < radius && !state.is(Blocks.BEDROCK))
-							{
+							if (dist < radius && !state.is(Blocks.BEDROCK)) {
 								int varrand = 1 + dist - halfradius;
-								if (dist < halfradius)
-								{
-									if (breakobj && state.is(RRBlocks.omegaobj))
-									{
+								if (dist < halfradius) {
+									if (breakobj && state.is(RRBlocks.omegaobj)) {
 										RivalRebels.round.winSigma();
 										state = RRBlocks.plasmaexplosion.get().defaultBlockState();
-									}
-									else if (breakobj && state.is(RRBlocks.sigmaobj))
-									{
+									} else if (breakobj && state.is(RRBlocks.sigmaobj)) {
 										RivalRebels.round.winOmega();
 										state = RRBlocks.plasmaexplosion.get().defaultBlockState();
-									}
-									else if (state.is(RRBlocks.reactive))
-									{
+									} else if (state.is(RRBlocks.reactive)) {
 										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.random.nextDouble() * 2); i++)
 											world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-									}
-									else
-									{
+									} else {
 										world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 										state = Blocks.AIR.defaultBlockState();
 									}
-								}
-								else if (varrand > 0)
-								{
+								} else if (varrand > 0) {
 									int randomness = halfradius - varrand / 2;
 									if (breakobj && state.is(RRBlocks.omegaobj))
 									{
@@ -236,13 +206,10 @@ public class NuclearExplosion {
                         if (isEmptyNotSideAvailable) {
 							int r = world.random.nextInt(50);
 							Block id;
-							if (r == 0)
-							{
+							if (r == 0) {
                                 id = world.registryAccess().registryOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);
-							}
-							else
-							{
-								id = pgblocks[world.random.nextInt(pgblocks.length)];
+							} else {
+								id = world.registryAccess().registryOrThrow(Registries.BLOCK).getRandomElementOf(RivalRebels.NUCLEAR_STONE_GENERATEABLE, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);
 							}
 							world.setBlockAndUpdate(pos, id.defaultBlockState());
 						}

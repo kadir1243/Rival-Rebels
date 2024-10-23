@@ -155,7 +155,7 @@ public class EntityRoddiskRep extends RoddiskBase {
 			{
                 Entity hitEntity = ((EntityHitResult) var3).getEntity();
                 this.playSound(RRSounds.ROD_DISK_HIT_ENTITY.get());
-				if (hitEntity instanceof Player entityPlayerHit && hitEntity != getOwner())
+				if (hitEntity instanceof Player entityPlayerHit && ownedBy(hitEntity))
 				{
                     for (EquipmentSlot slot : EquipmentSlot.values()) {
                         if (!slot.isArmor()) return;

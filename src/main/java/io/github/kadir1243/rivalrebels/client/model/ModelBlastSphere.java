@@ -28,8 +28,8 @@ import org.joml.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelBlastSphere {
-    private static final RenderType LIGHTNING_TRIANGLES = RenderType.create(
-        RRIdentifiers.MODID +"_lightning_triangles",
+    private static final RenderType RENDER_TYPE = RenderType.create(
+        RRIdentifiers.MODID +"_model_blast_sphere_triangles",
         DefaultVertexFormat.POSITION_COLOR,
         VertexFormat.Mode.TRIANGLES,
         1536,
@@ -60,7 +60,7 @@ public class ModelBlastSphere {
     }
 
     public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float size, int color) {
-        renderModel(matrices, vertexConsumers.getBuffer(LIGHTNING_TRIANGLES), size, color);
+        renderModel(matrices, vertexConsumers.getBuffer(RENDER_TYPE), size, color);
     }
 
 	public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int color) {

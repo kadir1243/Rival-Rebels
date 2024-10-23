@@ -11,6 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
+import com.mojang.blaze3d.vertex.DefaultVertexFormat;
+import com.mojang.blaze3d.vertex.VertexFormat;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelAntimatterBombBlast;
@@ -18,11 +20,9 @@ import io.github.kadir1243.rivalrebels.client.model.ModelBlastRing;
 import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.common.entity.EntityAntimatterBombBlast;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderStateShard;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -41,6 +41,17 @@ import org.joml.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast> {
+    private static final RenderType RENDER_TYPE = RenderType.create(
+        RRIdentifiers.MODID +"_antimatter_bomb_blast_entity",
+        DefaultVertexFormat.POSITION_COLOR,
+        VertexFormat.Mode.TRIANGLES,
+        1536,
+        RenderType.CompositeState.builder()
+            .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
+            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
+            .setTransparencyState(RenderStateShard.ADDITIVE_TRANSPARENCY)
+            .createCompositeState(false)
+    );
     private final ModelAntimatterBombBlast modelabomb = new ModelAntimatterBombBlast();
 
 	public RenderAntimatterBombBlast(EntityRendererProvider.Context manager)
@@ -106,11 +117,10 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 			for (int i = -5; i < 0; i++) {
 				matrices.pushPose();
 			}
-			RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE);
 			matrices.scale(random.nextFloat(), random.nextFloat(), random.nextFloat());
 			matrices.mulPose(Axis.of(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat())).rotationDegrees(random.nextFloat() * 360));
 			matrices.translate(random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f);
-			ModelBlastSphere.renderModel(matrices, vertexConsumers, entity.tickCount, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble(), 1);
+			ModelBlastSphere.renderModel(matrices, vertexConsumers.getBuffer(RENDER_TYPE), entity.tickCount, FastColor.ARGB32.colorFromFloat(1F, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble()));
 		}
 	}
 

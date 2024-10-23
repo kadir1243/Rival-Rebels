@@ -12,6 +12,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.schedule.Activity;
 
@@ -20,7 +21,7 @@ import java.util.Map;
 public class IdleBrain extends Behavior<EntityRhodes> {
     private int counter = 1;
     public IdleBrain() {
-        super(Map.of(MemoryModuleTypes.RHODES_AWAKEN.get(), MemoryStatus.VALUE_PRESENT), 1);
+        super(Map.of(MemoryModuleType.UNIVERSAL_ANGER, MemoryStatus.REGISTERED), 1);
     }
 
     @Override
@@ -119,7 +120,7 @@ public class IdleBrain extends Behavior<EntityRhodes> {
 
     @Override
     protected boolean canStillUse(ServerLevel level, EntityRhodes entity, long gameTime) {
-        return super.canStillUse(level, entity, gameTime) || counter > 0;
+        return (super.canStillUse(level, entity, gameTime) || counter > 0) && entity.getBrain().isMemoryValue(MemoryModuleType.UNIVERSAL_ANGER, true);
     }
 
     @Override

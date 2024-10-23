@@ -15,7 +15,6 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 @OnlyIn(Dist.CLIENT)
@@ -26,16 +25,16 @@ public class GuiScroll extends GuiButton {
 	/** Current scroll amount (from the top down) */
 	public float scroll;
 
-    public GuiScroll(int x, int y, int limit) {
-		super(x, y, 5, 11, Component.empty());
-		this.limit = limit;
-	}
+    public GuiScroll(Builder builder, float limit) {
+        super(builder);
+        this.limit = limit;
+    }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		int state = 0;
 		if (mouseClicked(mouseX, mouseY, 0)) state = 11;
-		context.blit(RRIdentifiers.guitbutton, this.getX(), (int) (this.getY() + scroll), 0, state, this.width, this.height);
+		graphics.blit(RRIdentifiers.guitbutton, this.getX(), (int) (this.getY() + scroll), 0, state, this.width, this.height);
 	}
 
     @Override

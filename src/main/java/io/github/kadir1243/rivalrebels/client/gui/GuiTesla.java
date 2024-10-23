@@ -44,7 +44,6 @@ public class GuiTesla extends Screen {
     protected void init() {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-        this.clearWidgets();
 		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, Component.literal("Knob"));
 		this.addRenderableWidget(knob);
 	}

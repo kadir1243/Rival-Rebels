@@ -41,17 +41,17 @@ public class GuiKnob extends GuiButton
 	}
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		if (degree > maxdegreelimit) degree = maxdegreelimit;
 		if (degree < mindegreelimit) degree = mindegreelimit;
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
-        PoseStack matrices = context.pose();
+        PoseStack matrices = graphics.pose();
         matrices.pushPose();
 		matrices.translate(this.getX() + (width / 2f), this.getY() + (height / 2f), 0);
 		matrices.mulPose(Axis.ZP.rotationDegrees(degree));
 		matrices.translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)), 0);
-		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
+		graphics.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
 		matrices.popPose();
 	}
 
@@ -76,10 +76,5 @@ public class GuiKnob extends GuiButton
 	public int getDegree()
 	{
 		return degree;
-	}
-
-    @Override
-    protected boolean clicked(double mouseX, double mouseY) {
-		return this.active && this.visible && Math.sqrt(((getX() - mouseX + (width / 2f)) * (getX() - mouseX + (width / 2f))) + ((getY() - mouseY + (height / 2f)) * (getY() - mouseY + (height / 2f)))) <= (width / 2f);
 	}
 }

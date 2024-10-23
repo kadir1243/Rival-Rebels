@@ -13,7 +13,6 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.*;
-import io.github.kadir1243.rivalrebels.client.model.*;
 import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;

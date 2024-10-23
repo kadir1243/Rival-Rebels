@@ -33,15 +33,15 @@ public class GuiRotor extends GuiButton
 	}
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        PoseStack matrices = context.pose();
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        PoseStack matrices = graphics.pose();
 		matrices.pushPose();
 		int deg = (degree % 180);
 		if (degree >= 180) deg = 180 - deg;
 		if (deg < 22) deg = 22;
 		degree = deg;
-		context.blit(RRIdentifiers.guitray, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180));
-        context.drawCenteredString(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
+		graphics.blit(RRIdentifiers.guitray, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180));
+        graphics.drawCenteredString(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
 		matrices.popPose();
 	}
 
@@ -67,10 +67,5 @@ public class GuiRotor extends GuiButton
 	public int getDegree()
 	{
 		return degree;
-	}
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return this.active && this.visible && Math.sqrt(((getX() - mouseX + (width / 2f)) * (getX() - mouseX + (width / 2f))) + ((getY() - mouseY + (height / 2f)) * (getY() - mouseY + (height / 2f)))) <= (width / 2f);
 	}
 }

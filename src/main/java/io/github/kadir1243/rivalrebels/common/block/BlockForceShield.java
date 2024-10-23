@@ -13,42 +13,30 @@ package io.github.kadir1243.rivalrebels.common.block;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 
-public class BlockForceShield extends Block
-{
+public class BlockForceShield extends Block {
 	public BlockForceShield(Properties settings)
 	{
 		super(settings.pushReaction(PushReaction.BLOCK));
 	}
 
-	boolean	Destroy	= false;
-
     @Override
-    public BlockState playerWillDestroy(Level world, BlockPos pos, BlockState state, Player player) {
-		Block id = state.getBlock();
-		if (!Destroy && id != RRBlocks.fshield.get() && id != RRBlocks.omegaobj.get() && id != RRBlocks.sigmaobj.get() && id != RRBlocks.reactive.get()) {
-			world.setBlockAndUpdate(pos, state);
-		}
-		Destroy = false;
-        return state;
+    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
+        if (newState.is(RRBlocks.fshield) || newState.is(RRBlocks.omegaobj) || newState.is(RRBlocks.sigmaobj) || newState.is(RRBlocks.reactive)) {
+            level.setBlockAndUpdate(pos, state);
+            return;
+        }
+
+        super.onRemove(state, level, pos, newState, movedByPiston);
     }
 
-    //@Override
-    public void onBlockHarvested(Level world, BlockPos pos, BlockState state, Player player) {
-		if (!world.isClientSide() && player.hasInfiniteMaterials() && player.isShiftKeyDown())
-		{
-			Destroy = true;
-			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-		}
-		else
-		{
-			Destroy = false;
-			world.setBlockAndUpdate(pos, state);
-		}
-	}
+    @Override
+    public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
+        return super.canHarvestBlock(state, level, pos, player) && player.hasInfiniteMaterials() && player.isShiftKeyDown();
+    }
 }

@@ -43,7 +43,6 @@ public class GuiNextBattle extends Screen {
 	public void init() {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
-		this.clearWidgets();
 
 		nextBattleButton = new GuiButton(posX + 66, posY + 203, 60, 11, Component.translatable("RivalRebels.nextbattle.yes"), button -> {
             Minecraft.getInstance().getConnection().send(new VotePacket(true));

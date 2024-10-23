@@ -1,31 +1,29 @@
 package io.github.kadir1243.rivalrebels.common.item;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.item.weapon.*;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.Util;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
-import net.minecraft.world.item.CreativeModeTab;
-import net.minecraft.world.item.Item;
+import net.minecraft.world.item.*;
+import net.minecraft.world.item.component.Unbreakable;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.function.Supplier;
 
 public class RRItems {
-    public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(RRIdentifiers.MODID);
+    private static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(RRIdentifiers.MODID);
     private static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, RRIdentifiers.MODID);
     private static final DeferredRegister<ArmorMaterial> ARMOR_MATERIALS = DeferredRegister.create(Registries.ARMOR_MATERIAL, RRIdentifiers.MODID);
 
@@ -40,102 +38,91 @@ public class RRItems {
     public static final Holder<ArmorMaterial> armorCamo = registerMaterial("camo", new int[]{2, 9, 5, 2}, 10);
     public static final Holder<ArmorMaterial> armorCamo2 = registerMaterial("camo2", new int[]{2, 9, 5, 2}, 10);
     public static final Holder<ArmorMaterial> TROLL_MATERIAL = registerMaterial("troll", new int[] {0, 0, 0, 0}, 1000);
-    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> rralltab = CREATIVE_MODE_TABS.register("creative_tab", () -> CreativeModeTab.builder()
+    public static final DeferredHolder<CreativeModeTab, CreativeModeTab> CREATIVE_TAB = CREATIVE_MODE_TABS.register("creative_tab", () -> CreativeModeTab.builder()
         .icon(RRItems.NUCLEAR_ROD::toStack)
         .title(Component.translatable(Translations.CREATIVE_TAB.toLanguageKey()))
         .displayItems((displayContext, entries) -> entries.acceptAll(ITEMS.getEntries().stream().map(DeferredHolder::get).map(Item::getDefaultInstance).toList())
     ).build());
-    public static final DeferredItem<Item> rpg = register("rpg", ItemRPG::new);
-    public static final DeferredItem<Item> flamethrower = register("flamethrower", ItemFlameThrower::new);
-    public static final DeferredItem<Item> tesla = register("tesla", ItemTesla::new);
-    public static final DeferredItem<Item> einsten = register("astro_blaster", ItemAstroBlaster::new);
-    public static final DeferredItem<Item> rocket = register("rocket", ItemRocket::new);
-    public static final DeferredItem<Item> fuel = register("fuel", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> battery = register("battery", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> redrod = register("redstone_rod", ItemRodRedstone::new);
-    public static final DeferredItem<Item> pliers = register("pliers", ItemPliers::new);
-    public static final DeferredItem<Item> armyshovel = register("army_shovel", ItemArmyShovel::new);
-    public static final DeferredItem<Item> knife = register("knife", ItemCuchillo::new);
-    public static final DeferredItem<Item> gasgrenade = register("gas_grenade", ItemGasGrenade::new);
-    public static final DeferredItem<Item> safepill = register("safe_pill", ItemSafePill::new);
-    public static final DeferredItem<Item> expill = register("expill", ItemExPill::new);
-    public static final DeferredItem<Item> remote = register("remote", ItemRemote::new);
-    public static final DeferredItem<Item> fuse = register("fuse", ItemFuse::new);
-    public static final DeferredItem<Item> NUCLEAR_ROD = register("nuclear_rod", ItemRodNuclear::new);
-    public static final DeferredItem<Item> hydrod = register("hydrogen_rod", ItemRodHydrogen::new);
-    public static final DeferredItem<Item> plasmacannon = register("plasma_cannon", ItemPlasmaCannon::new);
-    public static final DeferredItem<Item> roddisk = register("rod_disk", ItemRodDisk::new);
-    public static final DeferredItem<Item> antenna = register("antenna", () -> new Item(new Item.Properties().stacksTo(1)));
-    public static final DeferredItem<Item> emptyrod = register("empty_rod", () -> new Item(new Item.Properties()));
-    public static final DeferredItem<Item> core1 = register("copper_core", () -> new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 0.25F).stacksTo(1)));
-    public static final DeferredItem<Item> core2 = register("tungsten_core", () -> new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 0.75F).stacksTo(1)));
-    public static final DeferredItem<Item> core3 = register("titanium_core", () -> new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 1F).stacksTo(1)));
-    public static final DeferredItem<Item> binoculars = register("binoculars", ItemBinoculars::new);
-    public static final DeferredItem<Item> camera = register("camera", ItemCamera::new);
-    public static final DeferredItem<Item> chip = register("chip", ItemChip::new);
-    public static final DeferredItem<Item> roda = register("roda", ItemRoda::new);
-    public static final DeferredItem<Item> trollmask = register("troll_mask", ItemTrollHelmet::new);
-    public static final DeferredItem<Item> hackm202 = register("hackm202", ItemHackM202::new);
-    public static final DeferredItem<Item> seekm202 = register("seekm202", ItemSeekM202::new);
-    public static final DeferredItem<Item> orebelhelmet = register("orebelhelmet", () -> new ItemClassArmor(orebelarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> orebelchest = register("orebelchest", () -> new ItemClassArmor(orebelarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> orebelpants = register("orebelpants", () -> new ItemClassArmor(orebelarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> orebelboots = register("orebelboots", () -> new ItemClassArmor(orebelarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> onukerhelmet = register("onukerhelmet", () -> new ItemClassArmor(onukerarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> onukerchest = register("onukerchest", () -> new ItemClassArmor(onukerarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> onukerpants = register("onukerpants", () -> new ItemClassArmor(onukerarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> onukerboots = register("onukerboots", () -> new ItemClassArmor(onukerarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> ointelhelmet = register("ointelhelmet", () -> new ItemClassArmor(ointelarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> ointelchest = register("ointelchest", () -> new ItemClassArmor(ointelarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> ointelpants = register("ointelpants", () -> new ItemClassArmor(ointelarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> ointelboots = register("ointelboots", () -> new ItemClassArmor(ointelarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> ohackerhelmet = register("ohackerhelmet", () -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> ohackerchest = register("ohackerchest", () -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> ohackerpants = register("ohackerpants", () -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> ohackerboots = register("ohackerboots", () -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> srebelhelmet = register("srebelhelmet", () -> new ItemClassArmor(srebelarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> srebelchest = register("srebelchest", () -> new ItemClassArmor(srebelarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> srebelpants = register("srebelpants", () -> new ItemClassArmor(srebelarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> srebelboots = register("srebelboots", () -> new ItemClassArmor(srebelarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> snukerhelmet = register("snukerhelmet", () -> new ItemClassArmor(snukerarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> snukerchest = register("snukerchest", () -> new ItemClassArmor(snukerarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> snukerpants = register("snukerpants", () -> new ItemClassArmor(snukerarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> snukerboots = register("snukerboots", () -> new ItemClassArmor(snukerarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> sintelhelmet = register("sintelhelmet", () -> new ItemClassArmor(sintelarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> sintelchest = register("sintelchest", () -> new ItemClassArmor(sintelarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> sintelpants = register("sintelpants", () -> new ItemClassArmor(sintelarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> sintelboots = register("sintelboots", () -> new ItemClassArmor(sintelarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> shackerhelmet = register("shackerhelmet", () -> new ItemClassArmor(shackerarmor, ArmorItem.Type.HELMET));
-    public static final DeferredItem<Item> shackerchest = register("shackerchest", () -> new ItemClassArmor(shackerarmor, ArmorItem.Type.CHESTPLATE));
-    public static final DeferredItem<Item> shackerpants = register("shackerpants", () -> new ItemClassArmor(shackerarmor, ArmorItem.Type.LEGGINGS));
-    public static final DeferredItem<Item> shackerboots = register("shackerboots", () -> new ItemClassArmor(shackerarmor, ArmorItem.Type.BOOTS));
-    public static final DeferredItem<Item> camohat = register("camohat", () -> new ItemArmorCamo(armorCamo, ArmorItem.Type.HELMET, 0));
-    public static final DeferredItem<Item> camoshirt = register("camoshirt", () -> new ItemArmorCamo(armorCamo, ArmorItem.Type.CHESTPLATE, 0));
-    public static final DeferredItem<Item> camopants = register("camopants", () -> new ItemArmorCamo(armorCamo, ArmorItem.Type.LEGGINGS, 0));
-    public static final DeferredItem<Item> camoshoes = register("camoshoes", () -> new ItemArmorCamo(armorCamo, ArmorItem.Type.BOOTS, 0));
-    public static final DeferredItem<Item> camohat2 = register("camohat2", () -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.HELMET, 1));
-    public static final DeferredItem<Item> camoshirt2 = register("camoshirt2", () -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.CHESTPLATE, 1));
-    public static final DeferredItem<Item> camopants2 = register("camopants2", () -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.LEGGINGS, 1));
-    public static final DeferredItem<Item> camoshoes2 = register("camoshoes2", () -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.BOOTS, 1));
+    public static final DeferredItem<Item> rpg = ITEMS.register("rpg", ItemRPG::new);
+    public static final DeferredItem<Item> flamethrower = ITEMS.register("flamethrower", ItemFlameThrower::new);
+    public static final DeferredItem<Item> tesla = ITEMS.register("tesla", ItemTesla::new);
+    public static final DeferredItem<Item> einsten = ITEMS.register("astro_blaster", ItemAstroBlaster::new);
+    public static final DeferredItem<Item> rocket = ITEMS.registerSimpleItem("rocket");
+    public static final DeferredItem<Item> fuel = ITEMS.registerSimpleItem("fuel");
+    public static final DeferredItem<Item> battery = ITEMS.registerSimpleItem("battery");
+    public static final DeferredItem<Item> redrod = ITEMS.register("redstone_rod", () -> new Item(new Item.Properties().durability(256).component(RRComponents.ROD_POWER.get(), 300000)));
+    public static final DeferredItem<Item> pliers = ITEMS.register("pliers", ItemPliers::new);
+    public static final DeferredItem<Item> armyshovel = ITEMS.registerItem("army_shovel", properties -> new DiggerItem(Tiers.DIAMOND, RivalRebels.MINEABLE_WITH_ARMY_SHOVEL, properties), new Item.Properties().component(DataComponents.UNBREAKABLE, new Unbreakable(true)));
+    public static final DeferredItem<Item> knife = ITEMS.register("knife", ItemCuchillo::new);
+    public static final DeferredItem<Item> gasgrenade = ITEMS.register("gas_grenade", ItemGasGrenade::new);
+    public static final DeferredItem<Item> safepill = ITEMS.register("safe_pill", ItemSafePill::new);
+    public static final DeferredItem<Item> expill = ITEMS.register("expill", ItemExPill::new);
+    public static final DeferredItem<Item> remote = ITEMS.register("remote", ItemRemote::new);
+    public static final DeferredItem<Item> fuse = ITEMS.registerSimpleItem("fuse", new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> NUCLEAR_ROD = ITEMS.register("nuclear_rod", () -> new ItemRodNuclear(new Item.Properties().durability(32).component(RRComponents.ROD_POWER, 3000000)));
+    public static final DeferredItem<Item> hydrod = ITEMS.register("hydrogen_rod", () -> new Item(new Item.Properties().durability(32).component(RRComponents.ROD_POWER, 250000)));
+    public static final DeferredItem<Item> plasmacannon = ITEMS.register("plasma_cannon", ItemPlasmaCannon::new);
+    public static final DeferredItem<Item> roddisk = ITEMS.register("rod_disk", ItemRodDisk::new);
+    public static final DeferredItem<Item> antenna = ITEMS.registerSimpleItem("antenna", new Item.Properties().stacksTo(1));
+    public static final DeferredItem<Item> emptyrod = ITEMS.registerSimpleItem("empty_rod");
+    public static final DeferredItem<Item> core1 = ITEMS.register("copper_core", () -> new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 0.25F).stacksTo(1)));
+    public static final DeferredItem<Item> core2 = ITEMS.register("tungsten_core", () -> new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 0.75F).stacksTo(1)));
+    public static final DeferredItem<Item> core3 = ITEMS.register("titanium_core", () -> new Item(new Item.Properties().component(RRComponents.CORE_TIME_MULTIPLIER, 1F).stacksTo(1)));
+    public static final DeferredItem<Item> binoculars = ITEMS.register("binoculars", ItemBinoculars::new);
+    public static final DeferredItem<Item> camera = ITEMS.register("camera", ItemCamera::new);
+    public static final DeferredItem<Item> chip = ITEMS.register("chip", ItemChip::new);
+    public static final DeferredItem<Item> roda = ITEMS.register("roda", ItemRoda::new);
+    public static final DeferredItem<Item> trollmask = ITEMS.registerItem("troll_mask", ItemTrollHelmet::new, new Item.Properties().durability(5000));
+    public static final DeferredItem<Item> hackm202 = ITEMS.register("hackm202", ItemHackM202::new);
+    public static final DeferredItem<Item> seekm202 = ITEMS.register("seekm202", ItemSeekM202::new);
+    public static final DeferredItem<Item> orebelhelmet = ITEMS.registerItem("orebelhelmet", p -> new ItemClassArmor(orebelarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> orebelchest = ITEMS.registerItem("orebelchest", p -> new ItemClassArmor(orebelarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> orebelpants = ITEMS.registerItem("orebelpants", p -> new ItemClassArmor(orebelarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> orebelboots = ITEMS.registerItem("orebelboots", p -> new ItemClassArmor(orebelarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> onukerhelmet = ITEMS.registerItem("onukerhelmet", p -> new ItemClassArmor(onukerarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> onukerchest = ITEMS.registerItem("onukerchest", p -> new ItemClassArmor(onukerarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> onukerpants = ITEMS.registerItem("onukerpants", p -> new ItemClassArmor(onukerarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> onukerboots = ITEMS.registerItem("onukerboots", p -> new ItemClassArmor(onukerarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> ointelhelmet = ITEMS.registerItem("ointelhelmet", p -> new ItemClassArmor(ointelarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> ointelchest = ITEMS.registerItem("ointelchest", p -> new ItemClassArmor(ointelarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> ointelpants = ITEMS.registerItem("ointelpants", p -> new ItemClassArmor(ointelarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> ointelboots = ITEMS.registerItem("ointelboots", p -> new ItemClassArmor(ointelarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> ohackerhelmet = ITEMS.registerItem("ohackerhelmet", p -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> ohackerchest = ITEMS.registerItem("ohackerchest", p -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> ohackerpants = ITEMS.registerItem("ohackerpants", p -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> ohackerboots = ITEMS.registerItem("ohackerboots", p -> new ItemClassArmor(ohackerarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> srebelhelmet = ITEMS.registerItem("srebelhelmet", p -> new ItemClassArmor(srebelarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> srebelchest = ITEMS.registerItem("srebelchest", p -> new ItemClassArmor(srebelarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> srebelpants = ITEMS.registerItem("srebelpants", p -> new ItemClassArmor(srebelarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> srebelboots = ITEMS.registerItem("srebelboots", p -> new ItemClassArmor(srebelarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> snukerhelmet = ITEMS.registerItem("snukerhelmet", p -> new ItemClassArmor(snukerarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> snukerchest = ITEMS.registerItem("snukerchest", p -> new ItemClassArmor(snukerarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> snukerpants = ITEMS.registerItem("snukerpants", p -> new ItemClassArmor(snukerarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> snukerboots = ITEMS.registerItem("snukerboots", p -> new ItemClassArmor(snukerarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> sintelhelmet = ITEMS.registerItem("sintelhelmet", p -> new ItemClassArmor(sintelarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> sintelchest = ITEMS.registerItem("sintelchest", p -> new ItemClassArmor(sintelarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> sintelpants = ITEMS.registerItem("sintelpants", p -> new ItemClassArmor(sintelarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> sintelboots = ITEMS.registerItem("sintelboots", p -> new ItemClassArmor(sintelarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> shackerhelmet = ITEMS.registerItem("shackerhelmet", p -> new ItemClassArmor(shackerarmor, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> shackerchest = ITEMS.registerItem("shackerchest", p -> new ItemClassArmor(shackerarmor, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> shackerpants = ITEMS.registerItem("shackerpants", p -> new ItemClassArmor(shackerarmor, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> shackerboots = ITEMS.registerItem("shackerboots", p -> new ItemClassArmor(shackerarmor, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> camohat = ITEMS.registerItem("camohat", p -> new ItemArmorCamo(armorCamo, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> camoshirt = ITEMS.registerItem("camoshirt", p -> new ItemArmorCamo(armorCamo, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> camopants = ITEMS.registerItem("camopants", p -> new ItemArmorCamo(armorCamo, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> camoshoes = ITEMS.registerItem("camoshoes", p -> new ItemArmorCamo(armorCamo, ArmorItem.Type.BOOTS));
+    public static final DeferredItem<Item> camohat2 = ITEMS.registerItem("camohat2", p -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.HELMET));
+    public static final DeferredItem<Item> camoshirt2 = ITEMS.registerItem("camoshirt2", p -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.CHESTPLATE));
+    public static final DeferredItem<Item> camopants2 = ITEMS.registerItem("camopants2", p -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.LEGGINGS));
+    public static final DeferredItem<Item> camoshoes2 = ITEMS.registerItem("camoshoes2", p -> new ItemArmorCamo(armorCamo2, ArmorItem.Type.BOOTS));
 
-    public static <T extends Item> DeferredItem<T> register(String name, Supplier<T> item) {
-        return ITEMS.registerItem(name, properties -> item.get());
-    }
-
-    private static Holder<ArmorMaterial> registerMaterial(String id, int[] defense,
-                                                          int enchantmentValue) {
-        return registerMaterial(id, defense, enchantmentValue, null);
-    }
-
-    private static Holder<ArmorMaterial> registerMaterial(String id, int[] defense,
-                                                  int enchantmentValue,
-                                                  @Nullable Supplier<ArmorMaterial.Layer> layer) {
-        return ARMOR_MATERIALS.register(id, () -> new ArmorMaterial(Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
+    private static Holder<ArmorMaterial> registerMaterial(String id, int[] defense, int enchantmentValue) {
+        return ARMOR_MATERIALS.register(id, rl -> new ArmorMaterial(Util.make(new EnumMap<>(ArmorItem.Type.class), map -> {
             map.put(ArmorItem.Type.BOOTS, defense[0]);
             map.put(ArmorItem.Type.LEGGINGS, defense[1]);
             map.put(ArmorItem.Type.BODY, defense[2]);
             map.put(ArmorItem.Type.HELMET, defense[3]);
-        }), enchantmentValue, SoundEvents.ARMOR_EQUIP_GENERIC, () -> Ingredient.EMPTY, layer != null ? List.of(layer.get()) : List.of(), 1, 1));
+        }), enchantmentValue, SoundEvents.ARMOR_EQUIP_GENERIC, () -> Ingredient.EMPTY, List.of(new ArmorMaterial.Layer(rl)), 1, 1));
     }
 
     public static void init(IEventBus bus) {

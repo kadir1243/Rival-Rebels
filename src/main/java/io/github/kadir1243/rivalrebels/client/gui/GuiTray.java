@@ -13,7 +13,6 @@
 package io.github.kadir1243.rivalrebels.client.gui;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import io.github.kadir1243.rivalrebels.client.guihelper.*;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiCustomButton;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiDropdownOption;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiRotor;
@@ -50,12 +49,10 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 	}
 
 	@Override
-	public void init()
-	{
+	public void init() {
 		super.init();
-		int x = (width - imageWidth) / 2;
-		int y = (height - imageHeight) / 2;
-        this.clearWidgets();
+		int x = this.leftPos;
+		int y = this.topPos;
 		range = new GuiRotor(x + 93 - 16, y + 92 - 16, menu.getYawLimit(), Component.literal("Range"));
 		chip = new GuiCustomButton(new Rectangle(x + 94, y + 10, 19, 19), RRIdentifiers.guitray, new Vector2i(237, 10), true);
 		chip.isPressed = menu.getKTeam();

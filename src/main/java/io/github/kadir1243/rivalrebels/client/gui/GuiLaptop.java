@@ -39,10 +39,7 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
     protected void init() {
         super.init();
 
-		int x = (width - imageWidth) / 2;
-		int y = (height - imageHeight) / 2;
-        this.clearWidgets();
-		button = new GuiButton(x + 131, y + 89, 16, 16, Component.empty(), button1 -> Minecraft.getInstance().getConnection().send(new LaptopPressPacket(menu.getLaptopPos())));
+		button = new GuiButton(this.leftPos + 131, this.topPos + 89, 16, 16, Component.empty(), button1 -> Minecraft.getInstance().getConnection().send(new LaptopPressPacket(menu.getLaptopPos())));
 		addRenderableWidget(button);
 	}
 

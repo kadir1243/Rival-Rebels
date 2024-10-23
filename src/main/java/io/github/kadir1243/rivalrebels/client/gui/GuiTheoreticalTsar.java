@@ -14,67 +14,48 @@ package io.github.kadir1243.rivalrebels.client.gui;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.container.ContainerTheoreticalTsar;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiTheoreticalTsar extends AbstractContainerScreen<ContainerTheoreticalTsar> {
+public class GuiTheoreticalTsar extends BombContainerScreen<ContainerTheoreticalTsar> {
 	public GuiTheoreticalTsar(ContainerTheoreticalTsar container, Inventory inventoryPlayer, Component title) {
 		super(container, inventoryPlayer, title);
 		imageHeight = 206;
 	}
 
     @Override
+    public void renderName(GuiGraphics graphics) {
+        graphics.drawString(font, Component.translatable(Translations.TSAR_NAME.toLanguageKey()), 18, 16, 4210752, false);
+    }
+
+    @Override
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         super.renderLabels(context, mouseX, mouseY);
-        PoseStack matrices = context.pose();
-        showTimer(context);
-        float scalef = 0.666f;
-		matrices.pushPose();
-		matrices.scale(scalef, scalef, scalef);
-		context.drawString(font, Component.translatable(Translations.TSAR_NAME.toLanguageKey()), 18, 16, 4210752, false);
-		matrices.popPose();
-		if (menu.isArmed())
-		{
-			context.drawString(font, Component.translatable(Translations.BOMB_ARMED.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
-		}
-		else
-		{
-			context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 6, imageHeight - 97, 0xFFFFFF, false);
-		}
-    }
-
-    private void showTimer(GuiGraphics graphics) {
-        int seconds = (menu.getCountdown() / 20);
-        int millis = (menu.getCountdown() % 20) * 3;
-        String milli;
-        if (millis < 10) {
-            milli = "0" + millis;
+        if (menu.isArmed()) {
+            context.drawString(font, Component.translatable(Translations.BOMB_ARMED.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
         } else {
-            milli = "" + millis;
-        }
-        if (menu.getCountdown() % 20 >= 10) {
-            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFFFFFF, false);
-        } else {
-            graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), 6, imageHeight - 107, 0xFF0000, false);
+            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 6, imageHeight - 97, 0xFFFFFF, false);
         }
     }
 
     @Override
-    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-		int x = (width - imageWidth) / 2;
-		int y = (height - imageHeight) / 2;
-        context.blit(RRIdentifiers.guitheoreticaltsar, x, y, 0, 0, imageWidth, imageHeight);
-	}
+    public Vec2 getTimerPos() {
+        return new Vec2(6, imageHeight - 107);
+    }
 
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    public int getTimerColor() {
+        return getCountdown() % 20 >= 10 ? 0xFFFFFF : 0xFF0000;
+    }
+
+    @Override
+    public ResourceLocation getBackgroundTexture() {
+        return RRIdentifiers.guitheoreticaltsar;
     }
 }

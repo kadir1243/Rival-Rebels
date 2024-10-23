@@ -18,22 +18,21 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiFTKnob extends GuiButton {
-	protected int		mode;
-	protected boolean	pressed;
+	protected int mode;
+	protected boolean pressed;
 
-	public GuiFTKnob(int x, int y, int minDegree, int maxDegree, int startDegree, boolean respectLimits, Component message) {
-		super(x, y, 36, 36, message);
-		mode = startDegree;
-	}
+    public GuiFTKnob(Builder builder, int mode) {
+        super(builder);
+        this.mode = mode;
+    }
 
     @Override
-    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        PoseStack matrices = context.pose();
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        PoseStack matrices = graphics.pose();
 		if (mode > 2) mode = 2;
 		if (mode < 0) mode = 0;
 		int state = 0;
@@ -42,7 +41,7 @@ public class GuiFTKnob extends GuiButton {
 		matrices.translate(this.getX() + (width / 2f), this.getY() + (height / 2f), 0);
 		matrices.mulPose(Axis.ZP.rotationDegrees(mode * 90 - 90));
 		matrices.translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)), 0);
-		context.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
+		graphics.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
 		matrices.popPose();
 	}
 
@@ -69,10 +68,5 @@ public class GuiFTKnob extends GuiButton {
     public int getDegree()
 	{
 		return mode;
-	}
-
-    @Override
-    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-		return this.active && this.visible && Math.sqrt(((getX() - mouseX + (width / 2f)) * (getX() - mouseX + (width / 2f))) + ((getY() - mouseY + (height / 2f)) * (getY() - mouseY + (height / 2f)))) <= (width / 2f);
 	}
 }

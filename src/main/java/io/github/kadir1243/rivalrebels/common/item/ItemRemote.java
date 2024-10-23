@@ -45,7 +45,7 @@ public class ItemRemote extends Item {
 		return super.useOn(context);
 	}
 
-    //@Override
+    @Override
     public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
         Player player = context.getPlayer();
         Level world = context.getLevel();

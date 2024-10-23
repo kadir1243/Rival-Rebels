@@ -14,7 +14,6 @@ package io.github.kadir1243.rivalrebels.common.container;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTimedBomb;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
 import io.github.kadir1243.rivalrebels.common.item.*;
-import io.github.kadir1243.rivalrebels.common.item.*;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -25,8 +24,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class ContainerAntimatterBomb extends AbstractContainerMenu
-{
+public class ContainerAntimatterBomb extends AbstractContainerMenu implements BombContainer {
 	protected Container antimatter;
     private final ContainerData containerData;
 
@@ -38,15 +36,15 @@ public class ContainerAntimatterBomb extends AbstractContainerMenu
         super(RivalRebelsGuiHandler.ANTIMATTER_SCREEN_HANDLER_TYPE.get(), syncId);
 		this.antimatter = antimatter;
         this.containerData = containerData;
-        addSlot(new SlotRR(antimatter, 0, 18, 48, 1, ItemFuse.class));
-		addSlot(new SlotRR(antimatter, 1, 40, 59, 1, RRItems.antenna.asItem()));
-		addSlot(new SlotRR(antimatter, 2, 40, 37, 1, RRItems.antenna.asItem()));
+        addSlot(new SlotRR(antimatter, 0, 18, 48, 1, RRItems.fuse));
+		addSlot(new SlotRR(antimatter, 1, 40, 59, 1, RRItems.antenna));
+		addSlot(new SlotRR(antimatter, 2, 40, 37, 1, RRItems.antenna));
 		for (int i = 0; i <= 3; i++)
 		{
-			addSlot(new SlotRR(antimatter, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlot(new SlotRR(antimatter, i + 7, 62 + i * 18, 37, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlot(new SlotRR(antimatter, i + 11, 62 + i * 18, 59, 1, ItemRodRedstone.class).setAcceptsTrollface(true));
-			addSlot(new SlotRR(antimatter, i + 15, 62 + i * 18, 77, 1, ItemRodRedstone.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 3, 62 + i * 18, 19, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 7, 62 + i * 18, 37, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 11, 62 + i * 18, 59, 1, RRItems.redrod).setAcceptsTrollface(true));
+			addSlot(new SlotRR(antimatter, i + 15, 62 + i * 18, 77, 1, RRItems.redrod).setAcceptsTrollface(true));
 		}
 		addSlot(new SlotRR(antimatter, 19, 138, 48, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(antimatter, 20, 98, 99, 1, ItemChip.class));

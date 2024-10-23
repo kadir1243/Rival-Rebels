@@ -14,8 +14,8 @@ package io.github.kadir1243.rivalrebels.common.container;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTimedBomb;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
 import io.github.kadir1243.rivalrebels.common.item.ItemChip;
-import io.github.kadir1243.rivalrebels.common.item.ItemFuse;
 import io.github.kadir1243.rivalrebels.common.item.ItemRodNuclear;
+import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -26,8 +26,7 @@ import net.minecraft.world.inventory.SimpleContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
-public class ContainerNuclearBomb extends AbstractContainerMenu
-{
+public class ContainerNuclearBomb extends AbstractContainerMenu implements BombContainer {
 	protected Container nuclearBomb;
     private final ContainerData containerData;
 
@@ -39,10 +38,10 @@ public class ContainerNuclearBomb extends AbstractContainerMenu
         super(RivalRebelsGuiHandler.NUCLEAR_BOMB_SCREEN_HANDLER_TYPE.get(), syncId);
 		this.nuclearBomb = nuclearBomb;
         this.containerData = containerData;
-        addSlot(new SlotRR(nuclearBomb, 0, 16, 34, 1, ItemFuse.class));
+        addSlot(new SlotRR(nuclearBomb, 0, 16, 34, 1, RRItems.fuse));
 		for (int i = 0; i <= 4; i++) {
-			addSlot(new SlotRR(nuclearBomb, i + 1, 38 + i * 18, 25, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlot(new SlotRR(nuclearBomb, i + 6, 38 + i * 18, 43, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(nuclearBomb, i + 1, 38 + i * 18, 25, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
+			addSlot(new SlotRR(nuclearBomb, i + 6, 38 + i * 18, 43, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
 		}
 		addSlot(new SlotRR(nuclearBomb, 11, 133, 34, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(nuclearBomb, 12, 152, 34, 1, ItemChip.class));
@@ -77,7 +76,7 @@ public class ContainerNuclearBomb extends AbstractContainerMenu
 		return ItemStack.EMPTY;
 	}
 
-    public int getCountDown() {
+    public int getCountdown() {
         return containerData.get(0);
     }
 

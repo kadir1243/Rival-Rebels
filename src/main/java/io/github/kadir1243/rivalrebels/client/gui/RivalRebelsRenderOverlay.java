@@ -27,6 +27,7 @@ import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
 import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.DeltaTracker;
@@ -40,8 +41,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
 
@@ -248,10 +247,10 @@ public class RivalRebelsRenderOverlay {
             int tasks = binocularData.tasks();
             int carpet = binocularData.carpet();
             double dist = binocularData.dist();
-            Block id = player.level().getBlockState(tpos).getBlock();
+            BlockState id = player.level().getBlockState(tpos);
             Component text;
             text = Component.nullToEmpty("X");
-            if (id != Blocks.AIR) text = id.getName();
+            if (!id.isAir()) text = id.getBlock().getName();
             graphics.drawString(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.18), 0x00ff00, false);
             if (!ItemBinoculars.tooFar)
                 text = Component.literal("(" + tpos.getX() + ", " + tpos.getY() + ", " + tpos.getZ() + ")");
@@ -283,7 +282,7 @@ public class RivalRebelsRenderOverlay {
                 graphics.drawString(tr, Component.translatable("RivalRebels.binoculars.target"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.binoculars.target")) / 2f)), (int) (h * 0.85), 0xff0000, false);
 
             graphics.drawString(tr, Component.translatable("RivalRebels.message.use").append(" ").append(Component.translatable(Translations.SHIFT_CLICK.toLanguageKey())).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
-            graphics.drawString(tr, "Press C to select bomb type", (int) (w * 0.60), (int) (h * 0.95), 0xff0000, false);
+            graphics.drawString(tr, "Press C to select bomb type", (float) (w * 0.60), (float) (h * 0.95), 0xff0000, false);
 
             if ((tasks > 0 || carpet > 0) && dist < 10) {
                 RenderSystem.blendFunc(SourceFactor.ONE, DestFactor.ONE_MINUS_SRC_ALPHA);

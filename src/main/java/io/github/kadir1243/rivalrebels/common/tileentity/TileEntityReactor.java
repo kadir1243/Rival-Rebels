@@ -18,9 +18,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
-import io.github.kadir1243.rivalrebels.common.item.ItemRod;
-import io.github.kadir1243.rivalrebels.common.item.ItemRodNuclear;
-import io.github.kadir1243.rivalrebels.common.item.ItemRodRedstone;
+import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.packet.ReactorMachinesPacket;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
@@ -211,7 +209,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
             meltTick = 0;
         }
 
-        if (on && getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && !getFuel().isEmpty() && getFuel().getItem() instanceof ItemRod r)
+        if (on && getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && !getFuel().isEmpty() && getFuel().has(RRComponents.ROD_POWER))
         {
             if (!prevOn && on) RivalRebelsSoundPlayer.playSound(level, 21, 3, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5);
             else
@@ -219,7 +217,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
                 tick++;
                 if (on && tick % 39 == 0) RivalRebelsSoundPlayer.playSound(level, 21, 2, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, 0.9f, 0.77f);
             }
-            float power = ((r.power * getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
+            float power = ((getFuel().get(RRComponents.ROD_POWER) * getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
             float temp = power;
             for (BlockEntity te : TileEntityMachineBase.BLOCK_ENTITIES.values()) {
                 if (te instanceof TileEntityMachineBase temb) {
@@ -253,20 +251,18 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
                 double fuelLeft = (int) consumed;
                 double fuelPercentage = (fuelLeft / temp);
 
-                if (r instanceof ItemRodNuclear)
-                {
+                if (getFuel().is(RRItems.NUCLEAR_ROD)) {
                     double f2 = fuelPercentage * fuelPercentage;
                     double f4 = f2 * f2;
                     double f8 = f4 * f4;
-                    if (level.random.nextFloat() < f8)
-                    {
+                    if (level.random.nextFloat() < f8) {
                         melt = true;
                     }
                 }
             }
             else getFuel().set(RRComponents.REACTOR_FUEL_LEFT, 0);
             if (getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0) >= temp) {
-                lastrodwasredstone = r instanceof ItemRodRedstone; // meltdown if not redrod
+                lastrodwasredstone = getFuel().is(RRItems.redrod); // meltdown if not redrod
                 consumed = 0;
                 lasttickconsumed = 0;
                 tickssincelastrod = 1;
@@ -372,7 +368,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
     public boolean canPlaceItem(int slot, ItemStack stack) {
 		if (slot == 0 && stack.has(RRComponents.CORE_TIME_MULTIPLIER)) {
 			return getFuel().isEmpty() || !on;
-		} else if (slot == 1 && stack.getItem() instanceof ItemRod) {
+		} else if (slot == 1 && stack.has(RRComponents.ROD_POWER)) {
 			return !on;
 		}
 		return false;
@@ -391,9 +387,8 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
     }
 
 	public float getPower() {
-		if (getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && !getFuel().isEmpty()) {
-			ItemRod r = (ItemRod) getFuel().getItem();
-			return ((r.power * getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
+		if (getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && getFuel().has(RRComponents.ROD_POWER)) {
+			return ((getFuel().get(RRComponents.ROD_POWER) * getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
 		}
 		return 0;
 	}

@@ -16,7 +16,6 @@ import io.github.kadir1243.rivalrebels.client.guihelper.GuiCustomButton;
 import io.github.kadir1243.rivalrebels.client.guihelper.ReactorConnectedMachinesList;
 import io.github.kadir1243.rivalrebels.client.guihelper.Rectangle;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReactor;
-import io.github.kadir1243.rivalrebels.common.item.ItemRod;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsSimplexNoise;
@@ -117,7 +116,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 			float radius = 10;
 			if (menu.fuel.getItem().has(RRComponents.REACTOR_FUEL_LEFT)) {
                 float timemult = menu.core.getItem().get(RRComponents.CORE_TIME_MULTIPLIER);
-                radius += (((((ItemRod) menu.fuel.getItem().getItem()).power * timemult) - menu.fuel.getItem().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0)) / (((ItemRod) menu.fuel.getItem().getItem()).power * timemult)) * 30;
+                radius += (((menu.fuel.getItem().get(RRComponents.ROD_POWER) * timemult) - menu.fuel.getItem().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0)) / (menu.fuel.getItem().get(RRComponents.ROD_POWER) * timemult)) * 30;
             }
 			melttick = 30;
 			float brightness = 0;

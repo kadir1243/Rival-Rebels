@@ -13,9 +13,7 @@ package io.github.kadir1243.rivalrebels.common.container;
 
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTimedBomb;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
-import io.github.kadir1243.rivalrebels.common.item.*;
 import io.github.kadir1243.rivalrebels.common.item.ItemChip;
-import io.github.kadir1243.rivalrebels.common.item.ItemFuse;
 import io.github.kadir1243.rivalrebels.common.item.ItemRodNuclear;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import net.minecraft.world.Container;
@@ -25,7 +23,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 
-public class ContainerTheoreticalTsar extends AbstractContainerMenu {
+public class ContainerTheoreticalTsar extends AbstractContainerMenu implements BombContainer {
 	protected Container bomb;
     private final ContainerData containerData;
 
@@ -36,15 +34,15 @@ public class ContainerTheoreticalTsar extends AbstractContainerMenu {
     public ContainerTheoreticalTsar(int syncId, Inventory inventoryPlayer, Container bomb, ContainerData containerData) {
         super(RivalRebelsGuiHandler.THEORETICAL_TSAR_SCREEN_HANDLER_TYPE.get(), syncId);
         this.bomb = bomb;
-        addSlot(new SlotRR(bomb, 0, 18, 48, 1, ItemFuse.class));
+        addSlot(new SlotRR(bomb, 0, 18, 48, 1, RRItems.fuse));
 		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna.asItem()));
 		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna.asItem()));
 		for (int i = 0; i <= 3; i++)
 		{
-			addSlot(new SlotRR(bomb, i + 3, 62 + i * 18, 19, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlot(new SlotRR(bomb, i + 7, 62 + i * 18, 37, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlot(new SlotRR(bomb, i + 11, 62 + i * 18, 59, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
-			addSlot(new SlotRR(bomb, i + 15, 62 + i * 18, 77, 1, ItemRodNuclear.class).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 3, 62 + i * 18, 19, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 7, 62 + i * 18, 37, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 11, 62 + i * 18, 59, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
+			addSlot(new SlotRR(bomb, i + 15, 62 + i * 18, 77, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
 		}
 		addSlot(new SlotRR(bomb, 19, 138, 48, 1, BlockTimedBomb.class));
 		addSlot(new SlotRR(bomb, 20, 98, 99, 1, ItemChip.class));

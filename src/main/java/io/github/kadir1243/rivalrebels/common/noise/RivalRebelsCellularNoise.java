@@ -76,12 +76,12 @@ public class RivalRebelsCellularNoise {
 		byte blu = (byte) 0xFF;
 		for (int i = 0; i < ys; i++) {
 			ByteBuffer bb = BufferUtils.createByteBuffer(size);
-			for (int x = 0; x < xs; x++) {
-				for (int z = 0; z < zs; z++) {
+			for (double x = 0; x < xs; x++) {
+				for (double z = 0; z < zs; z++) {
 					bb.put(red);
 					bb.put(grn);
 					bb.put(blu);
-					bb.put((byte) ((noise((double) x / (double) xs, (double) z / (double) zs, (double) i / (double) ys) + 1) * 127));
+					bb.put((byte) ((noise(x / (double) xs, z / (double) zs, (double) i / (double) ys) + 1) * 127));
 				}
 			}
 			int id = TextureUtil.generateTextureId();
