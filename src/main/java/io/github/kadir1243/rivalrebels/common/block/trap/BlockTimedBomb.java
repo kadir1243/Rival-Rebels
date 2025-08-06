@@ -21,8 +21,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Blocks;
@@ -44,7 +46,7 @@ public class BlockTimedBomb extends FallingBlock {
     }
 
     @Override
-    public void wasExploded(Level world, BlockPos pos, net.minecraft.world.level.Explosion explosion) {
+    public void wasExploded(ServerLevel world, BlockPos pos, net.minecraft.world.level.Explosion explosion) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
@@ -105,6 +107,11 @@ public class BlockTimedBomb extends FallingBlock {
 			}
 		}
 	}
+
+    @Override
+    public int getDustColor(BlockState state, BlockGetter level, BlockPos pos) {
+        return CommonColors.WHITE;
+    }
 
 	/*public void onFinishFalling(Level level, int par2, int par3, int par4, int par5)
 	{

@@ -12,13 +12,17 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EntityReference;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -34,14 +38,13 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
-import java.util.UUID;
 
 public class EntityGore extends EntityInanimate {
     public static final EntityDataAccessor<Integer> MOB = SynchedEntityData.defineId(EntityGore.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Integer> TYPE_OF_GORE = SynchedEntityData.defineId(EntityGore.class, EntityDataSerializers.INT);
     public static final EntityDataAccessor<Float> SIZE = SynchedEntityData.defineId(EntityGore.class, EntityDataSerializers.FLOAT);
     public static final EntityDataAccessor<Boolean> IS_GREEN = SynchedEntityData.defineId(EntityGore.class, EntityDataSerializers.BOOLEAN);
-    public static final EntityDataAccessor<Optional<UUID>> OWNER = SynchedEntityData.defineId(EntityGore.class, EntityDataSerializers.OPTIONAL_UUID);
+    public static final EntityDataAccessor<Optional<EntityReference<LivingEntity>>> OWNER = SynchedEntityData.defineId(EntityGore.class, EntityDataSerializers.OPTIONAL_LIVING_ENTITY_REFERENCE);
     protected boolean		inGround;
 	public Entity			origin;
     private boolean			isSliding	= false;
@@ -55,7 +58,6 @@ public class EntityGore extends EntityInanimate {
 	float					motionpitch	= 0;
 	int						pitchLock	= 0;
 	float					offset		= 0;
-    // @OnlyIn(Dist.CLIENT)
 	public ResourceLocation	playerSkin	= null;
 	private int				bounces		= -1;
 
@@ -104,7 +106,7 @@ public class EntityGore extends EntityInanimate {
 		setMob(mob);
 		if (mob == 0)
 		{
-            setOwner(origin instanceof Player player ? player.getGameProfile().getId() : null);
+            setOwner(origin instanceof Player player ? player : null);
 			setBiped(0);
 		}
 		else if (mob == 1)
@@ -161,7 +163,7 @@ public class EntityGore extends EntityInanimate {
 		motionyaw = (float) ((random.nextDouble() - 0.5) * 135);
 		motionpitch = (float) ((random.nextDouble() - 0.5) * 135);
 
-		moveTo(toBeGibbed.getX() + x, toBeGibbed.getY() + y, toBeGibbed.getZ() + z, rotYaw, rotPitch);
+		snapTo(toBeGibbed.getX() + x, toBeGibbed.getY() + y, toBeGibbed.getZ() + z, rotYaw, rotPitch);
 		shoot(0.3f);
 	}
 
@@ -319,13 +321,12 @@ public class EntityGore extends EntityInanimate {
             random.nextGaussian() * par7);
 	}
 
-    @Nullable
-    public UUID getOwner() {
+    public EntityReference<LivingEntity> getOwner() {
         return entityData.get(OWNER).orElse(null);
     }
 
-    public void setOwner(@Nullable UUID owner) {
-        entityData.set(OWNER, Optional.ofNullable(owner));
+    public void setOwner(@Nullable LivingEntity owner) {
+        entityData.set(OWNER, Optional.ofNullable(owner).map(EntityReference::new));
     }
 
 	@Override
@@ -333,7 +334,7 @@ public class EntityGore extends EntityInanimate {
 	{
 		if (playerSkin == null && level().isClientSide && getOwner() != null) {
             for (Player player : level().players()) {
-                if (player.getGameProfile().getId().equals(getOwner())) {
+                if (getOwner().matches(player)) {
                     AbstractClientPlayer acp = (AbstractClientPlayer) player;
                     playerSkin = acp.getSkin().texture();
                 }
@@ -354,7 +355,7 @@ public class EntityGore extends EntityInanimate {
 		if (isSliding)
 		{
 			slideCount++;
-			if (slideCount == 140) kill();
+			if (slideCount == 140) kill((ServerLevel) level());
 		}
 
 		Vec3 vec3 = position();
@@ -376,7 +377,7 @@ public class EntityGore extends EntityInanimate {
 
 		float f2 = 0.99F;
 
-		if (isInWaterOrBubble())
+		if (isInWater())
 		{
             for (int k = 0; k < 4; ++k) {
                 float f4 = 0.25F;
@@ -434,22 +435,23 @@ public class EntityGore extends EntityInanimate {
 	}
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag nbt) {
-		nbt.putInt("Mob", getMob());
-		nbt.putInt("TypeOfGore", getTypeOfGore());
-		nbt.putBoolean("Green", isGreen());
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+		valueOutput.putInt("Mob", getMob());
+		valueOutput.putInt("TypeOfGore", getTypeOfGore());
+		valueOutput.putBoolean("Green", isGreen());
         if (getOwner() != null) {
-            nbt.putUUID("owner", getOwner());
+            getOwner().store(valueOutput, "owner");
         }
 	}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag nbt) {
-		setMob(nbt.getInt("Mob"));
-		setTypeOfGore(nbt.getInt("TypeOfGore"));
-		setGreen(nbt.getBoolean("Green"));
-        if (nbt.contains("owner")) {
-            setOwner(nbt.getUUID("owner"));
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+		setMob(valueInput.getInt("Mob").orElseThrow());
+		setTypeOfGore(valueInput.getInt("TypeOfGore").orElseThrow());
+		setGreen(valueInput.getBooleanOr("Green", false));
+        if (valueInput.child("owner").isPresent()) {
+            EntityReference<LivingEntity> owner = EntityReference.readWithOldOwnerConversion(valueInput, "owner", this.level());
+            entityData.set(OWNER, Optional.ofNullable(owner));
         }
 	}
 

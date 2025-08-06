@@ -6,7 +6,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.syncher.EntityDataSerializer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -57,7 +57,7 @@ public enum RhodesTypes implements RhodesType {
 
     public int getColor() {
         int colorType = ordinal();
-        return FastColor.ARGB32.colorFromFloat(1F, colors[colorType *3], colors[colorType *3+1], colors[colorType *3+2]);
+        return ARGB.colorFromFloat(1F, colors[colorType *3], colors[colorType *3+1], colors[colorType *3+2]);
     }
 
     @Override

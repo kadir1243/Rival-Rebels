@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.client.model.ModelTheoreticalTsarBomba;
 import io.github.kadir1243.rivalrebels.common.entity.EntityTheoreticalTsar;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,32 +23,43 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderTheoreticalTsar extends EntityRenderer<EntityTheoreticalTsar> {
+public class RenderTheoreticalTsar extends EntityRenderer<EntityTheoreticalTsar, RenderTheoreticalTsar.State> {
 	public RenderTheoreticalTsar(EntityRendererProvider.Context manager) {
         super(manager);
 	}
 
     @Override
-    public void render(EntityTheoreticalTsar entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
-		//matrices.mulPose(Axis.XP.rotationDegrees(90));
-		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
-		matrices.scale(1.3f, 1.3f, 1.3f);
-		ModelTheoreticalTsarBomba.render(matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
-		matrices.popPose();
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+		//poseStack.mulPose(Axis.XP.rotationDegrees(90));
+		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+		poseStack.scale(1.3f, 1.3f, 1.3f);
+		ModelTheoreticalTsarBomba.render(poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
+		poseStack.popPose();
 	}
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityTheoreticalTsar entity) {
-        return null;
-    }
 
     @Override
     public boolean shouldRender(EntityTheoreticalTsar livingEntity, Frustum camera, double camX, double camY, double camZ) {
         return true;
+    }
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityTheoreticalTsar p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
     }
 }

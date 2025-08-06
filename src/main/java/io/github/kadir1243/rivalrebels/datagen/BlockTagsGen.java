@@ -8,44 +8,42 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
 public class BlockTagsGen extends BlockTagsProvider {
-    public BlockTagsGen(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-        super(output, lookupProvider, RRIdentifiers.MODID, existingFileHelper);
+    public BlockTagsGen(PackOutput output, CompletableFuture<HolderLookup.Provider> lookupProvider) {
+        super(output, lookupProvider, RRIdentifiers.MODID);
     }
 
     @Override
     protected void addTags(HolderLookup.Provider provider) {
-        tag(RivalRebels.MINEABLE_WITH_ARMY_SHOVEL)
-            .add(RRBlocks.barricade.get())
-            .add(RRBlocks.reactive.get())
-            .add(RRBlocks.conduit.get())
-            .add(RRBlocks.tower.get())
-            .add(RRBlocks.steel.get())
-            .add(RRBlocks.rhodesactivator.get())
-            .add(RRBlocks.camo1.get())
-            .add(RRBlocks.camo2.get())
-            .add(RRBlocks.camo3.get())
-            .add(RRBlocks.jump.get())
-            .add(RRBlocks.landmine.get())
-            .add(RRBlocks.alandmine.get())
-            .add(RRBlocks.quicksand.get())
-            .add(RRBlocks.aquicksand.get())
-            .add(RRBlocks.mario.get())
-            .add(RRBlocks.amario.get())
-            .add(RRBlocks.loader.get())
-            .add(RRBlocks.reactor.get())
-            .add(RRBlocks.radioactivedirt.get())
-            .add(RRBlocks.radioactivesand.get())
-            .add(RRBlocks.petrifiedstone1.get())
-            .add(RRBlocks.petrifiedstone2.get())
-            .add(RRBlocks.petrifiedstone3.get())
-            .add(RRBlocks.petrifiedstone4.get())
-            .add(RRBlocks.petrifiedwood.get());
+        this.getOrCreateRawBuilder(RivalRebels.MINEABLE_WITH_ARMY_SHOVEL)
+            .addElement(RRBlocks.barricade.getId())
+            .addElement(RRBlocks.reactive.getId())
+            .addElement(RRBlocks.conduit.getId())
+            .addElement(RRBlocks.tower.getId())
+            .addElement(RRBlocks.steel.getId())
+            .addElement(RRBlocks.rhodesactivator.getId())
+            .addElement(RRBlocks.camo1.getId())
+            .addElement(RRBlocks.camo2.getId())
+            .addElement(RRBlocks.camo3.getId())
+            .addElement(RRBlocks.jump.getId())
+            .addElement(RRBlocks.landmine.getId())
+            .addElement(RRBlocks.alandmine.getId())
+            .addElement(RRBlocks.quicksand.getId())
+            .addElement(RRBlocks.aquicksand.getId())
+            .addElement(RRBlocks.mario.getId())
+            .addElement(RRBlocks.amario.getId())
+            .addElement(RRBlocks.loader.getId())
+            .addElement(RRBlocks.reactor.getId())
+            .addElement(RRBlocks.radioactivedirt.getId())
+            .addElement(RRBlocks.radioactivesand.getId())
+            .addElement(RRBlocks.petrifiedstone1.getId())
+            .addElement(RRBlocks.petrifiedstone2.getId())
+            .addElement(RRBlocks.petrifiedstone3.getId())
+            .addElement(RRBlocks.petrifiedstone4.getId())
+            .addElement(RRBlocks.petrifiedwood.getId());
 
         tag(RivalRebels.NUCLEAR_STONE_GENERATEABLE)
             .addTag(BlockTags.BASE_STONE_OVERWORLD)

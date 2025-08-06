@@ -13,12 +13,12 @@ public class ItemUtil {
     public static ItemStack getItemStack(Player player, Predicate<ItemStack> predicate) {
         if (player == null) return ItemStack.EMPTY;
 
-        for (ItemStack stack : player.getAllSlots()) {
-            if (predicate.test(stack)) {
-                return stack;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (predicate.test(player.getItemBySlot(slot))) {
+                return player.getItemBySlot(slot);
             }
         }
-        for (ItemStack stack : player.getInventory().items) {
+        for (ItemStack stack : player.getInventory()) {
             if (predicate.test(stack))
                 return stack;
         }
@@ -40,9 +40,10 @@ public class ItemUtil {
     public static ItemStack getItemStack(LivingEntity user, Predicate<ItemStack> predicate) {
         if (user == null) return ItemStack.EMPTY;
         if (user instanceof Player) return getItemStack(((Player) user), predicate);
-        for (ItemStack stack : user.getAllSlots()) {
-            if (predicate.test(stack))
-                return stack;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            if (predicate.test(user.getItemBySlot(slot))) {
+                return user.getItemBySlot(slot);
+            }
         }
         return ItemStack.EMPTY;
     }

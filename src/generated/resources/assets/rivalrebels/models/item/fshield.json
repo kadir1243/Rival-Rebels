@@ -1,3 +1,6 @@
 {
-  "parent": "rivalrebels:item/fshield"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rivalrebels:block/fshield"
+  }
 }

@@ -11,9 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -32,17 +31,16 @@ public class GuiFTKnob extends GuiButton {
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        PoseStack matrices = graphics.pose();
 		if (mode > 2) mode = 2;
 		if (mode < 0) mode = 0;
 		int state = 0;
 		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
-		matrices.pushPose();
-		matrices.translate(this.getX() + (width / 2f), this.getY() + (height / 2f), 0);
-		matrices.mulPose(Axis.ZP.rotationDegrees(mode * 90 - 90));
-		matrices.translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)), 0);
-		graphics.blit(RRIdentifiers.guitbutton, this.getX(), this.getY(), 76 + state, 0, this.width, this.height);
-		matrices.popPose();
+        graphics.pose().pushMatrix();
+        graphics.pose().translate(this.getX() + (width / 2f), this.getY() + (height / 2f));
+        graphics.pose().rotate(mode * 90 - 90);
+        graphics.pose().translate(-(this.getX() + (width / 2f)), -(this.getY() + (height / 2f)));
+        RRTextures.guitbutton.blit(graphics, this.getX(), this.getY(), 76 + state, 0, this.width, this.height, CommonColors.WHITE);
+        graphics.pose().popMatrix();
 	}
 
     @Override

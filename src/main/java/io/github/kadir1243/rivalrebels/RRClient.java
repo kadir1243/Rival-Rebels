@@ -2,7 +2,7 @@ package io.github.kadir1243.rivalrebels;
 
 import io.github.kadir1243.rivalrebels.client.gui.RivalRebelsRenderOverlay;
 import io.github.kadir1243.rivalrebels.client.itemrenders.*;
-import io.github.kadir1243.rivalrebels.client.model.RRModelLoadingPlugin;
+import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderentity.*;
 import io.github.kadir1243.rivalrebels.client.tileentityrender.*;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
@@ -12,8 +12,8 @@ import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
@@ -22,15 +22,16 @@ import net.minecraft.client.KeyMapping;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
+import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
+import java.util.Set;
 import java.util.function.Supplier;
 
 import static org.lwjgl.glfw.GLFW.*;
@@ -73,7 +74,6 @@ public class RRClient {
 
 	public static void registerRenderInformation(EntityRenderersEvent.RegisterRenderers event) {
 		event.registerBlockEntityRenderer(RRTileEntities.NUKE_CRATE.get(), TileEntityNukeCrateRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.NUCLEAR_BOMB.get(), TileEntityNuclearBombRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.PLASMA_EXPLOSION.get(), TileEntityPlasmaExplosionRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.REACTOR.get(), TileEntityReactorRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.JUMP_BLOCK.get(), TileEntityJumpBlockRenderer::new);
@@ -87,8 +87,6 @@ public class RRClient {
 		event.registerBlockEntityRenderer(RRTileEntities.RECIEVER.get(), TileEntityRecieverRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.MELT_DOWN.get(), TileEntityMeltdownRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.THEORETICAL_TSAR_BOMB.get(), TileEntityTheoreticalTsarBombaRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.ANTIMATTER_BOMB.get(), TileEntityAntimatterBombRenderer::new);
-		event.registerBlockEntityRenderer(RRTileEntities.TACHYON_BOMB.get(), TileEntityTachyonBombRenderer::new);
 		event.registerEntityRenderer(RREntities.GAS_GRENADE.get(), RenderGasGrenade::new);
 		event.registerEntityRenderer(RREntities.PROPULSION_FX.get(), manager -> new RenderBullet(manager, "fire"));
 		event.registerEntityRenderer(RREntities.PASSIVE_FIRE.get(), manager -> new RenderBullet(manager, "fire"));
@@ -144,35 +142,25 @@ public class RRClient {
 		event.registerEntityRenderer(RREntities.TACHYON_BOMB_BLAST.get(), RenderTachyonBombBlast::new);
         event.registerEntityRenderer(RREntities.RAYTRACE.get(), context -> new EntityRenderer<>(context) {
             @Override
-            public ResourceLocation getTextureLocation(EntityRaytrace entity) {
-                return null;
+            public boolean shouldRender(EntityRaytrace livingEntity, Frustum camera, double camX, double camY, double camZ) {
+                return false;
             }
 
             @Override
-            public boolean shouldRender(EntityRaytrace livingEntity, Frustum camera, double camX, double camY, double camZ) {
-                return false;
+            public EntityRenderState createRenderState() {
+                return new EntityRenderState();
             }
         });
 	}
 
     private static void addItemRenderer(RegisterClientExtensionsEvent event, Holder<Item> item, Supplier<DynamicItemRenderer> renderer) {
-        event.registerItem(new IClientItemExtensions() {
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return new DynamicItemRendererWrapper(renderer);
-            }
-        }, item);
     }
 
     private static void registerCustomRenderers(RegisterClientExtensionsEvent event) {
         addItemRenderer(event, RRItems.NUCLEAR_ROD, NuclearRodRenderer::new);
         addItemRenderer(event, RRItems.tesla, TeslaRenderer::new);
         addItemRenderer(event, RRItems.einsten, AstroBlasterRenderer::new);
-        addItemRenderer(event, RRItems.battery, BatteryRenderer::new);
-        addItemRenderer(event, RRItems.binoculars, BinocularsRenderer::new);
         addItemRenderer(event, RRItems.emptyrod, EmptyRodRenderer::new);
-        addItemRenderer(event, RRItems.flamethrower, FlamethrowerRenderer::new);
-        addItemRenderer(event, RRItems.fuel, GasRenderer::new);
         addItemRenderer(event, RRItems.hackm202, HackRocketLauncherRenderer::new);
         addItemRenderer(event, RRItems.hydrod, HydrogenRodRenderer::new);
         addItemRenderer(event, Holder.direct(RRBlocks.controller.asItem()), LaptopRenderer::new);
@@ -193,21 +181,30 @@ public class RRClient {
         bus.addListener(RRClient::registerRenderInformation);
         bus.addListener(RRClient::registerKeyBinding);
         bus.addListener(RRClient::registerCustomRenderers);
-        RRModelLoadingPlugin.init(bus);
+        bus.addListener(ObjModels::registerModels);
     }
 
     @OnlyIn(Dist.CLIENT)
-    private static class DynamicItemRendererWrapper extends BlockEntityWithoutLevelRenderer {
+    private static class DynamicItemRendererWrapper implements SpecialModelRenderer<ItemStack> {
         private final DynamicItemRenderer itemRenderer;
 
         public DynamicItemRendererWrapper(Supplier<DynamicItemRenderer> renderer) {
-            super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
             itemRenderer = renderer.get();
         }
 
         @Override
-        public void renderByItem(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-            itemRenderer.render(stack, displayContext, poseStack, buffer, packedLight, packedOverlay);
+        public void render(ItemStack stack, ItemDisplayContext displayContext, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, boolean p_387131_) {
+            itemRenderer.render(stack, displayContext, poseStack, bufferSource, packedLight, packedOverlay);
+        }
+
+        @Override
+        public @Nullable ItemStack extractArgument(ItemStack stack) {
+            return stack;
+        }
+
+        @Override
+        public void getExtents(Set<Vector3f> p_428206_) {
+
         }
     }
 }

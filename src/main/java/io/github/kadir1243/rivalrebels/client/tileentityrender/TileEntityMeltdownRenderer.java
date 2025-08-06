@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityMeltDown;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,25 +31,25 @@ public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntit
 	}
 
     @Override
-    public void render(TileEntityMeltDown entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        float fsize = Mth.sin(entity.size);
+    public void render(TileEntityMeltDown blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        float fsize = Mth.sin(blockEntity.size);
 		if (fsize <= 0) return;
-		matrices.pushPose();
-		matrices.translate(0.5F, 0.5F, 0.5F);
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
+		poseStack.pushPose();
+		poseStack.translate(0.5F, 0.5F, 0.5F);
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.size * 50));
 
-        ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.5f, 1, 1, 1, 0.4f);
+        ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.5f, 1, 1, 1, 0.4f);
 
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
+		poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.size * 50));
 
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.6f, 1, 1, 1, 0.4f);
+		ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.6f, 1, 1, 1, 0.4f);
 
-		matrices.popPose();
+		poseStack.popPose();
 
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.9f, 1, 1, 1, 0.4f);
+		ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.9f, 1, 1, 1, 0.4f);
 
-		matrices.popPose();
+		poseStack.popPose();
 	}
 
     @Override

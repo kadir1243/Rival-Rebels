@@ -1,11 +1,12 @@
 package io.github.kadir1243.rivalrebels.client.gui;
 
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.BombContainer;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.phys.Vec2;
@@ -20,12 +21,12 @@ public abstract class BombContainerScreen<T extends AbstractContainerMenu & Bomb
         super.renderLabels(guiGraphics, mouseX, mouseY);
         showTimer(guiGraphics);
         if (scaleName()) {
-            guiGraphics.pose().pushPose();
-            guiGraphics.pose().scale(0.666F, 0.666F, 0.666F);
+            guiGraphics.pose().pushMatrix();
+            guiGraphics.pose().scale(0.666F, 0.666F);
         }
         renderName(guiGraphics);
         if (scaleName()) {
-            guiGraphics.pose().popPose();
+            guiGraphics.pose().popMatrix();
         }
     }
 
@@ -38,7 +39,7 @@ public abstract class BombContainerScreen<T extends AbstractContainerMenu & Bomb
         } else {
             milli = "" + millis;
         }
-        graphics.drawString(font, Component.translatable(Translations.BOMB_TIMER.toLanguageKey()).append(": -" + seconds + ":" + milli), (int) getTimerPos().x, (int) getTimerPos().y, getTimerColor(), false);
+        graphics.drawString(font, Translations.BOMB_TIMER.translate().append(": -" + seconds + ":" + milli), (int) getTimerPos().x, (int) getTimerPos().y, getTimerColor(), false);
     }
 
     public abstract Vec2 getTimerPos();
@@ -62,11 +63,11 @@ public abstract class BombContainerScreen<T extends AbstractContainerMenu & Bomb
     }
 
     @Override
-    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
-        context.blit(getBackgroundTexture(), x, y, 0, 0, imageWidth, imageHeight);
+        getBackgroundTexture().blit(graphics, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
     }
 
-    public abstract ResourceLocation getBackgroundTexture();
+    public abstract RRTextures.Texture getBackgroundTexture();
 }

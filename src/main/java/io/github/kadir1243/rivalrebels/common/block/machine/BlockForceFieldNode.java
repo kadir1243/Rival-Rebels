@@ -21,9 +21,10 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -34,13 +35,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockForceFieldNode extends BaseEntityBlock {
     public static final MapCodec<BlockForceFieldNode> CODEC = simpleCodec(BlockForceFieldNode::new);
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public BlockForceFieldNode(Properties settings)
 	{
 		super(settings);
@@ -58,20 +59,20 @@ public class BlockForceFieldNode extends BaseEntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		BlockEntity te = level.getBlockEntity(pos);
 		if (te instanceof TileEntityForceFieldNode teffn && !level.isClientSide()) {
-			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.uuid == null && teffn.rrteam == RivalRebelsTeam.NONE)
+			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.owner == null && teffn.rrteam == RivalRebelsTeam.NONE)
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
 				if (teffn.rrteam == RivalRebelsTeam.NONE) {
-					teffn.uuid = player.getGameProfile().getId();
+					teffn.owner = new ResolvableProfile(player.getGameProfile());
 				}
 
                 player.playSound(RRSounds.GUI_UNKNOWN6.get());
 			}
 		}
-		return ItemInteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
     @Nullable
@@ -91,42 +92,4 @@ public class BlockForceFieldNode extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityForceFieldNode(pos, state);
 	}
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icontop1;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icontop2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icontop3;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icontop4;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (meta == 0)
-		{
-			if (side == 0 || side == 1) return icontop2;
-			if (side == 4) return icon2;
-			return icon;
-		}
-		if (side == 0 || side == 1) return meta == 3 ? icontop1 : meta == 4 ? icontop2 : meta == 2 ? icontop3 : icontop4;
-		if (side == meta) return icon2;
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon("RivalRebels:cf");
-		icon2 = iconregister.registerIcon("RivalRebels:cg");
-		icontop1 = iconregister.registerIcon("RivalRebels:cj");
-		icontop2 = iconregister.registerIcon("RivalRebels:ck");
-		icontop3 = iconregister.registerIcon("RivalRebels:cl");
-		icontop4 = iconregister.registerIcon("RivalRebels:cm");
-	}*/
 }

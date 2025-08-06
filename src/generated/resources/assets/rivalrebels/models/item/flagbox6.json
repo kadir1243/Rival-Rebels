@@ -1,3 +1,6 @@
 {
-  "parent": "rivalrebels:item/flagbox6"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rivalrebels:block/flagbox6"
+  }
 }

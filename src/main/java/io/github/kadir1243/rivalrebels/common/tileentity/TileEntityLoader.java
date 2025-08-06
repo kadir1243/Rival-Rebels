@@ -14,7 +14,6 @@ package io.github.kadir1243.rivalrebels.common.tileentity;
 import io.github.kadir1243.rivalrebels.common.container.ContainerLoader;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 
@@ -23,7 +22,6 @@ import java.util.List;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -33,6 +31,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TileEntityLoader extends BaseContainerBlockEntity implements Tickable {
 	private NonNullList<ItemStack> items = NonNullList.withSize(64, ItemStack.EMPTY);
@@ -54,17 +54,17 @@ public class TileEntityLoader extends BaseContainerBlockEntity implements Tickab
 	}
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
 
-        ContainerHelper.loadAllItems(nbt, this.items, provider);
+        ContainerHelper.loadAllItems(valueInput, this.items);
 	}
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.saveAdditional(nbt, provider);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
 
-        ContainerHelper.saveAllItems(nbt, this.items, provider);
+        ContainerHelper.saveAllItems(valueOutput, this.items);
     }
 
     @Override

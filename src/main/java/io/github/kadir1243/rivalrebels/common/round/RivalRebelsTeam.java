@@ -12,34 +12,30 @@
 package io.github.kadir1243.rivalrebels.common.round;
 
 import com.mojang.serialization.Codec;
+import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.netty.buffer.ByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.StringRepresentable;
 
 public enum RivalRebelsTeam implements StringRepresentable {
-	NONE(0),
-	OMEGA(1),
-	SIGMA(2);
+	NONE,
+	OMEGA,
+	SIGMA;
     public static final Codec<RivalRebelsTeam> CODEC = StringRepresentable.fromValues(RivalRebelsTeam::values);
     public static final StreamCodec<ByteBuf, RivalRebelsTeam> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
-
-	public final int id;
-
-	RivalRebelsTeam(int i) {
-		id = i;
-	}
 
     @Override
     public String getSerializedName() {
         return name();
     }
 
-    public static RivalRebelsTeam getForID(int i) {
-        return switch (i) {
-            case 1 -> OMEGA;
-            case 2 -> SIGMA;
-            default -> NONE;
+    public Component getBlockName() {
+        return switch (this) {
+            case NONE -> Component.literal("NONE");
+            case OMEGA -> RRBlocks.sigmaobj.get().getName();
+            case SIGMA -> RRBlocks.omegaobj.get().getName();
         };
     }
 }

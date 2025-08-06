@@ -11,18 +11,22 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.model;
 
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
+import com.mojang.math.Transformation;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.pipeline.TransformingVertexPipeline;
 import org.joml.Vector3f;
 
+import java.util.function.Supplier;
+
 @OnlyIn(Dist.CLIENT)
-public class ModelRocketLauncherHandle
-{
+public class ModelRocketLauncherHandle {
     private static final TextureFace	handleside		= new TextureFace(
 										new TextureVertice(0f / 64f, 11f / 32f),
 										new TextureVertice(0f / 64f, 18f / 32f),
@@ -81,28 +85,26 @@ public class ModelRocketLauncherHandle
 	private static final Vector3f		vbb2			= new Vector3f(20f, 0f, 2f);
 	private static final Vector3f		vbb3			= new Vector3f(20f, 0f, -2f);
 	private static final Vector3f		vbb4			= new Vector3f(8f, 0f, -2f);
+    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+        TransformingVertexPipeline scaled = new TransformingVertexPipeline(buffer, new Transformation(null, null, new Vector3f(1.3F, 1, 1), null));
 
-	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
-	{
-		matrices.pushPose();
+        // bottom
+        QuadHelper.addFace(scaled, vbt3, vbt4, vbt1, vbt2, bottombottom);
+        QuadHelper.addFace(scaled, vbb1, vbt1, vbt4, vbb4, bottomfront);
+        QuadHelper.addFace(scaled, vbb3, vbt3, vbt2, vbb2, bottomback);
+        QuadHelper.addFace(scaled, vbt2, vbb2, vbb1, vbt1, bottomside);
+        QuadHelper.addFace(scaled, vbt3, vbb3, vbb4, vbt4, bottomside);
+        QuadHelper.addFace(scaled, vbb3, vbb4, vbb1, vbb2, bottombottom);
 
-		matrices.pushPose();
-		matrices.scale(1.3F, 1, 1);
-		// bottom
-		RenderHelper.addFace(matrices, buffer, vbt3, vbt4, vbt1, vbt2, bottombottom, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbb1, vbt1, vbt4, vbb4, bottomfront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbb3, vbt3, vbt2, vbb2, bottomback, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbt2, vbb2, vbb1, vbt1, bottomside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbt3, vbb3, vbb4, vbt4, bottomside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbb3, vbb4, vbb1, vbb2, bottombottom, light, overlay);
-		matrices.popPose();
+        // handle
+        QuadHelper.addFace(buffer, vht4, vhb4, vhb1, vht1, handlefront);
+        QuadHelper.addFace(buffer, vht2, vhb2, vhb3, vht3, handlefront);
+        QuadHelper.addFace(buffer, vht1, vhb1, vhb2, vht2, handleside);
+        QuadHelper.addFace(buffer, vht3, vhb3, vhb4, vht4, handleside);
+        QuadHelper.addFace(buffer, vhb2, vhb1, vhb4, vhb3, handlebottom);
+    });
 
-		// handle
-		RenderHelper.addFace(matrices, buffer, vht4, vhb4, vhb1, vht1, handlefront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vht2, vhb2, vhb3, vht3, handlefront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vht1, vhb1, vhb2, vht2, handleside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vht3, vhb3, vhb4, vht4, handleside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vhb2, vhb1, vhb4, vhb3, handlebottom, light, overlay);
-		matrices.popPose();
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+        ModelBlockRenderer.renderModel(matrices.last(), buffer, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, light, overlay);
 	}
 }

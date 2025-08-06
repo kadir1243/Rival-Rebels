@@ -11,10 +11,10 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
-import com.mojang.blaze3d.systems.RenderSystem;
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import net.minecraft.client.gui.components.WidgetSprites;
-import net.minecraft.util.Mth;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -25,9 +25,9 @@ import net.minecraft.network.chat.Component;
 @OnlyIn(Dist.CLIENT)
 public class GuiButton extends Button {
     protected static final WidgetSprites SPRITES = new WidgetSprites(
-        RRIdentifiers.button_enabled,
-        RRIdentifiers.button_disabled,
-        RRIdentifiers.button_hovered
+        RRTextures.button_enabled,
+        RRTextures.button_disabled,
+        RRTextures.button_hovered
     );
     public GuiButton(int x, int y, int width, int height, Component message) {
         this(x, y, width, height, message, button -> {});
@@ -43,12 +43,18 @@ public class GuiButton extends Button {
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        Minecraft client = Minecraft.getInstance();
-        RenderSystem.enableBlend();
-        RenderSystem.enableDepthTest();
-        graphics.blitSprite(SPRITES.get(this.active, this.isHoveredOrFocused()), this.getX(), this.getY(), this.getWidth(), this.getHeight());
+        Minecraft minecraft = Minecraft.getInstance();
+        graphics.blitSprite(
+            RenderPipelines.GUI_TEXTURED,
+            SPRITES.get(this.active, this.isHoveredOrFocused()),
+            this.getX(),
+            this.getY(),
+            this.getWidth(),
+            this.getHeight(),
+            ARGB.white(this.alpha)
+        );
 
-        int i = getFGColor();
-        this.renderString(graphics, client.font, i | Mth.ceil(this.alpha * 255.0F) << 24);
+        int i = ARGB.color(this.alpha, getFGColor());
+        this.renderString(graphics, minecraft.font, i);
     }
 }

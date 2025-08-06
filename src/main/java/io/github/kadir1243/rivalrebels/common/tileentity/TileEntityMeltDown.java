@@ -21,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -59,7 +60,7 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable {
 
                 if (vec3.length() != 0.0D) {
                     vec3 = vec3.normalize();
-                    double var32 = net.minecraft.world.level.Explosion.getSeenPercent(Vec3.atLowerCornerOf(getBlockPos()), e);
+                    double var32 = ServerExplosion.getSeenPercent(Vec3.atLowerCornerOf(getBlockPos()), e);
                     double var34 = (1.0D - var13) * var32;
                     if (!(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityRhodes)) {
                         e.hurt(RivalRebelsDamageSource.plasmaExplosion(level), (int) ((var34 * var34 + var34) / 16.0D * fsize + 1.0D));

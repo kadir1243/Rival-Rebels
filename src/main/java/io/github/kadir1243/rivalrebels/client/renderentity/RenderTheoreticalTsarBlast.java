@@ -12,7 +12,6 @@
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import io.github.kadir1243.rivalrebels.common.entity.EntityTsarBlast;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -25,7 +24,12 @@ public class RenderTheoreticalTsarBlast extends RenderTsarBlast {
     }
 
     @Override
-    public ResourceLocation getTextureLocation(EntityTsarBlast entity) {
+    public ResourceLocation getTextureLocation(State entity) {
         return RRIdentifiers.etblacktsar;
+    }
+
+    @Override
+    public boolean shouldBeScaledToSmaller() {
+        return true;
     }
 }

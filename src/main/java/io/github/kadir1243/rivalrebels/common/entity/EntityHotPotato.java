@@ -17,8 +17,8 @@ import io.github.kadir1243.rivalrebels.common.command.CommandHotPotato;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.explosion.TsarBomba;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -27,6 +27,8 @@ import net.minecraft.world.entity.projectile.ProjectileUtil;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -100,7 +102,7 @@ public class EntityHotPotato extends ThrowableProjectile {
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < level().getMinBuildHeight()) kill();
+		if (getY() < level().getMinY()) kill((ServerLevel) level());
 
 		if (this.isPassenger())
 		{
@@ -136,18 +138,18 @@ public class EntityHotPotato extends ThrowableProjectile {
         this.reapplyPosition();
 	}
 
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-        super.addAdditionalSaveData(nbt);
-        nbt.putInt("charge", charges);
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+        valueOutput.putInt("charge", charges);
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-        super.readAdditionalSaveData(nbt);
-        charges = nbt.getInt("charge");
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+        charges = valueInput.getIntOr("charge", 0);
 		if (charges == 0) charges = RRConfig.SERVER.getTsarBombaStrength() + 9;
-		setYRot(yRotO = nbt.getFloat("rot"));
+		setYRot(yRotO = valueInput.getFloatOr("rot", 0));
 	}
 
     @Override
@@ -174,7 +176,7 @@ public class EntityHotPotato extends ThrowableProjectile {
 			tickCount = 0;
 			round = round - 1;
 			CommandHotPotato.roundinprogress = false;
-			if (round <= 0) this.kill();
+			if (round <= 0) this.kill((ServerLevel) level());
 		}
 	}
 }

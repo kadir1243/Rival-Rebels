@@ -42,14 +42,14 @@ public class BlockSupplies extends Block
 		if (level.isClientSide())
 		{
 			player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.armyshovel.get().getDescription() + ". §9(" + "Ideal for special blocks." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.armyshovel.get().getName() + ". §9(" + "Ideal for special blocks." + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.jump.get().getName() + ". §9(" + "Use at your own risk." + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.quicksand.get().getName() + ". §9(" + "Sand that is quick" + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.mario.get().getName() + ". §9(" + "For trap making." + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.loader.get().getName() + ". §9(" + "Modular item container." + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.steel.get().getName() + ". §9(" + "Climbable and blast resistant." + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.expill.get().getDescription() + ". §9(" + "Take at your own risk." + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.safepill.get().getDescription() + ". §9(" + "Restores health." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.expill.get().getName() + ". §9(" + "Take at your own risk." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.safepill.get().getName() + ". §9(" + "Restores health." + ")"), false);
 			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.breadbox.get().getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"), false);
 		}
 		if (!level.isClientSide())
@@ -68,9 +68,9 @@ public class BlockSupplies extends Block
 			if (level.random.nextInt(5) == 0)
 			{
                 Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.toStack());
-				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.asItem().getDescription() + ". §9" + "(Used in nuclear weapons)"), false);
+				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.asItem().getName() + ". §9" + "(Used in nuclear weapons)"), false);
 			}
-			return InteractionResult.sidedSuccess(level.isClientSide());
+			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.PASS;
 	}

@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
+    "facing=east": {
+      "model": "rivalrebels:block/antimatterbombblock",
+      "y": 90
+    },
+    "facing=north": {
       "model": "rivalrebels:block/antimatterbombblock"
+    },
+    "facing=south": {
+      "model": "rivalrebels:block/antimatterbombblock",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "rivalrebels:block/antimatterbombblock",
+      "y": 270
     }
   }
 }

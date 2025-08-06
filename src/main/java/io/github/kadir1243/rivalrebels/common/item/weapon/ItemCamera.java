@@ -14,18 +14,22 @@ package io.github.kadir1243.rivalrebels.common.item.weapon;
 import static org.lwjgl.glfw.GLFW.*;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorMaterials;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.item.equipment.ArmorType;
 
-public class ItemCamera extends ArmorItem
+import javax.annotation.Nullable;
+
+public class ItemCamera extends Item
 {
-	public ItemCamera() {
-		super(ArmorMaterials.CHAIN, Type.HELMET, new Properties().stacksTo(1));
+	public ItemCamera(Properties properties) {
+		super(properties.equippable(EquipmentSlot.HEAD).humanoidArmor(ArmorMaterials.CHAINMAIL, ArmorType.HELMET));
 	}
 
 	float	zoom		= 30f;
@@ -36,11 +40,11 @@ public class ItemCamera extends ArmorItem
 	public static boolean zoomed = false;
 
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (entity instanceof LivingEntity living) {
-            ItemStack equippedStack = living.getItemBySlot(getEquipmentSlot());
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+        if (entity instanceof Player player) {//FIXME
+            ItemStack equippedStack = player.getItemBySlot(slot);
             if (equippedStack == stack) {
-                if (world.isClientSide()) {
+                if (level.isClientSide()) {
                     Minecraft client = Minecraft.getInstance();
                     if (entity == client.player) {
                         boolean key = glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_B) == GLFW_PRESS && client.screen == null;

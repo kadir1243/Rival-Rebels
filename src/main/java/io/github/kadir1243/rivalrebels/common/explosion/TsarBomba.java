@@ -18,6 +18,7 @@ import io.github.kadir1243.rivalrebels.common.block.trap.BlockPetrifiedStone;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import io.github.kadir1243.rivalrebels.common.entity.EntityTsarBlast;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -55,7 +56,7 @@ public class TsarBomba
 		if (world.isClientSide()) return;
 		int clamprad = radius; //Mth.clamp(radius, radiussmaller, 50);
 
-        BlockPos.betweenClosedStream(-clamprad, world.getMinBuildHeight(), -clamprad, clamprad, posY + 70, clamprad)
+        BlockPos.betweenClosedStream(-clamprad, world.getMinY(), -clamprad, clamprad, posY + 70, clamprad)
             .map(BlockPos::immutable)
             .filter(blockPos -> Vec3.atLowerCornerOf(blockPos).horizontalDistanceSqr() < radius * radius)
             .map(pos -> pos.offset(x, 0, z))
@@ -94,7 +95,7 @@ public class TsarBomba
 		else
 		{
 			tsarblast.bomb = null;
-			tsarblast.kill();
+			tsarblast.kill((ServerLevel) world);
 		}
 	}
 
@@ -108,7 +109,7 @@ public class TsarBomba
 			int ylimit = Mth.floor(yele - ((radius - dist) / 2) + (Math.sin(dist * 0.5) * 1.15));
 
 			for (int Y = y; Y > ylimit; Y--) {
-				if (Y == world.getMinBuildHeight()) break;
+				if (Y == world.getMinY()) break;
                 BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
                 BlockState state = world.getBlockState(pos);
 				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
@@ -129,7 +130,7 @@ public class TsarBomba
 				metadata++;
 				if (metadata > 15) metadata = 15;
 				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--) {
-					if (Y == world.getMinBuildHeight()) break;
+					if (Y == world.getMinY()) break;
                     BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
                     BlockState state = world.getBlockState(pos);
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
@@ -148,7 +149,7 @@ public class TsarBomba
 				metadata++;
 				if (metadata > 15) metadata = 15;
 				for (int Y = ylimit; Y > ylimit - treeHeight; Y--) {
-					if (Y == world.getMinBuildHeight()) break;
+					if (Y == world.getMinY()) break;
 					world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), RRBlocks.petrifiedwood.get().defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 				}
 			}
@@ -166,7 +167,7 @@ public class TsarBomba
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y >= world.getMinBuildHeight(); Y--) {
+				for (int Y = ylimit; Y >= world.getMinY(); Y--) {
 					int yy = Y + y;
 					BlockState state = world.getBlockState(new BlockPos(x + posX, yy, z + posZ));
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
@@ -212,9 +213,9 @@ public class TsarBomba
 
 	private int getTopBlock(int x, int z, double dist)
 	{
-		int foundY = world.getMinBuildHeight();
+		int foundY = world.getMinY();
 		boolean found = false;
-		for (int y = world.getMaxBuildHeight(); y > world.getMinBuildHeight(); y--)
+		for (int y = world.getMaxY(); y > world.getMinY(); y--)
 		{
             BlockPos pos = new BlockPos(x, y, z);
             BlockState state = world.getBlockState(pos);

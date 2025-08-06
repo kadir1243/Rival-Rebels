@@ -10,6 +10,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 
 public class RoddiskBase extends Projectile {
     public RoddiskBase(EntityType<? extends RoddiskBase> type, Level world) {
@@ -24,7 +25,7 @@ public class RoddiskBase extends Projectile {
 
     public RoddiskBase(EntityType<? extends RoddiskBase> type, Level world, Entity shooter, float speed) {
         this(type, world, shooter);
-        this.moveTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
+        this.snapTo(shooter.getEyePosition(), shooter.getYRot(), shooter.getXRot());
         setPos(getX() - (Mth.cos(this.getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             getY() - 0.1,
             getZ() - (Mth.sin(this.getYRot() * Mth.DEG_TO_RAD) * 0.16F)
@@ -34,7 +35,7 @@ public class RoddiskBase extends Projectile {
     }
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canBeCollidedWith(@Nullable Entity p_423659_) {
         return isAlive();
     }
 

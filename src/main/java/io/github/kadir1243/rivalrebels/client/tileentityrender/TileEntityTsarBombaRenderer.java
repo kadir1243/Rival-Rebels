@@ -12,15 +12,14 @@
 package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
 import io.github.kadir1243.rivalrebels.client.model.ModelTsarBomba;
-import io.github.kadir1243.rivalrebels.common.block.trap.BlockTsarBomba;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityTsarBomba;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
@@ -30,14 +29,12 @@ public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEnti
     }
 
     @Override
-    public void render(TileEntityTsarBomba entity, float tickDelta, PoseStack pose, MultiBufferSource vertexConsumers, int light, int overlay) {
-        pose.pushPose();
-        pose.translate(0.5F, 1F, 0.5F);
-        Direction facing = entity.getBlockState().getValue(BlockTsarBomba.FACING);
+    public void render(TileEntityTsarBomba blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        poseStack.pushPose();
+        poseStack.translate(0.5F, 1F, 0.5F);
 
-        pose.mulPose(facing.getRotation());
-        ModelTsarBomba.render(pose, vertexConsumers, light, overlay);
-        pose.popPose();
+        ModelTsarBomba.render(poseStack, bufferSource, packedLight, packedOverlay);
+        poseStack.popPose();
     }
 
     @Override

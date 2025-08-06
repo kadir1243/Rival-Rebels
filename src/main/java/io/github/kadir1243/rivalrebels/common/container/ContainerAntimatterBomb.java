@@ -75,36 +75,28 @@ public class ContainerAntimatterBomb extends AbstractContainerMenu implements Bo
 	}
 
     @Override
-    public ItemStack quickMoveStack(Player player, int slot) {
+    public ItemStack quickMoveStack(Player player, int index) {
 		ItemStack itemStack = ItemStack.EMPTY;
-		Slot var4 = this.getSlot(slot);
+		Slot slot = this.getSlot(index);
 
-		if (var4 != null && var4.hasItem())
-		{
-			ItemStack var5 = var4.getItem();
-			itemStack = var5.copy();
+        if (slot != null && slot.hasItem()) {
+            ItemStack var5 = slot.getItem();
+            itemStack = var5.copy();
 
-			if (slot <= 19)
-			{
-				if (!this.moveItemStackTo(var5, 19, this.slots.size(), true))
-				{
-					return ItemStack.EMPTY;
-				}
-			}
-			else if (!this.moveItemStackTo(var5, 0, 19, false))
-			{
-				return ItemStack.EMPTY;
-			}
+            if (index <= 19) {
+                if (!this.moveItemStackTo(var5, 19, this.slots.size(), true)) {
+                    return ItemStack.EMPTY;
+                }
+            } else if (!this.moveItemStackTo(var5, 0, 19, false)) {
+                return ItemStack.EMPTY;
+            }
 
-			if (var5.isEmpty())
-			{
-				var4.setByPlayer(ItemStack.EMPTY);
-			}
-			else
-			{
-				var4.setChanged();
-			}
-		}
+            if (var5.isEmpty()) {
+                slot.setByPlayer(ItemStack.EMPTY);
+            } else {
+                slot.setChanged();
+            }
+        }
 
 		return itemStack;
 	}

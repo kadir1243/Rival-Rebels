@@ -5,36 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 public class RRIdentifiers {
     public static final String MODID = "rivalrebels";
 
-    public static final ResourceLocation guitrivalrebels = create("textures/gui/h.png");
-    public static final ResourceLocation guitbutton = create("textures/gui/camo2_layer_1.png");
-    public static final ResourceLocation button_disabled = create("textures/gui/button_disabled.png");
-    public static final ResourceLocation button_enabled = create("textures/gui/button_enabled.png");
-    public static final ResourceLocation button_hovered = create("textures/gui/button_hovered.png");
-    public static final ResourceLocation guitspawn = create("textures/gui/b.png");
-    public static final ResourceLocation guitclass = create("textures/gui/c.png");
-    public static final ResourceLocation guitrebel = create("textures/gui/d.png");
-    public static final ResourceLocation guitnuker = create("textures/gui/e.png");
-    public static final ResourceLocation guitintel = create("textures/gui/f.png");
-    public static final ResourceLocation guithacker = create("textures/gui/g.png");
-    public static final ResourceLocation guitnuke = create("textures/gui/j.png");
-    public static final ResourceLocation guittsar = create("textures/gui/k.png");
-    public static final ResourceLocation guitwarning0 = create("textures/gui/l.png");
-    public static final ResourceLocation guitwarning1 = create("textures/gui/m.png");
-    public static final ResourceLocation guitloader = create("textures/gui/i.png");
-    public static final ResourceLocation guittokamak = create("textures/gui/n.png");
-    public static final ResourceLocation guibinoculars = create("textures/gui/troll_layer_1.png");
-    public static final ResourceLocation guibinocularsoverlay = create("textures/gui/p.png");
-    public static final ResourceLocation guilaptopnuke = create("textures/gui/q.png");
-    public static final ResourceLocation guitesla = create("textures/gui/r.png");
-    public static final ResourceLocation guitray = create("textures/gui/s.png");
-    public static final ResourceLocation guiflamethrower = create("textures/gui/u.png");
-    public static final ResourceLocation guirhodesline = create("textures/gui/rhodes-gui_line.png");
-    public static final ResourceLocation guirhodesout = create("textures/gui/rhodes-gui_out.png");
-    public static final ResourceLocation guirhodeshelp = create("textures/gui/rhodes-gui_help.png");
-    public static final ResourceLocation guicarpet = create("textures/gui/v.png");
-    public static final ResourceLocation guitheoreticaltsar = create("textures/gui/w.png");
-    public static final ResourceLocation guitantimatterbomb = create("textures/gui/x.png");
-    public static final ResourceLocation guitachyonbomb = create("textures/gui/y.png");
     public static final ResourceLocation etdisk0 = create("textures/entity/ba.png");
     public static final ResourceLocation etdisk1 = create("textures/entity/bb.png");
     public static final ResourceLocation etdisk2 = create("textures/entity/bc.png");
@@ -117,4 +87,7 @@ public class RRIdentifiers {
         return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
+    public static ResourceLocation getModelLocation(String model) {
+        return create(model).withPrefix("models/").withSuffix(".obj");
+    }
 }

@@ -11,6 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.round;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.RivalRebels;
@@ -22,16 +24,13 @@ import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.packet.GuiSpawnPacket;
 import com.mojang.datafixers.util.Function9;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.world.level.saveddata.SavedDataType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtOps;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.numbers.StyledFormat;
@@ -69,7 +68,6 @@ import java.util.List;
 import java.util.function.Function;
 
 public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
-    private static final SavedData.Factory<RivalRebelsRound> WORLD_DATA_TYPE = new SavedData.Factory<>(RivalRebelsRound::new, RivalRebelsRound::fromNbt, null);
     public static final StreamCodec<FriendlyByteBuf, RivalRebelsRound> STREAM_CODEC = composite(
         ByteBufCodecs.BOOL,
         rivalRebelsRound -> rivalRebelsRound.roundstarted,
@@ -91,6 +89,20 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         rivalRebelsRound -> rivalRebelsRound.rrplayerlist,
         RivalRebelsRound::new
     );
+    public static final Codec<RivalRebelsRound> CODEC = RecordCodecBuilder.create(
+        instance ->
+            instance.group(Codec.BOOL.fieldOf("roundstarted").forGetter(rivalRebelsRound -> rivalRebelsRound.roundstarted),
+                    BlockPos.CODEC.fieldOf("cSpawn").forGetter(rivalRebelsRound -> rivalRebelsRound.cSpawn),
+                    TeamData.CODEC.fieldOf("omegaData").forGetter(rivalRebelsRound -> rivalRebelsRound.omegaData),
+                    TeamData.CODEC.fieldOf("sigmaData").forGetter(rivalRebelsRound -> rivalRebelsRound.sigmaData),
+                    Codec.INT.fieldOf("winCountdown").forGetter(rivalRebelsRound -> rivalRebelsRound.winCountdown),
+                    RivalRebelsTeam.CODEC.fieldOf("lastWinnerTeam").forGetter(rivalRebelsRound -> rivalRebelsRound.lastWinnerTeam),
+                    Codec.BOOL.fieldOf("fatnuke").forGetter(rivalRebelsRound -> rivalRebelsRound.fatnuke),
+                    Codec.STRING.fieldOf("motd").forGetter(RivalRebelsRound::getMotD),
+                    RivalRebelsPlayerList.CODEC.fieldOf("rrplayerlist").forGetter(rivalRebelsRound -> rivalRebelsRound.rrplayerlist))
+                .apply(instance, RivalRebelsRound::new)
+    );
+    private static final SavedDataType<RivalRebelsRound> WORLD_DATA_TYPE = new SavedDataType<>("rivalrebelsgamedata", RivalRebelsRound::new, CODEC);
     public static final Type<RivalRebelsRound> PACKET_TYPE = new Type<>(RRIdentifiers.create("rivalrebelsrounddata"));
     public BlockPos cSpawn;
     public TeamData omegaData;
@@ -253,37 +265,9 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         }
     }
 
-    public static RivalRebelsRound fromNbt(CompoundTag nbt, HolderLookup.Provider registries) {
-        RivalRebelsRound packet = new RivalRebelsRound();
-        packet.roundstarted = nbt.getBoolean("roundstarted");
-        packet.cSpawn = BlockPos.of(nbt.getLong("cSpawn"));
-        packet.omegaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("omega_data")).map(Pair::getFirst).getOrThrow();
-        packet.sigmaData = TeamData.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("sigma_data")).map(Pair::getFirst).getOrThrow();
-        packet.winCountdown = nbt.getInt("winCountdown");
-        packet.lastWinnerTeam = RivalRebelsTeam.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("lastWinTeam")).map(Pair::getFirst).getOrThrow();
-        packet.fatnuke = nbt.getBoolean("fatnuke");
-        packet.MotD = nbt.getString("MotD");
-        packet.rrplayerlist = RivalRebelsPlayerList.CODEC.decode(NbtOps.INSTANCE, nbt.getCompound("rrplayerlist")).map(Pair::getFirst).getOrThrow();
-        return packet;
-    }
-
     @Override
     public Type<? extends CustomPacketPayload> type() {
         return PACKET_TYPE;
-    }
-
-    @Override
-    public CompoundTag save(CompoundTag tag, HolderLookup.Provider registries) {
-        tag.putBoolean("roundstarted", roundstarted);
-        tag.putLong("cSpawn", cSpawn.asLong());
-        tag.put("omega_data", TeamData.CODEC.encode(omegaData, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
-        tag.put("sigma_data", TeamData.CODEC.encode(sigmaData, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
-        tag.putInt("winCountdown", winCountdown);
-        tag.put("lastWinTeam", RivalRebelsTeam.CODEC.encode(lastWinnerTeam, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
-        tag.putBoolean("fatnuke", fatnuke);
-        tag.putString("MotD", MotD);
-        tag.put("rrplayerlist", RivalRebelsPlayerList.CODEC.encode(rrplayerlist, NbtOps.INSTANCE, new CompoundTag()).getOrThrow());
-        return tag;
     }
 
     public static void onMessage(RivalRebelsRound m, IPayloadContext context) {
@@ -443,7 +427,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 		else if (winCountdown == 1200) { //open winner gui
             if (lastWinnerTeam == RivalRebelsTeam.OMEGA) minecraft.setScreen(new GuiOmegaWin());
             else if (lastWinnerTeam == RivalRebelsTeam.SIGMA) minecraft.setScreen(new GuiSigmaWin());
-            else minecraft.player.sendSystemMessage(Component.literal("Error No Winner ?").withStyle(ChatFormatting.RED));
+            else minecraft.player.displayClientMessage(Component.literal("Error No Winner ?").withStyle(ChatFormatting.RED), false);
         }
 	}
 
@@ -474,14 +458,14 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         } catch(Exception ignored) {} //just in case teams already exist etc
 
         if (world.isClientSide()) return;
-        this.world.getGameRules().getRule(GameRules.RULE_KEEPINVENTORY).set(true, world.getServer());
-        ((ServerLevel) world).getDataStorage().get(WORLD_DATA_TYPE, "rivalrebelsgamedata");
+        ((ServerLevel) this.world).getGameRules().getRule(GameRules.RULE_KEEPINVENTORY).set(true, world.getServer());
+        ((ServerLevel) world).getDataStorage().get(WORLD_DATA_TYPE);
     }
 
     public void save(Level world) {
         this.world = world;
         if (world.isClientSide()) return;
-        ((ServerLevel) world).getDataStorage().set("rivalrebelsgamedata", this);
+        ((ServerLevel) world).getDataStorage().set(WORLD_DATA_TYPE, this);
 	}
 
 	private void buildSpawn()
@@ -507,7 +491,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         sigmaData.objPos = new BlockPos(cSpawn.getX() - objDist, sigmaData.objPos().getY(), cSpawn.getZ());
 
 		ChunkAccess chunk = world.getChunk(omegaData.objPos());
-        for (omegaData.objPos = new BlockPos(omegaData.objPos().getX(), chunk.getHighestFilledSectionIndex() + 15, omegaData.objPos().getZ()); omegaData.objPos().getY() > world.getMinBuildHeight(); omegaData.objPos().below())
+        for (omegaData.objPos = new BlockPos(omegaData.objPos().getX(), chunk.getHighestFilledSectionIndex() + 15, omegaData.objPos().getZ()); omegaData.objPos().getY() > world.getMinY(); omegaData.objPos().below())
         {
             if (!chunk.getBlockState(omegaData.objPos()).isAir())
             {
@@ -516,7 +500,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         }
         chunk = world.getChunk(sigmaData.objPos());
         sigmaData.objPos = new BlockPos(sigmaData.objPos().getX(), chunk.getHighestFilledSectionIndex() + 15, sigmaData.objPos().getZ());
-        for (; sigmaData.objPos().getY() > world.getMinBuildHeight(); sigmaData.objPos = sigmaData.objPos().below())
+        for (; sigmaData.objPos().getY() > world.getMinY(); sigmaData.objPos = sigmaData.objPos().below())
         {
             if (!chunk.getBlockState(sigmaData.objPos()).isAir())
             {

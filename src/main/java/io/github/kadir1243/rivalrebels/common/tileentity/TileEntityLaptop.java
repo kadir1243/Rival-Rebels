@@ -35,6 +35,8 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickable {
@@ -57,21 +59,21 @@ public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickab
 	}
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
 
-        ContainerHelper.loadAllItems(nbt, this.items, provider);
-		b2spirit = nbt.getInt("b2spirit");
-		b2carpet = nbt.getInt("b2carpet");
+        ContainerHelper.loadAllItems(valueInput, this.items);
+		b2spirit = valueInput.getIntOr("b2spirit", 0);
+		b2carpet = valueInput.getIntOr("b2carpet", 0);
 	}
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.saveAdditional(nbt, provider);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
 
-        ContainerHelper.saveAllItems(nbt, this.items, provider);
-		nbt.putInt("b2spirit", b2spirit);
-		nbt.putInt("b2carpet", b2carpet);
+        ContainerHelper.saveAllItems(valueOutput, this.items);
+		valueOutput.putInt("b2spirit", b2spirit);
+		valueOutput.putInt("b2carpet", b2carpet);
     }
 
     @Override
@@ -134,9 +136,7 @@ public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickab
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag nbt = new CompoundTag();
-        saveAdditional(nbt, registries);
-        return nbt;
+        return this.saveWithoutMetadata(registries);
     }
 
     @Override

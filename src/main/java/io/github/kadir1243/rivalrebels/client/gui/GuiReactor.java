@@ -11,25 +11,24 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiCustomButton;
 import io.github.kadir1243.rivalrebels.client.guihelper.ReactorConnectedMachinesList;
-import io.github.kadir1243.rivalrebels.client.guihelper.Rectangle;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReactor;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsSimplexNoise;
 import io.github.kadir1243.rivalrebels.common.packet.ReactorMachinesPacket;
 import io.github.kadir1243.rivalrebels.common.packet.ReactorStatePacket;
-import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
@@ -67,10 +66,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
         super.init();
 		int posX = (this.width - 256) / 2;
 		int posY = (this.height - 256) / 2;
-		power = new GuiCustomButton(new Rectangle(posX + 70, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(212, 0), true, button -> {
+		power = new GuiCustomButton(new ScreenRectangle(posX + 70, posY + 164, 22, 22), RRTextures.guittokamak, new Vector2i(212, 0), true, button -> {
             Minecraft.getInstance().getConnection().send(new ReactorStatePacket(menu.getPos(), ReactorStatePacket.Type.TOGGLE_ON));
         });
-		eject = new GuiCustomButton(new Rectangle(posX + 164, posY + 164, 22, 22), RRIdentifiers.guittokamak, new Vector2i(234, 0), false, button -> {
+		eject = new GuiCustomButton(new ScreenRectangle(posX + 164, posY + 164, 22, 22), RRTextures.guittokamak, new Vector2i(234, 0), false, button -> {
             Minecraft.getInstance().getConnection().send(new ReactorStatePacket(menu.getPos(), ReactorStatePacket.Type.EJECT_CORE));
         });
 		power.isPressed = menu.isOn();
@@ -85,18 +84,17 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 	}
 
     @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
-        PoseStack matrices = context.pose();
-        matrices.pushPose();
-		matrices.scale(1.25f, 1f, 1f);
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        graphics.pose().pushMatrix();
+        graphics.pose().scale(1.25f, 1f);
 
         menu.core.locked = menu.isOn();
         menu.fuel.locked = menu.fuel.hasItem() && menu.isOn();
 
-		context.drawString(font, "ToKaMaK", 10, 8, 0x444444, false);
-		matrices.popPose();
-        context.drawString(font, "Teslas: " + df.format(menu.getPower() - menu.getConsumed()), 120, 8, 0xffffff, false);
-        context.drawString(font, "Output/t: " + df.format(menu.getLastTickConsumed()), 140, 18, 0xffffff, false);
+		graphics.drawString(font, "ToKaMaK", 10, 8, 0x444444, false);
+        graphics.pose().popMatrix();
+        graphics.drawString(font, "Teslas: " + df.format(menu.getPower() - menu.getConsumed()), 120, 8, 0xffffff, false);
+        graphics.drawString(font, "Output/t: " + df.format(menu.getLastTickConsumed()), 140, 18, 0xffffff, false);
 	}
 
     @Override
@@ -107,7 +105,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-		context.blit(RRIdentifiers.guittokamak, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208);
+        RRTextures.guittokamak.blit(context, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208, CommonColors.WHITE);
 
 		long time = System.currentTimeMillis();
 		// 1f, 1f, 1f, 0.7f, 0f, 1f, HYDROGEN
@@ -166,10 +164,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
      * @param sscale     Noise Scale
      */
     protected void drawNoiseSphere(GuiGraphics graphics, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
-        Tesselator t = Tesselator.getInstance();
-        BufferBuilder buffer = t.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
-        PoseStack matrices = graphics.pose();
-        matrices.pushPose();
+        graphics.pose().pushMatrix();
         float pointSize = (float) (minecraft.getWindow().getGuiScale() / resolution);
         radius *= resolution;
         int outerR = (int) (radius + (outer * resolution));
@@ -194,7 +189,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
                         a /= 2;
                     }
                     v *= 1f - (fdist - radius) / maxdist;
-                    drawPoint(graphics, buffer, pointSize, X, Y, 4, FastColor.ARGB32.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
+                    drawPoint(graphics, pointSize, X, Y, 4, ARGB.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
                 } else {
                     float Z = Mth.sqrt(rradius - ys) / resolution;
                     float v = startcol;
@@ -207,35 +202,26 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
                     }
 
 
-                    drawPoint(graphics, buffer, pointSize, X, Y, 4, FastColor.ARGB32.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
+                    drawPoint(graphics, pointSize, X, Y, 4, ARGB.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
                 }
             }
         }
-        BufferUploader.drawWithShader(buffer.buildOrThrow());
-        matrices.popPose();
+        graphics.pose().popMatrix();
     }
 
-    private static void drawPoint(GuiGraphics graphics, VertexConsumer buffer, float pointSize, float x, float y, float z, int color) {
-        PoseStack pose = graphics.pose();
+    private static void drawPoint(GuiGraphics graphics, float pointSize, float x, float y, float z, int color) {
         float halfSize = pointSize / 2.0f;
 
         // I don't really know what is rendering, so I just tried to create points from quads
-        buffer.addVertex(pose.last(), x - halfSize, y - halfSize, z).setColor(color); // Bottom-left
-        buffer.addVertex(pose.last(), x + halfSize, y - halfSize, z).setColor(color); // Bottom-right
-        buffer.addVertex(pose.last(), x + halfSize, y + halfSize, z).setColor(color); // Top-right
-        buffer.addVertex(pose.last(), x - halfSize, y + halfSize, z).setColor(color); // Top-left
+        graphics.fill((int) (x - halfSize), (int) (y - halfSize), (int) (x + halfSize), (int) (y + halfSize), color);
     }
 
-	protected float lerp(float delta, float start, float end) {
+	protected static float lerp(float delta, float start, float end) {
         return start * (1 - end) + delta * end;
 	}
 
 	protected void drawInfographic(GuiGraphics graphics, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {
-        PoseStack pose = graphics.pose();
-        Tesselator t = Tesselator.getInstance();
-        pose.pushPose();
         float pointSize = 4 / resolution;
-        BufferBuilder buffer = t.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
         radius *= resolution;
 		sep *= resolution;
 		width1 *= resolution;
@@ -263,18 +249,18 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
                     int color;
                     if (angle <= outerRatio) {
 						if (angle <= innerRatio1) {
-							color = FastColor.ARGB32.colorFromFloat(0.25f, 0.25f, 1, 1);
+							color = ARGB.colorFromFloat(0.25f, 0.25f, 1, 1);
 						} else {
-                            color = FastColor.ARGB32.colorFromFloat(0.75f, 0.75f, 1, 1);
+                            color = ARGB.colorFromFloat(0.75f, 0.75f, 1, 1);
 						}
 					} else {
 						if (angle <= innerRatio2) {
-                            color = FastColor.ARGB32.colorFromFloat(1, 0.25f, 0.25f, 1);
+                            color = ARGB.colorFromFloat(1, 0.25f, 0.25f, 1);
 						} else {
-                            color = FastColor.ARGB32.colorFromFloat(1, 0.75f, 0.75f, 1);
+                            color = ARGB.colorFromFloat(1, 0.75f, 0.75f, 1);
 						}
 					}
-                    drawPoint(graphics, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
+                    drawPoint(graphics, pointSize, hwidth + X, hheight + Y - 45, 4, color);
 				} else if (fdist >= midR2 && fdist < outerR) {
 					float Y = y / resolution;
 					float angle = (float) (Mth.PI + Mth.atan2(X, Y));
@@ -284,12 +270,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 					} else {
                         color = CommonColors.RED;
 					}
-                    drawPoint(graphics, buffer, pointSize, hwidth + X, hheight + Y - 45, 4, color);
+                    drawPoint(graphics, pointSize, hwidth + X, hheight + Y - 45, 4, color);
 				}
 			}
 		}
-        BufferUploader.drawWithShader(buffer.buildOrThrow());
-		pose.popPose();
 	}
 
     @Override

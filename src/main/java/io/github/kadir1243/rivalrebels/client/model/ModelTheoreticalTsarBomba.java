@@ -19,6 +19,7 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -40,7 +41,7 @@ public class ModelTheoreticalTsarBomba {
         matrices.pushPose();
         matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         matrices.pushPose();
-        VertexConsumer tsarShell1TextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettheoreticaltsarshell1));
+        VertexConsumer tsarShell1TextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ettheoreticaltsarshell1));
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
             matrices.mulPose(Axis.YP.rotationDegrees(add * i));
@@ -56,7 +57,7 @@ public class ModelTheoreticalTsarBomba {
             }
             matrices.popPose();
         }
-        VertexConsumer tsarShell2TextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettheoreticaltsarshell2));
+        VertexConsumer tsarShell2TextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ettheoreticaltsarshell2));
         for (float i = 0; i < segments; i++) {
             matrices.pushPose();
             matrices.mulPose(Axis.YP.rotationDegrees(add * i));
@@ -75,7 +76,7 @@ public class ModelTheoreticalTsarBomba {
         }
         matrices.popPose();
 
-        VertexConsumer tsarFinsTextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettsarfins));
+        VertexConsumer tsarFinsTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ettsarfins));
 
         matrices.pushPose();
 

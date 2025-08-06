@@ -15,10 +15,14 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.core.Vec3i;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelAstroBlasterBody {
@@ -40,7 +44,7 @@ public class ModelAstroBlasterBody {
 
 	public static void render(PoseStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
 		matrices.pushPose();
-        int color = FastColor.ARGB32.colorFromFloat(alpha, red, green, blue);
+        int color = ARGB.colorFromFloat(alpha, red, green, blue);
 
 		matrices.scale(size, size, size);
         for (int p = 0; p < 4; p++) {
@@ -66,6 +70,57 @@ public class ModelAstroBlasterBody {
 
 			matrices.popPose();
 		}
+
 		matrices.popPose();
 	}
+
+    public static void main(String[] args) {
+        StringBuilder buffer = new StringBuilder();
+        PoseStack matrices = new PoseStack();
+        for (int p = 0; p < 4; p++) {
+            matrices.pushPose();
+            matrices.mulPose(Axis.YP.rotationDegrees(p * 90));
+
+            log(matrices, buffer, vy, vy1, vy3);
+            log(matrices, buffer, vy1, vyz, vy2);
+            log(matrices, buffer, vy3, vy2, vxy);
+            log(matrices, buffer, vy1, vy2, vy3);
+            log(matrices, buffer, vx, vx1, vx3);
+            log(matrices, buffer, vx1, vxy, vx2);
+            log(matrices, buffer, vx3, vx2, vxz);
+            log(matrices, buffer, vx1, vx2, vx3);
+            log(matrices, buffer, vz, vz1, vz3);
+            log(matrices, buffer, vz1, vxz, vz2);
+            log(matrices, buffer, vz3, vz2, vyz);
+            log(matrices, buffer, vz1, vz2, vz3);
+            log(matrices, buffer, vyz, vz2, vy2);
+            log(matrices, buffer, vxy, vy2, vx2);
+            log(matrices, buffer, vxz, vx2, vz2);
+            log(matrices, buffer, vx2, vy2, vz2);
+
+            matrices.popPose();
+        }
+        buffer.append("\n");
+        for (Vec3i face : faces) {
+            buffer.append("f ").append(face.getX()).append(" ").append(face.getY()).append(" ").append(face.getZ()).append("\n");
+        }
+        System.out.println(buffer);
+    }
+
+    private static int vertexNum;
+    private static final List<Vec3i> faces = new ArrayList<>();
+
+    private static void log(PoseStack poseStack, StringBuilder buffer, Vector3f a, Vector3f b, Vector3f c) {
+        log(poseStack, buffer, a);
+        log(poseStack, buffer, b);
+        log(poseStack, buffer, c);
+
+        faces.add(new Vec3i(vertexNum - 2, vertexNum - 1, vertexNum));
+    }
+
+    private static void log(PoseStack poseStack, StringBuilder buffer, Vector3f a) {
+        a = poseStack.last().pose().transformPosition(a, new Vector3f());
+        buffer.append("v ").append(a.x).append(" ").append(a.y).append(" ").append(a.z).append("\n");
+        vertexNum++;
+    }
 }

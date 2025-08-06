@@ -13,7 +13,6 @@ package io.github.kadir1243.rivalrebels.common.item.weapon;
 
 import io.github.kadir1243.rivalrebels.RRClient;
 import io.github.kadir1243.rivalrebels.RRConfig;
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.gui.GuiFlameThrower;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.entity.EntityFlameBall;
@@ -25,32 +24,33 @@ import io.github.kadir1243.rivalrebels.common.item.components.FlameThrowerMode;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemFlameThrower extends TieredItem {
-	public static final ResourceLocation OUT_OF_FUEL = RRIdentifiers.create("out_of_fuel");
-    public ItemFlameThrower() {
-		super(Tiers.DIAMOND, new Properties().stacksTo(1).component(RRComponents.FLAME_THROWER_MODE, FlameThrowerMode.DEFAULT));
+public class ItemFlameThrower extends Item {
+	public static final Translations.TranslationKey OUT_OF_FUEL = new Translations.TranslationKey("out_of_fuel");
+    public ItemFlameThrower(Properties properties) {
+		super(properties);
 	}
 
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-		return UseAnim.BOW;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+		return ItemUseAnimation.BOW;
 	}
 
     @Override
@@ -59,7 +59,7 @@ public class ItemFlameThrower extends TieredItem {
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(user, RRItems.fuel.asItem());
@@ -79,22 +79,22 @@ public class ItemFlameThrower extends TieredItem {
 				world.addFreshEntity(new EntityFlameBallGreen(world, user, world.random.nextFloat() + 1.0f));
 			}
 		} else {
-			user.displayClientMessage(Component.translatable(OUT_OF_FUEL.toLanguageKey()).withStyle(ChatFormatting.RED), false);
+			user.displayClientMessage(OUT_OF_FUEL.translate().withStyle(ChatFormatting.RED), false);
 		}
 		if (message) {
 			user.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
-		return InteractionResultHolder.pass(stack);
+		return InteractionResult.PASS;
 	}
 	boolean message = true;
 
     @Override
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
 		if (!world.isClientSide()) {
-            if (world.random.nextInt(10) == 0 && !user.isInWaterOrBubble()) {
+            if (world.random.nextInt(10) == 0 && !user.isInWater()) {
                 user.playSound(RRSounds.FLAME_THROWER_USE.get(), 0.03f, 1F);
-                if (world.random.nextInt(3) == 0 && !user.isInWaterOrBubble()) {
+                if (world.random.nextInt(3) == 0 && !user.isInWater()) {
                     user.playSound(RRSounds.FLAME_THROWER_EXTINGUISH.get(), 0.1F, 1F);
                 }
             }
@@ -116,13 +116,13 @@ public class ItemFlameThrower extends TieredItem {
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
 		if (entity instanceof Player) {
-            if (selected && world.random.nextInt(10) == 0 && !entity.isInWaterOrBubble()) {
+            if (slot != null && level.random.nextInt(10) == 0 && !entity.isInWater()) {
                 entity.playSound(RRSounds.FLAME_THROWER_USE.get(), 0.03f, 1F);
             }
         }
-        if (world.isClientSide()) {
+        if (level.isClientSide()) {
             openGui(stack);
         }
 	}

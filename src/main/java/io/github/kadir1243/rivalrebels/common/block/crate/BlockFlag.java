@@ -14,10 +14,11 @@ package io.github.kadir1243.rivalrebels.common.block.crate;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
+import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.Mirror;
@@ -232,11 +233,9 @@ public class BlockFlag extends Block {
     }
 
     @Override
-    public BlockState updateShape(
-        BlockState state, Direction direction, BlockState neighborState, LevelAccessor world, BlockPos pos, BlockPos neighborPos
-    ) {
+    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
         if (direction == Direction.DOWN) {
-            return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
+            return super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random);
         } else {
             BlockState blockstate = this.getPlacementShape(state, world, pos);
             return !this.hasAdjacentBlocks(blockstate) ? Blocks.AIR.defaultBlockState() : blockstate;

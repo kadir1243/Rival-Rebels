@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReciever;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -75,13 +76,13 @@ public class EntityFlameBall extends FlameBallProjectile {
 	public void tick() {
 		super.tick();
 		if (tickCount % 3 == 0) sequence++;
-		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
+		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill((ServerLevel) level());
 
 		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
 		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5) {
 			fire();
-			kill();
+            kill((ServerLevel) level());
 			if (hitResult.getType() == HitResult.Type.ENTITY) {
                 Entity hitEntity = ((EntityHitResult) hitResult).getEntity();
                 hitEntity.igniteForSeconds(3);
@@ -97,7 +98,7 @@ public class EntityFlameBall extends FlameBallProjectile {
 		rotation += motionr;
 		motionr *= 1.06f;
 
-		if (isInWaterOrBubble()) kill();
+		if (isInWater()) kill((ServerLevel) level());
 		float airFriction = 0.96F;
         setDeltaMovement(getDeltaMovement().scale(airFriction));
         applyGravity();

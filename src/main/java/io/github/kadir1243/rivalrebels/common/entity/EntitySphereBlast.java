@@ -15,6 +15,8 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import java.util.List;
+
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -31,7 +33,6 @@ public class EntitySphereBlast extends EntityTsarBlast {
 
 	public EntitySphereBlast(Level level) {
 		this(RREntities.SPHERE_BLAST.get(), level);
-		noCulling = true;
 	}
 
 	public EntitySphereBlast(Level level, double x, double y, double z, float rad) {
@@ -57,7 +58,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
 
 		tickCount++;
 
-		if (tickCount > 400) kill();
+		if (tickCount > 400) kill((ServerLevel) level());
 	}
 
 	@Override

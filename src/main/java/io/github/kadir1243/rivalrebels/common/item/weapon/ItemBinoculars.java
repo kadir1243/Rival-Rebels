@@ -18,24 +18,29 @@ import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.packet.LaptopEngagePacket;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityLaptop;
+import net.minecraft.client.player.AbstractClientPlayer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,8 +59,8 @@ public class ItemBinoculars extends Item {
     boolean zoomed = false;
     boolean prevzoomed = false;
     boolean prevmclick;
-    public ItemBinoculars() {
-        super(new Properties().stacksTo(1).component(RRComponents.BINOCULAR_DATA, BinocularData.DEFAULT));
+    public ItemBinoculars(Properties properties) {
+        super(properties.stacksTo(1).component(RRComponents.BINOCULAR_DATA, BinocularData.DEFAULT));
     }
 
     public static void add(TileEntityLaptop tel) {
@@ -69,8 +74,8 @@ public class ItemBinoculars extends Item {
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack stack) {
-        return UseAnim.BOW;
+    public ItemUseAnimation getUseAnimation(ItemStack stack) {
+        return ItemUseAnimation.BOW;
     }
 
     @Override
@@ -79,19 +84,19 @@ public class ItemBinoculars extends Item {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
         user.startUsingItem(hand);
         return super.use(world, user, hand);
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
         if (world.isClientSide && entity == Minecraft.getInstance().player) {
             boolean strike = isMousePressed() && !prevmclick;
             c ^= RRClient.USE_BINOCULARS_ITEM.isDown() && !sc;
             sc = RRClient.USE_BINOCULARS_ITEM.isDown();
             prevzoomed = zoomed;
-            zoomed = ((Minecraft.getInstance().mouseHandler.isRightPressed() && (selected || zoomed))) && !Minecraft.getInstance().options.keyDrop.isDown() && Minecraft.getInstance().screen == null;
+            zoomed = ((Minecraft.getInstance().mouseHandler.isRightPressed() && (((AbstractClientPlayer) entity).getItemBySlot(slot).is(this) || zoomed))) && !Minecraft.getInstance().options.keyDrop.isDown() && Minecraft.getInstance().screen == null;
             if (zoomed) {
                 if (!prevzoomed) {
                     fovset = (float) Minecraft.getInstance().options.fov().get();

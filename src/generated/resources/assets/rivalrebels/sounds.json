@@ -208,6 +208,12 @@
       "rivalrebels:ak/c"
     ]
   },
+  "laser_shoot": {
+    "sounds": [
+      "rivalrebels:au/b1",
+      "rivalrebels:au/b2"
+    ]
+  },
   "mendeleed": {
     "sounds": [
       "rivalrebels:al/a"
@@ -287,6 +293,41 @@
     "sounds": [
       "rivalrebels:as/a1",
       "rivalrebels:as/a2"
+    ]
+  },
+  "reactor_disabling": {
+    "sounds": [
+      "rivalrebels:at/d"
+    ]
+  },
+  "reactor_running": {
+    "sounds": [
+      "rivalrebels:at/b"
+    ]
+  },
+  "reactor_running_2": {
+    "sounds": [
+      "rivalrebels:at/c"
+    ]
+  },
+  "reactor_unknown": {
+    "sounds": [
+      "rivalrebels:at/a"
+    ]
+  },
+  "remote_charge_explosion": {
+    "sounds": [
+      "rivalrebels:au/a"
+    ]
+  },
+  "remote_explode": {
+    "sounds": [
+      "rivalrebels:au/d"
+    ]
+  },
+  "remote_plant": {
+    "sounds": [
+      "rivalrebels:au/c"
     ]
   },
   "rod_disk_hit_entity": {

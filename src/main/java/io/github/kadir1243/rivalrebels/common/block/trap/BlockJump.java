@@ -16,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -35,10 +36,10 @@ public class BlockJump extends Block implements EntityBlock {
 	}
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
         if (entity instanceof LivingEntity) {
             entity.push(0, 2, 0);
-			world.playLocalSound(pos, SoundEvents.ARROW_HIT, SoundSource.BLOCKS, 3F, 2, true);
+			level.playLocalSound(pos, SoundEvents.ARROW_HIT, SoundSource.BLOCKS, 3F, 2, true);
 		}
 	}
 

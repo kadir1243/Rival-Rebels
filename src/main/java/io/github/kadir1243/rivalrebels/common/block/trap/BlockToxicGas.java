@@ -19,6 +19,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.animal.Animal;
@@ -48,15 +49,15 @@ public class BlockToxicGas extends Block {
     }
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
         if (entity instanceof LivingEntity living) {
 			living.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0));
-			living.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
+			living.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
 			living.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 0));
-			living.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
+			living.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 0));
 		}
 		if (entity instanceof PathfinderMob || entity instanceof Animal || entity instanceof Player) {
-			entity.hurt(RivalRebelsDamageSource.gasGrenade(world), 1);
+			entity.hurt(RivalRebelsDamageSource.gasGrenade(level), 1);
 		}
 	}
 

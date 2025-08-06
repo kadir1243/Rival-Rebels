@@ -12,10 +12,9 @@
 package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
 import io.github.kadir1243.rivalrebels.client.model.ModelTheoreticalTsarBomba;
-import io.github.kadir1243.rivalrebels.common.block.trap.BlockTheoreticalTsarBomba;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityTheoreticalTsarBomba;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,26 +29,13 @@ public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRender
     }
 
     @Override
-    public void render(TileEntityTheoreticalTsarBomba entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        matrices.pushPose();
-        matrices.translate(0.5F, 1F, 0.5F);
-        matrices.scale(1.3f, 1.3f, 1.3f);
-        int metadata = entity.getBlockState().getValue(BlockTheoreticalTsarBomba.FACING).get3DDataValue();
+    public void render(TileEntityTheoreticalTsarBomba blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        poseStack.pushPose();
+        poseStack.translate(0.5F, 1F, 0.5F);
+        poseStack.scale(1.3f, 1.3f, 1.3f);
 
-        if (metadata == 2) {
-            matrices.mulPose(Axis.YP.rotationDegrees(180));
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (metadata == 3) {
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (metadata == 4) {
-            matrices.mulPose(Axis.YP.rotationDegrees(-90));
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        } else if (metadata == 5) {
-            matrices.mulPose(Axis.YP.rotationDegrees(90));
-            matrices.mulPose(Axis.XP.rotationDegrees(90));
-        }
-        ModelTheoreticalTsarBomba.render(matrices, vertexConsumers, light, overlay);
-        matrices.popPose();
+        ModelTheoreticalTsarBomba.render(poseStack, bufferSource, packedLight, packedOverlay);
+        poseStack.popPose();
     }
 
     @Override

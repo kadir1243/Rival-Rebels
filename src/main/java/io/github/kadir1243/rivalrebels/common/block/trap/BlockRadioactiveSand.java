@@ -16,6 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -28,9 +29,9 @@ public class BlockRadioactiveSand extends Block
 	}
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
-		if (world.random.nextInt(2) == 0) {
-			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), world.random.nextInt(2));
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
+		if (level.random.nextInt(2) == 0) {
+			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), level.random.nextInt(2));
 		}
 	}
 

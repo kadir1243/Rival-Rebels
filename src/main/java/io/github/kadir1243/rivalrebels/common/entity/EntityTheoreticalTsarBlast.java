@@ -23,7 +23,6 @@ public class EntityTheoreticalTsarBlast extends EntityTsarBlast {
 
     public EntityTheoreticalTsarBlast(Level level) {
         this(RREntities.THEORETICAL_TSAR_BLAST.get(), level);
-        noCulling = true;
     }
 
     public EntityTheoreticalTsarBlast(Level level, float x, float y, float z, TsarBomba tsarBomba, int rad) {

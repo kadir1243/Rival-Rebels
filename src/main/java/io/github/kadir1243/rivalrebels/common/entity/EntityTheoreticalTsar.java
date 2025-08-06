@@ -17,6 +17,7 @@ import io.github.kadir1243.rivalrebels.common.explosion.TsarBomba;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -27,6 +28,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
@@ -46,7 +49,7 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
 
 	public EntityTheoreticalTsar(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll) {
 		this(level);
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
 		aoc = charges;
 		hasTrollface = troll;
 		if (!RRConfig.SERVER.isNukedrop())
@@ -90,7 +93,7 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < level().getMinBuildHeight()) kill();
+		if (getY() < level().getMinY()) kill((ServerLevel) level());
 
 		if (this.isPassenger())
 		{
@@ -126,19 +129,19 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
         this.reapplyPosition();
 	}
 
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-        super.addAdditionalSaveData(nbt);
-        nbt.putInt("charge", aoc);
-		nbt.putBoolean("troll", hasTrollface);
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+        valueOutput.putInt("charge", aoc);
+		valueOutput.putBoolean("troll", hasTrollface);
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-        super.readAdditionalSaveData(nbt);
-		aoc = nbt.getInt("charge");
-		hasTrollface = nbt.getBoolean("troll");
-		setYRot(yRotO = nbt.getFloat("rot"));
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+		aoc = valueInput.getInt("charge").orElseThrow();
+		hasTrollface = valueInput.getBooleanOr("troll", false);
+		setYRot(yRotO = valueInput.getFloatOr("rot", 0F));
 	}
 
     @Override
@@ -175,7 +178,7 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
 			TsarBomba tsar = new TsarBomba((int)getX(), (int)getY(), (int)getZ(), level(), (int) ((RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc)) * 0.6f));
 			EntityTheoreticalTsarBlast tsarblast = new EntityTheoreticalTsarBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc));
 			level().addFreshEntity(tsarblast);
-			this.kill();
+			this.kill((ServerLevel) level());
 		}
 	}
 }

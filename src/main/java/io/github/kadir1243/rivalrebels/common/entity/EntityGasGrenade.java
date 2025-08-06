@@ -13,6 +13,7 @@ package io.github.kadir1243.rivalrebels.common.entity;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
+import net.minecraft.server.level.ServerLevel;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.BlockPos;
@@ -45,7 +46,7 @@ public class EntityGasGrenade extends Projectile {
         this(level);
         this.setOwner(player);
 
-        moveTo(player.getEyePosition(), player.getYRot(), player.getXRot());
+        snapTo(player.getEyePosition(), player.getYRot(), player.getXRot());
         setPos(getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
         getY() - 0.1F,
         getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F));
@@ -61,7 +62,7 @@ public class EntityGasGrenade extends Projectile {
             float var7 = Mth.sqrt((float) (x * x + z * z));
             setYRot(yRotO = (float) (Math.atan2(x, z) * Mth.RAD_TO_DEG));
             setXRot(xRotO = (float) (Math.atan2(y, var7) * Mth.RAD_TO_DEG));
-            moveTo(getX(), getY(), getZ(), getYRot(), getXRot());
+            snapTo(getX(), getY(), getZ(), getYRot(), getXRot());
         }
     }
 
@@ -80,9 +81,9 @@ public class EntityGasGrenade extends Projectile {
         }
         HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
-        if (hitResult.getType() != HitResult.Type.MISS) {
+        if (hitResult.getType() != HitResult.Type.MISS && !level().isClientSide()) {
             pop();
-            kill();
+            kill((ServerLevel) level());
         }
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
@@ -93,7 +94,7 @@ public class EntityGasGrenade extends Projectile {
         }
         float var23 = 0.9999F;
 
-        if (isInWaterOrBubble()) {
+        if (isInWater()) {
             for (int var26 = 0; var26 < 4; ++var26) {
                 float var27 = 0.25F;
                 level().addParticle(ParticleTypes.BUBBLE, getX() - getDeltaMovement().x() * var27, getY() - getDeltaMovement().y() * var27, getZ() - getDeltaMovement().z() * var27, getDeltaMovement().x(), getDeltaMovement().y(), getDeltaMovement().z());
@@ -105,7 +106,7 @@ public class EntityGasGrenade extends Projectile {
         setDeltaMovement(getDeltaMovement().scale(var23));
         applyGravity();
         reapplyPosition();
-        checkInsideBlocks();
+        applyEffectsFromBlocks();
     }
 
     @Override

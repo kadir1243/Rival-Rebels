@@ -52,7 +52,7 @@ public record JoinTeamPacket(RivalRebelsClass rrclass, RivalRebelsTeam rrteam) i
             p.rrteam = m.rrteam;
             Scoreboard scrb = RivalRebels.round.world.getScoreboard();
             scrb.resetAllPlayerScores(player);
-            scrb.addPlayerToTeam(player.getScoreboardName(), new PlayerTeam(player.getCommandSenderWorld().getScoreboard(), p.rrteam.toString()));
+            scrb.addPlayerToTeam(player.getScoreboardName(), new PlayerTeam(player.level().getScoreboard(), p.rrteam.toString()));
 
             for (ItemStack stack : m.rrclass.getInventory()) {
                 player.getInventory().add(stack.copy());

@@ -3,15 +3,14 @@ package io.github.kadir1243.rivalrebels.datagen;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import net.minecraft.data.PackOutput;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.common.data.SoundDefinition;
 import net.neoforged.neoforge.common.data.SoundDefinitionsProvider;
 
 import java.util.Arrays;
 
 public class SoundDataGen extends SoundDefinitionsProvider {
-    public SoundDataGen(PackOutput dataOutput, ExistingFileHelper helper) {
-        super(dataOutput, RRIdentifiers.MODID, helper);
+    public SoundDataGen(PackOutput dataOutput) {
+        super(dataOutput, RRIdentifiers.MODID);
     }
 
     @Override
@@ -98,6 +97,16 @@ public class SoundDataGen extends SoundDefinitionsProvider {
         add(RRSounds.PRINTER3, sounds("ar/c"));
 
         add(RRSounds.QUICK_SAND, sounds("as/a1","as/a2"));
+
+        add(RRSounds.REACTOR_UNKNOWN,  sounds("at/a"));
+        add(RRSounds.REACTOR_RUNNING, sounds("at/b"));
+        add(RRSounds.REACTOR_RUNNING_2, sounds("at/c"));
+        add(RRSounds.REACTOR_DISABLING, sounds("at/d"));
+
+        add(RRSounds.REMOTE_CHARGE_EXPLOSION,  sounds("au/a"));
+        add(RRSounds.LASER_SHOOT, sounds("au/b1", "au/b2"));
+        add(RRSounds.REMOTE_PLANT, sounds("au/c"));
+        add(RRSounds.REMOTE_EXPLODE, sounds("au/d"));
 
     }
 

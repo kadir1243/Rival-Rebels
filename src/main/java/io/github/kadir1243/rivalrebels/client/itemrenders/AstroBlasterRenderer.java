@@ -13,14 +13,15 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.*;
-import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
@@ -30,29 +31,7 @@ import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
 public class AstroBlasterRenderer implements DynamicItemRenderer {
-    private static final RenderType LIGHTNING = RenderType.create(
-        RRIdentifiers.MODID+"_lightning_astro_blast",
-        DefaultVertexFormat.POSITION_COLOR,
-        VertexFormat.Mode.QUADS,
-        99999,
-        RenderType.CompositeState.builder()
-            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
-            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
-            .createCompositeState(false)
-    );
-    private static final RenderType LIGHTNING_TRIANGLES = RenderType.create(
-        RRIdentifiers.MODID+"_lightning_astro_blast_triangles",
-        DefaultVertexFormat.POSITION_COLOR,
-        VertexFormat.Mode.TRIANGLES,
-        99999,
-        RenderType.CompositeState.builder()
-            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
-            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
-            .createCompositeState(false)
-    );
-
+    private static final ModelBlockRenderer BAKED_MODEL_RENDERER = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
     private float pullback = 0;
     private float rotation = 0;
     private boolean isreloading = false;
@@ -90,8 +69,8 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.pushPose();
         matrices.translate(0f, 0.9f, 0f);
-        VertexConsumer cellular_noise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES);
-        ModelAstroBlasterBarrel.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.eteinstenbarrel)), light, overlay);
+        VertexConsumer cellular_noise = vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE);
+        ModelAstroBlasterBarrel.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.eteinstenbarrel)), light, overlay);
         if (stack.isEnchanted()) {
             ModelAstroBlasterBarrel.render(matrices, cellular_noise, light, overlay);
         }
@@ -101,9 +80,10 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.translate(0.22f, -0.025f, 0f);
         matrices.mulPose(Axis.ZP.rotationDegrees(90));
         matrices.scale(0.03125f, 0.03125f, 0.03125f);
-        ModelAstroBlasterHandle.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.eteinstenhandle)), light, overlay);
+
+        BAKED_MODEL_RENDERER.renderModel(matrices.last(), vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.eteinstenhandle)), ModelAstroBlasterHandle.BAKED_MODEL.get().blockStateModel(),1, 1, 1, light,overlay);
         if (stack.isEnchanted()) {
-            ModelAstroBlasterHandle.render(matrices, cellular_noise, light, overlay);
+            ModelBlockRenderer.renderModel(matrices.last(), cellular_noise, ModelAstroBlasterHandle.BAKED_MODEL.get().blockStateModel(),1, 1, 1, light,overlay);
         }
         matrices.popPose();
 
@@ -117,9 +97,9 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.pushPose();
         matrices.translate(0f, 0.2f, 0f);
         matrices.scale(0.85F, 0.85F, 0.85F);
-        ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.eteinstenback)), light, overlay);
+        ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.eteinstenback)), light, overlay);
         if (stack.isEnchanted()) {
-            ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES), light, overlay);
+            ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE), light, overlay);
         }
         matrices.popPose();
 
@@ -127,7 +107,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         matrices.translate(0f, -pullback, 0f);
         matrices.mulPose(Axis.YP.rotationDegrees(rotation));
         matrices.pushPose();
-        VertexConsumer redstoneRodTextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etredrod));
+        VertexConsumer redstoneRodTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etredrod));
         matrices.translate(0.12f, 0.1f, 0.12f);
         matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         matrices.scale(0.3f, 0.7f, 0.3f);
@@ -168,7 +148,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         float prevAddedX;
         float prevAddedZ;
         // double angle = 0;
-        VertexConsumer lightningQuads = vertexConsumers.getBuffer(LIGHTNING);
+        VertexConsumer lightningQuads = vertexConsumers.getBuffer(RenderTypes.LIGHTNING_ASTRO_BLAST);
         for (float AddedY = distance; AddedY >= 0; AddedY -= segmentDistance) {
             prevAddedX = AddedX;
             prevAddedZ = AddedZ;
@@ -245,7 +225,7 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
 
         matrices.popPose();
 
-        VertexConsumer lightningTriangles = vertexConsumers.getBuffer(LIGHTNING_TRIANGLES);
+        VertexConsumer lightningTriangles = vertexConsumers.getBuffer(RenderTypes.LIGHTNING_ASTRO_BLAST_TRIANGLES);
         matrices.pushPose();
         matrices.translate(0f, 0.8f, 0f);
         matrices.mulPose(Axis.ZP.rotationDegrees(180));

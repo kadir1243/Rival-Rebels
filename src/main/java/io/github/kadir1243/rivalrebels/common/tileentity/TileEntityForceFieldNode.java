@@ -19,22 +19,26 @@ import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
-public class TileEntityForceFieldNode extends TileEntityMachineBase
-{
-    public UUID uuid;
+import javax.annotation.Nullable;
+
+public class TileEntityForceFieldNode extends TileEntityMachineBase {
+    @Nullable
+    public ResolvableProfile owner;
 	public RivalRebelsTeam	rrteam		= RivalRebelsTeam.NONE;
 	public int				level		= 0;
 
@@ -76,18 +80,19 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
 	}
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
 
-		rrteam = RivalRebelsTeam.getForID(nbt.getInt("rrteam"));
-		if (rrteam == RivalRebelsTeam.NONE) uuid = nbt.getUUID("uuid");
+		rrteam = valueInput.read("rrteam", RivalRebelsTeam.CODEC).orElse(RivalRebelsTeam.NONE);
+        owner = valueInput.read("profile", ResolvableProfile.CODEC).orElse(null);
 	}
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-		super.saveAdditional(nbt, provider);
-		if (rrteam != RivalRebelsTeam.NONE) nbt.putInt("rrteam", rrteam.ordinal());
-		if (uuid != null) nbt.putUUID("uuid", uuid);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
+
+        valueOutput.store("rrteam", RivalRebelsTeam.CODEC, rrteam);
+        valueOutput.storeNullable("profile", ResolvableProfile.CODEC, owner);
     }
 
 	@Override
@@ -110,7 +115,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX() + (p.getX() > (getBlockPos().getX() + 0.5) ? -2 : 2), p.getY(), p.getZ());
@@ -159,7 +164,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX() + (p.getX() > (getBlockPos().getX() + 0.5) ? -2 : 2), p.getY(), p.getZ());
@@ -208,7 +213,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX(), p.getY(), p.getZ() + (p.getZ() > (getBlockPos().getZ() + 0.5) ? -2 : 2));
@@ -257,7 +262,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().getId().equals(uuid) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX(), p.getY(), p.getZ() + (p.getZ() > (getBlockPos().getZ() + 0.5) ? -2 : 2));

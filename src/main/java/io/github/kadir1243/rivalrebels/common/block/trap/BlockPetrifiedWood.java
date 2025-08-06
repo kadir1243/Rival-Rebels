@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -42,15 +43,15 @@ public class BlockPetrifiedWood extends Block {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 		if (player.isCreative()) {
 			level.setBlockAndUpdate(pos, state.setValue(META, state.getValue(META) + 1));
-			return InteractionResult.sidedSuccess(level.isClientSide());
+			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.PASS;
 	}
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
-		if (world.random.nextInt(2) == 0) {
-			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), ((16 - world.getBlockState(pos).getValue(META)) / 2) + world.random.nextInt(3) - 1);
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
+		if (level.random.nextInt(2) == 0) {
+			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), ((16 - level.getBlockState(pos).getValue(META)) / 2) + level.random.nextInt(3) - 1);
 		}
 	}
 

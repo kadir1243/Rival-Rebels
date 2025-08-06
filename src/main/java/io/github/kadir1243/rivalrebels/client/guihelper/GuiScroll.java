@@ -11,7 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -34,7 +35,7 @@ public class GuiScroll extends GuiButton {
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
 		int state = 0;
 		if (mouseClicked(mouseX, mouseY, 0)) state = 11;
-		graphics.blit(RRIdentifiers.guitbutton, this.getX(), (int) (this.getY() + scroll), 0, state, this.width, this.height);
+        RRTextures.guitbutton.blit(graphics, this.getX(), (int) (this.getY() + scroll), 0, state, this.width, this.height, CommonColors.WHITE);
 	}
 
     @Override

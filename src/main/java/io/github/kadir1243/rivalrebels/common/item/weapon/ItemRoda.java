@@ -14,7 +14,6 @@ package io.github.kadir1243.rivalrebels.common.item.weapon;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.entity.*;
-import io.github.kadir1243.rivalrebels.common.entity.*;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsRank;
@@ -22,13 +21,12 @@ import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
@@ -38,6 +36,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemRoda extends Item
 {
@@ -213,24 +212,24 @@ public class ItemRoda extends Item
             case 8 -> new EntityLaserBurst(world, mx, my, mz);
             case 9 -> new EntityGore(world, mx, my, mz, world.random.nextInt(3), world.random.nextInt(11) + 1);
             case 10 -> new EntityBomb(world, x, y, z, mx, my, mz);
-            case 11 -> EntityType.CREEPER.create(world);
-            case 12 -> EntityType.SNOW_GOLEM.create(world);
+            case 11 -> EntityType.CREEPER.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+            case 12 -> EntityType.SNOW_GOLEM.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             case 13 -> new EntityRoddiskRebel(world);
             case 14 -> new EntitySeekB83(world);
-            case 15 -> EntityType.ZOMBIFIED_PIGLIN.create(world);
-            case 16 -> EntityType.ZOMBIE.create(world);
+            case 15 -> EntityType.ZOMBIFIED_PIGLIN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+            case 16 -> EntityType.ZOMBIE.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             case 17 -> new PrimedTnt(world, x, y, z, null);
-            case 18 -> EntityType.IRON_GOLEM.create(world);
+            case 18 -> EntityType.IRON_GOLEM.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             case 19 -> {
-                Entity zomb = EntityType.ZOMBIFIED_PIGLIN.create(world);
+                Entity zomb = EntityType.ZOMBIFIED_PIGLIN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
                 zomb.setPos(x, y, z);
                 zomb.setDeltaMovement(velocity);
                 world.addFreshEntity(zomb);
-                Chicken chicken = EntityType.CHICKEN.create(world);
+                Chicken chicken = EntityType.CHICKEN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
                 zomb.startRiding(chicken);
                 yield chicken;
             }
-            case 20 -> new EntityDebris(world, world.registryAccess().registryOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR));
+            case 20 -> new EntityDebris(world, world.registryAccess().lookupOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR));
             case 21 -> {
                 Block[] blocks2 = new Block[]{RRBlocks.ammunition.get(), RRBlocks.supplies.get(), RRBlocks.weapons.get(), RRBlocks.explosives.get(), RRBlocks.omegaarmor.get(), RRBlocks.sigmaarmor.get()};
                 Block b2 = blocks2[world.random.nextInt(blocks2.length)];
@@ -260,12 +259,12 @@ public class ItemRoda extends Item
 	}
 
 	boolean pass = false;
-	public ItemRoda() {
-		super(new Properties().stacksTo(1).component(RRComponents.HAPPY_NEW_YEAR, 0));
+	public ItemRoda(Properties properties) {
+		super(properties.stacksTo(1).component(RRComponents.HAPPY_NEW_YEAR, 0));
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         if (!pass) {
@@ -281,26 +280,26 @@ public class ItemRoda extends Item
 			{
 				world.addFreshEntity(new EntityNuclearBlast(world, player.getX(), player.getY(), player.getZ(), 6, true));
 				player.setItemInHand(hand, ItemStack.EMPTY);
-				return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+				return InteractionResult.SUCCESS;
 			}
 			double motionX = (-Mth.sin(player.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(player.getXRot() * Mth.DEG_TO_RAD));
 			double motionZ = (Mth.cos(player.getYRot() * Mth.DEG_TO_RAD) * Mth.cos(player.getXRot() * Mth.DEG_TO_RAD));
 			double motionY = (-Mth.sin(player.getXRot() * Mth.DEG_TO_RAD));
 			spawn(rodaindex, world, player.getX(), player.getY() + 3.0, player.getZ(),motionX,motionY,motionZ, 1.0,0.0);
-            return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+            return InteractionResult.SUCCESS;
         }
-		return InteractionResultHolder.pass(stack);
+		return InteractionResult.PASS;
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-		if (world.isClientSide()) return;
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity p_41406_, @Nullable EquipmentSlot p_401900_) {
+		if (level.isClientSide()) return;
 		if (stack.get(RRComponents.HAPPY_NEW_YEAR)>0)stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)-1);
 	}
 
     @Override
-    public boolean hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
-		if (attacker.level().isClientSide()) return true;
+    public void hurtEnemy(ItemStack stack, LivingEntity target, LivingEntity attacker) {
+		if (attacker.level().isClientSide()) return;
 		RandomSource r = attacker.getRandom();
         Vec3 vector = target.position().subtract(attacker.position());
 
@@ -323,6 +322,5 @@ public class ItemRoda extends Item
             }
             default -> {}
         }
-		return true;
 	}
 }

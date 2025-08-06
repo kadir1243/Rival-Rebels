@@ -1,6 +1,16 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "display": {
+    "none": {
+      "rotation": [
+        0.5,
+        1,
+        0.5
+      ]
+    }
+  },
+  "loader": "neoforge:obj",
+  "model": "rivalrebels:models/t.obj",
   "textures": {
-    "all": "rivalrebels:block/ak"
+    "texture": "rivalrebels:textures/entity/ck.png"
   }
 }

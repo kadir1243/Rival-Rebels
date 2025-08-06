@@ -18,6 +18,7 @@ import io.github.kadir1243.rivalrebels.common.block.trap.BlockPetrifiedWood;
 import io.github.kadir1243.rivalrebels.common.entity.EntityTachyonBombBlast;
 import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsSimplexNoise;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -64,7 +65,7 @@ public class TachyonBomb {
 			{
 				if (x2 + Z * Z < rad)
 				{
-					for (int Y = 70; Y > world.getMinBuildHeight(); Y--)
+					for (int Y = 70; Y > world.getMinY(); Y--)
 					{
                         BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
 						if (!state.getFluidState().isEmpty()) {
@@ -103,7 +104,7 @@ public class TachyonBomb {
 		else
 		{
 			tsarblast.bomb = null;
-			tsarblast.kill();
+			tsarblast.kill((ServerLevel) world);
 		}
 	}
 
@@ -121,7 +122,7 @@ public class TachyonBomb {
 
 			for (int Y = y; Y > ylimit; Y--)
 			{
-				if (Y == world.getMinBuildHeight()) break;
+				if (Y == world.getMinY()) break;
 				BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
 				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
@@ -133,7 +134,7 @@ public class TachyonBomb {
 			{
 				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--)
 				{
-					if (Y == world.getMinBuildHeight()) break;
+					if (Y == world.getMinY()) break;
 					BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
@@ -154,7 +155,7 @@ public class TachyonBomb {
 				if (metadata < 0) metadata = 0;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y >= world.getMinBuildHeight(); Y--) {
+				for (int Y = ylimit; Y >= world.getMinY(); Y--) {
 					int yy = Y + y;
 					BlockState state = world.getBlockState(new BlockPos(x + posX, yy, z + posZ));
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
@@ -187,9 +188,9 @@ public class TachyonBomb {
 
 	private int getTopBlock(int x, int z, double dist)
 	{
-		int foundY = world.getMinBuildHeight();
+		int foundY = world.getMinY();
 		boolean found = false;
-		for (int y = world.getMaxBuildHeight(); y > world.getMinBuildHeight(); y--)
+		for (int y = world.getMaxY(); y > world.getMinY(); y--)
 		{
             BlockPos pos = new BlockPos(x, y, z);
             BlockState state = world.getBlockState(pos);

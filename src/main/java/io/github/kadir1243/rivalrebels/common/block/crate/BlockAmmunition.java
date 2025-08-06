@@ -38,12 +38,12 @@ public class BlockAmmunition extends Block {
         int z = pos.getZ();
 		if (level.isClientSide()) {
 			player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
-            player.displayClientMessage(RRItems.rocket.asItem().getDescription().copy().withStyle(ChatFormatting.GREEN).append(". ").append(RRItems.rpg.asItem().getDescription().copy().withStyle(ChatFormatting.BLUE)).append(" ").append(Translations.ammunition()).append(")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.battery.asItem().getDescription() + ". §9(" + RRItems.tesla.asItem().getDescription() + " " + Translations.ammunition() + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.hydrod.asItem().getDescription() + ". §9(" + RRItems.plasmacannon.asItem().getDescription() + " " + Translations.ammunition() + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.fuel.asItem().getDescription() + ". §9(" + RRItems.flamethrower.asItem().getDescription() + " " + Translations.ammunition() + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.redrod.asItem().getDescription() + ". §9(" + RRItems.einsten.asItem().getDescription() + " " + Translations.ammunition() + ")"), false);
-			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.gasgrenade.asItem().getDescription() + ". §9(" + Component.translatable("RivalRebels.chemicalweapon") + ")"), false);
+            player.displayClientMessage(RRItems.rocket.asItem().getName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(RRItems.rpg.asItem().getName().copy().withStyle(ChatFormatting.BLUE)).append(" ").append(Translations.ammunition()).append(")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.battery.asItem().getName() + ". §9(" + RRItems.tesla.asItem().getName() + " " + Translations.ammunition() + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.hydrod.asItem().getName() + ". §9(" + RRItems.plasmacannon.asItem().getName() + " " + Translations.ammunition() + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.fuel.asItem().getName() + ". §9(" + RRItems.flamethrower.asItem().getName() + " " + Translations.ammunition() + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.redrod.asItem().getName() + ". §9(" + RRItems.einsten.asItem().getName() + " " + Translations.ammunition() + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.gasgrenade.asItem().getName() + ". §9(" + Component.translatable("RivalRebels.chemicalweapon") + ")"), false);
 		} else {
             Containers.dropItemStack(level, x, y, z, RRItems.rocket.toStack(32));
 			Containers.dropItemStack(level, x, y, z, RRItems.battery.toStack(16));
@@ -60,9 +60,9 @@ public class BlockAmmunition extends Block {
 			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			if (level.random.nextInt(3) == 0) {
 				Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.toStack());
-				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.asItem().getDescription() + ". §9(" + "Used in nuclear weapons" + ")"), false);
+				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.asItem().getName() + ". §9(" + "Used in nuclear weapons" + ")"), false);
 			}
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 }

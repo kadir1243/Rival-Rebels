@@ -16,6 +16,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.explosion.NuclearExplosion;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -23,6 +24,8 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
@@ -37,7 +40,6 @@ public class EntityNuclearBlast extends EntityInanimate {
 	public EntityNuclearBlast(Level level)
 	{
 		this(RREntities.NUCLEAR_BLAST.get(), level);
-		noCulling = true;
 		tickCount = 0;
 		time = 0;
 	}
@@ -92,7 +94,7 @@ public class EntityNuclearBlast extends EntityInanimate {
 		}
 		else
 		{
-			kill();
+			kill((ServerLevel) level());
 		}
 
 		tickCount++;
@@ -114,7 +116,7 @@ public class EntityNuclearBlast extends EntityInanimate {
                 if (vec3.length() != 0.0D) {
                     vec3 = vec3.normalize();
                     if (!(entity instanceof EntityNuclearBlast) && !(entity instanceof EntityTsarBlast)) {
-                        if (entity instanceof FallingBlockEntity) entity.kill();
+                        if (entity instanceof FallingBlockEntity) entity.kill((ServerLevel) level());
                         else {
                             if (entity instanceof Player && entity.isInvulnerable())
                                 continue;
@@ -127,20 +129,18 @@ public class EntityNuclearBlast extends EntityInanimate {
         }
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt)
-	{
-		tickCount = nbt.getInt("age");
-		time = nbt.getInt("time");
-        setDeltaMovement(nbt.getBoolean("troll") ? 1 : 0, Strength = nbt.getInt("charges"), getDeltaMovement().z());
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+		tickCount = valueInput.getIntOr("age", 0);
+		time = valueInput.getIntOr("time", 0);
+        setDeltaMovement(valueInput.getBooleanOr("troll", false) ? 1 : 0, Strength = valueInput.getIntOr("charges", 0), getDeltaMovement().z());
 	}
 
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt)
-	{
-		nbt.putInt("age", tickCount);
-		nbt.putInt("time", time);
-		nbt.putInt("charges", Strength);
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+		valueOutput.putInt("age", tickCount);
+		valueOutput.putInt("time", time);
+		valueOutput.putInt("charges", Strength);
 	}
 
 }

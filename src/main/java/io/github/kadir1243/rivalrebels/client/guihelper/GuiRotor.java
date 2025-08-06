@@ -11,8 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import com.mojang.blaze3d.vertex.PoseStack;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -34,15 +34,14 @@ public class GuiRotor extends GuiButton
 
     @Override
     protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        PoseStack matrices = graphics.pose();
-		matrices.pushPose();
+        graphics.pose().pushMatrix();
 		int deg = (degree % 180);
 		if (degree >= 180) deg = 180 - deg;
 		if (deg < 22) deg = 22;
 		degree = deg;
-		graphics.blit(RRIdentifiers.guitray, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180));
+        RRTextures.guitray.blit(graphics, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180), CommonColors.WHITE);
         graphics.drawCenteredString(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
-		matrices.popPose();
+        graphics.pose().popMatrix();
 	}
 
     @Override

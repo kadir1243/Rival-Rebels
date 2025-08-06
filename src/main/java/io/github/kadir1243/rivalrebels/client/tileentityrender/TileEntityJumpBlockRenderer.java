@@ -15,10 +15,11 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelJump;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityJumpBlock;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
@@ -28,10 +29,10 @@ public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEnti
     }
 
     @Override
-    public void render(TileEntityJumpBlock entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate(0.5F, 0.5F, 0.5F);
-		ModelJump.renderModel(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.btcrate)), light, overlay);
-		matrices.popPose();
+    public void render(TileEntityJumpBlock blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        poseStack.pushPose();
+		poseStack.translate(0.5F, 0.5F, 0.5F);
+		ModelJump.renderModel(poseStack, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.btcrate)), packedLight, packedOverlay);
+		poseStack.popPose();
 	}
 }

@@ -47,6 +47,6 @@ public class BlockOmegaArmor extends Block {
 			level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camoshoes.toStack()));
 			level.setBlockAndUpdate(new BlockPos(x, y, z), Blocks.AIR.defaultBlockState());
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 }

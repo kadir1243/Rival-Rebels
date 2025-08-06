@@ -2,6 +2,7 @@ package io.github.kadir1243.rivalrebels.datagen;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
+import net.minecraft.data.CachedOutput;
 import net.minecraft.data.PackOutput;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
@@ -20,6 +21,14 @@ public class LootTableDataGen extends LootTableProvider {
         super(dataOutput, Set.of(), List.of(new SubProviderEntry(BlockLoots::new, LootContextParamSets.BLOCK)), registryLookup);
     }
 
+    @Override
+    public CompletableFuture<?> run(CachedOutput p_254060_) {
+        return super.run(p_254060_).exceptionally(e -> {
+            e.printStackTrace();
+            return null;
+        });
+    }
+
     public static class BlockLoots extends BlockLootSubProvider {
         protected BlockLoots(HolderLookup.Provider registries) {
             super(Set.of(), FeatureFlags.DEFAULT_FLAGS, registries);
@@ -27,7 +36,7 @@ public class LootTableDataGen extends LootTableProvider {
 
         @Override
         protected Iterable<Block> getKnownBlocks() {
-            return RRBlocks.BLOCKS.getEntries().stream().map(DeferredHolder::get).map(block -> (Block)block).toList();
+            return RRBlocks.BLOCKS.getEntries().stream().map(DeferredHolder::value).map(block -> (Block)block).toList();
         }
 
         @Override

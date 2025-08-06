@@ -21,12 +21,6 @@ public class FlameBallProjectile extends Projectile {
     }
 
     @Override
-    public void tick() {
-        super.tick();
-        tickCount++;
-    }
-
-    @Override
     public boolean isAttackable() {
         return false;
     }

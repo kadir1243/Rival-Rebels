@@ -3,7 +3,6 @@ package io.github.kadir1243.rivalrebels.common.block.crate;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -35,7 +34,7 @@ public abstract class AbstractFlagBoxBlock extends Block {
             return InteractionResult.PASS;
         }
         if (!player.isShiftKeyDown() && !level.isClientSide()) {
-            player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable(Translations.SHIFT_CLICK.toLanguageKey())), false);
+            player.displayClientMessage(Translations.orders().append(" ").append(Translations.SHIFT_CLICK.translate()), false);
             level.setBlockAndUpdate(pos, getStateToReplace());
             return InteractionResult.PASS;
         }

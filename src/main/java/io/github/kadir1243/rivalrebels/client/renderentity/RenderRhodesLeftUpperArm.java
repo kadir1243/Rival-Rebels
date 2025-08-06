@@ -7,17 +7,16 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderRhodesLeftUpperArm extends RhodesPartRenderer<EntityRhodesLeftUpperArm> {
-    public RenderRhodesLeftUpperArm(EntityRendererProvider.Context renderManager) {
-        super(renderManager);
+    public RenderRhodesLeftUpperArm(EntityRendererProvider.Context context) {
+        super(context, ObjModels.UPPER_ARM_MODEL);
     }
 
     @Override
-    public void renderParts(EntityRhodesLeftUpperArm entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void renderParts(State entity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         poseStack.scale(-1, 1, 1);
-        ObjModels.renderSolid(ObjModels.upperarm, getTextureLocation(entity), poseStack, bufferSource, entity.getColorRGBA(), packedLight, OverlayTexture.NO_OVERLAY);
+        super.renderParts(entity, poseStack, bufferSource, packedLight);
     }
 }

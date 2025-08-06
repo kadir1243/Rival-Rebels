@@ -16,31 +16,43 @@ import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
 import io.github.kadir1243.rivalrebels.common.entity.EntityLaptop;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderLaptop extends EntityRenderer<EntityLaptop> {
+public class RenderLaptop extends EntityRenderer<EntityLaptop, RenderLaptop.State> {
     public RenderLaptop(EntityRendererProvider.Context manager) {
         super(manager);
 	}
 
     @Override
-    public void render(EntityLaptop entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(180 - entity.getYRot()));
-		ModelLaptop.renderModel(vertexConsumers, matrices, (float) -entity.slide, light, OverlayTexture.NO_OVERLAY);
-		ModelLaptop.renderScreen(vertexConsumers, RRIdentifiers.etubuntu, matrices, (float) -entity.slide, light, OverlayTexture.NO_OVERLAY);
-		matrices.popPose();
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(180 - renderState.yRot));
+		ModelLaptop.renderModel(bufferSource, poseStack, -renderState.slide, packedLight, OverlayTexture.NO_OVERLAY);
+		ModelLaptop.renderScreen(bufferSource, RRIdentifiers.etubuntu, poseStack, -renderState.slide, packedLight, OverlayTexture.NO_OVERLAY);
+		poseStack.popPose();
 	}
 
     @Override
-    public ResourceLocation getTextureLocation(EntityLaptop entity) {
-        return null;
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityLaptop p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.slide = (float) p_entity.slide;
+        reusedState.yRot = p_entity.getYRot(partialTick);
+    }
+
+    public static class State extends EntityRenderState {
+        public float slide;
+        public float yRot;
     }
 }

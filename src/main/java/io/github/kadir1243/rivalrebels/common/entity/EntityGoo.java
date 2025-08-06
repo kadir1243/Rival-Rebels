@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.entity;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -31,7 +32,7 @@ public class EntityGoo extends EntityInanimate
 	public EntityGoo(Level level, EntityGore bloodEmitter)
 	{
 		this(level);
-		moveTo(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
+		snapTo(bloodEmitter.getX(), bloodEmitter.getY(), bloodEmitter.getZ(), 0, 0);
 		shoot(0.1f);
 		isGore = true;
 	}
@@ -39,7 +40,7 @@ public class EntityGoo extends EntityInanimate
 	public EntityGoo(Level level, double x, double y, double z)
 	{
 		this(level);
-		moveTo(x, y, z, 0, 0);
+		snapTo(x, y, z, 0, 0);
 		shoot(0f);
 		isGore = false;
 	}
@@ -59,7 +60,7 @@ public class EntityGoo extends EntityInanimate
 
 		Vec3 vec31 = position().add(getDeltaMovement());
 
-		if (isInWaterOrBubble() || (tickCount == 20 && isGore)) kill();
+		if (isInWater() || (tickCount == 20 && isGore)) kill((ServerLevel) level());
 
         setPosRaw(vec31.x(), vec31.y(), vec31.z());
 

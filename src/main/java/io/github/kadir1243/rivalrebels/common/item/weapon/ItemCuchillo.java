@@ -16,26 +16,25 @@ import io.github.kadir1243.rivalrebels.common.entity.EntityCuchillo;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
-public class ItemCuchillo extends TieredItem
+public class ItemCuchillo extends Item
 {
-	public ItemCuchillo()
+	public ItemCuchillo(Properties properties)
 	{
-		super(Tiers.IRON, new Properties().stacksTo(5));
+		super(properties);
 	}
 
     @Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
     @Override
@@ -44,22 +43,24 @@ public class ItemCuchillo extends TieredItem
 	}
 
     @Override
-    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
         ItemStack itemStack = ItemUtil.getItemStack(user, RRItems.knife.asItem());
         if (user.hasInfiniteMaterials() || !itemStack.isEmpty())
 		{
 			float f = (getUseDuration(stack, user) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
-			if (f < 0.1D) return;
+			if (f < 0.1D) return false;
 			if (f > 1.0F) f = 1.0F;
             stack.consume(1, user);
             user.playSound(RRSounds.CUCHILLO_UNKNOWN3.get());
 			if (!world.isClientSide()) world.addFreshEntity(new EntityCuchillo(world, user, 0.5f + f));
+            return true;
 		}
-	}
+        return false;
+    }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
         user.startUsingItem(hand);
         return super.use(world, user, hand);
     }

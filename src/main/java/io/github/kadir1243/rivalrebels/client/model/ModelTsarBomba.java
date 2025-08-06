@@ -12,13 +12,13 @@
 // Copyrighted Rodolian Material
 package io.github.kadir1243.rivalrebels.client.model;
 
-import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -36,13 +36,10 @@ public class ModelTsarBomba {
 	private static final float	cos			= Mth.cos(deg);
 	private static final float	add			= 360 / segments;
 
-	public static void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay)
-	{
-		matrices.pushPose();
-		matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
+	public static void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 
-        VertexConsumer tsarShellTextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettsarshell));
+        VertexConsumer tsarShellTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ettsarshell));
         for (float i = 0; i < segments; i++)
 		{
 			matrices.pushPose();
@@ -62,7 +59,7 @@ public class ModelTsarBomba {
 		}
 		matrices.popPose();
 
-        VertexConsumer tsarFinsTextureVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ettsarfins));
+        VertexConsumer tsarFinsTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ettsarfins));
 
         matrices.pushPose();
 
@@ -102,7 +99,6 @@ public class ModelTsarBomba {
 				new Vector3f(0f, -3.5f, -0.5f),
 				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		matrices.popPose();
 		matrices.popPose();
 	}
 }

@@ -1,6 +1,7 @@
 package io.github.kadir1243.rivalrebels;
 
 import io.github.kadir1243.rivalrebels.common.entity.RhodesType;
+import net.minecraft.core.Holder;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
@@ -285,7 +286,7 @@ public class RRConfig {
             if (list.isEmpty()) {
                 return RivalRebels.RHODES_TYPE_REGISTRY.stream().collect(RHODES_TYPES_SHUFFLER).toArray(new RhodesType[0]);
             }
-            return list.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).map(RivalRebels.RHODES_TYPE_REGISTRY::get).filter(Objects::nonNull).toArray(RhodesType[]::new);
+            return list.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).map(RivalRebels.RHODES_TYPE_REGISTRY::get).filter(Optional::isPresent).map(Optional::get).map(Holder.Reference::value).toArray(RhodesType[]::new);
         }
         private static final Collector<RhodesType, ?, List<RhodesType>> RHODES_TYPES_SHUFFLER = Collectors.collectingAndThen(
             Collectors.<RhodesType>toList(),

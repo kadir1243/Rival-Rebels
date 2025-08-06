@@ -12,6 +12,7 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
@@ -49,8 +50,8 @@ public class EntityPropulsionFX extends ThrowableProjectile
 	public void tick() {
 		super.tick();
 		ticksInAir++;
-		if ((ticksInAir >= 5 && random.nextInt(2) == 1) || this.isInWaterOrBubble()) {
-			kill();
+		if ((ticksInAir >= 5 && random.nextInt(2) == 1) || this.isInWater()) {
+			kill((ServerLevel) level());
 		}
         setPos(getX() + getDeltaMovement().x() + (random.nextDouble() - 0.5) * 0.07,
             getY() + getDeltaMovement().y() + (random.nextDouble() - 0.5) * 0.07 + 0.005,

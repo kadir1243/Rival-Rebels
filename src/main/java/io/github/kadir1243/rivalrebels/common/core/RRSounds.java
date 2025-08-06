@@ -84,6 +84,14 @@ public class RRSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> PRINTER2 = register("printer2"); // 19.1
     public static final DeferredHolder<SoundEvent, SoundEvent> PRINTER3 = register("printer3"); // 19.2
     public static final DeferredHolder<SoundEvent, SoundEvent> QUICK_SAND = register("quick_sand"); // 20.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> REACTOR_UNKNOWN = register("reactor_unknown"); // 21.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> REACTOR_RUNNING = register("reactor_running"); // 21.1
+    public static final DeferredHolder<SoundEvent, SoundEvent> REACTOR_RUNNING_2 = register("reactor_running_2"); // 21.2
+    public static final DeferredHolder<SoundEvent, SoundEvent> REACTOR_DISABLING = register("reactor_disabling"); // 21.3
+    public static final DeferredHolder<SoundEvent, SoundEvent> REMOTE_CHARGE_EXPLOSION = register("remote_charge_explosion"); // 22.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> LASER_SHOOT = register("laser_shoot"); // 22.1
+    public static final DeferredHolder<SoundEvent, SoundEvent> REMOTE_PLANT = register("remote_plant"); // 22.2
+    public static final DeferredHolder<SoundEvent, SoundEvent> REMOTE_EXPLODE = register("remote_explode"); // 22.3
 
     public static void init(IEventBus bus) {
         SOUNDS.register(bus);

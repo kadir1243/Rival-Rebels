@@ -17,6 +17,7 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -72,15 +73,13 @@ public class ModelLaptop
 	private static final Vector3f			v12		= new Vector3f(-0.4375f, 0.125f, 0.5625f);
 
     public static void renderModel(MultiBufferSource vertexConsumers, PoseStack matrices, float turn, int light, int overlay) {
-        VertexConsumer buffer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etlaptop));
-        matrices.pushPose();
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etlaptop));
 		RenderHelper.addFace(matrices, buffer, v11, v12, v9, v10, t4t, t9t, t10t, t5t, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v12, v4, v1, v9, t9t, t13t, t14t, t10t, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v11, v3, v4, v12, t4t, t3t, t8t, t9t, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v10, v2, v3, v11, t5t, t2t, t1t, t4t, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v9, v1, v2, v10, t10t, t11t, t6t, t5t, light, overlay);
 		RenderHelper.addFace(matrices, buffer, v2, v1, v4, v3, t6t, t11t, t12t, t7t, light, overlay);
-		matrices.popPose();
 
 		matrices.pushPose();
 		matrices.translate(0, 0.125f, 0);
@@ -108,7 +107,7 @@ public class ModelLaptop
 		matrices.pushPose();
 		matrices.translate(0, 0.125f, 0);
 		matrices.mulPose(ROTATION_AXIS.rotationDegrees(turn));
-		RenderHelper.addFace(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(screenTexture)), v2v, v1v, v4v, v3v, t333, t222, t111, t444, light, overlay);
+		RenderHelper.addFace(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(screenTexture)), v2v, v1v, v4v, v3v, t333, t222, t111, t444, light, overlay);
 		matrices.popPose();
 	}
 }

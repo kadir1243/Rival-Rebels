@@ -14,18 +14,21 @@ package io.github.kadir1243.rivalrebels.common.explosion;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.core.BlackList;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityDebris;
 import io.github.kadir1243.rivalrebels.common.entity.EntityFlameBall;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
@@ -139,7 +142,7 @@ public class Explosion
 		if (state.is(RRBlocks.remotecharge))
 		{
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-			RivalRebelsSoundPlayer.playSound(world, 22, 0, pos, 0.5f, 0.3f);
+            world.playLocalSound(pos, RRSounds.REMOTE_CHARGE_EXPLOSION.get(), SoundSource.BLOCKS, 0.5F, 0.3F, false);
 			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getChargeExplosionSize(), false, false, RivalRebelsDamageSource.charge(world));
 			return;
 		}
@@ -180,9 +183,9 @@ public class Explosion
 
                     if (var33 != 0.0D) {
                         vector = vector.normalize();
-                        double var32 = net.minecraft.world.level.Explosion.getSeenPercent(pos, entity);
+                        double var32 = ServerExplosion.getSeenPercent(pos, entity);
                         double var34 = (1.0D - var13) * var32;
-                        entity.hurt(dmgsrc, (int) ((var34 * var34 + var34) / 2.0D * radius + 1.0D));
+                        entity.hurtServer((ServerLevel) world, dmgsrc, (int) ((var34 * var34 + var34) / 2.0D * radius + 1.0D));
                         entity.push(vector.scale(var34));
                     }
                 }

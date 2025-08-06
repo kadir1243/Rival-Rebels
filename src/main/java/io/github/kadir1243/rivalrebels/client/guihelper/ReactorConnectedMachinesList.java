@@ -17,16 +17,10 @@ public class ReactorConnectedMachinesList extends AbstractSelectionList<ReactorC
     public ReactorConnectedMachinesList(Minecraft minecraft, int width, int height, int x, int y, int itemHeight) {
         super(minecraft, width, height, y, itemHeight);
         this.setX(x);
-        this.setRenderHeader(false, 0);
     }
 
     @Override
     protected void updateWidgetNarration(NarrationElementOutput narration) {
-    }
-
-    @Override
-    protected int getDefaultScrollbarPosition() {
-        return this.getX() + getWidth();
     }
 
     @Override
@@ -76,9 +70,7 @@ public class ReactorConnectedMachinesList extends AbstractSelectionList<ReactorC
         public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
             float alpha = 0.5f;
             if (onMachine) alpha = 1;
-            graphics.setColor(1, 1, 1, alpha);
-            graphics.renderItem(machine.asItem().getDefaultInstance(), left + width / 2 - 13, top, 0, 1);
-            graphics.setColor(1, 1, 1, 1);
+            graphics.renderItem(machine.asItem().getDefaultInstance(), left + width / 2 - 13, top);
         }
 
         @Override

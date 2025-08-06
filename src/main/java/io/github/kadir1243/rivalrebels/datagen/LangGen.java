@@ -19,7 +19,7 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
 
     @Override
     protected void addTranslations() {
-        add(Translations.CREATIVE_TAB.toLanguageKey(), "Rival Rebels");
+        add(Translations.CREATIVE_TAB, "Rival Rebels");
         addBlock(RRBlocks.radioactivesand, "Radioactive Sand");
         addBlock(RRBlocks.radioactivedirt, "Radioactive Dirt");
         addBlock(RRBlocks.timedbomb, "Timed Bomb");
@@ -99,27 +99,27 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addDamage(RRDamageTypes.ELECTRICITY, "%1s is Now Electric-Man");
         addDamage(RRDamageTypes.CHARGE, "%1s Charged");
 
-        add(ItemFlameThrower.OUT_OF_FUEL.toLanguageKey(), "Out Of Fuel");
-        add(Translations.OVERHEAT_TRANSLATION.toLanguageKey(), "Reactor is Overheating");
-        add(Translations.WARNING_TRANSLATION.toLanguageKey(), "WARNING");
-        add(Translations.ORDERS_TRANSLATION.toLanguageKey(), "ORDERS");
-        add(Translations.STATUS_TRANSLATION.toLanguageKey(), "STATUS");
-        add(Translations.DEFUSE_TRANSLATION.toLanguageKey(), "DEFUSE");
-        add(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.toLanguageKey(), "Use pliers to build.");
-        add(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.toLanguageKey(), "Use pliers to open.");
-        add(Translations.AMMUNITION_TRANSLATION.toLanguageKey(), "ammunition");
-        add(Translations.NUKE_TRANSLATION.toLanguageKey(), "Nuclear Bomb");
-        add(Translations.SHIFT_CLICK.toLanguageKey(), "Shift-Click (Sneak).");
-        add(Translations.BOMB_TIMER.toLanguageKey(), "Timer");
-        add(Translations.UNBALANCED_BOMB.toLanguageKey(), "Unbalanced");
-        add(Translations.BOMB_MEGATONS.toLanguageKey(), "Megatons");
-        add(Translations.BOMB_ARMED.toLanguageKey(), "Armed");
-        add(Translations.LAPTOP_B2_SPIRIT.toLanguageKey(), "B-2 Spirit");
-        add(Translations.BUILDING_TOKAMAK.toLanguageKey(), "Constructing ToKaMaK %s");
-        add(Translations.BUILDING.toLanguageKey(), "Constructing %s");
-        add(Translations.SPAWN_RESET_WARNING.toLanguageKey(), "Warning: Resetting will clear your inventory");
-        add(Translations.RHODES_IS_ARMED.toLanguageKey(), "%s Armed");
-        add(Translations.TSAR_NAME.toLanguageKey(), "Tsar Bomb");
+        add(ItemFlameThrower.OUT_OF_FUEL, "Out Of Fuel");
+        add(Translations.OVERHEAT_TRANSLATION, "Reactor is Overheating");
+        add(Translations.WARNING_TRANSLATION, "WARNING");
+        add(Translations.ORDERS_TRANSLATION, "ORDERS");
+        add(Translations.STATUS_TRANSLATION, "STATUS");
+        add(Translations.DEFUSE_TRANSLATION, "DEFUSE");
+        add(Translations.USE_PLIERS_TO_BUILD_TRANSLATION, "Use pliers to build.");
+        add(Translations.USE_PLIERS_TO_OPEN_TRANSLATION, "Use pliers to open.");
+        add(Translations.AMMUNITION_TRANSLATION, "ammunition");
+        add(Translations.NUKE_TRANSLATION, "Nuclear Bomb");
+        add(Translations.SHIFT_CLICK, "Shift-Click (Sneak).");
+        add(Translations.BOMB_TIMER, "Timer");
+        add(Translations.UNBALANCED_BOMB, "Unbalanced");
+        add(Translations.BOMB_MEGATONS, "Megatons");
+        add(Translations.BOMB_ARMED, "Armed");
+        add(Translations.LAPTOP_B2_SPIRIT, "B-2 Spirit");
+        add(Translations.BUILDING_TOKAMAK, "Constructing ToKaMaK %s");
+        add(Translations.BUILDING, "Constructing %s");
+        add(Translations.SPAWN_RESET_WARNING, "Warning: Resetting will clear your inventory");
+        add(Translations.RHODES_IS_ARMED, "%s Armed");
+        add(Translations.TSAR_NAME, "Tsar Bomb");
 
         add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_1", "Radiological Alarm.");
         add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_2", "Nuclear weapon armed.");
@@ -127,17 +127,17 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
 
         add(RRIdentifiers.MODID + ".warning_meltdown", "Meltdown");
 
-        add(RivalRebelsClass.NONE.getDescriptionTranslationKey(), "None");
-        add(RivalRebelsClass.REBEL.getDescriptionTranslationKey(), "Front line hero, heavy warrior, super soldier, half human half war machine, tank. Team value: essential to achieve victory by holding the enemy and protecting the team. Armor: Heavy, long durability. Speed: +1");
-        add(RivalRebelsClass.NUKER.getDescriptionTranslationKey(), "Demolition expert, tactical nuking, heavy technician, mass destruction, booby trapping. Team value: essential to achieve victory by nuking the enemy's objective. Armor: Ultra heavy, medium durability. Speed: Normal");
-        add(RivalRebelsClass.INTEL.getDescriptionTranslationKey(), "Expert in intelligence gathering, sabotage, infiltration, trap making, spying, attacks plotting. Team value: essential to locate targets and disrupt enemy offensives. Armor: Light, medium durability. Speed: +2");
-        add(RivalRebelsClass.HACKER.getDescriptionTranslationKey(), "Tactical defense, cyber spying, sabotage, communications jamming, code breaking, technology expert, machinist. Team value: essential to protect the objective and boost weaponry production. Armor: Ultra light, long durability. Speed: +2");
+        add(RivalRebelsClass.NONE.getDescription(), "None");
+        add(RivalRebelsClass.REBEL.getDescription(), "Front line hero, heavy warrior, super soldier, half human half war machine, tank. Team value: essential to achieve victory by holding the enemy and protecting the team. Armor: Heavy, long durability. Speed: +1");
+        add(RivalRebelsClass.NUKER.getDescription(), "Demolition expert, tactical nuking, heavy technician, mass destruction, booby trapping. Team value: essential to achieve victory by nuking the enemy's objective. Armor: Ultra heavy, medium durability. Speed: Normal");
+        add(RivalRebelsClass.INTEL.getDescription(), "Expert in intelligence gathering, sabotage, infiltration, trap making, spying, attacks plotting. Team value: essential to locate targets and disrupt enemy offensives. Armor: Light, medium durability. Speed: +2");
+        add(RivalRebelsClass.HACKER.getDescription(), "Tactical defense, cyber spying, sabotage, communications jamming, code breaking, technology expert, machinist. Team value: essential to protect the objective and boost weaponry production. Armor: Ultra light, long durability. Speed: +2");
 
-        add(RivalRebelsClass.NONE.getMiniDescriptionTranslationKey(), "None");
-        add(RivalRebelsClass.REBEL.getMiniDescriptionTranslationKey(), "Heavy Weapon Specialist");
-        add(RivalRebelsClass.NUKER.getMiniDescriptionTranslationKey(), "Explosives Specialist");
-        add(RivalRebelsClass.INTEL.getMiniDescriptionTranslationKey(), "Special Forces");
-        add(RivalRebelsClass.HACKER.getMiniDescriptionTranslationKey(), "Cyber War Specialist");
+        add(RivalRebelsClass.NONE.getMiniDescription(), "None");
+        add(RivalRebelsClass.REBEL.getMiniDescription(), "Heavy Weapon Specialist");
+        add(RivalRebelsClass.NUKER.getMiniDescription(), "Explosives Specialist");
+        add(RivalRebelsClass.INTEL.getMiniDescription(), "Special Forces");
+        add(RivalRebelsClass.HACKER.getMiniDescription(), "Cyber War Specialist");
 
         addItem(RRItems.onukerhelmet, "Nuker Helmet O");
         addItem(RRItems.snukerhelmet, "Nuker Helmet S");
@@ -187,5 +187,9 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
 
     public void addDamage(ResourceKey<DamageType> resourceKey, String translation) {
         add("death.attack."+ RRIdentifiers.MODID + "." + resourceKey.location().getPath(), translation);
+    }
+
+    public void add(Translations.TranslationKey key, String translation) {
+        add(key.key(), translation);
     }
 }

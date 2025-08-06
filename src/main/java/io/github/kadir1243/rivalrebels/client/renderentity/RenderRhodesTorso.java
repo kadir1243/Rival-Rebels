@@ -7,17 +7,16 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderRhodesTorso extends RhodesPartRenderer<EntityRhodesTorso> {
-    public RenderRhodesTorso(EntityRendererProvider.Context renderManager) {
-        super(renderManager);
+    public RenderRhodesTorso(EntityRendererProvider.Context context) {
+        super(context, ObjModels.TORSO_MODEL);
     }
 
     @Override
-    public void renderParts(EntityRhodesTorso entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void renderParts(State entity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         poseStack.translate(0, 0.7F, 0);
-        ObjModels.renderSolid(ObjModels.torso, getTextureLocation(entity), poseStack, bufferSource, entity.getColorRGBA(), packedLight, OverlayTexture.NO_OVERLAY);
+        super.renderParts(entity, poseStack, bufferSource, packedLight);
     }
 }

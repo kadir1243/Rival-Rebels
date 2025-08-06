@@ -19,19 +19,19 @@ import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderLibrary {
 
-	public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
+	public static void renderModel(PoseStack poseStack, MultiBufferSource bufferSource, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
         RandomSource random = Minecraft.getInstance().level.random;
-        matrices.pushPose();
-		matrices.translate(x1, y1, z1);
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
-        matrices.mulPose(Axis.YP.rotationDegrees((float) (Math.atan2(x, z) * 57.295779513 - 90)));
+        poseStack.pushPose();
+		poseStack.translate(x1, y1, z1);
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.lightning());
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) (Math.atan2(x, z) * 57.295779513 - 90)));
 		float dist = Mth.sqrt(x * x + z * z);
 		float hdist = dist / 2f;
 		float hdists = hdist * hdist;
@@ -40,7 +40,7 @@ public class RenderLibrary {
 		float[] xv = new float[segNum];
         float[] yv = new float[segNum];
         float[] zv = new float[segNum];
-        int color = FastColor.ARGB32.colorFromFloat(a, r, g, b);
+        int color = ARGB.colorFromFloat(a, r, g, b);
 
 		for (int i = 1; i < segNum; i++) {
 			float interp = (float) i / (float) segNum;
@@ -61,28 +61,28 @@ public class RenderLibrary {
         for (int o = 0; o < steps; o++) {
 			for (int i = 1; i < segNum; i++) {
                 float s = rs * o;
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
 
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
 
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
 
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
-				buffer.addVertex(matrices.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
 			}
 		}
 
-		matrices.popPose();
+		poseStack.popPose();
 	}
 }

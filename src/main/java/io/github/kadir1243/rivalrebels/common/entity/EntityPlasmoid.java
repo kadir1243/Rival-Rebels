@@ -16,6 +16,7 @@ import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.core.BlackList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -52,7 +53,7 @@ public class EntityPlasmoid extends Projectile {
         setNoGravity(!drop);
         speed *= (isNoGravity() ? 1 : 3);
         this.setOwner(thrower);
-		moveTo(
+		snapTo(
             thrower.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             thrower.getEyeY(),
             thrower.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
@@ -100,7 +101,7 @@ public class EntityPlasmoid extends Projectile {
 
     protected void explode() {
 		if (!level().isClientSide()) {
-			kill();
+			kill((ServerLevel) level());
 			BlockState state = Blocks.STONE.defaultBlockState();
 			int i = -1;
             while ((state.canOcclude() || BlackList.plasmaExplosion(state)) && i < 4) {

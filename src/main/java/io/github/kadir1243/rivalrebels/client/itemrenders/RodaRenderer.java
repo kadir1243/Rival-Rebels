@@ -15,6 +15,11 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,22 +28,22 @@ import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
 public class RodaRenderer implements DynamicItemRenderer {
+    private final QuadCollection rodaModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.RODA_MODEL);
     @Override
-    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate(0.5f, 0.5f, -0.03f);
-		matrices.mulPose(Axis.ZP.rotationDegrees(35));
-		matrices.mulPose(Axis.YP.rotationDegrees(90));
-		matrices.scale(0.35f, 0.35f, 0.35f);
-		if (!mode.firstPerson()) matrices.scale(-1, 1, 1);
-		matrices.translate(0.2f, -0.55f, 0.1f);
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack poseStack, MultiBufferSource vertexConsumers, int light, int overlay) {
+		poseStack.pushPose();
+		poseStack.translate(0.5f, 0.5f, -0.03f);
+		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+		poseStack.mulPose(Axis.YP.rotationDegrees(90));
+		poseStack.scale(0.35f, 0.35f, 0.35f);
+		if (!mode.firstPerson()) poseStack.scale(-1, 1, 1);
+		poseStack.translate(0.2f, -0.55f, 0.1f);
 
-        ObjModels.renderSolid(ObjModels.roda, RRIdentifiers.etrust, matrices, vertexConsumers, light, overlay);
-		matrices.pushPose();
-		ObjModels.renderNoise(ObjModels.roda, matrices, vertexConsumers, light, overlay);
-		matrices.popPose();
+        ObjModels.render(rodaModel, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrust)), poseStack, CommonColors.WHITE, light, overlay);
 
-		matrices.popPose();
+        ObjModels.render(rodaModel, vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE), poseStack, CommonColors.WHITE, light, overlay);
+
+		poseStack.popPose();
 	}
 }
 

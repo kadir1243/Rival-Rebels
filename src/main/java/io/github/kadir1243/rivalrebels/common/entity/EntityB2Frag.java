@@ -16,15 +16,19 @@ import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import java.util.List;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityB2Frag extends EntityInanimate
 {
@@ -44,15 +48,12 @@ public class EntityB2Frag extends EntityInanimate
 		this(RREntities.B2FRAG.get(), level);
 		health = 300;
 		setBoundingBox(new AABB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
-		noCulling = true;
 	}
 
-	public EntityB2Frag(Level level, Entity toBeGibbed, int Type)
-	{
+	public EntityB2Frag(Level level, Entity toBeGibbed, int Type) {
 		this(level);
 		health = 300;
 		setBoundingBox(new AABB(-2.5, -2.5, -2.5, 2.5, 2.5, 2.5));
-		noCulling = true;
 
 		isSliding = false;
 		type = Type;
@@ -60,7 +61,7 @@ public class EntityB2Frag extends EntityInanimate
 		motionyaw = (float) ((random.nextDouble() - 0.5) * 35);
 		motionpitch = (float) ((random.nextDouble() - 0.5) * 25);
 
-		moveTo(toBeGibbed.getX(), toBeGibbed.getY(), toBeGibbed.getZ(), toBeGibbed.getYRot(), toBeGibbed.getXRot());
+		snapTo(toBeGibbed.getX(), toBeGibbed.getY(), toBeGibbed.getZ(), toBeGibbed.getYRot(), toBeGibbed.getXRot());
 
 		double ox = getX();
 		double oz = getZ();
@@ -85,9 +86,8 @@ public class EntityB2Frag extends EntityInanimate
 		igniteForSeconds(10);
 	}
 
-	@Override
-	public boolean canBeCollidedWith()
-	{
+    @Override
+    public boolean canBeCollidedWith(@Nullable Entity p_423659_) {
 		return true;
 	}
 
@@ -100,7 +100,7 @@ public class EntityB2Frag extends EntityInanimate
 
 			if (ticksInGround == 1200)
 			{
-				kill();
+				kill((ServerLevel) level());
 			}
 
             setOnGround(false);
@@ -134,7 +134,7 @@ public class EntityB2Frag extends EntityInanimate
                 }
 
                 if (var9 instanceof EntityLaserBurst) {
-                    var9.kill();
+                    var9.kill((ServerLevel) level());
                     hurt(damageSources().generic(), 6);
                 }
             }
@@ -170,22 +170,24 @@ public class EntityB2Frag extends EntityInanimate
     }
 
     @Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-		nbt.putInt("Type", type);
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+        valueOutput.putInt("Type", type);
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-		type = nbt.getInt("Type");
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+		type = valueInput.getIntOr("Type", 0);
 	}
 
-	@Override
-	public boolean hurt(DamageSource source, float amount) {
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource source, float amount) {
 		if (isAlive()) {
 			health -= amount;
 
 			if (health <= 0) {
-				kill();
+				kill(level);
 				new Explosion(level(), getX(), getY(), getZ(), 6, true, true, RivalRebelsDamageSource.rocket(level()));
                 this.playSound(RRSounds.ARTILLERY_EXPLODE.get(), 30, 1);
 			}

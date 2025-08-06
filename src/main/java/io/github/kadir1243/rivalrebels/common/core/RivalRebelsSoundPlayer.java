@@ -16,7 +16,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
-
+//TODO: Remove this
 public class RivalRebelsSoundPlayer
 {
 	static String[]		directory	=
@@ -219,21 +219,25 @@ public class RivalRebelsSoundPlayer
 			"s"}
                                     };
 
+    @Deprecated(forRemoval = true)
 	public static boolean playSound(Level world, int dir, int num, double x, double y, double z, float volume, float pitch) {
         RivalRebels.LOGGER.error("TODO: Add all sounds back");
         return false;
 	}
 
+    @Deprecated(forRemoval = true)
     public static boolean playSound(Level world, int dir, int num, BlockPos pos, float volume, float pitch)
     {
         return playSound(world, dir, num, pos.getX(), pos.getY(), pos.getZ(), volume, pitch);
     }
 
+    @Deprecated(forRemoval = true)
     public static boolean playSound(Level world, int dir, int num, double x, double y, double z)
 	{
 		return playSound(world, dir, num, x, y, z, 1, 1);
 	}
 
+    @Deprecated(forRemoval = true)
     public static boolean playSound(Entity entity, int dir, int num, float volume, float pitch)
 	{
 		if (entity != null)
@@ -246,15 +250,18 @@ public class RivalRebelsSoundPlayer
 		}
 	}
 
+    @Deprecated(forRemoval = true)
 	public static boolean playSound(Entity entity, int dir, int num, float volume)
 	{
 		return playSound(entity, dir, num, volume, 1);
 	}
 
-	public static boolean playSound(Entity entity, int dir, int num) {
+    @Deprecated(forRemoval = true)
+    public static boolean playSound(Entity entity, int dir, int num) {
 		return playSound(entity, dir, num, 1, 1);
 	}
 
+    @Deprecated(forRemoval = true)
     public static boolean playSound(Level world, int dir, int num, Vec3 pos) {
         return playSound(world, dir, num, pos.x(), pos.y(), pos.z());
     }

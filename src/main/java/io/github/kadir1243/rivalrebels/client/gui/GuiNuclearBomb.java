@@ -11,10 +11,11 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerNuclearBomb;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -32,9 +33,9 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         super.renderLabels(context, mouseX, mouseY);
 		if (menu.isArmed()) {
-            context.drawString(font, Component.translatable(Translations.BOMB_ARMED.toLanguageKey()), 80, imageHeight - 96 + 2, 0xffffff, false);
+            context.drawString(font, Translations.BOMB_ARMED.translate(), 80, imageHeight - 96 + 2, 0xffffff, false);
 		} else if (!menu.hasTrollFace()) {
-            context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 80, imageHeight - 96 + 2, 0xffffff, false);
+            context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Translations.BOMB_MEGATONS.translate()), 80, imageHeight - 96 + 2, 0xffffff, false);
         } else {
             context.drawString(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
         }
@@ -62,17 +63,17 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     }
 
     @Override
-    public ResourceLocation getBackgroundTexture() {
-        return RRIdentifiers.guitnuke;
+    public RRTextures.Texture getBackgroundTexture() {
+        return RRTextures.guitnuke;
     }
 
     @Override
     protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
-		if (menu.getAmountOfCharges() != 0) graphics.setColor((menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0, 1);
+        int color = CommonColors.WHITE;
+        if (menu.getAmountOfCharges() != 0) color = ARGB.colorFromFloat(1F, (menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0F);
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
-		graphics.blit(RRIdentifiers.guitnuke, x, y, 0, 0, imageWidth, 81);
-		graphics.setColor(1, 1, 1, 1);
-        graphics.blit(RRIdentifiers.guitnuke, x, y + 81, 0, 81, imageWidth, imageHeight - 81);
+		RRTextures.guitnuke.blit(graphics, x, y, 0, 0, imageWidth, 81, color);
+        RRTextures.guitnuke.blit(graphics, x, y + 81, 0, 81, imageWidth, imageHeight - 81, CommonColors.WHITE);
 	}
 }

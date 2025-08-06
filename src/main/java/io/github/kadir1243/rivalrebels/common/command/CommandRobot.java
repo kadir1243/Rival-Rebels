@@ -134,10 +134,10 @@ public class CommandRobot {
     }
 
     public static class RhodesTypeArgumentType extends ResourceOrIdArgument<RhodesType> {
-        private static final Codec<Holder<RhodesType>> codec = RivalRebels.RHODES_TYPE_REGISTRY.holderByNameCodec();
+        private static final Codec<RhodesType> CODEC = RivalRebels.RHODES_TYPE_REGISTRY.byNameCodec();
 
         protected RhodesTypeArgumentType(CommandBuildContext context) {
-            super(context, RivalRebels.RHODES_TYPE_REGISTRY_KEY, codec);
+            super(context, RivalRebels.RHODES_TYPE_REGISTRY_KEY, CODEC);
         }
 
         public static RhodesTypeArgumentType argumentType(CommandBuildContext context) {

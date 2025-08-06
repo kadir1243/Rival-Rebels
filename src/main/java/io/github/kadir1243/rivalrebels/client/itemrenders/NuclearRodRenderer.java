@@ -13,9 +13,9 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRod;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -29,11 +29,9 @@ public class NuclearRodRenderer implements DynamicItemRenderer {
 		matrices.translate(0.5f, 0.5f, -0.03f);
 		matrices.mulPose(Axis.ZP.rotationDegrees(35));
 		matrices.scale(0.5f, 1.25f, 0.5f);
-		matrices.pushPose();
 
-		ModelRod.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etradrod)), light, overlay);
+		ModelRod.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etradrod)), light, overlay);
 
-		matrices.popPose();
 		matrices.popPose();
 	}
 }

@@ -14,13 +14,12 @@ package io.github.kadir1243.rivalrebels.common.block.trap;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.RandomSource;
@@ -31,7 +30,6 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.WallTorchBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.Nullable;
 
 public class BlockFlare extends WallTorchBlock {
 	public BlockFlare(Properties settings) {
@@ -73,19 +71,8 @@ public class BlockFlare extends WallTorchBlock {
     }
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
-		entity.hurt(RivalRebelsDamageSource.flare(world), 1);
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
+		entity.hurt(RivalRebelsDamageSource.flare(level), 1);
 		entity.igniteForSeconds(5);
 	}
-    @Nullable
-    private String translationKey;
-
-    @Override
-    public String getDescriptionId() {
-        if (this.translationKey == null) {
-            this.translationKey = Util.makeDescriptionId("block", BuiltInRegistries.BLOCK.getKey(this));
-        }
-
-        return this.translationKey; // Direct copy of Block.getTranslationKey
-    }
 }

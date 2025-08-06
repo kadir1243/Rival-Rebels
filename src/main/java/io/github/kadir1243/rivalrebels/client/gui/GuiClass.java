@@ -11,16 +11,13 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiButton;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiScroll;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsClass;
 import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
-import com.mojang.blaze3d.platform.GlStateManager.DestFactor;
-import com.mojang.blaze3d.platform.GlStateManager.SourceFactor;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -29,14 +26,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Matrix3x2fStack;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiClass extends Screen {
 	private static final int xSizeOfTexture	= 256;
 	private static final int ySizeOfTexture	= 256;
-	private int			posX;
-	private int			posY;
-    private static final float[]		sizelookup		= new float[] { 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
+	private int posX;
+	private int posY;
+    private static final float[] sizelookup = new float[] { 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f, 1f };
 	private Button nextButton;
 	private Button doneButton;
 	private GuiScroll	gameScroll;
@@ -92,7 +90,7 @@ public class GuiClass extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        PoseStack pose = graphics.pose();
+        Matrix3x2fStack pose = graphics.pose();
         if (rrclass == RivalRebelsClass.NONE) rrclass = RivalRebelsClass.REBEL;
         float f = 0.00390625F;
         renderTransparentBackground(graphics);
@@ -101,7 +99,8 @@ public class GuiClass extends Screen {
         graphics.fillGradient(posX + 160, posY + 9, posX + 244, posY + 38, CommonColors.BLACK, CommonColors.BLACK);
 
         ((GuiGraphicsAccessor) graphics).blit(
-            RRIdentifiers.guitclass,
+            RenderPipelines.GUI_TEXTURED,
+            RRTextures.guitclass,
             posX,
             posX + xSizeOfTexture,
             posY + ySizeOfTexture,
@@ -113,32 +112,34 @@ public class GuiClass extends Screen {
             0
         );
 
-        graphics.blit(
-            rrclass.resource,
+        rrclass.resource.get().blit(
+            graphics,
             posX + 12,
             posY + 12,
             128,
             128,
             xSizeOfTexture,
             ySizeOfTexture,
-            512,
-            512
+            CommonColors.WHITE
         );
 
         float scalefactor = 1.5f;
-        pose.scale(scalefactor * 1.2f, scalefactor, scalefactor);
+        pose.pushMatrix();
+        pose.scale(scalefactor * 1.2f, scalefactor);
         graphics.drawCenteredString(font, rrclass.name, (int) ((posX + 76) / (scalefactor * 1.2f)), (int) ((posY + 16) / scalefactor), rrclass.color);
-        pose.scale(1 / (scalefactor * 1.2f), 1 / scalefactor, 1 / scalefactor);
+        pose.popMatrix();
 
 		scalefactor = 0.666f;
-        pose.scale(scalefactor, scalefactor, scalefactor);
-        graphics.drawCenteredString(font, rrclass.getMiniDescriptionTranslation(), (int) ((posX + 76) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
-        pose.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
+        pose.pushMatrix();
+        pose.scale(scalefactor, scalefactor);
+        graphics.drawCenteredString(font, rrclass.getMiniDescription().translate(), (int) ((posX + 76) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
+        pose.popMatrix();
 
 		scalefactor = 0.666f;
-		pose.scale(scalefactor, scalefactor, scalefactor);
+        pose.pushMatrix();
+		pose.scale(scalefactor, scalefactor);
         graphics.drawCenteredString(font, Component.translatable("RivalRebels.class.description"), (int) ((posX + 181) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
-        pose.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
+        pose.popMatrix();
 
         for (int i = 0; i < sizelookup.length; i++) {
             int X = posX + 18 + (i % 9) * 22;
@@ -153,33 +154,23 @@ public class GuiClass extends Screen {
             }
             sizelookup[i] = size;
         }
-		RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
+
 		for (int i = rrclass.getInventory().size() - 1; i >= 0; i--) {
 			int X = posX + 18 + (i % 9) * 22;
 			int Y = posY + 158 + 22 * (i / 9);
-			pose.pushPose();
-			pose.translate(X + 8, Y + 8, 0);
-			pose.scale(sizelookup[i], sizelookup[i], sizelookup[i]);
-			pose.translate(-X - 8, -Y - 8, 0);
+			pose.pushMatrix();
+			pose.translate(X + 8, Y + 8);
+			pose.scale(sizelookup[i], sizelookup[i]);
+			pose.translate(-X - 8, -Y - 8);
 			graphics.renderItem(rrclass.getInventory().get(i), X, Y);
-			pose.popPose();
-            RenderSystem.blendFunc(SourceFactor.SRC_ALPHA, DestFactor.ONE);
-		}
-		for (int i = rrclass.getInventory().size() - 1; i >= 0; i--) {
-			int X = posX + 18 + (i % 9) * 22;
-			int Y = posY + 158 + 22 * (i / 9);
-			pose.pushPose();
-			pose.translate(X + 8, Y + 8, 20);
-			pose.scale(sizelookup[i], sizelookup[i], sizelookup[i]);
-			pose.translate(-X - 8, -Y - 8, 0);
+
 			ItemStack stack = rrclass.getInventory().get(i);
 			if (!stack.isEmpty()) graphics.drawString(font, Component.nullToEmpty(String.valueOf(stack.getCount())),X+17-font.width(String.valueOf(stack.getCount())),Y+9,0xFFFFFF);
-			if (sizelookup[i] > 1)
-			{
+			if (sizelookup[i] > 1) {
                 graphics.fillGradient(X + 17, Y + 3, (int) (X + ((font.width(stack.getHoverName()) + 4) * (sizelookup[i] - 1) * 2) + 15), Y + 13, 0xaa111111, 0xaa111111);
 				graphics.drawString(font, stack.getHoverName(), X + 18, Y + 4, 0xFFFFFF);
 			}
-			pose.popPose();
+			pose.popMatrix();
 		}
 
 		super.render(graphics, mouseX, mouseY, delta);
@@ -189,9 +180,9 @@ public class GuiClass extends Screen {
 		int length = 10;
 		int dist = (int) (-(scroll / scrolllimit) * (((length) * 10) - height));
 		float scalefactor = 0.6666f;
-        PoseStack matrices = context.pose();
-        matrices.scale(scalefactor, scalefactor, scalefactor);
-		context.drawWordWrap(font, rrclass.getDescriptionTranslation(), (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), 0xffffff);
-		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
+        context.pose().pushMatrix();
+        context.pose().scale(scalefactor, scalefactor);
+		context.drawWordWrap(font, rrclass.getDescription().translate(), (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), 0xffffff);
+		context.pose().popMatrix();
 	}
 }

@@ -11,32 +11,33 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector2i;
 
 @OnlyIn(Dist.CLIENT)
-public class GuiCustomButton extends Button
-{
-	Rectangle bbox;
+public class GuiCustomButton extends Button {
+    ScreenRectangle bbox;
     Vector2i tbox;
-	ResourceLocation resloc;
+    private final RRTextures.Texture resloc;
 	boolean				toggleable;
 	public boolean	 isPressed	= false;
 	public boolean	 wasPressed	= false;
 	public boolean	 mouseDown	= false;
 
-    public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector2i uv, boolean isToggle) {
+    public GuiCustomButton(ScreenRectangle rec, RRTextures.Texture rl, Vector2i uv, boolean isToggle) {
         this(rec, rl, uv, isToggle, button -> {});
     }
 
-	public GuiCustomButton(Rectangle rec, ResourceLocation rl, Vector2i uv, boolean isToggle, Button.OnPress onPress) {
-		super(rec.xMin, rec.yMin, rec.xMax - rec.xMin, rec.yMax - rec.yMin, Component.empty(), onPress, DEFAULT_NARRATION);
+	public GuiCustomButton(ScreenRectangle rec, RRTextures.Texture rl, Vector2i uv, boolean isToggle, Button.OnPress onPress) {
+		super(rec.position().x(), rec.position().y(), rec.width(), rec.height(), Component.empty(), onPress, DEFAULT_NARRATION);
 		bbox = rec;
 		tbox = uv;
 		resloc = rl;
@@ -45,7 +46,7 @@ public class GuiCustomButton extends Button
 
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
-		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && bbox.isVecInside(new Vector2i(mouseX, mouseY));
+		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && bbox.containsPoint(mouseX, mouseY);
 		wasPressed = false;
 		if (toggleable && current && !mouseDown)
 		{
@@ -67,7 +68,7 @@ public class GuiCustomButton extends Button
 		}
 
 		if (isPressed) {
-            context.blit(resloc, bbox.xMin, bbox.yMin, tbox.x, tbox.y, bbox.xMax - bbox.xMin, bbox.yMax - bbox.yMin);
+            resloc.blit(context, bbox.position().x(), bbox.position().y(), tbox.x, tbox.y, bbox.width(), bbox.height(), CommonColors.WHITE);
 		}
 	}
 }

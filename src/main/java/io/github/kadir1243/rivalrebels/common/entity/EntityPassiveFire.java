@@ -11,13 +11,15 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.entity;
 
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class EntityPassiveFire extends Projectile {
     private int		ticksInAir;
@@ -41,7 +43,7 @@ public class EntityPassiveFire extends Projectile {
     public EntityPassiveFire(Level level, Entity entity, float par3) {
 		this(level);
         this.setOwner(entity);
-		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
+		snapTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
 		setYRot((getYRot() + 25) % 360);
         setPos(
             getX() - Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F,
@@ -82,14 +84,14 @@ public class EntityPassiveFire extends Projectile {
 		super.tick();
 
 		if (ticksInAir > 7) {
-			this.kill();
+			this.kill((ServerLevel) level());
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var17 = 0.4F;
 
-		if (this.isInWaterOrBubble()) {
-			kill();
+		if (this.isInWater()) {
+			kill((ServerLevel) level());
 		}
 
         setDeltaMovement(getDeltaMovement().scale(var17));
@@ -104,15 +106,15 @@ public class EntityPassiveFire extends Projectile {
     }
 
     @Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-        super.addAdditionalSaveData(nbt);
-		nbt.putDouble("damage", damage);
+    protected void addAdditionalSaveData(ValueOutput p_422546_) {
+        super.addAdditionalSaveData(p_422546_);
+        p_422546_.putDouble("damage", damage);
 	}
 
     @Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-        super.readAdditionalSaveData(nbt);
-        damage = nbt.getDouble("damage");
+    protected void readAdditionalSaveData(ValueInput p_421811_) {
+        super.readAdditionalSaveData(p_421811_);
+        damage = p_421811_.getDoubleOr("damage", 0);
 	}
 
 	@Override

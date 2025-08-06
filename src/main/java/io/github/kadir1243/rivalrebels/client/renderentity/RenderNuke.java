@@ -17,6 +17,10 @@ import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.common.entity.EntityNuke;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,31 +28,45 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderNuke extends EntityRenderer<EntityNuke> {
+public class RenderNuke extends EntityRenderer<EntityNuke, RenderNuke.State> {
+    private final QuadCollection nukeModel;
+
     public RenderNuke(EntityRendererProvider.Context manager) {
         super(manager);
+        nukeModel = manager.getModelManager().getStandaloneModel(ObjModels.NUKE_MODEL);
     }
 
     @Override
-    public void render(EntityNuke entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        matrices.pushPose();
-        matrices.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
-        matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
-        ObjModels.renderSolid(ObjModels.nuke, RRIdentifiers.etwacknuke, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
-        matrices.popPose();
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityNuke entity) {
-        return RRIdentifiers.etwacknuke;
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        poseStack.pushPose();
+        poseStack.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
+        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+        ObjModels.render(nukeModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etwacknuke)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
     }
 
     @Override
     public boolean shouldRender(EntityNuke livingEntity, Frustum camera, double camX, double camY, double camZ) {
         return true;
+    }
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityNuke p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
     }
 }

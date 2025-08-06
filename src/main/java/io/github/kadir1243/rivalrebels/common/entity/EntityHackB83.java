@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.explosion.NuclearExplosion;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -48,7 +49,7 @@ public class EntityHackB83 extends ThrowableProjectile
 	{
 		this(level);
 		straight = flystraight;
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
         setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)),
             (-Mth.sin(pitch * Mth.DEG_TO_RAD)),
             (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)));
@@ -68,7 +69,7 @@ public class EntityHackB83 extends ThrowableProjectile
     @Override
 	public void tick()
 	{
-		if (ticksInAir == - 100 || getY() < level().getMinBuildHeight() || getY() > level().getMaxBuildHeight()) explode();
+		if (ticksInAir == - 100 || getY() < level().getMinY() || getY() > level().getMaxY()) explode();
 		++this.ticksInAir;
 		if (!straight && !level().isClientSide())
 		{
@@ -87,7 +88,7 @@ public class EntityHackB83 extends ThrowableProjectile
 			}
 		}
 
-		if (level().isClientSide && !isInWaterOrBubble())
+		if (level().isClientSide && !isInWater())
 		{
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x(), -getDeltaMovement().y(), -getDeltaMovement().z()));
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x()*0.8f, -getDeltaMovement().y()*0.8f, -getDeltaMovement().z()*0.8f));
@@ -126,8 +127,9 @@ public class EntityHackB83 extends ThrowableProjectile
 
 	public void explode()
 	{
+        if (level().isClientSide()) return;
 		new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength(), false);
 		level().addFreshEntity(new EntityTsarBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f).setTime());
-		this.kill();
+		this.kill(((ServerLevel) level()));
 	}
 }

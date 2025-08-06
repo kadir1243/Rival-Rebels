@@ -17,6 +17,12 @@ import io.github.kadir1243.rivalrebels.common.block.machine.BlockReciever;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReciever;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.util.CommonColors;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,28 +34,35 @@ import net.minecraft.world.phys.AABB;
 
 @OnlyIn(Dist.CLIENT)
 public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever> {
+    private final QuadCollection armModel;
+    private final QuadCollection trayModel;
+    private final QuadCollection adsdragonModel;
+
     public TileEntityRecieverRenderer(BlockEntityRendererProvider.Context context) {
-	}
+        ModelManager modelManager = Minecraft.getInstance().getModelManager();
+        armModel = modelManager.getStandaloneModel(ObjModels.ARM_MODEL);
+        trayModel = modelManager.getStandaloneModel(ObjModels.TRAY_MODEL);
+        adsdragonModel = modelManager.getStandaloneModel(ObjModels.ADS_DRAGON_MODEL);
+    }
 
     @Override
-    public void render(TileEntityReciever entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate(0.5F, 0, 0.5F);
-        Direction facing = entity.getBlockState().getValue(BlockReciever.FACING);
+    public void render(TileEntityReciever blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        poseStack.pushPose();
+		poseStack.translate(0.5F, 0, 0.5F);
+        Direction facing = blockEntity.getBlockState().getValue(BlockReciever.FACING);
 
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-        matrices.translate(0, 0, 0.5);
-        ObjModels.renderSolid(ObjModels.tray, RRIdentifiers.etreciever, matrices, vertexConsumers, light, overlay);
-		if (entity.hasWeapon) {
-            matrices.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			matrices.mulPose(Axis.YP.rotationDegrees(entity.yaw - facing.toYRot()));
-			ObjModels.renderSolid(ObjModels.arm, RRIdentifiers.etreciever, matrices, vertexConsumers, light, overlay);
-            matrices.mulPose(Axis.XP.rotationDegrees(entity.pitch));
-			ObjModels.renderSolid(ObjModels.adsdragon, RRIdentifiers.etadsdragon, matrices, vertexConsumers, light, overlay);
+		poseStack.pushPose();
+        poseStack.translate(0, 0, 0.5);
+        ObjModels.render(trayModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etreciever)), poseStack, CommonColors.WHITE, packedLight, packedOverlay);
+		if (blockEntity.hasWeapon) {
+            poseStack.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
+			poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.yaw - facing.toYRot()));
+			ObjModels.render(armModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etreciever)), poseStack, CommonColors.WHITE, packedLight, packedOverlay);
+            poseStack.mulPose(Axis.XP.rotationDegrees(blockEntity.pitch));
+			ObjModels.render(adsdragonModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etadsdragon)), poseStack, CommonColors.WHITE, packedLight, packedOverlay);
 		}
-		matrices.popPose();
-		matrices.popPose();
+		poseStack.popPose();
+		poseStack.popPose();
 	}
 
     @Override

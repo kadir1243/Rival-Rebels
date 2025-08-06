@@ -12,13 +12,16 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityLaptop extends EntityInanimate
 {
@@ -35,7 +38,7 @@ public class EntityLaptop extends EntityInanimate
 	}
 
     @Override
-    public boolean canBeCollidedWith() {
+    public boolean canBeCollidedWith(@Nullable Entity p_423659_) {
         return this.isAlive();
     }
 
@@ -69,8 +72,8 @@ public class EntityLaptop extends EntityInanimate
 			player.openMenu(null);
 		}
 		if (!player.isShiftKeyDown() && player.getInventory().add(RRBlocks.controller.toStack())) {
-			kill();
-            return InteractionResult.sidedSuccess(level().isClientSide());
+			kill((ServerLevel) level());
+            return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.PASS;
 	}

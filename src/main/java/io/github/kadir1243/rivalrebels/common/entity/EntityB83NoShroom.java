@@ -13,6 +13,7 @@ package io.github.kadir1243.rivalrebels.common.entity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.explosion.NuclearExplosion;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 
@@ -39,6 +40,6 @@ public class EntityB83NoShroom extends EntityB83 {
 		EntitySphereBlast etb = new EntitySphereBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f);
 		etb.tickCount = -920;
 		level().addFreshEntity(etb);
-		this.kill();
+		this.kill((ServerLevel) level());
 	}
 }

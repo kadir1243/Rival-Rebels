@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import net.minecraft.core.Holder;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -39,19 +40,18 @@ public class EntityRhodesHead extends EntityRhodesPiece
 		return 3000;
 	}
 
-	@Override
-	public boolean hurt(DamageSource damageSource, float amount) {
-		if (isAlive() && !level().isClientSide()) {
+    @Override
+    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
+		if (isAlive()) {
 			health -= amount;
-			if (health <= 0)
-			{
-				kill();
-				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.NUCLEAR_ROD.toStack(4)));
-				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.core3.toStack()));
-				level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.einsten.toStack()));
+			if (health <= 0) {
+				kill(level);
+				level().addFreshEntity(new ItemEntity(level, getX(), getY(), getZ(), RRItems.NUCLEAR_ROD.toStack(4)));
+				level().addFreshEntity(new ItemEntity(level, getX(), getY(), getZ(), RRItems.core3.toStack()));
+				level().addFreshEntity(new ItemEntity(level, getX(), getY(), getZ(), RRItems.einsten.toStack()));
 				if (random.nextBoolean())
 				{
-					level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRBlocks.buildrhodes.toStack()));
+					level().addFreshEntity(new ItemEntity(level, getX(), getY(), getZ(), RRBlocks.buildrhodes.toStack()));
 				}
                 this.playSound(RRSounds.ARTILLERY_EXPLODE.get(), 30, 1);
 			}

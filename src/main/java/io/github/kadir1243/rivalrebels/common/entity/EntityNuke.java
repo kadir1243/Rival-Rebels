@@ -14,8 +14,8 @@ package io.github.kadir1243.rivalrebels.common.entity;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -26,6 +26,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
@@ -45,7 +47,7 @@ public class EntityNuke extends ThrowableProjectile {
 	public EntityNuke(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
 	{
 		this(level);
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
 		this.setYRot(yRotO = yaw);
 		this.setXRot(xRotO = pitch);
 		aoc = charges;
@@ -83,7 +85,7 @@ public class EntityNuke extends ThrowableProjectile {
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < level().getMinBuildHeight()) kill();
+		if (getY() < level().getMinY()) kill((ServerLevel) level());
 
 		if (this.isPassenger())
 		{
@@ -119,18 +121,18 @@ public class EntityNuke extends ThrowableProjectile {
         this.reapplyPosition();
 	}
 
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-        super.addAdditionalSaveData(nbt);
-		nbt.putInt("charge", aoc);
-		nbt.putBoolean("troll", troll);
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+		valueOutput.putInt("charge", aoc);
+		valueOutput.putBoolean("troll", troll);
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-        super.readAdditionalSaveData(nbt);
-        aoc = nbt.getInt("charge");
-		troll = nbt.getBoolean("troll");
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+        aoc = valueInput.getIntOr("charge", 0);
+		troll = valueInput.getBooleanOr("troll", false);
 	}
 
     @Override
@@ -155,7 +157,7 @@ public class EntityNuke extends ThrowableProjectile {
 		if (!level().isClientSide())
 		{
 			level().addFreshEntity(new EntityNuclearBlast(level(), getX(), getY(), getZ(), aoc, troll));
-			this.kill();
+			this.kill((ServerLevel) level());
 		}
 	}
 }

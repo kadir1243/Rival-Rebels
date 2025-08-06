@@ -18,9 +18,9 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
+import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -33,13 +33,13 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class BlockAntimatterBomb extends BaseEntityBlock {
     public static final MapCodec<BlockAntimatterBomb> CODEC = simpleCodec(BlockAntimatterBomb::new);
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public BlockAntimatterBomb(Properties settings)
 	{
@@ -63,16 +63,16 @@ public class BlockAntimatterBomb extends BaseEntityBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!stack.isEmpty() && stack.is(RRItems.pliers))
 		{
             player.openMenu(getMenuProvider(state, level, pos));
-            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.SUCCESS;
 		} else if (!level.isClientSide()) {
-			player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), true);
-            return ItemInteractionResult.FAIL;
+			player.displayClientMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)), true);
+            return InteractionResult.FAIL;
 		}
-		return ItemInteractionResult.FAIL;
+		return InteractionResult.FAIL;
 	}
 
     @Nullable

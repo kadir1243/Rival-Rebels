@@ -18,16 +18,18 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
 
 public class EntityDebris extends EntityInanimate {
@@ -95,27 +97,27 @@ public class EntityDebris extends EntityInanimate {
     }
 
     public void die(double x, double y, double z) {
-		kill();
+        kill((ServerLevel) level());
         BlockPos pos = BlockPos.containing(x, y, z);
         level().setBlockAndUpdate(pos, getState());
     }
 
     @Override
-    protected void addAdditionalSaveData(CompoundTag nbt) {
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
         if (getState() != null) {
-            nbt.put("Block", NbtUtils.writeBlockState(getState()));
+            valueOutput.store("Block", CompoundTag.CODEC, NbtUtils.writeBlockState(getState()));
         }
-		nbt.putInt("Age", tickCount);
-		if (!getTileEntityData().isEmpty()) nbt.put("TileEntityData", getTileEntityData());
+        valueOutput.putInt("Age", tickCount);
+		if (!getTileEntityData().isEmpty()) valueOutput.store("TileEntityData", CompoundTag.CODEC, getTileEntityData());
 	}
 
     @Override
-    protected void readAdditionalSaveData(CompoundTag nbt) {
-        if (nbt.contains("Block")) {
-            setState(NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK), nbt.getCompound("Block")));
-        }
-        tickCount = nbt.getInt("Age");
-		if (nbt.contains("TileEntityData", Tag.TAG_COMPOUND)) setTileEntityData(nbt.getCompound("TileEntityData"));
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+        valueInput.read("Block", CompoundTag.CODEC).ifPresent(compoundTag -> {
+            setState(NbtUtils.readBlockState(level().holderLookup(Registries.BLOCK), compoundTag));
+        });
+        tickCount = valueInput.getIntOr("Age", 0);
+        valueInput.read("TileEntityData", CompoundTag.CODEC).ifPresent(this::setTileEntityData);
 	}
 
     @Override

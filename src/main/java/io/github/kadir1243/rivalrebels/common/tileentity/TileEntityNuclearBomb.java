@@ -27,9 +27,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -42,6 +40,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -100,16 +100,17 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
     }
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput p_422403_) {
+        super.loadAdditional(p_422403_);
 
-        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
+        ContainerHelper.loadAllItems(p_422403_, this.chestContents);
 	}
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.saveAdditional(nbt, provider);
-        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
+    protected void saveAdditional(ValueOutput p_422177_) {
+        super.saveAdditional(p_422177_);
+
+        ContainerHelper.saveAllItems(p_422177_, this.chestContents);
     }
 
     @Override
@@ -146,7 +147,7 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.displayClientMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".nuke_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.get().getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.get().getName() : Component.nullToEmpty("NONE")), false);
+                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".nuke_bomb_defuse", rrteam.getBlockName()), false);
                 }
 			}
 		}

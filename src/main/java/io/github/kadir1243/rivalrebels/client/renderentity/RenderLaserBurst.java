@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.entity.EntityLaserBurst;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,11 +24,10 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst> {
+public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst, RenderLaserBurst.State> {
 	private static final float red = 1F;
 
     public RenderLaserBurst(EntityRendererProvider.Context renderManager) {
@@ -35,34 +35,29 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst> {
     }
 
     @Override
-    public void render(EntityLaserBurst entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         float radius = 0.12F;
         int distance = 4;
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.lightning());
-        matrices.pushPose();
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.lightning());
+        poseStack.pushPose();
 
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
-        matrices.mulPose(Axis.XP.rotationDegrees(-entity.getXRot()));
+        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
+        poseStack.mulPose(Axis.XP.rotationDegrees(-renderState.xRot));
 
         for (float o = 0; o <= radius; o += radius / 8) {
             float color = 1f - (o * 8.333f);
             if (color < 0) color = 0;
-            buffer.addVertex(matrices.last(), 0 + o, 0 - o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(matrices.last(), 0 + o, 0 + o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(matrices.last(), 0 + o, 0 + o, distance).setColor(red, color, color, 1);
-            buffer.addVertex(matrices.last(), 0 + o, 0 - o, distance).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 + o, 0 - o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 + o, 0 + o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 + o, 0 + o, distance).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 + o, 0 - o, distance).setColor(red, color, color, 1);
 
-            buffer.addVertex(matrices.last(), 0 - o, 0 - o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(matrices.last(), 0 - o, 0 - o, distance).setColor(red, color, color, 1);
-            buffer.addVertex(matrices.last(), 0 - o, 0 + o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(matrices.last(), 0 - o, 0 + o, distance).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 - o, 0 - o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 - o, 0 - o, distance).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 - o, 0 + o, 0).setColor(red, color, color, 1);
+            buffer.addVertex(poseStack.last(), 0 - o, 0 + o, distance).setColor(red, color, color, 1);
         }
-        matrices.popPose();
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityLaserBurst entity) {
-        return null;
+        poseStack.popPose();
     }
 
     @Override
@@ -73,5 +68,23 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst> {
     @Override
     protected int getBlockLightLevel(EntityLaserBurst entity, BlockPos pos) {
         return LightEngine.MAX_LEVEL;
+    }
+
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityLaserBurst p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
     }
 }

@@ -14,7 +14,6 @@ package io.github.kadir1243.rivalrebels.common.tileentity;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.RivalRebels;
-import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTsarBomba;
 import io.github.kadir1243.rivalrebels.common.container.ContainerTsar;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
@@ -28,9 +27,7 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundSource;
@@ -46,6 +43,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tickable {
 	public GameProfile player = null;
@@ -72,16 +71,16 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
 	}
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
 
-        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
+        ContainerHelper.loadAllItems(valueInput, this.chestContents);
 	}
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.saveAdditional(nbt, provider);
-        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
+        ContainerHelper.saveAllItems(valueOutput, this.chestContents);
     }
 
     @Override
@@ -165,7 +164,7 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.displayClientMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.getId()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam == RivalRebelsTeam.OMEGA ? RRBlocks.omegaobj.get().getName() : rrteam == RivalRebelsTeam.SIGMA ? RRBlocks.sigmaobj.get().getName() : Component.nullToEmpty("NONE")), false);
+                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()), false);
                 }
 			}
 		}

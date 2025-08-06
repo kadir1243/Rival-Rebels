@@ -14,11 +14,15 @@ package io.github.kadir1243.rivalrebels.client.tileentityrender;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLoader;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
-import io.github.kadir1243.rivalrebels.common.block.machine.BlockLoader;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityLoader;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -31,33 +35,37 @@ import net.minecraft.world.phys.AABB;
 
 @OnlyIn(Dist.CLIENT)
 public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityLoader> {
+    private final QuadCollection tubeModel;
+
     public TileEntityLoaderRenderer(BlockEntityRendererProvider.Context context) {
+        tubeModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.TUBE_MODEL);
     }
 
     @Override
-    public void render(TileEntityLoader loader, float tickDelta, PoseStack pose, MultiBufferSource vertexConsumers, int light, int overlay) {
-		pose.pushPose();
-		pose.translate(0.5F, 0.5F, 0.5F);
-        pose.mulPose(Axis.YP.rotationDegrees(loader.getBlockState().getValue(BlockLoader.FACING).toYRot()));
+    public void render(TileEntityLoader blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        poseStack.pushPose();
+		poseStack.translate(0.5F, 0.5F, 0.5F);
 
-        VertexConsumer vertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etloader));
-		ModelLoader.renderA(vertexConsumer, pose, light, overlay);
-		ModelLoader.renderB(vertexConsumer, pose, loader.slide, light, overlay);
-		pose.popPose();
-        for (BlockEntity machine : loader.machines) {
-			pose.pushPose();
-			pose.translate(0.5F, 0.5F, 0.5F);
-			int xdif = machine.getBlockPos().getX() - loader.getBlockPos().getX();
-			int zdif = machine.getBlockPos().getZ() - loader.getBlockPos().getZ();
-			pose.mulPose(Axis.YP.rotationDegrees((float) (-90 + (Math.atan2(xdif, zdif) / Mth.PI) * 180F)));
-			pose.translate(-1f, -0.40f, 0);
-			pose.scale(0.5F, 0.15F, 0.15F);
+        VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etloader));
+		ModelLoader.render(vertexConsumer, poseStack, blockEntity.slide, packedLight, packedOverlay);
+		poseStack.popPose();
+        for (BlockEntity machine : blockEntity.machines) {
+			poseStack.pushPose();
+			poseStack.translate(0.5F, 0.5F, 0.5F);
+			int xdif = machine.getBlockPos().getX() - blockEntity.getBlockPos().getX();
+			int zdif = machine.getBlockPos().getZ() - blockEntity.getBlockPos().getZ();
+			poseStack.mulPose(Axis.YP.rotationDegrees((float) (-90 + Math.atan2(xdif, zdif) * Mth.RAD_TO_DEG)));
+			poseStack.translate(-1f, -0.40f, 0);
+			poseStack.scale(0.5F, 0.15F, 0.15F);
 			int dist = (int) Mth.sqrt((xdif * xdif) + (zdif * zdif));
             for (int d = 0; d < dist; d++) {
-				pose.translate(2, 0, 0);
-                ObjModels.renderSolid(ObjModels.tube, RRIdentifiers.ettube, pose, vertexConsumers, light, overlay);
+				poseStack.translate(2, 0, 0);
+                VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.ettube));
+                for (BakedQuad bakedQuad : tubeModel.getAll()) {
+                    buffer.putBulkData(poseStack.last(), bakedQuad, 1, 1, 1, 1, packedLight, packedOverlay);
+                }
             }
-			pose.popPose();
+			poseStack.popPose();
 		}
 	}
 

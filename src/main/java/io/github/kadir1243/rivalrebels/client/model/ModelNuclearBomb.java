@@ -12,17 +12,22 @@
 package io.github.kadir1243.rivalrebels.client.model;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.minecraft.resources.ResourceLocation;
 import org.joml.Vector3f;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.texture.OverlayTexture;
+
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelNuclearBomb {
@@ -60,39 +65,31 @@ public class ModelNuclearBomb {
     private static final Vector3f v19 = new Vector3f(-s, -g * 24, -s);
     private static final Vector3f v20 = new Vector3f(-s, -g * 24, s);
 
-    public static void renderModel(PoseStack pose, MultiBufferSource vertexConsumers, ResourceLocation texture, int light, boolean hasFuse) {
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
-        pose.pushPose();
-        pose.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
+    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL_BOMB = QuadHelper.createBakedModel(buffer -> {
         int itemIcon = 39;
         float var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
         float var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
         float var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
         float var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
+        QuadHelper.addVertice(buffer, v2, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v1, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var3, var5));
 
-        pose.pushPose();
-        pose.scale(1.01f, 1.01f, 1.01f);
+        QuadHelper.addVertice(buffer, v3, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v2, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var3, var5));
 
-        int overlay = OverlayTexture.NO_OVERLAY;
-        RenderHelper.addVertice(pose, buffer, v2, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v1, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v5, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v6, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v4, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v3, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v3, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v2, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v6, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v7, new TextureVertice(var3, var5), light, overlay);
-
-        RenderHelper.addVertice(pose, buffer, v4, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v3, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v7, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v8, new TextureVertice(var3, var5), light, overlay);
-
-        RenderHelper.addVertice(pose, buffer, v1, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v4, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v8, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v5, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v1, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v4, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var3, var5));
 
         itemIcon = 40;
         var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -100,45 +97,45 @@ public class ModelNuclearBomb {
         var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
         var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-        RenderHelper.addVertice(pose, buffer, v6, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v5, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v21, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v22, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v7, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v6, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v22, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v23, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v8, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v7, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v23, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v24, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v5, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v8, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v24, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v21, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v22, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v21, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v9, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v10, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v9, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v10, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v23, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v22, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v10, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v11, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v10, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v11, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v24, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v23, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v11, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v12, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v11, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v12, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v21, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v24, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v12, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v9, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v12, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v9, new TextureVertice(var3, var5));
 
         itemIcon = 38;
         var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -146,10 +143,10 @@ public class ModelNuclearBomb {
         var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
         var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-        RenderHelper.addVertice(pose, buffer, v10, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v9, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v12, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v11, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v10, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v9, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v12, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v11, new TextureVertice(var3, var5));
 
         itemIcon = 41;
         var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -158,44 +155,45 @@ public class ModelNuclearBomb {
         var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
         float o = 0.999F;
 
-        RenderHelper.addVertice(pose, buffer, v13.mul(o, new Vector3f()), new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v14.mul(o, new Vector3f()), new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v18.mul(o, new Vector3f()), new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v17.mul(o, new Vector3f()), new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v13.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v14.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v18.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v17.mul(o, new Vector3f()), new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v14.mul(o, new Vector3f()), new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v15.mul(o, new Vector3f()), new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v19.mul(o, new Vector3f()), new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v18.mul(o, new Vector3f()), new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v14.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v15.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v19.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v18.mul(o, new Vector3f()), new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v15.mul(o, new Vector3f()), new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v16.mul(o, new Vector3f()), new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v20.mul(o, new Vector3f()), new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v19.mul(o, new Vector3f()), new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v15.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v16.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v20.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v19.mul(o, new Vector3f()), new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v16.mul(o, new Vector3f()), new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v13.mul(o, new Vector3f()), new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v17.mul(o, new Vector3f()), new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v20.mul(o, new Vector3f()), new TextureVertice(var3, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v14, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v13, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v17, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v18, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v16.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v13.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v17.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v20.mul(o, new Vector3f()), new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v15, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v14, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v18, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v19, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v16, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v15, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v19, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v20, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v13, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v16, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v20, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v17, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var3, var5));
 
         itemIcon = 42;
         var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -203,25 +201,44 @@ public class ModelNuclearBomb {
         var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
         var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-        RenderHelper.addVertice(pose, buffer, v13, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v15, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v19, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v17, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v16, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v14, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v18, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v20, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v15, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v13, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v17, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v19, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var3, var5));
 
-        RenderHelper.addVertice(pose, buffer, v14, new TextureVertice(var3, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v16, new TextureVertice(var4, var6), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v20, new TextureVertice(var4, var5), light, overlay);
-        RenderHelper.addVertice(pose, buffer, v18, new TextureVertice(var3, var5), light, overlay);
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var3, var5));
+    });
+
+    public static void renderModel(PoseStack pose, MultiBufferSource vertexConsumers, ResourceLocation texture, int light, boolean hasFuse) {
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
+        pose.pushPose();
+        pose.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
+        int itemIcon;
+        float var3;
+        float var4;
+        float var5;
+        float var6;
+
+        pose.pushPose();
+        pose.scale(1.01f, 1.01f, 1.01f);
+
+        int overlay = OverlayTexture.NO_OVERLAY;
+
+        ModelBlockRenderer.renderModel(pose.last(), buffer, BAKED_MODEL_BOMB.get().blockStateModel(), 1, 1, 1, light, overlay);
+
         if (!hasFuse) {
             itemIcon = 37;
             var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -240,7 +257,7 @@ public class ModelNuclearBomb {
             var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
             var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-            VertexConsumer bufferTriangles = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(texture));
+            VertexConsumer bufferTriangles = vertexConsumers.getBuffer(RenderTypes.RENDER_SOLID_TRIANGLES.apply(texture));
             RenderHelper.addVertice(pose, bufferTriangles, v0, new TextureVertice(var3, var6), light, overlay);
             RenderHelper.addVertice(pose, bufferTriangles, v1, new TextureVertice(var4, var6), light, overlay);
             RenderHelper.addVertice(pose, bufferTriangles, v2, new TextureVertice(var4, var5), light, overlay);

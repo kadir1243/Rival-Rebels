@@ -2,12 +2,11 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelDisk;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import io.github.kadir1243.rivalrebels.common.entity.*;
-import io.github.kadir1243.rivalrebels.common.entity.*;
-import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,7 +21,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @OnlyIn(Dist.CLIENT)
-public class RoddiskRenderer extends EntityRenderer<RoddiskBase> {
+public class RoddiskRenderer extends EntityRenderer<RoddiskBase, RoddiskRenderer.State> {
     private float er = 0;
 
     public RoddiskRenderer(EntityRendererProvider.Context dispatcher) {
@@ -30,34 +29,20 @@ public class RoddiskRenderer extends EntityRenderer<RoddiskBase> {
     }
 
     @Override
-    public void render(RoddiskBase entity, float yaw, float partialTick, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        er = Mth.lerp(partialTick, er, er + 13.46F);
-        matrices.pushPose();
-        matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f + er));
-        matrices.scale(0.4f, 0.4f, 0.4f);
-        matrices.pushPose();
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
+        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f + er));
+        poseStack.scale(0.4f, 0.4f, 0.4f);
+        poseStack.pushPose();
 
         RenderType buffer;
-        if (entity instanceof EntityRoddiskRep) buffer = RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES;
-        else buffer = ObjModels.RENDER_SOLID_TRIANGLES.apply(getTextureLocation(entity));
-        ModelDisk.render(matrices, vertexConsumers.getBuffer(buffer), light, OverlayTexture.NO_OVERLAY);
+        if (renderState.isNoiseBuffer) buffer = RenderTypes.CELLULAR_NOISE;
+        else buffer = RenderType.entitySolid(renderState.texture);
+        ModelDisk.render(poseStack, bufferSource.getBuffer(buffer), packedLight, OverlayTexture.NO_OVERLAY);
 
-        matrices.popPose();
-        matrices.popPose();
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(RoddiskBase entity) {
-        if (entity instanceof EntityRoddiskRegular)
-            return RRIdentifiers.etdisk0;
-        if (entity instanceof EntityRoddiskRebel)
-            return RRIdentifiers.etdisk1;
-        if (entity instanceof EntityRoddiskOfficer)
-            return RRIdentifiers.etdisk2;
-        if (entity instanceof EntityRoddiskLeader)
-            return RRIdentifiers.etdisk3;
-        return null;
+        poseStack.popPose();
+        poseStack.popPose();
     }
 
     @Override
@@ -68,5 +53,33 @@ public class RoddiskRenderer extends EntityRenderer<RoddiskBase> {
     @Override
     protected int getBlockLightLevel(RoddiskBase entity, BlockPos pos) {
         return LightEngine.MAX_LEVEL;
+    }
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(RoddiskBase p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+        reusedState.isNoiseBuffer = p_entity instanceof EntityRoddiskRep;
+        reusedState.texture = switch (p_entity) {
+            case EntityRoddiskRegular ignored -> RRIdentifiers.etdisk0;
+            case EntityRoddiskRebel ignored -> RRIdentifiers.etdisk1;
+            case EntityRoddiskOfficer ignored -> RRIdentifiers.etdisk2;
+            case EntityRoddiskLeader ignored -> RRIdentifiers.etdisk3;
+            default -> null;
+        };
+        er = Mth.lerp(partialTick, er, er + 13.46F);
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
+        public ResourceLocation texture;
+        public boolean isNoiseBuffer;
     }
 }

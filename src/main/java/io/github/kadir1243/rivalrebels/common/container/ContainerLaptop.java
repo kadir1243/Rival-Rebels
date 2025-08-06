@@ -15,7 +15,6 @@ import io.github.kadir1243.rivalrebels.common.block.crate.BlockNukeCrate;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockRemoteCharge;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
 import io.github.kadir1243.rivalrebels.common.item.ItemChip;
-import io.github.kadir1243.rivalrebels.common.item.ItemRodNuclear;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Container;

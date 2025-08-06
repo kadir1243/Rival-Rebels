@@ -2,7 +2,6 @@ package io.github.kadir1243.rivalrebels.common.entity.brain;
 
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityGore;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
@@ -46,7 +45,7 @@ public class ShootLaser extends Behavior<EntityRhodes> {
             if (pointing) {
                 if (owner.endangered) owner.enableAllLasers();
                 else owner.setOnLaserData(owner.getRandom().nextInt(2) + 1);
-                RivalRebelsSoundPlayer.playSound(owner, 22, 1, 30f, 0f);
+                owner.playSound(RRSounds.LASER_SHOOT.get(), 30F, 0F);
                 if (lastLaserTarget instanceof Player player) {
                     ItemUtil.damageRandomArmor(player, 24, owner.getRandom());
                     lastLaserTarget.hurt(RivalRebelsDamageSource.laserBurst(owner.level()), owner.isAllLaserEnabled()?16:8);
@@ -135,7 +134,7 @@ public class ShootLaser extends Behavior<EntityRhodes> {
                             owner.level().addFreshEntity(new EntityGore(owner.level(), lastLaserTarget, 2, mobs));
                         for (int i = 0; i < legs; i++)
                             owner.level().addFreshEntity(new EntityGore(owner.level(), lastLaserTarget, 3, mobs));
-                        lastLaserTarget.kill();
+                        lastLaserTarget.kill(level);
                     }
                 }
             }

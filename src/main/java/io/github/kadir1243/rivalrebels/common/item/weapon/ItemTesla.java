@@ -21,37 +21,33 @@ import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Item;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
-public class ItemTesla extends TieredItem {
-	public ItemTesla() {
-		super(Tiers.DIAMOND, new Properties().stacksTo(1).component(RRComponents.TESLA_DIAL, 0));
+public class ItemTesla extends Item {
+	public ItemTesla(Properties properties) {
+		super(properties.stacksTo(1).enchantable(100).component(RRComponents.TESLA_DIAL, 0));
 	}
 
 	@Override
-	public int getEnchantmentValue()
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return 100;
-	}
-
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
-	{
-		return UseAnim.NONE;
+		return ItemUseAnimation.NONE;
 	}
 
     @Override
@@ -60,7 +56,7 @@ public class ItemTesla extends TieredItem {
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
         int degree = getDegree(stack);
 		float chance = Mth.abs(degree - 90) / 90f;
@@ -89,14 +85,14 @@ public class ItemTesla extends TieredItem {
 			player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 	boolean message = true;
 
     @OnlyIn(Dist.CLIENT)
     @Override
-    public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
-        if (selected && level.isClientSide()) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+        if (slot != null && level.isClientSide()) {
             if (RRClient.USE_KEY.isDown() && Minecraft.getInstance().screen == null) {
                 Minecraft.getInstance().setScreen(new GuiTesla(getDegree(stack)));
             }
@@ -105,7 +101,7 @@ public class ItemTesla extends TieredItem {
 
     @Override
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-		if (user.isInWaterRainOrBubble() && !user.isInvulnerableTo(RivalRebelsDamageSource.electricity(world))) {
+		if (user.isInWaterOrRain() && !user.isInvulnerableTo(((ServerLevel) world), RivalRebelsDamageSource.electricity(world))) {
 			user.hurt(RivalRebelsDamageSource.electricity(world), 2);
 		}
 		if (user.getRandom().nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);

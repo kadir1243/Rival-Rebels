@@ -11,10 +11,9 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerTheoreticalTsar;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -31,16 +30,16 @@ public class GuiTheoreticalTsar extends BombContainerScreen<ContainerTheoretical
 
     @Override
     public void renderName(GuiGraphics graphics) {
-        graphics.drawString(font, Component.translatable(Translations.TSAR_NAME.toLanguageKey()), 18, 16, 4210752, false);
+        graphics.drawString(font, Translations.TSAR_NAME.translate(), 18, 16, 4210752, false);
     }
 
     @Override
     protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
         super.renderLabels(context, mouseX, mouseY);
         if (menu.isArmed()) {
-            context.drawString(font, Component.translatable(Translations.BOMB_ARMED.toLanguageKey()), 6, imageHeight - 97, 0xFF0000, false);
+            context.drawString(font, Translations.BOMB_ARMED.translate(), 6, imageHeight - 97, 0xFF0000, false);
         } else {
-            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Component.translatable(Translations.BOMB_MEGATONS.toLanguageKey())), 6, imageHeight - 97, 0xFFFFFF, false);
+            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Translations.BOMB_MEGATONS.translate()), 6, imageHeight - 97, 0xFFFFFF, false);
         }
     }
 
@@ -55,7 +54,7 @@ public class GuiTheoreticalTsar extends BombContainerScreen<ContainerTheoretical
     }
 
     @Override
-    public ResourceLocation getBackgroundTexture() {
-        return RRIdentifiers.guitheoreticaltsar;
+    public RRTextures.Texture getBackgroundTexture() {
+        return RRTextures.guitheoreticaltsar;
     }
 }

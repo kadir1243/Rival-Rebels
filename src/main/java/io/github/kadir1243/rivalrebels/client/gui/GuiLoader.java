@@ -11,10 +11,9 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerLoader;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -33,17 +32,16 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
 	}
 
     @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
-        PoseStack matrices = context.pose();
-        matrices.pushPose();
-		matrices.mulPose(Axis.ZP.rotationDegrees(-13));
-		context.drawString(font, "Loader", 165, 237, 0x444444, false);
-		matrices.popPose();
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        graphics.pose().pushMatrix();
+		graphics.pose().rotate(-13);
+		graphics.drawString(font, "Loader", 165, 237, 0x444444, false);
+		graphics.pose().popMatrix();
 	}
 
     @Override
-    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
-		context.blit(RRIdentifiers.guitloader, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210);
+    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
+        RRTextures.guitloader.blit(graphics, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210, CommonColors.WHITE);
 	}
 
     @Override

@@ -1,6 +1,16 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "display": {
+    "none": {
+      "rotation": [
+        0.5,
+        0.5,
+        0.5
+      ]
+    }
+  },
+  "loader": "neoforge:obj",
+  "model": "rivalrebels:models/wacknuke.obj",
   "textures": {
-    "all": "rivalrebels:block/ak"
+    "texture": "rivalrebels:textures/entity/cg.png"
   }
 }

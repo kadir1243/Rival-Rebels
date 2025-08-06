@@ -14,6 +14,7 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -29,7 +30,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderBullet extends EntityRenderer<Entity> {
+public class RenderBullet extends EntityRenderer<Entity, EntityRenderState> {
     private final String path;
 
 	public RenderBullet(EntityRendererProvider.Context manager, String path) {
@@ -38,25 +39,29 @@ public class RenderBullet extends EntityRenderer<Entity> {
 	}
 
     @Override
-    public void render(Entity entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		if (entity.tickCount > 1) {
-			matrices.pushPose();
-			matrices.scale(0.5F, 0.5F, 0.5F);
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
+    }
+
+    @Override
+    public void render(EntityRenderState renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		if (renderState.ageInTicks > 1) {
+			poseStack.pushPose();
+			poseStack.scale(0.5F, 0.5F, 0.5F);
             float var7 = 1.0F;
             float var8 = 0.5F;
             float var9 = 0.25F;
-            matrices.mulPose(this.entityRenderDispatcher.cameraOrientation());
-            VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(getTextureLocation(entity)));
-            buffer.addVertex(matrices.last(), (0.0F - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-            buffer.addVertex(matrices.last(), (var7 - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-            buffer.addVertex(matrices.last(), (var7 - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-            buffer.addVertex(matrices.last(), (0.0F - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-			matrices.popPose();
+            poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+            VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(getTextureLocation()));
+            buffer.addVertex(poseStack.last(), (0.0F - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(poseStack.last(), 0, 1, 0);
+            buffer.addVertex(poseStack.last(), (var7 - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(poseStack.last(), 0, 1, 0);
+            buffer.addVertex(poseStack.last(), (var7 - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(poseStack.last(), 0, 1, 0);
+            buffer.addVertex(poseStack.last(), (0.0F - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(poseStack.last(), 0, 1, 0);
+			poseStack.popPose();
 		}
 	}
 
-    @Override
-    public ResourceLocation getTextureLocation(Entity entity) {
+    public ResourceLocation getTextureLocation() {
         if (path.equals("flame")) return RRIdentifiers.etflame;
         if (path.equals("fire")) return RRIdentifiers.etfire;
         return null;

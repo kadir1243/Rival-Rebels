@@ -1,3 +1,6 @@
 {
-  "parent": "rivalrebels:item/petrifiedstone4"
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "rivalrebels:block/petrifiedstone4"
+  }
 }

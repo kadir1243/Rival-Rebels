@@ -16,6 +16,7 @@ import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
@@ -30,10 +31,10 @@ public class BlockQuickSand extends Block
 	}
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
 		entity.fallDistance = 0.0F;
         entity.setDeltaMovement(entity.getDeltaMovement().multiply(1, 0.005, 1));
-		if (world.random.nextFloat() > 0.95) world.playSound(entity, pos, RRSounds.QUICK_SAND.get(), SoundSource.BLOCKS, 0.2F, 1);
+		if (level.random.nextFloat() > 0.95) level.playSound(entity, pos, RRSounds.QUICK_SAND.get(), SoundSource.BLOCKS, 0.2F, 1);
 	}
 
 	/*@Override
@@ -102,7 +103,7 @@ public class BlockQuickSand extends Block
 	}*/
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return RRBlocks.aquicksand.toStack();
     }
 

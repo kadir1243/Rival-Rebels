@@ -11,35 +11,20 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.model;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import com.mojang.math.Axis;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelBlastSphere {
-    private static final RenderType RENDER_TYPE = RenderType.create(
-        RRIdentifiers.MODID +"_model_blast_sphere_triangles",
-        DefaultVertexFormat.POSITION_COLOR,
-        VertexFormat.Mode.TRIANGLES,
-        1536,
-        RenderType.CompositeState.builder()
-            .setShaderState(RenderStateShard.RENDERTYPE_LIGHTNING_SHADER)
-            .setWriteMaskState(RenderStateShard.COLOR_DEPTH_WRITE)
-            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
-            .createCompositeState(false)
-    );
-	private static final Vector3f	vx	= new Vector3f(1, 0, 0).normalize();
+    private static final Vector3f	vx	= new Vector3f(1, 0, 0).normalize();
 	private static final Vector3f	vy	= new Vector3f(0, 1, 0).normalize();
 	private static final Vector3f	vz	= new Vector3f(0, 0, 1).normalize();
 	private static final Vector3f	vxy	= new Vector3f(0.5f, 0.5f, 0).normalize();
@@ -56,11 +41,11 @@ public class ModelBlastSphere {
 	private static final Vector3f	vz3	= new Vector3f(0, 0.25f, 0.75f).normalize();
 
     public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float size, float red, float green, float blue, float alpha) {
-        renderModel(matrices, vertexConsumers, size, FastColor.ARGB32.colorFromFloat(alpha, red, green, blue));
+        renderModel(matrices, vertexConsumers, size, ARGB.colorFromFloat(alpha, red, green, blue));
     }
 
     public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float size, int color) {
-        renderModel(matrices, vertexConsumers.getBuffer(RENDER_TYPE), size, color);
+        renderModel(matrices, vertexConsumers.getBuffer(RenderTypes.MODEL_BLAST_SPHERE_TRIANGLES), size, color);
     }
 
 	public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int color) {

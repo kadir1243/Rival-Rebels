@@ -17,26 +17,31 @@ import io.github.kadir1243.rivalrebels.common.item.components.ChipData;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemChip extends Item {
-	public ItemChip()
+	public ItemChip(Properties properties)
 	{
-		super(new Properties().stacksTo(1));
+		super(properties);
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
+    public void inventoryTick(ItemStack stack, ServerLevel p_401805_, Entity entity, @Nullable EquipmentSlot p_401900_) {
 		if (RivalRebels.round.isStarted() && !stack.has(RRComponents.CHIP_DATA) && entity instanceof Player player) {
             stack.set(RRComponents.CHIP_DATA, new ChipData(player.getGameProfile(), RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam));
 		}
@@ -64,18 +69,18 @@ public class ItemChip extends Item {
 				} else {
 					world.setBlockAndUpdate(pos, RRBlocks.rhodesactivator.get().defaultBlockState());
 				}
-				return InteractionResult.sidedSuccess(world.isClientSide());
+				return InteractionResult.SUCCESS;
 			}
 		}
 		return InteractionResult.PASS;
 	}
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay tooltipDisplay, Consumer<Component> consumer, TooltipFlag tooltipFlag) {
         if (stack.has(RRComponents.CHIP_DATA)) {
             ChipData chipData = stack.get(RRComponents.CHIP_DATA);
-            tooltipComponents.add(Component.literal(chipData.team().name()));
-            tooltipComponents.add(Component.literal("Player with name " + chipData.gameProfile().getName() + ", and uuid " + chipData.gameProfile().getId()));
+            consumer.accept(Component.literal(chipData.team().name()));
+            consumer.accept(Component.literal("Player with name " + chipData.gameProfile().getName() + ", and uuid " + chipData.gameProfile().getId()));
 		}
 	}
 }

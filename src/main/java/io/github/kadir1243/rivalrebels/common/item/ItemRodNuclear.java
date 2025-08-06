@@ -12,11 +12,12 @@
 package io.github.kadir1243.rivalrebels.common.item;
 
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemRodNuclear extends Item {
 	public ItemRodNuclear(Properties properties) {
@@ -24,9 +25,9 @@ public class ItemRodNuclear extends Item {
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, Level world, Entity entity, int slot, boolean selected) {
-        if (world.random.nextInt(16) == 0) {
-            entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(world), world.random.nextInt(4));
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+        if (level.getRandom().nextInt(16) == 0) {
+            entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), level.getRandom().nextInt(4));
         }
 	}
 }

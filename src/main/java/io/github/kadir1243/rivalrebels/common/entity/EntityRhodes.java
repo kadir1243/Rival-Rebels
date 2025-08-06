@@ -36,7 +36,6 @@ import com.mojang.serialization.Dynamic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -46,16 +45,15 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.util.Unit;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
-import net.minecraft.world.entity.ai.targeting.TargetingConditions;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.monster.CaveSpider;
 import net.minecraft.world.entity.monster.Creeper;
@@ -75,14 +73,20 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.entity.EntityTypeTest;
+import net.minecraft.world.level.entity.LevelEntityGetter;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Predicate;
 
-public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<RhodesType>> {
+//FIXME: Should be refactored, also this is broken
+public class EntityRhodes extends LivingEntity {
     public static final EntityDataAccessor<Boolean> FIRE = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Boolean> PLASMA = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.BOOLEAN);
     public static final EntityDataAccessor<Integer> ENERGY = SynchedEntityData.defineId(EntityRhodes.class, EntityDataSerializers.INT);
@@ -172,7 +176,6 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 	public EntityRhodes(Level w) {
 		this(RREntities.RHODES.get(), w);
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(RRConfig.SERVER.getRhodesHealth());
-		noCulling = true;
 		noPhysics = true;
 		//pushSpeedReduction = 100;
         this.playSound(RRSounds.LAPTOP2.get(), 90, 1);
@@ -204,7 +207,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 		setPos(x, y, z);
 		if (!level().isClientSide()) {
             for (Player player : level().players()) {
-                player.displayClientMessage(Translations.warning().append(" ").append(Component.translatable(Translations.RHODES_IS_ARMED.toLanguageKey(), getName())), false);
+                player.displayClientMessage(Translations.warning().append(" ").append(Translations.RHODES_IS_ARMED.translate(getName())), false);
             }
         }
 	}
@@ -214,8 +217,8 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 		if ((wakePos.getY() != -1) && !level().getBlockState(wakePos).is(RRBlocks.rhodesactivator)) {
 			damageUntilWake -= 100;
 		}
-		if (getY() <= 0) {
-			kill();
+		if (getY() <= level().getMinY()) {
+			kill((ServerLevel) level());
 			return;
 		}
         makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
@@ -299,7 +302,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 				if (isDeadOrDying()) {
                     MutableComponent text = Translations.status().append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
                     for (Player player : level().players()) {
-                        player.sendSystemMessage(text);
+                        player.displayClientMessage(text, false);
                     }
                 }
 				if (tickCount % 5 == 0) {
@@ -308,7 +311,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                     }
                 }
 				if (getHealth() < -100) {
-					kill();
+					kill((ServerLevel) level());
 				}
 				if (isDeadOrDying()) {
 					float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
@@ -661,19 +664,19 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                         this.hurt(level().damageSources().generic(), 8);
                     }
                     case EntityFlameBall ignored -> {
-                        e.kill();
+                        e.kill((ServerLevel) level());
                         this.hurt(level().damageSources().generic(), 3);
                     }
                     case EntityFlameBall1 ignored -> {
-                        e.kill();
+                        e.kill((ServerLevel) level());
                         this.hurt(level().damageSources().generic(), 4);
                     }
                     case EntityFlameBall2 ignored -> {
-                        e.kill();
+                        e.kill((ServerLevel) level());
                         this.hurt(level().damageSources().generic(), 2);
                     }
                     case EntityLaserBurst ignored -> {
-                        e.kill();
+                        e.kill((ServerLevel) level());
                         this.hurt(level().damageSources().generic(), 4);
                     }
                     default -> {}
@@ -712,7 +715,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
             float pz = (float) getZ() + syaw * 6.4f * getScale();
             BlockEntity te = null;
             float priority1 = 0;
-            for (LivingEntity e1 : level().getNearbyEntities(LivingEntity.class, TargetingConditions.forCombat(), this, new AABB(px - 100 * getScale(), py - 100 * getScale(), pz - 100 * getScale(), px + 100 * getScale(), py + 100 * getScale(), pz + 100 * getScale()))) {
+            for (Entity e1 : level().getEntities(this, new AABB(px - 100 * getScale(), py - 100 * getScale(), pz - 100 * getScale(), px + 100 * getScale(), py + 100 * getScale(), pz + 100 * getScale()), e -> e instanceof LivingEntity)) {
                 float dx = (float) e1.getX() - px;
                 float dz = (float) e1.getZ() - pz;
                 float dot = (cyaw * dx + syaw * dz);
@@ -722,7 +725,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                     if (dist1 < 100 * 100 * getScale() * getScale()) {
                         float prio1 = getPriority(e1) - Mth.sqrt(dist1);
                         if (prio1 > priority1 && rayTraceBlocks(px, py, pz, (float) e1.getX(), (float) e1.getY() + e1.getBbHeight() / 2f, (float) e1.getZ()) == null) {
-                            target = e1;
+                            target = (LivingEntity) e1;
                             priority1 = prio1;
                         }
                     }
@@ -755,7 +758,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
             float py = (float) getY() + 6.26759f * getScale();
             float pz = (float) getZ() - syaw * 6.4f * getScale();
             float priority1 = 0;
-            for (LivingEntity e1 : level().getNearbyEntities(LivingEntity.class, TargetingConditions.forCombat(), this, new AABB(px - 40 * getScale(), py - 40 * getScale(), pz - 40 * getScale(), px + 40 * getScale(), py + 40 * getScale(), pz + 40 * getScale()))) {
+            for (Entity e1 : level().getEntities(this, new AABB(px - 40 * getScale(), py - 40 * getScale(), pz - 40 * getScale(), px + 40 * getScale(), py + 40 * getScale(), pz + 40 * getScale()), e -> e instanceof LivingEntity)) {
                 float dx = (float) e1.getX() - px;
                 float dz = (float) e1.getZ() - pz;
                 float dot = (-cyaw * dx + -syaw * dz);
@@ -765,7 +768,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                     if (dist1 < 40 * 40 * getScale() * getScale()) {
                         float prio1 = getPriority(e1) - Mth.sqrt(dist1);
                         if (prio1 > priority1 && rayTraceBlocks(px, py, pz, (float) e1.getX(), (float) e1.getY() + e1.getBbHeight(), (float) e1.getZ()) == null) {
-                            target = e1;
+                            target = (LivingEntity) e1;
                             priority1 = prio1;
                         }
                     }
@@ -775,7 +778,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
         if (!hasTarget) {
             float priority = 0;
 
-            for (LivingEntity e : level().getNearbyEntities(LivingEntity.class, TargetingConditions.forCombat(), this, new AABB(getX() - 70 * getScale(), getY() + 13 * getScale() - 70 * getScale(), getZ() - 70 * getScale(), getX() + 70 * getScale(), getY() + 13 * getScale() + 70 * getScale(), getZ() + 70 * getScale()))) {
+            for (Entity e : level().getEntities(this, new AABB(getX() - 70 * getScale(), getY() + 13 * getScale() - 70 * getScale(), getZ() - 70 * getScale(), getX() + 70 * getScale(), getY() + 13 * getScale() + 70 * getScale(), getZ() + 70 * getScale()), e -> e instanceof LivingEntity)) {
                 float x = (float) (e.getX() - getX());
                 float z = (float) (e.getZ() - getZ());
                 if (Mth.abs(cyaw * x + syaw * z) < 2) {
@@ -785,7 +788,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                         if (y * Mth.abs(y) > -0.64f * dist) {
                             float prio = getPriority(e) - Mth.sqrt(dist);
                             if (prio > priority && rayTraceBlocks((float) getX(), (float) getY() + 13, (float) getZ(), (float) e.getX(), (float) e.getY() + e.getBbHeight() / 2f, (float) e.getZ()) == null) {
-                                target = e;
+                                target = (LivingEntity) e;
                                 priority = prio;
                             }
                         }
@@ -922,7 +925,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 			if (laser)
 			{
 				setOnLaserData(random.nextInt(2)+1);
-				RivalRebelsSoundPlayer.playSound(this, 22, 1, 30f, 0f);
+                playSound(RRSounds.LASER_SHOOT.get(), 30F, 0F);
 				float x = (float) (getX() - endx);
 				float y = (float) (getY() + 13*getScale() - endy);
 				float z = (float) (getZ() - endz);
@@ -938,12 +941,11 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 					end = end.xRot(-headpitch * Mth.DEG_TO_RAD);
 					end = end.yRot(bodyyaw * Mth.DEG_TO_RAD);
 					end = end.add(getX(), getY()+13*getScale(), getZ());
-                    List<LivingEntity> entities = level().getNearbyEntities(LivingEntity.class, TargetingConditions.forCombat(), this, new AABB(start, end).inflate(5));
-                    for (LivingEntity e : entities) {
+                    for (Entity e : level().getEntities(this, new AABB(start, end).inflate(5), e1 -> e1 instanceof LivingEntity)) {
                         if (e != rider) {
                             Vec3 entity = new Vec3(e.getX(), e.getY(), e.getZ());
                             double bbx = 1;
-                            if (e instanceof EntityRhodes) bbx = 20 * e.getScale();
+                            if (e instanceof EntityRhodes) bbx = 20 * ((LivingEntity) e).getScale();
                             if (entity.subtract(start).cross(entity.subtract(end)).distanceToSqr(0, 0, 0) < 10000 * bbx) {
                                 e.hurt(RivalRebelsDamageSource.laserBurst(level()), 24);
                                 if (e instanceof Player player) {
@@ -959,7 +961,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                                         level().addFreshEntity(new EntityGore(level(), e, 3, 0));
                                     }
                                 } else {
-                                    if (!e.isAlive() || e.getHealth() < 3) {
+                                    if (!e.isAlive() || ((LivingEntity) e).getHealth() < 3) {
                                         int legs;
                                         int arms;
                                         int mobs;
@@ -1017,7 +1019,7 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
                                             level().addFreshEntity(new EntityGore(level(), e, 2, mobs));
                                         for (int i = 0; i < legs; i++)
                                             level().addFreshEntity(new EntityGore(level(), e, 3, mobs));
-                                        e.kill();
+                                        e.kill((ServerLevel) level());
                                     }
                                 }
                             }
@@ -1176,19 +1178,21 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
 	}
 
 	public Entity findTarget() {
-		Entity target = null;
-		double priority = 0;
-        List<LivingEntity> otherEntities = level().getNearbyEntities(LivingEntity.class, TargetingConditions.forCombat(), this, AABB.of(BoundingBox.infinite()));
-        for (LivingEntity e : otherEntities) {
-            if (e.canBeSeenAsEnemy() && (!(e instanceof EntityRhodes) || RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || !((EntityRhodes) e).getVariant().is(getVariant())))) {
-                double prio = getPriority(e) - distanceTo(e);
-                if (prio > priority) {
-                    target = e;
-                    priority = prio;
+		AtomicReference<Entity> target = new AtomicReference<>();
+		AtomicReference<Double> priority = new AtomicReference<>((double) 0);
+        LevelEntityGetter<Entity> otherEntities = ((ServerLevel) level()).getEntities();
+        otherEntities.get(EntityTypeTest.forClass(LivingEntity.class), AbortableIterationConsumer.forConsumer(e -> {
+            if (e != this) {
+                if (e.canBeSeenAsEnemy() && (!(e instanceof EntityRhodes) || RRConfig.SERVER.isFriendlyFireRhodesEnabled() && (RRConfig.SERVER.isTeamFriendlyFireRhodesEnabled() || !((EntityRhodes) e).getVariant().is(getVariant())))) {
+                    double prio = getPriority(e) - distanceTo(e);
+                    if (prio > priority.get()) {
+                        target.set(e);
+                        priority.set(prio);
+                    }
                 }
             }
-        }
-		return target;
+        }));
+		return target.get();
 	}
 
     public void doWalkingAnimation() {
@@ -1449,56 +1453,56 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
         return getVariant().value().getName();
 	}
 
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-        super.addAdditionalSaveData(nbt);
-		nbt.putFloat("bodyyaw", bodyyaw);
-		nbt.putFloat("headyaw", getYHeadRot());
-		nbt.putFloat("headpitch", headpitch);
-		nbt.putFloat("leftarmyaw", leftarmyaw);
-		nbt.putFloat("leftarmpitch", leftarmpitch);
-		nbt.putFloat("rightarmyaw", rightarmyaw);
-		nbt.putFloat("rightarmpitch", rightarmpitch);
-		nbt.putFloat("leftthighpitch", leftthighpitch);
-		nbt.putFloat("rightthighpitch", rightthighpitch);
-		nbt.putFloat("leftshinpitch", leftshinpitch);
-		nbt.putFloat("rightshinpitch", rightshinpitch);
-		nbt.putBoolean("endangered", endangered);
-		nbt.putInt("walkstate", walkstate);
-		nbt.putInt("damageuntilwake", damageUntilWake);
-		nbt.putString("type", getVariant().getRegisteredName());
-		nbt.putInt("rocketcount", getRocketCount());
-		nbt.putInt("energy", getEnergy());
-		nbt.putInt("b2energy", getB2Energy());
-		nbt.putInt("flamecount", getFlameCount());
-		nbt.putInt("nukecount", getNukeCount());
-        nbt.putString("texloc", getFlagTextureLocation());
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+		valueOutput.putFloat("bodyyaw", bodyyaw);
+		valueOutput.putFloat("headyaw", getYHeadRot());
+		valueOutput.putFloat("headpitch", headpitch);
+		valueOutput.putFloat("leftarmyaw", leftarmyaw);
+		valueOutput.putFloat("leftarmpitch", leftarmpitch);
+		valueOutput.putFloat("rightarmyaw", rightarmyaw);
+		valueOutput.putFloat("rightarmpitch", rightarmpitch);
+		valueOutput.putFloat("leftthighpitch", leftthighpitch);
+		valueOutput.putFloat("rightthighpitch", rightthighpitch);
+		valueOutput.putFloat("leftshinpitch", leftshinpitch);
+		valueOutput.putFloat("rightshinpitch", rightshinpitch);
+		valueOutput.putBoolean("endangered", endangered);
+		valueOutput.putInt("walkstate", walkstate);
+		valueOutput.putInt("damageuntilwake", damageUntilWake);
+		valueOutput.putString("type", getVariant().getRegisteredName());
+		valueOutput.putInt("rocketcount", getRocketCount());
+		valueOutput.putInt("energy", getEnergy());
+		valueOutput.putInt("b2energy", getB2Energy());
+		valueOutput.putInt("flamecount", getFlameCount());
+		valueOutput.putInt("nukecount", getNukeCount());
+        valueOutput.putString("texloc", getFlagTextureLocation());
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-        super.readAdditionalSaveData(nbt);
-		bodyyaw = nbt.getFloat("bodyyaw");
-        setYHeadRot(nbt.getFloat("headyaw"));
-		headpitch = nbt.getFloat("headpitch");
-		leftarmyaw = nbt.getFloat("leftarmyaw");
-		leftarmpitch = nbt.getFloat("leftarmpitch");
-		rightarmyaw = nbt.getFloat("rightarmyaw");
-		rightarmpitch = nbt.getFloat("rightarmpitch");
-		leftthighpitch = nbt.getFloat("leftthighpitch");
-		rightthighpitch = nbt.getFloat("rightthighpitch");
-		leftshinpitch = nbt.getFloat("leftshinpitch");
-		rightshinpitch = nbt.getFloat("rightshinpitch");
-		endangered = nbt.getBoolean("endangered");
-		walkstate = nbt.getInt("walkstate");
-		damageUntilWake = nbt.getInt("damageuntilwake");
-        RivalRebels.RHODES_TYPE_REGISTRY.getHolder(ResourceLocation.tryParse(nbt.getString("type"))).ifPresent(this::setVariant);
-		setRocketCount(nbt.getInt("rocketcount"));
-		setEnergy(nbt.getInt("energy"));
-		setB2Energy(nbt.getInt("b2energy"));
-		setFlameCount(nbt.getInt("flamecount"));
-		setNukeCount(nbt.getInt("nukecount"));
-        setFlagTextureLocation(nbt.getString("texloc"));
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+		bodyyaw = valueInput.getFloatOr("bodyyaw", 0);
+        setYHeadRot(valueInput.getFloatOr("headyaw", 0));
+		headpitch = valueInput.getFloatOr("headpitch", 0);
+		leftarmyaw = valueInput.getFloatOr("leftarmyaw", 0);
+		leftarmpitch = valueInput.getFloatOr("leftarmpitch", 0);
+		rightarmyaw = valueInput.getFloatOr("rightarmyaw", 0);
+		rightarmpitch = valueInput.getFloatOr("rightarmpitch", 0);
+		leftthighpitch = valueInput.getFloatOr("leftthighpitch", 0);
+		rightthighpitch = valueInput.getFloatOr("rightthighpitch", 0);
+		leftshinpitch = valueInput.getFloatOr("leftshinpitch", 0);
+		rightshinpitch = valueInput.getFloatOr("rightshinpitch", 0);
+		endangered = valueInput.getBooleanOr("endangered", false);
+		walkstate = valueInput.getInt("walkstate").orElseThrow();
+		damageUntilWake = valueInput.getInt("damageuntilwake").orElseThrow();
+        RivalRebels.RHODES_TYPE_REGISTRY.get(ResourceLocation.tryParse(valueInput.getString("type").orElseThrow())).ifPresent(this::setVariant);
+		setRocketCount(valueInput.getInt("rocketcount").orElseThrow());
+		setEnergy(valueInput.getInt("energy").orElseThrow());
+		setB2Energy(valueInput.getInt("b2energy").orElseThrow());
+		setFlameCount(valueInput.getInt("flamecount").orElseThrow());
+		setNukeCount(valueInput.getInt("nukecount").orElseThrow());
+        setFlagTextureLocation(valueInput.getString("texloc").orElseThrow());
 	}
 
     @Override
@@ -1507,15 +1511,16 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
     }
 
     @Override
-    protected void actuallyHurt(DamageSource damageSource, float damageAmount) {
-        super.actuallyHurt(damageSource, damageAmount);
-        if (damageAmount > 50) {
+    protected void actuallyHurt(ServerLevel level, DamageSource damageSource, float amount) {
+        super.actuallyHurt(level, damageSource, amount);
+
+        if (amount > 50) {
             setHealth(getHealth() - 50);
             if (rider == null) damageUntilWake -= 50;
             endangered = true;
         } else {
-            setHealth(getHealth() - damageAmount);
-            if (rider == null) damageUntilWake -= damageAmount;
+            setHealth(getHealth() - amount);
+            if (rider == null) damageUntilWake -= amount;
         }
 
         if (isDeadOrDying()) {
@@ -1527,11 +1532,6 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
             this.getBrain().setMemory(MemoryModuleType.UNIVERSAL_ANGER, true);
         }
         this.getBrain().setMemory(MemoryModuleType.HURT_BY, damageSource);
-    }
-
-    @Override
-    public Iterable<ItemStack> getArmorSlots() {
-        return List.of();
     }
 
     @Override
@@ -1564,12 +1564,10 @@ public class EntityRhodes extends LivingEntity implements VariantHolder<Holder<R
         builder.define(ON_LASERS, 0);
     }
 
-    @Override
     public Holder<RhodesType> getVariant() {
         return entityData.get(TYPE);
     }
 
-    @Override
     public void setVariant(Holder<RhodesType> variant) {
         entityData.set(TYPE, variant);
     }

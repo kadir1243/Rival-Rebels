@@ -19,10 +19,12 @@ import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Arrow;
@@ -51,14 +53,14 @@ public class EntityRoddiskRegular extends RoddiskBase {
 		if (tickCount > 100 && getOwner() == null && !level().isClientSide())
 		{
 			//world.spawnEntity(new ItemEntity(world, getX(), getY(), getZ(), new ItemStack(RivalRebels.roddisk)));
-			kill();
+			kill((ServerLevel) level());
             this.playSound(RRSounds.FORCE_FIELD.get());
 		}
 		if (tickCount >= 100 && !level().isClientSide && getOwner() != null)
 		{
 			ItemEntity ei = new ItemEntity(level(), getOwner().getX(), getOwner().getY(), getOwner().getZ(), RRItems.roddisk.toStack());
 			level().addFreshEntity(ei);
-			kill();
+			kill((ServerLevel) level());
             this.playSound(RRSounds.RODDISK_UNKNOWN5.get());
 		}
 		if (tickCount == 10)
@@ -72,7 +74,7 @@ public class EntityRoddiskRegular extends RoddiskBase {
 
         for (Entity var31 : par9) {
             if (var31 instanceof Arrow) {
-                var31.kill();
+                var31.kill((ServerLevel) level());
             }
         }
 
@@ -94,13 +96,13 @@ public class EntityRoddiskRegular extends RoddiskBase {
             for (Entity var9 : var5) {
                 if (var9 instanceof EntityRoddiskRegular) {
                     if (this.getDeltaMovement().x() + this.getDeltaMovement().y() + this.getDeltaMovement().z() >= var9.getDeltaMovement().x() + var9.getDeltaMovement().y() + var9.getDeltaMovement().z()) {
-                        var9.kill();
+                        var9.kill((ServerLevel) level());
                     } else {
-                        kill();
+                        kill((ServerLevel) level());
                     }
                     ItemEntity ei = new ItemEntity(level(), var9.getX(), var9.getY(), var9.getZ(), RRItems.roddisk.toStack());
                     level().addFreshEntity(ei);
-                } else if (var9.canBeCollidedWith() && !this.ownedBy(var9)) {
+                } else if (var9.canBeCollidedWith(this) && !this.ownedBy(var9)) {
                     float var10 = 0.3F;
                     AABB var11 = var9.getBoundingBox().inflate(var10, var10, var10);
                     Optional<Vec3> var12 = var11.clip(var15, var2);
@@ -151,7 +153,7 @@ public class EntityRoddiskRegular extends RoddiskBase {
                 }
                 else if (state.is(RRBlocks.landmine) || state.is(RRBlocks.alandmine))
                 {
-                    state.entityInside(level(), pos, this);
+                    state.entityInside(level(), pos, this, InsideBlockEffectApplier.NOOP);
                 }
                 else
                 {
@@ -190,10 +192,10 @@ public class EntityRoddiskRegular extends RoddiskBase {
 		if (tickCount < 10) return InteractionResult.PASS;
 		if (player.getInventory().add(RRItems.roddisk.toStack()))
 		{
-			kill();
+			kill((ServerLevel) level());
             this.playSound(RRSounds.RODDISK_UNKNOWN5.get());
 		}
-		return InteractionResult.sidedSuccess(level().isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
 }

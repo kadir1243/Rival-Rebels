@@ -2,9 +2,7 @@ package io.github.kadir1243.rivalrebels.common.tileentity;
 
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
@@ -17,6 +15,8 @@ import net.minecraft.world.level.BaseCommandBlock;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
@@ -94,19 +94,19 @@ public abstract class AbstractObjectiveBlockEntity extends BaseContainerBlockEnt
     }
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
 
-        ContainerHelper.loadAllItems(nbt, this.items, provider);
-        commandExecutor.load(nbt, provider);
+        ContainerHelper.loadAllItems(valueInput, this.items);
+        commandExecutor.load(valueInput);
     }
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.saveAdditional(nbt, provider);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
 
-        ContainerHelper.saveAllItems(nbt, this.items, provider);
-        commandExecutor.save(nbt, provider);
+        ContainerHelper.saveAllItems(valueOutput, this.items);
+        commandExecutor.save(valueOutput);
     }
 
     @Override

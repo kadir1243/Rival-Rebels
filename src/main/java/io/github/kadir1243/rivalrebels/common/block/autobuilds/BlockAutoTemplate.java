@@ -16,13 +16,14 @@ import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.FallingBlock;
@@ -39,15 +40,15 @@ public abstract class BlockAutoTemplate extends FallingBlock {
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!level.isClientSide()) {
             if (!stack.is(RRItems.pliers)){
-                player.displayClientMessage(Translations.warning().append(" ").append(Component.translatable(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.toLanguageKey())), true);
-                return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+                player.displayClientMessage(Translations.warning().append(" ").append(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.translate()), true);
+                return InteractionResult.PASS;
             }
-            return ItemInteractionResult.sidedSuccess(level.isClientSide());
+            return InteractionResult.SUCCESS;
 		}
-        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        return InteractionResult.PASS;
 	}
 
 	public void build(Level world, int x, int y, int z) {
@@ -81,4 +82,8 @@ public abstract class BlockAutoTemplate extends FallingBlock {
 		if (!world.isClientSide()) build(world, pos.getX(), pos.getY(), pos.getZ());
 	}
 
+    @Override
+    public int getDustColor(BlockState state, BlockGetter level, BlockPos pos) {
+        return CommonColors.WHITE;
+    }
 }

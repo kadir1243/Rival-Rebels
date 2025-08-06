@@ -22,6 +22,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -52,11 +53,12 @@ public class BlockOmegaObjective extends BaseEntityBlock {
 	}
 
     @Override
-    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
-        super.onRemove(state, world, pos, newState, moved);
+    public void onBlockStateChange(LevelReader readOnlyLevel, BlockPos pos, BlockState oldState, BlockState newState) {
+        super.onBlockStateChange(readOnlyLevel, pos, oldState, newState);
 
+        if (!(readOnlyLevel instanceof Level level)) return;
         if (!newState.is(RRBlocks.plasmaexplosion) && !newState.is(this) && !newState.is(RRBlocks.sigmaobj)) {
-            world.setBlockAndUpdate(pos, state);
+            level.setBlockAndUpdate(pos, oldState);
         }
     }
 
@@ -64,7 +66,7 @@ public class BlockOmegaObjective extends BaseEntityBlock {
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         level.playSound(player, pos, RRSounds.GUI_UNKNOWN4.get(), SoundSource.PLAYERS);
 
-		return InteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
     @Nullable

@@ -17,6 +17,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -58,7 +59,7 @@ public class EntityLaserBurst extends Projectile {
 	public EntityLaserBurst(Level level, Entity player) {
 		this(level);
         this.setOwner(player);
-        moveTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
+        snapTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getEyeY() - 0.12D,
             player.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getYRot(),
@@ -70,7 +71,7 @@ public class EntityLaserBurst extends Projectile {
 	public EntityLaserBurst(Level level, Entity player, boolean accurate) {
 		this(level);
         this.setOwner(player);
-		moveTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
+		snapTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getEyeY() - 0.12D,
             player.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getYRot(),
@@ -103,7 +104,7 @@ public class EntityLaserBurst extends Projectile {
 		super.tick();
 
 		++tickCount;
-		if (tickCount > 60) kill();
+		if (tickCount > 60) kill((ServerLevel) level());
 
 		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
@@ -128,11 +129,11 @@ public class EntityLaserBurst extends Projectile {
                 level().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             }
         } else if (state.is(RRBlocks.remotecharge)) {
-            state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
+            state.onExplosionHit((ServerLevel) level(), pos, null, (stack, pos1) -> {});
         } else if (state.is(RRBlocks.timedbomb)) {
-            state.onExplosionHit(level(), pos, null, (stack, pos1) -> {});
+            state.onExplosionHit((ServerLevel) level(), pos, null, (stack, pos1) -> {});
         }
-        kill();
+        kill((ServerLevel) level());
     }
 
     @Override
@@ -152,7 +153,7 @@ public class EntityLaserBurst extends Projectile {
                 level().addFreshEntity(new EntityGore(level(), hitEntity, 3, 0));
                 level().addFreshEntity(new EntityGore(level(), hitEntity, 3, 0));
             }
-            kill();
+            kill((ServerLevel) level());
         }
         else if ((hitEntity instanceof LivingEntity entity
             && !(hitEntity instanceof Animal)
@@ -165,7 +166,7 @@ public class EntityLaserBurst extends Projectile {
                 int legs;
                 int arms;
                 int mobs;
-                entity.kill();
+                entity.kill((ServerLevel) level());
                 this.playSound(RRSounds.BLASTER_FIRE.get(), 1, 4);
                 switch (entity) {
                     case ZombifiedPiglin ignored -> {
@@ -231,7 +232,7 @@ public class EntityLaserBurst extends Projectile {
                 for (int i = 0; i < legs; i++)
                     level().addFreshEntity(new EntityGore(level(), hitEntity, 3, mobs));
             }
-            kill();
+            kill((ServerLevel) level());
         }
         else if((hitEntity instanceof EntityRhodesHead
             || hitEntity instanceof EntityRhodesLeftLowerArm

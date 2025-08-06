@@ -12,6 +12,7 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
+import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
@@ -19,7 +20,9 @@ import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
+import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
@@ -35,6 +38,7 @@ import net.minecraft.world.phys.HitResult;
 
 public class EntityRocket extends AbstractArrow
 {
+    public static final ContextKey<Boolean> HAS_FINS = new ContextKey<>(RRIdentifiers.create("has_fins"));
     public boolean fins			= false;
 	public int rotation		= 45;
 	public float slide			= 0;
@@ -53,7 +57,7 @@ public class EntityRocket extends AbstractArrow
 		this(level);
         fins = false;
         this.setOwner(entity);
-		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
+		snapTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(
             getX() - Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F,
             getY(),
@@ -65,8 +69,8 @@ public class EntityRocket extends AbstractArrow
 	public EntityRocket(Level level, double mx, double my, double mz) {
 		this(level);
 		fins = false;
-        this.setYRot((float)(Mth.atan2(mx, mz) * 180.0F / Mth.PI));
-        this.setXRot((float)(Mth.atan2(my, Math.sqrt(mx * mx + mz * mz)) * 180.0F / Mth.PI));
+        this.setYRot((float)(Mth.atan2(mx, mz) * Mth.RAD_TO_DEG));
+        this.setXRot((float)(Mth.atan2(my, Math.sqrt(mx * mx + mz * mz)) * Mth.RAD_TO_DEG));
         this.yRotO = this.getYRot();
         this.xRotO = this.getXRot();
     }
@@ -94,7 +98,7 @@ public class EntityRocket extends AbstractArrow
 		}
 		// world.spawnEntity(new EntityLightningLink(world, getX(), getY(), getZ(), yaw, pitch, 100));
 
-		if (level().isClientSide && tickCount >= 5 && !isInWaterOrBubble() && tickCount <= 100)
+		if (level().isClientSide && tickCount >= 5 && !isInWater() && tickCount <= 100)
 		{
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x() * 0.5, -getDeltaMovement().y() * 0.5 - 0.1, -getDeltaMovement().z() * 0.5));
 		}
@@ -106,7 +110,7 @@ public class EntityRocket extends AbstractArrow
 		float var17 = 1.1f;
 		if (tickCount > 25) var17 = 0.9999F;
 
-		if (isInWaterOrBubble())
+		if (isInWater())
 		{
 			for (int var7 = 0; var7 < 4; ++var7)
 			{
@@ -159,8 +163,9 @@ public class EntityRocket extends AbstractArrow
     }
 
     public void explode() {
+        if (level().isClientSide()) return;
 		RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
 		new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
-		kill();
+		kill((ServerLevel) level());
 	}
 }

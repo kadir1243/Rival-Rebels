@@ -52,6 +52,6 @@ public class BlockSigmaArmor extends Block
 			level.addFreshEntity(ei10);
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 }

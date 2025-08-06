@@ -17,6 +17,10 @@ import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.common.entity.EntityTachyonBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,23 +28,25 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
+public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb, RenderTachyonBomb.State> {
+    private final QuadCollection bombModel;
+
     public RenderTachyonBomb(EntityRendererProvider.Context manager) {
         super(manager);
+        bombModel = manager.getModelManager().getStandaloneModel(ObjModels.BOMB_MODEL);
     }
 
     @Override
-    public void render(EntityTachyonBomb entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        matrices.pushPose();
-        matrices.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
-        // matrices.mulPose(Axis.XP.rotationDegrees(90));
-        matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot()));
-        ObjModels.renderSolid(ObjModels.bomb, RRIdentifiers.ettachyonbomb, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
-        matrices.popPose();
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        poseStack.pushPose();
+        poseStack.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
+        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+        // poseStack.mulPose(Axis.XP.rotationDegrees(90));
+        poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
+        ObjModels.render(bombModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.ettachyonbomb)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
     }
 
     @Override
@@ -48,8 +54,20 @@ public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb> {
         return true;
     }
 
+
     @Override
-    public ResourceLocation getTextureLocation(EntityTachyonBomb entity) {
-        return RRIdentifiers.ettachyonbomb;
+    public State createRenderState() {
+        return new State();
     }
-}
+
+    @Override
+    public void extractRenderState(EntityTachyonBomb p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
+    }}

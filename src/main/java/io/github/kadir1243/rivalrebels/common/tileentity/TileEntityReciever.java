@@ -23,7 +23,6 @@ import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.item.weapon.ItemRoda;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
@@ -48,24 +47,30 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.neoforged.neoforge.model.data.ModelData;
+import net.neoforged.neoforge.model.data.ModelProperty;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Vector3f;
 
 public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuConstructor {
 	public float			yaw;
 	public float			pitch;
 	public Entity			target;
-	public double			xO						= 0;
-	public double			zO						= 0;
+	public float			xO						= 0;
+	public float			zO						= 0;
     double					ll						= -50;
 	double					ul						= 90;
-	double					scale					= 1.5;
+	private final float	scale = 1.5F;
 	public final NonNullList<ItemStack> chestContents			= NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
 	private int				ticksSinceLastTarget	= 0;
 	public int				yawLimit				= 180;
@@ -73,15 +78,16 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	public boolean			kPlayers				= false;
 	public boolean			kMobs					= true;
 	public boolean			hasWeapon				= false;
-	private RivalRebelsTeam	team;
+	private RivalRebelsTeam	team = RivalRebelsTeam.NONE;
 	private int				ammoCounter;
-    private Vec3 prevTpos = Vec3.ZERO;
+    private Vector3f prevTpos = new Vector3f();
 	private Entity			le						= null;
 	public int				wepSelected;
 	public static int		staticEntityIndex		= 1;
 	public int				entityIndex;
-	public GameProfile player = new GameProfile(ChipData.FAKE_PLAYER, "nobody");
-	private int ticksincepacket;
+    @Nullable
+    public ResolvableProfile owner;
+    private int ticksincepacket;
 	int ticksSinceLastShot = 0;
 
 	public TileEntityReciever(BlockPos pos, BlockState state) {
@@ -91,7 +97,6 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		if (RRConfig.SERVER.isFreeDragonAmmo())
 		{
 			hasWeapon = true;
-			team = RivalRebelsTeam.NONE;
 			kPlayers = true;
 			setItem(3, RRItems.battery.toStack(64));
 			setItem(4, RRItems.battery.toStack(64));
@@ -151,7 +156,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 			{
                 ChipData chipData = getItem(6).get(RRComponents.CHIP_DATA);
                 team = chipData.team();
-				player = chipData.gameProfile();
+				owner = new ResolvableProfile(chipData.gameProfile());
 			}
 			setItem(6, ItemStack.EMPTY);
             setItem(7, ItemStack.EMPTY);
@@ -209,11 +214,20 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
+    public static final ModelProperty<Float> YAW = new ModelProperty<>(aFloat -> aFloat != null && !aFloat.isNaN());
+    public static final ModelProperty<Float> PITCH = new ModelProperty<>(aFloat -> aFloat != null && !aFloat.isNaN());
+
+    @Override
+    public ModelData getModelData() {
+        return ModelData.builder()
+            .with(YAW, yaw)
+            .with(PITCH, pitch)
+            .build();
+    }
+
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag nbt = new CompoundTag();
-        saveAdditional(nbt, registries);
-        return nbt;
+        return this.saveWithoutMetadata(registries);
     }
 
     private boolean hasAmmo()
@@ -267,7 +281,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
             else if (!kTeam) return false;
             RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(((Player) e).getGameProfile());
             if (rrp == null) return kTeam;
-            if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getGameProfile().equals(player);
+            if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getGameProfile().equals(owner != null ? owner.gameProfile() : null);
             if (rrp.rrteam != team) return kTeam;
             else return false;
         }
@@ -287,8 +301,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	private void updateDirection()
 	{
         Direction direction = this.getBlockState().getValue(BlockReciever.FACING);
-		xO = 0.0;
-		zO = 0.0;
+		xO = 0.0F;
+		zO = 0.0F;
 		if (direction == Direction.NORTH) zO = -0.76f;
 		else if (direction == Direction.WEST) xO = -0.76f;
 		else if (direction == Direction.SOUTH) zO = 0.76f;
@@ -307,8 +321,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 			else if (yaw - ya > 180) yaw -= 360;
 			yaw = (yaw + yaw + yaw + ya) / 4F;
 			//pitch += dist / 10;
-            prevTpos = t.position();
+            prevTpos = t.position().toVector3f();
 			le = t;
+            requestModelDataUpdate();
 			return 1;
 		}
 		else return 0;
@@ -316,16 +331,16 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 
 	public float getYawTo(Entity t, float off)
 	{
-		double x = getBlockPos().getX() + 0.5 + xO - t.getX() - (t.getX() - prevTpos.x()) * off;
-		double z = getBlockPos().getZ() + 0.5 + zO - t.getZ() - (t.getZ() - prevTpos.z()) * off;
+		double x = getBlockPos().getX() + 0.5F + xO - t.getX() - (t.getX() - prevTpos.x()) * off;
+		double z = getBlockPos().getZ() + 0.5F + zO - t.getZ() - (t.getZ() - prevTpos.z()) * off;
 		double ya = Math.atan2(x, z);
-		return (float) ((ya / Mth.PI) * 180);
+		return (float) (ya * Mth.DEG_TO_RAD);
 	}
 
 	public float getPitchTo(Entity t, float off) {
-		double x = getBlockPos().getX() + 0.5 + xO - t.getX() - (t.getX() - prevTpos.x()) * off;
-		double y = getBlockPos().getY() + (0.5 * scale) - t.getEyeY() - (t.getY() - prevTpos.y()) * off;
-		double z = getBlockPos().getZ() + 0.5 + zO - t.getZ() - (t.getZ() - prevTpos.z()) * off;
+		double x = getBlockPos().getX() + 0.5F + xO - t.getX() - (t.getX() - prevTpos.x()) * off;
+		double y = getBlockPos().getY() + (0.5F * scale) - t.getEyeY() - (t.getY() - prevTpos.y()) * off;
+		double z = getBlockPos().getZ() + 0.5F + zO - t.getZ() - (t.getZ() - prevTpos.z()) * off;
 		double d = Math.sqrt(x * x + z * z);
 		double pi = Math.atan2(d, -y);
 		return (float) (90 - ((pi / Mth.PI) * 180));
@@ -395,34 +410,33 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	}
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
 
-        ContainerHelper.loadAllItems(nbt, this.chestContents, provider);
-		yawLimit = nbt.getInt("yawLimit");
-		kPlayers = nbt.getBoolean("kPlayers");
-		kTeam = nbt.getBoolean("kTeam");
-		kMobs = nbt.getBoolean("kMobs");
-		hasWeapon = nbt.getBoolean("hasWeapon");
-        player = new GameProfile(nbt.getUUID("uuid"), nbt.getString("username"));
-		team = RivalRebelsTeam.getForID(nbt.getInt("team"));
-		entityIndex = nbt.getInt("entityIndex");
+        ContainerHelper.loadAllItems(valueInput, this.chestContents);
+		yawLimit = valueInput.getInt("yawLimit").orElse(0);
+		kPlayers = valueInput.getBooleanOr("kPlayers", false);
+		kTeam = valueInput.getBooleanOr("kTeam", false);
+		kMobs = valueInput.getBooleanOr("kMobs", false);
+		hasWeapon = valueInput.getBooleanOr("hasWeapon", false);
+        owner = valueInput.read("owner", ResolvableProfile.CODEC).orElse(null);
+		team = valueInput.read("team", RivalRebelsTeam.CODEC).orElse(RivalRebelsTeam.NONE);
+		entityIndex = valueInput.getInt("entityIndex").orElse(0);
 	}
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-		super.saveAdditional(nbt, provider);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
 
-        ContainerHelper.saveAllItems(nbt, this.chestContents, provider);
-		nbt.putInt("yawLimit", yawLimit);
-		nbt.putBoolean("kPlayers", kPlayers);
-		nbt.putBoolean("kTeam", kTeam);
-		nbt.putBoolean("kMobs", kMobs);
-		nbt.putBoolean("hasWeapon", hasWeapon);
-		nbt.putString("username", player.getName());
-        nbt.putUUID("uuid", player.getId());
-		nbt.putInt("entityIndex", entityIndex);
-		if (team != null) nbt.putInt("team", team.ordinal());
+        ContainerHelper.saveAllItems(valueOutput, this.chestContents);
+		valueOutput.putInt("yawLimit", yawLimit);
+		valueOutput.putBoolean("kPlayers", kPlayers);
+		valueOutput.putBoolean("kTeam", kTeam);
+		valueOutput.putBoolean("kMobs", kMobs);
+		valueOutput.putBoolean("hasWeapon", hasWeapon);
+        valueOutput.storeNullable("owner", ResolvableProfile.CODEC, owner);
+		valueOutput.putInt("entityIndex", entityIndex);
+		valueOutput.store("team", RivalRebelsTeam.CODEC, team);
     }
 
     @Override

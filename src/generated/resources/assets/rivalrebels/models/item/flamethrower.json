@@ -1,3 +1,25 @@
 {
-  "parent": "minecraft:item/generated"
+  "loader": "neoforge:obj",
+  "model": "rivalrebels:models/n.obj",
+  "textures": {
+    "texture": "rivalrebels:textures/entity/bt.png"
+  },
+  "transform": {
+    "rotation": [
+      0.0,
+      0.70710677,
+      0.0,
+      -0.70710677
+    ],
+    "scale": [
+      0.18,
+      0.18,
+      0.18
+    ],
+    "translation": [
+      0.7,
+      0.1,
+      0.0
+    ]
+  }
 }

@@ -20,6 +20,7 @@ import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -58,7 +59,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		this(level);
 		fins = false;
         this.setOwner(entity);
-		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
+		snapTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(
             getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             getY(),
@@ -73,7 +74,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		this(level);
         this.setOwner(entity);
 		fins = false;
-		moveTo(entity.getEyePosition(), entity.getYRot() + yawdelta, entity.getXRot());
+		snapTo(entity.getEyePosition(), entity.getYRot() + yawdelta, entity.getXRot());
         setPos(
             getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             getY(),
@@ -113,7 +114,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		}
 		// world.spawnEntity(new EntityLightningLink(world, getX(), getY(), getZ(), yaw, pitch, 100));
 
-		if (level().isClientSide && tickCount >= 5 && !isInWaterOrBubble() && tickCount <= 100)
+		if (level().isClientSide && tickCount >= 5 && !isInWater() && tickCount <= 100)
 		{
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x() * 0.5, -getDeltaMovement().y() * 0.5 - 0.1, -getDeltaMovement().z() * 0.5));
 		}
@@ -143,7 +144,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		float var17 = 1.1f;
 		if (tickCount > 25) var17 = 0.9999F;
 
-		if (isInWaterOrBubble())
+		if (isInWater())
 		{
 			for (int var7 = 0; var7 < 4; ++var7)
 			{
@@ -181,9 +182,9 @@ public class EntitySeekB83 extends AbstractArrow {
                 Entity entityHit = ((EntityHitResult) mop).getEntity();
                 if (entityHit instanceof EntityHackB83)
 				{
-					entityHit.kill();
+					entityHit.kill((ServerLevel) level());
 					level().setBlockAndUpdate(blockPosition(), RRBlocks.plasmaexplosion.get().defaultBlockState());
-					kill();
+                    kill((ServerLevel) level());
 				}
 				else if (entityHit instanceof Player player) {
                     for (EquipmentSlot slot : EquipmentSlot.values()) {
@@ -195,12 +196,12 @@ public class EntitySeekB83 extends AbstractArrow {
                     }
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
 					new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
-					kill();
+					kill((ServerLevel) level());
 				}
 				else
 				{
 					new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
-					kill();
+					kill((ServerLevel) level());
 				}
 			}
 			else
@@ -216,7 +217,7 @@ public class EntitySeekB83 extends AbstractArrow {
 				{
 					RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
 					new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
-					kill();
+					kill((ServerLevel) level());
 				}
 			}
 		}
@@ -224,7 +225,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		{
 			RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
 			new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
-			kill();
+			kill((ServerLevel) level());
 		}
 	}
 

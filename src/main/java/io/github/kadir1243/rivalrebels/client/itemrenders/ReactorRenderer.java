@@ -14,8 +14,8 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
 import io.github.kadir1243.rivalrebels.client.model.ModelReactor;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -33,7 +33,7 @@ public class ReactorRenderer implements DynamicItemRenderer {
 		matrices.popPose();
 		matrices.pushPose();
 		matrices.translate(0.5F, 0.5F, 0.5F);
-		ModelReactor.renderModel(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etreactor)), light, overlay);
+		ModelReactor.renderModel(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etreactor)), light, overlay);
 		matrices.popPose();
 	}
 }

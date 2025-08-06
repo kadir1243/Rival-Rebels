@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
 import io.github.kadir1243.rivalrebels.client.model.ModelReactor;
@@ -22,6 +23,11 @@ import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityMachineBase;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReactor;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.model.BakedQuad;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -37,28 +43,34 @@ import java.util.Map;
 
 @OnlyIn(Dist.CLIENT)
 public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntityReactor> {
+    private final QuadCollection electrodeModel;
+
     public TileEntityReactorRenderer(BlockEntityRendererProvider.Context context) {
+        electrodeModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.ELECTRODE_MODEL);
     }
 
     @Override
-    public void render(TileEntityReactor entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		Direction facing = entity.getBlockState().getValue(BlockReactor.FACING);
-        matrices.pushPose();
-		matrices.translate(0.5F, 1.1875F, 0.5F);
-		matrices.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-		ModelLaptop.renderModel(vertexConsumers, matrices, (float) -entity.slide, light, overlay);
-		ModelLaptop.renderScreen(vertexConsumers, RRIdentifiers.etscreen, matrices, (float) -entity.slide, light, overlay);
-		matrices.popPose();
-		matrices.pushPose();
-		matrices.translate(0.5F, 0.5F, 0.5F);
-		matrices.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-		ModelReactor.renderModel(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etreactor)), light, overlay);
-		matrices.translate(0, 2, -0.125f);
-		matrices.scale(0.2f, 0.2f, 0.2f);
-		ObjModels.renderSolid(ObjModels.electrode, RRIdentifiers.etelectrode, matrices, vertexConsumers, light, overlay);
-        matrices.popPose();
-        Map<BlockPos, ReactorMachinesPacket.MachineEntry> entries = new HashMap<>(entity.entries);
-        for (TileEntityMachineBase temb : entity.machines) {
+    public void render(TileEntityReactor blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+		Direction facing = blockEntity.getBlockState().getValue(BlockReactor.FACING);
+        poseStack.pushPose();
+		poseStack.translate(0.5F, 1.1875F, 0.5F);
+		poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+		ModelLaptop.renderModel(bufferSource, poseStack, (float) -blockEntity.slide, packedLight, packedOverlay);
+		ModelLaptop.renderScreen(bufferSource, RRIdentifiers.etscreen, poseStack, (float) -blockEntity.slide, packedLight, packedOverlay);
+		poseStack.popPose();
+		poseStack.pushPose();
+		poseStack.translate(0.5F, 0.5F, 0.5F);
+		poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+		ModelReactor.renderModel(poseStack, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etreactor)), packedLight, packedOverlay);
+		poseStack.translate(0, 2, -0.125f);
+		poseStack.scale(0.2f, 0.2f, 0.2f);
+        VertexConsumer electrodeBuffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etelectrode));
+        for (BakedQuad quad : electrodeModel.getAll()) {
+            electrodeBuffer.putBulkData(poseStack.last(), quad, 1, 1, 1, 1, packedLight, packedOverlay);
+        }
+        poseStack.popPose();
+        Map<BlockPos, ReactorMachinesPacket.MachineEntry> entries = new HashMap<>(blockEntity.entries);
+        for (TileEntityMachineBase temb : blockEntity.machines) {
             if (!entries.get(temb.getBlockPos()).enabled()) {
                 continue;
             }
@@ -71,7 +83,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
 				if (radius > 0.15) steps++;
 				if (radius > 0.25) radius = 0.25f;
 				// if (steps == 2 && temb.world.random.nextInt(5) != 0) return;
-				RenderLibrary.renderModel(matrices, vertexConsumers, 0.5F, 2.5F, 0.5F, temb.getBlockPos().getX() - entity.getBlockPos().getX(), temb.getBlockPos().getY() - entity.getBlockPos().getY() - 2.5f, temb.getBlockPos().getZ() - entity.getBlockPos().getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
+				RenderLibrary.renderModel(poseStack, bufferSource, 0.5F, 2.5F, 0.5F, temb.getBlockPos().getX() - blockEntity.getBlockPos().getX(), temb.getBlockPos().getY() - blockEntity.getBlockPos().getY() - 2.5f, temb.getBlockPos().getZ() - blockEntity.getBlockPos().getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
 			}
 		}
 	}

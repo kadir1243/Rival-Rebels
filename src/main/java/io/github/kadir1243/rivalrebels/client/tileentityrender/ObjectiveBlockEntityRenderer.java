@@ -1,11 +1,11 @@
 package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
 import io.github.kadir1243.rivalrebels.client.model.ModelObjective;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.common.tileentity.AbstractObjectiveBlockEntity;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -18,13 +18,13 @@ import net.minecraft.world.phys.AABB;
 @OnlyIn(Dist.CLIENT)
 public abstract class ObjectiveBlockEntityRenderer<T extends AbstractObjectiveBlockEntity> implements BlockEntityRenderer<T> {
     @Override
-    public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(T blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
 
         VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(getTexture()));
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        ModelObjective.renderA(poseStack, bufferSource.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(getTexture())), packedLight, packedOverlay);
+        ModelObjective.renderA(poseStack, buffer, packedLight, packedOverlay);
         poseStack.mulPose(Axis.XP.rotationDegrees(-90));
         poseStack.mulPose(Axis.ZP.rotationDegrees(90));
         ModelObjective.renderB(poseStack, buffer, (float) blockEntity.slide, 96f / 256f, 44f / 128f, 0.125f, 0.84375f, packedLight, packedOverlay);

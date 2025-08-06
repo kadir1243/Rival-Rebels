@@ -84,7 +84,7 @@ public class RivalRebelsDamageSource {
     }
 
     private static DamageSource of(Level world, ResourceKey<DamageType> key) {
-        return new DamageSource(world.registryAccess().registryOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(key));
+        return world.damageSources().source(key);
     }
 
     public static class RRDamageTypes {

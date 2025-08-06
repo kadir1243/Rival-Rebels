@@ -18,24 +18,24 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
 public class ItemSafePill extends Item
 {
-	public ItemSafePill() {
-		super(new Properties().stacksTo(6));
+	public ItemSafePill(Properties properties) {
+		super(properties);
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
 		player.startUsingItem(hand);
 		if (!world.isClientSide()) {
 			player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Regenerating...").withStyle(ChatFormatting.YELLOW)), true);
@@ -48,15 +48,15 @@ public class ItemSafePill extends Item
 			player.heal(10);
             ItemStack stack = player.getItemInHand(hand);
             stack.consume(1, player);
-            return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+            return InteractionResult.SUCCESS;
 		}
 		return super.use(world, player, hand);
 	}
 
 	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.EAT;
+		return ItemUseAnimation.EAT;
 	}
 
     @Override

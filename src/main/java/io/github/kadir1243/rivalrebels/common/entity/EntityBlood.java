@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.entity;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
@@ -57,7 +58,7 @@ public class EntityBlood extends EntityInanimate
 
 		++tickCount;
 
-		if (isInWaterOrBubble() || (tickCount == 20 && isGore)) kill();
+		if (isInWater() || (tickCount == 20 && isGore)) kill((ServerLevel) level());
 
         Vec3 vec3d = position().add(getDeltaMovement());
         setDeltaMovement(vec3d.x(), vec3d.y(), vec3d.z());

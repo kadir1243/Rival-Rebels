@@ -41,9 +41,9 @@ public class BlockExplosives extends Block
 		if (!level.isClientSide()) {
             player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
             player.displayClientMessage(RRBlocks.timedbomb.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(1 minute countdown.)").withStyle(ChatFormatting.BLUE)), false);
-            player.displayClientMessage(RRItems.pliers.get().getDescription().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("§9(to defuse explosives.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRItems.pliers.get().getName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("§9(to defuse explosives.)").withStyle(ChatFormatting.BLUE)), false);
             player.displayClientMessage(RRBlocks.remotecharge.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Remote charge.)").withStyle(ChatFormatting.BLUE)), false);
-            player.displayClientMessage(RRItems.remote.get().getDescription().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Set and detonate charge.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRItems.remote.get().getName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Set and detonate charge.)").withStyle(ChatFormatting.BLUE)), false);
             player.displayClientMessage(RRBlocks.minetrap.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Handle with care.)").withStyle(ChatFormatting.BLUE)), false);
             player.displayClientMessage(RRBlocks.flare.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Incendiary defense.)").withStyle(ChatFormatting.BLUE)), false);
             Containers.dropItemStack(level, x, y, z, RRBlocks.timedbomb.toStack());
@@ -54,7 +54,7 @@ public class BlockExplosives extends Block
 			Containers.dropItemStack(level, x, y, z, RRItems.pliers.toStack());
 			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		}
-		return InteractionResult.sidedSuccess(level.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
 }

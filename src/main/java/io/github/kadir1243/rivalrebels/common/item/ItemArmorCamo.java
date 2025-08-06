@@ -11,13 +11,12 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.item;
 
-import net.minecraft.core.Holder;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterial;
+import net.minecraft.world.item.equipment.ArmorMaterial;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorType;
 
-public class ItemArmorCamo extends ArmorItem {
-	public ItemArmorCamo(Holder<ArmorMaterial> material, Type type) {
-		super(material, type, new Item.Properties().durability(material.value().getDefense(type) * 2));
+public class ItemArmorCamo extends Item {
+	public ItemArmorCamo(ArmorMaterial material, ArmorType type, Properties properties) {
+		super(properties.durability(material.defense().get(type) * 2).humanoidArmor(material, type));
 	}
 }

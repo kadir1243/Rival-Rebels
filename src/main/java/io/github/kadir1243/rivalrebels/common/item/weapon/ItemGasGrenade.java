@@ -18,26 +18,26 @@ import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
 public class ItemGasGrenade extends Item
 {
-	public ItemGasGrenade() {
-		super(new Properties().stacksTo(6));
+	public ItemGasGrenade(Properties properties) {
+		super(properties);
 	}
 
     @Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
     @Override
@@ -46,7 +46,7 @@ public class ItemGasGrenade extends Item
 	}
 
     @Override
-    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
         ItemStack itemStack = ItemUtil.getItemStack(user, RRItems.gasgrenade.asItem());
         if (user.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteGrenades())
 		{
@@ -62,10 +62,11 @@ public class ItemGasGrenade extends Item
 				entitysuperarrow.setPos(entitysuperarrow.getX(), entitysuperarrow.getY() - 0.05, entitysuperarrow.getZ());
 			}
 		}
-	}
+        return false;
+    }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
 		user.startUsingItem(hand);
 		user.playSound(SoundEvents.SLIME_ATTACK, 1.0F, 1.0F);
 		return super.use(world, user, hand);
@@ -81,9 +82,9 @@ public class ItemGasGrenade extends Item
         if (time == 75) {
 			user.playSound(SoundEvents.NOTE_BLOCK_SNARE.value());
 			user.addEffect(new MobEffectInstance(MobEffects.POISON, 80, 1));
-			user.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 200, 0));
+			user.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));
 			user.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 80, 0));
-			user.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 80, 0));
+			user.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 80, 0));
             stack.consume(1, user);
         }
 	}

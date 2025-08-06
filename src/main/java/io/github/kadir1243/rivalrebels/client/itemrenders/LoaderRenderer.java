@@ -13,9 +13,9 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLoader;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -28,9 +28,8 @@ public class LoaderRenderer implements DynamicItemRenderer {
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(0.0F, 0.05F, 0.0F);
-        VertexConsumer buffer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etloader));
-        ModelLoader.renderA(buffer, matrices, light, overlay);
-		ModelLoader.renderB(buffer, matrices, 0, light, overlay);
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etloader));
+        ModelLoader.render(buffer, matrices, 0, light, overlay);
 		matrices.popPose();
 	}
 }

@@ -14,8 +14,8 @@ package io.github.kadir1243.rivalrebels.common.tileentity;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReactor;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
@@ -25,9 +25,12 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -73,21 +76,21 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
     }
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
-        ContainerHelper.loadAllItems(nbt, items, provider);
-		consumed = nbt.getDouble("consumed");
-		on = nbt.getBoolean("on");
-        lasttickconsumed = nbt.getDouble("lasttickconsumed");
-        melt = nbt.getBoolean("melt");
-        eject = nbt.getBoolean("eject");
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
+        ContainerHelper.loadAllItems(valueInput, items);
+		consumed = valueInput.getDoubleOr("consumed", 0);
+		on = valueInput.getBooleanOr("on", false);
+        lasttickconsumed = valueInput.getDoubleOr("lasttickconsumed", 0D);
+        melt = valueInput.getBooleanOr("melt", false);
+        eject = valueInput.getBooleanOr("eject", false);
 		int i = 0;
-		while (nbt.contains("mpos" + i)) {
+		while (valueInput.child("mpos" + i).isPresent()) {
             if (hasLevel()) {
-				BlockEntity te = level.getBlockEntity(BlockPos.of(nbt.getLong("mpos" + i)));
+				BlockEntity te = level.getBlockEntity(BlockPos.of(valueInput.getLongOr("mpos" + i, 0L)));
                 if (te instanceof TileEntityMachineBase machineBase) {
-                    machineBase.powerGiven = nbt.getFloat("mpowerGiven" + i);
-                    machineBase.pInR = nbt.getFloat("mpInR" + i);
+                    machineBase.powerGiven = valueInput.getFloatOr("mpowerGiven" + i, 0F);
+                    machineBase.pInR = valueInput.getFloatOr("mpInR" + i, 0F);
                     machineBase.worldPosition = getBlockPos();
                     machineBase.edist = (float) Math.sqrt(machineBase.getBlockPos().distSqr(getBlockPos()));
                     machines.add(machineBase);
@@ -98,20 +101,22 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
 	}
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        ContainerHelper.saveAllItems(nbt, items, provider);
-		nbt.putDouble("consumed", consumed);
-		nbt.putBoolean("on", on);
-        nbt.putDouble("lasttickconsumed", lasttickconsumed);
-        nbt.putBoolean("melt", melt);
-        nbt.putBoolean("eject", eject);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
+
+        ContainerHelper.saveAllItems(valueOutput, items);
+		valueOutput.putDouble("consumed", consumed);
+		valueOutput.putBoolean("on", on);
+        valueOutput.putDouble("lasttickconsumed", lasttickconsumed);
+        valueOutput.putBoolean("melt", melt);
+        valueOutput.putBoolean("eject", eject);
 		if (on) {
             for (int i = 0; i < machines.size(); i++) {
                 TileEntityMachineBase te = machines.get(i);
                 if (te == null || te instanceof TileEntityReactive) continue;
-                nbt.putLong("mpos" + i, te.getBlockPos().asLong());
-                nbt.putFloat("mpowerGiven" + i, te.powerGiven);
-                nbt.putFloat("mpInR" + i, te.pInR);
+                valueOutput.putLong("mpos" + i, te.getBlockPos().asLong());
+                valueOutput.putFloat("mpowerGiven" + i, te.powerGiven);
+                valueOutput.putFloat("mpInR" + i, te.pInR);
             }
         }
     }
@@ -162,7 +167,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
 
         if (melt) {
             if (!getCore().isEmpty()) {
-                if (meltTick % 20 == 0) RivalRebelsSoundPlayer.playSound(level, 21, 1, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5);
+                if (meltTick % 20 == 0) level.playLocalSound(getBlockPos(), RRSounds.REACTOR_RUNNING.get(), SoundSource.BLOCKS, 1, 1, true);
                 on = true;
                 meltTick++;
                 if (meltTick == 300) meltDown(10);
@@ -190,7 +195,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
             }
             if (tickssincelastrod == 20 && !lastrodwasredstone) {
                 for (Player player : getLevel().players()) {
-                    player.displayClientMessage(Translations.warning().append(" ").append(Component.translatable(Translations.OVERHEAT_TRANSLATION.toLanguageKey()).withStyle(ChatFormatting.RED)), false);
+                    player.displayClientMessage(Translations.warning().append(" ").append(Translations.OVERHEAT_TRANSLATION.translate().withStyle(ChatFormatting.RED)), false);
                 }
             }
         } else {
@@ -211,11 +216,11 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
 
         if (on && getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && !getFuel().isEmpty() && getFuel().has(RRComponents.ROD_POWER))
         {
-            if (!prevOn && on) RivalRebelsSoundPlayer.playSound(level, 21, 3, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5);
+            if (!prevOn && on) level.playLocalSound(getBlockPos(), RRSounds.REACTOR_DISABLING.get(), SoundSource.BLOCKS, 1, 1, true);
             else
             {
                 tick++;
-                if (on && tick % 39 == 0) RivalRebelsSoundPlayer.playSound(level, 21, 2, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, 0.9f, 0.77f);
+                if (on && tick % 39 == 0) level.playLocalSound(getBlockPos(), RRSounds.REACTOR_RUNNING_2.get(), SoundSource.BLOCKS, 0.9f, 0.77f, true);
             }
             float power = ((getFuel().get(RRComponents.ROD_POWER) * getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
             float temp = power;
@@ -285,9 +290,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag nbt = new CompoundTag();
-        saveAdditional(nbt, registries);
-        return nbt;
+        return this.saveWithoutMetadata(registries);
     }
 
     public void meltDown(int radius)

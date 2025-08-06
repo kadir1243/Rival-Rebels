@@ -16,9 +16,9 @@ import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayerList;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsRound;
 import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityLaptop;
+import net.minecraft.network.protocol.PacketFlow;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
 public class PacketDispatcher {
@@ -47,11 +47,13 @@ public class PacketDispatcher {
         registrar.playToClient(RhodesPacket.PACKET_TYPE, RhodesPacket.STREAM_CODEC, RhodesPacket::onMessage);
         registrar.playToClient(RivalRebelsPlayerList.PACKET_TYPE, RivalRebelsPlayerList.STREAM_CODEC, RivalRebelsPlayerList::onMessage);
         registrar.playToClient(RivalRebelsRound.PACKET_TYPE, RivalRebelsRound.STREAM_CODEC, RivalRebelsRound::onMessage);
-        registrar.playBidirectional(ReactorMachinesPacket.TYPE, ReactorMachinesPacket.STREAM_CODEC, new DirectionalPayloadHandler<>(GuiReactor::onMachinesPacket, (payload, context) -> context.player().level().getBlockEntity(payload.reactorPos(), RRTileEntities.REACTOR.get()).ifPresent(tileEntityReactor -> {
-            tileEntityReactor.entries.clear();
-            for (ReactorMachinesPacket.MachineEntry machine : payload.machines()) {
-                tileEntityReactor.entries.put(machine.pos(), machine);
-            }
-        })));
+        registrar.playBidirectional(ReactorMachinesPacket.TYPE, ReactorMachinesPacket.STREAM_CODEC, (payload, context) -> {
+            context.player().level().getBlockEntity(payload.reactorPos(), RRTileEntities.REACTOR.get()).ifPresent(tileEntityReactor -> {
+                tileEntityReactor.entries.clear();
+                for (ReactorMachinesPacket.MachineEntry machine : payload.machines()) {
+                    tileEntityReactor.entries.put(machine.pos(), machine);
+                }
+            });
+        }, GuiReactor::onMachinesPacket);
     }
 }

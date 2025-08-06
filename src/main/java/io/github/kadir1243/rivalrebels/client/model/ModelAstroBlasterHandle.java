@@ -11,14 +11,16 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.model;
 
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
+import com.mojang.math.Transformation;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.neoforged.neoforge.client.model.pipeline.TransformingVertexPipeline;
 import org.joml.Vector3f;
+
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelAstroBlasterHandle {
@@ -81,26 +83,21 @@ public class ModelAstroBlasterHandle {
 	private static final Vector3f		vbb3			= new Vector3f(20f, 0f, -2f);
 	private static final Vector3f		vbb4			= new Vector3f(8f, 0f, -2f);
 
-    public static void render(PoseStack matrices, VertexConsumer vertices, int light, int overlay) {
-		matrices.pushPose();
+    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(vertexConsumer -> {
+        TransformingVertexPipeline scaledVertex = new TransformingVertexPipeline(vertexConsumer, new Transformation(null, null, new Vector3f(1.3F, 1, 1), null));
+        // bottom
+        QuadHelper.addFace(scaledVertex, vbt3, vbt4, vbt1, vbt2, bottombottom);
+        QuadHelper.addFace(scaledVertex, vbb1, vbt1, vbt4, vbb4, bottomfront);
+        QuadHelper.addFace(scaledVertex, vbb3, vbt3, vbt2, vbb2, bottomback);
+        QuadHelper.addFace(scaledVertex, vbt2, vbb2, vbb1, vbt1, bottomside);
+        QuadHelper.addFace(scaledVertex, vbt3, vbb3, vbb4, vbt4, bottomside);
+        QuadHelper.addFace(scaledVertex, vbb3, vbb4, vbb1, vbb2, bottombottom);
 
-		matrices.pushPose();
-		matrices.scale(1.3F, 1, 1);
-		// bottom
-		RenderHelper.addFace(matrices, vertices, vbt3, vbt4, vbt1, vbt2, bottombottom, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vbb1, vbt1, vbt4, vbb4, bottomfront, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vbb3, vbt3, vbt2, vbb2, bottomback, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vbt2, vbb2, vbb1, vbt1, bottomside, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vbt3, vbb3, vbb4, vbt4, bottomside, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vbb3, vbb4, vbb1, vbb2, bottombottom, light, overlay);
-		matrices.popPose();
-
-		// handle
-		RenderHelper.addFace(matrices, vertices, vht4, vhb4, vhb1, vht1, handlefront, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vht2, vhb2, vhb3, vht3, handlefront, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vht1, vhb1, vhb2, vht2, handleside, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vht3, vhb3, vhb4, vht4, handleside, light, overlay);
-		RenderHelper.addFace(matrices, vertices, vhb2, vhb1, vhb4, vhb3, handlebottom, light, overlay);
-		matrices.popPose();
-	}
+        // handle
+        QuadHelper.addFace(vertexConsumer, vht4, vhb4, vhb1, vht1, handlefront);
+        QuadHelper.addFace(vertexConsumer, vht2, vhb2, vhb3, vht3, handlefront);
+        QuadHelper.addFace(vertexConsumer, vht1, vhb1, vhb2, vht2, handleside);
+        QuadHelper.addFace(vertexConsumer, vht3, vhb3, vhb4, vht4, handleside);
+        QuadHelper.addFace(vertexConsumer, vhb2, vhb1, vhb4, vhb3, handlebottom);
+    });
 }

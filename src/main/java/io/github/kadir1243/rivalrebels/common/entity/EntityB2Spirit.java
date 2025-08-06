@@ -15,8 +15,9 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.item.weapon.ItemRoda;
 import java.util.List;
-import net.minecraft.nbt.CompoundTag;
+
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
@@ -24,8 +25,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.monster.Zombie;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityB2Spirit extends Projectile {
 	private int					ticksSinceStart	= 0;
@@ -47,7 +51,6 @@ public class EntityB2Spirit extends Projectile {
 
 	public EntityB2Spirit(EntityType<? extends EntityB2Spirit> entityType, Level level) {
 		super(entityType, level);
-		noCulling = true;
 		setBoundingBox(new AABB(-10, -3, -10, 10, 4, 10));
 		health = RRConfig.SERVER.getB2spirithealth();
 	}
@@ -94,9 +97,8 @@ public class EntityB2Spirit extends Projectile {
         );
 	}
 
-	@Override
-	public boolean canBeCollidedWith()
-	{
+    @Override
+    public boolean canBeCollidedWith(@Nullable Entity p_423659_) {
 		return true;
 	}
 
@@ -120,7 +122,7 @@ public class EntityB2Spirit extends Projectile {
 			if (t < 25.0 || tickCount > 100) {
                 rhodeswing.setB2Energy(8000);
 				rhodeswing.freeze = false;
-				kill();
+                kill((ServerLevel) level());
 			}
 		}
 
@@ -181,7 +183,7 @@ public class EntityB2Spirit extends Projectile {
                 }
 
                 if (var9 instanceof EntityLaserBurst) {
-                    var9.kill();
+                    var9.kill((ServerLevel) level());
                     this.hurt(damageSources().generic(), 6);
                 }
             }
@@ -193,7 +195,7 @@ public class EntityB2Spirit extends Projectile {
 			}
 			if (getY() > 256.0f)
 			{
-				kill();
+				kill((ServerLevel) level());
 			}
 		}
 
@@ -228,29 +230,27 @@ public class EntityB2Spirit extends Projectile {
         setYRot(yRotO = (float) (Math.atan2(getDeltaMovement().x(), getDeltaMovement().z()) * Mth.RAD_TO_DEG));
 	}
 
-	@Override
-	public void addAdditionalSaveData(CompoundTag nbt)
-	{
-		nbt.putInt("drop", entityIndex);
-		nbt.putFloat("tx", (float) tx);
-		nbt.putFloat("ty", (float) ty);
-		nbt.putFloat("tz", (float) tz);
-		nbt.putInt("age", ticksSinceStart);
-		nbt.putInt("health", health);
-		nbt.putInt("duration", timeLeft);
+    @Override
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+		valueOutput.putInt("drop", entityIndex);
+		valueOutput.putFloat("tx", (float) tx);
+		valueOutput.putFloat("ty", (float) ty);
+		valueOutput.putFloat("tz", (float) tz);
+		valueOutput.putInt("age", ticksSinceStart);
+		valueOutput.putInt("health", health);
+		valueOutput.putInt("duration", timeLeft);
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt)
-	{
-		entityIndex = nbt.getInt("drop");
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+		entityIndex = valueInput.getInt("drop").orElseThrow();
 		carpet = entityIndex < ItemRoda.rodaindex;
-		tx = nbt.getFloat("tx");
-		ty = nbt.getFloat("ty");
-		tz = nbt.getFloat("tz");
-		ticksSinceStart = nbt.getInt("age");
-		health = nbt.getInt("health");
-		timeLeft = nbt.getInt("duration");
+		tx = valueInput.getFloatOr("tx", 0);
+		ty = valueInput.getFloatOr("ty", 0);
+		tz = valueInput.getFloatOr("tz", 0);
+		ticksSinceStart = valueInput.getInt("age").orElseThrow();
+		health = valueInput.getInt("health").orElseThrow();
+		timeLeft = valueInput.getInt("duration").orElseThrow();
 		if (ticksSinceStart == 0)
 		{
 			double dx = tx - getX();
@@ -260,12 +260,12 @@ public class EntityB2Spirit extends Projectile {
 	}
 
     @Override
-	public boolean hurt(DamageSource damageSource, float amount) {
+    public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
 		super.hurt(damageSource, amount);
-		if (this.isAlive() && !this.level().isClientSide()) {
+		if (this.isAlive()) {
 			this.health -= amount;
 			if (this.health <= 0) {
-				this.kill();
+				this.kill(level);
 				this.level().explode(null, this.getX(), this.getY(), this.getZ(), 6.0F, Level.ExplosionInteraction.MOB);
 				level().addFreshEntity(new EntityB2Frag(level(), this, 0));
 				level().addFreshEntity(new EntityB2Frag(level(), this, 1));

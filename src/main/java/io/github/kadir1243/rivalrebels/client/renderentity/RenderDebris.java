@@ -13,6 +13,8 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.common.entity.EntityDebris;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.entity.state.FallingBlockRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -22,14 +24,14 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.List;
+
 @OnlyIn(Dist.CLIENT)
-public class RenderDebris extends EntityRenderer<EntityDebris> {
+public class RenderDebris extends EntityRenderer<EntityDebris, FallingBlockRenderState> {
     private final BlockRenderDispatcher dispatcher;
 
     public RenderDebris(EntityRendererProvider.Context manager) {
@@ -39,25 +41,32 @@ public class RenderDebris extends EntityRenderer<EntityDebris> {
     }
 
     @Override
-    public void render(EntityDebris entity, float yaw, float tickDelta, PoseStack pose, MultiBufferSource vertexConsumers, int light) {
-		if (!entity.isAlive()) return;
-        BlockState state = entity.getState();
-        if (state == null || state.isAir()) return; // Why ???
-        pose.pushPose();
-
-        BlockPos blockpos = BlockPos.containing(entity.getX(), entity.getBoundingBox().maxY, entity.getZ());
-
-        pose.translate(-0.5, 0.0, -0.5);
-        if (state.getRenderShape() != RenderShape.INVISIBLE) {
-            dispatcher.getModelRenderer().tesselateBlock(entity.level(), dispatcher.getBlockModel(state), state, blockpos, pose, vertexConsumers.getBuffer(ItemBlockRenderTypes.getMovingBlockRenderType(state)), false, RandomSource.create(), state.getSeed(blockpos), OverlayTexture.NO_OVERLAY);
-        }
-
-        pose.popPose();
+    public FallingBlockRenderState createRenderState() {
+        return new FallingBlockRenderState();
     }
 
-	@Override
-	public ResourceLocation getTextureLocation(EntityDebris entity)
-	{
-		return InventoryMenu.BLOCK_ATLAS;
-	}
+    @Override
+    public void extractRenderState(EntityDebris p_entity, FallingBlockRenderState reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.blockState = p_entity.getState();
+        reusedState.blockPos = BlockPos.containing(p_entity.getX(), p_entity.getBoundingBox().maxY, p_entity.getZ());
+        reusedState.level = p_entity.level();
+    }
+
+    @Override
+    public void render(FallingBlockRenderState renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        BlockState state = renderState.blockState;
+        if (state == null || state.isAir()) return; // Why ???
+        poseStack.pushPose();
+
+        BlockPos blockpos = renderState.blockPos;
+
+        poseStack.translate(-0.5, 0.0, -0.5);
+        if (state.getRenderShape() != RenderShape.INVISIBLE) {
+            List<BlockModelPart> list = dispatcher.getBlockModel(state).collectParts(renderState.level, blockpos, state, RandomSource.create(state.getSeed(blockpos)));
+            dispatcher.getModelRenderer().tesselateBlock(renderState.level, list, state, blockpos, poseStack, bufferSource.getBuffer(ItemBlockRenderTypes.getMovingBlockRenderType(state)), false, OverlayTexture.NO_OVERLAY);
+        }
+
+        poseStack.popPose();
+    }
 }

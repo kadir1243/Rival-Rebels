@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.common.entity.EntityPlasmoid;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,35 +23,29 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid> {
+public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid, RenderPlasmoid.State> {
     public RenderPlasmoid(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void render(EntityPlasmoid entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		matrices.pushPose();
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
-		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
-		matrices.scale(0.4f, 2.5f, 0.4f);
-		matrices.pushPose();
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+		poseStack.scale(0.4f, 2.5f, 0.4f);
+		poseStack.pushPose();
 
         for (int i = 0; i < 5; i++) {
-            matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-            ModelBlastSphere.renderModel(matrices, vertexConsumers, 0.4F + 0.2F * i, 0.65f, 0.55f, 0.95f, 0.9f);
+            poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rotation));
+            ModelBlastSphere.renderModel(poseStack, bufferSource, 0.4F + 0.2F * i, 0.65f, 0.55f, 0.95f, 0.9f);
         }
-		matrices.popPose();
-		matrices.popPose();
+		poseStack.popPose();
+		poseStack.popPose();
 	}
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityPlasmoid entity) {
-        return null;
-    }
 
     @Override
     public boolean shouldRender(EntityPlasmoid livingEntity, Frustum camera, double camX, double camY, double camZ) {
@@ -60,5 +55,24 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid> {
     @Override
     protected int getBlockLightLevel(EntityPlasmoid entity, BlockPos pos) {
         return LightEngine.MAX_LEVEL;
+    }
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityPlasmoid p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+        reusedState.rotation = p_entity.rotation;
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
+        public int rotation;
     }
 }

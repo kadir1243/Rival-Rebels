@@ -12,9 +12,14 @@
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
+import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
+import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.entity.EntityGoo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -22,34 +27,36 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.CommonColors;
+import org.joml.Vector3f;
+
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderGoo extends EntityRenderer<EntityGoo> {
-    public RenderGoo(EntityRendererProvider.Context renderManager) {
-        super(renderManager);
+public class RenderGoo extends EntityRenderer<EntityGoo, EntityRenderState> {
+    public RenderGoo(EntityRendererProvider.Context context) {
+        super(context);
     }
 
     @Override
-    public void render(EntityGoo entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-        if (entity.tickCount < 2) return;
-        matrices.pushPose();
-        matrices.scale(0.25F, 0.25F, 0.25F);
+    public EntityRenderState createRenderState() {
+        return new EntityRenderState();
+    }
+
+    @Override
+    public void render(EntityRenderState renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+        if (renderState.ageInTicks < 2) return;
+        poseStack.pushPose();
+        poseStack.scale(0.25F, 0.25F, 0.25F);
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etgoo));
+        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        ModelBlockRenderer.renderModel(poseStack.last(), buffer, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, packedLight, OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
+    }
+
+    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
         float var7 = 1.0F;
         float var8 = 0.5F;
         float var9 = 0.25F;
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etgoo));
-        matrices.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        buffer.addVertex(matrices.last(), (0.0F - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-        buffer.addVertex(matrices.last(), (var7 - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-        buffer.addVertex(matrices.last(), (var7 - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(1, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-        buffer.addVertex(matrices.last(), (0.0F - var8), (var7 - var9), 0).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(OverlayTexture.NO_OVERLAY).setLight(light).setNormal(matrices.last(), 0, 1, 0);
-        matrices.popPose();
-    }
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityGoo entity) {
-        return RRIdentifiers.etgoo;
-    }
+        QuadHelper.addFace(buffer, new Vector3f((0.0F - var8), (0.0F - var9), 0), new Vector3f((var7 - var8), (0.0F - var9), 0), new Vector3f((var7 - var8), (var7 - var9), 0), new Vector3f((0.0F - var8), (var7 - var9), 0), new TextureFace(new TextureVertice(0, 0), new TextureVertice(1, 0), new TextureVertice(1, 1), new TextureVertice(0, 1)));
+    });
 }

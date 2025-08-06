@@ -12,6 +12,7 @@
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.common.entity.EntityFlameBallGreen;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -23,8 +24,8 @@ public class RenderFlameBallGreen extends FlameBallRenderer<EntityFlameBallGreen
     }
 
     @Override
-    public float getSize(EntityFlameBallGreen entity) {
-        float size = 0.05F * entity.tickCount;
+    public float getSize(EntityRenderState entity) {
+        float size = 0.05F * entity.ageInTicks;
         //size *= size;
         return size;
     }

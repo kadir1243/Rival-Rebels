@@ -21,6 +21,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -29,7 +30,9 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
+import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -39,10 +42,23 @@ import org.jetbrains.annotations.Nullable;
 public class BlockGore extends BaseEntityBlock {
     public static final MapCodec<BlockGore> CODEC = simpleCodec(BlockGore::new);
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 5);
-	public BlockGore(Properties settings)
-	{
+    public static final BooleanProperty IS_UP_FULL = BooleanProperty.create("is_up_full");
+    public static final BooleanProperty IS_DOWN_FULL = BooleanProperty.create("is_down_full");
+    public static final BooleanProperty IS_NORTH_FULL = BooleanProperty.create("is_north_full");
+    public static final BooleanProperty IS_SOUTH_FULL = BooleanProperty.create("is_south_full");
+    public static final BooleanProperty IS_WEST_FULL = BooleanProperty.create("is_west_full");
+    public static final BooleanProperty IS_EAST_FULL = BooleanProperty.create("is_east_full");
+
+	public BlockGore(Properties settings) {
 		super(settings);
-        this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
+        this.registerDefaultState(this.getStateDefinition().any()
+                .setValue(IS_UP_FULL, false)
+                .setValue(IS_DOWN_FULL, false)
+                .setValue(IS_NORTH_FULL, false)
+                .setValue(IS_SOUTH_FULL, false)
+                .setValue(IS_WEST_FULL, false)
+                .setValue(IS_EAST_FULL, false)
+            .setValue(META, 0));
     }
 
     @Override
@@ -52,7 +68,12 @@ public class BlockGore extends BaseEntityBlock {
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(META);
+        builder.add(META, IS_UP_FULL,
+            IS_DOWN_FULL,
+            IS_NORTH_FULL,
+            IS_SOUTH_FULL,
+            IS_WEST_FULL,
+            IS_EAST_FULL);
     }
 
     @Override
@@ -61,7 +82,7 @@ public class BlockGore extends BaseEntityBlock {
 			int meta = state.getValue(META) + 1;
 			if (meta >= 6) meta = 0;
 			level.setBlockAndUpdate(pos, state.setValue(META, meta));
-			return InteractionResult.sidedSuccess(level.isClientSide());
+			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.FAIL;
 	}
@@ -95,7 +116,35 @@ public class BlockGore extends BaseEntityBlock {
 		return new TileEntityGore(pos, state);
 	}
 
-	/*@OnlyIn(Dist.CLIENT)
+    @Override
+    public @Nullable BlockState getStateForPlacement(BlockPlaceContext context) {
+        return updateState(context.getLevel(), context.getClickedPos(), super.getStateForPlacement(context));
+    }
+
+    private static BlockState updateState(BlockGetter level, BlockPos pos, BlockState oldState) {
+        return oldState
+            .setValue(IS_NORTH_FULL, isFaceFull(level, pos, Direction.NORTH))
+            .setValue(IS_SOUTH_FULL, isFaceFull(level, pos, Direction.SOUTH))
+            .setValue(IS_UP_FULL, isFaceFull(level, pos, Direction.UP))
+            .setValue(IS_DOWN_FULL, isFaceFull(level, pos, Direction.DOWN))
+            .setValue(IS_EAST_FULL, isFaceFull(level, pos, Direction.EAST))
+            .setValue(IS_WEST_FULL, isFaceFull(level, pos, Direction.WEST));
+    }
+
+    private static boolean isFaceFull(BlockGetter world, BlockPos pos, Direction direction) {
+        return world.getBlockState(pos.relative(direction)).isFaceSturdy(world, pos.relative(direction), direction.getOpposite());
+    }
+
+    @Override
+    protected void neighborChanged(BlockState state, Level level, BlockPos pos, Block neighborBlock, @Nullable Orientation orientation, boolean movedByPiston) {
+        super.neighborChanged(state, level, pos, neighborBlock, orientation, movedByPiston);
+        BlockState updatedState = updateState(level, pos, state);
+        if (!updatedState.toString().equals(state.toString())) {
+            level.setBlockAndUpdate(pos, updatedState);
+        }
+    }
+
+    /*@OnlyIn(Dist.CLIENT)
 	IIcon	icon;
 	@OnlyIn(Dist.CLIENT)
 	IIcon	icon2;

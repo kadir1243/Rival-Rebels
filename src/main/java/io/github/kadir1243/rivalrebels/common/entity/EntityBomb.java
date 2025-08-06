@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -43,7 +44,7 @@ public class EntityBomb extends ThrowableProjectile {
 
 	public EntityBomb(Level level, double x, double y, double z, float yaw, float pitch) {
 		this(level);
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
 		setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)),
             (-Mth.sin(pitch * Mth.DEG_TO_RAD)),
             (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)));
@@ -59,7 +60,7 @@ public class EntityBomb extends ThrowableProjectile {
 	public EntityBomb(Level level, Entity entity, float inaccuracy) {
 		this(level);
         this.setOwner(entity);
-		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
+		snapTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 2.5f, inaccuracy);
 	}
@@ -76,7 +77,7 @@ public class EntityBomb extends ThrowableProjectile {
 		if (exploded) {
             setDeltaMovement(0, hit ? 1 : 0, 0);
 			timeleft--;
-			if (timeleft < 0) kill();
+			if (timeleft < 0) kill((ServerLevel) level());
 			tickCount++;
 		} else {
             HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);

@@ -16,6 +16,7 @@ import io.github.kadir1243.rivalrebels.client.model.ModelRocket;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRocket;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,29 +25,22 @@ import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.lighting.LightEngine;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderRocket extends EntityRenderer<EntityRocket> {
+public class RenderRocket extends EntityRenderer<EntityRocket, RenderRocket.State> {
     public RenderRocket(EntityRendererProvider.Context manager) {
         super(manager);
     }
 
     @Override
-    public void render(EntityRocket entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot() - 90.0f));
-		matrices.mulPose(Axis.ZP.rotationDegrees(entity.getXRot() - 90.0f));
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.rotation));
-		ModelRocket.render(matrices, vertexConsumers, RRIdentifiers.etrocket, entity.fins, light, OverlayTexture.NO_OVERLAY);
-		matrices.popPose();
-	}
-
-	@Override
-    public ResourceLocation getTextureLocation(EntityRocket entity)
-	{
-		return RRIdentifiers.etrocket;
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rotation));
+		ModelRocket.render(poseStack, bufferSource, RRIdentifiers.etrocket, renderState.fins, packedLight, OverlayTexture.NO_OVERLAY);
+		poseStack.popPose();
 	}
 
     @Override
@@ -57,5 +51,26 @@ public class RenderRocket extends EntityRenderer<EntityRocket> {
     @Override
     protected int getBlockLightLevel(EntityRocket entity, BlockPos pos) {
         return LightEngine.MAX_LEVEL;
+    }
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityRocket p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+        reusedState.rotation = p_entity.rotation;
+        reusedState.fins = p_entity.fins;
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
+        public int rotation;
+        public boolean fins;
     }
 }

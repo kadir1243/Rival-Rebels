@@ -55,44 +55,6 @@ public class BlockBreadBox extends Block
                 level.addFreshEntity(ei);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide());
+        return InteractionResult.SUCCESS;
     }
-
-    /*@OnlyIn(Dist.CLIENT)
-	IIcon	icon1;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon2;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon3;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon4;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon5;
-	@OnlyIn(Dist.CLIENT)
-	IIcon	icon6;
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		if (side == 0) return icon1;
-		if (side == 1) return icon2;
-		if (side == 2) return icon3;
-		if (side == 3) return icon4;
-		if (side == 4) return icon5;
-		if (side == 5) return icon6;
-		return icon1;
-	}
-
-	@OnlyIn(Dist.CLIENT)
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon1 = iconregister.registerIcon("RivalRebels:ca"); // BOTTOM
-		icon2 = iconregister.registerIcon("RivalRebels:cc"); // TOP
-		icon3 = iconregister.registerIcon("RivalRebels:cb"); // SIDE N
-		icon4 = iconregister.registerIcon("RivalRebels:ca"); // SIDE S
-		icon5 = iconregister.registerIcon("RivalRebels:ca"); // SIDE W
-		icon6 = iconregister.registerIcon("RivalRebels:ca"); // SIDE E
-	}*/
 }

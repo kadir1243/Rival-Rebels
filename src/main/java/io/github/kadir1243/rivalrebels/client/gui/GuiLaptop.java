@@ -12,12 +12,13 @@
 
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiButton;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerLaptop;
 import io.github.kadir1243.rivalrebels.common.packet.LaptopPressPacket;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.client.Minecraft;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -44,21 +45,21 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 	}
 
     @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
-        super.renderLabels(context, mouseX, mouseY);
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        super.renderLabels(graphics, mouseX, mouseY);
 
-		if (menu.isReady()) context.blit(RRIdentifiers.guilaptopnuke, 131, 89, 239, 9, 16, 16);
-		else context.blit(RRIdentifiers.guilaptopnuke, 131, 89, 131, 89, 16, 16);
+		if (menu.isReady()) RRTextures.guilaptopnuke.blit(graphics, 131, 89, 239, 9, 16, 16, CommonColors.WHITE);
+		else RRTextures.guilaptopnuke.blit(graphics, 131, 89, 131, 89, 16, 16, CommonColors.WHITE);
     }
 
     @Override
     protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
-		context.blit(RRIdentifiers.guilaptopnuke, x, y, 0, 0, imageWidth, imageHeight);
-		if (menu.hasChips()) context.blit(RRIdentifiers.guilaptopnuke, x + 135, y + 79, 248, 0, 8, 8);
+        RRTextures.guilaptopnuke.blit(context, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
+		if (menu.hasChips()) RRTextures.guilaptopnuke.blit(context, x + 135, y + 79, 248, 0, 8, 8, CommonColors.WHITE);
 		context.drawString(font, Component.translatable("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff, false);
-		context.drawString(font, Component.translatable(Translations.LAPTOP_B2_SPIRIT.toLanguageKey()), x + 25, y + 11, 0xffffff, false);
+		context.drawString(font, Translations.LAPTOP_B2_SPIRIT.translate(), x + 25, y + 11, 0xffffff, false);
 		context.drawString(font, Component.translatable("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
 		context.drawString(font, Component.translatable("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
 	}

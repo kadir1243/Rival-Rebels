@@ -1,14 +1,4 @@
 {
-  "21.0": {"sounds": ["at/a"]},
-  "21.1": {"sounds": ["at/b"]},
-  "21.2": {"sounds": ["at/c"]},
-  "21.3": {"sounds": ["at/d"]},
-
-  "22.0": {"sounds": ["au/a"]},
-  "22.1": {"sounds": ["au/b1","au/b2"]},
-  "22.2": {"sounds": ["au/c"]},
-  "22.3": {"sounds": ["au/d"]},
-
   "23.0": {"sounds": ["av/a1","av/a2"]},
   "23.1": {"sounds": ["av/b"]},
   "23.2": {"sounds": ["av/c1","av/c2"]},

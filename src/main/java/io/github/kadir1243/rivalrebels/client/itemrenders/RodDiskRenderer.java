@@ -13,9 +13,9 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelDisk;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -33,7 +33,7 @@ public class RodDiskRenderer implements DynamicItemRenderer {
 		matrices.scale(0.5f, 0.5f, 0.5f);
 		matrices.pushPose();
 
-		ModelDisk.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etdisk0)), light, overlay);
+		ModelDisk.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etdisk0)), light, overlay);
 
 		matrices.popPose();
 		matrices.popPose();

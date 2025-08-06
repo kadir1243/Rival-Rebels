@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.entity;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -24,14 +25,12 @@ public class EntityLightningLink extends EntityInanimate {
 
 	public EntityLightningLink(Level level) {
 		this(RREntities.LIGHTNING_LINK.get(), level);
-		noCulling = true;
-		tickCount = 0;
 	}
 
 	public EntityLightningLink(Level level, Entity player, double distance) {
 		this(level);
         setDeltaMovement(distance / 100, getDeltaMovement().y(), getDeltaMovement().z());
-		moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+		snapTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
         Vec3 vec3d = position().subtract(
             (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.16F),
             0.12,
@@ -42,14 +41,13 @@ public class EntityLightningLink extends EntityInanimate {
 
 	public EntityLightningLink(Level level, double x, double y, double z, float yaw, float pitch, double distance) {
 		this(level);
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
         setDeltaMovement(distance / 100, getDeltaMovement().y(), getDeltaMovement().z());
 	}
 
 	@Override
 	public void tick() {
 		super.tick();
-		if (tickCount > 1) kill();
-		tickCount++;
+		if (tickCount > 1 && !level().isClientSide()) kill((ServerLevel) level());
 	}
 }

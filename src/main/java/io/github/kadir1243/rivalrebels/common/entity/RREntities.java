@@ -1,21 +1,16 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
-import java.util.function.BiFunction;
-import java.util.function.Consumer;
-
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraft.world.level.Level;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class RREntities {
-    private static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, RRIdentifiers.MODID);
+    private static final DeferredRegister.Entities ENTITY_TYPES = DeferredRegister.createEntities(RRIdentifiers.MODID);
 
     public static final DeferredHolder<EntityType<?>, EntityType<EntityAntimatterBomb>> ANTIMATTER_BOMB = create(EntityAntimatterBomb::new, "antimatter_bomb", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityAntimatterBombBlast>> ANTIMATTER_BOMB_BLAST = create(EntityAntimatterBombBlast::new, "antimatter_bomb_blast");
@@ -26,7 +21,7 @@ public class RREntities {
     public static final DeferredHolder<EntityType<?>, EntityType<EntityBlood>> BLOOD = create(EntityBlood::new, "blood", 0.25F, 0.25F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityBomb>> BOMB = create(EntityBomb::new, "bomb", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityCuchillo>> CUCHILLO = create(EntityCuchillo::new, "cuchillo", 0.5F, 0.5F);
-    public static final DeferredHolder<EntityType<?>, EntityType<EntityDebris>> DEBRIS = create(EntityDebris::new, "debris", 1F, 1F, b -> b.ridingOffset(0.5F));
+    public static final DeferredHolder<EntityType<?>, EntityType<EntityDebris>> DEBRIS = ENTITY_TYPES.registerEntityType("debris", EntityDebris::new, MobCategory.MISC, b1 -> b1.sized(1F, 1F).ridingOffset(0.5F).noSummon());
     public static final DeferredHolder<EntityType<?>, EntityType<EntityFlameBall>> FLAME_BALL = create(EntityFlameBall::new, "flame_ball", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityFlameBall1>> FLAME_BALL1 = create(EntityFlameBall1::new, "flame_ball1", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityFlameBall2>> FLAME_BALL2 = create(EntityFlameBall2::new, "flame_ball2", 0.5F, 0.5F);
@@ -72,27 +67,12 @@ public class RREntities {
     public static final DeferredHolder<EntityType<?>, EntityType<EntityTsar>> TSAR = create(EntityTsar::new, "tsar", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityTsarBlast>> TSAR_BLAST = create(EntityTsarBlast::new, "tsar_blast");
 
-    private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> create(BiFunction<EntityType<T>, Level, T> function, String id) {
-        return create(function, id, b -> {});
+    private static <T extends Entity> DeferredHolder<EntityType<?>, EntityType<T>> create(EntityType.EntityFactory<T> function, String id) {
+        return ENTITY_TYPES.registerEntityType(id, function, MobCategory.MISC, EntityType.Builder::noSummon);
     }
 
-    private static <T extends Entity> DeferredHolder<EntityType<?>,EntityType<T>> create(BiFunction<EntityType<T>, Level, T> function, String id, float width, float height) {
-        return create(function, id, width, height, t -> {});
-    }
-
-    private static <T extends Entity> DeferredHolder<EntityType<?>,EntityType<T>> create(BiFunction<EntityType<T>, Level, T> function, String id, float width, float height, Consumer<EntityType.Builder<T>> extensions) {
-        return create(function, id, b -> {
-            b.sized(width, height);
-            extensions.accept(b);
-        });
-    }
-
-    private static <T extends Entity> DeferredHolder<EntityType<?>,EntityType<T>> create(BiFunction<EntityType<T>, Level, T> function, String id, Consumer<EntityType.Builder<T>> extensions) {
-        return ENTITY_TYPES.register(id, () -> {
-            EntityType.Builder<T> builder = EntityType.Builder.of(function::apply, MobCategory.MISC).noSummon();
-            extensions.accept(builder);
-            return builder.build(id);
-        });
+    private static <T extends Entity> DeferredHolder<EntityType<?>,EntityType<T>> create(EntityType.EntityFactory<T> function, String id, float width, float height) {
+        return ENTITY_TYPES.registerEntityType(id, function, MobCategory.MISC, tBuilder -> tBuilder.sized(width, height).noSummon());
     }
 
     public static void init(IEventBus bus) {

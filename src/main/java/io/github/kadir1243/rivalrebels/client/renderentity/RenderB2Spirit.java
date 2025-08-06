@@ -17,6 +17,11 @@ import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.common.entity.EntityB2Spirit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.resources.model.ModelManager;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -24,44 +29,62 @@ import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit> {
-    public RenderB2Spirit(EntityRendererProvider.Context manager) {
-        super(manager);
-	}
+public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit, RenderB2Spirit.State> {
+    private final QuadCollection b2ForSpiritModel;
+    private final QuadCollection shuttleModel;
+    private final QuadCollection tupolevModel;
+
+    public RenderB2Spirit(EntityRendererProvider.Context context) {
+        super(context);
+        ModelManager modelManager = context.getModelManager();
+        b2ForSpiritModel = modelManager.getStandaloneModel(ObjModels.B2_FOR_SPIRIT_MODEL);
+        shuttleModel = modelManager.getStandaloneModel(ObjModels.SHUTTLE_MODEL);
+        tupolevModel = modelManager.getStandaloneModel(ObjModels.TUPOLEV_MODEL);
+    }
 
     @Override
-    public void render(EntityB2Spirit entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.getYRot()));
-		matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
+		poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
         if (RRConfig.CLIENT.getBomberType().equals("sh")) {
-			matrices.scale(3, 3, 3);
-            ObjModels.renderSolid(ObjModels.shuttle, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+			poseStack.scale(3, 3, 3);
+            ObjModels.render(shuttleModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etb2spirit)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
 		} else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
-            ObjModels.renderSolid(ObjModels.tupolev, RRIdentifiers.ettupolev, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+            ObjModels.render(tupolevModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.ettupolev)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
         } else {
-            matrices.scale(3, 3, 3);
-            ObjModels.renderSolid(ObjModels.b2ForSpirit, RRIdentifiers.etb2spirit, matrices, vertexConsumers, light, OverlayTexture.NO_OVERLAY);
+            poseStack.scale(3, 3, 3);
+            ObjModels.render(b2ForSpiritModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etb2spirit)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
         }
-		matrices.popPose();
+		poseStack.popPose();
 	}
 
     @Override
-    public ResourceLocation getTextureLocation(EntityB2Spirit entity) {
-        if (RRConfig.CLIENT.getBomberType().equals("sh")) {
-            return RRIdentifiers.etb2spirit;
-        } else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
-            return RRIdentifiers.ettupolev;
-        } else {
-            return RRIdentifiers.etb2spirit;
-        }
+    protected boolean affectedByCulling(EntityB2Spirit p_365169_) {
+        return false;
     }
 
     @Override
     public boolean shouldRender(EntityB2Spirit livingEntity, Frustum camera, double camX, double camY, double camZ) {
         return true;
+    }
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityB2Spirit p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
     }
 }

@@ -16,28 +16,21 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityHackB83;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
 import net.minecraft.world.level.Level;
 
-public class ItemHackM202 extends TieredItem
+public class ItemHackM202 extends Item
 {
-	public ItemHackM202()
+	public ItemHackM202(Properties properties)
 	{
-		super(Tiers.DIAMOND, new Properties().stacksTo(1));
-	}
-
-	@Override
-	public int getEnchantmentValue()
-	{
-		return 100;
+		super(properties);
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
 		user.setItemInHand(hand, ItemStack.EMPTY);
 		if (!world.isClientSide())
@@ -46,6 +39,6 @@ public class ItemHackM202 extends TieredItem
 		}
 		RivalRebelsSoundPlayer.playSound(user, 23, 2, 0.4f);
 		new Explosion(world, user.getX(), user.getY(), user.getZ(), 2, true, false, RivalRebelsDamageSource.flare(world));
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 }

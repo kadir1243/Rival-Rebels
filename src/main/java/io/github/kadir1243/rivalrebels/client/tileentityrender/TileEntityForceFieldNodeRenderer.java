@@ -11,49 +11,55 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.block.machine.BlockForceFieldNode;
-import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityForceFieldNode;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import org.joml.Vector3f;
+
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<TileEntityForceFieldNode> {
     public TileEntityForceFieldNodeRenderer(BlockEntityRendererProvider.Context context) {
     }
 
+    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, 3.5f, 0f), new TextureVertice(0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, -3.5f, 0f), new TextureVertice(0, 1));
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, -3.5f, 35f), new TextureVertice(5, 1));
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, 3.5f, 35f), new TextureVertice(5, 0));
+
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, -3.5f, 0f), new TextureVertice(0, 1));
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, 3.5f, 0f), new TextureVertice(0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, 3.5f, 35f), new TextureVertice(5, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, -3.5f, 35f), new TextureVertice(5, 1));
+    });
+
     @Override
-    public void render(TileEntityForceFieldNode entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        if (entity.pInR <= 0) return;
+    public void render(TileEntityForceFieldNode blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        if (blockEntity.pInR <= 0) return;
 
-		matrices.pushPose();
-		matrices.translate(0.5F, 0.5F, 0.5F);
+        poseStack.pushPose();
+        poseStack.translate(0.5F, 0.5F, 0.5F);
 
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockForceFieldNode.FACING).toYRot()));
+        poseStack.translate(0, 0, 0.5f);
+        VertexConsumer cellularNoise = bufferSource.getBuffer(RenderTypes.CELLULAR_NOISE);
+        ModelBlockRenderer.renderModel(poseStack.last(), cellularNoise, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, packedLight, packedOverlay);
 
-		matrices.translate(0, 0, 0.5f);
-        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
-		cellularNoise.addVertex(matrices.last(), -0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
-		cellularNoise.addVertex(matrices.last(), -0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
-		cellularNoise.addVertex(matrices.last(), -0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
-		cellularNoise.addVertex(matrices.last(), -0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
-
-		cellularNoise.addVertex(matrices.last(), 0.0625f, -3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 1).setOverlay(overlay).setLight(light);
-		cellularNoise.addVertex(matrices.last(), 0.0625f, 3.5f, 0f).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(overlay).setLight(light);
-		cellularNoise.addVertex(matrices.last(), 0.0625f, 3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 0).setOverlay(overlay).setLight(light);
-		cellularNoise.addVertex(matrices.last(), 0.0625f, -3.5f, 35f).setColor(CommonColors.WHITE).setUv(5, 1).setOverlay(overlay).setLight(light);
-
-		matrices.popPose();
+        poseStack.popPose();
 	}
 
     @Override

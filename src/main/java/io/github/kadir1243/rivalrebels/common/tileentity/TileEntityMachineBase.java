@@ -14,11 +14,11 @@ package io.github.kadir1243.rivalrebels.common.tileentity;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class TileEntityMachineBase extends BlockEntity implements Tickable {
     public static final Map<BlockPos, TileEntityMachineBase> BLOCK_ENTITIES = new HashMap<>();
@@ -42,17 +42,18 @@ public abstract class TileEntityMachineBase extends BlockEntity implements Ticka
 	}
 
     @Override
-    public void loadAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-        super.loadAdditional(nbt, provider);
-        worldPosition = BlockPos.of(nbt.getLong("rpos"));
-        edist = nbt.getFloat("edist");
+    protected void loadAdditional(ValueInput valueInput) {
+        super.loadAdditional(valueInput);
+        valueInput.getLong("rpos").map(BlockPos::of).ifPresent(pos -> worldPosition = pos);
+        edist = valueInput.getFloatOr("edist", 0);
     }
 
     @Override
-    public void saveAdditional(CompoundTag nbt, HolderLookup.Provider provider) {
-		super.saveAdditional(nbt, provider);
-        nbt.putLong("rpos", worldPosition.asLong());
-		nbt.putFloat("edist", edist);
+    protected void saveAdditional(ValueOutput valueOutput) {
+        super.saveAdditional(valueOutput);
+
+        valueOutput.putLong("rpos", worldPosition.asLong());
+		valueOutput.putFloat("edist", edist);
     }
 
     @Override

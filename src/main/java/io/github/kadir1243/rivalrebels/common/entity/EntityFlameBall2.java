@@ -16,6 +16,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReciever;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -74,7 +75,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 	public void tick() {
 		super.tick();
 		sequence++;
-		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill();
+		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill((ServerLevel) level());
 		if (tickCount > 5 && random.nextDouble() > 0.5) gonnadie = true;
 
 		if (gonnadie && sequence < 15) sequence++;
@@ -98,7 +99,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 			fire();
             setPosRaw(getX(), getY(), getZ() + 1);
             setPosRaw(getX() + 0.5, getY() + 0.5, getZ() + 0.5);
-			kill();
+			kill((ServerLevel) level());
 			if (hitResult.getType() == HitResult.Type.ENTITY)
 			{
                 Entity entityHit = ((EntityHitResult) hitResult).getEntity();
@@ -115,7 +116,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 		rotation += motionr;
 		motionr *= 1.06f;
 
-		if (isInWaterOrBubble()) kill();
+		if (isInWater()) kill((ServerLevel) level());
 		float airFriction = 0.9F;
 		if (gonnadie) {
             setDeltaMovement(getDeltaMovement().add(0, 0.05, 0));
@@ -151,7 +152,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 			else if (state.is(RRBlocks.landmine)) id.destroy(level(), blockPosition(), state);
 			else if (state.is(RRBlocks.alandmine)) id.destroy(level(), blockPosition(), state);
 			else if (state.is(Blocks.TNT)) {
-                TntBlock.explode(level(), blockPosition());
+                TntBlock.prime(level(), blockPosition());
                 level().removeBlock(blockPosition(), false);
 			}
 			else if (state.is(RRBlocks.conduit)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());

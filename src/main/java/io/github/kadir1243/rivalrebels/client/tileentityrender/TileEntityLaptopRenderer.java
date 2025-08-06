@@ -13,10 +13,9 @@ package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
-import io.github.kadir1243.rivalrebels.common.block.machine.BlockLaptop;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityLaptop;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -29,12 +28,11 @@ public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityL
     }
 
     @Override
-    public void render(TileEntityLaptop entity, float tickDelta, PoseStack pose, MultiBufferSource vertexConsumers, int light, int overlay) {
-		pose.pushPose();
-		pose.translate(0.5F, 0, 0.5F);
-        pose.mulPose(Axis.YP.rotationDegrees(entity.getBlockState().getValue(BlockLaptop.FACING).toYRot()));
-        ModelLaptop.renderModel(vertexConsumers, pose, (float) -entity.slide, light, overlay);
-		ModelLaptop.renderScreen(vertexConsumers, RRIdentifiers.etubuntu, pose, (float) -entity.slide, light, overlay);
-		pose.popPose();
+    public void render(TileEntityLaptop blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+		poseStack.pushPose();
+		poseStack.translate(0.5F, 0, 0.5F);
+        ModelLaptop.renderModel(bufferSource, poseStack, (float) -blockEntity.slide, packedLight, packedOverlay);
+		ModelLaptop.renderScreen(bufferSource, RRIdentifiers.etubuntu, poseStack, (float) -blockEntity.slide, packedLight, packedOverlay);
+		poseStack.popPose();
 	}
 }

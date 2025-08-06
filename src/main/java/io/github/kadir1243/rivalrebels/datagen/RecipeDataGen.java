@@ -2,12 +2,11 @@ package io.github.kadir1243.rivalrebels.datagen;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
-import net.minecraft.data.PackOutput;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.ItemLike;
@@ -15,13 +14,13 @@ import net.minecraft.world.level.ItemLike;
 import java.util.concurrent.CompletableFuture;
 
 public class RecipeDataGen extends RecipeProvider {
-    public RecipeDataGen(PackOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
-        super(output, registriesFuture);
+    public RecipeDataGen(HolderLookup.Provider output, RecipeOutput recipeOutput) {
+        super(output, recipeOutput);
     }
 
     @Override
-    public void buildRecipes(RecipeOutput exporter) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.fuel, 16)
+    protected void buildRecipes() {
+        this.shaped(RecipeCategory.MISC, RRItems.fuel, 16)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
@@ -30,9 +29,9 @@ public class RecipeDataGen extends RecipeProvider {
             .pattern("GC")
             .showNotification(false)
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, RRItems.rocket, 16)
+        this.shaped(RecipeCategory.COMBAT, RRItems.rocket, 16)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
@@ -40,9 +39,9 @@ public class RecipeDataGen extends RecipeProvider {
             .pattern("SC")
             .pattern("DG")
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.battery, 4)
+        this.shaped(RecipeCategory.MISC, RRItems.battery, 4)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
@@ -50,9 +49,9 @@ public class RecipeDataGen extends RecipeProvider {
             .pattern("CG")
             .pattern("SD")
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.gasgrenade, 6)
+        this.shaped(RecipeCategory.MISC, RRItems.gasgrenade, 6)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
@@ -60,17 +59,17 @@ public class RecipeDataGen extends RecipeProvider {
             .pattern("GD")
             .pattern("CS")
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.easteregg)
+        this.shaped(RecipeCategory.MISC, RRBlocks.easteregg)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('D', ItemTags.DIRT)
             .pattern("DD")
             .pattern("CC")
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.sigmaarmor)
+        this.shaped(RecipeCategory.MISC, RRBlocks.sigmaarmor)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', RRBlocks.steel)
             .define('P', RRItems.pliers)
@@ -80,9 +79,9 @@ public class RecipeDataGen extends RecipeProvider {
             .pattern("SPB")
             .pattern("SSD")
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.omegaarmor)
+        this.shaped(RecipeCategory.MISC, RRBlocks.omegaarmor)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', RRBlocks.steel)
             .define('P', RRItems.pliers)
@@ -92,23 +91,23 @@ public class RecipeDataGen extends RecipeProvider {
             .pattern("SPB")
             .pattern("SSC")
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.flagbox1)
+        this.shaped(RecipeCategory.MISC, RRBlocks.flagbox1)
             .define('W', ItemTags.WOOL)
             .define('P', RRItems.pliers)
             .pattern("WP")
             .unlockedBy("has_wool", has(ItemTags.WOOL))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.flagbox3)
+        this.shaped(RecipeCategory.MISC, RRBlocks.flagbox3)
             .define('W', ItemTags.WOOL)
             .define('P', RRItems.pliers)
             .pattern("PW")
             .unlockedBy("has_wool", has(ItemTags.WOOL))
-            .save(exporter);
+            .save(output);
 
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRItems.armyshovel)
+        this.shaped(RecipeCategory.MISC, RRItems.armyshovel)
             .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
             .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
@@ -116,16 +115,16 @@ public class RecipeDataGen extends RecipeProvider {
             .pattern("CD")
             .pattern("SG")
             .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(exporter);
+            .save(output);
 
         // Supplies
-        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, RRBlocks.amario, 16)
+        this.shaped(RecipeCategory.MISC, RRBlocks.amario, 16)
             .define('S', ItemTags.SAND)
             .define('G', Items.GRAVEL)
             .pattern("SS")
             .pattern("GG")
             .unlockedBy("has_sand", has(ItemTags.SAND))
-            .save(exporter);
+            .save(output);
 
         addRecipe(RRBlocks.aquicksand, 16, "SS", "DD", 'S', ItemTags.SAND, 'D', ItemTags.DIRT);
 
@@ -256,5 +255,21 @@ public class RecipeDataGen extends RecipeProvider {
     }
 
     private static void addRecipe(ItemLike output, int count, Object... input) {
+    }
+
+    public static class RecipeRunner extends RecipeProvider.Runner {
+        public RecipeRunner(PackOutput p_365369_, CompletableFuture<HolderLookup.Provider> p_361563_) {
+            super(p_365369_, p_361563_);
+        }
+
+        @Override
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider p_362946_, RecipeOutput p_365274_) {
+            return new RecipeDataGen(p_362946_, p_365274_);
+        }
+
+        @Override
+        public String getName() {
+            return "RR Recipe DataGen";
+        }
     }
 }

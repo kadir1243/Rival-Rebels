@@ -18,11 +18,9 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.level.Level;
 
 public class CommandHotPotato {
     public static BlockPos pos = BlockPos.ZERO;
-	public static Level world = null;
 	public static boolean roundinprogress = false;
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {

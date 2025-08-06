@@ -18,33 +18,26 @@ import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
-public class ItemPlasmaCannon extends TieredItem
+public class ItemPlasmaCannon extends Item
 {
-	public ItemPlasmaCannon() {
-		super(Tiers.DIAMOND, new Properties().stacksTo(1));
+	public ItemPlasmaCannon(Properties properties) {
+		super(properties);
 	}
 
 	@Override
-	public int getEnchantmentValue()
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return 100;
-	}
-
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
-	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
     @Override
@@ -53,7 +46,7 @@ public class ItemPlasmaCannon extends TieredItem
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
         ItemStack hydrodStack = ItemUtil.getItemStack(user, RRItems.hydrod.asItem());
         if (user.hasInfiniteMaterials() || !hydrodStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
@@ -71,7 +64,7 @@ public class ItemPlasmaCannon extends TieredItem
 				}
 				else
 				{
-					return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+					return InteractionResult.SUCCESS;
 				}
 			}
             user.playSound(RRSounds.PLASMA2.get(), 0.25F, 1);
@@ -80,11 +73,11 @@ public class ItemPlasmaCannon extends TieredItem
 		{
 			user.displayClientMessage(Component.nullToEmpty("§cOut of Hydrogen"), true);
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
     @Override
-    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
 		if (!world.isClientSide()) {
             float f = (getUseDuration(stack, user) - remainingUseTicks) / 20.0F;
 			f = (f * f + f * 2) * 0.3333f;
@@ -94,5 +87,6 @@ public class ItemPlasmaCannon extends TieredItem
 			Entity entity = new EntityPlasmoid(world, user, f+0.5f, stack.isEnchanted());
 			world.addFreshEntity(entity);
 		}
-	}
+        return false;
+    }
 }

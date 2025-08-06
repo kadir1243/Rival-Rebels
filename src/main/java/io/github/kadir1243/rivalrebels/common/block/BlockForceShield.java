@@ -15,6 +15,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
@@ -26,17 +27,17 @@ public class BlockForceShield extends Block {
 	}
 
     @Override
-    protected void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean movedByPiston) {
-        if (newState.is(RRBlocks.fshield) || newState.is(RRBlocks.omegaobj) || newState.is(RRBlocks.sigmaobj) || newState.is(RRBlocks.reactive)) {
-            level.setBlockAndUpdate(pos, state);
-            return;
-        }
+    public void onBlockStateChange(LevelReader readOnlyLevel, BlockPos pos, BlockState oldState, BlockState newState) {
+        super.onBlockStateChange(readOnlyLevel, pos, oldState, newState);
 
-        super.onRemove(state, level, pos, newState, movedByPiston);
+        if (!(readOnlyLevel instanceof Level level)) return;
+        if (newState.is(RRBlocks.fshield) || newState.is(RRBlocks.omegaobj) || newState.is(RRBlocks.sigmaobj) || newState.is(RRBlocks.reactive)) {
+            level.setBlockAndUpdate(pos, oldState);
+        }
     }
 
     @Override
     public boolean canHarvestBlock(BlockState state, BlockGetter level, BlockPos pos, Player player) {
-        return super.canHarvestBlock(state, level, pos, player) && player.hasInfiniteMaterials() && player.isShiftKeyDown();
+        return super.canHarvestBlock(state, level, pos, player) && player.isCreative() && player.isShiftKeyDown();
     }
 }

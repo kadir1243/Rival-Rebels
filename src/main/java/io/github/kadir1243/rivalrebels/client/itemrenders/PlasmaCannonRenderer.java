@@ -14,10 +14,14 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRod;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
-import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -26,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
 public class PlasmaCannonRenderer implements DynamicItemRenderer {
+    private final QuadCollection plasmaCannonModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.PLASMA_CANNON_MODEL);
     public PlasmaCannonRenderer() {
     }
 
@@ -39,10 +44,10 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
 		matrices.pushPose();
 
-        ObjModels.renderSolid(ObjModels.plasma_cannon, RRIdentifiers.etplasmacannon, matrices, vertexConsumers, light, overlay);
-        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES);
+        ObjModels.render(plasmaCannonModel, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etplasmacannon)), matrices, CommonColors.WHITE, light, overlay);
+        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE);
         if (stack.isEnchanted()) {
-			ObjModels.renderNoise(ObjModels.plasma_cannon, matrices, vertexConsumers, light, overlay);
+			ObjModels.render(plasmaCannonModel, cellularNoise, matrices, CommonColors.WHITE, light, overlay);
 		}
 
 		matrices.popPose();
@@ -55,7 +60,7 @@ public class PlasmaCannonRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(225));
 		matrices.translate(-0.5f, 0.5f, 0.0f);
 		matrices.scale(0.25f, 0.5f, 0.25f);
-        VertexConsumer hydrodVertexConsumer = vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ethydrod));
+        VertexConsumer hydrodVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ethydrod));
         ModelRod.render(matrices, hydrodVertexConsumer, light, overlay, false);
 		if (stack.isEnchanted()) {
 			ModelRod.render(matrices, cellularNoise, light, overlay, false);

@@ -21,32 +21,25 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TieredItem;
-import net.minecraft.world.item.Tiers;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
-public class ItemAstroBlaster extends TieredItem {
+public class ItemAstroBlaster extends Item {
 	boolean	isA	= true;
 
-	public ItemAstroBlaster() {
-		super(Tiers.DIAMOND, new Properties().stacksTo(1));
+	public ItemAstroBlaster(Properties properties) {
+		super(properties);
 	}
 
 	@Override
-	public int getEnchantmentValue()
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return 100;
-	}
-
-	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
-	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
     @Override
@@ -55,7 +48,7 @@ public class ItemAstroBlaster extends TieredItem {
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
 
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.redrod.asItem());
@@ -66,7 +59,7 @@ public class ItemAstroBlaster extends TieredItem {
 		} else if (!world.isClientSide()) {
 			player.displayClientMessage(Component.nullToEmpty("§cNot enough redstone rods"), false);
 		}
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
     @Override
@@ -100,7 +93,8 @@ public class ItemAstroBlaster extends TieredItem {
 	}
 
     @Override
-    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
 		if (world.isClientSide()) stack.set(DataComponents.REPAIR_COST, 0);
-	}
+        return false;
+    }
 }

@@ -27,7 +27,7 @@ public class ShootFlame extends Behavior<EntityRhodes> {
         float py = (float) owner.getY() + 6.26759f * owner.getScale();
         float pz = (float) owner.getZ() + syaw * 6.4f * owner.getScale();
         LivingEntity target = owner.getBrain().getMemory(MemoryModuleType.ATTACK_TARGET).orElse(null);
-        if (target != null && owner.canAttack(target, TargetingConditions.forCombat())) {
+        if (target != null && target.canBeSeenAsEnemy()) {
             float x = px - (float) target.getX();
             float y = py - (float) target.getY() - (target.getBbHeight() * 0.5f);
             float z = pz - (float) target.getZ();

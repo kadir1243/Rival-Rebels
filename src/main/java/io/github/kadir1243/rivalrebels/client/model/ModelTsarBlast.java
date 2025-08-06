@@ -51,7 +51,7 @@ public class ModelTsarBlast {
         }
     }
 
-    public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay, float partialTick) {
+    public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
         if (timer == 0) {
             timer += time[index];
             index++;

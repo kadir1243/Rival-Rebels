@@ -14,7 +14,9 @@ package io.github.kadir1243.rivalrebels.common.entity;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.explosion.NuclearExplosion;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
+import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -38,7 +40,7 @@ public class EntityB83 extends ThrowableProjectile
 
 	public EntityB83(Level level, double x, double y, double z, float yaw, float pitch) {
 		this(RREntities.B83.get(), level);
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
         setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)),
             (-Mth.sin(pitch * Mth.DEG_TO_RAD)),
             (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)));
@@ -47,7 +49,7 @@ public class EntityB83 extends ThrowableProjectile
 	public EntityB83(Level level, double x, double y, double z, float yaw, float pitch, float strength)
 	{
         this(RREntities.B83.get(), level);
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
 		setDeltaMovement(-(-Mth.sin(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)) * strength,
             (-Mth.sin(pitch * Mth.DEG_TO_RAD)) * strength,
             (Mth.cos(yaw * Mth.DEG_TO_RAD) * Mth.cos(pitch * Mth.DEG_TO_RAD)) * strength);
@@ -65,7 +67,7 @@ public class EntityB83 extends ThrowableProjectile
 
 	@Override
 	public void tick() {
-		if (ticksInAir == - 100 || getY() < level().getMinBuildHeight() || getY() > level().getMaxBuildHeight()) explode();
+		if (ticksInAir == - 100 || getY() < level().getMinY() || getY() > level().getMaxY()) explode();
 		++this.ticksInAir;
 
 		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
@@ -105,6 +107,11 @@ public class EntityB83 extends ThrowableProjectile
 	{
 		new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength());
 		level().addFreshEntity(new EntityTsarBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f).setTime());
-		this.kill();
+		this.kill((ServerLevel) level());
 	}
+
+    @Override
+    protected void checkFallDamage(double y, boolean onGround, BlockState state, BlockPos pos) {
+        super.checkFallDamage(y, onGround, state, pos);
+    }
 }

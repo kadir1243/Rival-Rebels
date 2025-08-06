@@ -7,18 +7,16 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.texture.OverlayTexture;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderRhodesRightLowerLeg extends RhodesPartRenderer<EntityRhodesRightLowerLeg> {
-    public RenderRhodesRightLowerLeg(EntityRendererProvider.Context renderManager) {
-        super(renderManager);
+    public RenderRhodesRightLowerLeg(EntityRendererProvider.Context context) {
+        super(context, ObjModels.SHIN_MODEL);
     }
 
     @Override
-    public void renderParts(EntityRhodesRightLowerLeg entity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-        super.renderParts(entity, partialTick, poseStack, bufferSource, packedLight);
+    public void renderParts(State entity, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
 		poseStack.translate(-3, 4f, 0);
-		ObjModels.renderSolid(ObjModels.shin, getTextureLocation(entity), poseStack, bufferSource, entity.getColorRGBA(), packedLight, OverlayTexture.NO_OVERLAY);
+        super.renderParts(entity, poseStack, bufferSource, packedLight);
 	}
 }

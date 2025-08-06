@@ -12,8 +12,8 @@
 package io.github.kadir1243.rivalrebels.client.gui;
 
 import io.github.kadir1243.rivalrebels.RRClient;
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiFTKnob;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.FlameThrowerMode;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
@@ -21,6 +21,7 @@ import io.github.kadir1243.rivalrebels.common.packet.ItemUpdate;
 import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.renderer.RenderPipelines;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -62,7 +63,8 @@ public class GuiFlameThrower extends Screen {
         super.render(context, mouseX, mouseY, delta);
         float f = 0.00390625F;
         ((GuiGraphicsAccessor) context).blit(
-            RRIdentifiers.guiflamethrower,
+            RenderPipelines.GUI_TEXTURED,
+            RRTextures.guiflamethrower,
             posX,
             posX + xSizeOfTexture,
             posY,
@@ -80,12 +82,10 @@ public class GuiFlameThrower extends Screen {
         if (RRClient.USE_KEY.matches(keyCode, scanCode)) {
             onClose();
             minecraft.setWindowActive(true);
-            for (ItemStack stack : minecraft.player.getHandSlots()) {
-                if (stack.isEmpty() || !stack.is(RRItems.flamethrower)) continue;
-                stack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(knob.getDegree()));
-                Minecraft.getInstance().getConnection().send(new ItemUpdate(minecraft.player.getInventory().selected, knob.getDegree()));
-                break;
-            }
+            ItemStack stack = minecraft.player.getMainHandItem();
+            if (stack.isEmpty() || !stack.is(RRItems.flamethrower)) return super.keyReleased(keyCode, scanCode, modifiers);
+            stack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(knob.getDegree()));
+            Minecraft.getInstance().getConnection().send(new ItemUpdate(minecraft.player.getInventory().getSelectedSlot(), knob.getDegree()));
         }
         return super.keyReleased(keyCode, scanCode, modifiers);
     }

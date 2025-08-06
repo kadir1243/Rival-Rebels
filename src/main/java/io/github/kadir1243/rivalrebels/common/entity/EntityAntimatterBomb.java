@@ -15,8 +15,8 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.explosion.AntimatterBomb;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.util.Mth;
@@ -27,6 +27,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 
@@ -46,7 +48,7 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 	public EntityAntimatterBomb(Level level, double x, double y, double z, float yaw, float pitch, int charges, boolean troll)
 	{
 		this(level);
-		moveTo(x, y, z, yaw, pitch);
+        snapTo(x, y, z, yaw, pitch);
 		yRotO = yaw;
 		xRotO = pitch;
 		aoc = charges;
@@ -93,7 +95,7 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < level().getMinBuildHeight()) kill();
+		if (getY() < level().getMinY()) kill((ServerLevel) level());
 
 		if (this.isPassenger())
 		{
@@ -130,17 +132,17 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 	}
 
     @Override
-	public void addAdditionalSaveData(CompoundTag nbt) {
-        super.addAdditionalSaveData(nbt);
-		nbt.putInt("charge", aoc);
-		nbt.putBoolean("troll", hasTrollface);
+    protected void addAdditionalSaveData(ValueOutput valueOutput) {
+        super.addAdditionalSaveData(valueOutput);
+		valueOutput.putInt("charge", aoc);
+		valueOutput.putBoolean("troll", hasTrollface);
 	}
 
-	@Override
-	public void readAdditionalSaveData(CompoundTag nbt) {
-        super.readAdditionalSaveData(nbt);
-		aoc = nbt.getInt("charge");
-		hasTrollface = nbt.getBoolean("troll");
+    @Override
+    protected void readAdditionalSaveData(ValueInput valueInput) {
+        super.readAdditionalSaveData(valueInput);
+		aoc = valueInput.getIntOr("charge", 0);
+		hasTrollface = valueInput.getBooleanOr("troll", false);
 	}
 
     @Override
@@ -187,7 +189,7 @@ public class EntityAntimatterBomb extends ThrowableProjectile {
 			AntimatterBomb tsar = new AntimatterBomb((int)getX(), (int)getY(), (int)getZ(), level(), (int) ((RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc)) * 0.8f));
 			EntityAntimatterBombBlast tsarblast = new EntityAntimatterBombBlast(level(), (int)getX(), (int)getY(), (int)getZ(), tsar, RRConfig.SERVER.getTsarBombaStrength() + (aoc * aoc));
 			level().addFreshEntity(tsarblast);
-			this.kill();
+			this.kill((ServerLevel) level());
 		}
 	}
 }

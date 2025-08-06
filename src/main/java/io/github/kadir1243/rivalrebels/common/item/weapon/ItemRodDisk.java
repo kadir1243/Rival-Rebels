@@ -14,29 +14,28 @@ package io.github.kadir1243.rivalrebels.common.item.weapon;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.entity.*;
-import io.github.kadir1243.rivalrebels.common.entity.*;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsRank;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
 public class ItemRodDisk extends Item
 {
-	public ItemRodDisk() {
-		super(new Properties().stacksTo(1));
+	public ItemRodDisk(Properties properties) {
+		super(properties);
 	}
 
     @Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.BOW;
+		return ItemUseAnimation.BOW;
 	}
 
     @Override
@@ -47,7 +46,7 @@ public class ItemRodDisk extends Item
 	boolean pass = false;
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player user, InteractionHand hand) {
+    public InteractionResult use(Level world, Player user, InteractionHand hand) {
         ItemStack stack = user.getItemInHand(hand);
 
 		if (!pass)
@@ -58,12 +57,12 @@ public class ItemRodDisk extends Item
 		user.startUsingItem(hand);
 		if (RivalRebels.round.rrplayerlist.getForGameProfile(user.getGameProfile()).rrrank.id > 1) user.playSound(RRSounds.RODDISK_UNKNOWN2.get());
 		else user.playSound(RRSounds.RODDISK_UNKNOWN6.get());
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
     @Override
-    public void releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
-        if (!(user instanceof Player player)) return;
+    public boolean releaseUsing(ItemStack stack, Level world, LivingEntity user, int remainingUseTicks) {
+        if (!(user instanceof Player player)) return false;
         if (!world.isClientSide()) {
             stack.consume(1, user);
 			RivalRebelsRank rank = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrrank;
@@ -102,6 +101,8 @@ public class ItemRodDisk extends Item
 				world.addFreshEntity(entity);
                 user.playSound(RRSounds.RODDISK_UNKNOWN3.get());
 			}
+            return false;
 		}
-	}
+        return true;
+    }
 }

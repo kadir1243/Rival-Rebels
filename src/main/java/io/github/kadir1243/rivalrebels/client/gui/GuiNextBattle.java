@@ -11,12 +11,13 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiButton;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.packet.VotePacket;
 import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.GuiGraphics;
@@ -63,7 +64,6 @@ public class GuiNextBattle extends Screen {
 
     @Override
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        PoseStack matrices = graphics.pose();
         count++;
 		if (count == 60)
 		{
@@ -72,22 +72,24 @@ public class GuiNextBattle extends Screen {
 		}
         float f = 0.00390625F;
         ((GuiGraphicsAccessor) graphics).blit(
-            num == 0 ? RRIdentifiers.guitwarning0 : RRIdentifiers.guitwarning1,
+            RenderPipelines.GUI_TEXTURED,
+            num == 0 ? RRTextures.guitwarning0 : RRTextures.guitwarning1,
             posX,
             posX + xSizeOfTexture,
             posY,
             posY + ySizeOfTexture,
-            0, // z offset
             0,
             xSizeOfTexture * f,
             ySizeOfTexture * f,
-            0
+            0,
+            CommonColors.WHITE
         );
         graphics.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
 		float scalefactor = 4f;
-		matrices.scale(scalefactor, scalefactor, scalefactor);
+        graphics.pose().pushMatrix();
+        graphics.pose().scale(scalefactor, scalefactor);
         graphics.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
-		matrices.scale(1 / scalefactor, 1 / scalefactor, 1 / scalefactor);
+        graphics.pose().popMatrix();
         MultiLineLabel.create(font, Component.translatable("RivalRebels.nextbattle.question"), 128).renderLeftAlignedNoShadow(graphics, posX + 64, posY + 160, this.font.lineHeight, 0xffffff);
         super.render(graphics, mouseX, mouseY, delta);
 	}

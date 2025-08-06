@@ -11,11 +11,16 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
+import com.mojang.math.Transformation;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
+import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.entity.EntityCuchillo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -23,60 +28,79 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.CommonColors;
+import net.neoforged.neoforge.client.model.pipeline.TransformingVertexPipeline;
+import org.joml.Vector3f;
+
+import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderCuchillo extends EntityRenderer<EntityCuchillo> {
-    public static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etknife);
-    public RenderCuchillo(EntityRendererProvider.Context renderManager) {
-        super(renderManager);
+public class RenderCuchillo extends EntityRenderer<EntityCuchillo, RenderCuchillo.State> {
+
+    public RenderCuchillo(EntityRendererProvider.Context context) {
+        super(context);
+    }
+
+    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+        byte var11 = 0;
+        float var12 = 0.0F;
+        float var13 = 0.5F;
+        float var14 = (0 + var11 * 10) / 32.0F;
+        float var15 = (5 + var11 * 10) / 32.0F;
+        float var16 = 0.0F;
+        float var17 = 0.15625F;
+        float var18 = (5 + var11 * 10) / 32.0F;
+        float var19 = (10 + var11 * 10) / 32.0F;
+        float var20 = 0.05625F;
+        QuadHelper.addVertice(buffer, new Vector3f(-7, -2, -2), new TextureVertice(var16, var18), new Vector3f(var20, 0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-7, -2,  2), new TextureVertice(var17, var18), new Vector3f(var20, 0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-7,  2,  2), new TextureVertice(var17, var19), new Vector3f(var20, 0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-7,  2, -2), new TextureVertice(var16, var19), new Vector3f(var20, 0, 0));
+
+        QuadHelper.addVertice(buffer, new Vector3f(-7,  2, -2), new TextureVertice(var16, var18), new Vector3f(-var20, 0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-7,  2,  2), new TextureVertice(var17, var18), new Vector3f(-var20, 0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-7, -2,  2), new TextureVertice(var17, var19), new Vector3f(-var20, 0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-7, -2, -2), new TextureVertice(var16, var19), new Vector3f(-var20, 0, 0));
+
+        for (int i = 0; i < 4; ++i) {
+            TransformingVertexPipeline rotated = new TransformingVertexPipeline(buffer, new Transformation(null, Axis.XP.rotationDegrees(90 * (i + 1)), null, null));
+            QuadHelper.addVertice(rotated, new Vector3f(-8, -2, 0), new TextureVertice(var12, var14), new Vector3f(0, 0, var20));
+            QuadHelper.addVertice(rotated, new Vector3f( 8, -2, 0), new TextureVertice(var13, var14), new Vector3f(0, 0, var20));
+            QuadHelper.addVertice(rotated, new Vector3f( 8,  2, 0), new TextureVertice(var13, var15), new Vector3f(0, 0, var20));
+            QuadHelper.addVertice(rotated, new Vector3f(-8,  2, 0), new TextureVertice(var12, var15), new Vector3f(0, 0, var20));
+        }
+    });
+
+    @Override
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90));
+		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etknife));
+		float var20 = 0.05625F;
+
+        poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
+		poseStack.scale(var20, var20, var20);
+		poseStack.translate(-4.0F, 0.0F, 0.0F);
+        ModelBlockRenderer.renderModel(poseStack.last(), buffer, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, packedLight, OverlayTexture.NO_OVERLAY);
+
+		poseStack.popPose();
+	}
+
+
+    @Override
+    public State createRenderState() {
+        return new State();
     }
 
     @Override
-    public void render(EntityCuchillo entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.yRotO + (entity.getYRot() - entity.yRotO) * tickDelta - 90));
-		matrices.mulPose(Axis.ZP.rotationDegrees(entity.xRotO + (entity.getXRot() - entity.xRotO) * tickDelta));
-        VertexConsumer buffer = vertexConsumers.getBuffer(RENDER_LAYER);
-        byte var11 = 0;
-		float var12 = 0.0F;
-		float var13 = 0.5F;
-		float var14 = (0 + var11 * 10) / 32.0F;
-		float var15 = (5 + var11 * 10) / 32.0F;
-		float var16 = 0.0F;
-		float var17 = 0.15625F;
-		float var18 = (5 + var11 * 10) / 32.0F;
-		float var19 = (10 + var11 * 10) / 32.0F;
-		float var20 = 0.05625F;
-        int overlay = OverlayTexture.NO_OVERLAY;
+    public void extractRenderState(EntityCuchillo p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+    }
 
-		matrices.mulPose(Axis.XP.rotationDegrees(45.0F));
-		matrices.scale(var20, var20, var20);
-		matrices.translate(-4.0F, 0.0F, 0.0F);
-        int defaultColor = CommonColors.WHITE;
-        buffer.addVertex(matrices.last(), -7, -2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0, 0);
-		buffer.addVertex(matrices.last(), -7, -2,  2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0, 0);
-		buffer.addVertex(matrices.last(), -7,  2,  2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0, 0);
-		buffer.addVertex(matrices.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), var20, 0, 0);
-		buffer.addVertex(matrices.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0, 0);
-		buffer.addVertex(matrices.last(), -7,  2,  2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0, 0);
-		buffer.addVertex(matrices.last(), -7, -2,  2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0, 0);
-		buffer.addVertex(matrices.last(), -7, -2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(light).setNormal(matrices.last(), -var20, 0, 0);
-
-		for (int var23 = 0; var23 < 4; ++var23) {
-			matrices.mulPose(Axis.XP.rotationDegrees(90));
-			buffer.addVertex(matrices.last(), -8, -2, 0).setColor(defaultColor).setUv(var12, var14).setOverlay(overlay).setLight(light).setNormal(matrices.last(), 0, 0, var20);
-			buffer.addVertex(matrices.last(),  8, -2, 0).setColor(defaultColor).setUv(var13, var14).setOverlay(overlay).setLight(light).setNormal(matrices.last(), 0, 0, var20);
-			buffer.addVertex(matrices.last(),  8,  2, 0).setColor(defaultColor).setUv(var13, var15).setOverlay(overlay).setLight(light).setNormal(matrices.last(), 0, 0, var20);
-			buffer.addVertex(matrices.last(), -8,  2, 0).setColor(defaultColor).setUv(var12, var15).setOverlay(overlay).setLight(light).setNormal(matrices.last(), 0, 0, var20);
-		}
-
-		matrices.popPose();
-	}
-
-    @Override
-    public ResourceLocation getTextureLocation(EntityCuchillo entity) {
-        return RRIdentifiers.etknife;
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
     }
 }

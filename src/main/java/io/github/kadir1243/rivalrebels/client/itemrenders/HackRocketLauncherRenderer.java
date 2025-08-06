@@ -16,10 +16,13 @@ import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherBody;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherHandle;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherTube;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
-import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -30,6 +33,7 @@ import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
 public class HackRocketLauncherRenderer implements DynamicItemRenderer {
+    private final QuadCollection b83Model = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.B83_MODEL);
     @Override
     public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
 		matrices.pushPose();
@@ -41,8 +45,8 @@ public class HackRocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.translate(0.22f, -0.025f, 0f);
 		matrices.mulPose(Axis.ZP.rotationDegrees(90));
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
-        VertexConsumer buffer = vertexConsumers.getBuffer(ItemBlockRenderTypes.getRenderType(stack, true));
-        VertexConsumer cellular_noise = vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE);
+        VertexConsumer buffer = vertexConsumers.getBuffer(ItemBlockRenderTypes.getRenderType(stack));
+        VertexConsumer cellular_noise = vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE);
         ModelRocketLauncherHandle.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlauncherhandle)), light, overlay);
 		if (stack.isEnchanted()) {
 			ModelRocketLauncherHandle.render(matrices, cellular_noise, light, overlay);
@@ -54,9 +58,9 @@ public class HackRocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(90));
 		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		matrices.scale(0.4f, 0.4f, 0.4f);
-		ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.ethack202)), light, overlay);
+		ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ethack202)), light, overlay);
 		if (stack.isEnchanted()) {
-			ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES), light, overlay);
+			ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE), light, overlay);
 		}
 		matrices.popPose();
 
@@ -140,9 +144,9 @@ public class HackRocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(-90));
 		matrices.scale(0.7f, 0.7f, 0.7f);
 		matrices.translate(-0.5f, -0.1f, 0);
-		ObjModels.renderSolid(ObjModels.b83, RRIdentifiers.etb83, matrices, vertexConsumers, light, overlay);
+		ObjModels.render(b83Model, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etb83)), matrices, CommonColors.WHITE, light, overlay);
 		if (stack.isEnchanted()) {
-			ObjModels.renderNoise(ObjModels.b83, matrices, vertexConsumers, light, overlay);
+			ObjModels.render(b83Model, cellular_noise, matrices, CommonColors.WHITE, light, overlay);
 		}
 		matrices.popPose();
 		matrices.popPose();

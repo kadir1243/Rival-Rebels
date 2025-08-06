@@ -11,19 +11,10 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.noise;
 
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import com.mojang.blaze3d.platform.GlConst;
-import com.mojang.blaze3d.platform.GlStateManager;
-import com.mojang.blaze3d.platform.TextureUtil;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.DefaultVertexFormat;
-import com.mojang.blaze3d.vertex.VertexFormat;
-import org.lwjgl.BufferUtils;
-import org.lwjgl.opengl.GL11;
+import com.mojang.blaze3d.platform.NativeImage;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.ARGB;
 
-import java.nio.ByteBuffer;
-import net.minecraft.client.renderer.RenderStateShard;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.phys.Vec3;
 
@@ -32,7 +23,7 @@ public class RivalRebelsCellularNoise {
     private static final int pointa3D = 32;
 	private static final Vec3[] points3D = new Vec3[pointa3D];
     private static final int frames = 28;
-    private static final int[] id = genTexture(28, 28, frames);
+    private static final DynamicTexture[] id = genTexture(28, 28, frames);
 
     private static void refresh3D(RandomSource random) {
 		for (int i = 0; i < pointa3D; i++) {
@@ -67,58 +58,34 @@ public class RivalRebelsCellularNoise {
         return result;
     }
 
-    private static int[] genTexture(int xs, int zs, int ys) {
-		int[] ids = new int[ys];
+    private static DynamicTexture[] genTexture(int xs, int zs, int ys) {
+        DynamicTexture[] ids = new DynamicTexture[ys];
 		refresh3D(random);
-		int size = xs * zs * 4;
 		byte red = (byte) 0xBB;
 		byte grn = (byte) 0x88;
 		byte blu = (byte) 0xFF;
 		for (int i = 0; i < ys; i++) {
-			ByteBuffer bb = BufferUtils.createByteBuffer(size);
-			for (double x = 0; x < xs; x++) {
-				for (double z = 0; z < zs; z++) {
-					bb.put(red);
-					bb.put(grn);
-					bb.put(blu);
-					bb.put((byte) ((noise(x / (double) xs, z / (double) zs, (double) i / (double) ys) + 1) * 127));
-				}
+            NativeImage image = new NativeImage(xs, zs, false);
+			for (int x = 0; x < xs; x++) {
+				for (int z = 0; z < zs; z++) {
+                    image.setPixel(x, z, ARGB.color((byte) ((noise(x / (double) xs, z / (double) zs, (double) i / (double) ys) + 1) * 127), red, grn, blu));
+                }
 			}
-			int id = TextureUtil.generateTextureId();
-			RenderSystem.bindTexture(id);
-			RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_WRAP_S, GL11.GL_REPEAT);
-			RenderSystem.texParameter(GlConst.GL_TEXTURE_2D, GlConst.GL_TEXTURE_WRAP_T, GL11.GL_REPEAT);
-            GlStateManager._texImage2D(GlConst.GL_TEXTURE_2D, 0, GlConst.GL_RGBA8, xs, zs, 0, GlConst.GL_RGBA, GlConst.GL_UNSIGNED_BYTE, bb.asIntBuffer());
-			ids[i] = id;
+            DynamicTexture texture = new DynamicTexture(
+                "Rival Rebels Cellular Noise",
+                xs,
+                zs,
+                false
+            );
+            texture.setClamp(false);
+            texture.setPixels(image);
+			ids[i] = texture;
 		}
 		return ids;
 	}
 
-    public static int getCurrentRandomId() {
+    public static DynamicTexture getCurrentRandomId() {
         return RivalRebelsCellularNoise.id[(int) ((System.currentTimeMillis() / 100) % RivalRebelsCellularNoise.frames)];
     }
 
-    public static final RenderType CELLULAR_NOISE = RenderType.create(
-        RRIdentifiers.MODID + "_cellular_noise",
-        DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
-        VertexFormat.Mode.QUADS,
-        999,
-        RenderType.CompositeState.builder()
-            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-            .setTextureState(new RenderStateShard.EmptyTextureStateShard(() -> RenderSystem.setShaderTexture(0, getCurrentRandomId()), () -> {}))
-            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
-            .createCompositeState(false)
-    );
-
-    public static final RenderType CELLULAR_NOISE_TRIANGLES = RenderType.create(
-        RRIdentifiers.MODID + "_cellular_noise_triangles",
-        DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP,
-        VertexFormat.Mode.TRIANGLES,
-        999,
-        RenderType.CompositeState.builder()
-            .setShaderState(RenderStateShard.RENDERTYPE_ENTITY_TRANSLUCENT_SHADER)
-            .setTextureState(new RenderStateShard.EmptyTextureStateShard(() -> RenderSystem.setShaderTexture(0, getCurrentRandomId()), () -> {}))
-            .setTransparencyState(RenderStateShard.LIGHTNING_TRANSPARENCY)
-            .createCompositeState(false)
-    );
 }

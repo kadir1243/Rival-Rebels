@@ -19,24 +19,24 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.UseAnim;
+import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
 
 public class ItemExPill extends Item
 {
-	public ItemExPill() {
-		super(new Properties().stacksTo(6));
+	public ItemExPill(Properties properties) {
+		super(properties);
 	}
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
+    public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         player.playSound(RRSounds.PILL.get());
 		RivalRebelsSoundPlayer.playSound(player, 28, 18, 1.0f, 0.6f);
@@ -61,11 +61,11 @@ public class ItemExPill extends Item
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
 				player.getFoodData().eat(20, 200);
 				player.heal(20);
-				player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 450, 20));
-				player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 500, 20));
-				player.addEffect(new MobEffectInstance(MobEffects.JUMP, 300, 2));
-				player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 500, 2));
-				player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 550, 2));
+				player.addEffect(new MobEffectInstance(MobEffects.RESISTANCE, 450, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.STRENGTH, 500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.JUMP_BOOST, 300, 2));
+				player.addEffect(new MobEffectInstance(MobEffects.HASTE, 500, 2));
+				player.addEffect(new MobEffectInstance(MobEffects.SPEED, 550, 2));
 				player.addEffect(new MobEffectInstance(MobEffects.WATER_BREATHING, 800, 20));
 				player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 800, 20));
 			}
@@ -81,21 +81,21 @@ public class ItemExPill extends Item
 				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Unexpected results have occurred.").withStyle(ChatFormatting.YELLOW)), true);
 				player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
 				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
-				player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 1500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 1500, 20));
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 1500, 20));
-				player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 1500, 20));
-				player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 1500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, 1500, 20));
+				player.addEffect(new MobEffectInstance(MobEffects.MINING_FATIGUE, 1500, 20));
 				player.addEffect(new MobEffectInstance(MobEffects.WEAKNESS, 1500, 20));
 			}
 			stack.consume(1, player);
         }
-		return InteractionResultHolder.sidedSuccess(stack, world.isClientSide());
+		return InteractionResult.SUCCESS;
 	}
 
 	@Override
-	public UseAnim getUseAnimation(ItemStack stack)
+	public ItemUseAnimation getUseAnimation(ItemStack stack)
 	{
-		return UseAnim.EAT;
+		return ItemUseAnimation.EAT;
 	}
 
     @Override

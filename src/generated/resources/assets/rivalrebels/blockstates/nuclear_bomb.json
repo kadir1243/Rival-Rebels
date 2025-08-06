@@ -1,7 +1,27 @@
 {
   "variants": {
-    "": {
+    "facing=down": {
+      "model": "rivalrebels:block/nuclear_bomb",
+      "x": 90
+    },
+    "facing=east": {
+      "model": "rivalrebels:block/nuclear_bomb",
+      "y": 90
+    },
+    "facing=north": {
       "model": "rivalrebels:block/nuclear_bomb"
+    },
+    "facing=south": {
+      "model": "rivalrebels:block/nuclear_bomb",
+      "y": 180
+    },
+    "facing=up": {
+      "model": "rivalrebels:block/nuclear_bomb",
+      "x": 270
+    },
+    "facing=west": {
+      "model": "rivalrebels:block/nuclear_bomb",
+      "y": 270
     }
   }
 }

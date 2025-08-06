@@ -14,21 +14,19 @@ package io.github.kadir1243.rivalrebels.client.tileentityrender;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
-import io.github.kadir1243.rivalrebels.common.block.machine.BlockForceField;
+import io.github.kadir1243.rivalrebels.common.block.BlockGore;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityGore;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import org.joml.Vector3f;
 
 @OnlyIn(Dist.CLIENT)
@@ -46,79 +44,75 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
     public TileEntityGoreRenderer(BlockEntityRendererProvider.Context context) {
     }
 
-    private static boolean isFaceFull(Level world, BlockPos pos, Direction direction) {
-        return Block.isFaceFull(world.getBlockState(pos.relative(direction)).getCollisionShape(world, pos.relative(direction)), direction.getOpposite());
-    }
-
     @Override
-    public void render(TileEntityGore entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        Level world = entity.getLevel();
+    public void render(TileEntityGore blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+        BlockState state = blockEntity.getBlockState();
+        boolean ceil = state.getValue(BlockGore.IS_UP_FULL);
+		boolean floor = state.getValue(BlockGore.IS_DOWN_FULL);
+		boolean side1 = state.getValue(BlockGore.IS_SOUTH_FULL);
+		boolean side2 = state.getValue(BlockGore.IS_WEST_FULL);
+		boolean side3 = state.getValue(BlockGore.IS_NORTH_FULL);
+		boolean side4 = state.getValue(BlockGore.IS_EAST_FULL);
 
-		boolean ceil = isFaceFull(world, entity.getBlockPos(), Direction.UP);
-		boolean floor = isFaceFull(world, entity.getBlockPos(), Direction.DOWN);
-		boolean side1 = isFaceFull(world, entity.getBlockPos(), Direction.SOUTH);
-		boolean side2 = isFaceFull(world, entity.getBlockPos(), Direction.WEST);
-		boolean side3 = isFaceFull(world, entity.getBlockPos(), Direction.NORTH);
-		boolean side4 = isFaceFull(world, entity.getBlockPos(), Direction.EAST);
-		Direction meta = entity.getBlockState().getValue(BlockForceField.FACING);
+		int meta = state.getValue(BlockGore.META);
 
-		matrices.pushPose();
-		matrices.translate(0.5F, 0.5F, 0.5F);
+		poseStack.pushPose();
+		poseStack.translate(0.5F, 0.5F, 0.5F);
         ResourceLocation texture = switch (meta) {
-            case DOWN -> RRIdentifiers.btsplash1;
-            case UP -> RRIdentifiers.btsplash2;
-            case NORTH -> RRIdentifiers.btsplash3;
-            case SOUTH -> RRIdentifiers.btsplash4;
-            case WEST -> RRIdentifiers.btsplash5;
-            case EAST -> RRIdentifiers.btsplash6;
+            case 0 -> RRIdentifiers.btsplash1;
+            case 1 -> RRIdentifiers.btsplash2;
+            case 2 -> RRIdentifiers.btsplash3;
+            case 3 -> RRIdentifiers.btsplash4;
+            case 4 -> RRIdentifiers.btsplash5;
+            case 5 -> RRIdentifiers.btsplash6;
+            default -> throw new IllegalStateException("Unexpected value: " + meta);
         };
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
-        if (side1)
-		{
-			addVertex(matrices, buffer, v1, 0, 0, light, overlay);
-			addVertex(matrices, buffer, v5, 1, 0, light, overlay);
-			addVertex(matrices, buffer, v8, 1, 1, light, overlay);
-			addVertex(matrices, buffer, v4, 0, 1, light, overlay);
-		}
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(texture));
+        if (side1) {
+            addVertex(poseStack, buffer, v1, 0, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v5, 1, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v8, 1, 1, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v4, 0, 1, packedLight, packedOverlay);
+        }
 
-		if (side2) {
-			addVertex(matrices, buffer, v4, 0, 0, light, overlay);
-			addVertex(matrices, buffer, v8, 1, 0, light, overlay);
-			addVertex(matrices, buffer, v7, 1, 1, light, overlay);
-			addVertex(matrices, buffer, v3, 0, 1, light, overlay);
-		}
+        if (side2) {
+            addVertex(poseStack, buffer, v4, 0, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v8, 1, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v7, 1, 1, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v3, 0, 1, packedLight, packedOverlay);
+        }
 
-		if (side3) {
-			addVertex(matrices, buffer, v3, 0, 0, light, overlay);
-			addVertex(matrices, buffer, v7, 1, 0, light, overlay);
-			addVertex(matrices, buffer, v6, 1, 1, light, overlay);
-			addVertex(matrices, buffer, v2, 0, 1, light, overlay);
-		}
+        if (side3) {
+            addVertex(poseStack, buffer, v3, 0, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v7, 1, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v6, 1, 1, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v2, 0, 1, packedLight, packedOverlay);
+        }
 
-		if (side4) {
-			addVertex(matrices, buffer, v2, 0, 0, light, overlay);
-			addVertex(matrices, buffer, v6, 1, 0, light, overlay);
-			addVertex(matrices, buffer, v5, 1, 1, light, overlay);
-			addVertex(matrices, buffer, v1, 0, 1, light, overlay);
-		}
+        if (side4) {
+            addVertex(poseStack, buffer, v2, 0, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v6, 1, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v5, 1, 1, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v1, 0, 1, packedLight, packedOverlay);
+        }
 
-		if (ceil) {
-			addVertex(matrices, buffer, v4, 0, 0, light, overlay);
-			addVertex(matrices, buffer, v3, 1, 0, light, overlay);
-			addVertex(matrices, buffer, v2, 1, 1, light, overlay);
-			addVertex(matrices, buffer, v1, 0, 1, light, overlay);
-		}
+        if (ceil) {
+            addVertex(poseStack, buffer, v4, 0, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v3, 1, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v2, 1, 1, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v1, 0, 1, packedLight, packedOverlay);
+        }
 
-		if (floor) {
-			addVertex(matrices, buffer, v5, 0, 0, light, overlay);
-			addVertex(matrices, buffer, v6, 1, 0, light, overlay);
-			addVertex(matrices, buffer, v7, 1, 1, light, overlay);
-			addVertex(matrices, buffer, v8, 0, 1, light, overlay);
-		}
+        if (floor) {
+            addVertex(poseStack, buffer, v5, 0, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v6, 1, 0, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v7, 1, 1, packedLight, packedOverlay);
+            addVertex(poseStack, buffer, v8, 0, 1, packedLight, packedOverlay);
+        }
 
-		matrices.popPose();
-	}
+        poseStack.popPose();
+    }
 
 	private void addVertex(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2, int light, int overlay) {
         RenderHelper.addVertice(poseStack, buffer, v.mul(0.999F, new Vector3f()), new TextureVertice(t, t2), light, overlay);

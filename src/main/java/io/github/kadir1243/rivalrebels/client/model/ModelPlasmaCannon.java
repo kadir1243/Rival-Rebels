@@ -11,18 +11,17 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.model;
 
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
+import java.util.function.Supplier;
+
 @OnlyIn(Dist.CLIENT)
-public class ModelPlasmaCannon
-{
+public class ModelPlasmaCannon {
 	private static final TextureFace	bodytop				= new TextureFace(
 											new TextureVertice(14f / 64f, 23f / 32f),
 											new TextureVertice(37f / 64f, 23f / 32f),
@@ -211,55 +210,51 @@ public class ModelPlasmaCannon
 	private static final Vector3f		vbb2				= new Vector3f(20f, 0f, 2f);
 	private static final Vector3f		vbb3				= new Vector3f(20f, 0f, -2f);
 	private static final Vector3f		vbb4				= new Vector3f(8f, 0f, -2f);
+    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+        // body
+        QuadHelper.addFace(buffer, vt1, vt2, vt3, vt4, bodytop);
+        QuadHelper.addFace(buffer, vs1, vt1, vt2, vs4, bodytopside);
+        QuadHelper.addFace(buffer, vs5, vt4, vt3, vs8, bodytopside);
+        QuadHelper.addFace(buffer, vs2, vs1, vs4, vs3, bodyside);
+        QuadHelper.addFace(buffer, vs6, vs5, vs8, vs7, bodyside);
+        QuadHelper.addFace(buffer, vs1, vt1, vt4, vs5, bodytopback);
+        QuadHelper.addFace(buffer, vs2, vs1, vs5, vs6, bodyback);
+        QuadHelper.addFace(buffer, vt2, vf1, vf2, vt3, bodytopfront);
+        QuadHelper.addFace(buffer, vt2, vf1, vs4, vs4, bodytopfrontside);
+        QuadHelper.addFace(buffer, vt3, vf2, vs8, vs8, bodytopfrontside);
+        QuadHelper.addFace(buffer, vs3, vs4, vfs2, vfs1, bodysidefrontedge);
+        QuadHelper.addFace(buffer, vs7, vs8, vfs4, vfs3, bodysidefrontedge);
+        QuadHelper.addFace(buffer, vf2, vs8, vs4, vf1, bodybottomback);
+        QuadHelper.addFace(buffer, vfs2, vfs1, vff1, vff2, bodysidefront);
+        QuadHelper.addFace(buffer, vfs4, vfs3, vff1, vff2, bodysidefront);
+        QuadHelper.addFace(buffer, vb1, vb2, vb3, vb4, bodybottom);
+        QuadHelper.addFace(buffer, vs2, vs3, vb2, vb1, bodybottomside);
+        QuadHelper.addFace(buffer, vs6, vs7, vb3, vb4, bodybottomside);
+        QuadHelper.addFace(buffer, vb2, vfb1, vs3, vs3, bodytopfrontside);
+        QuadHelper.addFace(buffer, vb3, vfb2, vs7, vs7, bodytopfrontside);
+        QuadHelper.addFace(buffer, vb2, vfb1, vfb2, vb3, bodybottomfront);
+        QuadHelper.addFace(buffer, vb1, vs2, vs6, vb4, bodybottomback);
+        QuadHelper.addFace(buffer, vfb2, vs7, vs3, vfb1, bodybottomback);
 
-	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay)
-	{
-		matrices.pushPose();
-		// body
-        RenderHelper.addFace(matrices, buffer, vt1, vt2, vt3, vt4, bodytop, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs1, vt1, vt2, vs4, bodytopside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs5, vt4, vt3, vs8, bodytopside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs2, vs1, vs4, vs3, bodyside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs6, vs5, vs8, vs7, bodyside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs1, vt1, vt4, vs5, bodytopback, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs2, vs1, vs5, vs6, bodyback, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vt2, vf1, vf2, vt3, bodytopfront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vt2, vf1, vs4, vs4, bodytopfrontside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vt3, vf2, vs8, vs8, bodytopfrontside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs3, vs4, vfs2, vfs1, bodysidefrontedge, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs7, vs8, vfs4, vfs3, bodysidefrontedge, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vf2, vs8, vs4, vf1, bodybottomback, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vfs2, vfs1, vff1, vff2, bodysidefront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vfs4, vfs3, vff1, vff2, bodysidefront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vb1, vb2, vb3, vb4, bodybottom, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs2, vs3, vb2, vb1, bodybottomside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vs6, vs7, vb3, vb4, bodybottomside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vb2, vfb1, vs3, vs3, bodytopfrontside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vb3, vfb2, vs7, vs7, bodytopfrontside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vb2, vfb1, vfb2, vb3, bodybottomfront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vb1, vs2, vs6, vb4, bodybottomback, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vfb2, vs7, vs3, vfb1, bodybottomback, light, overlay);
+        // bottom
+        QuadHelper.addFace(buffer, vbb1, vbt1, vbt4, vbb4, bottomfront);
+        QuadHelper.addFace(buffer, vbb3, vbt3, vbt2, vbb2, bottomback);
+        QuadHelper.addFace(buffer, vbt2, vbb2, vbb1, vbt1, bottomside);
+        QuadHelper.addFace(buffer, vbt3, vbb3, vbb4, vbt4, bottomside);
+        QuadHelper.addFace(buffer, vbb3, vbb4, vbb1, vbb2, bottombottom);
 
-		// bottom
-		RenderHelper.addFace(matrices, buffer, vbb1, vbt1, vbt4, vbb4, bottomfront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbb3, vbt3, vbt2, vbb2, bottomback, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbt2, vbb2, vbb1, vbt1, bottomside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbt3, vbb3, vbb4, vbt4, bottomside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vbb3, vbb4, vbb1, vbb2, bottombottom, light, overlay);
+        // detail
+        QuadHelper.addFace(buffer, vdt4, vdb4, vdb1, vdt1, detailedge1);
+        QuadHelper.addFace(buffer, vdt3, vdb3, vdb2, vdt2, detailedge1);
+        QuadHelper.addFace(buffer, vdt2, vdb2, vdb1, vdt1, detailedge2);
+        QuadHelper.addFace(buffer, vdt4, vdb4, vdb3, vdt3, detailedge2);
+        QuadHelper.addFace(buffer, vdb1, vdb2, vdb3, vdb4, detailpurple);
 
-		// detail
-		RenderHelper.addFace(matrices, buffer, vdt4, vdb4, vdb1, vdt1, detailedge1, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vdt3, vdb3, vdb2, vdt2, detailedge1, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vdt2, vdb2, vdb1, vdt1, detailedge2, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vdt4, vdb4, vdb3, vdt3, detailedge2, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vdb1, vdb2, vdb3, vdb4, detailpurple, light, overlay);
-
-		// handle
-		RenderHelper.addFace(matrices, buffer, vht4, vhb4, vhb1, vht1, handlefront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vht2, vhb2, vhb3, vht3, handlefront, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vht1, vhb1, vhb2, vht2, handleside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vht3, vhb3, vhb4, vht4, handleside, light, overlay);
-		RenderHelper.addFace(matrices, buffer, vhb2, vhb1, vhb4, vhb3, handlebottom, light, overlay);
-		matrices.popPose();
-	}
+        // handle
+        QuadHelper.addFace(buffer, vht4, vhb4, vhb1, vht1, handlefront);
+        QuadHelper.addFace(buffer, vht2, vhb2, vhb3, vht3, handlefront);
+        QuadHelper.addFace(buffer, vht1, vhb1, vhb2, vht2, handleside);
+        QuadHelper.addFace(buffer, vht3, vhb3, vhb4, vht4, handleside);
+        QuadHelper.addFace(buffer, vhb2, vhb1, vhb4, vhb3, handlebottom);
+    });
 }

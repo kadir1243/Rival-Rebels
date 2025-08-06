@@ -11,18 +11,31 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.model;
 
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
+import com.mojang.math.Transformation;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import io.github.kadir1243.rivalrebels.common.entity.EntityRocket;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.resources.model.ModelBaker;
+import net.minecraft.client.resources.model.ModelDebugName;
+import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.context.ContextMap;
+import net.neoforged.neoforge.client.model.ExtendedUnbakedGeometry;
 import org.joml.Vector3f;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import java.util.function.Supplier;
+
 @OnlyIn(Dist.CLIENT)
-public class ModelRocket {
+public class ModelRocket implements ExtendedUnbakedGeometry {
+    public static final ModelRocket INSTANCE = new ModelRocket();
     private static final Vector3f	vy1		= new Vector3f(0, 0, 0);
 	private static final Vector3f	vy2		= new Vector3f(0, 2.5f, 0);
 	private static final Vector3f	vpx1	= new Vector3f(0.5f, 0, 0);
@@ -57,38 +70,77 @@ public class ModelRocket {
 	private static final float	ty1		= 0;
 	private static final float	ty2		= 0.09375f;
 	private static final float	ty3		= 0.1875f;
+    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL_WITHOUT_FINS = QuadHelper.createBakedModel(buffer -> {
+        QuadHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
+        QuadHelper.addFace(buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
+        QuadHelper.addFace(buffer, vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
+        QuadHelper.addFace(buffer, vnxpz1, vnxpz2, vnx2, vnx1, tx1, tx2, ty1, ty2);
+        QuadHelper.addFace(buffer, vnx1, vnx2, vnxnz2, vnxnz1, tx1, tx2, ty1, ty2);
+        QuadHelper.addFace(buffer, vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2);
+        QuadHelper.addFace(buffer, vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2);
+        QuadHelper.addFace(buffer, vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2);
+
+        QuadHelper.addFace(buffer, vpxpz2, vpx2, vy2, vpz2, tx2, tx3, ty1, ty2);
+        QuadHelper.addFace(buffer, vnxpz2, vpz2, vy2, vnx2, tx2, tx3, ty1, ty2);
+        QuadHelper.addFace(buffer, vnxnz2, vnx2, vy2, vnz2, tx2, tx3, ty1, ty2);
+        QuadHelper.addFace(buffer, vpxnz2, vnz2, vy2, vpx2, tx2, tx3, ty1, ty2);
+
+        QuadHelper.addFace(buffer, vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2);
+        QuadHelper.addFace(buffer, vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2);
+        QuadHelper.addFace(buffer, vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2);
+        QuadHelper.addFace(buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
+    });
+
+    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL_FINS = QuadHelper.createBakedModel(buffer -> {
+        QuadHelper.addFace(buffer, vnx3, vpx3, vpx4, vnx4, tx3, tx4, ty1, ty3);
+        QuadHelper.addFace(buffer, vpx3, vnx3, vnx4, vpx4, tx3, tx4, ty1, ty3);
+        QuadHelper.addFace(buffer, vnz3, vpz3, vpz4, vnz4, tx3, tx4, ty1, ty3);
+        QuadHelper.addFace(buffer, vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3);
+    });
 
     public static void render(PoseStack pose, MultiBufferSource vertexConsumers, ResourceLocation texture, boolean fins, int light, int overlay) {
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entityCutout(texture));
+        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
         pose.pushPose();
 		pose.scale(0.125f, 0.25f, 0.125f);
 
-        RenderHelper.addFace(pose, buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnxpz1, vnxpz2, vnx2, vnx1, tx1, tx2, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnx1, vnx2, vnxnz2, vnxnz1, tx1, tx2, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2, light, overlay);
-
-        RenderHelper.addFace(pose, buffer, vpxpz2, vpx2, vy2, vpz2, tx2, tx3, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnxpz2, vpz2, vy2, vnx2, tx2, tx3, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnxnz2, vnx2, vy2, vnz2, tx2, tx3, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vpxnz2, vnz2, vy2, vpx2, tx2, tx3, ty1, ty2, light, overlay);
-
-        RenderHelper.addFace(pose, buffer, vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2, light, overlay);
-        RenderHelper.addFace(pose, buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2, light, overlay);
+        ModelBlockRenderer.renderModel(pose.last(), buffer, BAKED_MODEL_WITHOUT_FINS.get().blockStateModel(), 1, 1, 1, light, overlay);
 
         if (fins) {
-            RenderHelper.addFace(pose, buffer, vnx3, vpx3, vpx4, vnx4, tx3, tx4, ty1, ty3, light, overlay);
-            RenderHelper.addFace(pose, buffer, vpx3, vnx3, vnx4, vpx4, tx3, tx4, ty1, ty3, light, overlay);
-            RenderHelper.addFace(pose, buffer, vnz3, vpz3, vpz4, vnz4, tx3, tx4, ty1, ty3, light, overlay);
-            RenderHelper.addFace(pose, buffer, vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3, light, overlay);
+            ModelBlockRenderer.renderModel(pose.last(), buffer, BAKED_MODEL_FINS.get().blockStateModel(), 1, 1, 1, light, overlay);
         }
 
 		pose.popPose();
 	}
+
+    @Override
+    public QuadCollection bake(TextureSlots textureSlots, ModelBaker baker, ModelState state, ModelDebugName debugName, ContextMap additionalProperties) {
+        var has_fins = additionalProperties.getOrDefault(EntityRocket.HAS_FINS, false);
+        return QuadHelper.createBakedModel(buffer -> {
+            QuadHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
+            QuadHelper.addFace(buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
+            QuadHelper.addFace(buffer, vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
+            QuadHelper.addFace(buffer, vnxpz1, vnxpz2, vnx2, vnx1, tx1, tx2, ty1, ty2);
+            QuadHelper.addFace(buffer, vnx1, vnx2, vnxnz2, vnxnz1, tx1, tx2, ty1, ty2);
+            QuadHelper.addFace(buffer, vnxnz1, vnxnz2, vnz2, vnz1, tx1, tx2, ty1, ty2);
+            QuadHelper.addFace(buffer, vnz1, vnz2, vpxnz2, vpxnz1, tx1, tx2, ty1, ty2);
+            QuadHelper.addFace(buffer, vpxnz1, vpxnz2, vpx2, vpx1, tx1, tx2, ty1, ty2);
+
+            QuadHelper.addFace(buffer, vpxpz2, vpx2, vy2, vpz2, tx2, tx3, ty1, ty2);
+            QuadHelper.addFace(buffer, vnxpz2, vpz2, vy2, vnx2, tx2, tx3, ty1, ty2);
+            QuadHelper.addFace(buffer, vnxnz2, vnx2, vy2, vnz2, tx2, tx3, ty1, ty2);
+            QuadHelper.addFace(buffer, vpxnz2, vnz2, vy2, vpx2, tx2, tx3, ty1, ty2);
+
+            QuadHelper.addFace(buffer, vpx1, vpxpz1, vpz1, vy1, tx4, tx5, ty1, ty2);
+            QuadHelper.addFace(buffer, vpz1, vnxpz1, vnx1, vy1, tx4, tx5, ty1, ty2);
+            QuadHelper.addFace(buffer, vnx1, vnxnz1, vnz1, vy1, tx4, tx5, ty1, ty2);
+            QuadHelper.addFace(buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
+
+            if (has_fins) {
+                QuadHelper.addFace(buffer, vnx3, vpx3, vpx4, vnx4, tx3, tx4, ty1, ty3);
+                QuadHelper.addFace(buffer, vpx3, vnx3, vnx4, vpx4, tx3, tx4, ty1, ty3);
+                QuadHelper.addFace(buffer, vnz3, vpz3, vpz4, vnz4, tx3, tx4, ty1, ty3);
+                QuadHelper.addFace(buffer, vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3);
+            }
+        }, Transformation.identity());
+    }
 }

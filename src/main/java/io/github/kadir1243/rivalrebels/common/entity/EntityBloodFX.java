@@ -14,6 +14,7 @@ package io.github.kadir1243.rivalrebels.common.entity;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -22,7 +23,6 @@ import net.minecraft.client.particle.ParticleRenderType;
 import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.inventory.InventoryMenu;
 
 @OnlyIn(Dist.CLIENT)
 public class EntityBloodFX extends TextureSheetParticle {
@@ -36,7 +36,7 @@ public class EntityBloodFX extends TextureSheetParticle {
         this.setParticleSpeed(dx, dy, dz);
 		gravity = 0.75F;
 		lifetime = 20;
-        setSprite(Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(isBlood ? RRIdentifiers.etblood : RRIdentifiers.etgoo));
+        setSprite(Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(isBlood ? RRIdentifiers.etblood : RRIdentifiers.etgoo));
 	}
 
 	public EntityBloodFX(ClientLevel level, EntityGore gore, boolean isBlood)

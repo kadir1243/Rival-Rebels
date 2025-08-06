@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReciever;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -83,16 +84,16 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 	@Override
 	public void tick() {
 		super.tick();
-		if (tickCount > 100) kill();
+		if (tickCount > 100) kill((ServerLevel) level());
 		if (tickCount % 3 == 0) sequence++;
 		if (sequence > 3) sequence = 0;
 
-		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, Entity::canBeCollidedWith);
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, entity -> entity.canBeCollidedWith(this));
 
 		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5)
 		{
 			fire();
-			kill();
+			kill((ServerLevel) level());
 			if (hitResult.getType() == HitResult.Type.ENTITY)
 			{
                 Entity entity = ((EntityHitResult) hitResult).getEntity();
@@ -108,7 +109,7 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 
 		rotation += motionr;
 
-		if (isInWaterOrBubble()) kill();
+		if (isInWater()) kill((ServerLevel) level());
 		reapplyPosition();
 	}
 

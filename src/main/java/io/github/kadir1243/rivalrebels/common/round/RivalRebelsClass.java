@@ -12,15 +12,14 @@
 package io.github.kadir1243.rivalrebels.common.round;
 
 import com.google.common.base.Suppliers;
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import com.mojang.serialization.Codec;
+import io.github.kadir1243.rivalrebels.common.util.Translations;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.network.chat.Component;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 
@@ -29,47 +28,41 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public enum RivalRebelsClass implements StringRepresentable {
-	NONE(0, 0xFFFFFF, "NONE", RRIdentifiers.guitrivalrebels),
-	REBEL(1, 0xFF0000, "REBEL", RRIdentifiers.guitrebel),
-	NUKER(2, 0xFFFF00, "NUKER", RRIdentifiers.guitnuker),
-	INTEL(3, 0x00FFBB, "INTEL", RRIdentifiers.guitintel),
-	HACKER(4, 0x00FF00, "HACKER", RRIdentifiers.guithacker);
+	NONE(0, 0xFFFFFF, "NONE", () -> RRTextures.guitrivalrebels),
+	REBEL(1, 0xFF0000, "REBEL", () -> RRTextures.guitrebel),
+	NUKER(2, 0xFFFF00, "NUKER", () -> RRTextures.guitnuker),
+	INTEL(3, 0x00FFBB, "INTEL", () -> RRTextures.guitintel),
+	HACKER(4, 0x00FF00, "HACKER", () -> RRTextures.guithacker);
 
     public static final Codec<RivalRebelsClass> CODEC = StringRepresentable.fromValues(RivalRebelsClass::values);
     public static final StreamCodec<ByteBuf, RivalRebelsClass> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);
 
 	private final Supplier<ItemStack[]> inventory;
-	public final ResourceLocation resource;
+	public final Supplier<RRTextures.Texture> resource;
 	public final String name;
 	public final int color;
 	public final int id;
+    private final Translations.TranslationKey translationKey;
 
-	RivalRebelsClass(int id, int color, String name, ResourceLocation resource) {
+	RivalRebelsClass(int id, int color, String name, Supplier<RRTextures.Texture> resource) {
 		this.id = id;
 		this.color = color;
 		this.name = name;
 		this.resource = resource;
 		this.inventory = Suppliers.memoize(getItems(this)::get);
+        this.translationKey = new Translations.TranslationKey("class." + name);
 	}
 
     public List<ItemStack> getInventory() {
         return Arrays.asList(inventory.get());
     }
 
-    public String getDescriptionTranslationKey() {
-        return RRIdentifiers.MODID + ".class." + name + ".description";
+    public Translations.TranslationKey getDescription() {
+        return this.translationKey.getSubKey("description");
     }
 
-    public String getMiniDescriptionTranslationKey() {
-        return RRIdentifiers.MODID + ".class." + name + ".minidesc";
-    }
-
-    public Component getDescriptionTranslation() {
-        return Component.translatable(getDescriptionTranslationKey());
-    }
-
-    public Component getMiniDescriptionTranslation() {
-        return Component.translatable(getMiniDescriptionTranslationKey());
+    public Translations.TranslationKey getMiniDescription() {
+        return this.translationKey.getSubKey("minidesc");
     }
 
     @Override

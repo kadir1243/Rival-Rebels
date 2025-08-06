@@ -15,8 +15,7 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherBody;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherHandle;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherTube;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
-import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
@@ -42,7 +41,7 @@ public class RocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.scale(0.03125f, 0.03125f, 0.03125f);
         ModelRocketLauncherHandle.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlauncherhandle)), light, overlay);
 		if (stack.isEnchanted()) {
-			ModelRocketLauncherHandle.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE), light, overlay);
+			ModelRocketLauncherHandle.render(matrices, vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE), light, overlay);
 		}
 		matrices.popPose();
 
@@ -51,18 +50,18 @@ public class RocketLauncherRenderer implements DynamicItemRenderer {
 		matrices.mulPose(Axis.ZP.rotationDegrees(90));
 		matrices.mulPose(Axis.YP.rotationDegrees(90));
 		matrices.scale(0.4f, 0.4f, 0.4f);
-		ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_SOLID_TRIANGLES.apply(RRIdentifiers.etrocketlauncherbody)), light, overlay);
+		ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlauncherbody)), light, overlay);
 		if (stack.isDamaged()) {
-			ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(RivalRebelsCellularNoise.CELLULAR_NOISE_TRIANGLES), light, overlay);
+			ModelRocketLauncherBody.render(matrices, vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE), light, overlay);
 		}
 		matrices.popPose();
 
-		float s = 0.0812f;
+		final float s = 0.0812f;
 
+        VertexConsumer rocketLauncherTubeTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlaunchertube));
 		matrices.pushPose();
 		matrices.translate(-0.07f + s, 0.71f, s);
 		matrices.scale(0.15f, 0.1f, 0.15f);
-        VertexConsumer rocketLauncherTubeTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrocketlaunchertube));
 		ModelRocketLauncherTube.render(matrices, rocketLauncherTubeTextureVertexConsumer, light, overlay);
 		matrices.popPose();
 

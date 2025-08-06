@@ -20,10 +20,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class BlockCycle extends Block
-{
+public class BlockCycle extends Block {
 	public float	phase		= 0;
-	public static final float	phaseadd	= (((Mth.TWO_PI) / 360) * 10);
+	public static final float	phaseadd	= (Mth.DEG_TO_RAD * 10);
 	public static final float	pShiftR		= (((Mth.TWO_PI) / 3f) * 0f);
 	public static final float	pShiftG		= (((Mth.TWO_PI) / 3f) * 1f);
 	public static final float	pShiftB		= (((Mth.TWO_PI) / 3f) * 2f);

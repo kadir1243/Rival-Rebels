@@ -31,13 +31,13 @@ public class ItemPliers extends Item
 {
 	private int	i = 0;
 
-	public ItemPliers()
+	public ItemPliers(Properties properties)
 	{
-		super(new Properties().stacksTo(1));
+		super(properties);
 	}
 
     @Override
-    public ItemStack getCraftingRemainingItem(ItemStack stack) {
+    public ItemStack getCraftingRemainder(ItemStack itemStack) {
         return this.getDefaultInstance();
     }
 
@@ -60,7 +60,7 @@ public class ItemPliers extends Item
                     Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), RRBlocks.remotecharge.toStack());
 					level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					i = 0;
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.SUCCESS;
 				}
 			}
 			if (block == RRBlocks.timedbomb.get()) {
@@ -72,29 +72,29 @@ public class ItemPliers extends Item
                     level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					level.setBlockAndUpdate(pos.above(), Blocks.AIR.defaultBlockState());
 					i = 0;
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.SUCCESS;
 				}
 			}
 			if (block instanceof BlockAutoTemplate worldBlock) {
                 i = i + 1;
-				player.displayClientMessage(Translations.status().append(" ").append(Component.translatable(Translations.BUILDING.toLanguageKey(), i * 100 / worldBlock.time)), false);
+				player.displayClientMessage(Translations.status().append(" ").append(Translations.BUILDING.translate(i * 100 / worldBlock.time)), false);
 				if (i >= worldBlock.time) {
                     level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					worldBlock.build(level, pos.getX(), pos.getY(), pos.getZ());
 					i = 0;
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.SUCCESS;
 				}
 			}
 			if (block == RRBlocks.supplies.get() && level.getBlockState(pos.below()).is(RRBlocks.supplies))
 			{
 				i++;
-				player.displayClientMessage(Translations.status().append(" ").append(Component.translatable(Translations.BUILDING_TOKAMAK.toLanguageKey(), i * 100 / 15)), false);
+				player.displayClientMessage(Translations.status().append(" ").append(Translations.BUILDING_TOKAMAK.translate(i * 100 / 15)), false);
 				if (i >= 15)
 				{
                     level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					level.setBlockAndUpdate(pos.below(), RRBlocks.reactor.get().defaultBlockState());
 					i = 0;
-                    return InteractionResult.sidedSuccess(level.isClientSide());
+                    return InteractionResult.SUCCESS;
 				}
 			}
 		}

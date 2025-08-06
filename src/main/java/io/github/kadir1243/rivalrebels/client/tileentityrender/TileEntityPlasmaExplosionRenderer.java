@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityPlasmaExplosion;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,23 +31,23 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
 	}
 
     @Override
-    public void render(TileEntityPlasmaExplosion entity, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		float fsize = Mth.sin(entity.size);
-		matrices.pushPose();
-		matrices.translate(0.5F, 0.5F, 0.5F);
+    public void render(TileEntityPlasmaExplosion blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+		float fsize = Mth.sin(blockEntity.size);
+		poseStack.pushPose();
+		poseStack.translate(0.5F, 0.5F, 0.5F);
 
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
-        ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.5f, 0.45f, 0.45f, 0.65f, 0.4f);
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.6f, 0.45f, 0.35f, 0.65f, 0.4f);
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.7f, 0.45f, 0.35f, 0.95f, 0.4f);
-        matrices.mulPose(Axis.YP.rotationDegrees(entity.size * 50));
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.8f, 0.45f, 0.35f, 0.65f, 0.4f);
-		matrices.popPose();
-		ModelBlastSphere.renderModel(matrices, vertexConsumers, fsize * 5.9f, 0.45f, 0.35f, 0.65f, 0.4f);
-		matrices.popPose();
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.size * 50));
+        ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.5f, 0.45f, 0.45f, 0.65f, 0.4f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.size * 50));
+		ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.6f, 0.45f, 0.35f, 0.65f, 0.4f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.size * 50));
+		ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.7f, 0.45f, 0.35f, 0.95f, 0.4f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.size * 50));
+		ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.8f, 0.45f, 0.35f, 0.65f, 0.4f);
+		poseStack.popPose();
+		ModelBlastSphere.renderModel(poseStack, bufferSource, fsize * 5.9f, 0.45f, 0.35f, 0.65f, 0.4f);
+		poseStack.popPose();
 	}
 
     @Override

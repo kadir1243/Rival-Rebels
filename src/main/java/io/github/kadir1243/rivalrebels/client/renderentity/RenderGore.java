@@ -12,12 +12,12 @@
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.common.entity.EntityGore;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -30,18 +30,18 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.Objects;
 
 @OnlyIn(Dist.CLIENT)
-public class RenderGore extends EntityRenderer<EntityGore> {
-	private static final ResourceLocation	player			= ResourceLocation.withDefaultNamespace("textures/entity/steve.png");
-	private static final ResourceLocation	creeper			= ResourceLocation.withDefaultNamespace("textures/entity/creeper/creeper.png");
-	private static final ResourceLocation	enderman		= ResourceLocation.withDefaultNamespace("textures/entity/enderman/enderman.png");
-	private static final ResourceLocation	ghast			= ResourceLocation.withDefaultNamespace("textures/entity/ghast/ghast.png");
-	private static final ResourceLocation	skeleton		= ResourceLocation.withDefaultNamespace("textures/entity/skeleton/skeleton.png");
-	private static final ResourceLocation	slime			= ResourceLocation.withDefaultNamespace("textures/entity/slime/slime.png");
-	private static final ResourceLocation	magmacube		= ResourceLocation.withDefaultNamespace("textures/entity/slime/magmacube.png");
-	private static final ResourceLocation	spider			= ResourceLocation.withDefaultNamespace("textures/entity/spider/spider.png");
-	private static final ResourceLocation	cavespider		= ResourceLocation.withDefaultNamespace("textures/entity/spider/cave_spider.png");
-	private static final ResourceLocation	zombiepigman	= ResourceLocation.withDefaultNamespace("textures/entity/zombie_pigman.png");
-	private static final ResourceLocation	zombie			= ResourceLocation.withDefaultNamespace("textures/entity/zombie/zombie.png");
+public class RenderGore extends EntityRenderer<EntityGore, RenderGore.State> {
+    private static final ResourceLocation player = ResourceLocation.withDefaultNamespace("textures/entity/steve.png");
+    private static final ResourceLocation creeper = ResourceLocation.withDefaultNamespace("textures/entity/creeper/creeper.png");
+    private static final ResourceLocation enderman = ResourceLocation.withDefaultNamespace("textures/entity/enderman/enderman.png");
+    private static final ResourceLocation ghast = ResourceLocation.withDefaultNamespace("textures/entity/ghast/ghast.png");
+    private static final ResourceLocation skeleton = ResourceLocation.withDefaultNamespace("textures/entity/skeleton/skeleton.png");
+    private static final ResourceLocation slime = ResourceLocation.withDefaultNamespace("textures/entity/slime/slime.png");
+    private static final ResourceLocation magmacube = ResourceLocation.withDefaultNamespace("textures/entity/slime/magmacube.png");
+    private static final ResourceLocation spider = ResourceLocation.withDefaultNamespace("textures/entity/spider/spider.png");
+    private static final ResourceLocation cavespider = ResourceLocation.withDefaultNamespace("textures/entity/spider/cave_spider.png");
+    private static final ResourceLocation zombiepigman = ResourceLocation.withDefaultNamespace("textures/entity/zombie_pigman.png");
+    private static final ResourceLocation zombie = ResourceLocation.withDefaultNamespace("textures/entity/zombie/zombie.png");
 
     public RenderGore(EntityRendererProvider.Context renderManager) {
         super(renderManager);
@@ -49,113 +49,112 @@ public class RenderGore extends EntityRenderer<EntityGore> {
     }
 
     @Override
-    public void render(EntityGore entity, float yaw, float tickDelta, PoseStack matrices, MultiBufferSource vertexConsumers, int light) {
-		matrices.pushPose();
-		matrices.mulPose(Axis.YP.rotationDegrees(-entity.getYRot() + 180));
-		matrices.mulPose(Axis.XP.rotationDegrees(entity.getXRot()));
-        int mob = entity.getMob();
-		int type = entity.getTypeOfGore();
-		float size = entity.getSize();
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.YP.rotationDegrees(-renderState.yRot + 180));
+		poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
+        int mob = renderState.mob;
+		int type = renderState.type;
+		float size = renderState.size;
 
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.itemEntityTranslucentCull(getTextureLocation(entity)));
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.itemEntityTranslucentCull(getTextureLocation(renderState)));
         if (mob == 0) {
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16, light);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 32, 16, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 32, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 0, 64, 32, 16, packedLight);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, 4, 12, 8, 16, 16, 64, 32, 16, packedLight);
+			else if (type == 2) RenderHelper.renderBox(poseStack, buffer, 4, 12, 4, 40, 16, 64, 32, 16, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 4, 12, 4, 0, 16, 64, 32, 16, packedLight);
 		}
 		else if (mob == 1)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16, light);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16, light);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 0, 64, 64, 16, packedLight);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, 4, 12, 8, 16, 16, 64, 64, 16, packedLight);
+			else if (type == 2) RenderHelper.renderBox(poseStack, buffer, 4, 12, 4, 40, 16, 64, 64, 16, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 4, 12, 4, 0, 16, 64, 64, 16, packedLight);
 		}
 		else if (mob == 2)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 64, 16, light);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 64, 16, light);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 40, 16, 64, 64, 16, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 12, 4, 0, 16, 64, 64, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 0, 64, 64, 16, packedLight);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, 4, 12, 8, 16, 16, 64, 64, 16, packedLight);
+			else if (type == 2) RenderHelper.renderBox(poseStack, buffer, 4, 12, 4, 40, 16, 64, 64, 16, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 4, 12, 4, 0, 16, 64, 64, 16, packedLight);
 		}
 		else if (mob == 3)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16, light);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 40, 16, 64, 32, 16, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 10, 2, 0, 16, 64, 32, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 0, 64, 32, 16, packedLight);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, 4, 12, 8, 16, 16, 64, 32, 16, packedLight);
+			else if (type == 2) RenderHelper.renderBox(poseStack, buffer, 2, 10, 2, 40, 16, 64, 32, 16, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 2, 10, 2, 0, 16, 64, 32, 16, packedLight);
 		}
 		else if (mob == 4)
 		{
 			if (type == 0)
 			{
-				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
-				matrices.translate(0, -0.125, 0);
-				matrices.scale(0.875F, 0.875F, 0.875F);
-				RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 16, 64, 32, 16, light);
+				RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 0, 64, 32, 16, packedLight);
+				poseStack.translate(0, -0.125, 0);
+				poseStack.scale(0.875F, 0.875F, 0.875F);
+				RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 16, 64, 32, 16, packedLight);
 			}
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 32, 16, 64, 32, 16, light);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 30, 2, 56, 0, 64, 32, 16, light);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, 4, 12, 8, 32, 16, 64, 32, 16, packedLight);
+			else if (type == 2) RenderHelper.renderBox(poseStack, buffer, 2, 30, 2, 56, 0, 64, 32, 16, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 2, 30, 2, 56, 0, 64, 32, 16, packedLight);
 		}
 		else if (mob == 5)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 4, 12, 8, 16, 16, 64, 32, 16, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 4, 6, 4, 0, 16, 64, 32, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 0, 64, 32, 16, packedLight);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, 4, 12, 8, 16, 16, 64, 32, 16, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 4, 6, 4, 0, 16, 64, 32, 16, packedLight);
 		}
 		else if (mob == 6)
 		{
 			if (type == 0) {
-				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(getTextureLocation(entity))), 8, 8, 8, 0, 0, 64, 32, 16, light);
+				RenderHelper.renderBox(poseStack, bufferSource.getBuffer(RenderType.entityTranslucent(getTextureLocation(renderState))), 8, 8, 8, 0, 0, 64, 32, 16, packedLight);
 			} else if (type == 1) {
-				RenderHelper.renderBox(matrices, vertexConsumers.getBuffer(ObjModels.RENDER_TRANSLUCENT_TRIANGLES.apply(getTextureLocation(entity))), 6, 6, 6, 0, 16, 64, 32, 16, light);
+				RenderHelper.renderBox(poseStack, bufferSource.getBuffer(RenderType.entityTranslucent(getTextureLocation(renderState))), 6, 6, 6, 0, 16, 64, 32, 16, packedLight);
 			}
 		}
 		else if (mob == 7)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 0, 0, 64, 32, 16, light);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, 6, 6, 6, 0, 16, 64, 32, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 0, 0, 64, 32, 16, packedLight);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, 6, 6, 6, 0, 16, 64, 32, 16, packedLight);
 		}
 		else if (mob == 8)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 32, 4, 64, 32, 16, packedLight);
 			else if (type == 1)
 			{
-                matrices.mulPose(Axis.YP.rotationDegrees(90));
-				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
+                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+				RenderHelper.renderBox(poseStack, buffer, 8, 12, 10, 4, 12, 64, 32, 16, packedLight);
 			}
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 2, 2, 16, 18, 0, 64, 32, 16, packedLight);
 		}
 		else if (mob == 9)
 		{
-			matrices.scale(0.666f, 0.666f, 0.666f);
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 8, 8, 8, 32, 4, 64, 32, 16, light);
+			poseStack.scale(0.666f, 0.666f, 0.666f);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 8, 8, 8, 32, 4, 64, 32, 16, packedLight);
 			else if (type == 1)
 			{
-                matrices.mulPose(Axis.YP.rotationDegrees(90));
-				RenderHelper.renderBox(matrices, buffer, 8, 12, 10, 4, 12, 64, 32, 16, light);
+                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+				RenderHelper.renderBox(poseStack, buffer, 8, 12, 10, 4, 12, 64, 32, 16, packedLight);
 			}
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 2, 16, 18, 0, 64, 32, 16, light);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 2, 2, 16, 18, 0, 64, 32, 16, packedLight);
 		}
 		else if (mob == 10)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, 16, 16, 16, 0, 0, 64, 32, 4, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, 2, 14, 2, 0, 0, 64, 32, 4, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, 16, 16, 16, 0, 0, 64, 32, 4, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, 2, 14, 2, 0, 0, 64, 32, 4, packedLight);
 		}
 		else if (mob == 11)
 		{
-			if (type == 0) RenderHelper.renderBox(matrices, buffer, (int) (8 * size), (int) (8 * size), (int) (8 * size), 0, 0, 64, 64, 16, light);
-			else if (type == 1) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (8 * size), 0, 0, 64, 64, 16, light);
-			else if (type == 2) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, light);
-			else if (type == 3) RenderHelper.renderBox(matrices, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, light);
+			if (type == 0) RenderHelper.renderBox(poseStack, buffer, (int) (8 * size), (int) (8 * size), (int) (8 * size), 0, 0, 64, 64, 16, packedLight);
+			else if (type == 1) RenderHelper.renderBox(poseStack, buffer, (int) (4 * size), (int) (12 * size), (int) (8 * size), 0, 0, 64, 64, 16, packedLight);
+			else if (type == 2) RenderHelper.renderBox(poseStack, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, packedLight);
+			else if (type == 3) RenderHelper.renderBox(poseStack, buffer, (int) (4 * size), (int) (12 * size), (int) (4 * size), 0, 0, 64, 64, 16, packedLight);
 		}
-		matrices.popPose();
+		poseStack.popPose();
 	}
 
-	@Override
-    public ResourceLocation getTextureLocation(EntityGore entity) {
-        return switch (entity.getMob()) {
+    public ResourceLocation getTextureLocation(State entity) {
+        return switch (entity.mob) {
             case 0 -> Objects.requireNonNullElse(entity.playerSkin, player);
             case 1 -> zombie;
             case 2 -> zombiepigman;
@@ -168,8 +167,8 @@ public class RenderGore extends EntityRenderer<EntityGore> {
             case 9 -> cavespider;
             case 10 -> ghast;
             case 11 -> {
-                if (entity.getSize() < 1) yield RRIdentifiers.btsplash5;
-                else if (entity.getSize() < 2) yield RRIdentifiers.btsplash1;
+                if (entity.size < 1) yield RRIdentifiers.btsplash5;
+                else if (entity.size < 2) yield RRIdentifiers.btsplash1;
                 yield RRIdentifiers.btsplash3;
             }
             default -> null;
@@ -179,5 +178,31 @@ public class RenderGore extends EntityRenderer<EntityGore> {
     @Override
     public boolean shouldRender(EntityGore livingEntity, Frustum camera, double camX, double camY, double camZ) {
         return true;
+    }
+
+
+    @Override
+    public State createRenderState() {
+        return new State();
+    }
+
+    @Override
+    public void extractRenderState(EntityGore p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+        reusedState.mob = p_entity.getMob();
+        reusedState.type = p_entity.getTypeOfGore();
+        reusedState.size = p_entity.getSize();
+        reusedState.playerSkin = p_entity.playerSkin;
+    }
+
+    public static class State extends EntityRenderState {
+        public float xRot;
+        public float yRot;
+        public int mob;
+        public int type;
+        public float size;
+        public ResourceLocation playerSkin;
     }
 }

@@ -14,6 +14,8 @@ package io.github.kadir1243.rivalrebels.client.guihelper;
 import io.github.kadir1243.rivalrebels.client.gui.GuiTray;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
+import net.minecraft.ChatFormatting;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -34,19 +36,19 @@ public class GuiDropdownOption extends Button {
     @Override
     protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         boolean on = t.getMenu().hasWepReqs();
-		int color = 0x999999;
+		int color = ChatFormatting.GRAY.getColor();
 		if (on) {
 			RivalRebelsTeam team = RivalRebelsTeam.NONE;
-			if (t.getMenu().getSlot(6).hasItem() && t.getMenu().getSlot(6).getItem().has(RRComponents.CHIP_DATA)) {
+			if (t.getMenu().getSlot(6).getItem().has(RRComponents.CHIP_DATA)) {
 				team = t.getMenu().getSlot(6).getItem().get(RRComponents.CHIP_DATA).team();
 			}
             color = switch (team) {
-                case NONE -> 0xffff55;
-                case OMEGA -> 0x55ff55;
-                case SIGMA -> 0x5555ff;
+                case NONE -> ChatFormatting.YELLOW.getColor();
+                case OMEGA -> ChatFormatting.GREEN.getColor();
+                case SIGMA -> ChatFormatting.BLUE.getColor();
             };
+            if (isHoveredOrFocused()) color = ChatFormatting.WHITE.getColor();
 		}
-		if (isMouseOver(mouseX, mouseY) && on) color = 0xffffff;
-        context.drawCenteredString(Minecraft.getInstance().font, getMessage(), this.getX() + 1, this.getY() + 1, color);
+        context.drawCenteredString(Minecraft.getInstance().font, getMessage(), this.getX() + 1, this.getY() + 1, ARGB.color(this.alpha, color));
 	}
 }

@@ -12,6 +12,7 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -25,7 +26,6 @@ public class EntityLaserLink extends Projectile {
 
 	public EntityLaserLink(Level level) {
 		this(RREntities.LASER_LINK.get(), level);
-		noCulling = true;
 	}
 
 	public EntityLaserLink(Level level, Entity entity, double distance) {
@@ -33,7 +33,7 @@ public class EntityLaserLink extends Projectile {
         this.setOwner(entity);
 		tickCount = 0;
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
-		moveTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
+		snapTo(entity.getEyePosition(), entity.getYRot(), entity.getXRot());
         setPos(getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
 		getY() - 0.08,
 		getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F));
@@ -41,7 +41,7 @@ public class EntityLaserLink extends Projectile {
 
 	public EntityLaserLink(Level level, double x, double y, double z, float yaw, float pitch, double distance) {
 		this(level);
-		moveTo(x, y, z, yaw, pitch);
+		snapTo(x, y, z, yaw, pitch);
         setDeltaMovement(distance / 100f, getDeltaMovement().y(), getDeltaMovement().z());
 		tickCount = 0;
 	}
@@ -53,7 +53,7 @@ public class EntityLaserLink extends Projectile {
     @Override
 	public void tick() {
         super.tick();
-        if (tickCount == 1) kill();
+        if (tickCount == 1) kill((ServerLevel) level());
         tickCount++;
     }
 }

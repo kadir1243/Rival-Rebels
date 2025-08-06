@@ -18,6 +18,7 @@ import io.github.kadir1243.rivalrebels.common.explosion.TachyonBomb;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -33,7 +34,6 @@ public class EntityTachyonBombBlast extends AbstractBlastEntity<TachyonBomb> {
 
 	public EntityTachyonBombBlast(Level level) {
 		this(RREntities.TACHYON_BOMB_BLAST.get(), level);
-		noCulling = true;
 	}
 
 	public EntityTachyonBombBlast(Level level, float x, float y, float z, TachyonBomb tsarBomba, int rad) {
@@ -69,7 +69,7 @@ public class EntityTachyonBombBlast extends AbstractBlastEntity<TachyonBomb> {
 
 		if (!level().isClientSide())
 		{
-			if (bomb == null && tickCount > 1200) kill();
+			if (bomb == null && tickCount > 1200) kill((ServerLevel) level());
 			if (tickCount % 20 == 0) updateEntityList();
 			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RRConfig.SERVER.getTsarBombaSpeed() * 2; i++)
@@ -112,8 +112,7 @@ public class EntityTachyonBombBlast extends AbstractBlastEntity<TachyonBomb> {
 		float invrad = 1.0f / (float) radius;
 		for (Entity e : entitylist)
 		{
-			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearBlast(level())))
-			{
+			if (!e.isAlive() || e.isInvulnerable()) {
 				remove.add(e);
 				continue;
 			}

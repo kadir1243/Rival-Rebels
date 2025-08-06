@@ -21,8 +21,10 @@ import io.github.kadir1243.rivalrebels.common.entity.EntityRoddiskRegular;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
@@ -74,22 +76,27 @@ public class BlockLandMine extends FallingBlock
 	}
 
     @Override
+    public int getDustColor(BlockState state, BlockGetter level, BlockPos pos) {
+        return CommonColors.WHITE;
+    }
+
+    @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
 		float f = 0.01F;
 		return Shapes.create(0, 0, 0, 1, 1 - f, 1);
 	}
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
 		if (entity instanceof Player || entity instanceof Mob || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
-			world.setBlockAndUpdate(pos, state.setValue(UNSTABLE, true));
-			world.scheduleTick(pos, this, 5);
+			level.setBlockAndUpdate(pos, state.setValue(UNSTABLE, true));
+			level.scheduleTick(pos, this, 5);
             entity.playSound(RRSounds.LAND_MINE2.get(), 3, 2);
 		}
 	}
 
     @Override
-    protected void onExplosionHit(BlockState state, Level level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
+    protected void onExplosionHit(BlockState state, ServerLevel level, BlockPos pos, Explosion explosion, BiConsumer<ItemStack, BlockPos> dropConsumer) {
         if (!level.isClientSide()) level.explode(null, pos.getX(), pos.getY() + 2.5f, pos.getZ(), RRConfig.SERVER.getLandmineExplodeSize(), Level.ExplosionInteraction.BLOCK);
     }
 
@@ -165,7 +172,7 @@ public class BlockLandMine extends FallingBlock
 	}*/
 
     @Override
-    public ItemStack getCloneItemStack(LevelReader world, BlockPos pos, BlockState state) {
+    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
         return RRBlocks.alandmine.toStack();
     }
 

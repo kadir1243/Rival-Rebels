@@ -21,12 +21,14 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -174,10 +176,10 @@ public class NuclearExplosion {
 
                 if (vector.length() != 0.0D) {
                     vector = vector.normalize();
-                    double var32 = net.minecraft.world.level.Explosion.getSeenPercent(var30, entity);
+                    double var32 = ServerExplosion.getSeenPercent(var30, entity);
                     double var34 = (1.0D - distance) * var32 * ((entity instanceof EntityB83 || entity instanceof EntityHackB83) ? -1 : 1);
                     if (!(entity instanceof EntityNuclearBlast) && !(entity instanceof EntityTsarBlast) && !(entity instanceof EntityRhodes)) {
-                        if (entity instanceof FallingBlockEntity) entity.kill();
+                        if (entity instanceof FallingBlockEntity) entity.kill((ServerLevel) world);
                         entity.hurt(RivalRebelsDamageSource.nuclearBlast(world), (int) ((var34 * var34 + var34) / 2.0D * 8.0D * radius + 1.0D) * 4);
                         entity.setDeltaMovement(entity.getDeltaMovement().subtract(vector.scale(var34 * 8)));
                     }
@@ -207,9 +209,9 @@ public class NuclearExplosion {
 							int r = world.random.nextInt(50);
 							Block id;
 							if (r == 0) {
-                                id = world.registryAccess().registryOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);
+                                id = world.registryAccess().lookupOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);
 							} else {
-								id = world.registryAccess().registryOrThrow(Registries.BLOCK).getRandomElementOf(RivalRebels.NUCLEAR_STONE_GENERATEABLE, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);
+								id = world.registryAccess().lookupOrThrow(Registries.BLOCK).getRandomElementOf(RivalRebels.NUCLEAR_STONE_GENERATEABLE, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);
 							}
 							world.setBlockAndUpdate(pos, id.defaultBlockState());
 						}

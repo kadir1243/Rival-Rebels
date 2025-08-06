@@ -18,6 +18,7 @@ import io.github.kadir1243.rivalrebels.common.explosion.TsarBomba;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -33,7 +34,6 @@ public class EntityTsarBlast extends AbstractBlastEntity<TsarBomba> {
 
 	public EntityTsarBlast(Level level) {
 		this(RREntities.TSAR_BLAST.get(), level);
-		noCulling = true;
 	}
 
 	public EntityTsarBlast(Level level, float x, float y, float z, TsarBomba tsarBomba, int rad) {
@@ -62,11 +62,9 @@ public class EntityTsarBlast extends AbstractBlastEntity<TsarBomba> {
 			if (random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
 		}
 
-		tickCount++;
-
 		if (!level().isClientSide())
 		{
-			if (bomb == null && tickCount > 1200) kill();
+			if (bomb == null && tickCount > 1200) kill((ServerLevel) level());
 			if (tickCount % 20 == 0) updateEntityList();
 			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RRConfig.SERVER.getTsarBombaSpeed() * 2; i++)
@@ -110,8 +108,7 @@ public class EntityTsarBlast extends AbstractBlastEntity<TsarBomba> {
 		float invrad = 1.0f / (float) radius;
 		for (Entity e : entitylist)
 		{
-			if (!e.isAlive() || e.isInvulnerableTo(RivalRebelsDamageSource.nuclearBlast(level())))
-			{
+			if (!e.isAlive() || e.isInvulnerable()) {
 				remove.add(e);
 				continue;
 			}

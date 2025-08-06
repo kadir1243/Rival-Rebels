@@ -20,16 +20,17 @@ import java.util.Optional;
 
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.ArmorMaterials;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -66,7 +67,7 @@ public class EntityRaytrace extends Projectile {
 		this.chance = chance;
 		range = distance;
         this.setOwner(entity);
-		moveTo(entity.getEyePosition(),
+		snapTo(entity.getEyePosition(),
             entity.getYRot(),
             entity.getXRot()
         );
@@ -163,7 +164,7 @@ public class EntityRaytrace extends Projectile {
                     EquipmentSlot slot = ItemUtil.damageRandomArmor(entityPlayerHit, 14, random);
 					int i = slot.getIndex();
                     ItemStack stack = entityPlayerHit.getItemBySlot(slot);
-                    if (stack.isEmpty() || (stack.getItem() instanceof ArmorItem armor && armor.getMaterial() == ArmorMaterials.IRON)) {
+                    if (stack.isEmpty() || (stack.has(DataComponents.EQUIPPABLE) && stack.isValidRepairItem(Items.IRON_INGOT.getDefaultInstance()))) {
                         entityPlayerHit.hurt(RivalRebelsDamageSource.electricity(level()), (RRConfig.SERVER.getTeslaDecay() / ((int) entityHit.distanceTo(this) + 1) / (i + 1)));
                     } else {
 						entityPlayerHit.hurt(RivalRebelsDamageSource.electricity(level()), 1);
@@ -183,7 +184,7 @@ public class EntityRaytrace extends Projectile {
 		{
 			if (!level().isClientSide()) level().addFreshEntity(new EntityLightningLink(level(), this, range));
 		}
-		kill();
+		if (!level().isClientSide()) kill((ServerLevel) level());
 	}
 
     @Override

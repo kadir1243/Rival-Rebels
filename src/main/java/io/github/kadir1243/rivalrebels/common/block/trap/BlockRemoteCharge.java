@@ -12,8 +12,8 @@
 package io.github.kadir1243.rivalrebels.common.block.trap;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRoddiskLeader;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRoddiskOfficer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRoddiskRebel;
@@ -23,9 +23,12 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
@@ -93,8 +96,8 @@ public class BlockRemoteCharge extends FallingBlock {
     }
 
     @Override
-    public void wasExploded(Level world, BlockPos pos, net.minecraft.world.level.Explosion explosion) {
-		explode(world, pos);
+    public void wasExploded(ServerLevel p_361333_, BlockPos p_49845_, net.minecraft.world.level.Explosion p_49846_) {
+		explode(p_361333_, p_49845_);
 	}
 
 	public boolean boom = false;
@@ -121,21 +124,25 @@ public class BlockRemoteCharge extends FallingBlock {
 	}
 
     @Override
-    public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
+    public int getDustColor(BlockState state, BlockGetter level, BlockPos pos) {
+        return CommonColors.WHITE;
+    }
+
+    @Override
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
 		if (entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
-			explode(world, pos);
+			explode(level, pos);
 		}
 	}
 
-	public static void explode(Level world, BlockPos pos)
-	{
+	public static void explode(Level world, BlockPos pos) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
 
         world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getChargeExplosionSize(), false, false, RivalRebelsDamageSource.charge(world));
-		RivalRebelsSoundPlayer.playSound(world, 22, 0, x, y, z, 1f, 0.3f);
+        world.playLocalSound(pos, RRSounds.REMOTE_CHARGE_EXPLOSION.get(), SoundSource.BLOCKS, 1, 0.3F, false);
 	}
 
     @Override

@@ -18,6 +18,7 @@ import io.github.kadir1243.rivalrebels.common.explosion.AntimatterBomb;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -30,28 +31,22 @@ import net.minecraft.world.phys.Vec3;
 public class EntityAntimatterBombBlast extends AbstractBlastEntity<AntimatterBomb> {
 	public EntityAntimatterBombBlast(EntityType<? extends EntityAntimatterBombBlast> entityType, Level level) {
 		super(entityType, level);
-		noCulling = true;
 	}
 
     public EntityAntimatterBombBlast(Level level) {
         super(RREntities.ANTIMATTER_BOMB_BLAST.get(), level);
-        noCulling = true;
     }
 
-	public EntityAntimatterBombBlast(Level level, float x, float y, float z, AntimatterBomb tsarBomba, int rad)
-	{
+	public EntityAntimatterBombBlast(Level level, float x, float y, float z, AntimatterBomb tsarBomba, int rad) {
 		this(level);
-		noCulling = true;
 		bomb = tsarBomba;
 		radius = rad;
 		setDeltaMovement(Math.sqrt(radius - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
 	}
 
-	public EntityAntimatterBombBlast(Level level, double x, double y, double z, float rad)
-	{
+	public EntityAntimatterBombBlast(Level level, double x, double y, double z, float rad) {
 		this(level);
-		noCulling = true;
 		radius = rad;
 		setDeltaMovement(Math.sqrt(rad - RRConfig.SERVER.getTsarBombaStrength()) / 10, getDeltaMovement().y(), getDeltaMovement().z());
 		setPos(x, y, z);
@@ -72,7 +67,7 @@ public class EntityAntimatterBombBlast extends AbstractBlastEntity<AntimatterBom
 
 		if (!level().isClientSide())
 		{
-			if (bomb == null && tickCount > 1200) kill();
+			if (bomb == null && tickCount > 1200) kill((ServerLevel) level());
 			if (tickCount % 20 == 0) updateEntityList();
 			if (tickCount < 1200 && tickCount % 5 == 0) pushAndHurtEntities();
 			for (int i = 0; i < RRConfig.SERVER.getTsarBombaSpeed() * 2; i++)
