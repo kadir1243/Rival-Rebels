@@ -40,13 +40,13 @@ import net.minecraft.world.level.storage.ValueOutput;
 import org.jetbrains.annotations.Nullable;
 
 public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickable {
-    public RivalRebelsTeam	rrteam			= null;
+    public RivalRebelsTeam rrteam = RivalRebelsTeam.NONE;
 	private NonNullList<ItemStack> items = NonNullList.withSize(14, ItemStack.EMPTY);
 
-	public double			slide			= 0;
+	public float slide = 0;
 	private float test = Mth.PI;
-	public int				b2spirit		= 0;
-	public int				b2carpet		= 0;
+	public int b2spirit = 0;
+	public int b2carpet = 0;
 
     public TileEntityLaptop(BlockPos pos, BlockState state) {
         super(RRTileEntities.LAPTOP.get(), pos, state);

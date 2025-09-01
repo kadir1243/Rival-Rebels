@@ -332,7 +332,7 @@ public class EntityGore extends EntityInanimate {
 	@Override
 	public void tick()
 	{
-		if (playerSkin == null && level().isClientSide && getOwner() != null) {
+		if (playerSkin == null && level().isClientSide() && getOwner() != null) {
             for (Player player : level().players()) {
                 if (getOwner().matches(player)) {
                     AbstractClientPlayer acp = (AbstractClientPlayer) player;
@@ -388,7 +388,7 @@ public class EntityGore extends EntityInanimate {
 		}
 		else if (!isSliding)
 		{
-			if (level().isClientSide && RRConfig.CLIENT.isGoreEnabled())
+			if (level().isClientSide() && RRConfig.CLIENT.isGoreEnabled())
 			{
 				spawnBlood();
 			}

@@ -11,116 +11,24 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.model;
 
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Axis;
-import net.minecraft.core.Vec3i;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.world.level.lighting.LightEngine;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.util.ARGB;
-import org.joml.Vector3f;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelAstroBlasterBody {
-	private static final Vector3f vx = new Vector3f(1, 0, 0).normalize();
-	private static final Vector3f vy = new Vector3f(0, 1, 0).normalize();
-	private static final Vector3f vz = new Vector3f(0, 0, 1).normalize();
-	private static final Vector3f vxy = new Vector3f(0.5f, 0.5f, 0).normalize();
-	private static final Vector3f vyz = new Vector3f(0, 0.5f, 0.5f).normalize();
-	private static final Vector3f vxz = new Vector3f(0.5f, 0, 0.5f).normalize();
-	private static final Vector3f vx1 = new Vector3f(0.75f, 0.25f, 0).normalize();
-	private static final Vector3f vx2 = new Vector3f(0.5f, 0.25f, 0.25f).normalize();
-	private static final Vector3f vx3 = new Vector3f(0.75f, 0, 0.25f).normalize();
-	private static final Vector3f vy1 = new Vector3f(0, 0.75f, 0.25f).normalize();
-	private static final Vector3f vy2 = new Vector3f(0.25f, 0.5f, 0.25f).normalize();
-	private static final Vector3f vy3 = new Vector3f(0.25f, 0.75f, 0).normalize();
-	private static final Vector3f vz1 = new Vector3f(0.25f, 0, 0.75f).normalize();
-	private static final Vector3f vz2 = new Vector3f(0.25f, 0.25f, 0.5f).normalize();
-	private static final Vector3f vz3 = new Vector3f(0, 0.25f, 0.75f).normalize();
-
 	public static void render(PoseStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
 		matrices.pushPose();
         int color = ARGB.colorFromFloat(alpha, red, green, blue);
 
 		matrices.scale(size, size, size);
-        for (int p = 0; p < 4; p++) {
-			matrices.pushPose();
-			matrices.mulPose(Axis.YP.rotationDegrees(p * 90));
-
-			RenderHelper.addTri(matrices, buffer, vy, vy1, vy3, color);
-			RenderHelper.addTri(matrices, buffer, vy1, vyz, vy2, color);
-			RenderHelper.addTri(matrices, buffer, vy3, vy2, vxy, color);
-			RenderHelper.addTri(matrices, buffer, vy1, vy2, vy3, color);
-			RenderHelper.addTri(matrices, buffer, vx, vx1, vx3, color);
-			RenderHelper.addTri(matrices, buffer, vx1, vxy, vx2, color);
-			RenderHelper.addTri(matrices, buffer, vx3, vx2, vxz, color);
-			RenderHelper.addTri(matrices, buffer, vx1, vx2, vx3, color);
-			RenderHelper.addTri(matrices, buffer, vz, vz1, vz3, color);
-			RenderHelper.addTri(matrices, buffer, vz1, vxz, vz2, color);
-			RenderHelper.addTri(matrices, buffer, vz3, vz2, vyz, color);
-			RenderHelper.addTri(matrices, buffer, vz1, vz2, vz3, color);
-			RenderHelper.addTri(matrices, buffer, vyz, vz2, vy2, color);
-			RenderHelper.addTri(matrices, buffer, vxy, vy2, vx2, color);
-			RenderHelper.addTri(matrices, buffer, vxz, vx2, vz2, color);
-			RenderHelper.addTri(matrices, buffer, vx2, vy2, vz2, color);
-
-			matrices.popPose();
-		}
+        ObjModels.render(Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.ASTRO_BLASTER_BODY), buffer, matrices, color, LightEngine.MAX_LEVEL, OverlayTexture.NO_OVERLAY);
 
 		matrices.popPose();
 	}
-
-    public static void main(String[] args) {
-        StringBuilder buffer = new StringBuilder();
-        PoseStack matrices = new PoseStack();
-        for (int p = 0; p < 4; p++) {
-            matrices.pushPose();
-            matrices.mulPose(Axis.YP.rotationDegrees(p * 90));
-
-            log(matrices, buffer, vy, vy1, vy3);
-            log(matrices, buffer, vy1, vyz, vy2);
-            log(matrices, buffer, vy3, vy2, vxy);
-            log(matrices, buffer, vy1, vy2, vy3);
-            log(matrices, buffer, vx, vx1, vx3);
-            log(matrices, buffer, vx1, vxy, vx2);
-            log(matrices, buffer, vx3, vx2, vxz);
-            log(matrices, buffer, vx1, vx2, vx3);
-            log(matrices, buffer, vz, vz1, vz3);
-            log(matrices, buffer, vz1, vxz, vz2);
-            log(matrices, buffer, vz3, vz2, vyz);
-            log(matrices, buffer, vz1, vz2, vz3);
-            log(matrices, buffer, vyz, vz2, vy2);
-            log(matrices, buffer, vxy, vy2, vx2);
-            log(matrices, buffer, vxz, vx2, vz2);
-            log(matrices, buffer, vx2, vy2, vz2);
-
-            matrices.popPose();
-        }
-        buffer.append("\n");
-        for (Vec3i face : faces) {
-            buffer.append("f ").append(face.getX()).append(" ").append(face.getY()).append(" ").append(face.getZ()).append("\n");
-        }
-        System.out.println(buffer);
-    }
-
-    private static int vertexNum;
-    private static final List<Vec3i> faces = new ArrayList<>();
-
-    private static void log(PoseStack poseStack, StringBuilder buffer, Vector3f a, Vector3f b, Vector3f c) {
-        log(poseStack, buffer, a);
-        log(poseStack, buffer, b);
-        log(poseStack, buffer, c);
-
-        faces.add(new Vec3i(vertexNum - 2, vertexNum - 1, vertexNum));
-    }
-
-    private static void log(PoseStack poseStack, StringBuilder buffer, Vector3f a) {
-        a = poseStack.last().pose().transformPosition(a, new Vector3f());
-        buffer.append("v ").append(a.x).append(" ").append(a.y).append(" ").append(a.z).append("\n");
-        vertexNum++;
-    }
 }

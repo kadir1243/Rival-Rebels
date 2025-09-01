@@ -1,7 +1,5 @@
 package io.github.kadir1243.rivalrebels.common.entity.brain;
 
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
-import io.github.kadir1243.rivalrebels.common.entity.*;
 import io.github.kadir1243.rivalrebels.common.entity.EntityB83NoShroom;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.entity.EntitySeekB83;
@@ -87,7 +85,7 @@ public class ShootRocket extends Behavior<EntityRhodes> {
                 lastshot = owner.tickCount;
                 if (shotstaken == 21) shotstaken = 0;
                 shotstaken++;
-                RivalRebelsSoundPlayer.playSound(owner, 23, 10, 1f);
+                //RivalRebelsSoundPlayer.playSound(owner, 23, 10, 1f);
                 float cp = -0.5f / Mth.sqrt(x * x + y * y + z * z);
                 if (owner.getScale() >= 2.0)
                     owner.level().addFreshEntity(new EntityB83NoShroom(owner.level(), px, py, pz,
@@ -116,7 +114,7 @@ public class ShootRocket extends Behavior<EntityRhodes> {
 
             if (targetEntity.getMaxHealth() > 1000) {
                 if (pointing && owner.tickCount % 100 == 0) {
-                    RivalRebelsSoundPlayer.playSound(owner, 23, 10, 1f);
+                    // RivalRebelsSoundPlayer.playSound(owner, 23, 10, 1f);
                     float cp = -0.5f / Mth.sqrt(x * x + y * y + z * z);
                     if (owner.getScale() >= 2.0)
                         owner.level().addFreshEntity(new EntityTsar(owner.level(), px, py, pz,
@@ -131,7 +129,7 @@ public class ShootRocket extends Behavior<EntityRhodes> {
                     lastshot = owner.tickCount;
                     if (shotstaken == 21) shotstaken = 0;
                     shotstaken++;
-                    RivalRebelsSoundPlayer.playSound(owner, 23, 10, 1f);
+                    //RivalRebelsSoundPlayer.playSound(owner, 23, 10, 1f);
                     float cp = -0.5f / Mth.sqrt(x * x + y * y + z * z);
                     if (owner.getScale() >= 2.0)
                         owner.level().addFreshEntity(new EntityB83NoShroom(owner.level(), px, py, pz,

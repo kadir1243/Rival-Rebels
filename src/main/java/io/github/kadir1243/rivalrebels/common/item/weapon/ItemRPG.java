@@ -13,7 +13,6 @@ package io.github.kadir1243.rivalrebels.common.item.weapon;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityBomb;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRocket;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
@@ -51,10 +50,10 @@ public class ItemRPG extends Item {
         ItemStack itemStack = ItemUtil.getItemStack(player, RRItems.rocket.asItem());
         if (player.hasInfiniteMaterials() || !itemStack.isEmpty() || RRConfig.SERVER.isInfiniteAmmo()) {
 			player.startUsingItem(hand);
-			if (!world.isClientSide && !RRConfig.SERVER.isInfiniteAmmo() && !player.hasInfiniteMaterials()) {
+			if (!world.isClientSide() && !RRConfig.SERVER.isInfiniteAmmo() && !player.hasInfiniteMaterials()) {
                 itemStack.consume(1, player);
 			}
-			if (!stack.isEnchanted()) RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
+			if (!stack.isEnchanted()) player.playSound(RRSounds.ROCKET_FIRED.get(), 0.4F, 1);
 			else player.playSound(RRSounds.GUI_UNKNOWN5.get());
 			if (!world.isClientSide()) {
                 Projectile projectile = stack.isEnchanted() ? new EntityBomb(world, player, 0.1F) : new EntityRocket(world, player, 0.1F);

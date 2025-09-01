@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "rivalrebels:block/forcefieldnode",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "rivalrebels:block/forcefieldnode"
+    },
+    "facing=south": {
+      "model": "rivalrebels:block/forcefieldnode",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "rivalrebels:block/forcefieldnode",
+      "y": 270
+    }
+  }
+}

@@ -13,7 +13,6 @@ package io.github.kadir1243.rivalrebels.common.item;
 
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -39,7 +38,7 @@ public class ItemExPill extends Item
     public InteractionResult use(Level world, Player player, InteractionHand hand) {
         ItemStack stack = player.getItemInHand(hand);
         player.playSound(RRSounds.PILL.get());
-		RivalRebelsSoundPlayer.playSound(player, 28, 18, 1.0f, 0.6f);
+        player.playSound(RRSounds.VOICE_18.get(), 1, 0.6F);
 		player.startUsingItem(hand);
 		if (!world.isClientSide())
 		{

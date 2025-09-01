@@ -184,14 +184,14 @@ public class TileEntityAntimatterBomb extends BaseContainerBlockEntity implement
 			if (RRConfig.SERVER.getNuclearBombCountdown() == 0) countdown = 10;
 		}
 
-		if (countdown == 200 && !level.isClientSide && RRConfig.SERVER.getNuclearBombCountdown() > 10)
+		if (countdown == 200 && !level.isClientSide() && RRConfig.SERVER.getNuclearBombCountdown() > 10)
 		{
             Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}
 
 		if (countdown % 20 == 0 && countdown <= 200 && RRConfig.SERVER.getNuclearBombCountdown() > 10) level.playSound(null, getBlockPos(), RRSounds.NUKE.get(), SoundSource.BLOCKS, 100, 1);
 
-		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !level.isClientSide && nuclear == hydrogen)
+		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !level.isClientSide() && nuclear == hydrogen)
 		{
 			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 			level.setSkyFlashTime(2);

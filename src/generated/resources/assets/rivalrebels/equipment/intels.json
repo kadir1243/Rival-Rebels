@@ -1,0 +1,14 @@
+{
+  "layers": {
+    "humanoid": [
+      {
+        "texture": "rivalrebels:intel_sigma"
+      }
+    ],
+    "humanoid_leggings": [
+      {
+        "texture": "rivalrebels:sigma_pants"
+      }
+    ]
+  }
+}

@@ -19,7 +19,6 @@ import io.github.kadir1243.rivalrebels.common.command.CommandRobot;
 import io.github.kadir1243.rivalrebels.common.core.BlackList;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.brain.MemoryModuleTypes;
 import io.github.kadir1243.rivalrebels.common.entity.brain.RhodesAi;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
@@ -255,12 +254,12 @@ public class EntityRhodes extends LivingEntity {
 			if (level().isClientSide()) RRClient.rrro.setOverlay(this);
 
 			if (rider!=null) {
-				rider.setPos(((getX()+syaw*5.5*getScale()) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*getScale() - (level().isClientSide?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*getScale()) - rider.getZ()) * 0.33f + rider.getZ());
+				rider.setPos(((getX()+syaw*5.5*getScale()) - rider.getX()) * 0.33f + rider.getX(), ((getY() + bodyY - 10*getScale() - (level().isClientSide()?0:rider.getEyeHeight(rider.getPose()))) - rider.getY()) * 0.33f + rider.getY(), ((getZ()+cyaw*5.5*getScale()) - rider.getZ()) * 0.33f + rider.getZ());
 				rider.setOnGround(true);
 				if (level().isClientSide()) RivalRebels.round.setInvisible(rider);
 				rider.makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
 				rider.getAbilities().invulnerable = true;
-				if (level().isClientSide && rider == Minecraft.getInstance().player) Minecraft.getInstance().getConnection().send(new RhodesJumpPacket(this.getId()));
+				if (level().isClientSide() && rider == Minecraft.getInstance().player) Minecraft.getInstance().getConnection().send(new RhodesJumpPacket(this.getId()));
 			}
 			if (passenger1 != null)
 			{
@@ -516,7 +515,7 @@ public class EntityRhodes extends LivingEntity {
 							if (random.nextInt(333)==0)
 							{
 								new Explosion(level(), px, py, pz, 3, false, true, RivalRebelsDamageSource.rocket(level()));
-								RivalRebelsSoundPlayer.playSound(this, 23, 3, 4.5f, (float) (0.8f + random.nextDouble()*0.3f));
+								this.playSound(RRSounds.WET_BOMB_EXPLODED.get(), 4.5F, (float) (0.8f + random.nextDouble()*0.3f));
 							}
 						}
 					}
@@ -538,7 +537,7 @@ public class EntityRhodes extends LivingEntity {
                     setDeltaMovement(getDeltaMovement().x(), 0.125, getDeltaMovement().z());
 					if (!isFire() && random.nextInt(32)==0)
 					{
-						RivalRebelsSoundPlayer.playSound(this, 23, 1, 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
+						this.playSound(RRSounds.FIRE.get(), 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
 						setFire(true);
 					}
 				}
@@ -552,7 +551,7 @@ public class EntityRhodes extends LivingEntity {
             push(0, -0.03f, 0);
 			if (!isFire() && random.nextInt(32)==0)
 			{
-				RivalRebelsSoundPlayer.playSound(this, 23, 1, 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
+                this.playSound(RRSounds.FIRE.get(), 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
 				setFire(true);
 			}
 		}
@@ -569,7 +568,7 @@ public class EntityRhodes extends LivingEntity {
 			}
 			if (random.nextInt(32)==0)
 			{
-				RivalRebelsSoundPlayer.playSound(this, 23, 1, 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
+                this.playSound(RRSounds.FIRE.get(), 4.5f, (float) (0.8f + random.nextDouble()*0.2f));
 			}
 			setFire(true);
 		}
@@ -1110,7 +1109,7 @@ public class EntityRhodes extends LivingEntity {
 						{
 							tickssincenuke = 0;
                             setNukeCount(getNukeCount() - 1);
-							RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
+							//RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 							float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 							if (getScale() >= 3.0) {
                                 EntityHotPotato entity = new EntityHotPotato(level(), px, py, pz);
@@ -1132,7 +1131,7 @@ public class EntityRhodes extends LivingEntity {
 						lastshot = tickCount;
 						if (shotstaken == 21) shotstaken = 0;
 						shotstaken++;
-						RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
+						// RivalRebelsSoundPlayer.playSound(this, 23, 10, 1f);
 						float cp = -0.5f/ Mth.sqrt(x*x+y*y+z*z);
 
 						if (getScale() >= 2.0)

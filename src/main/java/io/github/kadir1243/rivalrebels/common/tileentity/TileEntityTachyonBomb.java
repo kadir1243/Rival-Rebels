@@ -175,7 +175,7 @@ public class TileEntityTachyonBomb extends BaseContainerBlockEntity implements T
 			if (RRConfig.SERVER.getNuclearBombCountdown() == 0) countdown = 10;
 		}
 
-		if (countdown == 200 && !level.isClientSide && RRConfig.SERVER.getNuclearBombCountdown() > 10)
+		if (countdown == 200 && !level.isClientSide() && RRConfig.SERVER.getNuclearBombCountdown() > 10)
 		{
             Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}

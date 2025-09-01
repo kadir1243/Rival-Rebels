@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "meta=0": {
+      "model": "rivalrebels:block/goreblockicon1"
+    },
+    "meta=1": {
+      "model": "rivalrebels:block/goreblockicon2"
+    },
+    "meta=2": {
+      "model": "rivalrebels:block/goreblockicon3"
+    },
+    "meta=3": {
+      "model": "rivalrebels:block/goreblockicon4"
+    },
+    "meta=4": {
+      "model": "rivalrebels:block/goreblockicon5"
+    },
+    "meta=5": {
+      "model": "rivalrebels:block/goreblockicon6"
+    }
+  }
+}

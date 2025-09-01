@@ -11,8 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.item.weapon;
 
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityHackB83;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import net.minecraft.world.InteractionHand;
@@ -37,7 +37,7 @@ public class ItemHackM202 extends Item
 		{
 			world.addFreshEntity(new EntityHackB83(world, user.getX(), user.getY(), user.getZ(), -user.getYHeadRot(), user.getXRot(), stack.isEnchanted()));
 		}
-		RivalRebelsSoundPlayer.playSound(user, 23, 2, 0.4f);
+        user.playSound(RRSounds.ROCKET_FIRED.get(), 0.4F, 1);
 		new Explosion(world, user.getX(), user.getY(), user.getZ(), 2, true, false, RivalRebelsDamageSource.flare(world));
 		return InteractionResult.SUCCESS;
 	}

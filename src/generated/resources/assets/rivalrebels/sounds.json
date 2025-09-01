@@ -52,6 +52,17 @@
       "rivalrebels:ac/a"
     ]
   },
+  "bomb_entering_water": {
+    "sounds": [
+      "rivalrebels:av/e"
+    ]
+  },
+  "bomb_explode": {
+    "sounds": [
+      "rivalrebels:av/a1",
+      "rivalrebels:av/a2"
+    ]
+  },
   "crate": {
     "sounds": [
       "rivalrebels:ad/a1",
@@ -92,6 +103,11 @@
   "cuchillo_unknown4": {
     "sounds": [
       "rivalrebels:ae/e"
+    ]
+  },
+  "fire": {
+    "sounds": [
+      "rivalrebels:av/b"
     ]
   },
   "flame_thrower_extinguish": {
@@ -330,6 +346,12 @@
       "rivalrebels:au/c"
     ]
   },
+  "rocket_fired": {
+    "sounds": [
+      "rivalrebels:av/c1",
+      "rivalrebels:av/c2"
+    ]
+  },
   "rod_disk_hit_entity": {
     "sounds": [
       "rivalrebels:af/b1",
@@ -381,6 +403,168 @@
   "roddisk_unknown7": {
     "sounds": [
       "rivalrebels:af/b/d"
+    ]
+  },
+  "tesla": {
+    "sounds": [
+      "rivalrebels:ax/b1",
+      "rivalrebels:ax/b2",
+      "rivalrebels:ax/b3",
+      "rivalrebels:ax/b4"
+    ]
+  },
+  "timed_blast_sound": {
+    "sounds": [
+      "rivalrebels:ay/a1",
+      "rivalrebels:ay/a2"
+    ]
+  },
+  "timed_blast_sound_unknown1": {
+    "sounds": [
+      "rivalrebels:ay/b"
+    ]
+  },
+  "timed_blast_sound_unknown2": {
+    "sounds": [
+      "rivalrebels:ay/c"
+    ]
+  },
+  "toaster": {
+    "sounds": [
+      "rivalrebels:az/a1",
+      "rivalrebels:az/a2"
+    ]
+  },
+  "unknown1": {
+    "sounds": [
+      "rivalrebels:aw/a"
+    ]
+  },
+  "unknown2": {
+    "sounds": [
+      "rivalrebels:aw/b"
+    ]
+  },
+  "unknown3": {
+    "sounds": [
+      "rivalrebels:aw/c"
+    ]
+  },
+  "unknown4": {
+    "sounds": [
+      "rivalrebels:aw/d1",
+      "rivalrebels:aw/d2"
+    ]
+  },
+  "unknown5": {
+    "sounds": [
+      "rivalrebels:aw/e"
+    ]
+  },
+  "unknown6": {
+    "sounds": [
+      "rivalrebels:ax/a"
+    ]
+  },
+  "voice_0": {
+    "sounds": [
+      "rivalrebels:ba/a1",
+      "rivalrebels:ba/a2"
+    ]
+  },
+  "voice_1": {
+    "sounds": [
+      "rivalrebels:ba/b"
+    ]
+  },
+  "voice_10": {
+    "sounds": [
+      "rivalrebels:ba/k"
+    ]
+  },
+  "voice_11": {
+    "sounds": [
+      "rivalrebels:ba/l"
+    ]
+  },
+  "voice_12": {
+    "sounds": [
+      "rivalrebels:ba/m"
+    ]
+  },
+  "voice_13": {
+    "sounds": [
+      "rivalrebels:ba/n"
+    ]
+  },
+  "voice_14": {
+    "sounds": [
+      "rivalrebels:ba/o"
+    ]
+  },
+  "voice_15": {
+    "sounds": [
+      "rivalrebels:ba/p"
+    ]
+  },
+  "voice_16": {
+    "sounds": [
+      "rivalrebels:ba/q"
+    ]
+  },
+  "voice_17": {
+    "sounds": [
+      "rivalrebels:ba/r"
+    ]
+  },
+  "voice_18": {
+    "sounds": [
+      "rivalrebels:ba/s"
+    ]
+  },
+  "voice_2": {
+    "sounds": [
+      "rivalrebels:ba/c"
+    ]
+  },
+  "voice_3": {
+    "sounds": [
+      "rivalrebels:ba/d"
+    ]
+  },
+  "voice_4": {
+    "sounds": [
+      "rivalrebels:ba/e"
+    ]
+  },
+  "voice_5": {
+    "sounds": [
+      "rivalrebels:ba/f"
+    ]
+  },
+  "voice_6": {
+    "sounds": [
+      "rivalrebels:ba/g"
+    ]
+  },
+  "voice_7": {
+    "sounds": [
+      "rivalrebels:ba/h"
+    ]
+  },
+  "voice_8": {
+    "sounds": [
+      "rivalrebels:ba/i"
+    ]
+  },
+  "voice_9": {
+    "sounds": [
+      "rivalrebels:ba/j"
+    ]
+  },
+  "wet_bomb_exploded": {
+    "sounds": [
+      "rivalrebels:av/d"
     ]
   }
 }

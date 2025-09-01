@@ -11,8 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.entity;
 
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.server.level.ServerLevel;
@@ -118,8 +118,8 @@ public class EntityBomb extends ThrowableProjectile {
 		exploded = true;
 		hit = b;
 		tickCount = 0;
-		if (random.nextDouble() > 0.8f) RivalRebelsSoundPlayer.playSound(this, 23, 0, 20, 0.4f + (float)random.nextDouble() * 0.3f);
-		if (!level().isClientSide && !b) {
+		if (random.nextDouble() > 0.8f) this.playSound(RRSounds.BOMB_EXPLODE.get(), 20, 0.4f + (float)random.nextDouble() * 0.3f);
+		if (!level().isClientSide() && !b) {
 			int r = 2;
 			for (int x = -r; x <= r; x++) {
 				for (int y = -r; y <= r; y++) {

@@ -12,7 +12,6 @@
 package io.github.kadir1243.rivalrebels.common.command;
 
 import io.github.kadir1243.rivalrebels.RivalRebels;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsRank;
 import com.google.common.hash.Hashing;
@@ -22,6 +21,7 @@ import java.nio.charset.StandardCharsets;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundSource;
 
 public class CommandPassword {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
@@ -81,7 +81,7 @@ public class CommandPassword {
 		if (p.rrrank != rank || rank == RivalRebelsRank.REGULAR)
 		{
 			p.rrrank = rank;
-			RivalRebelsSoundPlayer.playSound(source.getLevel(), 28, rank.snf, source.getPosition());
+            source.getLevel().playSound(null, source.getPlayer(), rank.sound.value(), SoundSource.PLAYERS, 1, 1);
 			RivalRebels.round.rrplayerlist.refreshForWorld(source.getLevel());
 			source.sendSuccess(() -> message, true);
 		}

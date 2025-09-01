@@ -76,7 +76,7 @@ public class BlockReactor extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-        return world.isClientSide ? (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).clientTick() : (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).serverTick();
+        return world.isClientSide() ? (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).clientTick() : (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).serverTick();
     }
 
     public static final Component DEFAULT_TOKAMAK = Component.literal("Tokamak");

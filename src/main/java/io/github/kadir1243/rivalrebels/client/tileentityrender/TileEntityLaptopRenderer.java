@@ -31,8 +31,8 @@ public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityL
     public void render(TileEntityLaptop blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
 		poseStack.pushPose();
 		poseStack.translate(0.5F, 0, 0.5F);
-        ModelLaptop.renderModel(bufferSource, poseStack, (float) -blockEntity.slide, packedLight, packedOverlay);
-		ModelLaptop.renderScreen(bufferSource, RRIdentifiers.etubuntu, poseStack, (float) -blockEntity.slide, packedLight, packedOverlay);
+        ModelLaptop.renderModel(bufferSource, poseStack, -blockEntity.slide, packedLight, packedOverlay);
+		ModelLaptop.renderScreen(bufferSource, RRIdentifiers.etubuntu, poseStack, -blockEntity.slide, packedLight, packedOverlay);
 		poseStack.popPose();
 	}
 }

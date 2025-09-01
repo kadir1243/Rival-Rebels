@@ -251,9 +251,12 @@ public class RecipeDataGen extends RecipeProvider {
         addRecipe(RRBlocks.buildrhodes, 2, "SAS", "CPT", "RLB", 'B', RRItems.binoculars, 'P', RRItems.pliers, 'S', RRBlocks.supplies, 'A', RRItems.antenna, 'C', RRItems.chip, 'T', RRItems.core3, 'R', RRBlocks.controller, 'L', RRBlocks.loader);
     }
 
+    // FIXME: This should be removed
+    @Deprecated(forRemoval = true)
     private static void addRecipee(ItemLike output, Object... input) {
     }
 
+    @Deprecated(forRemoval = true)
     private static void addRecipe(ItemLike output, int count, Object... input) {
     }
 

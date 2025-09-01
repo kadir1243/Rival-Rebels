@@ -12,7 +12,7 @@
 package io.github.kadir1243.rivalrebels.common.item.weapon;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.entity.EntitySeekB83;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
@@ -53,7 +53,7 @@ public class ItemSeekM202 extends Item
 			if (!RRConfig.SERVER.isInfiniteAmmo()) {
                 itemStack.consume(1, player);
 			}
-			RivalRebelsSoundPlayer.playSound(player, 23, 2, 0.4f);
+            player.playSound(RRSounds.ROCKET_FIRED.get(), 0.4F, 1);
 			if (!world.isClientSide())
 			{
 				if (!stack.isEnchanted())

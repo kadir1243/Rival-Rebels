@@ -94,12 +94,6 @@ public class RenderHelper {
         addVertice(pose, buffer, v4, new TextureVertice(x1, y2), light, overlay);
     }
 
-    public static void addTri(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, int color) {
-        buffer.addVertex(pose.last(), v3).setColor(color);
-        buffer.addVertex(pose.last(), v1).setColor(color);
-        buffer.addVertex(pose.last(), v2).setColor(color);
-    }
-
     public static void addVertice(PoseStack pose, VertexConsumer buffer, Vector3f v, TextureVertice t, int color, int light, int overlay) {
         buffer.addVertex(pose.last(), v)
             .setColor(color)

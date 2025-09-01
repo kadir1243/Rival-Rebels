@@ -12,8 +12,8 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.explosion.TsarBomba;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,7 +59,7 @@ public class EntityTsarBlast extends AbstractBlastEntity<TsarBomba> {
 		if (random.nextInt(10) == 0) {
 			this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
 		} else {
-			if (random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
+			if (random.nextInt(5) == 0) this.playSound(RRSounds.TIMED_BOMB_SOUND.get(), 100, 0.7f);
 		}
 
 		if (!level().isClientSide())

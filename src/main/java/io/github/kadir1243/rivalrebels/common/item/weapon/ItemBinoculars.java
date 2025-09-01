@@ -91,7 +91,7 @@ public class ItemBinoculars extends Item {
 
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel world, Entity entity, @Nullable EquipmentSlot slot) {
-        if (world.isClientSide && entity == Minecraft.getInstance().player) {
+        if (world.isClientSide() && entity == Minecraft.getInstance().player) {
             boolean strike = isMousePressed() && !prevmclick;
             c ^= RRClient.USE_BINOCULARS_ITEM.isDown() && !sc;
             sc = RRClient.USE_BINOCULARS_ITEM.isDown();

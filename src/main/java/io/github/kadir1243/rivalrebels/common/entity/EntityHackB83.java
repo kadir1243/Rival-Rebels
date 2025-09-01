@@ -88,7 +88,7 @@ public class EntityHackB83 extends ThrowableProjectile
 			}
 		}
 
-		if (level().isClientSide && !isInWater())
+		if (level().isClientSide() && !isInWater())
 		{
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x(), -getDeltaMovement().y(), -getDeltaMovement().z()));
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x()*0.8f, -getDeltaMovement().y()*0.8f, -getDeltaMovement().z()*0.8f));

@@ -15,7 +15,6 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
@@ -43,7 +42,6 @@ public class EntityRocket extends AbstractArrow
 	public int rotation		= 45;
 	public float slide			= 0;
 	private boolean inwaterprevtick	= false;
-	private int soundfile = 0;
 
 	public EntityRocket(EntityType<? extends EntityRocket> type, Level level) {
 		super(type, level);
@@ -98,7 +96,7 @@ public class EntityRocket extends AbstractArrow
 		}
 		// world.spawnEntity(new EntityLightningLink(world, getX(), getY(), getZ(), yaw, pitch, 100));
 
-		if (level().isClientSide && tickCount >= 5 && !isInWater() && tickCount <= 100)
+		if (level().isClientSide() && tickCount >= 5 && !isInWater() && tickCount <= 100)
 		{
 			level().addFreshEntity(new EntityPropulsionFX(level(), getX(), getY(), getZ(), -getDeltaMovement().x() * 0.5, -getDeltaMovement().y() * 0.5 - 0.1, -getDeltaMovement().z() * 0.5));
 		}
@@ -118,15 +116,10 @@ public class EntityRocket extends AbstractArrow
 			}
 			if (!inwaterprevtick)
 			{
-				RivalRebelsSoundPlayer.playSound(this, 23, 4, 0.5F, 0.5F);
+                this.playSound(RRSounds.BOMB_ENTERING_WATER.get(), 0.5F, 0.5F);
 			}
-			soundfile = 3;
 			var17 = 0.8F;
 			inwaterprevtick = true;
-		}
-		else
-		{
-			soundfile = 0;
 		}
 
         setDeltaMovement(getDeltaMovement().scale(var17));
@@ -164,7 +157,7 @@ public class EntityRocket extends AbstractArrow
 
     public void explode() {
         if (level().isClientSide()) return;
-		RivalRebelsSoundPlayer.playSound(this, 23, soundfile, 5F, 0.3F);
+        this.playSound(isInWater() ? RRSounds.WET_BOMB_EXPLODED.get() : RRSounds.BOMB_EXPLODE.get(), 5, 0.3F);
 		new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
 		kill((ServerLevel) level());
 	}

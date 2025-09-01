@@ -12,7 +12,6 @@
 package io.github.kadir1243.rivalrebels.common.item;
 
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -40,7 +39,7 @@ public class ItemSafePill extends Item
 		if (!world.isClientSide()) {
 			player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Regenerating...").withStyle(ChatFormatting.YELLOW)), true);
             player.playSound(RRSounds.PILL2.get());
-			RivalRebelsSoundPlayer.playSound(player, 28, 18);
+            player.playSound(RRSounds.VOICE_18.get());
 			player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
 			player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 			player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 10, 20));

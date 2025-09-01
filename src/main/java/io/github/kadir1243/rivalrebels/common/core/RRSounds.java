@@ -92,6 +92,41 @@ public class RRSounds {
     public static final DeferredHolder<SoundEvent, SoundEvent> LASER_SHOOT = register("laser_shoot"); // 22.1
     public static final DeferredHolder<SoundEvent, SoundEvent> REMOTE_PLANT = register("remote_plant"); // 22.2
     public static final DeferredHolder<SoundEvent, SoundEvent> REMOTE_EXPLODE = register("remote_explode"); // 22.3
+    public static final DeferredHolder<SoundEvent, SoundEvent> BOMB_EXPLODE = register("bomb_explode"); // 23.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> FIRE = register("fire"); // 23.1
+    public static final DeferredHolder<SoundEvent, SoundEvent> ROCKET_FIRED = register("rocket_fired"); // 23.2
+    public static final DeferredHolder<SoundEvent, SoundEvent> WET_BOMB_EXPLODED = register("wet_bomb_exploded"); // 23.3
+    public static final DeferredHolder<SoundEvent, SoundEvent> BOMB_ENTERING_WATER = register("bomb_entering_water"); // 23.4
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNKNOWN1 = register("unknown1"); // 24.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNKNOWN2 = register("unknown2"); // 24.1
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNKNOWN3 = register("unknown3"); // 24.2
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNKNOWN4 = register("unknown4"); // 24.3
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNKNOWN5 = register("unknown5"); // 24.4
+    public static final DeferredHolder<SoundEvent, SoundEvent> UNKNOWN6 = register("unknown6"); // 25.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> TESLA = register("tesla"); // 25.1
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIMED_BOMB_SOUND = register("timed_blast_sound"); // 26.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIMED_BOMB_SOUND_UNKNOWN1 = register("timed_blast_sound_unknown1"); // 26.1
+    public static final DeferredHolder<SoundEvent, SoundEvent> TIMED_BOMB_SOUND_UNKNOWN2 = register("timed_blast_sound_unknown2"); // 26.2
+    public static final DeferredHolder<SoundEvent, SoundEvent> TOASTER = register("toaster"); // 27.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_0 = register("voice_0"); // 28.0
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_1 = register("voice_1"); // 28.1
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_2 = register("voice_2"); // 28.2
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_3 = register("voice_3"); // 28.3
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_4 = register("voice_4"); // 28.4
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_5 = register("voice_5"); // 28.5
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_6 = register("voice_6"); // 28.6
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_7 = register("voice_7"); // 28.7
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_8 = register("voice_8"); // 28.8
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_9 = register("voice_9"); // 28.9
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_10 = register("voice_10"); // 28.10
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_11 = register("voice_11"); // 28.11
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_12 = register("voice_12"); // 28.12
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_13 = register("voice_13"); // 28.13
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_14 = register("voice_14"); // 28.14
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_15 = register("voice_15"); // 28.15
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_16 = register("voice_16"); // 28.16
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_17 = register("voice_17"); // 28.17
+    public static final DeferredHolder<SoundEvent, SoundEvent> VOICE_18 = register("voice_18"); // 28.18
 
     public static void init(IEventBus bus) {
         SOUNDS.register(bus);

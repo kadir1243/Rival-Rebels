@@ -111,7 +111,7 @@ public class EntityCuchillo extends ThrowableProjectile {
 
     @Override
 	public void playerTouch(Player player) {
-		if (!level().isClientSide && inGround) {
+		if (!level().isClientSide() && inGround) {
             this.hitTargetOrDeflectSelf(new EntityHitResult(player, position()));
 			playSound(SoundEvents.LAVA_POP, 0.2F, ((random.nextFloat() - random.nextFloat()) * 0.7F + 1.0F) * 2.0F);
 			kill((ServerLevel) level());

@@ -272,7 +272,7 @@ public class ItemRoda extends Item
 			pass = true;
 		}
 		RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());
-		if ((!world.isClientSide && world.getServer().isSingleplayer())
+		if ((!world.isClientSide() && world.getServer().isSingleplayer())
 		 || (rrp != null && (rrp.rrrank == RivalRebelsRank.LEADER || rrp.rrrank == RivalRebelsRank.OFFICER || rrp.rrrank == RivalRebelsRank.REP))) {
 			player.startUsingItem(hand);
 			stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)+10);

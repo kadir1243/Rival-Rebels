@@ -126,7 +126,7 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
 
     @Override
 	public void tick() {
-        boolean sp = level.isClientSide || (!level.isClientSide && (level.getServer().isSingleplayer() || level.getServer().getPlayerCount() == 1));
+        boolean sp = level.isClientSide() || (!level.isClientSide() && (level.getServer().isSingleplayer() || level.getServer().getPlayerCount() == 1));
 
 		if (hasFuse && hasExplosive && hasChip)
 		{
@@ -156,7 +156,7 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
 			Countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
 		}
 
-		if (Countdown == 200 && !level.isClientSide && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
+		if (Countdown == 200 && !level.isClientSide() && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
             Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
 		}
 

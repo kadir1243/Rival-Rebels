@@ -67,7 +67,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
 			kill((ServerLevel) level());
             this.playSound(RRSounds.FORCE_FIELD.get());
 		}
-		if (tickCount >= 120 && !level().isClientSide && getOwner() != null)
+		if (tickCount >= 120 && !level().isClientSide() && getOwner() != null)
 		{
 			ItemEntity ei = new ItemEntity(level(), getOwner().getX(), getOwner().getY(), getOwner().getZ(), RRItems.roddisk.toStack());
 			level().addFreshEntity(ei);

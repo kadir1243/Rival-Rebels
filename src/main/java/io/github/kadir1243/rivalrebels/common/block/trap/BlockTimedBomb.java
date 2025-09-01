@@ -13,8 +13,8 @@ package io.github.kadir1243.rivalrebels.common.block.trap;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -23,6 +23,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -52,7 +53,7 @@ public class BlockTimedBomb extends FallingBlock {
         int z = pos.getZ();
         world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timedBomb(world));
-		RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
+        world.playSound(null, pos, RRSounds.TIMED_BOMB_SOUND.get(), SoundSource.BLOCKS, 2F, 0.3F);
 	}
 
     @Override
@@ -62,7 +63,7 @@ public class BlockTimedBomb extends FallingBlock {
         int z = pos.getZ();
 		world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timedBomb(world));
-		RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
+        world.playSound(null, pos, RRSounds.TIMED_BOMB_SOUND.get(), SoundSource.BLOCKS, 2F, 0.3F);
         return state;
     }
 
@@ -83,7 +84,7 @@ public class BlockTimedBomb extends FallingBlock {
 		{
 			world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			new Explosion(world, x + 0.5f, y + 0.5f, z + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timedBomb(world));
-			RivalRebelsSoundPlayer.playSound(world, 26, 0, x + 0.5f, y + 0.5f, z + 0.5f, 2f, 0.3f);
+            world.playSound(null, pos, RRSounds.TIMED_BOMB_SOUND.get(), SoundSource.BLOCKS, 2F, 0.3F);
 		}
 		if (ticksSincePlaced == 100)
 		{
@@ -113,10 +114,10 @@ public class BlockTimedBomb extends FallingBlock {
         return CommonColors.WHITE;
     }
 
-	/*public void onFinishFalling(Level level, int par2, int par3, int par4, int par5)
-	{
-		level.setBlock(par2, par3, par4, Blocks.AIR);
-		new Explosion(level, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timebomb);
-		RivalRebelsSoundPlayer.playSound(level, 26, 0, par2 + 0.5f, par3 + 0.5f, par4 + 0.5f, 2f, 0.3f);
-	}*/
+    @Override
+    protected void falling(FallingBlockEntity entity) {
+        Level level = entity.level();
+        new Explosion(level, entity.getX() + 0.5f, entity.getY() + 0.5f, entity.getZ() + 0.5f, RRConfig.SERVER.getTimedbombExplosionSize(), false, true, RivalRebelsDamageSource.timedBomb(level));
+        level.playSound(null, entity.blockPosition(), RRSounds.TIMED_BOMB_SOUND.get(), SoundSource.BLOCKS, 2f, 0.3f);
+    }
 }

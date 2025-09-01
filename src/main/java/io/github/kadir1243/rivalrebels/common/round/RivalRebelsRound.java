@@ -29,7 +29,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -254,12 +253,12 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         if (dist.isClient()) {
             eventBus.addListener(ClientTickEvent.Post.class, event -> {
                 if (roundstarted && winCountdown > 0) {
-                    updateClient(Minecraft.getInstance());
+                    updateClient();
                 }
             });
             eventBus.addListener(LevelTickEvent.Post.class, event -> {
                 if (event.getLevel().isClientSide()) {
-                    this.updateInvisible((ClientLevel) event.getLevel());
+                    this.updateInvisible(event.getLevel());
                 }
             });
         }
@@ -338,37 +337,31 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 		}
 	}
 
-	public static class PlayerInvisibility
-	{
-		public PlayerInvisibility(Player p, int i)
-		{
-			player = p;
-			durationleft = i;
-		}
-		public Player player;
-		public int durationleft;
-	}
+    public static class PlayerInvisibility {
+        public final Player player;
+        public int durationLeft;
+
+        public PlayerInvisibility(Player player, int durationLeft) {
+            this.player = player;
+            this.durationLeft = durationLeft;
+        }
+    }
 
 	private final List<PlayerInvisibility> players = new ArrayList<>();
 
-	public void setInvisible(Player player)
-	{
-		if (player != null)
-		{
+	public void setInvisible(Player player) {
+		if (player != null) {
 			boolean contained = false;
-			for (int i = players.size()-1; i >= 0; i--)
-			{
-				PlayerInvisibility t = players.get(i);
-				if (t.player == player)
-				{
-					t.durationleft = 120;
-					contained = true;
-				}
-			}
-			if (!contained)
-			{
-				players.add(new PlayerInvisibility(player, 120));
-			}
+            for (int i = players.size() - 1; i >= 0; i--) {
+                PlayerInvisibility t = players.get(i);
+                if (t.player == player) {
+                    t.durationLeft = 120;
+                    contained = true;
+                }
+            }
+            if (!contained) {
+                players.add(new PlayerInvisibility(player, 120));
+            }
 		}
 	}
 
@@ -396,31 +389,28 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	}
 
 	@OnlyIn(Dist.CLIENT)
-	public void updateInvisible(ClientLevel level) {
-		if (level == null) return;
+    public void updateInvisible(Level level) {
+        if (level == null) return;
         for (Player player : level.players()) {
             if (player.getItemBySlot(EquipmentSlot.HEAD).is(RRItems.camera))
                 setInvisible(player);
         }
-		for (int i = players.size()-1; i >= 0; i--)
-		{
-			PlayerInvisibility t = players.get(i);
-			t.durationleft--;
-			if (t.durationleft <= 0)
-			{
+        for (int i = players.size() - 1; i >= 0; i--) {
+            PlayerInvisibility t = players.get(i);
+            t.durationLeft--;
+            if (t.durationLeft <= 0) {
                 Entity.setViewScale(1);
-				players.remove(i);
-			}
-			else
-			{
+                players.remove(i);
+            } else {
                 Entity.setViewScale(0);
-			}
-		}
-	}
+            }
+        }
+    }
 
 	@OnlyIn(Dist.CLIENT)
-	public void updateClient(Minecraft minecraft) {
-		winCountdown--;
+	public void updateClient() {
+        Minecraft minecraft = Minecraft.getInstance();
+        winCountdown--;
         if (winCountdown == 0 && !fatnuke) minecraft.setScreen(null);//cleargui
 		else if (winCountdown == 400 && !fatnuke) minecraft.setScreen(new GuiNextBattle());//open vote gui
 		else if (winCountdown == 1000) minecraft.setScreen(null);//close gui

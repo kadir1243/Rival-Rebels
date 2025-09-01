@@ -2,7 +2,6 @@ package io.github.kadir1243.rivalrebels.client.model;
 
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import io.github.kadir1243.rivalrebels.RivalRebels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.TextureSlots;
@@ -58,6 +57,7 @@ public class ObjModels {
     public static final StandaloneModelKey<QuadCollection> ARM_MODEL = createKey("arm");
     public static final StandaloneModelKey<QuadCollection> ADS_DRAGON_MODEL = createKey("ads_dragon");
     public static final StandaloneModelKey<QuadCollection> ASTRO_BLASTER_BODY = createKey("astro_blaster_body");
+    public static final StandaloneModelKey<QuadCollection> BLAST_SPHERE_MODEL = createKey("blast_sphere");
 
     @OnlyIn(Dist.CLIENT)
     private static StandaloneModelKey<QuadCollection> createKey(String name) {
@@ -68,8 +68,7 @@ public class ObjModels {
     @OnlyIn(Dist.CLIENT)
     public static void render(QuadCollection model, VertexConsumer buffer, PoseStack pose, int color, int light, int overlay) {
         if (model == null) {
-            RivalRebels.LOGGER.error("Model is null", new Throwable());
-            return;
+            throw new NullPointerException("Model is null");
         }
         for (BakedQuad quad : model.getAll()) {
             buffer.putBulkData(pose.last(), quad, ARGB.red(color), ARGB.green(color), ARGB.blue(light), ARGB.alpha(color), light, overlay);
@@ -116,6 +115,7 @@ public class ObjModels {
         event.register(ARM_MODEL, getModelFromObj("q"));
         event.register(ADS_DRAGON_MODEL, getModelFromObj("r"));
         event.register(ASTRO_BLASTER_BODY, getModelFromObj("astro_blaster_body"));
+        event.register(BLAST_SPHERE_MODEL, getModelFromObj("blast_sphere"));
     }
 
     @OnlyIn(Dist.CLIENT)

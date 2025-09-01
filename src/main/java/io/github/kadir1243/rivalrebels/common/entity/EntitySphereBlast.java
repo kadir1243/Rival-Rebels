@@ -12,8 +12,9 @@
 package io.github.kadir1243.rivalrebels.common.entity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
+
 import java.util.List;
 
 import net.minecraft.server.level.ServerLevel;
@@ -51,7 +52,7 @@ public class EntitySphereBlast extends EntityTsarBlast {
 		}
 		else
 		{
-			if (random.nextInt(5) == 0) RivalRebelsSoundPlayer.playSound(this, 26, 0, 100, 0.7f);
+			if (random.nextInt(5) == 0) this.playSound(RRSounds.TIMED_BOMB_SOUND.get(), 100, 0.7f);
 		}
 
 		if (random.nextBoolean()&&random.nextBoolean()) pushAndHurtEntities();

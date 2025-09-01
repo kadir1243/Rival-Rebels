@@ -108,6 +108,47 @@ public class SoundDataGen extends SoundDefinitionsProvider {
         add(RRSounds.REMOTE_PLANT, sounds("au/c"));
         add(RRSounds.REMOTE_EXPLODE, sounds("au/d"));
 
+        add(RRSounds.BOMB_EXPLODE, sounds("av/a1","av/a2"));
+        add(RRSounds.FIRE, sounds("av/b"));
+        add(RRSounds.ROCKET_FIRED, sounds("av/c1","av/c2"));
+        add(RRSounds.WET_BOMB_EXPLODED, sounds("av/d"));
+        add(RRSounds.BOMB_ENTERING_WATER, sounds("av/e"));
+
+        add(RRSounds.UNKNOWN1, sounds("aw/a"));
+        add(RRSounds.UNKNOWN2, sounds("aw/b"));
+        add(RRSounds.UNKNOWN3, sounds("aw/c"));
+        add(RRSounds.UNKNOWN4, sounds("aw/d1", "aw/d2"));
+        add(RRSounds.UNKNOWN5, sounds("aw/e"));
+
+        add(RRSounds.UNKNOWN6, sounds("ax/a"));
+        add(RRSounds.TESLA, sounds("ax/b1","ax/b2","ax/b3","ax/b4"));
+
+        add(RRSounds.TIMED_BOMB_SOUND, sounds("ay/a1","ay/a2"));
+        add(RRSounds.TIMED_BOMB_SOUND_UNKNOWN1, sounds("ay/b"));
+        add(RRSounds.TIMED_BOMB_SOUND_UNKNOWN2, sounds("ay/c"));
+
+        add(RRSounds.TOASTER, sounds("az/a1","az/a2"));
+
+        add(RRSounds.VOICE_0, sounds("ba/a1", "ba/a2"));
+        add(RRSounds.VOICE_1, sounds("ba/b"));
+        add(RRSounds.VOICE_2, sounds("ba/c"));
+        add(RRSounds.VOICE_3, sounds("ba/d"));
+        add(RRSounds.VOICE_4, sounds("ba/e"));
+        add(RRSounds.VOICE_5, sounds("ba/f"));
+        add(RRSounds.VOICE_6, sounds("ba/g"));
+        add(RRSounds.VOICE_7, sounds("ba/h"));
+        add(RRSounds.VOICE_8, sounds("ba/i"));
+        add(RRSounds.VOICE_9, sounds("ba/j"));
+        add(RRSounds.VOICE_10, sounds("ba/k"));
+        add(RRSounds.VOICE_11, sounds("ba/l"));
+        add(RRSounds.VOICE_12, sounds("ba/m"));
+        add(RRSounds.VOICE_13, sounds("ba/n"));
+        add(RRSounds.VOICE_14, sounds("ba/o"));
+        add(RRSounds.VOICE_15, sounds("ba/p"));
+        add(RRSounds.VOICE_16, sounds("ba/q"));
+        add(RRSounds.VOICE_17, sounds("ba/r"));
+        add(RRSounds.VOICE_18, sounds("ba/s"));
+
     }
 
     private static SoundDefinition sounds(String... sounds) {

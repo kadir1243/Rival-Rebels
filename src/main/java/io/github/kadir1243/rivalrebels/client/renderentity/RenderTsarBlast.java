@@ -15,7 +15,6 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.client.model.ModelTsarBlast;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import io.github.kadir1243.rivalrebels.common.entity.EntityTsarBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;

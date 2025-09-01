@@ -88,7 +88,7 @@ public class EntityDebris extends EntityInanimate {
         Vec3 add = getDeltaMovement().add(position());
         setPosRaw(add.x(), add.y(), add.z());
 
-		if (!level().isClientSide && level().getBlockState(this.blockPosition()).canOcclude()) die(xo, yo, zo);
+		if (!level().isClientSide() && level().getBlockState(this.blockPosition()).canOcclude()) die(xo, yo, zo);
 	}
 
     @Override

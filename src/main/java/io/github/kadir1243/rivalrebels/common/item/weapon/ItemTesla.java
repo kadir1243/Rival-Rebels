@@ -14,8 +14,8 @@ package io.github.kadir1243.rivalrebels.common.item.weapon;
 import io.github.kadir1243.rivalrebels.RRClient;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.client.gui.GuiTesla;
+import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
-import io.github.kadir1243.rivalrebels.common.core.RivalRebelsSoundPlayer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRaytrace;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
@@ -104,7 +104,7 @@ public class ItemTesla extends Item {
 		if (user.isInWaterOrRain() && !user.isInvulnerableTo(((ServerLevel) world), RivalRebelsDamageSource.electricity(world))) {
 			user.hurt(RivalRebelsDamageSource.electricity(world), 2);
 		}
-		if (user.getRandom().nextInt(10) == 0) RivalRebelsSoundPlayer.playSound(user, 25, 1);
+		if (user.getRandom().nextInt(10) == 0) user.playSound(RRSounds.TESLA.get());
 
 		int degree = getDegree(stack);
 		float chance = Mth.abs(degree - 90) / 90f;
