@@ -16,11 +16,13 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 
 public class CommandContinueRound {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("rrstartround")
-            .requires(arg -> arg.hasPermission(3))
+            .requires(arg -> arg.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS)))
             .executes(commandContext -> execute(commandContext.getSource()))
         );
     }

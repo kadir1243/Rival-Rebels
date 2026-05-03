@@ -1,17 +1,20 @@
 package io.github.kadir1243.rivalrebels.client.model;
 
+import com.mojang.blaze3d.vertex.QuadInstance;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.block.model.BakedQuad;
-import net.minecraft.client.renderer.block.model.TextureSlots;
-import net.minecraft.client.resources.model.BlockModelRotation;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
+import net.minecraft.client.resources.model.ModelDebugName;
+import net.minecraft.client.resources.model.geometry.BakedQuad;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.resources.model.ModelBaker;
-import net.minecraft.client.resources.model.QuadCollection;
-import net.minecraft.util.ARGB;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.obj.ObjGeometry;
 import net.neoforged.neoforge.client.model.obj.ObjLoader;
@@ -61,18 +64,34 @@ public class ObjModels {
 
     @OnlyIn(Dist.CLIENT)
     private static StandaloneModelKey<QuadCollection> createKey(String name) {
-        ResourceLocation location = RRIdentifiers.create(name + "_model");
+        Identifier location = RRIdentifiers.create(name + "_model");
         return new StandaloneModelKey<>(location::toString);
     }
 
     @OnlyIn(Dist.CLIENT)
     public static void render(QuadCollection model, VertexConsumer buffer, PoseStack pose, int color, int light, int overlay) {
+        render(model, buffer, pose.last(), color, light, overlay);
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void render(QuadCollection model, VertexConsumer buffer, PoseStack.Pose pose, int color, int light, int overlay) {
         if (model == null) {
             throw new NullPointerException("Model is null");
         }
+        var quadInstance = new QuadInstance();
+        quadInstance.setColor(color);
+        quadInstance.setLightCoords(light);
+        quadInstance.setOverlayCoords(overlay);
         for (BakedQuad quad : model.getAll()) {
-            buffer.putBulkData(pose.last(), quad, ARGB.red(color), ARGB.green(color), ARGB.blue(light), ARGB.alpha(color), light, overlay);
+            buffer.putBakedQuad(pose, quad, quadInstance);
         }
+    }
+
+    @OnlyIn(Dist.CLIENT)
+    public static void submit(SubmitNodeCollector nodeCollector, RenderType renderType, QuadCollection model, PoseStack poseStack, int color, int light, int overlay) {
+        nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
+            render(model, consumer, pose, color, light, overlay);
+        });
     }
 
     @OnlyIn(Dist.CLIENT)
@@ -123,8 +142,8 @@ public class ObjModels {
         ObjGeometry geometry = ObjLoader.INSTANCE.loadGeometry(new ObjGeometry.Settings(RRIdentifiers.getModelLocation(location), false, false, false, false, null));
         return new UnbakedStandaloneModel<>() {
             @Override
-            public QuadCollection bake(ModelBaker baker) {
-                return geometry.bake(TextureSlots.EMPTY, baker, BlockModelRotation.X0_Y0, () -> location);
+            public QuadCollection bake(ModelBaker baker, ModelDebugName name) {
+                return geometry.bake(TextureSlots.EMPTY, baker, BlockModelRotation.IDENTITY, name);
             }
 
             @Override

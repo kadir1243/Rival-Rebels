@@ -14,30 +14,31 @@ package io.github.kadir1243.rivalrebels.client.gui;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerNuclearBomb;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     public GuiNuclearBomb(ContainerNuclearBomb containerNuclearBomb, Inventory inventoryPlayer, Component title) {
-		super(containerNuclearBomb, inventoryPlayer, title);
+		super(containerNuclearBomb, inventoryPlayer, title, DEFAULT_IMAGE_WIDTH, DEFAULT_IMAGE_HEIGHT);
 	}
 
     @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
-        super.renderLabels(context, mouseX, mouseY);
+    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
+        super.extractLabels(graphics, xm, ym);
+
 		if (menu.isArmed()) {
-            context.drawString(font, Translations.BOMB_ARMED.translate(), 80, imageHeight - 96 + 2, 0xffffff, false);
+            graphics.text(font, Translations.BOMB_ARMED.translate(), 80, imageHeight - 96 + 2, 0xffffff, false);
 		} else if (!menu.hasTrollFace()) {
-            context.drawString(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Translations.BOMB_MEGATONS.translate()), 80, imageHeight - 96 + 2, 0xffffff, false);
+            graphics.text(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Translations.BOMB_MEGATONS.translate()), 80, imageHeight - 96 + 2, 0xffffff, false);
         } else {
-            context.drawString(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
+            graphics.text(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
         }
     }
 
@@ -47,9 +48,9 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     }
 
     @Override
-    public void renderName(GuiGraphics graphics) {
-        // graphics.drawString(font, Component.translatable(NUKE_TRANSLATION.toLanguageKey()), 8, 6, 0xffffff, false);
-        graphics.drawString(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
+    public void renderName(GuiGraphicsExtractor graphics) {
+        // graphics.text(font, Component.translatable(NUKE_TRANSLATION.toLanguageKey()), 8, 6, 0xffffff, false);
+        graphics.text(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
     }
 
     @Override
@@ -68,7 +69,8 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractBackground(graphics, mouseX, mouseY, a);
         int color = CommonColors.WHITE;
         if (menu.getAmountOfCharges() != 0) color = ARGB.colorFromFloat(1F, (menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0F);
 		int x = (width - imageWidth) / 2;

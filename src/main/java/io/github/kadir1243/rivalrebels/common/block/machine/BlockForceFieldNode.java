@@ -37,7 +37,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class BlockForceFieldNode extends BaseEntityBlock {
     public static final MapCodec<BlockForceFieldNode> CODEC = simpleCodec(BlockForceFieldNode::new);
@@ -66,7 +66,7 @@ public class BlockForceFieldNode extends BaseEntityBlock {
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
 				if (teffn.rrteam == RivalRebelsTeam.NONE) {
-					teffn.owner = new ResolvableProfile(player.getGameProfile());
+					teffn.owner = ResolvableProfile.createResolved(player.getGameProfile());
 				}
 
                 player.playSound(RRSounds.GUI_UNKNOWN6.get());

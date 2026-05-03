@@ -34,6 +34,8 @@ import net.minecraft.commands.SharedSuggestionProvider;
 import net.minecraft.commands.arguments.ResourceOrIdArgument;
 import net.minecraft.core.Holder;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.world.phys.Vec3;
 
 public class CommandRobot {
@@ -43,7 +45,7 @@ public class CommandRobot {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher, CommandBuildContext commandBuildContext) {
         dispatcher.register(Commands.literal("rrrobot")
-            .requires(arg -> arg.hasPermission(3))
+            .requires(arg -> arg.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS)))
             .then(Commands.literal("spawn")
                     .executes(context -> {
                         CommandSourceStack source = context.getSource();
@@ -155,7 +157,7 @@ public class CommandRobot {
 
         @Override
         public <S> CompletableFuture<Suggestions> listSuggestions(CommandContext<S> context, SuggestionsBuilder builder) {
-            return SharedSuggestionProvider.suggestResource(RivalRebels.RHODES_TYPE_REGISTRY.stream(), builder, RivalRebels.RHODES_TYPE_REGISTRY::getKey, rhodesType -> RivalRebels.RHODES_TYPE_REGISTRY.getKey(rhodesType)::toString);
+            return SharedSuggestionProvider.suggestResource(RivalRebels.RHODES_TYPE_REGISTRY.stream(), builder, RivalRebels.RHODES_TYPE_REGISTRY::getKey, rhodesType -> () -> RivalRebels.RHODES_TYPE_REGISTRY.getKey(rhodesType).toString());
         }
     }
 }

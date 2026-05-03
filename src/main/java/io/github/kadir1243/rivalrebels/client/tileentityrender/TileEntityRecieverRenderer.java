@@ -18,22 +18,27 @@ import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReciever;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
+import org.jspecify.annotations.Nullable;
 
 @OnlyIn(Dist.CLIENT)
-public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever> {
+public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntityReciever, TileEntityRecieverRenderer.RecieverBlockEntityRenderState> {
     private final QuadCollection armModel;
     private final QuadCollection trayModel;
     private final QuadCollection adsdragonModel;
@@ -46,20 +51,33 @@ public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntit
     }
 
     @Override
-    public void render(TileEntityReciever blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+    public RecieverBlockEntityRenderState createRenderState() {
+        return new RecieverBlockEntityRenderState();
+    }
+
+    @Override
+    public void submit(RecieverBlockEntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
 		poseStack.translate(0.5F, 0, 0.5F);
-        Direction facing = blockEntity.getBlockState().getValue(BlockReciever.FACING);
+        int packedLight = renderState.lightCoords;
+        int packedOverlay = OverlayTexture.NO_OVERLAY;
+        Direction facing = renderState.facing;
 
 		poseStack.pushPose();
         poseStack.translate(0, 0, 0.5);
-        ObjModels.render(trayModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etreciever)), poseStack, CommonColors.WHITE, packedLight, packedOverlay);
-		if (blockEntity.hasWeapon) {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etreciever), (pose, consumer) -> {
+            ObjModels.render(trayModel, consumer, pose, CommonColors.WHITE, packedLight, packedOverlay);
+        });
+		if (renderState.hasWeapon) {
             poseStack.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			poseStack.mulPose(Axis.YP.rotationDegrees(blockEntity.yaw - facing.toYRot()));
-			ObjModels.render(armModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etreciever)), poseStack, CommonColors.WHITE, packedLight, packedOverlay);
-            poseStack.mulPose(Axis.XP.rotationDegrees(blockEntity.pitch));
-			ObjModels.render(adsdragonModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etadsdragon)), poseStack, CommonColors.WHITE, packedLight, packedOverlay);
+			poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yaw - facing.toYRot()));
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etreciever), (pose, consumer) -> {
+                ObjModels.render(armModel, consumer, pose, CommonColors.WHITE, packedLight, packedOverlay);
+            });
+            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.pitch));
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etreciever), (pose, consumer) -> {
+                ObjModels.render(adsdragonModel, consumer, pose, CommonColors.WHITE, packedLight, packedOverlay);
+            });
 		}
 		poseStack.popPose();
 		poseStack.popPose();
@@ -74,5 +92,21 @@ public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntit
     @Override
     public AABB getRenderBoundingBox(TileEntityReciever blockEntity) {
         return AABB.of(BoundingBox.fromCorners(blockEntity.getBlockPos().offset(-1, -1, -1), blockEntity.getBlockPos().offset(2, 2, 2)));
+    }
+
+    @Override
+    public void extractRenderState(TileEntityReciever blockEntity, RecieverBlockEntityRenderState renderState, float partialTick, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(blockEntity, renderState, partialTick, cameraPosition, breakProgress);
+        renderState.pitch = blockEntity.pitch;
+        renderState.yaw = blockEntity.yaw;
+        renderState.hasWeapon = blockEntity.hasWeapon;
+        renderState.facing = blockEntity.getBlockState().getValue(BlockReciever.FACING);
+    }
+
+    public static class RecieverBlockEntityRenderState extends BlockEntityRenderState {
+        public Direction facing;
+        public float yaw;
+        public float pitch;
+        public boolean hasWeapon;
     }
 }

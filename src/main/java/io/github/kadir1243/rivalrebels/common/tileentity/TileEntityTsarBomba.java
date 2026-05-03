@@ -163,8 +163,8 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
 			{
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.displayClientMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.getId()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()), false);
+                    player.sendSystemMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.id()).getName().copy().withStyle(ChatFormatting.RED)));
+                    player.sendSystemMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()));
                 }
 			}
 		}

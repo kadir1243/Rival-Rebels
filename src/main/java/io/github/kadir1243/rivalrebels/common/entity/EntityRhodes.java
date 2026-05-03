@@ -31,7 +31,6 @@ import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityRhodesActivat
 import io.github.kadir1243.rivalrebels.common.util.ItemUtil;
 import io.github.kadir1243.rivalrebels.common.util.ModBlockTags;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import com.mojang.serialization.Dynamic;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
@@ -40,7 +39,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
@@ -54,16 +53,16 @@ import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.item.FallingBlockEntity;
-import net.minecraft.world.entity.monster.CaveSpider;
+import net.minecraft.world.entity.monster.spider.CaveSpider;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.MagmaCube;
-import net.minecraft.world.entity.monster.Skeleton;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.monster.Slime;
-import net.minecraft.world.entity.monster.Spider;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.spider.Spider;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.ItemStack;
@@ -206,7 +205,7 @@ public class EntityRhodes extends LivingEntity {
 		setPos(x, y, z);
 		if (!level().isClientSide()) {
             for (Player player : level().players()) {
-                player.displayClientMessage(Translations.warning().append(" ").append(Translations.RHODES_IS_ARMED.translate(getName())), false);
+                player.sendSystemMessage(Translations.warning().append(" ").append(Translations.RHODES_IS_ARMED.translate(getName())));
             }
         }
 	}
@@ -301,7 +300,7 @@ public class EntityRhodes extends LivingEntity {
 				if (isDeadOrDying()) {
                     MutableComponent text = Translations.status().append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
                     for (Player player : level().players()) {
-                        player.displayClientMessage(text, false);
+                        player.sendSystemMessage(text);
                     }
                 }
 				if (tickCount % 5 == 0) {
@@ -344,7 +343,7 @@ public class EntityRhodes extends LivingEntity {
 				if (!rider.isCreative())
 				{
 					rider.getAbilities().invulnerable = false;
-					rider.hurt(level().damageSources().fellOutOfWorld(), 2000000);
+					rider.hurt(damageSources().fellOutOfWorld(), 2000000);
 				}
 				rider = null;
 			}
@@ -362,7 +361,7 @@ public class EntityRhodes extends LivingEntity {
 				if (!passenger1.isCreative())
 				{
 					passenger1.getAbilities().invulnerable = false;
-					passenger1.hurt(level().damageSources().fellOutOfWorld(), 2000000);
+					passenger1.hurt(damageSources().fellOutOfWorld(), 2000000);
 				}
 				passenger1 = null;
 			}
@@ -380,7 +379,7 @@ public class EntityRhodes extends LivingEntity {
 				if (!passenger2.isCreative())
 				{
 					passenger2.getAbilities().invulnerable = false;
-					passenger2.hurt(level().damageSources().fellOutOfWorld(), 2000000);
+					passenger2.hurt(damageSources().fellOutOfWorld(), 2000000);
 				}
 				passenger2 = null;
 			}
@@ -615,68 +614,68 @@ public class EntityRhodes extends LivingEntity {
                 switch (e) {
                     case EntityRocket ignored -> {
                         e.tickCount = RRConfig.SERVER.getRpgDecay();
-                        this.hurt(level().damageSources().generic(), 20);
+                        this.hurt(damageSources().generic(), 20);
                     }
                     case EntitySeekB83 ignored -> {
                         e.tickCount = 800;
-                        this.hurt(level().damageSources().generic(), 24);
+                        this.hurt(damageSources().generic(), 24);
                     }
                     case EntityHackB83 entity -> {
                         entity.ticksInAir = -100;
-                        this.hurt(level().damageSources().generic(), 40);
+                        this.hurt(damageSources().generic(), 40);
                     }
                     case EntityB83 entity -> {
                         entity.ticksInAir = -100;
-                        this.hurt(level().damageSources().generic(), 40);
+                        this.hurt(damageSources().generic(), 40);
                     }
                     case EntityBomb entityBomb -> {
                         entityBomb.explode(true);
                         for (int i = 0; i < RRConfig.SERVER.getBombDamageToRhodes(); i++)
-                            this.hurt(level().damageSources().generic(), 50);
+                            this.hurt(damageSources().generic(), 50);
                     }
                     case EntityNuke entityNuke -> {
                         entityNuke.ticksInAir = -100;
-                        this.hurt(level().damageSources().generic(), 80);
+                        this.hurt(damageSources().generic(), 80);
                     }
                     case EntityTsar entityTsar -> {
                         entityTsar.ticksInAir = -100;
-                        this.hurt(level().damageSources().generic(), 100);
+                        this.hurt(damageSources().generic(), 100);
                     }
                     case EntityTheoreticalTsar entityTheoreticalTsar -> {
                         entityTheoreticalTsar.ticksInAir = -100;
-                        this.hurt(level().damageSources().generic(), 100);
+                        this.hurt(damageSources().generic(), 100);
                     }
                     case EntityAntimatterBomb entityAntimatterBomb -> {
                         entityAntimatterBomb.ticksInAir = -100;
-                        this.hurt(level().damageSources().generic(), 100);
+                        this.hurt(damageSources().generic(), 100);
                     }
                     case EntityTachyonBomb entityTachyonBomb -> {
                         entityTachyonBomb.ticksInAir = -100;
-                        this.hurt(level().damageSources().generic(), 100);
+                        this.hurt(damageSources().generic(), 100);
                     }
                     case EntityHotPotato ignored -> {
                         e.tickCount = -100;
-                        this.hurt(level().damageSources().generic(), 100);
+                        this.hurt(damageSources().generic(), 100);
                     }
                     case EntityPlasmoid entityPlasmoid -> {
                         entityPlasmoid.explode();
-                        this.hurt(level().damageSources().generic(), 8);
+                        this.hurt(damageSources().generic(), 8);
                     }
                     case EntityFlameBall ignored -> {
                         e.kill((ServerLevel) level());
-                        this.hurt(level().damageSources().generic(), 3);
+                        this.hurt(damageSources().generic(), 3);
                     }
                     case EntityFlameBall1 ignored -> {
                         e.kill((ServerLevel) level());
-                        this.hurt(level().damageSources().generic(), 4);
+                        this.hurt(damageSources().generic(), 4);
                     }
                     case EntityFlameBall2 ignored -> {
                         e.kill((ServerLevel) level());
-                        this.hurt(level().damageSources().generic(), 2);
+                        this.hurt(damageSources().generic(), 2);
                     }
                     case EntityLaserBurst ignored -> {
                         e.kill((ServerLevel) level());
-                        this.hurt(level().damageSources().generic(), 4);
+                        this.hurt(damageSources().generic(), 4);
                     }
                     default -> {}
                 }
@@ -684,21 +683,17 @@ public class EntityRhodes extends LivingEntity {
         }
 	}
 
-    @SuppressWarnings("unchecked")
+    private static final Brain.Provider<EntityRhodes> BRAIN_PROVIDER = RhodesAi.brainProvider();
+
     @Override
-    protected Brain<?> makeBrain(Dynamic<?> dynamic) {
-        return RhodesAi.makeBrain((Brain<EntityRhodes>) super.makeBrain(dynamic));
+    protected Brain<EntityRhodes> makeBrain(Brain.Packed packedBrain) {
+        return BRAIN_PROVIDER.makeBrain(this, packedBrain);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Brain<EntityRhodes> getBrain() {
         return (Brain<EntityRhodes>) super.getBrain();
-    }
-
-    @Override
-    protected Brain.Provider<?> brainProvider() {
-        return RhodesAi.brainProvider();
     }
 
     public void shootAllWeapons() {
@@ -1495,7 +1490,7 @@ public class EntityRhodes extends LivingEntity {
 		endangered = valueInput.getBooleanOr("endangered", false);
 		walkstate = valueInput.getInt("walkstate").orElseThrow();
 		damageUntilWake = valueInput.getInt("damageuntilwake").orElseThrow();
-        RivalRebels.RHODES_TYPE_REGISTRY.get(ResourceLocation.tryParse(valueInput.getString("type").orElseThrow())).ifPresent(this::setVariant);
+        RivalRebels.RHODES_TYPE_REGISTRY.get(Identifier.tryParse(valueInput.getString("type").orElseThrow())).ifPresent(this::setVariant);
 		setRocketCount(valueInput.getInt("rocketcount").orElseThrow());
 		setEnergy(valueInput.getInt("energy").orElseThrow());
 		setB2Energy(valueInput.getInt("b2energy").orElseThrow());

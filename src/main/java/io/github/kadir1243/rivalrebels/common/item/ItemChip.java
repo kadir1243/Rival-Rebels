@@ -16,7 +16,6 @@ import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.components.ChipData;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 
-import java.util.List;
 import java.util.function.Consumer;
 
 import net.minecraft.core.BlockPos;
@@ -32,7 +31,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ItemChip extends Item {
 	public ItemChip(Properties properties)
@@ -80,7 +79,7 @@ public class ItemChip extends Item {
         if (stack.has(RRComponents.CHIP_DATA)) {
             ChipData chipData = stack.get(RRComponents.CHIP_DATA);
             consumer.accept(Component.literal(chipData.team().name()));
-            consumer.accept(Component.literal("Player with name " + chipData.gameProfile().getName() + ", and uuid " + chipData.gameProfile().getId()));
+            consumer.accept(Component.literal("Player with name " + chipData.gameProfile().name() + ", and uuid " + chipData.gameProfile().id()));
 		}
 	}
 }

@@ -15,10 +15,11 @@ import io.github.kadir1243.rivalrebels.client.model.ModelTsarBomba;
 import io.github.kadir1243.rivalrebels.common.entity.EntityTsar;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -31,12 +32,12 @@ public class RenderTsar extends EntityRenderer<EntityTsar, RenderTsar.State> {
 	}
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-		poseStack.pushPose();
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+        poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
 		//poseStack.mulPose(Axis.XP.rotationDegrees(90));
 		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
-		ModelTsarBomba.render(poseStack, bufferSource, packedLight, OverlayTexture.NO_OVERLAY);
+		ModelTsarBomba.render(poseStack, nodeCollector, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
 	}
 

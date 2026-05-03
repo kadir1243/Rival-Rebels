@@ -37,11 +37,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class ItemTesla extends Item {
 	public ItemTesla(Properties properties) {
-		super(properties.stacksTo(1).enchantable(100).component(RRComponents.TESLA_DIAL, 0));
+		super(properties);
 	}
 
 	@Override
@@ -79,10 +79,10 @@ public class ItemTesla extends Item {
             }
 			player.startUsingItem(hand);
 		} else {
-			player.displayClientMessage(Component.nullToEmpty("§cOut of batteries"), false);
+			player.sendSystemMessage(Component.literal("§cOut of batteries"));
 		}
 		if (message) {
-			player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
+			player.sendSystemMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."));
 			message = false;
 		}
 		return InteractionResult.SUCCESS;

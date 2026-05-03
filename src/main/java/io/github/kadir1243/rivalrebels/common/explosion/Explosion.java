@@ -79,7 +79,7 @@ public class Explosion
 							}
 							else if (varrand > 0)
 							{
-								if (world.random.nextInt(varrand) == 0 || world.random.nextInt(varrand / 2 + 1) == 0)
+								if (world.getRandom().nextInt(varrand) == 0 || world.getRandom().nextInt(varrand / 2 + 1) == 0)
 								{
 									world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 								}
@@ -118,7 +118,7 @@ public class Explosion
 							}
 							else if (varrand > 0)
 							{
-								if ((world.random.nextInt(varrand) == 0 || world.random.nextInt(varrand / 2 + 1) == 0))
+								if ((world.getRandom().nextInt(varrand) == 0 || world.getRandom().nextInt(varrand / 2 + 1) == 0))
 								{
 									breakBlock(world, pos, radius, x, y, z);
 								}
@@ -154,7 +154,7 @@ public class Explosion
 		if (state.is(BlockTags.WOODEN_STAIRS)) world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 		if (state.is(RRBlocks.camo1) || state.is(RRBlocks.camo2) || state.is(RRBlocks.camo3) || state.is(RRBlocks.conduit))
 		{
-			if (world.random.nextInt(20) != 0) return;
+			if (world.getRandom().nextInt(20) != 0) return;
 		}
 		if (BlackList.explosion(state))
 		{

@@ -12,13 +12,12 @@
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 
@@ -42,8 +41,7 @@ public class GuiButton extends Button {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        Minecraft minecraft = Minecraft.getInstance();
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         graphics.blitSprite(
             RenderPipelines.GUI_TEXTURED,
             SPRITES.get(this.active, this.isHoveredOrFocused()),
@@ -54,7 +52,6 @@ public class GuiButton extends Button {
             ARGB.white(this.alpha)
         );
 
-        int i = ARGB.color(this.alpha, getFGColor());
-        this.renderString(graphics, minecraft.font, i);
+        this.extractDefaultLabel(graphics.textRendererForWidget(this, GuiGraphicsExtractor.HoveredTextEffects.NONE));
     }
 }

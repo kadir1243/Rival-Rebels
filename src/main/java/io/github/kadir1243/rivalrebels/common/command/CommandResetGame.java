@@ -17,12 +17,14 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 import net.minecraft.world.entity.player.Player;
 
 public class CommandResetGame {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("rrreset")
-            .requires(arg -> arg.hasPermission(3))
+            .requires(arg -> arg.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS)))
             .then(Commands.literal("all")
                     .executes(context -> execute(context.getSource(), null))
             )

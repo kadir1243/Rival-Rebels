@@ -16,10 +16,11 @@ import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
 import io.github.kadir1243.rivalrebels.common.entity.EntityLaptop;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -31,11 +32,11 @@ public class RenderLaptop extends EntityRenderer<EntityLaptop, RenderLaptop.Stat
 	}
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotationDegrees(180 - renderState.yRot));
-		ModelLaptop.renderModel(bufferSource, poseStack, -renderState.slide, packedLight, OverlayTexture.NO_OVERLAY);
-		ModelLaptop.renderScreen(bufferSource, RRIdentifiers.etubuntu, poseStack, -renderState.slide, packedLight, OverlayTexture.NO_OVERLAY);
+		ModelLaptop.renderModel(nodeCollector, poseStack, -renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+		ModelLaptop.renderScreen(nodeCollector, RRIdentifiers.etubuntu, poseStack, -renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
 	}
 

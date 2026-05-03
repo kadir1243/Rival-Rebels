@@ -38,9 +38,9 @@ public class BlockOmegaArmor extends Block {
         int z = pos.getZ();
 
 		if (!level.isClientSide()) {
-			player.displayClientMessage(Component.nullToEmpty("§7[§2Inventory§7]"), false);
-			player.displayClientMessage(Component.nullToEmpty("§aArmor. §9(Omega's color armor.)"), false);
-			player.displayClientMessage(Translations.orders().append(" ").append(Component.literal("Equip your set of armor.").withStyle(ChatFormatting.RED)), false);
+			player.sendSystemMessage(Component.nullToEmpty("§7[§2Inventory§7]"));
+			player.sendSystemMessage(Component.nullToEmpty("§aArmor. §9(Omega's color armor.)"));
+			player.sendSystemMessage(Translations.orders().append(" ").append(Component.literal("Equip your set of armor.").withStyle(ChatFormatting.RED)));
             level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camohat.toStack()));
 			level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camoshirt.toStack()));
 			level.addFreshEntity(new ItemEntity(level, x + .5, y + .5, z + .5, RRItems.camopants.toStack()));

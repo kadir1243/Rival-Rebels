@@ -14,24 +14,29 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocket;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
+import org.joml.Vector3fc;
+
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class RocketRenderer implements DynamicItemRenderer {
+public class RocketRenderer implements NoDataSpecialModelRenderer {
+    @Override
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+		poseStack.pushPose();
+		poseStack.translate(0.8f, 0.3f, -0.03f);
+		poseStack.scale(2, 2, 2);
+
+        ModelRocket.render(poseStack, submitNodeCollector, RRIdentifiers.etrocket, true, lightCoords, overlayCoords);
+
+		poseStack.popPose();
+	}
 
     @Override
-    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate(0.8f, 0.3f, -0.03f);
-		matrices.scale(2, 2, 2);
-
-        ModelRocket.render(matrices, vertexConsumers, RRIdentifiers.etrocket, true, light, overlay);
-
-		matrices.popPose();
-	}
+    public void getExtents(Consumer<Vector3fc> output) {
+    }
 }
 

@@ -24,7 +24,11 @@ import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.packet.GuiSpawnPacket;
 import com.mojang.datafixers.util.Function9;
+import net.minecraft.core.GlobalPos;
+import net.minecraft.resources.Identifier;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.saveddata.SavedDataType;
+import net.minecraft.world.level.storage.LevelData;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.ChatFormatting;
@@ -42,7 +46,6 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -101,8 +104,9 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
                     RivalRebelsPlayerList.CODEC.fieldOf("rrplayerlist").forGetter(rivalRebelsRound -> rivalRebelsRound.rrplayerlist))
                 .apply(instance, RivalRebelsRound::new)
     );
-    private static final SavedDataType<RivalRebelsRound> WORLD_DATA_TYPE = new SavedDataType<>("rivalrebelsgamedata", RivalRebelsRound::new, CODEC);
-    public static final Type<RivalRebelsRound> PACKET_TYPE = new Type<>(RRIdentifiers.create("rivalrebelsrounddata"));
+    public static final Identifier ROUNDS_DATA_IDENTIFIER = RRIdentifiers.create("round_data");
+    private static final SavedDataType<RivalRebelsRound> WORLD_DATA_TYPE = new SavedDataType<>(ROUNDS_DATA_IDENTIFIER, RivalRebelsRound::new, CODEC);
+    public static final Type<RivalRebelsRound> PACKET_TYPE = new Type<>(ROUNDS_DATA_IDENTIFIER);
     public BlockPos cSpawn;
     public TeamData omegaData;
     public TeamData sigmaData;
@@ -299,15 +303,15 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         }
         cSpawn = new BlockPos(cSpawn.getX(), -1, cSpawn.getZ() + spawnDist);
         if (!world.isClientSide()) {
-            ((ServerLevel) world).setDefaultSpawnPos(cSpawn.atY(200), 0);
+            world.setRespawnData(new LevelData.RespawnData(new GlobalPos(world.dimension(), cSpawn.atY(200)), 0, 0));
         }
 		float f = RRConfig.SERVER.getRhodesInRoundsChance();
 		while (f >= 1)
 		{
 			f--;
-			world.addFreshEntity(new EntityRhodes(world, cSpawn.getX()+world.random.nextDouble()-0.5f, 170, cSpawn.getZ()+world.random.nextDouble()-0.5f,1));
+			world.addFreshEntity(new EntityRhodes(world, cSpawn.getX()+world.getRandom().nextDouble()-0.5f, 170, cSpawn.getZ()+world.getRandom().nextDouble()-0.5f,1));
 		}
-		if (f > world.random.nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawn.getX()+world.random.nextDouble()-0.5f, 170, cSpawn.getZ()+world.random.nextDouble()-0.5f,1));
+		if (f > world.getRandom().nextDouble()) world.addFreshEntity(new EntityRhodes(world, cSpawn.getX()+world.getRandom().nextDouble()-0.5f, 170, cSpawn.getZ()+world.getRandom().nextDouble()-0.5f,1));
 		buildSpawn();
         omegaData.health=RRConfig.SERVER.getObjectiveHealth();
         sigmaData.health=RRConfig.SERVER.getObjectiveHealth();
@@ -330,7 +334,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 			roundstarted = true;
 			rrplayerlist = new RivalRebelsPlayerList();
 			cSpawn = new BlockPos((omegaData.objPos().getX()+sigmaData.objPos().getX())/2, -1, (omegaData.objPos().getZ()+sigmaData.objPos().getZ())/2);
-            ((ServerLevel) world).setDefaultSpawnPos(cSpawn.atY(world.getChunk(cSpawn).getHeight()), 0F);
+            world.setRespawnData(new LevelData.RespawnData(new GlobalPos(world.dimension(), cSpawn.atY(world.getChunk(cSpawn).getHeight())), 0, 0));
             omegaData.health=RRConfig.SERVER.getObjectiveHealth();
             sigmaData.health=RRConfig.SERVER.getObjectiveHealth();
 			sendUpdatePacket();
@@ -417,7 +421,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 		else if (winCountdown == 1200) { //open winner gui
             if (lastWinnerTeam == RivalRebelsTeam.OMEGA) minecraft.setScreen(new GuiOmegaWin());
             else if (lastWinnerTeam == RivalRebelsTeam.SIGMA) minecraft.setScreen(new GuiSigmaWin());
-            else minecraft.player.displayClientMessage(Component.literal("Error No Winner ?").withStyle(ChatFormatting.RED), false);
+            else minecraft.player.sendSystemMessage(Component.literal("Error No Winner ?").withStyle(ChatFormatting.RED));
         }
 	}
 
@@ -448,7 +452,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
         } catch(Exception ignored) {} //just in case teams already exist etc
 
         if (world.isClientSide()) return;
-        ((ServerLevel) this.world).getGameRules().getRule(GameRules.RULE_KEEPINVENTORY).set(true, world.getServer());
+        ((ServerLevel) world).getGameRules().set(GameRules.KEEP_INVENTORY, true, world.getServer());
         ((ServerLevel) world).getDataStorage().get(WORLD_DATA_TYPE);
     }
 

@@ -17,14 +17,16 @@ import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.common.entity.EntityB2Spirit;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -38,25 +40,32 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit, RenderB2Spiri
 
     public RenderB2Spirit(EntityRendererProvider.Context context) {
         super(context);
-        ModelManager modelManager = context.getModelManager();
+        ModelManager modelManager = Minecraft.getInstance().getModelManager();
         b2ForSpiritModel = modelManager.getStandaloneModel(ObjModels.B2_FOR_SPIRIT_MODEL);
         shuttleModel = modelManager.getStandaloneModel(ObjModels.SHUTTLE_MODEL);
         tupolevModel = modelManager.getStandaloneModel(ObjModels.TUPOLEV_MODEL);
     }
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
-		poseStack.pushPose();
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+        poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
 		poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
+        int packedLight = renderState.lightCoords;
         if (RRConfig.CLIENT.getBomberType().equals("sh")) {
 			poseStack.scale(3, 3, 3);
-            ObjModels.render(shuttleModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etb2spirit)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), (pose, consumer) -> {
+                ObjModels.render(shuttleModel, consumer, pose, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+            });
 		} else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
-            ObjModels.render(tupolevModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.ettupolev)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettupolev), (pose, consumer) -> {
+                ObjModels.render(tupolevModel, consumer, pose, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+            });
         } else {
             poseStack.scale(3, 3, 3);
-            ObjModels.render(b2ForSpiritModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etb2spirit)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), (pose, consumer) -> {
+                ObjModels.render(b2ForSpiritModel, consumer, pose, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+            });
         }
 		poseStack.popPose();
 	}

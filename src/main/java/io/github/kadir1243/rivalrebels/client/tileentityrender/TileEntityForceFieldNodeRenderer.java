@@ -11,17 +11,20 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
+import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.block.machine.BlockForceFieldNode;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityForceFieldNode;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -32,7 +35,7 @@ import org.joml.Vector3f;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<TileEntityForceFieldNode> {
+public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<TileEntityForceFieldNode, BlockEntityRenderState> {
     public TileEntityForceFieldNodeRenderer(BlockEntityRendererProvider.Context context) {
     }
 
@@ -49,15 +52,17 @@ public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<Til
     });
 
     @Override
-    public void render(TileEntityForceFieldNode blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
-        if (blockEntity.pInR <= 0) return;
+    public boolean shouldRender(TileEntityForceFieldNode blockEntity, Vec3 cameraPos) {
+        return BlockEntityRenderer.super.shouldRender(blockEntity, cameraPos) && blockEntity.pInR > 0;
+    }
 
+    @Override
+    public void submit(BlockEntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
 
         poseStack.translate(0, 0, 0.5f);
-        VertexConsumer cellularNoise = bufferSource.getBuffer(RenderTypes.CELLULAR_NOISE);
-        ModelBlockRenderer.renderModel(poseStack.last(), cellularNoise, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, packedLight, packedOverlay);
+        ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.BLACK, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
 	}
@@ -85,5 +90,10 @@ public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<Til
                 new AABB(pos.getX() + 1f, pos.getY() + 0.5f - h, pos.getZ() + 0.5f - t, pos.getX() + 1f + l, pos.getY() + 0.5f + h, pos.getZ() + 0.5f + t);
             default -> new AABB(Vec3.ZERO, Vec3.ZERO);
         };
+    }
+
+    @Override
+    public BlockEntityRenderState createRenderState() {
+        return new BlockEntityRenderState();
     }
 }

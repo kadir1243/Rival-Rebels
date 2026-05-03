@@ -5,6 +5,11 @@
         "texture": "rivalrebels:hacker_sigma"
       }
     ],
+    "humanoid_baby": [
+      {
+        "texture": "rivalrebels:hacker_sigma"
+      }
+    ],
     "humanoid_leggings": [
       {
         "texture": "rivalrebels:sigma_pants"

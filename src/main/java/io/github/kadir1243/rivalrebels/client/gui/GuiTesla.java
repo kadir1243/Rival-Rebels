@@ -17,13 +17,11 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.item.weapon.ItemTesla;
 import io.github.kadir1243.rivalrebels.common.packet.ItemUpdate;
-import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.util.CommonColors;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.KeyEvent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
@@ -56,35 +54,32 @@ public class GuiTesla extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-        super.render(graphics, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
         float f = 0.00390625F;
-        ((GuiGraphicsAccessor) graphics).blit(
-            RenderPipelines.GUI_TEXTURED,
+        graphics.blit(
             RRTextures.guitesla.location(),
             posX,
-            posX + xSizeOfTexture,
             posY,
+            posX + xSizeOfTexture,
             posY + ySizeOfTexture,
             0,
             xSizeOfTexture * f,
             0,
-            ySizeOfTexture * f,
-            CommonColors.WHITE
+            ySizeOfTexture * f
         );
 	}
 
     @Override
-    public boolean keyReleased(int keyCode, int scanCode, int modifiers) {
-        if (RRClient.USE_KEY.matches(keyCode, scanCode)) {
+    public boolean keyReleased(KeyEvent event) {
+        if (RRClient.USE_KEY.matches(event)) {
             onClose();
-            this.minecraft.setWindowActive(true);
             Minecraft.getInstance().getConnection().send(new ItemUpdate(minecraft.player.getInventory().getSelectedSlot(), knob.getDegree()));
             ItemStack stack = minecraft.player.getInventory().getSelectedItem();
             if (stack.getItem() instanceof ItemTesla) {
                 stack.set(RRComponents.TESLA_DIAL, knob.getDegree());
             }
         }
-        return super.keyReleased(keyCode, scanCode, modifiers);
+        return super.keyReleased(event);
     }
 }

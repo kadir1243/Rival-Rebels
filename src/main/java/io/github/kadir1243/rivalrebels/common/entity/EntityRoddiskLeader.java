@@ -27,11 +27,11 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.entity.monster.Skeleton;
-import net.minecraft.world.entity.monster.Zombie;
-import net.minecraft.world.entity.monster.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Arrow;
+import net.minecraft.world.entity.projectile.arrow.Arrow;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
@@ -195,7 +195,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
                 if (state.is(RRBlocks.flare)) {
                     state.getBlock().destroy(level(), pos, state);
                 } else if (state.is(RRBlocks.landmine) || state.is(RRBlocks.alandmine)) {
-                    state.entityInside(level(), pos, this, InsideBlockEffectApplier.NOOP);
+                    state.entityInside(level(), pos, this, InsideBlockEffectApplier.NOOP, true);
                 } else {
                     if (state.is(ModBlockTags.GLASS_BLOCKS) || state.is(ModBlockTags.GLASS_PANES))
                     {
@@ -228,7 +228,7 @@ public class EntityRoddiskLeader extends RoddiskBase {
 	}
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
+    public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
 		if (tickCount < 10 || player != getOwner()) return InteractionResult.PASS;
 		if (player.getInventory().add(RRItems.roddisk.toStack()))
 		{

@@ -40,7 +40,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class BlockNuclearBomb extends BaseEntityBlock {
     public static final MapCodec<BlockNuclearBomb> CODEC = simpleCodec(BlockNuclearBomb::new);
@@ -85,7 +85,7 @@ public class BlockNuclearBomb extends BaseEntityBlock {
                 player.openMenu(getMenuProvider(state, level, pos));
                 return InteractionResult.SUCCESS;
 			} else if (!level.isClientSide()) {
-				player.displayClientMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)), true);
+				player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
                 return InteractionResult.FAIL;
 			}
 		}

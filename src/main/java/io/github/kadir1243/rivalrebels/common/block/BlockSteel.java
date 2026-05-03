@@ -35,7 +35,7 @@ public class BlockSteel extends Block {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
 		if (entity.isShiftKeyDown() && !entity.horizontalCollision)
 		{
             entity.setDeltaMovement(entity.getDeltaMovement().x(), 0.08, entity.getDeltaMovement().z());

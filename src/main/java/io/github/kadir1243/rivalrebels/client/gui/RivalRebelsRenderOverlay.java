@@ -12,12 +12,14 @@
 package io.github.kadir1243.rivalrebels.client.gui;
 
 import com.mojang.blaze3d.pipeline.RenderPipeline;
-import com.mojang.blaze3d.textures.GpuTextureView;
+import com.mojang.blaze3d.platform.InputConstants;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.textures.FilterMode;
 import io.github.kadir1243.rivalrebels.RRClient;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
@@ -28,34 +30,28 @@ import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.vertex.*;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
-import net.minecraft.client.gui.render.state.GuiElementRenderState;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.util.ARGB;
-import net.minecraft.util.CommonColors;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.RegisterGuiLayersEvent;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.joml.Matrix3x2f;
-
-import static org.lwjgl.glfw.GLFW.*;
 
 @OnlyIn(Dist.CLIENT)
 public class RivalRebelsRenderOverlay {
@@ -78,7 +74,7 @@ public class RivalRebelsRenderOverlay {
         }
     }
 
-	private void renderItems(GuiGraphics graphics) {
+	private void renderItems(GuiGraphicsExtractor graphics) {
         Minecraft client = Minecraft.getInstance();
         Player player = client.player;
         ItemStack stack = player.getInventory().getSelectedItem();
@@ -86,7 +82,7 @@ public class RivalRebelsRenderOverlay {
         if (stack.getItem() instanceof ItemBinoculars) renderBinoculars(stack, graphics, player);
 	}
 
-	private void renderRhodes(GuiGraphics graphics, Player player, EntityRhodes rhodes, DeltaTracker tracker) {
+	private void renderRhodes(GuiGraphicsExtractor graphics, Player player, EntityRhodes rhodes, DeltaTracker tracker) {
         if (rhodes == null) return;
         float deltaTicks = tracker.getGameTimeDeltaPartialTick(true);
         counter = Mth.lerp(deltaTicks, counter, counter - 1);
@@ -126,18 +122,17 @@ public class RivalRebelsRenderOverlay {
             ARGB.colorFromFloat(0.333F, 0.0F, 0.0F, 0.0F)
         );
 
-        if (glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_H) == GLFW_PRESS) {
-            ((GuiGraphicsAccessor) graphics).blit(RenderPipelines.GUI_TEXTURED,
+        if (InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_H)) {
+            graphics.blit(
                 RRTextures.guirhodeshelp,
-                    Mth.floor(w*0.25F),
-                    Mth.floor(w*0.75F),
-                    Mth.floor(h*0.25F),
-                    Mth.floor(h*0.75F),
+                Mth.floor(w*0.25F),
+                Mth.floor(h*0.25F),
+                Mth.floor(w*0.75F),
+                Mth.floor(h*0.75F),
                 -90,
                 1,
                 0,
-                1,
-                0
+                1
             );
         }
 
@@ -145,45 +140,44 @@ public class RivalRebelsRenderOverlay {
             float s = 8;
             float wl = w*0.5f;
             float hl = h*0.05f;
-            ((GuiGraphicsAccessor) graphics).blit(RenderPipelines.GUI_TEXTURED,
+            graphics.blit(
                 RRIdentifiers.create("textures/" + rhodes.getFlagTextureLocation() + ".png"),
-                    Mth.floor(wl-s),
-                    Mth.floor(wl+s),
-                    Mth.floor(hl-s),
-                    Mth.floor(hl+s),
+                Mth.floor(wl-s),
+                Mth.floor(hl-s),
+                Mth.floor(wl+s),
+                Mth.floor(hl+s),
                 -90,
                 1,
                 0,
-                1,
-                0
+                1
             );
         }
 
         Component text = Component.literal("Rival Rebels");
-        graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.05), 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.05), 0xffffff, false);
         text = Component.literal("Robot: ").append(rhodes.getName());
-        graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.1), 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.1), 0xffffff, false);
         text = RRBlocks.reactor.get().getName().append(": " + rhodes.getHealth());
         float val = (rhodes.getHealth() / (float) RRConfig.SERVER.getRhodesHealth());
-        graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.15), (((int)((1-val)*255)&255)<<16) | (((int)(val*255)&255)<<8), false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.15), (((int)((1-val)*255)&255)<<16) | (((int)(val*255)&255)<<8), false);
         float yaw = (player.getYRot() + 360000) % 360;
         text = (yaw >= 315 || yaw < 45) ? Component.translatable("RivalRebels.binoculars.south") : (yaw >= 45 && yaw < 135) ? Component.translatable("RivalRebels.binoculars.west") : (yaw >= 135 && yaw < 225) ? Component.translatable("RivalRebels.binoculars.north") : (yaw >= 225 && yaw < 315) ? Component.translatable("RivalRebels.binoculars.east") : Component.nullToEmpty("Whut");
-        graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.2), 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.2), 0xffffff, false);
 
-        text = RRItems.einsten.asItem().getName().copy().append(": " + rhodes.getEnergy());
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.05), rhodes.isAnyLaserEnabled()?0xff3333:0xffffff, false);
+        text = RRItems.einsten.toStack().getItemName().copy().append(": " + rhodes.getEnergy());
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.05), rhodes.isAnyLaserEnabled()?0xff3333:0xffffff, false);
         text = Component.nullToEmpty("Jet: " + rhodes.getEnergy());
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.1), RRClient.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.1), RRClient.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
         text = RRBlocks.forcefieldnode.get().getName().append(": " + rhodes.getEnergy());
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.isForceFieldEnabled()?0xBB88FF:0xffffff, false);
-        text = RRItems.seekm202.asItem().getName().copy().append(": " + rhodes.getRocketCount());
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.2), 0xffffff, false);
-        text = (rhodes.isPlasma()?Component.nullToEmpty("Plasma: " + rhodes.getFlameCount()) : (((MutableComponent)RRItems.fuel.asItem().getName()).append(": " + rhodes.getFlameCount())));
-        graphics.drawString(fr, text, (int) (w * 0.8), (int) (h * 0.25), 0xffffff, false);
-        graphics.drawString(fr, RRBlocks.nuclearBomb.get().getName().copy().append(": " + rhodes.getNukeCount()), (int) (w * 0.8), (int) (h * 0.3), 0xffffff, false);
-        graphics.drawString(fr, Component.nullToEmpty("Guard"), (int) (w * 0.8), (int) (h * 0.35), RRClient.RHODES_GUARD_KEY.isDown() ? 0xffff00 : 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.isForceFieldEnabled()?0xBB88FF:0xffffff, false);
+        text = RRItems.seekm202.toStack().getItemName().copy().append(": " + rhodes.getRocketCount());
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.2), 0xffffff, false);
+        text = (rhodes.isPlasma()?Component.nullToEmpty("Plasma: " + rhodes.getFlameCount()) : (RRItems.fuel.toStack().getItemName().copy().append(": " + rhodes.getFlameCount())));
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.25), 0xffffff, false);
+        graphics.text(fr, RRBlocks.nuclearBomb.get().getName().copy().append(": " + rhodes.getNukeCount()), (int) (w * 0.8), (int) (h * 0.3), 0xffffff, false);
+        graphics.text(fr, Component.nullToEmpty("Guard"), (int) (w * 0.8), (int) (h * 0.35), RRClient.RHODES_GUARD_KEY.isDown() ? 0xffff00 : 0xffffff, false);
         text = rhodes.getName().copy().append(" ").append(RRBlocks.controller.get().getName()).append(": H");
-        graphics.drawString(fr, text, (int) (w * 0.05), (int) (h * 0.95), glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_H) == GLFW_PRESS ? 0xffff00 : 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.95), InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_H) ? 0xffff00 : 0xffffff, false);
         if (rhodes.isForceFieldEnabled()) {
             graphics.submitGuiElementRenderState(new GuiElementRenderState() {
                 private final Matrix3x2f pose = new Matrix3x2f(graphics.pose());
@@ -192,21 +186,21 @@ public class RivalRebelsRenderOverlay {
                 private final ScreenRectangle bounds = getBounds(0, 0, w, h, pose, scissorArea);
 
                 @Override
-                public void buildVertices(VertexConsumer consumer, float z) {
-                    consumer.addVertexWith2DPose(pose, 0, h, z).setColor(1, 1, 1, 0.7F).setUv(0, h*0.003f).setLight(LightTexture.FULL_BRIGHT);
-                    consumer.addVertexWith2DPose(pose, w, h, z).setColor(1, 1, 1, 0.7F).setUv(w*0.003f, h*0.003f).setLight(LightTexture.FULL_BRIGHT);
-                    consumer.addVertexWith2DPose(pose, w, 0, z).setColor(1, 1, 1, 0.7F).setUv(w*0.003f, 0).setLight(LightTexture.FULL_BRIGHT);
-                    consumer.addVertexWith2DPose(pose, 0, 0, z).setColor(1, 1, 1, 0.7F).setUv(0, 0).setLight(LightTexture.FULL_BRIGHT);
+                public void buildVertices(VertexConsumer consumer) {
+                    consumer.addVertexWith2DPose(pose, 0, h).setColor(1, 1, 1, 0.7F).setUv(0, h*0.003f).setLight(LightCoordsUtil.FULL_BRIGHT);
+                    consumer.addVertexWith2DPose(pose, w, h).setColor(1, 1, 1, 0.7F).setUv(w*0.003f, h*0.003f).setLight(LightCoordsUtil.FULL_BRIGHT);
+                    consumer.addVertexWith2DPose(pose, w, 0).setColor(1, 1, 1, 0.7F).setUv(w*0.003f, 0).setLight(LightCoordsUtil.FULL_BRIGHT);
+                    consumer.addVertexWith2DPose(pose, 0, 0).setColor(1, 1, 1, 0.7F).setUv(0, 0).setLight(LightCoordsUtil.FULL_BRIGHT);
                 }
 
                 @Override
                 public RenderPipeline pipeline() {
-                    return RenderTypes.CELLULAR_NOISE_PIPELINE;
+                    return RRRenderTypes.CELLULAR_NOISE_PIPELINE;
                 }
 
                 @Override
                 public TextureSetup textureSetup() {
-                    return TextureSetup.singleTexture(RivalRebelsCellularNoise.getCurrentRandomId().getTextureView());
+                    return TextureSetup.singleTexture(RivalRebelsCellularNoise.getCurrentRandomId().getTextureView(), RenderSystem.getSamplerCache().getRepeat(FilterMode.NEAREST));
                 }
 
                 @Override
@@ -230,7 +224,7 @@ public class RivalRebelsRenderOverlay {
         }
     }
 
-    private void renderBinoculars(ItemStack stack, GuiGraphics graphics, Player player) {
+    private void renderBinoculars(ItemStack stack, GuiGraphicsExtractor graphics, Player player) {
         if (!stack.has(RRComponents.BINOCULAR_DATA)) return;
         if (Minecraft.getInstance().mouseHandler.isRightPressed()) {
             tic++;
@@ -238,18 +232,16 @@ public class RivalRebelsRenderOverlay {
             int w = graphics.guiWidth();
             int h = graphics.guiHeight();
 
-            ((GuiGraphicsAccessor) graphics).blit(
-                RenderPipelines.GUI_TEXTURED,
+            graphics.blit(
                 RRTextures.guibinoculars,
                 0,
-                w,
                 h,
+                w,
                 0,
                 0,
                 1,
                 0,
-                1,
-                CommonColors.WHITE
+                1
             );
 
             ((GuiGraphicsAccessor) graphics).blit(
@@ -285,26 +277,26 @@ public class RivalRebelsRenderOverlay {
             Component text;
             text = Component.nullToEmpty("X");
             if (!id.isAir()) text = id.getBlock().getName();
-            graphics.drawString(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.18), 0x00ff00, false);
+            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.18), 0x00ff00, false);
             if (!ItemBinoculars.tooFar)
                 text = Component.literal("(" + tpos.getX() + ", " + tpos.getY() + ", " + tpos.getZ() + ")");
             else text = Component.empty();
-            graphics.drawString(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.13), 0x00ff00, false);
+            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.13), 0x00ff00, false);
             if (tic % 30 == 0) r = !r;
             //if (nbt.getInt("ty") != -1 && nbt.getInt("cooldowntime") > 0) text = Component.literal(">" + nbt.getInt("tx") + ", " + nbt.getInt("ty") + ", " + nbt.getInt("tz") + "<");
             //else if (r) text = Component.literal(">                    <");
             //graphics.drawText(tr, text, (int) ((w * 0.50) - (tr.getWidth(text) / 2f)), (int) (h * 0.85), 0xff0000);
             text = Component.nullToEmpty("LTD RR");
-            graphics.drawString(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.80), 0xffffff, false);
+            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.80), 0xffffff, false);
             text = Component.literal(((int) ItemBinoculars.distblock) + "m");
-            graphics.drawString(tr, text, (int) ((w * 0.637) - (tr.width(text) / 2f)), (int) (h * 0.205), 0xffffff, false);
+            graphics.text(tr, text, (int) ((w * 0.637) - (tr.width(text) / 2f)), (int) (h * 0.205), 0xffffff, false);
             float yaw = (player.getYRot() + 360000) % 360;
             text = (yaw >= 315 || yaw < 45) ? Component.translatable("RivalRebels.binoculars.south") : (yaw >= 45 && yaw < 135) ? Component.translatable("RivalRebels.binoculars.west") : (yaw >= 135 && yaw < 225) ? Component.translatable("RivalRebels.binoculars.north") : (yaw >= 225 && yaw < 315) ? Component.translatable("RivalRebels.binoculars.east") : Component.literal("Whut");
-            graphics.drawString(tr, text, (int) ((w * 0.370) - (tr.width(text) / 2f)), (int) (h * 0.205), 0xffffff, false);
+            graphics.text(tr, text, (int) ((w * 0.370) - (tr.width(text) / 2f)), (int) (h * 0.205), 0xffffff, false);
             if (ItemBinoculars.tooFar)
-                graphics.drawString(tr, Component.translatable("RivalRebels.controller.range"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.controller.range")) / 2f)), (int) (h * 0.85), 0xff0000, false);
+                graphics.text(tr, Component.translatable("RivalRebels.controller.range"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.controller.range")) / 2f)), (int) (h * 0.85), 0xff0000, false);
             else if (ItemBinoculars.tooClose)
-                graphics.drawString(tr, Component.translatable("RivalRebels.nextbattle.no"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.nextbattle.no")) / 2f)), (int) (h * 0.85), 0xff0000, false);
+                graphics.text(tr, Component.translatable("RivalRebels.nextbattle.no"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.nextbattle.no")) / 2f)), (int) (h * 0.85), 0xff0000, false);
                 //else if (dist2 < 40)
                 //{
                 //	text = Component.translatable("RivalRebels.nextbattle.no");
@@ -313,10 +305,10 @@ public class RivalRebelsRenderOverlay {
                 //	graphics.drawText(tr, text, (int) ((w * 0.5) - (tr.getWidth(text) / 2f)), (int) (h * 0.94), 0xff0000, false);
                 //}
             else if (ItemBinoculars.ready)
-                graphics.drawString(tr, Component.translatable("RivalRebels.binoculars.target"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.binoculars.target")) / 2f)), (int) (h * 0.85), 0xff0000, false);
+                graphics.text(tr, Component.translatable("RivalRebels.binoculars.target"), (int) ((w * 0.5) - (tr.width(Component.translatable("RivalRebels.binoculars.target")) / 2f)), (int) (h * 0.85), 0xff0000, false);
 
-            graphics.drawString(tr, Component.translatable("RivalRebels.message.use").append(" ").append(Translations.SHIFT_CLICK.translate()).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
-            graphics.drawString(tr, Component.literal("Press C to select bomb type"), (int) (w * 0.60), (int) (h * 0.95), 0xff0000, false);
+            graphics.text(tr, Component.translatable("RivalRebels.message.use").append(" ").append(Translations.SHIFT_CLICK.translate()).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
+            graphics.text(tr, Component.literal("Press C to select bomb type"), (int) (w * 0.60), (int) (h * 0.95), 0xff0000, false);
 
             if ((tasks > 0 || carpet > 0) && dist < 10) {
                 float col = (float) (1 - dist / 10);
@@ -335,15 +327,15 @@ public class RivalRebelsRenderOverlay {
                 );
 
                 text = Component.nullToEmpty("x" + tasks);
-                graphics.drawString(tr, text, (int) (w * 0.76), (int) (h * 0.85), ItemBinoculars.c ? 0xffff00 : 0xff0000, false);
+                graphics.text(tr, text, (int) (w * 0.76), (int) (h * 0.85), ItemBinoculars.c ? 0xffff00 : 0xff0000, false);
                 text = Component.nullToEmpty("x" + carpet);
-                graphics.drawString(tr, text, (int) (w * 0.76), (int) (h * 0.9), ItemBinoculars.c ? 0xff0000 : 0xffff00, false);
+                graphics.text(tr, text, (int) (w * 0.76), (int) (h * 0.9), ItemBinoculars.c ? 0xff0000 : 0xffff00, false);
                 text = Component.translatable("RivalRebels.tacticalnuke.name");
                 if (!r)
-                    graphics.drawString(tr, text, (int) ((w * 0.5) - (tr.width(text) / 2f)), (int) (h * 0.71), 0x00ff00, false);
+                    graphics.text(tr, text, (int) ((w * 0.5) - (tr.width(text) / 2f)), (int) (h * 0.71), 0x00ff00, false);
             } else if ((tasks > 0 || carpet > 0) && ItemBinoculars.hasLaptop) {
                 text = RRBlocks.controller.get().getName().append(" ").append(Component.translatable("RivalRebels.controller.range"));
-                graphics.drawString(tr, text, (int) (w * 0.63), (int) (h * 0.87), 0xffff00, false);
+                graphics.text(tr, text, (int) (w * 0.63), (int) (h * 0.87), 0xffff00, false);
             }
         }
 	}

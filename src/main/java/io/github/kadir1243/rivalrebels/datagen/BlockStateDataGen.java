@@ -12,11 +12,10 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
-import net.minecraft.client.renderer.block.model.VariantMutator;
+import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Holder;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.PackOutput;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.ItemLike;
@@ -29,7 +28,6 @@ import net.neoforged.neoforge.client.model.generators.template.TransformVecBuild
 
 import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 public class BlockStateDataGen extends ModelProvider {
     public BlockStateDataGen(PackOutput p_388260_) {
@@ -37,7 +35,7 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private void simpleBlock(BlockModelGenerators blockModels, Holder<Block> block, String textureLoc) {
-        blockModels.createTrivialBlock(block.value(), TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, idBlock(textureLoc))));
+        blockModels.createTrivialBlock(block.value(), TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, new Material(idBlock(textureLoc)))));
     }
 
     private void simpleBlock(BlockModelGenerators blockModels, Holder<Block> block, Block textureBlock) {
@@ -46,9 +44,9 @@ public class BlockStateDataGen extends ModelProvider {
 
     private void simpleBlock(BlockModelGenerators blockModels, Holder<Block> block, String sides, String down, String up) {
         blockModels.createTrivialBlock(block.value(), TexturedModel.CUBE_TOP_BOTTOM.updateTexture(textureMapping -> {
-            textureMapping.put(TextureSlot.BOTTOM, idBlock(down));
-            textureMapping.put(TextureSlot.TOP, idBlock(up));
-            textureMapping.put(TextureSlot.SIDE, idBlock(sides));
+            textureMapping.put(TextureSlot.BOTTOM, new Material(idBlock(down)));
+            textureMapping.put(TextureSlot.TOP, new Material(idBlock(up)));
+            textureMapping.put(TextureSlot.SIDE, new Material(idBlock(sides)));
         }));
     }
 
@@ -58,12 +56,12 @@ public class BlockStateDataGen extends ModelProvider {
 
     private void simpleSidedBlock(BlockModelGenerators blockModels, Holder<Block> block, String northAndSouthSide, String westAndEastSide, String up, String down) {
         blockModels.createTrivialBlock(block.value(), TexturedModel.CUBE.updateTexture(textureMapping -> {
-            textureMapping.put(TextureSlot.NORTH, idBlock(northAndSouthSide));
-            textureMapping.put(TextureSlot.SOUTH, idBlock(northAndSouthSide));
-            textureMapping.put(TextureSlot.WEST, idBlock(westAndEastSide));
-            textureMapping.put(TextureSlot.EAST, idBlock(westAndEastSide));
-            textureMapping.put(TextureSlot.BOTTOM, idBlock(down));
-            textureMapping.put(TextureSlot.TOP, idBlock(up));
+            textureMapping.put(TextureSlot.NORTH, new Material(idBlock(northAndSouthSide)));
+            textureMapping.put(TextureSlot.SOUTH, new Material(idBlock(northAndSouthSide)));
+            textureMapping.put(TextureSlot.WEST, new Material(idBlock(westAndEastSide)));
+            textureMapping.put(TextureSlot.EAST, new Material(idBlock(westAndEastSide)));
+            textureMapping.put(TextureSlot.BOTTOM, new Material(idBlock(down)));
+            textureMapping.put(TextureSlot.TOP, new Material(idBlock(up)));
         }));
     }
 
@@ -75,15 +73,15 @@ public class BlockStateDataGen extends ModelProvider {
         TextureSlot.ALL
     );
     public final void createConduitVariant(BlockModelGenerators blockModels, Holder<Block> block) {
-        var meta1 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_1", TextureMapping.cube(idBlock("co")), blockModels.modelOutput));
-        var meta2 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_2", TextureMapping.cube(idBlock("cp")), blockModels.modelOutput));
-        var meta3 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_3", TextureMapping.cube(idBlock("cq")), blockModels.modelOutput));
-        var meta4 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_4", TextureMapping.cube(idBlock("cr")), blockModels.modelOutput));
-        var meta5 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_5", TextureMapping.cube(idBlock("cs")), blockModels.modelOutput));
-        var meta6 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_6", TextureMapping.cube(idBlock("ct")), blockModels.modelOutput));
-        var meta7 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_7", TextureMapping.cube(idBlock("cu")), blockModels.modelOutput));
-        var meta8 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_8", TextureMapping.cube(idBlock("cv")), blockModels.modelOutput));
-        var meta9 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_9", TextureMapping.cube(idBlock("cw")), blockModels.modelOutput));
+        var meta1 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_1", TextureMapping.cube(new Material(idBlock("co"))), blockModels.modelOutput));
+        var meta2 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_2", TextureMapping.cube(new Material(idBlock("cp"))), blockModels.modelOutput));
+        var meta3 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_3", TextureMapping.cube(new Material(idBlock("cq"))), blockModels.modelOutput));
+        var meta4 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_4", TextureMapping.cube(new Material(idBlock("cr"))), blockModels.modelOutput));
+        var meta5 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_5", TextureMapping.cube(new Material(idBlock("cs"))), blockModels.modelOutput));
+        var meta6 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_6", TextureMapping.cube(new Material(idBlock("ct"))), blockModels.modelOutput));
+        var meta7 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_7", TextureMapping.cube(new Material(idBlock("cu"))), blockModels.modelOutput));
+        var meta8 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_8", TextureMapping.cube(new Material(idBlock("cv"))), blockModels.modelOutput));
+        var meta9 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_9", TextureMapping.cube(new Material(idBlock("cw"))), blockModels.modelOutput));
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block.value())
             .with(PropertyDispatch.initial(BlockConduit.VARIANT)
                 .select(0, meta1)
@@ -100,13 +98,12 @@ public class BlockStateDataGen extends ModelProvider {
         );
     }
 
-    private ResourceLocation idBlock(String name) {
+    private Identifier idBlock(String name) {
         return modLocation(name).withPrefix("block/");
     }
 
     @Override
     protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
-        super.registerModels(blockModels, itemModels);
         registerItems(itemModels);
         simpleBlock(blockModels, RRBlocks.steel, "bx");
         simpleBlock(blockModels, RRBlocks.smartcamo, "bq");
@@ -131,8 +128,10 @@ public class BlockStateDataGen extends ModelProvider {
         simpleBlock(blockModels, RRBlocks.petrifiedstone2, "bd", "bb");
         simpleBlock(blockModels, RRBlocks.petrifiedstone3, "be", "bb");
         simpleBlock(blockModels, RRBlocks.petrifiedstone4, "bf", "bb");
-        simpleBlock(blockModels, RRBlocks.radioactivedirt, Blocks.DIRT);
-        simpleBlock(blockModels, RRBlocks.radioactivesand, Blocks.SAND);
+        // FIXME: simpleBlock(blockModels, RRBlocks.radioactivedirt, Blocks.DIRT);
+        simpleBlock(blockModels, RRBlocks.radioactivedirt, "notexisting");
+        // FIXME: simpleBlock(blockModels, RRBlocks.radioactivesand, Blocks.SAND);
+        simpleBlock(blockModels, RRBlocks.radioactivesand, "notexisting");
         simpleBlock(blockModels, RRBlocks.remotecharge, "af", "ag");
         simpleBlock(blockModels, RRBlocks.omegaobj, "ba");
         simpleBlock(blockModels, RRBlocks.sigmaobj, "bp");
@@ -154,12 +153,12 @@ public class BlockStateDataGen extends ModelProvider {
         simpleBlock(blockModels, RRBlocks.mariotrap, "de", "dh");
         simpleBlock(blockModels, RRBlocks.supplies, "bz", "ah", "ai");
         blockModels.createTrivialBlock(RRBlocks.breadbox.value(), TexturedModel.CUBE.updateTexture(textureMapping -> {
-            textureMapping.put(TextureSlot.TOP, idBlock("cc"));
-            textureMapping.put(TextureSlot.BOTTOM, idBlock("ca"));
-            textureMapping.put(TextureSlot.NORTH, idBlock("cb"));
-            textureMapping.put(TextureSlot.SOUTH, idBlock("ca"));
-            textureMapping.put(TextureSlot.WEST, idBlock("ca"));
-            textureMapping.put(TextureSlot.EAST, idBlock("ca"));
+            textureMapping.put(TextureSlot.TOP, new Material(idBlock("cc")));
+            textureMapping.put(TextureSlot.BOTTOM, new Material(idBlock("ca")));
+            textureMapping.put(TextureSlot.NORTH, new Material(idBlock("cb")));
+            textureMapping.put(TextureSlot.SOUTH, new Material(idBlock("ca")));
+            textureMapping.put(TextureSlot.WEST, new Material(idBlock("ca")));
+            textureMapping.put(TextureSlot.EAST, new Material(idBlock("ca")));
         }));
         goreBlock(blockModels, RRBlocks.goreblock);
         createConduitVariant(blockModels, RRBlocks.conduit);
@@ -264,24 +263,24 @@ public class BlockStateDataGen extends ModelProvider {
         itemModels.declareCustomModelItem(item);
     }
 
-    private void objModelWithHorizontalRotation(BlockModelGenerators blockModels, Block block, ResourceLocation modelLocation, ResourceLocation texture, Consumer<TransformVecBuilder> transform) {
+    private void objModelWithHorizontalRotation(BlockModelGenerators blockModels, Block block, Identifier modelLocation, Identifier texture, Consumer<TransformVecBuilder> transform) {
         blockModels.createHorizontallyRotatedBlock(block, getObjTexturedModel(modelLocation, texture, transform));
     }
 
-    private void objModelWithRotation(BlockModelGenerators blockModels, Block block, ResourceLocation modelLocation, ResourceLocation texture, Consumer<TransformVecBuilder> transform) {
+    private void objModelWithRotation(BlockModelGenerators blockModels, Block block, Identifier modelLocation, Identifier texture, Consumer<TransformVecBuilder> transform) {
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(getObjTexturedModel(modelLocation, texture, transform).create(block, blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_FACING));
     }
 
     private void simpleModelRotated(BlockModelGenerators blockModels, Block block, String texture) {
-        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, idBlock(texture))).create(block, blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_FACING));
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, new Material(idBlock(texture)))).create(block, blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_FACING));
     }
 
     private void simpleModelHorizontallyRotated(BlockModelGenerators blockModels, Block block, String texture) {
-        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, idBlock(texture))).create(block, blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, new Material(idBlock(texture)))).create(block, blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_HORIZONTAL_FACING));
     }
 
-    private static TexturedModel.Provider getObjTexturedModel(ResourceLocation modelLocation, ResourceLocation texture, Consumer<TransformVecBuilder> transform) {
-        return TexturedModel.createDefault(block1 -> TextureMapping.defaultTexture(texture), ExtendedModelTemplateBuilder.builder()
+    private static TexturedModel.Provider getObjTexturedModel(Identifier modelLocation, Identifier texture, Consumer<TransformVecBuilder> transform) {
+        return TexturedModel.createDefault(block1 -> TextureMapping.defaultTexture(new Material(texture)), ExtendedModelTemplateBuilder.builder()
             .customLoader(ObjModelBuilder::new, objModelBuilder -> objModelBuilder.modelLocation(modelLocation))
             .requiredTextureSlot(TextureSlot.TEXTURE)
             .transform(ItemDisplayContext.NONE, transform)
@@ -297,12 +296,12 @@ public class BlockStateDataGen extends ModelProvider {
         var icontop4 = idBlock("cm");
 
         blockModels.createHorizontallyRotatedBlock(block, TexturedModel.CUBE.updateTexture(textureMapping -> {
-            textureMapping.put(TextureSlot.NORTH, icon);
-            textureMapping.put(TextureSlot.SOUTH, icon);
-            textureMapping.put(TextureSlot.WEST, icon2);
-            textureMapping.put(TextureSlot.EAST, icon);
-            textureMapping.put(TextureSlot.BOTTOM, icontop2);
-            textureMapping.put(TextureSlot.TOP, icontop2);
+            textureMapping.put(TextureSlot.NORTH, new Material(icon));
+            textureMapping.put(TextureSlot.SOUTH, new Material(icon));
+            textureMapping.put(TextureSlot.WEST, new Material(icon2));
+            textureMapping.put(TextureSlot.EAST, new Material(icon));
+            textureMapping.put(TextureSlot.BOTTOM, new Material(icontop2));
+            textureMapping.put(TextureSlot.TOP, new Material(icontop2));
         }));
     }
 
@@ -311,16 +310,16 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private void flareBlock(BlockModelGenerators blockModels, Holder<Block> flare, String texture) {
-        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(flare.value(), BlockModelGenerators.plainVariant(ModelTemplates.TORCH.create(flare.value(), new TextureMapping().put(TextureSlot.TORCH, idBlock(texture)), blockModels.modelOutput))));
+        blockModels.blockStateOutput.accept(BlockModelGenerators.createSimpleBlock(flare.value(), BlockModelGenerators.plainVariant(ModelTemplates.TORCH.create(flare.value(), new TextureMapping().put(TextureSlot.TORCH, new Material(idBlock(texture))), blockModels.modelOutput))));
     }
 
     private void goreBlock(BlockModelGenerators blockModels, Holder<Block> block) {
-        var icon = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(idBlock("br")).createWithSuffix(block.value(), "icon1", blockModels.modelOutput));
-        var icon2 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(idBlock("bs")).createWithSuffix(block.value(), "icon2", blockModels.modelOutput));
-        var icon3 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(idBlock("bt")).createWithSuffix(block.value(), "icon3", blockModels.modelOutput));
-        var icon4 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(idBlock("bu")).createWithSuffix(block.value(), "icon4", blockModels.modelOutput));
-        var icon5 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(idBlock("bv")).createWithSuffix(block.value(), "icon5", blockModels.modelOutput));
-        var icon6 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(idBlock("bw")).createWithSuffix(block.value(), "icon6", blockModels.modelOutput));
+        var icon = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("br"))).createWithSuffix(block.value(), "icon1", blockModels.modelOutput));
+        var icon2 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bs"))).createWithSuffix(block.value(), "icon2", blockModels.modelOutput));
+        var icon3 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bt"))).createWithSuffix(block.value(), "icon3", blockModels.modelOutput));
+        var icon4 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bu"))).createWithSuffix(block.value(), "icon4", blockModels.modelOutput));
+        var icon5 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bv"))).createWithSuffix(block.value(), "icon5", blockModels.modelOutput));
+        var icon6 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bw"))).createWithSuffix(block.value(), "icon6", blockModels.modelOutput));
 
         blockModels.blockStateOutput.accept(
             MultiVariantGenerator.dispatch(block.value())
@@ -347,20 +346,15 @@ public class BlockStateDataGen extends ModelProvider {
         simpleBlock(blockModels, block, "notexisting"); // TODO: Add model for mario
     }
 
-    @Override
-    protected Stream<? extends Holder<Item>> getKnownItems() {
-        return BuiltInRegistries.ITEM.listElements();
-    }
-
     private void simpleItem(ItemModelGenerators generator, ItemLike item, String tex) {
-        generator.itemModelOutput.accept(item.asItem(), ItemModelUtils.plainModel( ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item.asItem()), TextureMapping.layer0(modLocation(tex).withPrefix("item/")), generator.modelOutput)));
+        generator.itemModelOutput.accept(item.asItem(), ItemModelUtils.plainModel( ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(item.asItem()), TextureMapping.layer0(new Material(modLocation(tex).withPrefix("item/"))), generator.modelOutput)));
     }
 
     private void customModel(ItemModelGenerators generator, ItemLike item) {
         generator.declareCustomModelItem(item.asItem());
     }
 
-    private void objModel(ItemModelGenerators generator, ItemLike item, ResourceLocation modelLocation, ResourceLocation texture, Consumer<RootTransformsBuilder> action) {
+    private void objModel(ItemModelGenerators generator, ItemLike item, Identifier modelLocation, Identifier texture, Consumer<RootTransformsBuilder> action) {
         generator.itemModelOutput.accept(item.asItem(),
             ItemModelUtils.plainModel(
                 ExtendedModelTemplateBuilder.builder()
@@ -368,7 +362,7 @@ public class BlockStateDataGen extends ModelProvider {
                 .requiredTextureSlot(TextureSlot.TEXTURE)
                 .rootTransforms(action)
                 .build()
-                .create(item.asItem(), TextureMapping.defaultTexture(texture), generator.modelOutput)));
+                .create(item.asItem(), TextureMapping.defaultTexture(new Material(texture)), generator.modelOutput)));
     }
 
     protected void registerItems(ItemModelGenerators itemModels) {

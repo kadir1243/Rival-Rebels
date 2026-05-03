@@ -12,18 +12,19 @@
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.entity.EntityGoo;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -43,13 +44,12 @@ public class RenderGoo extends EntityRenderer<EntityGoo, EntityRenderState> {
     }
 
     @Override
-    public void render(EntityRenderState renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(EntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         if (renderState.ageInTicks < 2) return;
         poseStack.pushPose();
         poseStack.scale(0.25F, 0.25F, 0.25F);
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etgoo));
-        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        ModelBlockRenderer.renderModel(poseStack.last(), buffer, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, packedLight, OverlayTexture.NO_OVERLAY);
+        poseStack.mulPose(cameraRenderState.orientation);
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etgoo), BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

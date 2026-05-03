@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": "#minecraft:stone_crafting_materials",
+    "D": "#minecraft:dirt",
+    "G": "minecraft:gravel",
+    "S": "#minecraft:sand"
+  },
+  "pattern": [
+    "SC",
+    "DG"
+  ],
+  "result": {
+    "count": 16,
+    "id": "rivalrebels:rocket"
+  }
+}

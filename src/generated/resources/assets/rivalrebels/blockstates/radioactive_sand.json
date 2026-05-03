@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "minecraft:block/sand"
+      "model": "rivalrebels:block/radioactive_sand"
     }
   }
 }

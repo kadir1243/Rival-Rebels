@@ -191,4 +191,9 @@ public class EntityRaytrace extends Projectile {
     protected boolean canHitEntity(Entity target) {
         return super.canHitEntity(target) || target instanceof EntityRhodes;
     }
+
+    @Override
+    public boolean shouldRender(double camX, double camY, double camZ) {
+        return false;
+    }
 }

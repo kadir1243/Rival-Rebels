@@ -14,9 +14,9 @@ package io.github.kadir1243.rivalrebels.client.model;
 import com.mojang.math.Transformation;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -33,7 +33,7 @@ import java.util.Objects;
 public class ModelBlastRing {
     private static final Map<DataToRender, QuadHelper.BakedData> CACHE = new HashMap<>();
 
-    public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int color, int light, int overlay) {
+    public static void renderModel(PoseStack matrices, SubmitNodeCollector nodeCollector, RenderType renderType, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int color, int light, int overlay) {
 		matrices.pushPose();
 
 		matrices.translate(x, y, z);
@@ -59,16 +59,16 @@ public class ModelBlastRing {
                 QuadHelper.addFace(rotatedBuffer, v3, v1, v5, v7, color);
             }
         }).get());
-        ModelBlockRenderer.renderModel(matrices.last(), buffer, bakedModel.blockStateModel(), 1, 1, 1, light, overlay);
+        ObjModels.submit(nodeCollector, renderType, bakedModel.quadCollection(), matrices, CommonColors.WHITE, light, overlay);
         matrices.popPose();
 	}
 
-    public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int light, int overlay) {
-        renderModel(matrices, buffer, size, segments, thickness, height, pitch, yaw, roll, x, y, z, CommonColors.WHITE, light, overlay);
+    public static void renderModel(PoseStack matrices, SubmitNodeCollector nodeCollector, RenderType renderType, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int light, int overlay) {
+        renderModel(matrices, nodeCollector, renderType, size, segments, thickness, height, pitch, yaw, roll, x, y, z, CommonColors.WHITE, light, overlay);
     }
 
-    public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int light) {
-        renderModel(matrices, buffer, size, segments, thickness, height, pitch, yaw, roll, x, y, z, CommonColors.WHITE, light, OverlayTexture.NO_OVERLAY);
+    public static void renderModel(PoseStack matrices, SubmitNodeCollector nodeCollector, RenderType renderType, float size, int segments, float thickness, float height, float pitch, float yaw, float roll, float x, float y, float z, int light) {
+        renderModel(matrices, nodeCollector, renderType, size, segments, thickness, height, pitch, yaw, roll, x, y, z, CommonColors.WHITE, light, OverlayTexture.NO_OVERLAY);
     }
 
     private record DataToRender(float size, int segments, float thickness, float height) {

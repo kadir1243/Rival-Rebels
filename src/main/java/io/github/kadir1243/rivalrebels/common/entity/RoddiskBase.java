@@ -2,15 +2,12 @@ package io.github.kadir1243.rivalrebels.common.entity;
 
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.util.Mth;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class RoddiskBase extends Projectile {
     public RoddiskBase(EntityType<? extends RoddiskBase> type, Level world) {
@@ -46,10 +43,5 @@ public class RoddiskBase extends Projectile {
     @Override
     public boolean isPushable() {
         return true;
-    }
-
-    @Override
-    public InteractionResult interact(Player player, InteractionHand hand) {
-        return super.interact(player, hand);
     }
 }

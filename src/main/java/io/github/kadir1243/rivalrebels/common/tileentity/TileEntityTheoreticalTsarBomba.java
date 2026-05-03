@@ -45,7 +45,6 @@ import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -93,7 +92,7 @@ public class TileEntityTheoreticalTsarBomba extends BaseContainerBlockEntity imp
 	}
 
     @Override
-	public boolean stillValid(@NotNull Player player)
+	public boolean stillValid(Player player)
 	{
         return Container.stillValidBlockEntity(this, player, 64);
 	}
@@ -168,8 +167,8 @@ public class TileEntityTheoreticalTsarBomba extends BaseContainerBlockEntity imp
 			{
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.displayClientMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.getId()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()), false);
+                    player.sendSystemMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.id()).getName().copy().withStyle(ChatFormatting.RED)));
+                    player.sendSystemMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()));
                 }
 			}
 		}

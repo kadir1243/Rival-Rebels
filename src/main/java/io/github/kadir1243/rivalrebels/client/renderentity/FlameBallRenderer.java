@@ -3,18 +3,19 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.entity.*;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.util.LightCoordsUtil;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.level.lighting.LightEngine;
 
@@ -30,7 +31,7 @@ public abstract class FlameBallRenderer<T extends FlameBallProjectile> extends E
     }
 
     @Override
-    public void render(State renderState, PoseStack pose, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack pose, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         if (renderState.ageInTicks < 3) return;
         pose.pushPose();
 
@@ -38,15 +39,16 @@ public abstract class FlameBallRenderer<T extends FlameBallProjectile> extends E
         float X = (renderState.sequence % 4) / 4f;
         float Y = (renderState.sequence - (renderState.sequence % 4)) / 16f;
         float size = getSize(renderState);
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entityTranslucentEmissive(RRIdentifiers.etflamebluered));
-        pose.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        pose.mulPose(cameraRenderState.orientation);
         pose.mulPose(Axis.XP.rotationDegrees(90));
         pose.pushPose();
         pose.mulPose(Axis.YP.rotationDegrees(renderState.rotation));
-        buffer.addVertex(pose.last(), -size, 0, -size).setColor(CommonColors.WHITE).setUv(X, Y).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose.last(), 0, 1, 0);
-        buffer.addVertex(pose.last(),  size, 0, -size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose.last(), 0, 1, 0);
-        buffer.addVertex(pose.last(),  size, 0,  size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y + 0.25f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose.last(), 0, 1, 0);
-        buffer.addVertex(pose.last(), -size, 0,  size).setColor(CommonColors.WHITE).setUv(X, Y + 0.25f).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose.last(), 0, 1, 0);
+        nodeCollector.submitCustomGeometry(pose, RenderTypes.entityTranslucentEmissive(RRIdentifiers.etflamebluered), (pose1, buffer) -> {
+            buffer.addVertex(pose1, -size, 0, -size).setColor(CommonColors.WHITE).setUv(X, Y).setLight(LightCoordsUtil.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(pose.last(), 0, 1, 0);
+            buffer.addVertex(pose1,  size, 0, -size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y).setLight(LightCoordsUtil.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(pose.last(), 0, 1, 0);
+            buffer.addVertex(pose1,  size, 0,  size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y + 0.25f).setLight(LightCoordsUtil.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(pose.last(), 0, 1, 0);
+            buffer.addVertex(pose1, -size, 0,  size).setColor(CommonColors.WHITE).setUv(X, Y + 0.25f).setLight(LightCoordsUtil.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(pose.last(), 0, 1, 0);
+        });
         pose.popPose();
         pose.popPose();
 
@@ -62,7 +64,7 @@ public abstract class FlameBallRenderer<T extends FlameBallProjectile> extends E
 
     public abstract float getSize(EntityRenderState entity);
 
-    public ResourceLocation getTextureLocation(T entity) {
+    public Identifier getTextureLocation(T entity) {
         if (entity instanceof EntityFlameBall1) return RRIdentifiers.etflamebluered;
         if (entity instanceof EntityFlameBall2) return RRIdentifiers.etflameblue;
         if (entity instanceof EntityFlameBall) return RRIdentifiers.etflameball;

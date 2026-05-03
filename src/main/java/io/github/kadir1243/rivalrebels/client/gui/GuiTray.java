@@ -12,18 +12,21 @@
 
 package io.github.kadir1243.rivalrebels.client.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiCustomButton;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiDropdownOption;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiRotor;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TrayModelPIPRenderState;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReciever;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.input.CharacterEvent;
+import net.minecraft.client.input.KeyEvent;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -41,8 +44,7 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 
 	public GuiTray(ContainerReciever containerReciever, Inventory inventoryPlayer, Component title)
 	{
-		super(containerReciever, inventoryPlayer, title);
-		imageHeight = 206;
+		super(containerReciever, inventoryPlayer, title, DEFAULT_IMAGE_WIDTH, 206);
 	}
 
 	@Override
@@ -70,34 +72,34 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
     }
 
     @Override
-    public void render(GuiGraphics context, int mouseX, int mouseY, float delta) {
-        super.render(context, mouseX, mouseY, delta);
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractRenderState(graphics, mouseX, mouseY, a);
         this.xSize_lo = mouseX;
         this.ySize_lo = mouseY;
-        this.renderTooltip(context, mouseX, mouseY);
     }
 
     @Override
-    public boolean charTyped(char chr, int modifiers) {
-		if (modifiers == 1) {
+    public boolean keyPressed(KeyEvent event) {
+		if ((event.modifiers() & InputConstants.MOD_SHIFT) != 0) {
             onClose();
             menu.setKMobs(mobs.isPressed);
             menu.setKTeam(chip.isPressed);
             menu.setKPlayers(players.isPressed);
             menu.setYawLimit(range.getDegree() * 2);
 		}
-        return super.charTyped(chr, modifiers);
+        return super.keyPressed(event);
 	}
 
 	static int spinfac	= 0;
 
-	public void drawADS(GuiGraphics graphics, int x, int y, int scale, float px, float py) {
+	public void drawADS(GuiGraphicsExtractor graphics, int x, int y, int scale, float px, float py) {
 		spinfac += 1;
         graphics.submitPictureInPictureRenderState(new TrayModelPIPRenderState(new Vec3(x, y - 40, 50), menu.hasWeapon(), spinfac, x, y, (int) px, (int) py, scale, graphics.peekScissorStack()));
     }
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractBackground(graphics, mouseX, mouseY, a);
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
         RRTextures.guitray.blit(graphics, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
@@ -106,7 +108,7 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
             RRTextures.guitray.blit(graphics, x + 104, y + 68, 248, 0, 8, 8, CommonColors.WHITE);
 		}
 
-		graphics.drawString(font, Component.translatable("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff, false);
+		graphics.text(font, Component.translatable("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff, false);
 		drawADS(graphics, this.leftPos + 51, this.topPos + 75, 30, this.leftPos + 51 - this.xSize_lo, this.topPos + 25 - this.ySize_lo);
 	}
 }

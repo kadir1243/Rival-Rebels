@@ -14,26 +14,33 @@ package io.github.kadir1243.rivalrebels.client.tileentityrender;
 import io.github.kadir1243.rivalrebels.client.model.ModelTsarBomba;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityTsarBomba;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 
 @OnlyIn(Dist.CLIENT)
-public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEntityTsarBomba> {
+public class TileEntityTsarBombaRenderer implements BlockEntityRenderer<TileEntityTsarBomba, BlockEntityRenderState> {
     public TileEntityTsarBombaRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public void render(TileEntityTsarBomba blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
+    public BlockEntityRenderState createRenderState() {
+        return new BlockEntityRenderState();
+    }
+
+    @Override
+    public void submit(BlockEntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 1F, 0.5F);
 
-        ModelTsarBomba.render(poseStack, bufferSource, packedLight, packedOverlay);
+        ModelTsarBomba.render(poseStack, nodeCollector, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

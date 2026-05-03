@@ -14,8 +14,9 @@ package io.github.kadir1243.rivalrebels.client.model;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.util.Mth;
@@ -51,23 +52,26 @@ public class ModelDisk
 	private static final Vector3f v9 = new Vector3f(1.00f * cosdeg, 0f, 1.00f * sindeg);
 	private static final Vector3f v10 = new Vector3f(0.65f * cosdeg, -0.0625f, 0.65f * sindeg);
 
-	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
 		for (float i = 0; i < 360; i += 360 / numOfSegs) {
-			matrices.pushPose();
-			matrices.mulPose(Axis.YP.rotationDegrees(i));
-			RenderHelper.addFace(matrices, buffer, v2, v1, v6, v7, t4, t9, t10, t5, light, overlay);
-			if (i == 0 || i == 16) {
-				RenderHelper.addFace(matrices, buffer, v3, v2, v7, v8, t2, t7, t8, t3, light, overlay);
-				RenderHelper.addFace(matrices, buffer, v4, v3, v8, v9, t2, t7, t8, t3, light, overlay);
-				RenderHelper.addFace(matrices, buffer, v5, v4, v9, v10, t2, t7, t8, t3, light, overlay);
-				RenderHelper.addFace(matrices, buffer, v1, v5, v10, v6, t2, t7, t8, t3, light, overlay);
-			} else {
-				RenderHelper.addFace(matrices, buffer, v3, v2, v7, v8, t6, t1, t2, t7, light, overlay);
-				RenderHelper.addFace(matrices, buffer, v4, v3, v8, v9, t6, t1, t2, t7, light, overlay);
-				RenderHelper.addFace(matrices, buffer, v5, v4, v9, v10, t1, t6, t7, t2, light, overlay);
-				RenderHelper.addFace(matrices, buffer, v1, v5, v10, v6, t1, t6, t7, t2, light, overlay);
-			}
-			matrices.popPose();
+			poseStack.pushPose();
+			poseStack.mulPose(Axis.YP.rotationDegrees(i));
+            float finalI = i;
+            nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
+                RenderHelper.addFace(pose, consumer, v2, v1, v6, v7, t4, t9, t10, t5, light, overlay);
+                if (finalI == 0 || finalI == 16) {
+                    RenderHelper.addFace(pose, consumer, v3, v2, v7, v8, t2, t7, t8, t3, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v4, v3, v8, v9, t2, t7, t8, t3, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v5, v4, v9, v10, t2, t7, t8, t3, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v1, v5, v10, v6, t2, t7, t8, t3, light, overlay);
+                } else {
+                    RenderHelper.addFace(pose, consumer, v3, v2, v7, v8, t6, t1, t2, t7, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v4, v3, v8, v9, t6, t1, t2, t7, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v5, v4, v9, v10, t1, t6, t7, t2, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v1, v5, v10, v6, t1, t6, t7, t2, light, overlay);
+                }
+            });
+			poseStack.popPose();
 		}
 	}
 }

@@ -31,7 +31,7 @@ import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -174,11 +174,11 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
                 else if (meltTick == 1) {
                     Component text = Translations.warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_meltdown").withStyle(ChatFormatting.RED));
                     for (Player player : level.players()) {
-                        player.displayClientMessage(text, false);
+                        player.sendSystemMessage(text);
                     }
                 }
                 for (int i = 0; i < 4; i++) {
-                    level.addParticle(ParticleTypes.SMOKE, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, level.random.nextDouble() - 0.5, level.random.nextDouble() / 2, level.random.nextDouble() - 0.5);
+                    level.addParticle(ParticleTypes.SMOKE, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, level.getRandom().nextDouble() - 0.5, level.getRandom().nextDouble() / 2, level.getRandom().nextDouble() - 0.5);
                 }
             } else {
                 melt = false;
@@ -195,7 +195,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
             }
             if (tickssincelastrod == 20 && !lastrodwasredstone) {
                 for (Player player : getLevel().players()) {
-                    player.displayClientMessage(Translations.warning().append(" ").append(Translations.OVERHEAT_TRANSLATION.translate().withStyle(ChatFormatting.RED)), false);
+                    player.sendSystemMessage(Translations.warning().append(" ").append(Translations.OVERHEAT_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
                 }
             }
         } else {
@@ -260,7 +260,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
                     double f2 = fuelPercentage * fuelPercentage;
                     double f4 = f2 * f2;
                     double f8 = f4 * f4;
-                    if (level.random.nextFloat() < f8) {
+                    if (level.getRandom().nextFloat() < f8) {
                         melt = true;
                     }
                 }

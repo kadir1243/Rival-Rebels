@@ -14,74 +14,81 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRod;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
+import org.joml.Vector3fc;
+
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class PlasmaCannonRenderer implements DynamicItemRenderer {
+public class PlasmaCannonRenderer implements NoDataSpecialModelRenderer {
     private final QuadCollection plasmaCannonModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.PLASMA_CANNON_MODEL);
     public PlasmaCannonRenderer() {
     }
 
     @Override
-    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate(-0.1f, 0f, 0f);
-		matrices.pushPose();
-		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.mulPose(Axis.ZP.rotationDegrees(35));
-		matrices.scale(0.03125f, 0.03125f, 0.03125f);
-		matrices.pushPose();
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+        poseStack.pushPose();
+		poseStack.translate(-0.1f, 0f, 0f);
+		poseStack.pushPose();
+		poseStack.translate(0.5f, 0.2f, -0.03f);
+		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+		poseStack.scale(0.03125f, 0.03125f, 0.03125f);
+		poseStack.pushPose();
 
-        ObjModels.render(plasmaCannonModel, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etplasmacannon)), matrices, CommonColors.WHITE, light, overlay);
-        VertexConsumer cellularNoise = vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE);
-        if (stack.isEnchanted()) {
-			ObjModels.render(plasmaCannonModel, cellularNoise, matrices, CommonColors.WHITE, light, overlay);
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etplasmacannon), (pose, consumer) -> {
+            ObjModels.render(plasmaCannonModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
+        });
+        if (hasFoil) {
+            submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.CELLULAR_NOISE, (pose, consumer) -> {
+                ObjModels.render(plasmaCannonModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
+            });
 		}
 
-		matrices.popPose();
-		matrices.popPose();
+		poseStack.popPose();
+		poseStack.popPose();
 
-		matrices.pushPose();
-		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.mulPose(Axis.ZP.rotationDegrees(35));
-		matrices.pushPose();
-		matrices.mulPose(Axis.ZP.rotationDegrees(225));
-		matrices.translate(-0.5f, 0.5f, 0.0f);
-		matrices.scale(0.25f, 0.5f, 0.25f);
-        VertexConsumer hydrodVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ethydrod));
-        ModelRod.render(matrices, hydrodVertexConsumer, light, overlay, false);
-		if (stack.isEnchanted()) {
-			ModelRod.render(matrices, cellularNoise, light, overlay, false);
+		poseStack.pushPose();
+		poseStack.translate(0.5f, 0.2f, -0.03f);
+		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.ZP.rotationDegrees(225));
+		poseStack.translate(-0.5f, 0.5f, 0.0f);
+		poseStack.scale(0.25f, 0.5f, 0.25f);
+        ModelRod.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.ethydrod), lightCoords, overlayCoords, false);
+		if (hasFoil) {
+			ModelRod.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords, false);
 		}
-		matrices.popPose();
-		matrices.popPose();
+		poseStack.popPose();
+		poseStack.popPose();
 
-		matrices.pushPose();
-		matrices.translate(0.5f, 0.2f, -0.03f);
-		matrices.mulPose(Axis.ZP.rotationDegrees(35));
-		matrices.pushPose();
-		matrices.mulPose(Axis.ZP.rotationDegrees(247.5f));
-		matrices.translate(-0.175f, 0.1f, 0.0f);
-		matrices.scale(0.25f, 0.5f, 0.25f);
-		ModelRod.render(matrices, hydrodVertexConsumer, light, overlay);
-		if (stack.isEnchanted()) {
-			ModelRod.render(matrices, cellularNoise, light, overlay);
+		poseStack.pushPose();
+		poseStack.translate(0.5f, 0.2f, -0.03f);
+		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+		poseStack.pushPose();
+		poseStack.mulPose(Axis.ZP.rotationDegrees(247.5f));
+		poseStack.translate(-0.175f, 0.1f, 0.0f);
+		poseStack.scale(0.25f, 0.5f, 0.25f);
+		ModelRod.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.ethydrod), lightCoords, overlayCoords);
+		if (hasFoil) {
+			ModelRod.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
-		matrices.popPose();
-		matrices.popPose();
-		matrices.popPose();
+		poseStack.popPose();
+		poseStack.popPose();
+		poseStack.popPose();
 	}
+
+    @Override
+    public void getExtents(Consumer<Vector3fc> output) {
+    }
 }
 

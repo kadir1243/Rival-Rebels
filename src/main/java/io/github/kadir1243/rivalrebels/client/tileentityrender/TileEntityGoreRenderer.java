@@ -18,19 +18,25 @@ import io.github.kadir1243.rivalrebels.common.block.BlockGore;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityGore;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
+import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import org.joml.Vector3f;
+import org.jspecify.annotations.Nullable;
 
 @OnlyIn(Dist.CLIENT)
-public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGore> {
+public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGore, TileEntityGoreRenderer.GoreRenderState> {
 	private static final float s = 0.5F;
 	private static final Vector3f v1	= new Vector3f(s, s, s);
 	private static final Vector3f v2	= new Vector3f(s, s, -s);
@@ -45,76 +51,97 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
     }
 
     @Override
-    public void render(TileEntityGore blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
-        BlockState state = blockEntity.getBlockState();
-        boolean ceil = state.getValue(BlockGore.IS_UP_FULL);
-		boolean floor = state.getValue(BlockGore.IS_DOWN_FULL);
-		boolean side1 = state.getValue(BlockGore.IS_SOUTH_FULL);
-		boolean side2 = state.getValue(BlockGore.IS_WEST_FULL);
-		boolean side3 = state.getValue(BlockGore.IS_NORTH_FULL);
-		boolean side4 = state.getValue(BlockGore.IS_EAST_FULL);
+    public GoreRenderState createRenderState() {
+        return new GoreRenderState();
+    }
 
-		int meta = state.getValue(BlockGore.META);
+    @Override
+    public void extractRenderState(TileEntityGore blockEntity, GoreRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
+        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
+        BlockState bstate = blockEntity.getBlockState();
+        state.ceil = bstate.getValue(BlockGore.IS_UP_FULL);
+        state.floor = bstate.getValue(BlockGore.IS_DOWN_FULL);
+        state.side1 = bstate.getValue(BlockGore.IS_SOUTH_FULL);
+        state.side2 = bstate.getValue(BlockGore.IS_WEST_FULL);
+        state.side3 = bstate.getValue(BlockGore.IS_NORTH_FULL);
+        state.side4 = bstate.getValue(BlockGore.IS_EAST_FULL);
+        state.type = bstate.getValue(BlockGore.META);
+    }
 
+    @Override
+    public void submit(GoreRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		poseStack.pushPose();
 		poseStack.translate(0.5F, 0.5F, 0.5F);
-        ResourceLocation texture = switch (meta) {
+        Identifier texture = switch (renderState.type) {
             case 0 -> RRIdentifiers.btsplash1;
             case 1 -> RRIdentifiers.btsplash2;
             case 2 -> RRIdentifiers.btsplash3;
             case 3 -> RRIdentifiers.btsplash4;
             case 4 -> RRIdentifiers.btsplash5;
             case 5 -> RRIdentifiers.btsplash6;
-            default -> throw new IllegalStateException("Unexpected value: " + meta);
+            default -> throw new IllegalStateException("Unexpected value: " + renderState.type);
         };
+        int packedLight = renderState.lightCoords;
+        int packedOverlay = OverlayTexture.NO_OVERLAY;
 
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(texture));
-        if (side1) {
-            addVertex(poseStack, buffer, v1, 0, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v5, 1, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v8, 1, 1, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v4, 0, 1, packedLight, packedOverlay);
-        }
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(texture), (pose, consumer) -> {
+            if (renderState.side1) {
+                addVertex(pose, consumer, v1, 0, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v5, 1, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v8, 1, 1, packedLight, packedOverlay);
+                addVertex(pose, consumer, v4, 0, 1, packedLight, packedOverlay);
+            }
 
-        if (side2) {
-            addVertex(poseStack, buffer, v4, 0, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v8, 1, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v7, 1, 1, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v3, 0, 1, packedLight, packedOverlay);
-        }
+            if (renderState.side2) {
+                addVertex(pose, consumer, v4, 0, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v8, 1, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v7, 1, 1, packedLight, packedOverlay);
+                addVertex(pose, consumer, v3, 0, 1, packedLight, packedOverlay);
+            }
 
-        if (side3) {
-            addVertex(poseStack, buffer, v3, 0, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v7, 1, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v6, 1, 1, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v2, 0, 1, packedLight, packedOverlay);
-        }
+            if (renderState.side3) {
+                addVertex(pose, consumer, v3, 0, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v7, 1, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v6, 1, 1, packedLight, packedOverlay);
+                addVertex(pose, consumer, v2, 0, 1, packedLight, packedOverlay);
+            }
 
-        if (side4) {
-            addVertex(poseStack, buffer, v2, 0, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v6, 1, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v5, 1, 1, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v1, 0, 1, packedLight, packedOverlay);
-        }
+            if (renderState.side4) {
+                addVertex(pose, consumer, v2, 0, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v6, 1, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v5, 1, 1, packedLight, packedOverlay);
+                addVertex(pose, consumer, v1, 0, 1, packedLight, packedOverlay);
+            }
 
-        if (ceil) {
-            addVertex(poseStack, buffer, v4, 0, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v3, 1, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v2, 1, 1, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v1, 0, 1, packedLight, packedOverlay);
-        }
+            if (renderState.ceil) {
+                addVertex(pose, consumer, v4, 0, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v3, 1, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v2, 1, 1, packedLight, packedOverlay);
+                addVertex(pose, consumer, v1, 0, 1, packedLight, packedOverlay);
+            }
 
-        if (floor) {
-            addVertex(poseStack, buffer, v5, 0, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v6, 1, 0, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v7, 1, 1, packedLight, packedOverlay);
-            addVertex(poseStack, buffer, v8, 0, 1, packedLight, packedOverlay);
-        }
+            if (renderState.floor) {
+                addVertex(pose, consumer, v5, 0, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v6, 1, 0, packedLight, packedOverlay);
+                addVertex(pose, consumer, v7, 1, 1, packedLight, packedOverlay);
+                addVertex(pose, consumer, v8, 0, 1, packedLight, packedOverlay);
+            }
+        });
 
         poseStack.popPose();
     }
 
-	private void addVertex(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2, int light, int overlay) {
-        RenderHelper.addVertice(poseStack, buffer, v.mul(0.999F, new Vector3f()), new TextureVertice(t, t2), light, overlay);
+	private void addVertex(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v, float t, float t2, int light, int overlay) {
+        RenderHelper.addVertice(pose, buffer, v.mul(0.999F, new Vector3f()), new TextureVertice(t, t2), light, overlay);
 	}
+
+    public static class GoreRenderState extends BlockEntityRenderState {
+        public int type;
+        public boolean ceil;
+        public boolean floor;
+        public boolean side1;
+        public boolean side2;
+        public boolean side3;
+        public boolean side4;
+    }
 }

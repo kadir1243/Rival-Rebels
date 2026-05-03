@@ -13,25 +13,27 @@ package io.github.kadir1243.rivalrebels.client.itemrenders;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.*;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
-import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import org.joml.Vector3fc;
+import org.jspecify.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class AstroBlasterRenderer implements DynamicItemRenderer {
-    private static final ModelBlockRenderer BAKED_MODEL_RENDERER = Minecraft.getInstance().getBlockRenderer().getModelRenderer();
+public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
     private float pullback = 0;
     private float rotation = 0;
     private boolean isreloading = false;
@@ -39,8 +41,17 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
     private int spin = 0;
     private int reloadcooldown = 0;
 
-    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-        int repairCost = stack.getOrDefault(DataComponents.REPAIR_COST, 0);
+    @Override
+    public void getExtents(Consumer<Vector3fc> output) {
+    }
+
+    @Override
+    public @Nullable Integer extractArgument(ItemStack stack) {
+        return stack.getOrDefault(DataComponents.REPAIR_COST, 0);
+    }
+
+    @Override
+    public void submit(@Nullable Integer repairCost, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         spin++;
         if (repairCost >= 1) {
             spin = (int) (spin + repairCost / 2.2);
@@ -62,82 +73,81 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
             }
 
         }
-        matrices.pushPose();
-        matrices.translate(0.4f, 0.35f, -0.03f);
-        matrices.mulPose(Axis.ZP.rotationDegrees(-55));
-        matrices.translate(0f, -0.05f, 0.05f);
+        poseStack.pushPose();
+        poseStack.translate(0.4f, 0.35f, -0.03f);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(-55));
+        poseStack.translate(0f, -0.05f, 0.05f);
 
-        matrices.pushPose();
-        matrices.translate(0f, 0.9f, 0f);
-        VertexConsumer cellular_noise = vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE);
-        ModelAstroBlasterBarrel.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.eteinstenbarrel)), light, overlay);
-        if (stack.isEnchanted()) {
-            ModelAstroBlasterBarrel.render(matrices, cellular_noise, light, overlay);
+        poseStack.pushPose();
+        poseStack.translate(0f, 0.9f, 0f);
+        ModelAstroBlasterBarrel.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.eteinstenbarrel), lightCoords, overlayCoords);
+        if (hasFoil) {
+            ModelAstroBlasterBarrel.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
         }
-        matrices.popPose();
+        poseStack.popPose();
 
-        matrices.pushPose();
-        matrices.translate(0.22f, -0.025f, 0f);
-        matrices.mulPose(Axis.ZP.rotationDegrees(90));
-        matrices.scale(0.03125f, 0.03125f, 0.03125f);
+        poseStack.pushPose();
+        poseStack.translate(0.22f, -0.025f, 0f);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+        poseStack.scale(0.03125f, 0.03125f, 0.03125f);
 
-        BAKED_MODEL_RENDERER.renderModel(matrices.last(), vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.eteinstenhandle)), ModelAstroBlasterHandle.BAKED_MODEL.get().blockStateModel(),1, 1, 1, light,overlay);
-        if (stack.isEnchanted()) {
-            ModelBlockRenderer.renderModel(matrices.last(), cellular_noise, ModelAstroBlasterHandle.BAKED_MODEL.get().blockStateModel(),1, 1, 1, light,overlay);
+        ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.eteinstenhandle), ModelAstroBlasterHandle.BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
+        if (hasFoil) {
+            ObjModels.submit(submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, ModelAstroBlasterHandle.BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
         }
-        matrices.popPose();
+        poseStack.popPose();
 
-        // matrices.push();
-        // matrices.translate(0f, 0.8f, 0f);
-        // matrices.mulPose(180, 0.0F, 0.0F, 1.0F);
-        // matrices.scale(0.9F, 4.5F, 0.9F);
+        // poseStack.push();
+        // poseStack.translate(0f, 0.8f, 0f);
+        // poseStack.mulPose(180, 0.0F, 0.0F, 1.0F);
+        // poseStack.scale(0.9F, 4.5F, 0.9F);
         // md3.render(0.2f, 0.3f, 0.3f, 0.3f, 1f);
-        // matrices.pop();
+        // poseStack.pop();
 
-        matrices.pushPose();
-        matrices.translate(0f, 0.2f, 0f);
-        matrices.scale(0.85F, 0.85F, 0.85F);
-        ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.eteinstenback)), light, overlay);
-        if (stack.isEnchanted()) {
-            ModelAstroBlasterBack.render(matrices, vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE), light, overlay);
+        poseStack.pushPose();
+        poseStack.translate(0f, 0.2f, 0f);
+        poseStack.scale(0.85F, 0.85F, 0.85F);
+        ModelAstroBlasterBack.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.eteinstenback), lightCoords, overlayCoords);
+        if (hasFoil) {
+            ModelAstroBlasterBack.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
         }
-        matrices.popPose();
+        poseStack.popPose();
 
-        matrices.pushPose();
-        matrices.translate(0f, -pullback, 0f);
-        matrices.mulPose(Axis.YP.rotationDegrees(rotation));
-        matrices.pushPose();
-        VertexConsumer redstoneRodTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etredrod));
-        matrices.translate(0.12f, 0.1f, 0.12f);
-        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
-        matrices.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
-        matrices.popPose();
+        poseStack.pushPose();
+        poseStack.translate(0f, -pullback, 0f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
+        poseStack.pushPose();
+        RenderType redstoneRodRenderType = RenderTypes.entitySolid(RRIdentifiers.etredrod);
+        poseStack.translate(0.12f, 0.1f, 0.12f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.scale(0.3f, 0.7f, 0.3f);
+        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        poseStack.popPose();
 
-        matrices.pushPose();
-        matrices.translate(-0.12f, 0.1f, 0.12f);
-        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
-        matrices.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
-        matrices.popPose();
+        poseStack.pushPose();
+        poseStack.translate(-0.12f, 0.1f, 0.12f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.scale(0.3f, 0.7f, 0.3f);
+        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        poseStack.popPose();
 
-        matrices.pushPose();
-        matrices.translate(-0.12f, 0.1f, -0.12f);
-        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
-        matrices.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
-        matrices.popPose();
+        poseStack.pushPose();
+        poseStack.translate(-0.12f, 0.1f, -0.12f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.scale(0.3f, 0.7f, 0.3f);
+        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        poseStack.popPose();
 
-        matrices.pushPose();
-        matrices.translate(0.12f, 0.1f, -0.12f);
-        matrices.mulPose(Axis.YP.rotationDegrees(pullback * 270));
-        matrices.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(matrices, redstoneRodTextureVertexConsumer, light, overlay);
-        matrices.popPose();
-        matrices.popPose();
+        poseStack.pushPose();
+        poseStack.translate(0.12f, 0.1f, -0.12f);
+        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.scale(0.3f, 0.7f, 0.3f);
+        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        poseStack.popPose();
+        poseStack.popPose();
 
-        matrices.pushPose();
-        matrices.translate(0, 0.25f, 0);
+        poseStack.pushPose();
+        poseStack.translate(0, 0.25f, 0);
         float segmentDistance = 0.1f;
         float distance = 0.5f;
         float radius = 0.01F;
@@ -148,7 +158,6 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
         float prevAddedX;
         float prevAddedZ;
         // double angle = 0;
-        VertexConsumer lightningQuads = vertexConsumers.getBuffer(RenderTypes.LIGHTNING_ASTRO_BLAST);
         for (float AddedY = distance; AddedY >= 0; AddedY -= segmentDistance) {
             prevAddedX = AddedX;
             prevAddedZ = AddedZ;
@@ -171,29 +180,37 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
             }
 
             for (float o = 0; o <= radius; o += radius / 2f) {
-                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                float finalAddedX = AddedX;
+                float finalPrevAddedX = prevAddedX;
+                float finalO = o;
+                float finalAddedY = AddedY;
+                float finalAddedZ = AddedZ;
+                float finalPrevAddedZ = prevAddedZ;
+                submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.LIGHTNING_ASTRO_BLAST, (pose, consumer) -> {
+                    consumer.addVertex(pose, finalAddedX + finalO, finalAddedY, finalAddedZ - finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalAddedX + finalO, finalAddedY, finalAddedZ + finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX + finalO, finalAddedY + segmentDistance, finalPrevAddedZ + finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX + finalO, finalAddedY + segmentDistance, finalPrevAddedZ - finalO).setColor(CommonColors.RED);
 
-                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalAddedX - finalO, finalAddedY, finalAddedZ - finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalAddedX + finalO, finalAddedY, finalAddedZ - finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX + finalO, finalAddedY + segmentDistance, finalPrevAddedZ - finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX - finalO, finalAddedY + segmentDistance, finalPrevAddedZ - finalO).setColor(CommonColors.RED);
 
-                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ - o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ - o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalAddedX - finalO, finalAddedY, finalAddedZ + finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalAddedX - finalO, finalAddedY, finalAddedZ - finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX - finalO, finalAddedY + segmentDistance, finalPrevAddedZ - finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX - finalO, finalAddedY + segmentDistance, finalPrevAddedZ + finalO).setColor(CommonColors.RED);
 
-                lightningQuads.addVertex(matrices.last(), AddedX + o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), AddedX - o, AddedY, AddedZ + o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX - o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
-                lightningQuads.addVertex(matrices.last(), prevAddedX + o, AddedY + segmentDistance, prevAddedZ + o).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalAddedX + finalO, finalAddedY, finalAddedZ + finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalAddedX - finalO, finalAddedY, finalAddedZ + finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX - finalO, finalAddedY + segmentDistance, finalPrevAddedZ + finalO).setColor(CommonColors.RED);
+                    consumer.addVertex(pose, finalPrevAddedX + finalO, finalAddedY + segmentDistance, finalPrevAddedZ + finalO).setColor(CommonColors.RED);
+                });
             }
-            //matrices.pushPose();
-            //matrices.mulPose(Axis.ZP.rotationDegrees(90));
-            //matrices.mulPose(Axis.YP.rotationDegrees((float) angle));
+            //poseStack.pushPose();
+            //poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+            //poseStack.mulPose(Axis.YP.rotationDegrees((float) angle));
             //float o = 0.075f;
             //float s = 0.1f;
             //Tesselator tesselator = Tesselator.getInstance();
@@ -220,29 +237,28 @@ public class AstroBlasterRenderer implements DynamicItemRenderer {
             //builder.addVertex( + o, AddedY + s, + o).setColor(CommonColors.RED);
 
             //BufferUploader.drawWithShader(builder.buildOrThrow());
-            //matrices.popPose();
+            //poseStack.popPose();
         }
 
-        matrices.popPose();
+        poseStack.popPose();
 
-        VertexConsumer lightningTriangles = vertexConsumers.getBuffer(RenderTypes.LIGHTNING_ASTRO_BLAST_TRIANGLES);
-        matrices.pushPose();
-        matrices.translate(0f, 0.8f, 0f);
-        matrices.mulPose(Axis.ZP.rotationDegrees(180));
-        matrices.mulPose(Axis.YP.rotationDegrees(spin));
-        matrices.scale(0.9F, 4.1F, 0.9F);
-        ModelAstroBlasterBody.render(matrices, lightningTriangles, (float) (0.22f + (Mth.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
-        matrices.popPose();
+        poseStack.pushPose();
+        poseStack.translate(0f, 0.8f, 0f);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+        poseStack.mulPose(Axis.YP.rotationDegrees(spin));
+        poseStack.scale(0.9F, 4.1F, 0.9F);
+        ModelAstroBlasterBody.render(poseStack, submitNodeCollector, RRRenderTypes.LIGHTNING_ASTRO_BLAST_TRIANGLES, (float) (0.22f + (Mth.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
+        poseStack.popPose();
 
-        matrices.pushPose();
-        matrices.translate(0f, 0.8f, 0f);
-        matrices.mulPose(Axis.ZP.rotationDegrees(180));
-        matrices.mulPose(Axis.YP.rotationDegrees(-spin));
-        matrices.scale(0.9F, 4.1F, 0.9F);
-        ModelAstroBlasterBody.render(matrices, lightningTriangles, (float) (0.22f + (Mth.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
-        matrices.popPose();
+        poseStack.pushPose();
+        poseStack.translate(0f, 0.8f, 0f);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+        poseStack.mulPose(Axis.YP.rotationDegrees(-spin));
+        poseStack.scale(0.9F, 4.1F, 0.9F);
+        ModelAstroBlasterBody.render(poseStack, submitNodeCollector, RRRenderTypes.LIGHTNING_ASTRO_BLAST_TRIANGLES, (float) (0.22f + (Mth.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
+        poseStack.popPose();
 
-        matrices.popPose();
+        poseStack.popPose();
     }
 }
 

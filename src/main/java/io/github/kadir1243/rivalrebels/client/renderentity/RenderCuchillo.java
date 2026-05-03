@@ -13,18 +13,19 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import com.mojang.math.Transformation;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.entity.EntityCuchillo;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -40,7 +41,7 @@ public class RenderCuchillo extends EntityRenderer<EntityCuchillo, RenderCuchill
         super(context);
     }
 
-    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
         byte var11 = 0;
         float var12 = 0.0F;
         float var13 = 0.5F;
@@ -71,18 +72,16 @@ public class RenderCuchillo extends EntityRenderer<EntityCuchillo, RenderCuchill
     });
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90));
 		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etknife));
 		float var20 = 0.05625F;
 
         poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
 		poseStack.scale(var20, var20, var20);
 		poseStack.translate(-4.0F, 0.0F, 0.0F);
-        ModelBlockRenderer.renderModel(poseStack.last(), buffer, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, packedLight, OverlayTexture.NO_OVERLAY);
-
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etknife), BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
 	}
 

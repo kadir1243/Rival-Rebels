@@ -38,9 +38,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.Animal;
-import net.minecraft.world.entity.animal.Squid;
+import net.minecraft.world.entity.animal.squid.Squid;
 import net.minecraft.world.entity.monster.Ghast;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.npc.villager.Villager;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -59,7 +59,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.neoforged.neoforge.model.data.ModelData;
 import net.neoforged.neoforge.model.data.ModelProperty;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 import org.joml.Vector3f;
 
 public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuConstructor {
@@ -156,7 +156,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 			{
                 ChipData chipData = getItem(6).get(RRComponents.CHIP_DATA);
                 team = chipData.team();
-				owner = new ResolvableProfile(chipData.gameProfile());
+				owner = ResolvableProfile.createResolved(chipData.gameProfile());
 			}
 			setItem(6, ItemStack.EMPTY);
             setItem(7, ItemStack.EMPTY);
@@ -186,7 +186,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 					lookAt(target);
 					if (hasAmmo())
 					{
-						if (level.random.nextInt(3) == 0) {
+						if (level.getRandom().nextInt(3) == 0) {
 							getLevel().playLocalSound(getBlockPos(), RRSounds.FLAME_THROWER_EXTINGUISH.get(), SoundSource.BLOCKS, 0.1F, 1F, false);
 						}
 						float yaw = 180 - this.yaw;
@@ -281,7 +281,7 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
             else if (!kTeam) return false;
             RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(((Player) e).getGameProfile());
             if (rrp == null) return kTeam;
-            if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getGameProfile().equals(owner != null ? owner.gameProfile() : null);
+            if (rrp.rrteam == RivalRebelsTeam.NONE) return !p.getGameProfile().equals(owner != null ? owner.partialProfile() : null);
             if (rrp.rrteam != team) return kTeam;
             else return false;
         }

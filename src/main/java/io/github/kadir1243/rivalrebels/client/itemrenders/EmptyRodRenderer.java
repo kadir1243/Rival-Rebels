@@ -15,27 +15,33 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRod;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
+import org.joml.Vector3fc;
+
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class EmptyRodRenderer implements DynamicItemRenderer {
+public class EmptyRodRenderer implements NoDataSpecialModelRenderer {
     @Override
-    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-		matrices.translate(0.5f, 0.5f, -0.03f);
-		matrices.mulPose(Axis.ZP.rotationDegrees(35));
-		matrices.scale(0.5f, 1.25f, 0.5f);
-		matrices.pushPose();
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+        poseStack.pushPose();
+		poseStack.translate(0.5f, 0.5f, -0.03f);
+		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+		poseStack.scale(0.5f, 1.25f, 0.5f);
+		poseStack.pushPose();
 
-		ModelRod.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etemptyrod)), light, overlay);
+		ModelRod.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etemptyrod), lightCoords, overlayCoords);
 
-		matrices.popPose();
-		matrices.popPose();
+		poseStack.popPose();
+		poseStack.popPose();
 	}
+
+    @Override
+    public void getExtents(Consumer<Vector3fc> output) {
+    }
 }
 

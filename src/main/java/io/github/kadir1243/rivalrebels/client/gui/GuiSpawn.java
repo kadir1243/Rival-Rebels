@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiButton;
@@ -22,13 +23,14 @@ import io.github.kadir1243.rivalrebels.common.round.RivalRebelsClass;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
-import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.PlayerInfo;
@@ -106,14 +108,14 @@ public class GuiSpawn extends Screen {
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         RivalRebelsPlayer nw = RivalRebels.round.rrplayerlist.getForGameProfile(minecraft.player.getGameProfile());
 		classButton.active = nw.isreset;
 		omegaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.OMEGA;
 		sigmaButton.active = nw.rrteam == RivalRebelsTeam.NONE || nw.rrteam == RivalRebelsTeam.SIGMA;
 		resetButton.active = nw.resets > 0 && !nw.isreset;
         float f = 0.00390625F;
-		renderTransparentBackground(graphics);
+		extractTransparentBackground(graphics);
         graphics.fillGradient(posX, posY, posX + xSizeOfTexture, posY + ySizeOfTexture, CommonColors.BLACK, CommonColors.BLACK); // 0xFF587075, 0xFF041010);
 		drawPanel(graphics, posX + 10, posY + 142, 80, omegaScroll.getScroll(), omegaScroll.limit, RivalRebelsTeam.OMEGA);
 		drawPanel(graphics, posX + 135, posY + 142, 80, sigmaScroll.getScroll(), sigmaScroll.limit, RivalRebelsTeam.SIGMA);
@@ -121,52 +123,48 @@ public class GuiSpawn extends Screen {
         graphics.fillGradient(posX + 6, posY + 99, posX + 161, posY + 131, CommonColors.BLACK, CommonColors.BLACK);
 		drawPanel(graphics, posX + 10, posY + 105, 50, playerScroll.getScroll(), playerScroll.limit, new String[] { rrclass.name }, new int[] { rrclass.color });
 
-        ((GuiGraphicsAccessor) graphics).blit(
-            RenderPipelines.GUI_TEXTURED,
+        graphics.blit(
             RRTextures.guitspawn,
             posX,
-            posX + xSizeOfTexture,
             posY,
+            posX + xSizeOfTexture,
             posY + ySizeOfTexture,
             0, // z offset
             0,
             xSizeOfTexture * f,
-            ySizeOfTexture * f,
-            0
+            ySizeOfTexture * f
         );
 
         if (RRIdentifiers.banner != null) {
-            ((GuiGraphicsAccessor) graphics).blit(
-                RenderPipelines.GUI_TEXTURED,
+            graphics.blit(
                 RRIdentifiers.banner,
                 posX + 3,
-                posX + 253,
                 posY + 3,
+                posX + 253,
                 posY + 61,
                 0, // z offset
                 0,
                 1,
-                1,
-                0
+                1
             );
         }
 
-		super.render(graphics, mouseX, mouseY, delta);
+		super.extractRenderState(graphics, mouseX, mouseY, a);
 
-		graphics.drawString(font, String.valueOf(RivalRebels.round.getOmegaWins()), posX + 9, posY + 239, 0xFFFFFF, false);
-		graphics.drawString(font, String.valueOf(RivalRebels.round.getSigmaWins()), posX + 134, posY + 239, 0xFFFFFF, false);
+		graphics.text(font, String.valueOf(RivalRebels.round.getOmegaWins()), posX + 9, posY + 239, 0xFFFFFF, false);
+		graphics.text(font, String.valueOf(RivalRebels.round.getSigmaWins()), posX + 134, posY + 239, 0xFFFFFF, false);
 
-		if (resetButton.mouseClicked(mouseX, mouseY, 0) && resetButton.active) {
+		if (resetButton.mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false) && resetButton.active) {
             graphics.fillGradient(mouseX, mouseY, mouseX + 120, mouseY + 20, 0xaa111111, 0xaa111111);
 			float scalefactor = 0.666f;
             graphics.pose().pushMatrix();
             graphics.pose().scale(scalefactor, scalefactor);
-            MultiLineLabel.create(font, Translations.SPAWN_RESET_WARNING.translate(), (int) (116 / scalefactor)).renderLeftAlignedNoShadow(graphics, (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), font.lineHeight, 0xFF0000);
+            MultiLineLabel.create(font, Translations.SPAWN_RESET_WARNING.translate().withColor(0xFF0000), (int) (116 / scalefactor)).visitLines(TextAlignment.LEFT, (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), font.lineHeight, graphics.textRenderer());
             graphics.pose().popMatrix();
 		}
     }
 
-	protected void drawPanel(GuiGraphics graphics, int x, int y, int height, float scroll, float scrolllimit, RivalRebelsTeam team) {
+	protected void drawPanel(GuiGraphicsExtractor graphics, int x, int y, int height, float scroll, float scrolllimit, RivalRebelsTeam team) {
         List<RivalRebelsPlayer> newList;
 
         newList = RivalRebels.round.rrplayerlist.players().stream().filter(player -> player.rrteam.equals(team)).collect(Collectors.toList());
@@ -193,12 +191,12 @@ public class GuiSpawn extends Screen {
 					b /= 2;
 				}
 				color = (r << 16) | (g << 8) | b;
-                graphics.drawString(font, player.getUsername(), x, y + Y, color, false);
+                graphics.text(font, player.getUsername(), x, y + Y, color, false);
 			}
 		}
 	}
 
-	protected void drawPanel(GuiGraphics graphics, int x, int y, int height, float scroll, float scrolllimit, String[] display, int[] color)
+	protected void drawPanel(GuiGraphicsExtractor graphics, int x, int y, int height, float scroll, float scrolllimit, String[] display, int[] color)
 	{
 		int dist = (int) (-(scroll / scrolllimit) * (((display.length) * 10) - height));
 		boolean shouldScroll = (display.length) * 10 > height;
@@ -206,17 +204,17 @@ public class GuiSpawn extends Screen {
 		{
 			int Y = dist + (i * 10);
 			if (!shouldScroll) Y -= dist;
-			if (Y > -9 && Y < height + 9) graphics.drawString(font, Component.translatable(display[i]), x, y + Y, color[i], false);
+			if (Y > -9 && Y < height + 9) graphics.text(font, Component.translatable(display[i]), x, y + Y, color[i], false);
 		}
 	}
 
-	protected void drawPanel(GuiGraphics graphics, int x, int y, int width, int height, float scroll, float scrolllimit, String display) {
+	protected void drawPanel(GuiGraphicsExtractor graphics, int x, int y, int width, int height, float scroll, float scrolllimit, String display) {
         int length = 10;
 		int dist = (int) (-(scroll / scrolllimit) * (((length) * 10) - height));
 		float scalefactor = 0.6666f;
         graphics.pose().pushMatrix();
         graphics.pose().scale(scalefactor, scalefactor);
-        MultiLineLabel.create(font, Component.nullToEmpty(display), (int) (width * 1.5)).renderLeftAlignedNoShadow(graphics, (int) (x * 1.5), (int) ((y + dist) * 1.5), font.lineHeight, 0xffffff);
+        MultiLineLabel.create(font, Component.nullToEmpty(display), (int) (width * 1.5)).visitLines(TextAlignment.LEFT, (int) (x * 1.5), (int) ((y + dist) * 1.5), font.lineHeight, graphics.textRenderer());
         graphics.pose().popMatrix();
 	}
 

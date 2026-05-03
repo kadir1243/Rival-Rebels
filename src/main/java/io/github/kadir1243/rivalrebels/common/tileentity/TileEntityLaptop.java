@@ -37,7 +37,7 @@ import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickable {
     public RivalRebelsTeam rrteam = RivalRebelsTeam.NONE;

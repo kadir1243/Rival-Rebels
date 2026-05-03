@@ -17,11 +17,13 @@ import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.permissions.Permission;
+import net.minecraft.server.permissions.PermissionLevel;
 
 public class CommandMotD {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("rrmotd")
-            .requires(arg -> arg.hasPermission(3))
+            .requires(arg -> arg.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS)))
                 .executes(context -> execute(context.getSource(), null))
             .then(Commands.argument("motd", StringArgumentType.greedyString())
                 .executes(context -> execute(context.getSource(), StringArgumentType.getString(context, "motd"))))

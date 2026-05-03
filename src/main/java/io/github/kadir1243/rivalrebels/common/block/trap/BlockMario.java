@@ -44,7 +44,7 @@ public class BlockMario extends Block
 	}
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
 		if (entity instanceof Player || entity instanceof Mob) {
 			level.setBlockAndUpdate(pos, Blocks.GRAVEL.defaultBlockState());
 		}

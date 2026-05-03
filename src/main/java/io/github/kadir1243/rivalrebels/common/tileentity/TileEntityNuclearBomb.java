@@ -146,8 +146,8 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
 			{
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.displayClientMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
-                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".nuke_bomb_defuse", rrteam.getBlockName()), false);
+                    player.sendSystemMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)));
+                    player.sendSystemMessage(Component.translatable(RRIdentifiers.MODID + ".nuke_bomb_defuse", rrteam.getBlockName()));
                 }
 			}
 		}

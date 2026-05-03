@@ -1,0 +1,14 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "P": "rivalrebels:pliers",
+    "W": "#minecraft:wool"
+  },
+  "pattern": [
+    "WP"
+  ],
+  "result": {
+    "id": "rivalrebels:flagbox1"
+  }
+}

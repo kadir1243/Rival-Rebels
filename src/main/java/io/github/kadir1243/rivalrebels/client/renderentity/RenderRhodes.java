@@ -13,42 +13,41 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.RivalRebels;
-import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.entity.RhodesType;
 import io.github.kadir1243.rivalrebels.common.entity.RhodesTypes;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
-import org.joml.Matrix4f;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.State> {
-    private static final ResourceLocation flame = RRIdentifiers.create("textures/entity/flame.png");
+    private static final Identifier flame = RRIdentifiers.create("textures/entity/flame.png");
     private final QuadCollection headModel;
     private final QuadCollection b2jetForRhodesModel;
     private final QuadCollection torsoModel;
@@ -70,10 +69,11 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
     private final QuadCollection ffThighModel;
     private final QuadCollection ffShinModel;
     private final QuadCollection shuttleModel;
+    private final QuadCollection blastSphereModel;
 
     public RenderRhodes(EntityRendererProvider.Context context) {
         super(context);
-        ModelManager modelManager = context.getModelManager();
+        ModelManager modelManager = Minecraft.getInstance().getModelManager();
         headModel = modelManager.getStandaloneModel(ObjModels.HEAD_MODEL);
         b2jetForRhodesModel = modelManager.getStandaloneModel(ObjModels.B2_JET_FOR_RHODES_MODEL);
         torsoModel = modelManager.getStandaloneModel(ObjModels.TORSO_MODEL);
@@ -95,6 +95,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
         ffThighModel = modelManager.getStandaloneModel(ObjModels.FF_THIGH_MODEL);
         ffShinModel = modelManager.getStandaloneModel(ObjModels.FF_SHIN_MODEL);
         shuttleModel = modelManager.getStandaloneModel(ObjModels.SHUTTLE_MODEL);
+        blastSphereModel = modelManager.getStandaloneModel(ObjModels.BLAST_SPHERE_MODEL);
     }
 
     @Override
@@ -113,7 +114,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
     }
 
     @Override
-    protected void renderNameTag(State renderState, Component displayName, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    protected void submitNameDisplay(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         int color = 0;
         if (renderState.rider != null) {
             RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(renderState.rider.getGameProfile());
@@ -125,17 +126,14 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
         }
         poseStack.pushPose();
         poseStack.translate(0, 16, 0);
-        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
+        poseStack.mulPose(cameraRenderState.orientation);
         poseStack.scale(0.025F, -0.025F, 0.025F);
-        Matrix4f matrix4f = poseStack.last().pose();
         float f = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
         int j = (int)(f * 255.0F) << 24;
         Font font = this.getFont();
-        float x = (float)(-font.width(displayName) / 2);
-        font.drawInBatch(
-            displayName, x, 0, color, false, matrix4f, bufferSource, Font.DisplayMode.SEE_THROUGH, j, packedLight
-        );
-        font.drawInBatch(displayName, x, 0, color, false, matrix4f, bufferSource, Font.DisplayMode.NORMAL, 0, packedLight);
+        float x = (float)(-font.width(renderState.displayName) / 2);
+        nodeCollector.submitText(poseStack, x, 0, renderState.displayName.getVisualOrderText(), false, Font.DisplayMode.SEE_THROUGH, renderState.lightCoords, color, j, CommonColors.WHITE);
+        nodeCollector.submitText(poseStack, x, 0, renderState.displayName.getVisualOrderText(), false, Font.DisplayMode.NORMAL, renderState.lightCoords, color, 0, CommonColors.WHITE);
 
         poseStack.popPose();
     }
@@ -146,41 +144,35 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
     }
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         if (renderState.health > 0) {
 			poseStack.pushPose();
 			poseStack.scale(renderState.scale, renderState.scale, renderState.scale);
 
-            {
-                Component name = renderState.displayName;
-                if (renderState.rider != null) {
-                    name = name.copy().append(" - ").append(renderState.rider.getDisplayName());
-                }
-                this.renderNameTag(renderState, name, poseStack, bufferSource, packedLight);
-            }
+            this.submitNameDisplay(renderState, poseStack, nodeCollector, cameraRenderState);
 
             RhodesType rhodesType = renderState.variant.value();
+            int packedLight = renderState.lightCoords;
             if (rhodesType == RhodesTypes.Space) {
                 {
                     poseStack.pushPose();
                     poseStack.mulPose(Axis.YP.rotationDegrees(renderState.bodyyaw));
                     poseStack.translate(0, 10f, 0);
-                    ObjModels.render(boosterModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etbooster)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                    ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etbooster), boosterModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                     {
                         poseStack.pushPose();
                         poseStack.mulPose(Axis.XP.rotationDegrees(-90));
                         poseStack.translate(0, 4, -2);
                         poseStack.scale(2.2f, 2.2f, 2.2f);
                         if (renderState.b2Energy > 0) {
-                            ObjModels.render(shuttleModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etb2spirit)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), shuttleModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                         }
                         poseStack.popPose();
                     }
                     poseStack.popPose();
                 }
 			} else {
-                VertexConsumer noiseBuffer = bufferSource.getBuffer(RenderTypes.CELLULAR_NOISE);
-                VertexConsumer textureBuffer = bufferSource.getBuffer(RenderType.entitySolid(rhodesType.getTexture()));
+                RenderType textureRenderType = RenderTypes.entitySolid(rhodesType.getTexture());
                 poseStack.mulPose(Axis.YP.rotationDegrees(renderState.bodyyaw));
 
 				float leftlegheight = 7.26756f - 15
@@ -201,18 +193,18 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     if (renderState.b2Energy > 0) {
                         poseStack.pushPose();
                         poseStack.scale(2.5F, 2.5F, 2.5F);
-                        ObjModels.render(b2ForSpiritModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etb2spirit)), poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), b2ForSpiritModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                         poseStack.popPose();
                     }
                     if (renderState.jet && renderState.b2Energy > 0) {
                         poseStack.pushPose();
                         poseStack.scale(2.5F, 2.5F, 2.5F);
-                        ObjModels.render(b2jetForRhodesModel, bufferSource.getBuffer(RenderType.entityTranslucent(flame)), poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, RenderTypes.entityTranslucent(flame), b2jetForRhodesModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                         poseStack.popPose();
                     }
                     poseStack.popPose();
 
-                    ObjModels.render(torsoModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                    ObjModels.submit(nodeCollector, textureRenderType, torsoModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
 
                     {//RIGHT UPPERARM
@@ -220,16 +212,16 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         poseStack.translate(-6.4f, 0, 0);
                         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rightarmyaw));
                         poseStack.scale(-1, 1, 1);
-                        ObjModels.render(upperArmModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, textureRenderType, upperArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         //RIGHT LOWERARM
                         {
                             poseStack.pushPose();
                             poseStack.translate(0, -1.5f, 0);
                             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightarmpitch));
-                            ObjModels.render(lowerArmModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, textureRenderType, lowerArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             poseStack.scale(-1, 1, 1);
-                            ObjModels.render(flameThrowerModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, textureRenderType, flameThrowerModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             poseStack.popPose();
                         }
 
@@ -240,14 +232,14 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         poseStack.pushPose();
                         poseStack.translate(6.4f, 0, 0);
                         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.leftarmyaw));
-                        ObjModels.render(upperArmModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, textureRenderType, upperArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         {//LEFT LOWERARM
                             poseStack.pushPose();
                             poseStack.translate(0, -1.5f, 0);
                             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftarmpitch));
-                            ObjModels.render(lowerArmModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
-                            ObjModels.render(rocketLauncherModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, textureRenderType, lowerArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, textureRenderType, rocketLauncherModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             poseStack.popPose();
                         }
 
@@ -259,15 +251,15 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         poseStack.translate(0, -7.26756f, -0.27904f);
                         poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightthighpitch));
                         poseStack.scale(-1, 1, 1);
-                        ObjModels.render(thighModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, textureRenderType, thighModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         {//RIGHT SHIN
                             poseStack.pushPose();
                             poseStack.translate(0, -7.17156f, -1.52395f);
                             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightshinpitch));
-                            ObjModels.render(shinModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, textureRenderType, shinModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             if (renderState.isBurning) {
-                                ObjModels.render(flameModel, bufferSource.getBuffer(RenderType.entityCutout(flame)), poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RenderTypes.entityCutout(flame), flameModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             }
                             poseStack.popPose();
                         }
@@ -279,16 +271,16 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         poseStack.pushPose();
                         poseStack.translate(0, -7.26756f, -0.27904f);
                         poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftthighpitch));
-                        ObjModels.render(thighModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, textureRenderType, thighModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         //LEFT SHIN
                         {
                             poseStack.pushPose();
                             poseStack.translate(0, -7.17156f, -1.52395f);
                             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftshinpitch));
-                            ObjModels.render(shinModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, textureRenderType, shinModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             if (renderState.isBurning) {
-                                ObjModels.render(flameModel, bufferSource.getBuffer(RenderType.entityCutout(flame)), poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RenderTypes.entityCutout(flame), flameModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             }
                             poseStack.popPose();
                         }
@@ -301,16 +293,16 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         poseStack.translate(0, 5.23244f, 0);
                         poseStack.mulPose(Axis.XP.rotationDegrees(renderState.headpitch));
                         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.viewYRot));
-                        ObjModels.render(headModel, textureBuffer, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, textureRenderType, headModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         {
                             int color = ARGB.colorFromFloat(0.5F, 1, 0, 0);
                             if (renderState.topLaserEnabled) {
-                                ObjModels.render(laserModel, bufferSource.getBuffer(RenderTypes.LASER_RENDER_TYPE), poseStack, color, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RRRenderTypes.LASER_RENDER_TYPE, laserModel, poseStack, color, packedLight, OverlayTexture.NO_OVERLAY);
                             } else if (renderState.bottomLaserEnabled) {
                                 poseStack.scale(1, -1, 1);
                                 //GlStateManager.cullFace(GlStateManager.CullFace.FRONT);
-                                ObjModels.render(laserModel, bufferSource.getBuffer(RenderTypes.LASER_RENDER_TYPE), poseStack, color, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RRRenderTypes.LASER_RENDER_TYPE, laserModel, poseStack, color, packedLight, OverlayTexture.NO_OVERLAY);
                                 //GlStateManager.cullFace(GlStateManager.CullFace.BACK);
                             }
                         }
@@ -324,23 +316,23 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     poseStack.translate(0, Math.max(leftlegheight, rightlegheight), 0);
                     if (!renderState.flagTextureLocation.isBlank()) {
                         try {
-                            ObjModels.render(flagModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.create(renderState.flagTextureLocation + ".png"))), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.create(renderState.flagTextureLocation + ".png")), flagModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                         } catch (Exception ignored) {
                         }
                     }
                     if (renderState.forceFieldEnabled) {
-                        ObjModels.render(ffTorsoModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                        ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffTorsoModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                         {//RIGHT UPPERARM
                             poseStack.pushPose();
                             poseStack.translate(-6.4f, 0, 0);
                             poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rightarmyaw));
                             poseStack.scale(-1, 1, 1);
-                            ObjModels.render(ffUpperArmModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffUpperArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//RIGHT LOWERARM
                                 poseStack.pushPose();
                                 poseStack.translate(0, -1.5f, 0);
                                 poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightarmpitch));
-                                ObjModels.render(ffLowerArmModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffLowerArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
                             poseStack.popPose();
@@ -349,12 +341,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                             poseStack.pushPose();
                             poseStack.translate(6.4f, 0, 0);
                             poseStack.mulPose(Axis.YP.rotationDegrees(renderState.leftarmyaw));
-                            ObjModels.render(ffUpperArmModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffUpperArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//LEFT LOWERARM
                                 poseStack.pushPose();
                                 poseStack.translate(0, -1.5f, 0);
                                 poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftarmpitch));
-                                ObjModels.render(ffLowerArmModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffLowerArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
                             poseStack.popPose();
@@ -364,12 +356,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                             poseStack.translate(0, -7.26756f, -0.27904f);
                             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightthighpitch));
                             poseStack.scale(-1, 1, 1);
-                            ObjModels.render(ffThighModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffThighModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//RIGHT SHIN
                                 poseStack.pushPose();
                                 poseStack.translate(0, -7.17156f, -1.52395f);
                                 poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightshinpitch));
-                                ObjModels.render(ffShinModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffShinModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
                             poseStack.popPose();
@@ -378,12 +370,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                             poseStack.pushPose();
                             poseStack.translate(0, -7.26756f, -0.27904f);
                             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftthighpitch));
-                            ObjModels.render(ffThighModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffThighModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//LEFT SHIN
                                 poseStack.pushPose();
                                 poseStack.translate(0, -7.17156f, -1.52395f);
                                 poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftshinpitch));
-                                ObjModels.render(ffShinModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                                ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffShinModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
                             poseStack.popPose();
@@ -393,7 +385,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                             poseStack.translate(0, 5.23244f, 0);
                             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.headpitch));
                             poseStack.mulPose(Axis.YP.rotationDegrees(renderState.viewYRot));
-                            ObjModels.render(ffheadModel, noiseBuffer, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
+                            ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffheadModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             poseStack.popPose();
                         }
                     }
@@ -403,38 +395,55 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
 	    	poseStack.popPose();
 		}
 		if (renderState.health < 1) {
-            VertexConsumer lightning = bufferSource.getBuffer(RenderTypes.RHODES_LIGHTNING);
             poseStack.pushPose();
 
 			float elev = Mth.sin((renderState.health-renderState.partialTick)*-(Mth.PI / 100))*15;
 
-            poseStack.pushPose();
-			poseStack.mulPose(Axis.YP.rotationDegrees(elev * 2));
-			poseStack.mulPose(Axis.XP.rotationDegrees(elev * 3));
-			ModelBlastSphere.renderModel(poseStack, lightning, elev, ARGB.colorFromFloat(1F, 1F, 0.25f, 0));
-			poseStack.popPose();
+            {
+                poseStack.pushPose();
+                poseStack.mulPose(Axis.YP.rotationDegrees(elev * 2));
+                poseStack.mulPose(Axis.XP.rotationDegrees(elev * 3));
+                renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev, ARGB.colorFromFloat(1F, 1F, 0.25f, 0));
+                poseStack.popPose();
+            }
 
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(elev * -2));
-            poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 4));
-			ModelBlastSphere.renderModel(poseStack, lightning, elev - 0.2f, ARGB.colorFromFloat(1F, 1, 0.5f, 0));
-			poseStack.popPose();
+            {
+                poseStack.pushPose();
+                poseStack.mulPose(Axis.YP.rotationDegrees(elev * -2));
+                poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 4));
+                renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev - 0.2f, ARGB.colorFromFloat(1F, 1, 0.5f, 0));
+                poseStack.popPose();
+            }
 
-            poseStack.pushPose();
-			poseStack.mulPose(Axis.XP.rotationDegrees(elev * -3));
-			poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 2));
-			ModelBlastSphere.renderModel(poseStack, lightning, elev - 0.4f, CommonColors.RED);
-			poseStack.popPose();
+            {
+                poseStack.pushPose();
+                poseStack.mulPose(Axis.XP.rotationDegrees(elev * -3));
+                poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 2));
+                renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev - 0.4f, CommonColors.RED);
+                poseStack.popPose();
+            }
 
-            poseStack.pushPose();
-			poseStack.mulPose(Axis.YP.rotationDegrees(elev * -1));
-			poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 3));
-			ModelBlastSphere.renderModel(poseStack, lightning, elev - 0.6f, CommonColors.YELLOW);
-			poseStack.popPose();
+            {
+                poseStack.pushPose();
+                poseStack.mulPose(Axis.YP.rotationDegrees(elev * -1));
+                poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 3));
+                renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev - 0.6f, CommonColors.YELLOW);
+                poseStack.popPose();
+            }
 
             poseStack.popPose();
 		}
 	}
+
+    private void renderBlastSphereWithLightningRenderType(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, float scale, int color) {
+        poseStack.pushPose();
+        poseStack.scale(scale, scale, scale);
+        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.RHODES_LIGHTNING, (pose, consumer) -> {
+            ObjModels.render(blastSphereModel, consumer, pose, color, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+        });
+
+        poseStack.popPose();
+    }
 
     @Override
     public void extractRenderState(EntityRhodes p_entity, State reusedState, float partialTick) {
@@ -466,6 +475,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
         reusedState.bottomLaserEnabled = p_entity.isBottomLaserEnabled();
         reusedState.forceFieldEnabled = p_entity.isForceFieldEnabled();
         reusedState.jet = p_entity.jet;
+
+        Component name = reusedState.displayName;
+        if (reusedState.rider != null) {
+            name = name.copy().append(" - ").append(reusedState.rider.getDisplayName());
+        }
+        reusedState.displayName = name;
     }
 
     public static class State extends EntityRenderState {

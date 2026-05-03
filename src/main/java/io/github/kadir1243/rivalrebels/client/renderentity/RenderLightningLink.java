@@ -12,16 +12,16 @@
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.common.entity.EntityLightningLink;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -43,7 +43,7 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink, Ren
     }
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		float segmentDistance = RRConfig.CLIENT.getTeslaSegments();
 		float distance = (float) renderState.deltaMovement.x() * 100;
 		distance = 100;
@@ -57,7 +57,6 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink, Ren
 		if (distance > 0) {
 			RandomSource random = renderState.random;
 			float radius = 0.07F;
-            VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.LIGHTNING_LINK);
 
             poseStack.pushPose();
 			poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
@@ -87,25 +86,33 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink, Ren
 				}
 
 				for (float o = 0; o <= radius; o += radius / 8) {
-                    buffer.addVertex(poseStack.last(), AddedX + o, AddedY - o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), AddedX + o, AddedY + o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
+                    float finalAddedX = AddedX;
+                    float finalO = o;
+                    float finalPrevAddedX = prevAddedX;
+                    float finalAddedY = AddedY;
+                    float finalPrevAddedY = prevAddedY;
+                    int finalAddedZ = addedZ;
+                    nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.LIGHTNING_LINK, (pose, consumer) -> {
+                        consumer.addVertex(pose, finalAddedX + finalO, finalAddedY - finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalAddedX + finalO, finalAddedY + finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX + finalO, finalPrevAddedY + finalO, finalAddedZ + segmentDistance).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX + finalO, finalPrevAddedY - finalO, finalAddedZ + segmentDistance).setColor(COLOR);
 
-                    buffer.addVertex(poseStack.last(), AddedX - o, AddedY - o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), AddedX + o, AddedY - o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX + o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
+                        consumer.addVertex(pose, finalAddedX - finalO, finalAddedY - finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalAddedX + finalO, finalAddedY - finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX + finalO, finalPrevAddedY - finalO, finalAddedZ + segmentDistance).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX - finalO, finalPrevAddedY - finalO, finalAddedZ + segmentDistance).setColor(COLOR);
 
-                    buffer.addVertex(poseStack.last(), AddedX - o, AddedY + o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), AddedX - o, AddedY - o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX - o, prevAddedY - o, addedZ + segmentDistance).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
+                        consumer.addVertex(pose, finalAddedX - finalO, finalAddedY + finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalAddedX - finalO, finalAddedY - finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX - finalO, finalPrevAddedY - finalO, finalAddedZ + segmentDistance).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX - finalO, finalPrevAddedY + finalO, finalAddedZ + segmentDistance).setColor(COLOR);
 
-                    buffer.addVertex(poseStack.last(), AddedX + o, AddedY + o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), AddedX - o, AddedY + o, addedZ).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX - o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
-                    buffer.addVertex(poseStack.last(), prevAddedX + o, prevAddedY + o, addedZ + segmentDistance).setColor(COLOR);
+                        consumer.addVertex(pose, finalAddedX + finalO, finalAddedY + finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalAddedX - finalO, finalAddedY + finalO, finalAddedZ).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX - finalO, finalPrevAddedY + finalO, finalAddedZ + segmentDistance).setColor(COLOR);
+                        consumer.addVertex(pose, finalPrevAddedX + finalO, finalPrevAddedY + finalO, finalAddedZ + segmentDistance).setColor(COLOR);
+                    });
 				}
 			}
 

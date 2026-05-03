@@ -13,13 +13,13 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.common.entity.EntityLaserBurst;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -35,10 +35,9 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst, RenderLas
     }
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         float radius = 0.12F;
         int distance = 4;
-        VertexConsumer buffer = bufferSource.getBuffer(RenderType.lightning());
         poseStack.pushPose();
 
         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
@@ -47,15 +46,19 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst, RenderLas
         for (float o = 0; o <= radius; o += radius / 8) {
             float color = 1f - (o * 8.333f);
             if (color < 0) color = 0;
-            buffer.addVertex(poseStack.last(), 0 + o, 0 - o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(poseStack.last(), 0 + o, 0 + o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(poseStack.last(), 0 + o, 0 + o, distance).setColor(red, color, color, 1);
-            buffer.addVertex(poseStack.last(), 0 + o, 0 - o, distance).setColor(red, color, color, 1);
+            float finalO = o;
+            float finalColor = color;
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.lightning(), (pose, consumer) -> {
+                consumer.addVertex(pose, 0 + finalO, 0 - finalO, 0).setColor(red, finalColor, finalColor, 1);
+                consumer.addVertex(pose, 0 + finalO, 0 + finalO, 0).setColor(red, finalColor, finalColor, 1);
+                consumer.addVertex(pose, 0 + finalO, 0 + finalO, distance).setColor(red, finalColor, finalColor, 1);
+                consumer.addVertex(pose, 0 + finalO, 0 - finalO, distance).setColor(red, finalColor, finalColor, 1);
 
-            buffer.addVertex(poseStack.last(), 0 - o, 0 - o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(poseStack.last(), 0 - o, 0 - o, distance).setColor(red, color, color, 1);
-            buffer.addVertex(poseStack.last(), 0 - o, 0 + o, 0).setColor(red, color, color, 1);
-            buffer.addVertex(poseStack.last(), 0 - o, 0 + o, distance).setColor(red, color, color, 1);
+                consumer.addVertex(pose, 0 - finalO, 0 - finalO, 0).setColor(red, finalColor, finalColor, 1);
+                consumer.addVertex(pose, 0 - finalO, 0 - finalO, distance).setColor(red, finalColor, finalColor, 1);
+                consumer.addVertex(pose, 0 - finalO, 0 + finalO, 0).setColor(red, finalColor, finalColor, 1);
+                consumer.addVertex(pose, 0 - finalO, 0 + finalO, distance).setColor(red, finalColor, finalColor, 1);
+            });
         }
         poseStack.popPose();
     }

@@ -14,17 +14,17 @@ package io.github.kadir1243.rivalrebels.client.model;
 import com.mojang.math.Transformation;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRocket;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.client.renderer.block.model.TextureSlots;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.block.dispatch.ModelState;
+import net.minecraft.client.resources.model.sprite.TextureSlots;
+import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelDebugName;
-import net.minecraft.client.resources.model.ModelState;
-import net.minecraft.client.resources.model.QuadCollection;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.context.ContextMap;
 import net.neoforged.neoforge.client.model.ExtendedUnbakedGeometry;
 import org.joml.Vector3f;
@@ -98,15 +98,15 @@ public class ModelRocket implements ExtendedUnbakedGeometry {
         QuadHelper.addFace(buffer, vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3);
     });
 
-    public static void render(PoseStack pose, MultiBufferSource vertexConsumers, ResourceLocation texture, boolean fins, int light, int overlay) {
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
+    public static void render(PoseStack pose, SubmitNodeCollector nodeCollector, Identifier texture, boolean fins, int light, int overlay) {
+        RenderType renderType = RenderTypes.entitySolid(texture);
         pose.pushPose();
 		pose.scale(0.125f, 0.25f, 0.125f);
 
-        ModelBlockRenderer.renderModel(pose.last(), buffer, BAKED_MODEL_WITHOUT_FINS.get().blockStateModel(), 1, 1, 1, light, overlay);
+        ObjModels.submit(nodeCollector, renderType, BAKED_MODEL_WITHOUT_FINS.get().quadCollection(), pose, CommonColors.WHITE, light, overlay);
 
         if (fins) {
-            ModelBlockRenderer.renderModel(pose.last(), buffer, BAKED_MODEL_FINS.get().blockStateModel(), 1, 1, 1, light, overlay);
+            ObjModels.submit(nodeCollector, renderType, BAKED_MODEL_FINS.get().quadCollection(), pose, CommonColors.WHITE, light, overlay);
         }
 
 		pose.popPose();
@@ -141,6 +141,6 @@ public class ModelRocket implements ExtendedUnbakedGeometry {
                 QuadHelper.addFace(buffer, vnz3, vpz3, vpz4, vnz4, tx3, tx4, ty1, ty3);
                 QuadHelper.addFace(buffer, vpz3, vnz3, vnz4, vpz4, tx3, tx4, ty1, ty3);
             }
-        }, Transformation.identity());
+        }, Transformation.IDENTITY);
     }
 }

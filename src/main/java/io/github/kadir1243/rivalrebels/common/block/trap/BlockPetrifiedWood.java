@@ -25,7 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class BlockPetrifiedWood extends Block {
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
@@ -49,9 +49,9 @@ public class BlockPetrifiedWood extends Block {
 	}
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
-		if (level.random.nextInt(2) == 0) {
-			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), ((16 - level.getBlockState(pos).getValue(META)) / 2) + level.random.nextInt(3) - 1);
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
+		if (level.getRandom().nextInt(2) == 0) {
+			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), ((16 - level.getBlockState(pos).getValue(META)) / 2) + level.getRandom().nextInt(3) - 1);
 		}
 	}
 

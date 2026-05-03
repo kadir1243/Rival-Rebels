@@ -45,7 +45,7 @@ public class TachyonBomb {
 	public int processedchunks = 0;
 
 	public TachyonBomb(int x, int y, int z, Level world, int rad) {
-        noise = new RivalRebelsSimplexNoise(world.random);
+        noise = new RivalRebelsSimplexNoise(world.getRandom());
 		posX = x;
 		posY = y;
 		posZ = z;
@@ -129,10 +129,10 @@ public class TachyonBomb {
 				world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.AIR.defaultBlockState());
 			}
 
-			double limit = (radius / 2) + world.random.nextInt(radius / 4) + 7.5;
+			double limit = (radius / 2) + world.getRandom().nextInt(radius / 4) + 7.5;
 			if (dist < limit)
 			{
-				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--)
+				for (int Y = ylimit; Y > ylimit - (world.getRandom().nextInt(5) + 2); Y--)
 				{
 					if (Y == world.getMinY()) break;
 					BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
@@ -198,7 +198,7 @@ public class TachyonBomb {
 				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 				if (state.is(RRBlocks.reactive)) {
-					for (int i = 0; i < (1 - (dist / radius)) * 16 + world.random.nextDouble() * 2; i++) {
+					for (int i = 0; i < (1 - (dist / radius)) * 16 + world.getRandom().nextDouble() * 2; i++) {
 						world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					}
 				}

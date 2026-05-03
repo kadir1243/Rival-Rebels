@@ -11,11 +11,14 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 
 @OnlyIn(Dist.CLIENT)
@@ -32,14 +35,14 @@ public class GuiScroll extends GuiButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
 		int state = 0;
-		if (mouseClicked(mouseX, mouseY, 0)) state = 11;
+		if (mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false)) state = 11;
         RRTextures.guitbutton.blit(graphics, this.getX(), (int) (this.getY() + scroll), 0, state, this.width, this.height, CommonColors.WHITE);
 	}
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
+    protected void onDrag(MouseButtonEvent event, double mouseX, double mouseY) {
         scroll = (float) (mouseY - getY() - 5);
         scroll = Mth.clamp(scroll, 0, limit);
     }

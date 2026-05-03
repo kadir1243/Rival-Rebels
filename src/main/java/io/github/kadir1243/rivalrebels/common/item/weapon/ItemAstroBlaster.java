@@ -57,7 +57,7 @@ public class ItemAstroBlaster extends Item {
 			player.startUsingItem(hand);
             player.playSound(RRSounds.LAPTOP.get(), 0.7F, 0.7F);
 		} else if (!world.isClientSide()) {
-			player.displayClientMessage(Component.nullToEmpty("§cNot enough redstone rods"), false);
+			player.sendSystemMessage(Component.nullToEmpty("§cNot enough redstone rods"));
 		}
 		return InteractionResult.SUCCESS;
 	}

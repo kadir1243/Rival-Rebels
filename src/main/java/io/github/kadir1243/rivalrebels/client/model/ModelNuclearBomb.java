@@ -14,14 +14,13 @@ package io.github.kadir1243.rivalrebels.client.model;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.ModelBlockRenderer;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
 import org.joml.Vector3f;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -222,22 +221,21 @@ public class ModelNuclearBomb {
         QuadHelper.addVertice(buffer, v18, new TextureVertice(var3, var5));
     });
 
-    public static void renderModel(PoseStack pose, MultiBufferSource vertexConsumers, ResourceLocation texture, int light, boolean hasFuse) {
-        VertexConsumer buffer = vertexConsumers.getBuffer(RenderType.entitySolid(texture));
-        pose.pushPose();
-        pose.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
+    public static void renderModel(PoseStack poseStack, SubmitNodeCollector nodeCollector, Identifier texture, int light, boolean hasFuse) {
+        poseStack.pushPose();
+        poseStack.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         int itemIcon;
         float var3;
         float var4;
         float var5;
         float var6;
 
-        pose.pushPose();
-        pose.scale(1.01f, 1.01f, 1.01f);
+        poseStack.pushPose();
+        poseStack.scale(1.01f, 1.01f, 1.01f);
 
         int overlay = OverlayTexture.NO_OVERLAY;
 
-        ModelBlockRenderer.renderModel(pose.last(), buffer, BAKED_MODEL_BOMB.get().blockStateModel(), 1, 1, 1, light, overlay);
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(texture), BAKED_MODEL_BOMB.get().quadCollection(), poseStack, CommonColors.WHITE, light, overlay);
 
         if (!hasFuse) {
             itemIcon = 37;
@@ -246,10 +244,12 @@ public class ModelNuclearBomb {
             var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
             var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-            RenderHelper.addVertice(pose, buffer, v1, new TextureVertice(var3, var6), light, overlay);
-            RenderHelper.addVertice(pose, buffer, v2, new TextureVertice(var4, var6), light, overlay);
-            RenderHelper.addVertice(pose, buffer, v3, new TextureVertice(var4, var5), light, overlay);
-            RenderHelper.addVertice(pose, buffer, v4, new TextureVertice(var3, var5), light, overlay);
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(texture), (pose, consumer) -> {
+                RenderHelper.addVertice(pose, consumer, v1, new TextureVertice(var3, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v2, new TextureVertice(var4, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v3, new TextureVertice(var4, var5), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v4, new TextureVertice(var3, var5), light, overlay);
+            });
         } else {
             itemIcon = 43;
             var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
@@ -257,24 +257,25 @@ public class ModelNuclearBomb {
             var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
             var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
-            VertexConsumer bufferTriangles = vertexConsumers.getBuffer(RenderTypes.RENDER_SOLID_TRIANGLES.apply(texture));
-            RenderHelper.addVertice(pose, bufferTriangles, v0, new TextureVertice(var3, var6), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v1, new TextureVertice(var4, var6), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v2, new TextureVertice(var4, var5), light, overlay);
+            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.RENDER_SOLID_TRIANGLES.apply(texture), (pose, consumer) -> {
+                RenderHelper.addVertice(pose, consumer, v0, new TextureVertice(var3, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v1, new TextureVertice(var4, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v2, new TextureVertice(var4, var5), light, overlay);
 
-            RenderHelper.addVertice(pose, bufferTriangles, v0, new TextureVertice(var3, var6), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v2, new TextureVertice(var4, var5), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v3, new TextureVertice(var4, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v0, new TextureVertice(var3, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v2, new TextureVertice(var4, var5), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v3, new TextureVertice(var4, var6), light, overlay);
 
-            RenderHelper.addVertice(pose, bufferTriangles, v0, new TextureVertice(var3, var6), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v3, new TextureVertice(var3, var5), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v4, new TextureVertice(var4, var5), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v0, new TextureVertice(var3, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v3, new TextureVertice(var3, var5), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v4, new TextureVertice(var4, var5), light, overlay);
 
-            RenderHelper.addVertice(pose, bufferTriangles, v0, new TextureVertice(var3, var6), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v4, new TextureVertice(var4, var5), light, overlay);
-            RenderHelper.addVertice(pose, bufferTriangles, v1, new TextureVertice(var4, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v0, new TextureVertice(var3, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v4, new TextureVertice(var4, var5), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v1, new TextureVertice(var4, var6), light, overlay);
+            });
         }
-        pose.popPose();
-        pose.popPose();
+        poseStack.popPose();
+        poseStack.popPose();
     }
 }

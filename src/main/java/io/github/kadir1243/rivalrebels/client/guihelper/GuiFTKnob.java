@@ -11,12 +11,15 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.client.input.MouseButtonInfo;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.util.Mth;
 
 @OnlyIn(Dist.CLIENT)
@@ -30,11 +33,11 @@ public class GuiFTKnob extends GuiButton {
     }
 
     @Override
-    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
-		if (mode > 2) mode = 2;
+    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        if (mode > 2) mode = 2;
 		if (mode < 0) mode = 0;
 		int state = 0;
-		if (pressed || mouseClicked(mouseX, mouseY, 0)) state = 36;
+		if (pressed || mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false)) state = 36;
         graphics.pose().pushMatrix();
         graphics.pose().translate(this.getX() + (width / 2f), this.getY() + (height / 2f));
         graphics.pose().rotate(mode * 90 - 90);
@@ -44,9 +47,9 @@ public class GuiFTKnob extends GuiButton {
 	}
 
     @Override
-    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
-		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
-			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
+    protected void onDrag(MouseButtonEvent event, double mouseX, double mouseY) {
+        if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
+			if (mouseClicked(event, false)) pressed = true;
 			if (pressed) mode = (((((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * Mth.RAD_TO_DEG)) + 450) % 360) - 45) / 90;
 		} else {
 			pressed = false;
@@ -59,7 +62,7 @@ public class GuiFTKnob extends GuiButton {
 	}
 
     @Override
-    public void onRelease(double mouseX, double mouseY) {
+    public void onRelease(MouseButtonEvent event) {
         pressed = false;
     }
 

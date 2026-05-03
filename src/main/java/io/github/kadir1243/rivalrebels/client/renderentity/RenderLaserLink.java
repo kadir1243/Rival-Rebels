@@ -11,17 +11,17 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.common.entity.EntityLaserLink;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -37,26 +37,28 @@ public class RenderLaserLink extends EntityRenderer<EntityLaserLink, RenderLaser
     }
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         float distance = (float) (renderState.deltaMovement.x() * 100F);
         if (distance > 0) {
             float radius = 0.7F;
-            VertexConsumer buffer = bufferSource.getBuffer(RenderTypes.LASER_LINK_ENTITY);
 
             poseStack.pushPose();
             poseStack.mulPose(Axis.YP.rotationDegrees(-renderState.yRot));
             poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
 
             for (float o = 0; o <= radius; o += radius / 16) {
-                buffer.addVertex(poseStack.last(), 0 + o, 0 - o, 0).setColor(COLOR);
-                buffer.addVertex(poseStack.last(), 0 + o, 0 + o, 0).setColor(COLOR);
-                buffer.addVertex(poseStack.last(), 0 + o, 0 + o, 0 + distance).setColor(COLOR);
-                buffer.addVertex(poseStack.last(), 0 + o, 0 - o, 0 + distance).setColor(COLOR);
+                float finalO = o;
+                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.LASER_LINK_ENTITY, (pose, consumer) -> {
+                    consumer.addVertex(pose, 0 + finalO, 0 - finalO, 0).setColor(COLOR);
+                    consumer.addVertex(pose, 0 + finalO, 0 + finalO, 0).setColor(COLOR);
+                    consumer.addVertex(pose, 0 + finalO, 0 + finalO, 0 + distance).setColor(COLOR);
+                    consumer.addVertex(pose, 0 + finalO, 0 - finalO, 0 + distance).setColor(COLOR);
 
-                buffer.addVertex(poseStack.last(), 0 - o, 0 - o, 0).setColor(COLOR);
-                buffer.addVertex(poseStack.last(), 0 - o, 0 - o, 0 + distance).setColor(COLOR);
-                buffer.addVertex(poseStack.last(), 0 - o, 0 + o, 0).setColor(COLOR);
-                buffer.addVertex(poseStack.last(), 0 - o, 0 + o, 0 + distance).setColor(COLOR);
+                    consumer.addVertex(pose, 0 - finalO, 0 - finalO, 0).setColor(COLOR);
+                    consumer.addVertex(pose, 0 - finalO, 0 - finalO, 0 + distance).setColor(COLOR);
+                    consumer.addVertex(pose, 0 - finalO, 0 + finalO, 0).setColor(COLOR);
+                    consumer.addVertex(pose, 0 - finalO, 0 + finalO, 0 + distance).setColor(COLOR);
+                });
             }
 
             poseStack.popPose();

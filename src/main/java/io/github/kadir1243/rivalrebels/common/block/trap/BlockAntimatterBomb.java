@@ -35,7 +35,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 public class BlockAntimatterBomb extends BaseEntityBlock {
     public static final MapCodec<BlockAntimatterBomb> CODEC = simpleCodec(BlockAntimatterBomb::new);
@@ -69,7 +69,7 @@ public class BlockAntimatterBomb extends BaseEntityBlock {
             player.openMenu(getMenuProvider(state, level, pos));
             return InteractionResult.SUCCESS;
 		} else if (!level.isClientSide()) {
-			player.displayClientMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)), true);
+			player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
             return InteractionResult.FAIL;
 		}
 		return InteractionResult.FAIL;

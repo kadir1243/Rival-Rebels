@@ -1,7 +1,7 @@
 {
   "variants": {
     "": {
-      "model": "minecraft:block/dirt"
+      "model": "rivalrebels:block/radioactive_dirt"
     }
   }
 }

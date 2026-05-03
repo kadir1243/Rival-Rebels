@@ -15,17 +15,21 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelAntimatterBombBlast;
 import io.github.kadir1243.rivalrebels.client.model.ModelBlastRing;
-import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
+import io.github.kadir1243.rivalrebels.client.model.ObjModels;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.common.entity.EntityAntimatterBombBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.LightCoordsUtil;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -40,34 +44,43 @@ import org.joml.Vector3f;
 @OnlyIn(Dist.CLIENT)
 public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBombBlast, RenderAntimatterBombBlast.State> {
     private final ModelAntimatterBombBlast modelabomb = new ModelAntimatterBombBlast();
+    private final QuadCollection blastSphereModel;
 
-	public RenderAntimatterBombBlast(EntityRendererProvider.Context manager)
-	{
-        super(manager);
+	public RenderAntimatterBombBlast(EntityRendererProvider.Context context) {
+        super(context);
+        blastSphereModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.BLAST_SPHERE_MODEL);
     }
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         RandomSource random = renderState.random;
 		double radius = (((renderState.deltaMovement.x() * 10) - 1) * ((renderState.deltaMovement.x() * 10) - 1) * 2) + RRConfig.SERVER.getTsarBombaStrength();
 		poseStack.pushPose();
 		poseStack.pushPose();
 		poseStack.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
 		float size = (renderState.ageInTicks % 100) * 2.0f;
-		ModelBlastRing.renderModel(poseStack, bufferSource.getBuffer(RenderType.solid()), size, 64, 6f, 2f, 0f, 0f, 0f, 0, 0, 0, ARGB.colorFromFloat(1, 0, 0, 0.2F), packedLight, OverlayTexture.NO_OVERLAY);
-		poseStack.popPose();
+        ModelBlastRing.renderModel(poseStack, nodeCollector, RenderTypes.solidMovingBlock(), size, 64, 6f, 2f, 0f, 0f, 0f, 0, 0, 0, ARGB.colorFromFloat(1, 0, 0, 0.2F), LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        poseStack.popPose();
 		if (renderState.ageInTicks < 60) {
 			double elev = renderState.ageInTicks / 5f;
 			poseStack.translate(0, elev, 0);
-			ModelBlastSphere.renderModel(poseStack, bufferSource, renderState.ageInTicks, CommonColors.WHITE);
-		}
+
+            poseStack.pushPose();
+            poseStack.scale(renderState.ageInTicks, renderState.ageInTicks, renderState.ageInTicks);
+            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+                ObjModels.render(blastSphereModel, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+            });
+            poseStack.popPose();
+        }
 		else
 		{
 			//double elev = Math.sin(renderState.time * 0.1f) * 5.0f + 60.0f;
 			//double noisy = 5.0f;
 			//double hnoisy = noisy * 0.5f;
 			poseStack.scale((float) (radius * 0.06f), (float) (radius * 0.06f), (float) (radius * 0.06f));
-			modelabomb.render(poseStack, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etantimatterblast)), packedLight);
+            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etantimatterblast), (pose, consumer) -> {
+                modelabomb.render(poseStack, consumer, LightCoordsUtil.FULL_BRIGHT);
+            });
 			/*modelsphere.renderModel(50.0f, 0.0f, 0.0f, 0.0f, 1.0f, false);
 			poseStack.push();
 			//poseStack.translate(random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy, random.nextDouble() * noisy - hnoisy);
@@ -107,7 +120,12 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 			poseStack.scale(random.nextFloat(), random.nextFloat(), random.nextFloat());
 			poseStack.mulPose(Axis.of(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat())).rotationDegrees(random.nextFloat() * 360));
 			poseStack.translate(random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f);
-			ModelBlastSphere.renderModel(poseStack, bufferSource.getBuffer(RenderTypes.ANTIMATTER_BOMB_BLAST_ENTITY), renderState.ageInTicks, ARGB.colorFromFloat(1F, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble()));
+            poseStack.pushPose();
+            poseStack.scale(renderState.ageInTicks, renderState.ageInTicks, renderState.ageInTicks);
+			nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.ANTIMATTER_BOMB_BLAST_ENTITY, (pose, consumer) -> {
+                ObjModels.render(blastSphereModel, consumer, pose, ARGB.colorFromFloat(1F, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble()), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+            });
+            poseStack.popPose();
 		}
 	}
 

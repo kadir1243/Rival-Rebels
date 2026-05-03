@@ -2,7 +2,7 @@ package io.github.kadir1243.rivalrebels;
 
 import io.github.kadir1243.rivalrebels.common.entity.RhodesType;
 import net.minecraft.core.Holder;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.common.ModConfigSpec.BooleanValue;
 import net.neoforged.neoforge.common.ModConfigSpec.ConfigValue;
@@ -85,7 +85,7 @@ public class RRConfig {
             infiniteAmmo = builder.define("infiniteAmmo", false);
             infiniteNukes = builder.define("infiniteNukes", false);
             infiniteGrenades = builder.define("infiniteGrenades", false);
-            rhodesTeams = builder.comment("Repeat the type for multiple occurences of the same rhodes. Leave Empty For Random Rhodes Types").defineList("rhodesTeams", List.of(), o -> RivalRebels.RHODES_TYPE_REGISTRY.containsKey(ResourceLocation.tryParse(o.toString())));
+            rhodesTeams = builder.comment("Repeat the type for multiple occurences of the same rhodes. Leave Empty For Random Rhodes Types").defineList("rhodesTeams", List.of(), o -> RivalRebels.RHODES_TYPE_REGISTRY.containsKey(Identifier.tryParse(o.toString())));
             prefillrhodes = builder.define("prefillrhodes", true);
             rhodesNukes = builder.define("rhodesNukes", 8);
             rhodesInRoundsChance = builder.define("rhodesInRoundsChance", 0);
@@ -286,7 +286,7 @@ public class RRConfig {
             if (list.isEmpty()) {
                 return RivalRebels.RHODES_TYPE_REGISTRY.stream().collect(RHODES_TYPES_SHUFFLER).toArray(new RhodesType[0]);
             }
-            return list.stream().map(ResourceLocation::tryParse).filter(Objects::nonNull).map(RivalRebels.RHODES_TYPE_REGISTRY::get).filter(Optional::isPresent).map(Optional::get).map(Holder.Reference::value).toArray(RhodesType[]::new);
+            return list.stream().map(Identifier::tryParse).filter(Objects::nonNull).map(RivalRebels.RHODES_TYPE_REGISTRY::get).filter(Optional::isPresent).map(Optional::get).map(Holder.Reference::value).toArray(RhodesType[]::new);
         }
         private static final Collector<RhodesType, ?, List<RhodesType>> RHODES_TYPES_SHUFFLER = Collectors.collectingAndThen(
             Collectors.<RhodesType>toList(),

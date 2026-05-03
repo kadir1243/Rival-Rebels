@@ -39,7 +39,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -60,7 +60,7 @@ public class ItemBinoculars extends Item {
     boolean prevzoomed = false;
     boolean prevmclick;
     public ItemBinoculars(Properties properties) {
-        super(properties.stacksTo(1).component(RRComponents.BINOCULAR_DATA, BinocularData.DEFAULT));
+        super(properties);
     }
 
     public static void add(TileEntityLaptop tel) {

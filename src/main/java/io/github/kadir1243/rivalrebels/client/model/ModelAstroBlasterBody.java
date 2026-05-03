@@ -12,8 +12,9 @@
 package io.github.kadir1243.rivalrebels.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.level.lighting.LightEngine;
 import net.neoforged.api.distmarker.Dist;
@@ -22,12 +23,14 @@ import net.minecraft.util.ARGB;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelAstroBlasterBody {
-	public static void render(PoseStack matrices, VertexConsumer buffer, float size, float red, float green, float blue, float alpha) {
+	public static void render(PoseStack matrices, SubmitNodeCollector nodeCollector, RenderType renderType, float size, float red, float green, float blue, float alpha) {
 		matrices.pushPose();
         int color = ARGB.colorFromFloat(alpha, red, green, blue);
 
 		matrices.scale(size, size, size);
-        ObjModels.render(Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.ASTRO_BLASTER_BODY), buffer, matrices, color, LightEngine.MAX_LEVEL, OverlayTexture.NO_OVERLAY);
+        nodeCollector.submitCustomGeometry(matrices, renderType, (pose, consumer) -> {
+            ObjModels.render(Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.ASTRO_BLASTER_BODY), consumer, pose, color, LightEngine.MAX_LEVEL, OverlayTexture.NO_OVERLAY);
+        });
 
 		matrices.popPose();
 	}

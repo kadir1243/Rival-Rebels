@@ -12,45 +12,55 @@
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.client.model.ModelNuclearBomb;
+import io.github.kadir1243.rivalrebels.client.model.ObjModels;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.common.entity.EntityBomb;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderBomb extends EntityRenderer<EntityBomb, RenderBomb.State> {
-    public RenderBomb(EntityRendererProvider.Context manager) {
-        super(manager);
+    private final QuadCollection model;
+    public RenderBomb(EntityRendererProvider.Context context) {
+        super(context);
+        model = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.BLAST_SPHERE_MODEL);
 	}
 
     @Override
-    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
         poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
-        if (renderState.deltaMovement.x()==0&& renderState.deltaMovement.z()==0)
-        {
-            if (renderState.deltaMovement.y() == 1)
-            {
-                ModelBlastSphere.renderModel(poseStack, bufferSource, renderState.ageInTicks * 0.2f, 0.25f, 0.25f, 1.0f, 0.75f);
+        if (renderState.deltaMovement.x() == 0 && renderState.deltaMovement.z() == 0) {
+            poseStack.pushPose();
+            poseStack.scale(renderState.ageInTicks * 0.2f, renderState.ageInTicks * 0.2f, renderState.ageInTicks * 0.2f);
+            if (renderState.deltaMovement.y() == 1) {
+                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+                    ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.75f, 0.25f, 0.25f, 1.0f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+                });
+            } else if (renderState.deltaMovement.y() == 0) {
+                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+                    ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.75f, 0.8f, 0.8f, 1f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+                });
             }
-            else if (renderState.deltaMovement.y() == 0)
-            {
-                ModelBlastSphere.renderModel(poseStack, bufferSource, renderState.ageInTicks * 0.2f, 0.8f, 0.8f, 1f, 0.75f);
-            }
-        }
-        else {
+            poseStack.popPose();
+        } else {
             poseStack.scale(0.25f, 0.5f, 0.25f);
-            ModelNuclearBomb.renderModel(poseStack, bufferSource, RRIdentifiers.etnuke, packedLight, true);
+            ModelNuclearBomb.renderModel(poseStack, nodeCollector, RRIdentifiers.etnuke, renderState.lightCoords, true);
         }
         poseStack.popPose();
     }

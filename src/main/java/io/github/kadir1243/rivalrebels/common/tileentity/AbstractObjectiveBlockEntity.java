@@ -1,9 +1,11 @@
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
+import net.minecraft.commands.CommandSource;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.permissions.LevelBasedPermissionSet;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
@@ -30,32 +32,22 @@ public abstract class AbstractObjectiveBlockEntity extends BaseContainerBlockEnt
         }
 
         @Override
-        public ServerLevel getLevel() {
-            return (ServerLevel)level;
-        }
-
-        @Override
-        public void onUpdated() {
+        public void onUpdated(ServerLevel level) {
             BlockState lv = level.getBlockState(worldPosition);
-            this.getLevel().sendBlockUpdated(worldPosition, lv, lv, 3);
+            getLevel().sendBlockUpdated(worldPosition, lv, lv, 3);
         }
 
         @Override
-        public Vec3 getPosition() {
-            return Vec3.atCenterOf(worldPosition);
-        }
-
-        @Override
-        public CommandSourceStack createCommandSourceStack() {
+        public CommandSourceStack createCommandSourceStack(ServerLevel level, CommandSource commandSource) {
             return new CommandSourceStack(
-                this,
-                getPosition(),
+                commandSource,
+                Vec3.atCenterOf(worldPosition),
                 Vec2.ZERO,
-                this.getLevel(),
-                2,
+                level,
+                LevelBasedPermissionSet.GAMEMASTER,
                 this.getName().getString(),
                 this.getName(),
-                this.getLevel().getServer(),
+                level.getServer(),
                 null
             );
         }

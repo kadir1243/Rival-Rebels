@@ -13,10 +13,10 @@ package io.github.kadir1243.rivalrebels.client.gui;
 
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerLoader;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -24,29 +24,22 @@ import net.minecraft.world.entity.player.Inventory;
 @OnlyIn(Dist.CLIENT)
 public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
     public GuiLoader(ContainerLoader containerLoader, Inventory playerInv, Component title) {
-		super(containerLoader, playerInv, title);
         int BASE_IMAGE_HEIGHT = 114;
         int inventoryRows = containerLoader.size() / 9;
-		this.imageHeight = BASE_IMAGE_HEIGHT + inventoryRows * 18;
-		this.imageWidth = 256;
+        super(containerLoader, playerInv, title, 256, BASE_IMAGE_HEIGHT + inventoryRows * 18);
 	}
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
         graphics.pose().pushMatrix();
 		graphics.pose().rotate(-13);
-		graphics.drawString(font, "Loader", 165, 237, 0x444444, false);
+		graphics.text(font, "Loader", 165, 237, 0x444444, false);
 		graphics.pose().popMatrix();
 	}
 
     @Override
-    protected void renderBg(GuiGraphics graphics, float delta, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractBackground(graphics, mouseX, mouseY, a);
         RRTextures.guitloader.blit(graphics, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210, CommonColors.WHITE);
 	}
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
 }

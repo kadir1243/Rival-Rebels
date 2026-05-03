@@ -77,9 +77,9 @@ public class Translations {
         MutableComponent line2 = warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_2").withStyle(ChatFormatting.RED));
         MutableComponent line3 = warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_3").withStyle(ChatFormatting.RED));
         for (Player player : level.players()) {
-            player.displayClientMessage(line1, false);
-            player.displayClientMessage(line2, false);
-            player.displayClientMessage(line3, false);
+            player.sendSystemMessage(line1);
+            player.sendSystemMessage(line2);
+            player.sendSystemMessage(line3);
         }
     }
 

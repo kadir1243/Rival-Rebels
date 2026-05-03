@@ -5,7 +5,7 @@ import io.github.kadir1243.rivalrebels.common.tileentity.OmegaObjectiveBlockEnti
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 @OnlyIn(Dist.CLIENT)
 public class OmegaObjectiveBlockEntityRenderer extends ObjectiveBlockEntityRenderer<OmegaObjectiveBlockEntity> {
@@ -13,7 +13,7 @@ public class OmegaObjectiveBlockEntityRenderer extends ObjectiveBlockEntityRende
 	}
 
     @Override
-    public ResourceLocation getTexture() {
+    public Identifier getTexture() {
         return RRIdentifiers.etomegaobj;
     }
 }

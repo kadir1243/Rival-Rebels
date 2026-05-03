@@ -5,12 +5,12 @@ import com.mojang.math.Axis;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import net.minecraft.client.gui.render.pip.PictureInPictureRenderer;
-import net.minecraft.client.renderer.LightTexture;
+import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.ModelManager;
-import net.minecraft.client.resources.model.QuadCollection;
+import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.util.CommonColors;
 
 public class GuiTrayModelRenderer extends PictureInPictureRenderer<TrayModelPIPRenderState> {
@@ -54,13 +54,13 @@ public class GuiTrayModelRenderer extends PictureInPictureRenderer<TrayModelPIPR
         pose.mulPose(Axis.YP.rotationDegrees(180));
         // pose.mulPose((spinfac * 0.5), 0, 1, 0);
         pose.translate(0, -0.5 * 1.5, (-0.5 - 0.34) * -1.5);
-        ObjModels.render(trayModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etreciever)), pose, CommonColors.WHITE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        ObjModels.render(trayModel, bufferSource.getBuffer(RenderTypes.entitySolid(RRIdentifiers.etreciever)), pose, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         if (renderState.hasWeapon()) {
             pose.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
             pose.mulPose(Axis.YP.rotationDegrees((float) (-Math.atan(renderState.x1() / 40.0F) * 40.0F)));
-            ObjModels.render(armModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etreciever)), pose, CommonColors.WHITE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            ObjModels.render(armModel, bufferSource.getBuffer(RenderTypes.entitySolid(RRIdentifiers.etreciever)), pose, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
             pose.mulPose(Axis.XP.rotationDegrees((float) (Math.atan(renderState.y1() / 40.0F) * 40.0F + 20)));
-            ObjModels.render(adsdragonModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etadsdragon)), pose, CommonColors.WHITE, LightTexture.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+            ObjModels.render(adsdragonModel, bufferSource.getBuffer(RenderTypes.entitySolid(RRIdentifiers.etadsdragon)), pose, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         }
         pose.popPose();
     }

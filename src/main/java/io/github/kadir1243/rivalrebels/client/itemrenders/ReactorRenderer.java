@@ -15,26 +15,34 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
 import io.github.kadir1243.rivalrebels.client.model.ModelReactor;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
+import org.joml.Vector3fc;
+
+import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class ReactorRenderer implements DynamicItemRenderer {
+public class ReactorRenderer implements NoDataSpecialModelRenderer {
     @Override
-    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
-		matrices.pushPose();
-        matrices.translate(0.5F, 1.1875F, 0.5F);
-		ModelLaptop.renderModel(vertexConsumers, matrices, 0, light, overlay);
-		ModelLaptop.renderScreen(vertexConsumers, RRIdentifiers.etscreen, matrices, 0, light, overlay);
-		matrices.popPose();
-		matrices.pushPose();
-		matrices.translate(0.5F, 0.5F, 0.5F);
-		ModelReactor.renderModel(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etreactor)), light, overlay);
-		matrices.popPose();
+    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
+        poseStack.pushPose();
+        poseStack.translate(0.5F, 1.1875F, 0.5F);
+		ModelLaptop.renderModel(submitNodeCollector, poseStack, 0, lightCoords, overlayCoords);
+		ModelLaptop.renderScreen(submitNodeCollector, RRIdentifiers.etscreen, poseStack, 0, lightCoords, overlayCoords);
+		poseStack.popPose();
+		poseStack.pushPose();
+		poseStack.translate(0.5F, 0.5F, 0.5F);
+        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etreactor), (pose, consumer) -> {
+            ModelReactor.renderModel(pose, consumer, lightCoords, overlayCoords);
+        });
+		poseStack.popPose();
 	}
+
+    @Override
+    public void getExtents(Consumer<Vector3fc> output) {
+    }
 }
 

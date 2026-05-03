@@ -14,18 +14,17 @@ package io.github.kadir1243.rivalrebels.client.gui;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerAntimatterBomb;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiAntimatterBomb extends BombContainerScreen<ContainerAntimatterBomb> {
 	public GuiAntimatterBomb(ContainerAntimatterBomb bomb, Inventory inventoryPlayer, Component title) {
-		super(bomb, inventoryPlayer, title);
-		imageHeight = 206;
+		super(bomb, inventoryPlayer, title, DEFAULT_IMAGE_WIDTH, 206);
 	}
 
     @Override
@@ -39,19 +38,19 @@ public class GuiAntimatterBomb extends BombContainerScreen<ContainerAntimatterBo
     }
 
     @Override
-    public void renderName(GuiGraphics graphics) {
-        graphics.drawString(font, Component.translatable("RivalRebels.antimatterbomb"), 18, 16, 4210752, false);
+    public void renderName(GuiGraphicsExtractor graphics) {
+        graphics.text(font, Component.translatable("RivalRebels.antimatterbomb"), 18, 16, 4210752, false);
     }
 
     @Override
-    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
-        super.renderLabels(context, mouseX, mouseY);
+    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
+        super.extractLabels(graphics, xm, ym);
         if (menu.isUnbalanced()) {
-            context.drawString(font, Translations.UNBALANCED_BOMB.translate(), 6, imageHeight - 97, 0xFF0000, false);
+            graphics.text(font, Translations.UNBALANCED_BOMB.translate(), 6, imageHeight - 97, 0xFF0000, false);
         } else if (menu.isArmed()) {
-            context.drawString(font, Translations.BOMB_ARMED.translate(), 6, imageHeight - 97, 0xFF0000, false);
+            graphics.text(font, Translations.BOMB_ARMED.translate(), 6, imageHeight - 97, 0xFF0000, false);
         } else {
-            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Translations.BOMB_MEGATONS.translate()), 6, imageHeight - 97, 0xFFFFFF, false);
+            graphics.text(font, Component.literal(menu.getMegaton() + " ").append(Translations.BOMB_MEGATONS.translate()), 6, imageHeight - 97, 0xFFFFFF, false);
         }
     }
 

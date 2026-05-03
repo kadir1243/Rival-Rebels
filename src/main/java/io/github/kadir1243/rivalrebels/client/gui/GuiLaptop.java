@@ -18,10 +18,10 @@ import io.github.kadir1243.rivalrebels.common.container.ContainerLaptop;
 import io.github.kadir1243.rivalrebels.common.packet.LaptopPressPacket;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -32,8 +32,7 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 
 	public GuiLaptop(ContainerLaptop containerLaptop, Inventory playerInventory, Component title)
 	{
-		super(containerLaptop, playerInventory, title);
-		imageHeight = 206;
+		super(containerLaptop, playerInventory, title, DEFAULT_IMAGE_WIDTH, 206);
 	}
 
     @Override
@@ -45,28 +44,23 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 	}
 
     @Override
-    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
-        super.renderLabels(graphics, mouseX, mouseY);
+    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
+        super.extractLabels(graphics, xm, ym);
 
 		if (menu.isReady()) RRTextures.guilaptopnuke.blit(graphics, 131, 89, 239, 9, 16, 16, CommonColors.WHITE);
 		else RRTextures.guilaptopnuke.blit(graphics, 131, 89, 131, 89, 16, 16, CommonColors.WHITE);
     }
 
     @Override
-    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractBackground(graphics, mouseX, mouseY, a);
 		int x = (width - imageWidth) / 2;
 		int y = (height - imageHeight) / 2;
-        RRTextures.guilaptopnuke.blit(context, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
-		if (menu.hasChips()) RRTextures.guilaptopnuke.blit(context, x + 135, y + 79, 248, 0, 8, 8, CommonColors.WHITE);
-		context.drawString(font, Component.translatable("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff, false);
-		context.drawString(font, Translations.LAPTOP_B2_SPIRIT.translate(), x + 25, y + 11, 0xffffff, false);
-		context.drawString(font, Component.translatable("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
-		context.drawString(font, Component.translatable("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
+        RRTextures.guilaptopnuke.blit(graphics, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
+		if (menu.hasChips()) RRTextures.guilaptopnuke.blit(graphics, x + 135, y + 79, 248, 0, 8, 8, CommonColors.WHITE);
+		graphics.text(font, Component.translatable("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff, false);
+		graphics.text(font, Translations.LAPTOP_B2_SPIRIT.translate(), x + 25, y + 11, 0xffffff, false);
+		graphics.text(font, Component.translatable("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
+		graphics.text(font, Component.translatable("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
 	}
-
-    @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
-        super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.renderTooltip(guiGraphics, mouseX, mouseY);
-    }
 }
