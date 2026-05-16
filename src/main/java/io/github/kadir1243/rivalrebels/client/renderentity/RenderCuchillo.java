@@ -19,6 +19,7 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.entity.EntityCuchillo;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
@@ -32,6 +33,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.neoforged.neoforge.client.model.pipeline.TransformingVertexPipeline;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -41,7 +43,7 @@ public class RenderCuchillo extends EntityRenderer<EntityCuchillo, RenderCuchill
         super(context);
     }
 
-    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+    private static final Supplier<List<QuadHelper.BakedQuadWrapper>> BAKED_MODEL = QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(RRIdentifiers.etknife), buffer -> {
         byte var11 = 0;
         float var12 = 0.0F;
         float var13 = 0.5F;
@@ -52,22 +54,37 @@ public class RenderCuchillo extends EntityRenderer<EntityCuchillo, RenderCuchill
         float var18 = (5 + var11 * 10) / 32.0F;
         float var19 = (10 + var11 * 10) / 32.0F;
         float var20 = 0.05625F;
-        QuadHelper.addVertice(buffer, new Vector3f(-7, -2, -2), new TextureVertice(var16, var18), new Vector3f(var20, 0, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(-7, -2,  2), new TextureVertice(var17, var18), new Vector3f(var20, 0, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(-7,  2,  2), new TextureVertice(var17, var19), new Vector3f(var20, 0, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(-7,  2, -2), new TextureVertice(var16, var19), new Vector3f(var20, 0, 0));
+        QuadHelper.addFace(buffer,
+            new Vector3f(-7, -2, -2),
+            new Vector3f(-7, -2, 2),
+            new Vector3f(-7, 2, 2),
+            new Vector3f(-7, 2, -2),
+            new TextureVertice(var16, var18),
+            new TextureVertice(var17, var18),
+            new TextureVertice(var17, var19),
+            new TextureVertice(var16, var19));
 
-        QuadHelper.addVertice(buffer, new Vector3f(-7,  2, -2), new TextureVertice(var16, var18), new Vector3f(-var20, 0, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(-7,  2,  2), new TextureVertice(var17, var18), new Vector3f(-var20, 0, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(-7, -2,  2), new TextureVertice(var17, var19), new Vector3f(-var20, 0, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(-7, -2, -2), new TextureVertice(var16, var19), new Vector3f(-var20, 0, 0));
+        QuadHelper.addFace(buffer,
+            new Vector3f(-7,  2, -2),
+            new Vector3f(-7,  2,  2),
+            new Vector3f(-7, -2,  2),
+            new Vector3f(-7, -2, -2),
+            new TextureVertice(var16, var18),
+            new TextureVertice(var17, var18),
+            new TextureVertice(var17, var19),
+            new TextureVertice(var16, var19));
 
         for (int i = 0; i < 4; ++i) {
-            TransformingVertexPipeline rotated = new TransformingVertexPipeline(buffer, new Transformation(null, Axis.XP.rotationDegrees(90 * (i + 1)), null, null));
-            QuadHelper.addVertice(rotated, new Vector3f(-8, -2, 0), new TextureVertice(var12, var14), new Vector3f(0, 0, var20));
-            QuadHelper.addVertice(rotated, new Vector3f( 8, -2, 0), new TextureVertice(var13, var14), new Vector3f(0, 0, var20));
-            QuadHelper.addVertice(rotated, new Vector3f( 8,  2, 0), new TextureVertice(var13, var15), new Vector3f(0, 0, var20));
-            QuadHelper.addVertice(rotated, new Vector3f(-8,  2, 0), new TextureVertice(var12, var15), new Vector3f(0, 0, var20));
+            Transformation transformation = new Transformation(null, Axis.XP.rotationDegrees(90 * (i + 1)), null, null);
+            QuadHelper.addFace(buffer, transformation,
+                new Vector3f(-8, -2, 0),
+                new Vector3f( 8, -2, 0),
+                new Vector3f( 8,  2, 0),
+                new Vector3f(-8,  2, 0),
+                new TextureVertice(var12, var14),
+                new TextureVertice(var13, var14),
+                new TextureVertice(var13, var15),
+                new TextureVertice(var12, var15));
         }
     });
 
@@ -81,7 +98,7 @@ public class RenderCuchillo extends EntityRenderer<EntityCuchillo, RenderCuchill
         poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
 		poseStack.scale(var20, var20, var20);
 		poseStack.translate(-4.0F, 0.0F, 0.0F);
-        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etknife), BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, RenderTypes.entityCutout(RRIdentifiers.etknife), BAKED_MODEL, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
 	}
 

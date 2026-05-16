@@ -103,7 +103,7 @@ public class EntityRocket extends AbstractArrow
         HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 		if (hitResult.getType() != HitResult.Type.MISS) onHit(hitResult);
 
-        setPosRaw(getX() + getDeltaMovement().y(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
+        setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		this.updateRotation();
 		float var17 = 1.1f;
 		if (tickCount > 25) var17 = 0.9999F;

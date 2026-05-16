@@ -19,9 +19,9 @@ import io.github.kadir1243.rivalrebels.client.guihelper.GuiRotor;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TrayModelPIPRenderState;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReciever;
+import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
-import net.minecraft.client.input.CharacterEvent;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec3;
@@ -59,7 +59,7 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 		players.isPressed = menu.getKPlayers();
 		mobs = new GuiCustomButton(new ScreenRectangle(x + 94, y + 46, 19, 19), RRTextures.guitray, new Vector2i(237, 46), true);
 		mobs.isPressed = menu.getKMobs();
-		select1 = new GuiDropdownOption(new Vector2i(119 + x, 8 + y), 45, 0, Component.translatable("RivalRebels.ads.dragon"), button -> {
+		select1 = new GuiDropdownOption(new Vector2i(119 + x, 8 + y), 45, 0, Translations.ADS_DRAGON.translate(), button -> {
             if (menu.hasWepReqs()) {
                 menu.setWep(true);
             }
@@ -108,7 +108,7 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
             RRTextures.guitray.blit(graphics, x + 104, y + 68, 248, 0, 8, 8, CommonColors.WHITE);
 		}
 
-		graphics.text(font, Component.translatable("RivalRebels.ads.tray"), x + 25, y + 66, 0xffffff, false);
+		graphics.text(font, Translations.ADS_TRAY.translate(), x + 25, y + 66, 0xffffff, false);
 		drawADS(graphics, this.leftPos + 51, this.topPos + 75, 30, this.leftPos + 51 - this.xSize_lo, this.topPos + 25 - this.ySize_lo);
 	}
 }

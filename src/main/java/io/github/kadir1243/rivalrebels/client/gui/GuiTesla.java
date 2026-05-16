@@ -15,7 +15,6 @@ import io.github.kadir1243.rivalrebels.RRClient;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiKnob;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
-import io.github.kadir1243.rivalrebels.common.item.weapon.ItemTesla;
 import io.github.kadir1243.rivalrebels.common.packet.ItemUpdate;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
@@ -76,7 +75,7 @@ public class GuiTesla extends Screen {
             onClose();
             Minecraft.getInstance().getConnection().send(new ItemUpdate(minecraft.player.getInventory().getSelectedSlot(), knob.getDegree()));
             ItemStack stack = minecraft.player.getInventory().getSelectedItem();
-            if (stack.getItem() instanceof ItemTesla) {
+            if (stack.has(RRComponents.TESLA_DIAL)) {
                 stack.set(RRComponents.TESLA_DIAL, knob.getDegree());
             }
         }

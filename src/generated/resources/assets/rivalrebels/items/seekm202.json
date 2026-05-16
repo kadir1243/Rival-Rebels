@@ -1,6 +1,9 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "rivalrebels:item/seekm202"
+    "type": "minecraft:special",
+    "base": "minecraft:air",
+    "model": {
+      "type": "rivalrebels:seek_rocket_launcher_renderer"
+    }
   }
 }

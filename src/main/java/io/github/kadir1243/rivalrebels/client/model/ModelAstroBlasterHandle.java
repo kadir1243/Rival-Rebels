@@ -12,14 +12,16 @@
 package io.github.kadir1243.rivalrebels.client.model;
 
 import com.mojang.math.Transformation;
+import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
+import net.minecraft.client.renderer.Sheets;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.neoforged.neoforge.client.model.pipeline.TransformingVertexPipeline;
 import org.joml.Vector3f;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -83,15 +85,15 @@ public class ModelAstroBlasterHandle {
 	private static final Vector3f		vbb3			= new Vector3f(20f, 0f, -2f);
 	private static final Vector3f		vbb4			= new Vector3f(8f, 0f, -2f);
 
-    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(vertexConsumer -> {
-        TransformingVertexPipeline scaledVertex = new TransformingVertexPipeline(vertexConsumer, new Transformation(null, null, new Vector3f(1.3F, 1, 1), null));
+    public static final Supplier<List<QuadHelper.BakedQuadWrapper>> BAKED_MODEL = QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(RRIdentifiers.eteinstenhandle), vertexConsumer -> {
+        Transformation transformation = new Transformation(null, null, new Vector3f(1.3F, 1, 1), null);
         // bottom
-        QuadHelper.addFace(scaledVertex, vbt3, vbt4, vbt1, vbt2, bottombottom);
-        QuadHelper.addFace(scaledVertex, vbb1, vbt1, vbt4, vbb4, bottomfront);
-        QuadHelper.addFace(scaledVertex, vbb3, vbt3, vbt2, vbb2, bottomback);
-        QuadHelper.addFace(scaledVertex, vbt2, vbb2, vbb1, vbt1, bottomside);
-        QuadHelper.addFace(scaledVertex, vbt3, vbb3, vbb4, vbt4, bottomside);
-        QuadHelper.addFace(scaledVertex, vbb3, vbb4, vbb1, vbb2, bottombottom);
+        QuadHelper.addFace(vertexConsumer, transformation, vbt3, vbt4, vbt1, vbt2, bottombottom);
+        QuadHelper.addFace(vertexConsumer, transformation, vbb1, vbt1, vbt4, vbb4, bottomfront);
+        QuadHelper.addFace(vertexConsumer, transformation, vbb3, vbt3, vbt2, vbb2, bottomback);
+        QuadHelper.addFace(vertexConsumer, transformation, vbt2, vbb2, vbb1, vbt1, bottomside);
+        QuadHelper.addFace(vertexConsumer, transformation, vbt3, vbb3, vbb4, vbt4, bottomside);
+        QuadHelper.addFace(vertexConsumer, transformation, vbb3, vbb4, vbb1, vbb2, bottombottom);
 
         // handle
         QuadHelper.addFace(vertexConsumer, vht4, vhb4, vhb1, vht1, handlefront);

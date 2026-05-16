@@ -47,7 +47,7 @@ public class BlockPetrifiedStone extends Block {
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
 		if (player.isCreative()) {
-			level.setBlockAndUpdate(pos, state.setValue(META, state.getValue(META) + 1));
+			level.setBlockAndUpdate(pos, state.setValue(META, (state.getValue(META) + 1) % 15));
 			return InteractionResult.SUCCESS;
 		}
 		return InteractionResult.FAIL;

@@ -14,13 +14,19 @@ package io.github.kadir1243.rivalrebels.client.model;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -133,7 +139,8 @@ public class ModelRocketLauncherBody
 	private static final TextureVertice	rs10		= new TextureVertice((u + p) / 2f + 0.25f, k + r * 2);
 	private static final TextureVertice	rs11		= new TextureVertice((u + q) / 2f + 0.25f, k + q * 2);
 	private static final TextureVertice	rs12		= new TextureVertice((u + r) / 2f + 0.25f, k + p * 2);
-    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+    private static final Map<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> MAP = new HashMap<>();
+    public static final Function<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> BAKED_MODEL = t-> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t), buffer -> {
         QuadHelper.addFace(buffer, llauncher1, llauncher12, rlauncher12, rlauncher1, l1f, l12s, r12s, r1f);
         QuadHelper.addFace(buffer, llauncher2, llauncher1, rlauncher1, rlauncher2, l2, l1s, r1s, r2);
         QuadHelper.addFace(buffer, llauncher3, llauncher2, rlauncher2, rlauncher3, l3f, l2, r2, r3f);
@@ -160,7 +167,7 @@ public class ModelRocketLauncherBody
         QuadHelper.addFace(buffer, rlauncher6, rlauncher5, rlauncher8, rlauncher7, rs12, rs11, rs2, rs1);
     });
 
-	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
-        ObjModels.submit(nodeCollector, renderType, BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, light, overlay);
+	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, Identifier texture, int light, int overlay) {
+        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, renderType, MAP.computeIfAbsent(texture, BAKED_MODEL), light, overlay);
 	}
 }

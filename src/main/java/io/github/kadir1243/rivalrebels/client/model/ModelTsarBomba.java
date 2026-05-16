@@ -65,7 +65,7 @@ public class ModelTsarBomba {
 		TextureVertice t7 = new TextureVertice(134f / 256f, 64f / 256f);
 		TextureVertice t8 = new TextureVertice(70 / 256f, 64f / 256f);
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(RRIdentifiers.ettsarfins), (pose, consumer) -> {
             RenderHelper.addFace(pose, consumer, new Vector3f(0.5f, -5f, 0.5f),
                 new Vector3f(-0.5f, -5f, 0.5f),
                 new Vector3f(-0.5f, -5f, -0.5f),
@@ -81,7 +81,7 @@ public class ModelTsarBomba {
 		TextureVertice t3 = new TextureVertice(70f / 256f, 96f / 256f);
 		TextureVertice t4 = new TextureVertice(0, 96f / 256f);
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(RRIdentifiers.ettsarfins), (pose, consumer) -> {
             RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
                 new Vector3f(0f, -5f, -0.5f),
                 new Vector3f(0f, -3.5f, -0.5f),
@@ -90,14 +90,14 @@ public class ModelTsarBomba {
 
 		poseStack.mulPose(Axis.YP.rotationDegrees(120));
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(RRIdentifiers.ettsarfins), (pose, consumer) -> {
             RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
                 new Vector3f(0f, -5f, -0.5f),
                 new Vector3f(0f, -3.5f, -0.5f),
                 new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
         });
         poseStack.mulPose(Axis.YP.rotationDegrees(120));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(RRIdentifiers.ettsarfins), (pose, consumer) -> {
             RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
                 new Vector3f(0f, -5f, -0.5f),
                 new Vector3f(0f, -3.5f, -0.5f),

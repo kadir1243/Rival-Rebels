@@ -11,8 +11,11 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.itemrenders;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.*;
+import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Axis;
@@ -20,6 +23,7 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.component.DataComponents;
@@ -80,9 +84,9 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
 
         poseStack.pushPose();
         poseStack.translate(0f, 0.9f, 0f);
-        ModelAstroBlasterBarrel.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.eteinstenbarrel), lightCoords, overlayCoords);
+        ModelAstroBlasterBarrel.render(poseStack, submitNodeCollector, RRIdentifiers.eteinstenbarrel, RenderTypes.entitySolid(RRIdentifiers.eteinstenbarrel), lightCoords, overlayCoords);
         if (hasFoil) {
-            ModelAstroBlasterBarrel.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+            // FIXME: ModelAstroBlasterBarrel.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
         }
         poseStack.popPose();
 
@@ -91,9 +95,9 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
         poseStack.mulPose(Axis.ZP.rotationDegrees(90));
         poseStack.scale(0.03125f, 0.03125f, 0.03125f);
 
-        ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.eteinstenhandle), ModelAstroBlasterHandle.BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
+        QuadHelper.submitQuadSupplier(submitNodeCollector, poseStack, RenderTypes.entitySolid(RRIdentifiers.eteinstenhandle), ModelAstroBlasterHandle.BAKED_MODEL, lightCoords, overlayCoords);
         if (hasFoil) {
-            ObjModels.submit(submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, ModelAstroBlasterHandle.BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
+            // FIXME: ObjModels.submit(submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, ModelAstroBlasterHandle.BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
         }
         poseStack.popPose();
 
@@ -121,28 +125,28 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
         poseStack.translate(0.12f, 0.1f, 0.12f);
         poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(-0.12f, 0.1f, 0.12f);
         poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(-0.12f, 0.1f, -0.12f);
         poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(0.12f, 0.1f, -0.12f);
         poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
-        ModelRod.render(poseStack, submitNodeCollector, redstoneRodRenderType, lightCoords, overlayCoords);
+        ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
         poseStack.popPose();
 
@@ -260,5 +264,21 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
 
         poseStack.popPose();
     }
+
+    public record Unbaked() implements SpecialModelRenderer.Unbaked<Integer> {
+        public static final Identifier ID = RRIdentifiers.create("astro_blaster_renderer");
+        public static final Unbaked INSTANCE = new Unbaked();
+        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(INSTANCE);
+        @Override
+        public SpecialModelRenderer<Integer> bake(BakingContext context) {
+            return new AstroBlasterRenderer();
+        }
+
+        @Override
+        public MapCodec<Unbaked> type() {
+            return MAP_CODEC;
+        }
+    }
+
 }
 

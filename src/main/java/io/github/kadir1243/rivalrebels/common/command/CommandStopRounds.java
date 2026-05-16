@@ -29,7 +29,7 @@ public class CommandStopRounds {
 
     private static int execute(CommandSourceStack source) {
         RivalRebels.round.stopRounds();
-        source.sendSuccess(() -> Component.nullToEmpty("The current round has been successfully stopped."), true);
+        source.sendSuccess(() -> Component.literal("The current round has been successfully stopped."), true);
         return 0;
     }
 }

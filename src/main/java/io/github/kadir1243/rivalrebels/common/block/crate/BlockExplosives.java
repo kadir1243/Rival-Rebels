@@ -13,6 +13,7 @@ package io.github.kadir1243.rivalrebels.common.block.crate;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
+import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -39,7 +40,7 @@ public class BlockExplosives extends Block
         int y = pos.getY();
         int z = pos.getZ();
 		if (!level.isClientSide()) {
-            player.sendSystemMessage(Component.translatable("RivalRebels.Inventory"));
+            player.sendSystemMessage(Translations.inventory());
             player.sendSystemMessage(RRBlocks.timedbomb.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(1 minute countdown.)").withStyle(ChatFormatting.BLUE)));
             player.sendSystemMessage(RRItems.pliers.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("§9(to defuse explosives.)").withStyle(ChatFormatting.BLUE)));
             player.sendSystemMessage(RRBlocks.remotecharge.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Remote charge.)").withStyle(ChatFormatting.BLUE)));
@@ -47,9 +48,9 @@ public class BlockExplosives extends Block
             player.sendSystemMessage(RRBlocks.minetrap.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Handle with care.)").withStyle(ChatFormatting.BLUE)));
             player.sendSystemMessage(RRBlocks.flare.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Incendiary defense.)").withStyle(ChatFormatting.BLUE)));
             Containers.dropItemStack(level, x, y, z, RRBlocks.timedbomb.toStack());
-            Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.remotecharge, 8));
-			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.minetrap, 16));
-			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.flare, 8));
+            Containers.dropItemStack(level, x, y, z, RRBlocks.remotecharge.toStack(8));
+			Containers.dropItemStack(level, x, y, z, RRBlocks.minetrap.toStack(16));
+			Containers.dropItemStack(level, x, y, z, RRBlocks.flare.toStack(8));
 			Containers.dropItemStack(level, x, y, z, RRItems.remote.toStack());
 			Containers.dropItemStack(level, x, y, z, RRItems.pliers.toStack());
 			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

@@ -25,6 +25,7 @@ import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -47,10 +48,11 @@ public class HackRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.translate(0.22f, -0.025f, 0f);
 		poseStack.mulPose(Axis.ZP.rotationDegrees(90));
 		poseStack.scale(0.03125f, 0.03125f, 0.03125f);
-        RenderType renderType = RenderTypes.entitySolid(RRIdentifiers.create("bg").withPrefix("item/"));
-        ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrocketlauncherhandle), lightCoords, overlayCoords);
+        Identifier tex = RRIdentifiers.create("bg").withPrefix("item/");
+        RenderType renderType = RenderTypes.entitySolid(tex);
+        ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrocketlauncherhandle), RRIdentifiers.etrocketlauncherhandle, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
@@ -59,9 +61,9 @@ public class HackRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.mulPose(Axis.ZP.rotationDegrees(90));
 		poseStack.mulPose(Axis.YP.rotationDegrees(90));
 		poseStack.scale(0.4f, 0.4f, 0.4f);
-		ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.ethack202), lightCoords, overlayCoords);
+		ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.ethack202), RRIdentifiers.ethack202, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
@@ -70,36 +72,36 @@ public class HackRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, 0.71f, s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-        ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrocketlaunchertube), lightCoords, overlayCoords);
+        ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrocketlaunchertube), RRIdentifiers.etrocketlaunchertube, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, 0.71f, s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, tex, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, 0.71f, -s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, tex, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, 0.71f, -s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, tex, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
@@ -108,36 +110,36 @@ public class HackRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, -0.285f, s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, tex, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, -0.285f, s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, tex, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, -0.285f, -s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, tex, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, -0.285f, -s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, renderType, tex, lightCoords, overlayCoords);
 		if (hasFoil) {
-			ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			//ModelRocketLauncherTube.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 

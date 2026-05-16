@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "rivalrebels:block/flagbox7"
+    "down": "rivalrebels:block/ah",
+    "east": "rivalrebels:block/ah",
+    "north": "rivalrebels:block/ai",
+    "particle": "rivalrebels:block/aj",
+    "south": "rivalrebels:block/ai",
+    "up": "rivalrebels:block/aj",
+    "west": "rivalrebels:block/ah"
   }
 }

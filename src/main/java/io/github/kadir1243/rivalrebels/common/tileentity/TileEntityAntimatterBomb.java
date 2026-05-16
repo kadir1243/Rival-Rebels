@@ -40,6 +40,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -174,7 +175,7 @@ public class TileEntityAntimatterBomb extends BaseContainerBlockEntity implement
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.sendSystemMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)));
-                    player.sendSystemMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()));
+                    player.sendSystemMessage(Translations.status().append(" ").append(rrteam.getBlockName()).append(" ").append(Translations.defuse()).append(this.getDefaultName()));
                 }
 			}
 		}
@@ -193,7 +194,7 @@ public class TileEntityAntimatterBomb extends BaseContainerBlockEntity implement
 
 		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !level.isClientSide() && nuclear == hydrogen)
 		{
-			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
+            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
 			level.setSkyFlashTime(2);
 			float pitch = 0;
 			float yaw = this.getBlockState().getValue(BlockAntimatterBomb.FACING).toYRot();
@@ -204,14 +205,14 @@ public class TileEntityAntimatterBomb extends BaseContainerBlockEntity implement
 
 		if (countdown == 0 && nuclear == 0 && hydrogen == 0)
 		{
-			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
+            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
 			level.explode(null, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 4, Level.ExplosionInteraction.NONE);
 		}
     }
 
     @Override
     protected Component getDefaultName() {
-        return Component.nullToEmpty("Antimatter Bomb");
+        return this.getBlockState().getBlock().getName();
     }
 
     @Override

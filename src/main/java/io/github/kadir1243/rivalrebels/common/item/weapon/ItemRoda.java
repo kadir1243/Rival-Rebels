@@ -268,7 +268,7 @@ public class ItemRoda extends Item
         ItemStack stack = player.getItemInHand(hand);
 
         if (!pass) {
-			player.sendSystemMessage(Component.nullToEmpty("Password?"));
+			player.sendSystemMessage(Component.literal("Password?"));
 			pass = true;
 		}
 		RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());

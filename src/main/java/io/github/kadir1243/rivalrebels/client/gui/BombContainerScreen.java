@@ -21,26 +21,28 @@ public abstract class BombContainerScreen<T extends AbstractContainerMenu & Bomb
         super.extractLabels(graphics, xm, ym);
 
         showTimer(graphics);
-        if (scaleName()) {
+        boolean shouldScaleName = scaleName();
+        if (shouldScaleName) {
             graphics.pose().pushMatrix();
             graphics.pose().scale(0.666F, 0.666F);
         }
         renderName(graphics);
-        if (scaleName()) {
+        if (shouldScaleName) {
             graphics.pose().popMatrix();
         }
     }
 
     public void showTimer(GuiGraphicsExtractor graphics) {
-        int seconds = (getCountdown() / 20);
-        int millis = (getCountdown() % 20) * 3;
+        int countdown = getCountdown();
+        int seconds = countdown / 20;
+        int millis = (countdown % 20) * 3;
         String milli;
         if (millis < 10) {
             milli = "0" + millis;
         } else {
             milli = "" + millis;
         }
-        graphics.text(font, Translations.BOMB_TIMER.translate().append(": -" + seconds + ":" + milli), (int) getTimerPos().x, (int) getTimerPos().y, getTimerColor(), false);
+        graphics.text(font, Translations.BOMB_TIMER.translate(seconds, milli), (int) getTimerPos().x, (int) getTimerPos().y, getTimerColor(), false);
     }
 
     public abstract Vec2 getTimerPos();

@@ -5,7 +5,6 @@ import io.github.kadir1243.rivalrebels.client.itemrenders.*;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderentity.*;
 import io.github.kadir1243.rivalrebels.client.tileentityrender.*;
-import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.entity.RREntities;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
@@ -20,6 +19,7 @@ import net.minecraft.client.KeyMapping;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
 import java.util.function.Supplier;
@@ -137,23 +137,23 @@ public class RRClient {
     private static void addItemRenderer(RegisterClientExtensionsEvent event, Holder<Item> item, Supplier<SpecialModelRenderer<?>> renderer) {
     }
 
+    private static void registerSpecialRenderers(RegisterSpecialModelRendererEvent event) {
+        event.register(PlasmaCannonRenderer.Unbaked.ID, PlasmaCannonRenderer.Unbaked.MAP_CODEC);
+        event.register(RodRenderer.Unbaked.ID, RodRenderer.Unbaked.MAP_CODEC);
+        event.register(LoaderRenderer.Unbaked.ID, LoaderRenderer.Unbaked.MAP_CODEC);
+        event.register(AstroBlasterRenderer.Unbaked.ID, AstroBlasterRenderer.Unbaked.MAP_CODEC);
+        event.register(RocketLauncherRenderer.Unbaked.ID, RocketLauncherRenderer.Unbaked.MAP_CODEC);
+        event.register(TeslaRenderer.Unbaked.ID, TeslaRenderer.Unbaked.MAP_CODEC);
+        event.register(RocketRenderer.Unbaked.ID, RocketRenderer.Unbaked.MAP_CODEC);
+        event.register(RodDiskRenderer.Unbaked.ID, RodDiskRenderer.Unbaked.MAP_CODEC);
+        event.register(LaptopRenderer.Unbaked.ID, LaptopRenderer.Unbaked.MAP_CODEC);
+        event.register(SeekRocketLauncherRenderer.Unbaked.ID, SeekRocketLauncherRenderer.Unbaked.MAP_CODEC);
+        event.register(ReactorRenderer.Unbaked.ID, ReactorRenderer.Unbaked.MAP_CODEC);
+    }
+
     private static void registerCustomRenderers(RegisterClientExtensionsEvent event) {
-        addItemRenderer(event, RRItems.NUCLEAR_ROD, NuclearRodRenderer::new);
-        addItemRenderer(event, RRItems.tesla, TeslaRenderer::new);
-        addItemRenderer(event, RRItems.einsten, AstroBlasterRenderer::new);
-        addItemRenderer(event, RRItems.emptyrod, EmptyRodRenderer::new);
         addItemRenderer(event, RRItems.hackm202, HackRocketLauncherRenderer::new);
-        addItemRenderer(event, RRItems.hydrod, HydrogenRodRenderer::new);
-        addItemRenderer(event, Holder.direct(RRBlocks.controller.asItem()), LaptopRenderer::new);
-        addItemRenderer(event, Holder.direct(RRBlocks.loader.asItem()), LoaderRenderer::new);
-        addItemRenderer(event, RRItems.plasmacannon, PlasmaCannonRenderer::new);
-        addItemRenderer(event, Holder.direct(RRBlocks.reactor.asItem()), ReactorRenderer::new);
-        addItemRenderer(event, RRItems.redrod, RedstoneRodRenderer::new);
-        addItemRenderer(event, RRItems.rpg, RocketLauncherRenderer::new);
-        addItemRenderer(event, RRItems.rocket, RocketRenderer::new);
         addItemRenderer(event, RRItems.roda, RodaRenderer::new);
-        addItemRenderer(event, RRItems.roddisk, RodDiskRenderer::new);
-        addItemRenderer(event, RRItems.seekm202, SeekRocketLauncherRenderer::new);
     }
 
     public static void init(IEventBus bus) {
@@ -162,6 +162,7 @@ public class RRClient {
         bus.addListener(RRClient::registerRenderInformation);
         bus.addListener(RRClient::registerKeyBinding);
         bus.addListener(RRClient::registerCustomRenderers);
+        bus.addListener(RRClient::registerSpecialRenderers);
         bus.addListener(ObjModels::registerModels);
     }
 }

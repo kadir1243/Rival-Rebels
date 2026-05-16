@@ -38,7 +38,7 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
 		} else if (!menu.hasTrollFace()) {
             graphics.text(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Translations.BOMB_MEGATONS.translate()), 80, imageHeight - 96 + 2, 0xffffff, false);
         } else {
-            graphics.text(font, "Umad bro?", 80, imageHeight - 96 + 2, 0xffffff, false);
+            graphics.text(font, Component.literal("Umad bro?"), 80, imageHeight - 96 + 2, 0xffffff, false);
         }
     }
 

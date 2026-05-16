@@ -1,6 +1,12 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "all": "rivalrebels:block/timedbomb"
+    "down": "rivalrebels:block/ac",
+    "east": "rivalrebels:block/ab",
+    "north": "rivalrebels:block/ac",
+    "particle": "rivalrebels:block/ae",
+    "south": "rivalrebels:block/ac",
+    "up": "rivalrebels:block/ae",
+    "west": "rivalrebels:block/ab"
   }
 }

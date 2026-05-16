@@ -44,10 +44,10 @@ public record ItemUpdate(int item, int value) implements CustomPacketPayload {
         context.enqueueWork(() -> {
             if (message.item() > context.player().getInventory().getContainerSize() || message.item() < 0) throw new UnsupportedOperationException("Item is out of bounds");
             ItemStack stack = context.player().getInventory().getItem(message.item());
-            if (stack.getItem() instanceof ItemTesla) {
+            if (stack.has(RRComponents.TESLA_DIAL)) {
                 stack.set(RRComponents.TESLA_DIAL, message.value());
             }
-            if (stack.getItem() instanceof ItemFlameThrower) {
+            if (stack.has(RRComponents.FLAME_THROWER_MODE)) {
                 stack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(message.value()));
             }
         }).exceptionally(throwable -> {

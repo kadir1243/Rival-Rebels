@@ -72,7 +72,7 @@ public class BlockReciever extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        player.openMenu(getMenuProvider(state, level, pos));
+        player.openMenu(state.getMenuProvider(level, pos));
 
         level.playSound(player, pos, RRSounds.GUI_UNKNOWN4.get(), SoundSource.PLAYERS);
 

@@ -127,7 +127,7 @@ public class CommandRobot {
                     .executes(context -> {
                         String pathToTexture = StringArgumentType.getString(context, "pathToTexture");
                         EntityRhodes.texloc = pathToTexture;
-                        context.getSource().sendSuccess(() -> Component.nullToEmpty("§cNext Rhodes Flag is " + pathToTexture), true);
+                        context.getSource().sendSuccess(() -> Component.literal("§cNext Rhodes Flag is " + pathToTexture), true);
                         return 0;
                     })
                 )

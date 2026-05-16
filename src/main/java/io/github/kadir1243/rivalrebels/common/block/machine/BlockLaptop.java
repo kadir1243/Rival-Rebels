@@ -55,12 +55,12 @@ public class BlockLaptop extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return super.getStateForPlacement(ctx).setValue(FACING, Direction.getFacingAxis(ctx.getPlayer(), Direction.Axis.X));
+        return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection().getOpposite());
 	}
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        player.openMenu(getMenuProvider(state, level, pos));
+        player.openMenu(state.getMenuProvider(level, pos));
         level.playSound(player, pos, RRSounds.GUI_UNKNOWN4.get(), SoundSource.PLAYERS);
 
 		return InteractionResult.SUCCESS;

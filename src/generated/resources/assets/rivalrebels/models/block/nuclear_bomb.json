@@ -11,6 +11,6 @@
   "loader": "neoforge:obj",
   "model": "rivalrebels:models/wacknuke.obj",
   "textures": {
-    "texture": "rivalrebels:textures/entity/cg.png"
+    "texture": "rivalrebels:entity/cg.png"
   }
 }

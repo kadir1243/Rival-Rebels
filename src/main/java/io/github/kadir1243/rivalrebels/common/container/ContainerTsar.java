@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.container;
 
+import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTimedBomb;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
 import io.github.kadir1243.rivalrebels.common.item.*;
@@ -37,8 +38,8 @@ public class ContainerTsar extends AbstractContainerMenu implements BombContaine
         this.tsarBomb = tsarBomb;
         this.containerData = containerData;
         addSlot(new SlotRR(tsarBomb, 0, 18, 48, 1, RRItems.fuse));
-		addSlot(new SlotRR(tsarBomb, 1, 40, 59, 1, RRItems.antenna.asItem()));
-		addSlot(new SlotRR(tsarBomb, 2, 40, 37, 1, RRItems.antenna.asItem()));
+		addSlot(new SlotRR(tsarBomb, 1, 40, 59, 1, RRItems.antenna));
+		addSlot(new SlotRR(tsarBomb, 2, 40, 37, 1, RRItems.antenna));
 		for (int i = 0; i <= 3; i++)
 		{
 			addSlot(new SlotRR(tsarBomb, i + 3, 62 + i * 18, 19, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
@@ -46,8 +47,8 @@ public class ContainerTsar extends AbstractContainerMenu implements BombContaine
 			addSlot(new SlotRR(tsarBomb, i + 11, 62 + i * 18, 59, 1, RRItems.hydrod).setAcceptsTrollface(true));
 			addSlot(new SlotRR(tsarBomb, i + 15, 62 + i * 18, 77, 1, RRItems.hydrod).setAcceptsTrollface(true));
 		}
-		addSlot(new SlotRR(tsarBomb, 19, 138, 48, 1, BlockTimedBomb.class));
-		addSlot(new SlotRR(tsarBomb, 20, 98, 99, 1, ItemChip.class));
+		addSlot(new SlotRR(tsarBomb, 19, 138, 48, 1, RRBlocks.timedbomb.asItem()));
+		addSlot(new SlotRR(tsarBomb, 20, 98, 99, 1, RRItems.chip));
 		bindPlayerInventory(inventoryPlayer);
         this.addDataSlots(containerData);
 	}
@@ -59,18 +60,9 @@ public class ContainerTsar extends AbstractContainerMenu implements BombContaine
 
 	protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
-		for (int i = 0; i < 3; i++)
-		{
-			for (int j = 0; j < 9; j++)
-			{
-				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
-			}
-		}
+        addInventoryExtendedSlots(inventoryPlayer, 8, 119);
 
-		for (int i = 0; i < 9; i++)
-		{
-			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
-		}
+        addInventoryHotbarSlots(inventoryPlayer, 8, 175);
 	}
 
     @Override

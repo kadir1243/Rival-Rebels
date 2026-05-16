@@ -14,6 +14,7 @@ package io.github.kadir1243.rivalrebels.common.block.machine;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.item.ItemChip;
+import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import io.github.kadir1243.rivalrebels.common.tileentity.Tickable;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityForceFieldNode;
@@ -62,7 +63,7 @@ public class BlockForceFieldNode extends BaseEntityBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 		BlockEntity te = level.getBlockEntity(pos);
 		if (te instanceof TileEntityForceFieldNode teffn && !level.isClientSide()) {
-			if (!stack.isEmpty() && stack.getItem() instanceof ItemChip && teffn.owner == null && teffn.rrteam == RivalRebelsTeam.NONE)
+			if (stack.is(RRItems.chip) && teffn.owner == null && teffn.rrteam == RivalRebelsTeam.NONE)
 			{
 				teffn.rrteam = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam;
 				if (teffn.rrteam == RivalRebelsTeam.NONE) {

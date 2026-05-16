@@ -29,7 +29,7 @@ import net.minecraft.util.CommonColors;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade, RenderGasGrenade.State> {
-    private static final RenderType RENDER_LAYER = RenderTypes.entitySolid(RRIdentifiers.etgasgrenade);
+    private static final RenderType RENDER_LAYER = RenderTypes.entityCutout(RRIdentifiers.etgasgrenade);
 
     public RenderGasGrenade(EntityRendererProvider.Context renderManager) {
         super(renderManager);

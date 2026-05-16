@@ -130,11 +130,10 @@ public class EntityFlameBall1 extends FlameBallProjectile {
 					{
                         BlockPos pos = blockPosition().offset(x, y, z);
                         BlockState state = level().getBlockState(pos);
-                        Block id = state.getBlock();
-						if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+                        if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 						else if (state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
-						else if (id == Blocks.GRASS_BLOCK && random.nextInt(5) == 0) level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
-						else if (state.is(RRBlocks.flare)) id.destroy(level(), pos, state);
+						else if (state.is(BlockTags.GRASS_BLOCKS) && random.nextInt(5) == 0) level().setBlockAndUpdate(pos, Blocks.DIRT.defaultBlockState());
+						else if (state.is(RRBlocks.flare)) state.getBlock().destroy(level(), pos, state);
 					}
 				}
 			}

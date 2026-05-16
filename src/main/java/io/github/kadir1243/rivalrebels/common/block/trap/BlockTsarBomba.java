@@ -60,13 +60,13 @@ public class BlockTsarBomba extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        return super.getStateForPlacement(ctx).setValue(FACING, Direction.getFacingAxis(ctx.getPlayer(), Direction.Axis.X));
+        return super.getStateForPlacement(ctx).setValue(FACING, ctx.getHorizontalDirection());
 	}
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (!stack.isEmpty() && stack.is(RRItems.pliers)) {
-			player.openMenu(getMenuProvider(state, level, pos));
+        if (stack.is(RRItems.pliers)) {
+			player.openMenu(state.getMenuProvider(level, pos));
 		} else if (!level.isClientSide()) {
 			player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
 		}

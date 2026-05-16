@@ -82,7 +82,7 @@ public class ItemFlameThrower extends Item {
 			user.sendSystemMessage(OUT_OF_FUEL.translate().withStyle(ChatFormatting.RED));
 		}
 		if (message) {
-			user.sendSystemMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."));
+			user.sendSystemMessage(Translations.use(Component.literal("[R].")));
 			message = false;
 		}
 		return InteractionResult.PASS;

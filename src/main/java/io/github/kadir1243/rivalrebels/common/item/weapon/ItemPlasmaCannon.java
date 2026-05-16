@@ -71,7 +71,7 @@ public class ItemPlasmaCannon extends Item
 		}
 		else if (!world.isClientSide())
 		{
-			user.sendSystemMessage(Component.nullToEmpty("§cOut of Hydrogen"));
+			user.sendSystemMessage(Component.literal("§cOut of Hydrogen"));
 		}
 		return InteractionResult.SUCCESS;
 	}

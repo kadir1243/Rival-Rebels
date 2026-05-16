@@ -43,6 +43,7 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.tags.FluidTags;
 import net.minecraft.util.AbortableIterationConsumer;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -166,6 +167,7 @@ public class EntityRhodes extends LivingEntity {
 	public static String texloc = "";
 
     public BlockPos wakePos = new BlockPos(-1, -1, -1);
+    private Block b;
 
     public EntityRhodes(EntityType<? extends EntityRhodes> type, Level world) {
         super(type, world);
@@ -298,7 +300,7 @@ public class EntityRhodes extends LivingEntity {
 			if (!level().isClientSide())
 			{
 				if (isDeadOrDying()) {
-                    MutableComponent text = Translations.status().append(" ").append(getName()).append(" ").append("RivalRebels.meltdown").append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
+                    MutableComponent text = Translations.status().append(" ").append(getName()).append(" ").append(Translations.WARNING_MELTDOWN.translate()).append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
                     for (Player player : level().players()) {
                         player.sendSystemMessage(text);
                     }
@@ -442,64 +444,68 @@ public class EntityRhodes extends LivingEntity {
 			{
 				int irpyyoff = irpy + (tickCount % 6);
 				int ilpyyoff = ilpy + (tickCount % 6);
-				Block b = getBlock(irpx, irpyyoff, irpz);
-				if (b != Blocks.WATER && b != Blocks.AIR)
-				{
-					setBlock(irpx-2, irpyyoff, irpz-2, Blocks.AIR);
-					setBlock(irpx-2, irpyyoff, irpz-1, Blocks.AIR);
-					setBlock(irpx-2, irpyyoff, irpz, Blocks.AIR);
-					setBlock(irpx-2, irpyyoff, irpz+1, Blocks.AIR);
-					setBlock(irpx-2, irpyyoff, irpz+2, Blocks.AIR);
-					setBlock(irpx-1, irpyyoff, irpz-2, Blocks.AIR);
-					setBlock(irpx-1, irpyyoff, irpz-1, Blocks.AIR);
-					setBlock(irpx-1, irpyyoff, irpz, Blocks.AIR);
-					setBlock(irpx-1, irpyyoff, irpz+1, Blocks.AIR);
-					setBlock(irpx-1, irpyyoff, irpz+2, Blocks.AIR);
-					setBlock(irpx, irpyyoff, irpz-2, Blocks.AIR);
-					setBlock(irpx, irpyyoff, irpz-1, Blocks.AIR);
-					setBlock(irpx, irpyyoff, irpz, Blocks.AIR);
-					setBlock(irpx, irpyyoff, irpz+1, Blocks.AIR);
-					setBlock(irpx, irpyyoff, irpz+2, Blocks.AIR);
-					setBlock(irpx+1, irpyyoff, irpz-2, Blocks.AIR);
-					setBlock(irpx+1, irpyyoff, irpz-1, Blocks.AIR);
-					setBlock(irpx+1, irpyyoff, irpz, Blocks.AIR);
-					setBlock(irpx+1, irpyyoff, irpz+1, Blocks.AIR);
-					setBlock(irpx+1, irpyyoff, irpz+2, Blocks.AIR);
-					setBlock(irpx+2, irpyyoff, irpz-2, Blocks.AIR);
-					setBlock(irpx+2, irpyyoff, irpz-1, Blocks.AIR);
-					setBlock(irpx+2, irpyyoff, irpz, Blocks.AIR);
-					setBlock(irpx+2, irpyyoff, irpz+1, Blocks.AIR);
-					setBlock(irpx+2, irpyyoff, irpz+2, Blocks.AIR);
-				}
-				b = getBlock(ilpx, ilpyyoff, ilpz);
-				if (b != Blocks.WATER && b != Blocks.AIR)
-				{
-					setBlock(ilpx-2, ilpyyoff, ilpz-2, Blocks.AIR);
-					setBlock(ilpx-2, ilpyyoff, ilpz-1, Blocks.AIR);
-					setBlock(ilpx-2, ilpyyoff, ilpz, Blocks.AIR);
-					setBlock(ilpx-2, ilpyyoff, ilpz+1, Blocks.AIR);
-					setBlock(ilpx-2, ilpyyoff, ilpz+2, Blocks.AIR);
-					setBlock(ilpx-1, ilpyyoff, ilpz-2, Blocks.AIR);
-					setBlock(ilpx-1, ilpyyoff, ilpz-1, Blocks.AIR);
-					setBlock(ilpx-1, ilpyyoff, ilpz, Blocks.AIR);
-					setBlock(ilpx-1, ilpyyoff, ilpz+1, Blocks.AIR);
-					setBlock(ilpx-1, ilpyyoff, ilpz+2, Blocks.AIR);
-					setBlock(ilpx, ilpyyoff, ilpz-2, Blocks.AIR);
-					setBlock(ilpx, ilpyyoff, ilpz-1, Blocks.AIR);
-					setBlock(ilpx, ilpyyoff, ilpz, Blocks.AIR);
-					setBlock(ilpx, ilpyyoff, ilpz+1, Blocks.AIR);
-					setBlock(ilpx, ilpyyoff, ilpz+2, Blocks.AIR);
-					setBlock(ilpx+1, ilpyyoff, ilpz-2, Blocks.AIR);
-					setBlock(ilpx+1, ilpyyoff, ilpz-1, Blocks.AIR);
-					setBlock(ilpx+1, ilpyyoff, ilpz, Blocks.AIR);
-					setBlock(ilpx+1, ilpyyoff, ilpz+1, Blocks.AIR);
-					setBlock(ilpx+1, ilpyyoff, ilpz+2, Blocks.AIR);
-					setBlock(ilpx+2, ilpyyoff, ilpz-2, Blocks.AIR);
-					setBlock(ilpx+2, ilpyyoff, ilpz-1, Blocks.AIR);
-					setBlock(ilpx+2, ilpyyoff, ilpz, Blocks.AIR);
-					setBlock(ilpx+2, ilpyyoff, ilpz+1, Blocks.AIR);
-					setBlock(ilpx+2, ilpyyoff, ilpz+2, Blocks.AIR);
-				}
+                {
+                    BlockPos pos = new BlockPos(irpx, irpyyoff, irpz);
+                    BlockState state = level().getBlockState(pos);
+                    if (!state.isAir() && !state.getFluidState().is(FluidTags.WATER)) {
+                        setBlock(irpx - 2, irpyyoff, irpz - 2, Blocks.AIR);
+                        setBlock(irpx - 2, irpyyoff, irpz - 1, Blocks.AIR);
+                        setBlock(irpx - 2, irpyyoff, irpz, Blocks.AIR);
+                        setBlock(irpx - 2, irpyyoff, irpz + 1, Blocks.AIR);
+                        setBlock(irpx - 2, irpyyoff, irpz + 2, Blocks.AIR);
+                        setBlock(irpx - 1, irpyyoff, irpz - 2, Blocks.AIR);
+                        setBlock(irpx - 1, irpyyoff, irpz - 1, Blocks.AIR);
+                        setBlock(irpx - 1, irpyyoff, irpz, Blocks.AIR);
+                        setBlock(irpx - 1, irpyyoff, irpz + 1, Blocks.AIR);
+                        setBlock(irpx - 1, irpyyoff, irpz + 2, Blocks.AIR);
+                        setBlock(irpx, irpyyoff, irpz - 2, Blocks.AIR);
+                        setBlock(irpx, irpyyoff, irpz - 1, Blocks.AIR);
+                        setBlock(irpx, irpyyoff, irpz, Blocks.AIR);
+                        setBlock(irpx, irpyyoff, irpz + 1, Blocks.AIR);
+                        setBlock(irpx, irpyyoff, irpz + 2, Blocks.AIR);
+                        setBlock(irpx + 1, irpyyoff, irpz - 2, Blocks.AIR);
+                        setBlock(irpx + 1, irpyyoff, irpz - 1, Blocks.AIR);
+                        setBlock(irpx + 1, irpyyoff, irpz, Blocks.AIR);
+                        setBlock(irpx + 1, irpyyoff, irpz + 1, Blocks.AIR);
+                        setBlock(irpx + 1, irpyyoff, irpz + 2, Blocks.AIR);
+                        setBlock(irpx + 2, irpyyoff, irpz - 2, Blocks.AIR);
+                        setBlock(irpx + 2, irpyyoff, irpz - 1, Blocks.AIR);
+                        setBlock(irpx + 2, irpyyoff, irpz, Blocks.AIR);
+                        setBlock(irpx + 2, irpyyoff, irpz + 1, Blocks.AIR);
+                        setBlock(irpx + 2, irpyyoff, irpz + 2, Blocks.AIR);
+                    }
+                }
+                {
+                    BlockPos pos = new BlockPos(ilpx, ilpyyoff, ilpz);
+                    BlockState state = level().getBlockState(pos);
+                    if (!state.isAir() && !state.getFluidState().is(FluidTags.WATER)) {
+                        setBlock(ilpx - 2, ilpyyoff, ilpz - 2, Blocks.AIR);
+                        setBlock(ilpx - 2, ilpyyoff, ilpz - 1, Blocks.AIR);
+                        setBlock(ilpx - 2, ilpyyoff, ilpz, Blocks.AIR);
+                        setBlock(ilpx - 2, ilpyyoff, ilpz + 1, Blocks.AIR);
+                        setBlock(ilpx - 2, ilpyyoff, ilpz + 2, Blocks.AIR);
+                        setBlock(ilpx - 1, ilpyyoff, ilpz - 2, Blocks.AIR);
+                        setBlock(ilpx - 1, ilpyyoff, ilpz - 1, Blocks.AIR);
+                        setBlock(ilpx - 1, ilpyyoff, ilpz, Blocks.AIR);
+                        setBlock(ilpx - 1, ilpyyoff, ilpz + 1, Blocks.AIR);
+                        setBlock(ilpx - 1, ilpyyoff, ilpz + 2, Blocks.AIR);
+                        setBlock(ilpx, ilpyyoff, ilpz - 2, Blocks.AIR);
+                        setBlock(ilpx, ilpyyoff, ilpz - 1, Blocks.AIR);
+                        setBlock(ilpx, ilpyyoff, ilpz, Blocks.AIR);
+                        setBlock(ilpx, ilpyyoff, ilpz + 1, Blocks.AIR);
+                        setBlock(ilpx, ilpyyoff, ilpz + 2, Blocks.AIR);
+                        setBlock(ilpx + 1, ilpyyoff, ilpz - 2, Blocks.AIR);
+                        setBlock(ilpx + 1, ilpyyoff, ilpz - 1, Blocks.AIR);
+                        setBlock(ilpx + 1, ilpyyoff, ilpz, Blocks.AIR);
+                        setBlock(ilpx + 1, ilpyyoff, ilpz + 1, Blocks.AIR);
+                        setBlock(ilpx + 1, ilpyyoff, ilpz + 2, Blocks.AIR);
+                        setBlock(ilpx + 2, ilpyyoff, ilpz - 2, Blocks.AIR);
+                        setBlock(ilpx + 2, ilpyyoff, ilpz - 1, Blocks.AIR);
+                        setBlock(ilpx + 2, ilpyyoff, ilpz, Blocks.AIR);
+                        setBlock(ilpx + 2, ilpyyoff, ilpz + 1, Blocks.AIR);
+                        setBlock(ilpx + 2, ilpyyoff, ilpz + 2, Blocks.AIR);
+                    }
+                }
 				int px = (int) getX();
 				int py = (int) (getY()-5*getScale() + (tickCount%20)*getScale());
 				int pz = (int) getZ();
@@ -507,9 +513,9 @@ public class EntityRhodes extends LivingEntity {
 				{
 					for (int z = -4; z < 5; z++)
 					{
-						b = getBlock(px+x, py, pz+z);
-						if (b != Blocks.AIR && b != Blocks.WATER)
-						{
+                        BlockPos pos = new BlockPos(px + x, py, pz + z);
+                        BlockState state = level().getBlockState(pos);
+						if (!state.isAir() && !state.getFluidState().is(FluidTags.WATER)) {
 							setBlock(px+x, py, pz+z, Blocks.AIR);
 							if (random.nextInt(333)==0)
 							{
@@ -1640,10 +1646,6 @@ public class EntityRhodes extends LivingEntity {
 
     private void setBlock(int x, int y, int z, Block block) {
         level().setBlockAndUpdate(new BlockPos(x, y, z), block.defaultBlockState());
-    }
-
-    private Block getBlock(int x, int y, int z) {
-        return level().getBlockState(new BlockPos(x, y, z)).getBlock();
     }
 
     private BlockState getBlockState(int x, int y, int z) {

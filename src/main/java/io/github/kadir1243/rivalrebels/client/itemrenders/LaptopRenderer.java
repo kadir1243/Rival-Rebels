@@ -11,12 +11,16 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.itemrenders;
 
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
+import net.minecraft.client.renderer.special.SpecialModelRenderer;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3fc;
@@ -24,19 +28,31 @@ import org.joml.Vector3fc;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class LaptopRenderer implements NoDataSpecialModelRenderer {
+public record LaptopRenderer(Identifier screenTexture) implements NoDataSpecialModelRenderer {
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
-        poseStack.pushPose();
-		poseStack.translate(0.3F, 0.3F, 0);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180));
 		ModelLaptop.renderModel(submitNodeCollector, poseStack, -90, lightCoords, overlayCoords);
 		ModelLaptop.renderScreen(submitNodeCollector, RRIdentifiers.etubuntu, poseStack, -90, lightCoords, overlayCoords);
-		poseStack.popPose();
 	}
 
     @Override
     public void getExtents(Consumer<Vector3fc> output) {
+    }
+
+    public record Unbaked(Identifier screenTexture) implements NoDataSpecialModelRenderer.Unbaked {
+        public static final Identifier ID = RRIdentifiers.create("laptop_item_renderer");
+        public static final MapCodec<Unbaked> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i
+            .group(Identifier.CODEC.fieldOf("screenTexture").forGetter(Unbaked::screenTexture))
+            .apply(i, Unbaked::new));
+        @Override
+        public SpecialModelRenderer<Void> bake(BakingContext context) {
+            return new LaptopRenderer(screenTexture);
+        }
+
+        @Override
+        public MapCodec<Unbaked> type() {
+            return MAP_CODEC;
+        }
     }
 }
 

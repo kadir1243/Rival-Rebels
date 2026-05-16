@@ -39,13 +39,13 @@ public class CommandHotPotato {
     private static int execute(CommandSourceStack source, int numberOfRounds) {
         if (numberOfRounds == -1) {
             roundinprogress = false;
-            source.sendSuccess(() -> Component.nullToEmpty("§cRound stopped."), true);
+            source.sendSuccess(() -> Component.literal("§cRound stopped."), true);
         } else {
             if (roundinprogress) {
-                source.sendFailure(Component.nullToEmpty("§cRound already in progress! Do /rrhotpotato stop to end the current round."));
+                source.sendFailure(Component.literal("§cRound already in progress! Do /rrhotpotato stop to end the current round."));
                 return 0;
             }
-            source.sendSuccess(() -> Component.nullToEmpty("§cLet the Hot Potato games begin! " + numberOfRounds + " rounds."), true);
+            source.sendSuccess(() -> Component.literal("§cLet the Hot Potato games begin! " + numberOfRounds + " rounds."), true);
             EntityHotPotato tsar = new EntityHotPotato(source.getLevel(),pos.getX(),pos.getY(), pos.getZ(), numberOfRounds);
             source.getLevel().addFreshEntity(tsar);
             roundinprogress = true;

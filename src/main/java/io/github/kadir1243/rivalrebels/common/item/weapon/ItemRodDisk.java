@@ -51,7 +51,7 @@ public class ItemRodDisk extends Item
 
 		if (!pass)
 		{
-			user.sendSystemMessage(Component.nullToEmpty("Password?"));
+			user.sendSystemMessage(Component.literal("Password?"));
 			pass = true;
 		}
 		user.startUsingItem(hand);

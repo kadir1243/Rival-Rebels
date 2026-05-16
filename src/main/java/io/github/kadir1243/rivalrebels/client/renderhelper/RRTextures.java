@@ -42,7 +42,7 @@ public class RRTextures {
 
     public record Texture(Identifier location, int width, int height) {
         public void blit(GuiGraphicsExtractor graphics, int x, int y, float uOffset, float vOffset, int uWidth, int vHeight, int color) {
-            graphics.blit(RenderPipelines.GUI_TEXTURED, location, x, y, uOffset, vOffset, uWidth, vHeight, width, height, color);
+            graphics.blit(RenderPipelines.GUI_TEXTURED, location, x, y, uOffset, vOffset, uWidth, vHeight, 256, 256, color);
         }
 
         private Texture(String location, int width, int height) {

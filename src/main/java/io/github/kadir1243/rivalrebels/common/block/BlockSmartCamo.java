@@ -28,10 +28,7 @@ public class BlockSmartCamo extends Block
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-        if (getBlockState(world, x + 1, y, z).is(BlockTags.SNOW) || getBlockState(world, x - 1, y, z).is(BlockTags.SNOW) || getBlockState(world, x, y, z - 1).is(BlockTags.SNOW) || getBlockState(world, x, y, z + 1).is(BlockTags.SNOW)) {
+        if (getBlockState(world, pos.east()).is(BlockTags.SNOW) || getBlockState(world, pos.west()).is(BlockTags.SNOW) || getBlockState(world, pos.north()).is(BlockTags.SNOW) || getBlockState(world, pos.south()).is(BlockTags.SNOW)) {
             setBlock(world, pos, RRBlocks.camo3.get());
         } else {
             if (getBlockState(world, pos.below()).is(BlockTags.DIRT)) {
@@ -40,13 +37,13 @@ public class BlockSmartCamo extends Block
                 if (getBlockState(world, pos.below()).is(BlockTags.SAND) || getBlockState(world, pos.below()).is(ModBlockTags.SANDSTONE_BLOCKS)) {
                     setBlock(world, pos, RRBlocks.camo2.get());
                 } else {
-                    if (getBlockState(world, pos.below()).is(BlockTags.BASE_STONE_OVERWORLD) || getBlockState(world, pos.below()).is(Blocks.GRAVEL) || getBlock(world, pos.below()) == Blocks.BEDROCK || getBlockState(world, pos.below()).is(Blocks.COBBLESTONE)) {
+                    if (getBlockState(world, pos.below()).is(BlockTags.BASE_STONE_OVERWORLD) || getBlockState(world, pos.below()).is(Blocks.GRAVEL) || getBlockState(world, pos.below()).is(Blocks.BEDROCK) || getBlockState(world, pos.below()).is(Blocks.COBBLESTONE)) {
                         setBlock(world, pos, RRBlocks.camo3.get());
                     } else {
-                        if (getBlock(world, pos.below()) == RRBlocks.camo2.get() || getBlock(world, x + 1, y, z) == RRBlocks.camo2.get() || getBlock(world, x - 1, y, z) == RRBlocks.camo2.get() || getBlock(world, x, y, z + 1) == RRBlocks.camo2.get() || getBlock(world, x, y, z - 1) == RRBlocks.camo2.get() || getBlock(world, x, y + 1, z) == RRBlocks.camo2.get()) {
+                        if (getBlockState(world, pos.below()).is(RRBlocks.camo2) || getBlockState(world, pos.east()).is(RRBlocks.camo2) || getBlockState(world, pos.west()).is(RRBlocks.camo2) || getBlockState(world, pos.south()).is(RRBlocks.camo2) || getBlockState(world, pos.north()).is(RRBlocks.camo2) || getBlockState(world, pos.above()).is(RRBlocks.camo2)) {
                             setBlock(world, pos, RRBlocks.camo2.get());
                         } else {
-                            if (getBlock(world, pos.below()) == RRBlocks.camo3.get() || getBlock(world, x + 1, y, z) == RRBlocks.camo3.get() || getBlock(world, x - 1, y, z) == RRBlocks.camo3.get() || getBlock(world, x, y, z + 1) == RRBlocks.camo3.get() || getBlock(world, x, y, z - 1) == RRBlocks.camo3.get() || getBlock(world, x, y + 1, z) == RRBlocks.camo3.get()) {
+                            if (getBlockState(world, pos.below()).is(RRBlocks.camo3) || getBlockState(world, pos.east()).is(RRBlocks.camo3) || getBlockState(world, pos.west()).is(RRBlocks.camo3) || getBlockState(world, pos.south()).is(RRBlocks.camo3) || getBlockState(world, pos.north()).is(RRBlocks.camo3) || getBlockState(world, pos.above()).is(RRBlocks.camo3)) {
                                 setBlock(world, pos, RRBlocks.camo3.get());
                             } else {
                                 setBlock(world, pos, RRBlocks.camo1.get());
@@ -58,20 +55,8 @@ public class BlockSmartCamo extends Block
         }
     }
 
-    private static Block getBlock(Level world, int x, int y, int z) {
-        return getBlockState(world, x, y, z).getBlock();
-    }
-
-    private static BlockState getBlockState(Level world, int x, int y, int z) {
-        return world.getBlockState(new BlockPos(x, y, z));
-    }
-
     private static void setBlock(Level world, BlockPos pos, Block block) {
         world.setBlockAndUpdate(pos, block.defaultBlockState());
-    }
-
-    private static Block getBlock(Level world, BlockPos pos) {
-        return getBlockState(world, pos).getBlock();
     }
 
     private static BlockState getBlockState(Level world, BlockPos pos) {

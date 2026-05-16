@@ -38,13 +38,13 @@ public class CommandResetGame {
 		if (player == null) {
 			RivalRebels.round.rrplayerlist.clearTeam();
 			RivalRebels.round.rrplayerlist.refreshForWorld(source.getLevel());
-			source.sendSuccess(() -> Component.nullToEmpty("§7All players have been reset."), true);
+			source.sendSuccess(() -> Component.literal("§7All players have been reset."), true);
 		} else if (RivalRebels.round.rrplayerlist.contains(player.getGameProfile())) {
 			RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).clearTeam();
 			RivalRebels.round.rrplayerlist.refreshForWorld(source.getLevel());
-			source.sendSuccess(() -> Component.nullToEmpty("§7Player successfully reset."), true);
+			source.sendSuccess(() -> Component.literal("§7Player successfully reset."), true);
 		} else {
-			source.sendFailure(Component.nullToEmpty("§7No player by that name."));
+			source.sendFailure(Component.literal("§7No player by that name."));
 		}
         return 0;
 	}

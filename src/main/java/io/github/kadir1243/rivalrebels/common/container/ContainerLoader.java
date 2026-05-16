@@ -82,11 +82,6 @@ public class ContainerLoader extends AbstractContainerMenu
 		return var3;
 	}
 
-	public void clearSlots()
-	{
-		this.slots.clear();
-	}
-
 	public void addSlots() {
 		for (int var4 = 0; var4 < 6; ++var4)
 		{
@@ -112,16 +107,7 @@ public class ContainerLoader extends AbstractContainerMenu
 			}
 		}
 
-		for (int var4 = 0; var4 < 3; ++var4)
-		{
-			for (int var5 = 0; var5 < 9; ++var5)
-			{
-				this.addSlot(new Slot(playerInventory, var5 + var4 * 9 + 9, 48 + var5 * 18, 127 + var4 * 18));
-			}
-		}
-
-		for (int hotbar = 0; hotbar < 9; ++hotbar) {
-			this.addSlot(new Slot(playerInventory, hotbar, 48 + hotbar * 18, 183));
-		}
+        addInventoryExtendedSlots(playerInventory, 48, 127);
+        addInventoryHotbarSlots(playerInventory, 48, 183);
 	}
 }

@@ -33,7 +33,7 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
     protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
         graphics.pose().pushMatrix();
 		graphics.pose().rotate(-13);
-		graphics.text(font, "Loader", 165, 237, 0x444444, false);
+		graphics.text(font, Component.literal("Loader"), 165, 237, 0x444444, false);
 		graphics.pose().popMatrix();
 	}
 

@@ -13,13 +13,19 @@ package io.github.kadir1243.rivalrebels.client.model;
 
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import org.joml.Vector3f;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -47,7 +53,8 @@ public class ModelRocketLauncherTube {
 	private static final float	tx5		= 0.65625f;
 	private static final float	ty1		= 0;
 	private static final float	ty2		= 0.09375f;
-    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+    private static final Map<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> MAP = new HashMap<>();
+    private static final Function<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> BAKED_MODEL = t -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t), buffer -> {
         QuadHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
         QuadHelper.addFace(buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
         QuadHelper.addFace(buffer, vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);
@@ -63,7 +70,7 @@ public class ModelRocketLauncherTube {
         QuadHelper.addFace(buffer, vnz1, vpxnz1, vpx1, vy1, tx4, tx5, ty1, ty2);
     });
 
-	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
-        ObjModels.submit(nodeCollector, renderType, BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, light, overlay);
+	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, Identifier texture, int light, int overlay) {
+        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, renderType, MAP.computeIfAbsent(texture, BAKED_MODEL), light, overlay);
 	}
 }

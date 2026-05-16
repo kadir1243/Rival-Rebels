@@ -16,13 +16,19 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -134,7 +140,7 @@ public class ModelObjective {
 	private static final TextureVertice	rs10		= new TextureVertice(u + p, k + r * 2);
 	private static final TextureVertice	rs11		= new TextureVertice(u + q, k + q * 2);
 	private static final TextureVertice	rs12		= new TextureVertice(u + r, k + p * 2);
-    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL_A = QuadHelper.createBakedModel(buffer -> {
+    private static final Function<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> BAKED_MODEL_A = texture -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(texture), buffer -> {
         QuadHelper.addFace(buffer, lloader1, lloader12, rloader12, rloader1, l1f, l12s, r12s, r1f);
         QuadHelper.addFace(buffer, lloader2, lloader1, rloader1, rloader2, l2, l1s, r1s, r2);
         QuadHelper.addFace(buffer, lloader3, lloader2, rloader2, rloader3, l3f, l2, r2, r3f);
@@ -160,9 +166,10 @@ public class ModelObjective {
         QuadHelper.addFace(buffer, rloader5, rloader4, rloader9, rloader8, rs11, rs10, rs3, rs2);
         QuadHelper.addFace(buffer, rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1);
     });
+    private static final Map<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> MAP = new HashMap<>();
 
-	public static void renderA(PoseStack.Pose pose, VertexConsumer buffer, int light, int overlay) {
-        ObjModels.render(BAKED_MODEL_A.get().quadCollection(), buffer, pose, CommonColors.WHITE, light, overlay);
+	public static void renderA(SubmitNodeCollector nodeCollector, PoseStack poseStack, Identifier texture, RenderType renderType, int light, int overlay) {
+        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, renderType, MAP.computeIfAbsent(texture, BAKED_MODEL_A), light, overlay);
 	}
 
 	private static final Vector3f	vfront1	= new Vector3f(0.5f, 0.3125f, 0.3125f);

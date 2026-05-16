@@ -89,10 +89,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 
         graphics.pose().pushMatrix();
         graphics.pose().scale(1.25f, 1f);
-        graphics.text(font, "ToKaMaK", 10, 8, 0x444444, false);
+        graphics.text(font, Component.literal("ToKaMaK"), 10, 8, 0x444444, false);
         graphics.pose().popMatrix();
-        graphics.text(font, "Teslas: " + df.format(menu.getPower() - menu.getConsumed()), 120, 8, 0xffffff, false);
-        graphics.text(font, "Output/t: " + df.format(menu.getLastTickConsumed()), 140, 18, 0xffffff, false);
+        graphics.text(font, Component.literal("Teslas: " + df.format(menu.getPower() - menu.getConsumed())), 120, 8, 0xffffff, false);
+        graphics.text(font, Component.literal("Output/t: " + df.format(menu.getLastTickConsumed())), 140, 18, 0xffffff, false);
 	}
 
     @Override
@@ -137,10 +137,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 		if (elapsed > 30)
 		{
 			if (resolution == 0.25) resolution = 0.125f;
-			if (resolution == 0.5) resolution = 0.25f;
-			if (resolution == 1) resolution = 0.5f;
-			if (resolution == 2) resolution = 1;
-			if (resolution == 4) resolution = 2;
+			else if (resolution == 0.5) resolution = 0.25f;
+			else if (resolution == 1) resolution = 0.5f;
+			else if (resolution == 2) resolution = 1;
+			else if (resolution == 4) resolution = 2;
 		}
 		frame += 0.75f + (menu.getLastTickConsumed() / 100);
 		power.isPressed = menu.isOn();
@@ -209,7 +209,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
     }
 
     private static void drawPoint(GuiGraphicsExtractor graphics, float pointSize, float x, float y, float z, int color) {
-        float halfSize = pointSize / 2.0f;
+        float halfSize = pointSize / 2F;
 
         // I don't really know what is rendering, so I just tried to create points from quads
         graphics.fill((int) (x - halfSize), (int) (y - halfSize), (int) (x + halfSize), (int) (y + halfSize), color);

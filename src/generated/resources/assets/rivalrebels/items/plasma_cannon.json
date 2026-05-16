@@ -1,6 +1,11 @@
 {
   "model": {
-    "type": "minecraft:model",
-    "model": "rivalrebels:item/plasma_cannon"
+    "type": "minecraft:special",
+    "base": "minecraft:air",
+    "model": {
+      "type": "rivalrebels:plasma_cannon_renderer",
+      "rodTexture": "rivalrebels:textures/entity/ao.png",
+      "texture": "rivalrebels:textures/entity/ay.png"
+    }
   }
 }

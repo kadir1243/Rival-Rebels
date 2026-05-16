@@ -21,7 +21,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.SimpleContainerData;
-import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
 public class ContainerReactor extends AbstractContainerMenu
@@ -54,9 +53,7 @@ public class ContainerReactor extends AbstractContainerMenu
 	}
 
 	protected void bindPlayerInventory(Container inventoryPlayer) {
-		for (int i = 0; i < 9; i++) {
-			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 172));
-		}
+        addInventoryHotbarSlots(inventoryPlayer, 8, 172);
 	}
 
     @Override

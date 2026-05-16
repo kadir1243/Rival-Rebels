@@ -63,7 +63,7 @@ public class RRIdentifiers {
     public static final Identifier ettheoreticaltsarshell1 = create("textures/entity/cd.png");
     public static final Identifier ettheoreticaltsarshell2 = create("textures/entity/ce.png");
     public static final Identifier etblacktsar = create("textures/entity/cf.png");
-    public static final Identifier etwacknuke = create("textures/entity/cg.png");
+    public static final Identifier etwacknuke = create("entity/cg.png");
     public static final Identifier ettupolev = create("textures/entity/tupolev.png");
     public static final Identifier etbooster = create("textures/entity/booster.png");
     public static final Identifier etflameballgreen = create("textures/entity/ch.png");

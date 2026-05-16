@@ -72,7 +72,7 @@ public class ItemSeekM202 extends Item
 		}
 		else if (!world.isClientSide())
 		{
-			player.sendSystemMessage(Component.nullToEmpty("§cOut of ammunition"));
+			player.sendSystemMessage(Component.literal("§cOut of ammunition"));
 		}
 		return InteractionResult.SUCCESS;
 	}

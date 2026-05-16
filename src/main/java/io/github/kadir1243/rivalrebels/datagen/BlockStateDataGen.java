@@ -1,7 +1,9 @@
 package io.github.kadir1243.rivalrebels.datagen;
 
 import com.mojang.math.Axis;
+import com.mojang.math.Transformation;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
+import io.github.kadir1243.rivalrebels.client.itemrenders.*;
 import io.github.kadir1243.rivalrebels.common.block.BlockConduit;
 import io.github.kadir1243.rivalrebels.common.block.BlockGore;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
@@ -12,6 +14,7 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.renderer.item.SpecialModelWrapper;
 import net.minecraft.client.resources.model.sprite.Material;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
@@ -21,10 +24,14 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.neoforged.neoforge.client.model.EmptyModel;
 import net.neoforged.neoforge.client.model.generators.loaders.ObjModelBuilder;
+import net.neoforged.neoforge.client.model.generators.template.CustomLoaderBuilder;
 import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
 import net.neoforged.neoforge.client.model.generators.template.RootTransformsBuilder;
 import net.neoforged.neoforge.client.model.generators.template.TransformVecBuilder;
+import org.apache.commons.lang3.function.Consumers;
+import org.joml.Vector3f;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -55,14 +62,35 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private void simpleSidedBlock(BlockModelGenerators blockModels, Holder<Block> block, String northAndSouthSide, String westAndEastSide, String up, String down) {
-        blockModels.createTrivialBlock(block.value(), TexturedModel.CUBE.updateTexture(textureMapping -> {
-            textureMapping.put(TextureSlot.NORTH, new Material(idBlock(northAndSouthSide)));
-            textureMapping.put(TextureSlot.SOUTH, new Material(idBlock(northAndSouthSide)));
-            textureMapping.put(TextureSlot.WEST, new Material(idBlock(westAndEastSide)));
-            textureMapping.put(TextureSlot.EAST, new Material(idBlock(westAndEastSide)));
-            textureMapping.put(TextureSlot.BOTTOM, new Material(idBlock(down)));
-            textureMapping.put(TextureSlot.TOP, new Material(idBlock(up)));
-        }));
+        TextureMapping textures = new TextureMapping()
+            .put(TextureSlot.NORTH, new Material(idBlock(northAndSouthSide)))
+            .put(TextureSlot.SOUTH, new Material(idBlock(northAndSouthSide)))
+            .put(TextureSlot.WEST, new Material(idBlock(westAndEastSide)))
+            .put(TextureSlot.EAST, new Material(idBlock(westAndEastSide)))
+            .put(TextureSlot.DOWN, new Material(idBlock(down)))
+            .put(TextureSlot.UP, new Material(idBlock(up)))
+            .put(TextureSlot.PARTICLE, new Material(idBlock(up))); // FIXME: particles
+        blockModels.blockStateOutput
+            .accept(BlockModelGenerators.createSimpleBlock(block.value(), BlockModelGenerators.plainVariant(ModelTemplates.CUBE.create(block.value(), textures, blockModels.modelOutput))));
+    }
+
+    private static class EmptyLoaderBuilder extends CustomLoaderBuilder {
+        protected EmptyLoaderBuilder() {
+            super(Identifier.fromNamespaceAndPath("neoforge", "empty"), false);
+        }
+
+        @Override
+        protected CustomLoaderBuilder copyInternal() {
+            return new EmptyLoaderBuilder();
+        }
+    }
+
+    private static final ModelTemplate EMPTY_MODEL_TEMPLATE = new ModelTemplate(
+        Optional.empty(),
+        Optional.empty()
+    ).extend().customLoader(EmptyLoaderBuilder::new, Consumers.nop()).build();
+    private void emptyBlockModel(BlockModelGenerators blockModels, Holder<Block> block) {
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block.value(), BlockModelGenerators.plainVariant(EMPTY_MODEL_TEMPLATE.create(block.value(), new TextureMapping(), blockModels.modelOutput))));
     }
 
     public static final ModelTemplate CONDUIT_TEMPLATE = new ModelTemplate(
@@ -133,13 +161,15 @@ public class BlockStateDataGen extends ModelProvider {
         // FIXME: simpleBlock(blockModels, RRBlocks.radioactivesand, Blocks.SAND);
         simpleBlock(blockModels, RRBlocks.radioactivesand, "notexisting");
         simpleBlock(blockModels, RRBlocks.remotecharge, "af", "ag");
-        simpleBlock(blockModels, RRBlocks.omegaobj, "ba");
-        simpleBlock(blockModels, RRBlocks.sigmaobj, "bp");
+        //simpleBlock(blockModels, RRBlocks.omegaobj, "ba");
+        //simpleBlock(blockModels, RRBlocks.sigmaobj, "bp");
+        emptyBlockModel(blockModels, RRBlocks.omegaobj);
+        emptyBlockModel(blockModels, RRBlocks.sigmaobj);
         simpleModelHorizontallyRotated(blockModels, RRBlocks.ffreciever.value(), "dj");
         simpleBlock(blockModels, RRBlocks.rhodesactivator, "ci", "ch");
-        simpleBlock(blockModels, RRBlocks.reactor, "bj");
+        emptyBlockModel(blockModels, RRBlocks.reactor);
         simpleModelHorizontallyRotated(blockModels, RRBlocks.loader.value(), "av");
-        simpleModelHorizontallyRotated(blockModels, RRBlocks.controller.value(), "dc");
+        emptyBlockModel(blockModels, RRBlocks.controller);
         simpleBlock(blockModels, RRBlocks.forcefield, "di");
         simpleBlock(blockModels, RRBlocks.ammunition, "aa", "ah", "ai");
         simpleBlock(blockModels, RRBlocks.explosives, "am", "ah", "ai");
@@ -197,9 +227,34 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     public void registerBlockItemModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels) {
-        customItemModel(itemModels, RRBlocks.controller.asItem());
-        customItemModel(itemModels, RRBlocks.loader.asItem());
-        customItemModel(itemModels, RRBlocks.reactor.asItem());
+        itemModels.itemModelOutput.accept(
+            RRBlocks.controller.asItem(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.of(new Transformation(new Vector3f(0.3F, 0.3F, 0), Axis.YP.rotationDegrees(180), null, null)),
+                new LaptopRenderer.Unbaked(
+                    RRIdentifiers.etubuntu
+                )
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRBlocks.loader.asItem(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.of(new Transformation(new Vector3f(0F, 0.05F, 0F), null, null, null)),
+                new LoaderRenderer.Unbaked(
+                    RRIdentifiers.etloader
+                )
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRBlocks.reactor.asItem(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new ReactorRenderer.Unbaked()
+            )
+        );
 
         simpleBlockItem(blockModels, RRBlocks.amario);
         simpleBlockItem(blockModels, RRBlocks.aquicksand);
@@ -280,7 +335,7 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private static TexturedModel.Provider getObjTexturedModel(Identifier modelLocation, Identifier texture, Consumer<TransformVecBuilder> transform) {
-        return TexturedModel.createDefault(block1 -> TextureMapping.defaultTexture(new Material(texture)), ExtendedModelTemplateBuilder.builder()
+        return TexturedModel.createDefault(block1 -> new TextureMapping().put(TextureSlot.TEXTURE, new Material(texture)).put(TextureSlot.PARTICLE, new Material(texture)), ExtendedModelTemplateBuilder.builder()
             .customLoader(ObjModelBuilder::new, objModelBuilder -> objModelBuilder.modelLocation(modelLocation))
             .requiredTextureSlot(TextureSlot.TEXTURE)
             .transform(ItemDisplayContext.NONE, transform)
@@ -368,10 +423,6 @@ public class BlockStateDataGen extends ModelProvider {
     protected void registerItems(ItemModelGenerators itemModels) {
         simpleItem(itemModels, RRItems.trollmask, "bf");
         simpleItem(itemModels, RRItems.safepill, "ak");
-        //simpleItem(RRItems.redrod, "al");
-        //simpleItem(RRItems.NUCLEAR_ROD, "av");
-        //simpleItem(RRItems.hydrod, "au");
-        //simpleItem(RRItems.emptyrod, "at");
         //simpleItem(RRItems.rocket, "ar");
         simpleItem(itemModels, RRItems.remote, "am");
         simpleItem(itemModels, RRItems.pliers, "ap");
@@ -406,26 +457,16 @@ public class BlockStateDataGen extends ModelProvider {
             .rotation(Axis.ZP.rotationDegrees(35))
             .rotation(Axis.YP.rotationDegrees(90))
             .scale(0.3f, 0.3f, 0.3f));
-        customModel(itemModels, RRItems.einsten);
-        customModel(itemModels, RRItems.redrod);
-        customModel(itemModels, RRItems.hydrod);
-        customModel(itemModels, RRItems.NUCLEAR_ROD);
         objModel(itemModels, RRItems.binoculars, RRIdentifiers.getModelLocation("b"), RRIdentifiers.etbinoculars, rootTransformsBuilder -> rootTransformsBuilder
             .translation(0.5f, 0.5f, -0.03f)
             .rotation(Axis.ZP.rotationDegrees(35))
             .rotation(Axis.YP.rotationDegrees(90))
             .scale(0.35f, 0.35f, 0.35f)
             .translation(0.6f, 0.05f, 0.3f));
-        customModel(itemModels, RRItems.emptyrod);
         customModel(itemModels, RRItems.gasgrenade);
-        customModel(itemModels, RRItems.rocket);
-        customModel(itemModels, RRItems.tesla);
         customModel(itemModels, RRItems.hackm202);
-        customModel(itemModels, RRItems.plasmacannon);
-        customModel(itemModels, RRItems.rpg);
+        //customModel(itemModels, RRItems.plasmacannon);
         customModel(itemModels, RRItems.roda);
-        customModel(itemModels, RRItems.roddisk);
-        customModel(itemModels, RRItems.seekm202);
         objModel(itemModels, RRItems.flamethrower, RRIdentifiers.getModelLocation("n"), RRIdentifiers.etflamethrower, rootTransformsBuilder ->
             rootTransformsBuilder.rotation(Axis.ZP.rotationDegrees(35))
                 .translation(0.7f, 0.1f, 00f)
@@ -481,5 +522,105 @@ public class BlockStateDataGen extends ModelProvider {
         simpleItem(itemModels, RRItems.shackerchest, "hsc");
         simpleItem(itemModels, RRItems.shackerpants, "hsp");
         simpleItem(itemModels, RRItems.shackerboots, "hsb");
+
+        itemModels.itemModelOutput.accept(
+            RRItems.plasmacannon.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new PlasmaCannonRenderer.Unbaked(
+                    RRIdentifiers.etplasmacannon,
+                    RRIdentifiers.ethydrod
+                )
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.redrod.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new RodRenderer.Unbaked(
+                    RRIdentifiers.etredrod
+                )
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.hydrod.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new RodRenderer.Unbaked(
+                    RRIdentifiers.ethydrod
+                )
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.NUCLEAR_ROD.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new RodRenderer.Unbaked(
+                    RRIdentifiers.etradrod
+                )
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.emptyrod.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new RodRenderer.Unbaked(
+                    RRIdentifiers.etemptyrod
+                )
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.einsten.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new AstroBlasterRenderer.Unbaked()
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.rpg.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new RocketLauncherRenderer.Unbaked()
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.tesla.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new TeslaRenderer.Unbaked()
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.rocket.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.of(new Transformation(new Vector3f(0.8f, 0.3f, -0.03f), null, new Vector3f(2, 2, 2), null)),
+                new RocketRenderer.Unbaked(RRIdentifiers.etrocket)
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.roddisk.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new RodDiskRenderer.Unbaked(RRIdentifiers.etdisk0)
+            )
+        );
+        itemModels.itemModelOutput.accept(
+            RRItems.seekm202.get(),
+            new SpecialModelWrapper.Unbaked(
+                Identifier.fromNamespaceAndPath("minecraft", "air"),
+                Optional.empty(),
+                new SeekRocketLauncherRenderer.Unbaked()
+            )
+        );
     }
 }

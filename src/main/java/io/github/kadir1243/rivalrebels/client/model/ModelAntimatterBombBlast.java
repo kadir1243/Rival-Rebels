@@ -47,10 +47,10 @@ public class ModelAntimatterBombBlast {
         RandomSource random = RandomSource.create();
         for (int f = 0; f < tsarx.length; f++) {
             for (int i = 0; i < tsarx[f].length; i++) {
-                tsarx[f][i] += (random.nextFloat() - 0.5f) * 1f;
+                tsarx[f][i] += random.nextFloat() - 0.5f;
             }
             for (int i = 0; i < tsary[f].length; i++) {
-                tsary[f][i] += (random.nextFloat() - 0.5f) * 1f;
+                tsary[f][i] += random.nextFloat() - 0.5f;
             }
         }
     }

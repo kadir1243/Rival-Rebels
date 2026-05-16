@@ -18,6 +18,7 @@ import net.minecraft.resources.Identifier;
 import net.neoforged.neoforge.client.event.ModelEvent;
 import net.neoforged.neoforge.client.model.obj.ObjGeometry;
 import net.neoforged.neoforge.client.model.obj.ObjLoader;
+import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneModel;
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.neoforged.neoforge.client.model.standalone.UnbakedStandaloneModel;
 
@@ -140,15 +141,6 @@ public class ObjModels {
     @OnlyIn(Dist.CLIENT)
     private static UnbakedStandaloneModel<QuadCollection> getModelFromObj(String location) {
         ObjGeometry geometry = ObjLoader.INSTANCE.loadGeometry(new ObjGeometry.Settings(RRIdentifiers.getModelLocation(location), false, false, false, false, null));
-        return new UnbakedStandaloneModel<>() {
-            @Override
-            public QuadCollection bake(ModelBaker baker, ModelDebugName name) {
-                return geometry.bake(TextureSlots.EMPTY, baker, BlockModelRotation.IDENTITY, name);
-            }
-
-            @Override
-            public void resolveDependencies(Resolver resolver) {
-            }
-        };
+        return new SimpleUnbakedStandaloneModel<>(RRIdentifiers.create(location + "_obj_special_model"), (model, baker, name) -> geometry.bake(TextureSlots.EMPTY, baker, BlockModelRotation.IDENTITY, name));
     }
 }

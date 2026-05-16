@@ -16,14 +16,20 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.neoforged.neoforge.client.model.pipeline.TransformingVertexPipeline;
 import org.joml.Vector3f;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -86,16 +92,17 @@ public class ModelRocketLauncherHandle {
 	private static final Vector3f		vbb2			= new Vector3f(20f, 0f, 2f);
 	private static final Vector3f		vbb3			= new Vector3f(20f, 0f, -2f);
 	private static final Vector3f		vbb4			= new Vector3f(8f, 0f, -2f);
-    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
-        TransformingVertexPipeline scaled = new TransformingVertexPipeline(buffer, new Transformation(null, null, new Vector3f(1.3F, 1, 1), null));
+    private static final Map<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> MAP = new HashMap<>();
+    public static final Function<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> BAKED_MODEL = id -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(id), buffer -> {
+        Transformation transformation = new Transformation(null, null, new Vector3f(1.3F, 1, 1), null);
 
         // bottom
-        QuadHelper.addFace(scaled, vbt3, vbt4, vbt1, vbt2, bottombottom);
-        QuadHelper.addFace(scaled, vbb1, vbt1, vbt4, vbb4, bottomfront);
-        QuadHelper.addFace(scaled, vbb3, vbt3, vbt2, vbb2, bottomback);
-        QuadHelper.addFace(scaled, vbt2, vbb2, vbb1, vbt1, bottomside);
-        QuadHelper.addFace(scaled, vbt3, vbb3, vbb4, vbt4, bottomside);
-        QuadHelper.addFace(scaled, vbb3, vbb4, vbb1, vbb2, bottombottom);
+        QuadHelper.addFace(buffer, transformation, vbt3, vbt4, vbt1, vbt2, bottombottom);
+        QuadHelper.addFace(buffer, transformation, vbb1, vbt1, vbt4, vbb4, bottomfront);
+        QuadHelper.addFace(buffer, transformation, vbb3, vbt3, vbt2, vbb2, bottomback);
+        QuadHelper.addFace(buffer, transformation, vbt2, vbb2, vbb1, vbt1, bottomside);
+        QuadHelper.addFace(buffer, transformation, vbt3, vbb3, vbb4, vbt4, bottomside);
+        QuadHelper.addFace(buffer, transformation, vbb3, vbb4, vbb1, vbb2, bottombottom);
 
         // handle
         QuadHelper.addFace(buffer, vht4, vhb4, vhb1, vht1, handlefront);
@@ -105,7 +112,7 @@ public class ModelRocketLauncherHandle {
         QuadHelper.addFace(buffer, vhb2, vhb1, vhb4, vhb3, handlebottom);
     });
 
-	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
-        ObjModels.submit(nodeCollector, renderType, BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, light, overlay);
+	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, Identifier texture, int light, int overlay) {
+        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, renderType, MAP.computeIfAbsent(texture, BAKED_MODEL), light, overlay);
 	}
 }

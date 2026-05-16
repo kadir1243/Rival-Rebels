@@ -30,7 +30,7 @@ public class CommandContinueRound {
     private static int execute(CommandSourceStack source) {
 		RivalRebels.round.stopRounds();
 		RivalRebels.round.newRound();
-		source.sendSuccess(() -> Component.nullToEmpty("The current round has been restarted."), true);
+		source.sendSuccess(() -> Component.literal("The current round has been restarted."), true);
         return 0;
 	}
 }

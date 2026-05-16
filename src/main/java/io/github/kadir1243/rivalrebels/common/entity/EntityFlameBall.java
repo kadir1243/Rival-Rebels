@@ -76,9 +76,9 @@ public class EntityFlameBall extends FlameBallProjectile {
 	public void tick() {
 		super.tick();
 		if (tickCount % 3 == 0) sequence++;
-		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill((ServerLevel) level());
 
         if (!level().isClientSide()) {
+            if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill((ServerLevel) level());
             HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
             if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5) {
