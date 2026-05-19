@@ -18,10 +18,12 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.entity.EntityGoo;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -30,6 +32,10 @@ import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import org.joml.Vector3f;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -49,11 +55,12 @@ public class RenderGoo extends EntityRenderer<EntityGoo, EntityRenderState> {
         poseStack.pushPose();
         poseStack.scale(0.25F, 0.25F, 0.25F);
         poseStack.mulPose(cameraRenderState.orientation);
-        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etgoo), BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, RenderTypes.entitySolid(RRIdentifiers.etgoo), MAP.computeIfAbsent(RRIdentifiers.etgoo, BAKED_MODEL), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 
-    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+    private static final Map<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> MAP = new HashMap<>();
+    private static final Function<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> BAKED_MODEL = id -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(id), buffer -> {
         float var7 = 1.0F;
         float var8 = 0.5F;
         float var9 = 0.25F;

@@ -29,6 +29,7 @@ import net.minecraft.client.gui.TextAlignment;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.input.MouseButtonInfo;
+import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -151,15 +152,15 @@ public class GuiSpawn extends Screen {
 
 		super.extractRenderState(graphics, mouseX, mouseY, a);
 
-		graphics.text(font, Component.literal(String.valueOf(RivalRebels.round.getOmegaWins())), posX + 9, posY + 239, 0xFFFFFF, false);
-		graphics.text(font, Component.literal(String.valueOf(RivalRebels.round.getSigmaWins())), posX + 134, posY + 239, 0xFFFFFF, false);
+		graphics.text(font, Component.literal(String.valueOf(RivalRebels.round.getOmegaWins())), posX + 9, posY + 239, CommonColors.WHITE, false);
+		graphics.text(font, Component.literal(String.valueOf(RivalRebels.round.getSigmaWins())), posX + 134, posY + 239, CommonColors.WHITE, false);
 
 		if (resetButton.mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false) && resetButton.active) {
             graphics.fillGradient(mouseX, mouseY, mouseX + 120, mouseY + 20, 0xaa111111, 0xaa111111);
 			float scalefactor = 0.666f;
             graphics.pose().pushMatrix();
             graphics.pose().scale(scalefactor, scalefactor);
-            MultiLineLabel.create(font, Translations.SPAWN_RESET_WARNING.translate().withColor(0xFF0000), (int) (116 / scalefactor)).visitLines(TextAlignment.LEFT, (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), font.lineHeight, graphics.textRenderer());
+            MultiLineLabel.create(font, Translations.SPAWN_RESET_WARNING.translate().withColor(CommonColors.RED), (int) (116 / scalefactor)).visitLines(TextAlignment.LEFT, (int) ((mouseX + 2) / scalefactor), (int) ((mouseY + 2) / scalefactor), font.lineHeight, graphics.textRenderer());
             graphics.pose().popMatrix();
 		}
     }
@@ -181,16 +182,16 @@ public class GuiSpawn extends Screen {
 			if (Y > -9 && Y < height + 9)
 			{
 				int color = player.rrclass.color;
-				int r = (color & 0xFF0000) >> 16;
-				int g = (color & 0xFF00) >> 8;
-				int b = (color & 0xFF);
+				int r = ARGB.red(color);
+				int g = ARGB.green(color);
+				int b = ARGB.blue(color);
 				if (!isOnline(player))
 				{
 					r /= 2;
 					g /= 2;
 					b /= 2;
 				}
-				color = (r << 16) | (g << 8) | b;
+                color = ARGB.color(r, g, b);
                 graphics.text(font, Component.literal(player.getUsername()), x, y + Y, color, false);
 			}
 		}

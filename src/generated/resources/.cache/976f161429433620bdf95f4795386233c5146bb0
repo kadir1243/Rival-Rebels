@@ -1,4 +1,4 @@
-// 26.1.2	2026-05-05T18:54:32.324129343	RR Recipe DataGen
+// 26.1.2	2026-05-16T12:14:50.164073449	RR Recipe DataGen
 e1851b93f3c162620d3d13a1a179c2535c426bd8 data/rivalrebels/advancement/recipes/combat/rocket.json
 1901b1f3c22ffe3c644056276c23045c68e7e2bd data/rivalrebels/advancement/recipes/misc/amario.json
 ae6a3a74b61991a3662a8dcb82cff0df5e265252 data/rivalrebels/advancement/recipes/misc/aquicksand.json
@@ -9,8 +9,11 @@ ae6a3a74b61991a3662a8dcb82cff0df5e265252 data/rivalrebels/advancement/recipes/mi
 ddc579181b14d2b90e1d38562b4c4cc8aeb870f9 data/rivalrebels/advancement/recipes/misc/flagbox3.json
 0ee9c58c8d9e8b76d0b308a481942faf0c0e94c1 data/rivalrebels/advancement/recipes/misc/fuel.json
 2ac238e46066c6398f4dfb14681e3bc824b9daef data/rivalrebels/advancement/recipes/misc/gas_grenade.json
+b2e1a1aef3bc22e01847359a981e8e01fa92dff7 data/rivalrebels/advancement/recipes/misc/jump.json
 ae4756829fde67d869d5741b3e29211480ad4bae data/rivalrebels/advancement/recipes/misc/omegaarmor.json
 197e6aa5e44986c832f9ef6e6f55729d0315a8de data/rivalrebels/advancement/recipes/misc/sigmaarmor.json
+2d9761ae802b0ea95da79f0903b1015f29ad99b6 data/rivalrebels/advancement/recipes/misc/smartcamo.json
+18af0f0ccffdfa910c99cd93c629cb2692ee1238 data/rivalrebels/advancement/recipes/misc/steel.json
 2b9c62abd72e382610f6b629195b61222645f95f data/rivalrebels/recipe/amario.json
 14b9d90ec77e6ebb57d0f51e1eb233459fbf18ba data/rivalrebels/recipe/aquicksand.json
 b7414c502d81e59c63abb0ab573f3142a93da0d3 data/rivalrebels/recipe/army_shovel.json
@@ -20,6 +23,9 @@ e9cd145c383d0efda4848264f28f7ca0c41cdc82 data/rivalrebels/recipe/flagbox1.json
 54cabc66bf467d961adcebac3710674330783fb3 data/rivalrebels/recipe/flagbox3.json
 f38ac68f4e1aa57bcfa524cc8befe49d9421dc0b data/rivalrebels/recipe/fuel.json
 4ba11abcaea4eec890a6f8a11751f34f415892af data/rivalrebels/recipe/gas_grenade.json
+c271f9e6fbb9945d1c35d07198ee29edfd8acb46 data/rivalrebels/recipe/jump.json
 f3d94fe98523a63e9ba0e2831d8b15ca4e65c055 data/rivalrebels/recipe/omegaarmor.json
 37a90f3066a0941bab751221a093c25d5d228362 data/rivalrebels/recipe/rocket.json
 aec5d576959e54f4ff4ff4f23ac0b62e2a881146 data/rivalrebels/recipe/sigmaarmor.json
+3cee25642cba4ac59b7d9206cb0b499e19ccf08e data/rivalrebels/recipe/smartcamo.json
+9b750bb94152d4745661b39256d2a63cb7edce69 data/rivalrebels/recipe/steel.json

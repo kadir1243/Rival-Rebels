@@ -28,7 +28,6 @@ public class AntimatterBomb {
 	public int		posX;
 	public int		posY;
 	public int		posZ;
-    public BlockPos pos = BlockPos.ZERO;
 	public int		lastposX = 0;
 	public int		lastposZ = 0;
 	public int		radius;
@@ -64,11 +63,10 @@ public class AntimatterBomb {
 			{
 				if (x2 + Z * Z < rad)
 				{
-                    BlockPos pos1 = new BlockPos(X + pos.getX(), 70,Z + pos.getZ());
+                    BlockPos pos1 = new BlockPos(X + posX, 70,Z + posZ);
 					for (; pos1.getY() > world.getMinY(); pos1 = pos1.below())
 					{
-                        BlockState state = world.getBlockState(pos1);
-						if (!state.getFluidState().isEmpty()) {
+                        if (!world.getFluidState(pos1).isEmpty()) {
 							world.setBlockAndUpdate(pos1, Blocks.AIR.defaultBlockState());
 						}
 					}
@@ -122,10 +120,11 @@ public class AntimatterBomb {
 			for (int Y = y; Y > ylimit; Y--)
 			{
 				if (Y == world.getMinY()) break;
-				BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
+                BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
+                BlockState state = world.getBlockState(pos);
 				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
-				world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.AIR.defaultBlockState());
+				world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			}
 
 			double limit = (radius / 2) + world.getRandom().nextInt(radius / 4) + 7.5;
@@ -134,10 +133,11 @@ public class AntimatterBomb {
 				for (int Y = ylimit; Y > ylimit - (world.getRandom().nextInt(5) + 2); Y--)
 				{
 					if (Y == world.getMinY()) break;
-					BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
+                    BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
+                    BlockState state = world.getBlockState(pos);
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
-					world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.OBSIDIAN.defaultBlockState());
+					world.setBlockAndUpdate(pos, Blocks.OBSIDIAN.defaultBlockState());
 				}
 			}
 
@@ -156,19 +156,20 @@ public class AntimatterBomb {
 				if (metadata > 15) metadata = 15;
 				for (int Y = ylimit; Y >= world.getMinY(); Y--) {
 					int yy = Y + y;
-					BlockState state = world.getBlockState(new BlockPos(x + posX, yy, z + posZ));
+                    BlockPos pos = new BlockPos(x + posX, yy, z + posZ);
+                    BlockState state = world.getBlockState(pos);
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 					else if (!isTree)
 					{
-                        world.setBlockAndUpdate(new BlockPos(x + posX, yy, z + posZ), world.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ)));
+                        world.setBlockAndUpdate(pos, world.getBlockState(pos.below(ylimit)));
 					}
 					else
 					{
 						isTree = false;
 						for (int Yy = 0; Yy >= -treeHeight; Yy--)
 						{
-							world.setBlockAndUpdate(new BlockPos(x + posX, yy + Yy, z + posZ), RRBlocks.petrifiedwood.get().defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
+							world.setBlockAndUpdate(pos.above(Yy), RRBlocks.petrifiedwood.get().defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 						}
 						break;
 					}
@@ -176,8 +177,9 @@ public class AntimatterBomb {
 			}
 			else
 			{
-                BlockState state = world.getBlockState(new BlockPos(x + posX, y, z + posZ));
-				if (!state.canOcclude()) world.setBlockAndUpdate(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.defaultBlockState());
+                BlockPos pos = new BlockPos(x + posX, y, z + posZ);
+                BlockState state = world.getBlockState(pos);
+				if (!state.canOcclude()) world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			}
 			return true;
 		}

@@ -16,6 +16,7 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -25,12 +26,18 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
-public class BlockWeapons extends Block
-{
-	public BlockWeapons(Properties settings)
-	{
-		super(settings);
-	}
+public class BlockWeapons extends Block {
+    public BlockWeapons(Properties settings) {
+        super(settings);
+    }
+
+    private static Component parenthesized(MutableComponent a, Component b) {
+        return Component.literal("(").withStyle(ChatFormatting.BLUE).append(a.withStyle(ChatFormatting.BLUE)).append(" ").append(b.copy().withStyle(ChatFormatting.BLUE)).append(Component.literal(")").withStyle(ChatFormatting.BLUE));
+    }
+
+    private static Component parenthesized(MutableComponent a) {
+        return Component.literal("(").withStyle(ChatFormatting.BLUE).append(a.withStyle(ChatFormatting.BLUE)).append(Component.literal(")").withStyle(ChatFormatting.BLUE));
+    }
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
@@ -39,35 +46,33 @@ public class BlockWeapons extends Block
         int z = pos.getZ();
         if (level.isClientSide()) {
             player.sendSystemMessage(Translations.inventory());
-            player.sendSystemMessage(Component.literal(RRItems.rpg.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN) + ". §9(" + Translations.REQUIRES.translate() + " " + (RRItems.rocket.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal(RRItems.tesla.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN) + ". §9(" + Translations.REQUIRES.translate() + " " + (RRItems.hydrod.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.flamethrower.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Translations.REQUIRES.translate() + " " + (RRItems.fuel.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.plasmacannon.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Translations.REQUIRES.translate() + " " + (RRItems.battery.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.einsten.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Translations.REQUIRES.translate() + " " + (RRItems.redrod.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.roddisk.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Translations.USE_MESSAGE.translate() + " /rr)"));
+            player.sendSystemMessage(RRItems.rpg.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.REQUIRES.translate(), RRItems.rocket.toStack().getItemName())));
+            player.sendSystemMessage(RRItems.tesla.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.REQUIRES.translate(), RRItems.hydrod.toStack().getItemName())));
+            player.sendSystemMessage(RRItems.flamethrower.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.REQUIRES.translate(), RRItems.fuel.toStack().getItemName())));
+            player.sendSystemMessage(RRItems.plasmacannon.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.REQUIRES.translate(), RRItems.battery.toStack().getItemName())));
+            player.sendSystemMessage(RRItems.einsten.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.REQUIRES.translate(), RRItems.redrod.toStack().getItemName())));
+            player.sendSystemMessage(RRItems.roddisk.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.USE_MESSAGE.translate(), Component.literal("/rr"))));
             // player.sendMessage(Text.literal("§a" + I18n.translate(RivalRebels.bastion.getTranslationKey() + ".name") + ". §9(" +
             // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.barricade.getTranslationKey() + ".name") + ")");
             // player.sendMessage(Text.literal("§a" + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ". §9(" +
             // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ")");
-            player.sendSystemMessage((RRItems.knife.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". §9(").append(Translations.OPS_KNIFE.translate()).append(")")));
-            player.sendSystemMessage(Component.literal((RRItems.gasgrenade.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Translations.CHEMICAL_WEAPON.translate() + ")"));
+            player.sendSystemMessage(RRItems.knife.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.OPS_KNIFE.translate())));
+            player.sendSystemMessage(RRItems.gasgrenade.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.CHEMICAL_WEAPON.translate())));
             player.sendSystemMessage(Translations.orders().append(" ").append(Translations.EQUIP_WEAPONS_MESSAGE.translate()));
-        }
-        if (!level.isClientSide())
-        {
+        } else {
+            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
             Containers.dropItemStack(level, x, y, z, RRItems.rpg.toStack());
             Containers.dropItemStack(level, x, y, z, RRItems.tesla.toStack());
             Containers.dropItemStack(level, x, y, z, RRItems.plasmacannon.toStack());
             Containers.dropItemStack(level, x, y, z, RRItems.flamethrower.toStack());
             Containers.dropItemStack(level, x, y, z, RRItems.roddisk.toStack());
-         // Containers.dropItemStack(level, x, y, z, new ItemStack(RivalRebels.barricade, 6));
-         // Containers.dropItemStack(level, x, y, z, new ItemStack(RivalRebels.tower, 3));
+            // Containers.dropItemStack(level, x, y, z, new ItemStack(RivalRebels.barricade, 6));
+            // Containers.dropItemStack(level, x, y, z, new ItemStack(RivalRebels.tower, 3));
             Containers.dropItemStack(level, x, y, z, RRItems.knife.toStack(10));
             Containers.dropItemStack(level, x, y, z, RRItems.gasgrenade.toStack(6));
             Containers.dropItemStack(level, x, y, z, RRItems.einsten.toStack());
-            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
         }
-        return InteractionResult.PASS;
+        return InteractionResult.SUCCESS;
     }
 
 }

@@ -96,14 +96,14 @@ public class BlockRemoteCharge extends FallingBlock {
     }
 
     @Override
-    public void wasExploded(ServerLevel p_361333_, BlockPos p_49845_, net.minecraft.world.level.Explosion p_49846_) {
-		explode(p_361333_, p_49845_);
+    public void wasExploded(ServerLevel level, BlockPos pos, net.minecraft.world.level.Explosion explosion) {
+		explode(level, pos);
 	}
 
 	public boolean boom = false;
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
 		world.scheduleTick(pos, this, 1);
 	}
 

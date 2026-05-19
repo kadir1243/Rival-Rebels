@@ -137,12 +137,12 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink, Ren
     }
 
     @Override
-    public void extractRenderState(EntityLightningLink p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.xRot = p_entity.getXRot(partialTick);
-        reusedState.yRot = p_entity.getYRot(partialTick);
-        reusedState.deltaMovement = p_entity.getDeltaMovement();
-        reusedState.random = p_entity.getRandom();
+    public void extractRenderState(EntityLightningLink entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.xRot = entity.getXRot(partialTick);
+        reusedState.yRot = entity.getYRot(partialTick);
+        reusedState.deltaMovement = entity.getDeltaMovement();
+        reusedState.random = entity.getRandom();
     }
 
     public static class State extends EntityRenderState {

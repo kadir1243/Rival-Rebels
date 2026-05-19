@@ -19,7 +19,7 @@ public class Translations {
     public static final TranslationKey BOMB_MEGATONS = new TranslationKey("bomb.megatons");
     public static final TranslationKey BOMB_ARMED = new TranslationKey("bomb.armed");
     public static final TranslationKey SHIFT_CLICK = new TranslationKey("sneak.click");
-    public static final TranslationKey AMMUNITION_TRANSLATION = new TranslationKey("ammunition");
+    public static final TranslationKey AMMUNITION = new TranslationKey("ammunition");
     public static final TranslationKey ORDERS_TRANSLATION = new TranslationKey("orders");
     public static final TranslationKey STATUS_TRANSLATION = new TranslationKey("status");
     public static final TranslationKey DEFUSE_TRANSLATION = new TranslationKey("defuse");
@@ -74,6 +74,7 @@ public class Translations {
     public static final TranslationKey OPS_KNIFE = new TranslationKey("ops_knife");
     public static final TranslationKey REQUIRES = new TranslationKey("requires");
     public static final TranslationKey TACTICAL_NUKE_NAME = new TranslationKey("tactical_nuke.name");
+    public static final TranslationKey PRESS_TO_SELECT_BOMB_TYPE = new TranslationKey("rhodes.select_bomb_type");
 
     private static final MutableComponent WARNING = Component.empty()
         .append(Component.literal("[").withStyle(ChatFormatting.DARK_RED))
@@ -118,10 +119,6 @@ public class Translations {
 
     public static MutableComponent use(Component msg) {
         return orders().append(" ").append(USE_MESSAGE.translate()).append(" ").append(msg);
-    }
-
-    public static MutableComponent ammunition() {
-        return AMMUNITION_TRANSLATION.translate();
     }
 
     public static void sendWarningBombWillExplodeMessageToPlayers(Level level) {

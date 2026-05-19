@@ -67,7 +67,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 
             poseStack.pushPose();
             poseStack.scale(renderState.ageInTicks, renderState.ageInTicks, renderState.ageInTicks);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
                 ObjModels.render(blastSphereModel, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             });
             poseStack.popPose();
@@ -135,7 +135,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
     }
 
     @Override
-    protected boolean affectedByCulling(EntityAntimatterBombBlast p_365169_) {
+    protected boolean affectedByCulling(EntityAntimatterBombBlast entity) {
         return false;
     }
 
@@ -151,10 +151,10 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
     }
 
     @Override
-    public void extractRenderState(EntityAntimatterBombBlast p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.random = p_entity.getRandom();
-        reusedState.deltaMovement = p_entity.getDeltaMovement();
+    public void extractRenderState(EntityAntimatterBombBlast entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.random = entity.getRandom();
+        reusedState.deltaMovement = entity.getDeltaMovement();
     }
 
     public static class State extends EntityRenderState {

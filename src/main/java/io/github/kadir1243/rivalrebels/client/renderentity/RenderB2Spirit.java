@@ -71,7 +71,7 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit, RenderB2Spiri
 	}
 
     @Override
-    protected boolean affectedByCulling(EntityB2Spirit p_365169_) {
+    protected boolean affectedByCulling(EntityB2Spirit entity) {
         return false;
     }
 
@@ -86,10 +86,10 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit, RenderB2Spiri
     }
 
     @Override
-    public void extractRenderState(EntityB2Spirit p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.xRot = p_entity.getXRot(partialTick);
-        reusedState.yRot = p_entity.getYRot(partialTick);
+    public void extractRenderState(EntityB2Spirit entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.xRot = entity.getXRot(partialTick);
+        reusedState.yRot = entity.getYRot(partialTick);
     }
 
     public static class State extends EntityRenderState {

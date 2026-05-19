@@ -27,13 +27,15 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
         int BASE_IMAGE_HEIGHT = 114;
         int inventoryRows = containerLoader.size() / 9;
         super(containerLoader, playerInv, title, 256, BASE_IMAGE_HEIGHT + inventoryRows * 18);
+        this.titleLabelX = 165;
+        this.titleLabelY = 237;
 	}
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
         graphics.pose().pushMatrix();
 		graphics.pose().rotate(-13);
-		graphics.text(font, Component.literal("Loader"), 165, 237, 0x444444, false);
+		graphics.text(font, Component.literal("Loader"), this.titleLabelX, this.titleLabelY, 0xFF444444, false);
 		graphics.pose().popMatrix();
 	}
 

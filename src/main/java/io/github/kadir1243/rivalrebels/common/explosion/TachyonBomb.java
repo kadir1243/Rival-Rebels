@@ -67,9 +67,9 @@ public class TachyonBomb {
 				{
 					for (int Y = 70; Y > world.getMinY(); Y--)
 					{
-                        BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
-						if (!state.getFluidState().isEmpty()) {
-							world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.AIR.defaultBlockState());
+                        BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
+                        if (!world.getFluidState(pos).isEmpty()) {
+							world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 						}
 					}
 				}
@@ -123,10 +123,11 @@ public class TachyonBomb {
 			for (int Y = y; Y > ylimit; Y--)
 			{
 				if (Y == world.getMinY()) break;
-				BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
+                BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
+                BlockState state = world.getBlockState(pos);
 				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
-				world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.AIR.defaultBlockState());
+				world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			}
 
 			double limit = (radius / 2) + world.getRandom().nextInt(radius / 4) + 7.5;
@@ -135,10 +136,11 @@ public class TachyonBomb {
 				for (int Y = ylimit; Y > ylimit - (world.getRandom().nextInt(5) + 2); Y--)
 				{
 					if (Y == world.getMinY()) break;
-					BlockState state = world.getBlockState(new BlockPos(x + posX, Y, z + posZ));
+                    BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
+                    BlockState state = world.getBlockState(pos);
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
-					world.setBlockAndUpdate(new BlockPos(x + posX, Y, z + posZ), Blocks.OBSIDIAN.defaultBlockState());
+					world.setBlockAndUpdate(pos, Blocks.OBSIDIAN.defaultBlockState());
 				}
 			}
 
@@ -157,20 +159,21 @@ public class TachyonBomb {
 				if (metadata > 15) metadata = 15;
 				for (int Y = ylimit; Y >= world.getMinY(); Y--) {
 					int yy = Y + y;
-					BlockState state = world.getBlockState(new BlockPos(x + posX, yy, z + posZ));
+                    BlockPos pos = new BlockPos(x + posX, yy, z + posZ);
+                    BlockState state = world.getBlockState(pos);
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 					else if (!isTree)
 					{
-						BlockState state1 = world.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ));
-						world.setBlockAndUpdate(new BlockPos(x + posX, yy, z + posZ), state1);
+						BlockState state1 = world.getBlockState(pos.below(ylimit));
+						world.setBlockAndUpdate(pos, state1);
 					}
 					else
 					{
 						isTree = false;
 						for (int Yy = 0; Yy >= -treeHeight; Yy--)
 						{
-							world.setBlockAndUpdate(new BlockPos(x + posX, yy + Yy, z + posZ), RRBlocks.petrifiedwood.get().defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
+							world.setBlockAndUpdate(pos.above(Yy), RRBlocks.petrifiedwood.get().defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 						}
 						break;
 					}
@@ -178,8 +181,9 @@ public class TachyonBomb {
 			}
 			else
 			{
-				BlockState block = world.getBlockState(new BlockPos(x + posX, y, z + posZ));
-				if (!block.canOcclude()) world.setBlockAndUpdate(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.defaultBlockState());
+                BlockPos pos = new BlockPos(x + posX, y, z + posZ);
+                BlockState block = world.getBlockState(pos);
+				if (!block.canOcclude()) world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 			}
 			return true;
 		}
@@ -194,7 +198,7 @@ public class TachyonBomb {
 		{
             BlockPos pos = new BlockPos(x, y, z);
             BlockState state = world.getBlockState(pos);
-			if (!world.isEmptyBlock(pos)) {
+			if (!state.isAir()) {
 				if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 				if (state.is(RRBlocks.reactive)) {

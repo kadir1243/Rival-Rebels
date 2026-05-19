@@ -1,6 +1,7 @@
 package io.github.kadir1243.rivalrebels.datagen;
 
 import com.mojang.math.Axis;
+import com.mojang.math.Quadrant;
 import com.mojang.math.Transformation;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.itemrenders.*;
@@ -11,11 +12,14 @@ import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.MultiVariant;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
+import net.minecraft.client.renderer.block.dispatch.VariantMutator;
 import net.minecraft.client.renderer.item.SpecialModelWrapper;
 import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.Identifier;
@@ -23,22 +27,21 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.client.model.EmptyModel;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.client.model.generators.loaders.ObjModelBuilder;
-import net.neoforged.neoforge.client.model.generators.template.CustomLoaderBuilder;
-import net.neoforged.neoforge.client.model.generators.template.ExtendedModelTemplateBuilder;
-import net.neoforged.neoforge.client.model.generators.template.RootTransformsBuilder;
-import net.neoforged.neoforge.client.model.generators.template.TransformVecBuilder;
+import net.neoforged.neoforge.client.model.generators.template.*;
 import org.apache.commons.lang3.function.Consumers;
 import org.joml.Vector3f;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
+import static net.minecraft.client.data.models.BlockModelGenerators.*;
+
 public class BlockStateDataGen extends ModelProvider {
-    public BlockStateDataGen(PackOutput p_388260_) {
-        super(p_388260_, RRIdentifiers.MODID);
+    public BlockStateDataGen(PackOutput output) {
+        super(output, RRIdentifiers.MODID);
     }
 
     private void simpleBlock(BlockModelGenerators blockModels, Holder<Block> block, String textureLoc) {
@@ -145,13 +148,13 @@ public class BlockStateDataGen extends ModelProvider {
         simpleBlock(blockModels, RRBlocks.camo3, "by");
         simpleBlock(blockModels, RRBlocks.camo2, "bn");
         simpleBlock(blockModels, RRBlocks.camo1, "as");
-        objModelWithHorizontalRotation(blockModels, RRBlocks.antimatterbombblock.value(), RRIdentifiers.getModelLocation("t"), RRIdentifiers.etantimatterbomb, transformVecBuilder -> transformVecBuilder.rotation(0.5F, 1F, 0.5F));
+        objModelWithSpecialRot(blockModels, RRBlocks.antimatterbombblock.value(), RRIdentifiers.getModelLocation("t"), RRIdentifiers.etantimatterbomb, transformVecBuilder -> transformVecBuilder.rotation(0.5F, 1F, 0.5F), TACHYON_BOMB_ROTATION);
         flareBlock(blockModels, RRBlocks.flare, "an");
         objModelWithRotation(blockModels, RRBlocks.nuclearBomb.value(), RRIdentifiers.getModelLocation("wacknuke"), RRIdentifiers.etwacknuke, transformVecBuilder -> transformVecBuilder.rotation(0.5F, 0.5F, 0.5F));
         simpleModelHorizontallyRotated(blockModels, RRBlocks.tsarbombablock.value(), "ak");
         simpleBlock(blockModels, RRBlocks.toxicgas, "ak");
         simpleModelHorizontallyRotated(blockModels, RRBlocks.theoreticaltsarbombablock.value(), "ak");
-        objModelWithHorizontalRotation(blockModels, RRBlocks.tachyonbombblock.value(), RRIdentifiers.getModelLocation("t"), RRIdentifiers.ettachyonbomb, transformVecBuilder -> transformVecBuilder.rotation(0.5F, 1F, 0.5F));
+        objModelWithSpecialRot(blockModels, RRBlocks.tachyonbombblock.value(), RRIdentifiers.getModelLocation("t"), RRIdentifiers.ettachyonbomb, transformVecBuilder -> transformVecBuilder.rotation(0.5F, 1F, 0.5F), TACHYON_BOMB_ROTATION);
         simpleBlock(blockModels, RRBlocks.petrifiedstone1, "bc", "bb");
         simpleBlock(blockModels, RRBlocks.petrifiedstone2, "bd", "bb");
         simpleBlock(blockModels, RRBlocks.petrifiedstone3, "be", "bb");
@@ -173,8 +176,8 @@ public class BlockStateDataGen extends ModelProvider {
         simpleBlock(blockModels, RRBlocks.forcefield, "di");
         simpleBlock(blockModels, RRBlocks.ammunition, "aa", "ah", "ai");
         simpleBlock(blockModels, RRBlocks.explosives, "am", "ah", "ai");
-        simpleBlock(blockModels, RRBlocks.nukeCrateTop, "ay");
-        simpleBlock(blockModels, RRBlocks.nukeCrateBottom, "ax");
+        nukeCrateBlock(blockModels, RRBlocks.nukeCrateTop, "ay");
+        nukeCrateBlock(blockModels, RRBlocks.nukeCrateBottom, "ax");
         simpleBlock(blockModels, RRBlocks.weapons, "ce", "ah", "ai");
         simpleBlock(blockModels, RRBlocks.barricade, "cx", "cz", "da");
         simpleBlock(blockModels, RRBlocks.bunker, "bl", "ah");
@@ -318,16 +321,33 @@ public class BlockStateDataGen extends ModelProvider {
         itemModels.declareCustomModelItem(item);
     }
 
+    public static final PropertyDispatch<VariantMutator> ROTATION_HORIZONTAL_FACING_FOR_OLD_MODELS = PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_FACING)
+        .select(Direction.EAST, BlockModelGenerators.Y_ROT_90.then(X_ROT_90))
+        .select(Direction.SOUTH, X_ROT_90)
+        .select(Direction.WEST, BlockModelGenerators.Y_ROT_270.then(X_ROT_90))
+        .select(Direction.NORTH, BlockModelGenerators.Y_ROT_180.then(X_ROT_90));
+
+    public static final PropertyDispatch<VariantMutator> TACHYON_BOMB_ROTATION = PropertyDispatch.modify(BlockStateProperties.HORIZONTAL_FACING)
+        .select(Direction.EAST, BlockModelGenerators.Y_ROT_90)
+        .select(Direction.SOUTH, NOP)
+        .select(Direction.WEST, BlockModelGenerators.Y_ROT_270)
+        .select(Direction.NORTH, BlockModelGenerators.Y_ROT_180);
+
     private void objModelWithHorizontalRotation(BlockModelGenerators blockModels, Block block, Identifier modelLocation, Identifier texture, Consumer<TransformVecBuilder> transform) {
         blockModels.createHorizontallyRotatedBlock(block, getObjTexturedModel(modelLocation, texture, transform));
+    }
+
+    private void objModelWithSpecialRot(BlockModelGenerators blockModels, Block block, Identifier modelLocation, Identifier texture, Consumer<TransformVecBuilder> transform, PropertyDispatch<VariantMutator> rot) {
+        MultiVariant model = BlockModelGenerators.plainVariant(getObjTexturedModel(modelLocation, texture, transform).create(block, blockModels.modelOutput));
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, model).with(rot));
     }
 
     private void objModelWithRotation(BlockModelGenerators blockModels, Block block, Identifier modelLocation, Identifier texture, Consumer<TransformVecBuilder> transform) {
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(getObjTexturedModel(modelLocation, texture, transform).create(block, blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_FACING));
     }
 
-    private void simpleModelRotated(BlockModelGenerators blockModels, Block block, String texture) {
-        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block, BlockModelGenerators.plainVariant(TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, new Material(idBlock(texture)))).create(block, blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_FACING));
+    private void simpleModelRotated(BlockModelGenerators blockModels, Holder<Block> block, String texture) {
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block.value(), BlockModelGenerators.plainVariant(TexturedModel.CUBE.updateTexture(textureMapping -> textureMapping.put(TextureSlot.ALL, new Material(idBlock(texture)))).create(block.value(), blockModels.modelOutput))).with(BlockModelGenerators.ROTATION_FACING));
     }
 
     private void simpleModelHorizontallyRotated(BlockModelGenerators blockModels, Block block, String texture) {
@@ -387,6 +407,39 @@ public class BlockStateDataGen extends ModelProvider {
                         .select(4, icon5)
                         .select(5, icon6)
                 ));
+    }
+
+    private static final PropertyDispatch<VariantMutator> NUKE_CRATE_ROTATION_FACING = PropertyDispatch.modify(BlockStateProperties.FACING)
+        .select(Direction.DOWN, X_ROT_180)
+        .select(Direction.UP, X_ROT_180)
+        .select(Direction.NORTH, X_ROT_270)
+        .select(Direction.SOUTH, X_ROT_90)
+        .select(Direction.WEST, VariantMutator.Z_ROT.withValue(Quadrant.R90))
+        .select(Direction.EAST, VariantMutator.Z_ROT.withValue(Quadrant.R270));
+    private static final ExtendedModelTemplate NUKE_BASE_MODEL = ExtendedModelTemplateBuilder.builder()
+        .parent(Identifier.withDefaultNamespace("block/block"))
+        .element(elementBuilder -> elementBuilder
+            .from(0, 0, 0)
+            .to(16, 16, 16)
+            .allFaces((direction, faceBuilder) -> {
+                TextureSlot slot = switch (direction) {
+                    case EAST, WEST, SOUTH, NORTH -> TextureSlot.SIDE;
+                    case UP -> TextureSlot.TOP;
+                    case DOWN -> TextureSlot.BOTTOM;
+                };
+                faceBuilder.texture(slot).cullface(direction);
+            })
+            .allFacesExcept((_, faceBuilder) -> faceBuilder.rotation(Quadrant.R270), Set.of(Direction.UP, Direction.DOWN))
+        )
+        .build();
+    private void nukeCrateBlock(BlockModelGenerators blockModels, Holder<Block> block, String texture) {
+        TextureMapping textures = new TextureMapping()
+            .putForced(TextureSlot.SIDE, new Material(idBlock(texture)))
+            .putForced(TextureSlot.TOP, new Material(idBlock("ah")))
+            .putForced(TextureSlot.BOTTOM, new Material(idBlock("ah")));
+
+        blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block.value(), BlockModelGenerators.plainVariant(
+            NUKE_BASE_MODEL.create(block.value(), textures, blockModels.modelOutput))).with(NUKE_CRATE_ROTATION_FACING));
     }
 
     private void landmineBlock(BlockModelGenerators blockModels, Holder<Block> block) {

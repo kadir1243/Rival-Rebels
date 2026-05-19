@@ -5,11 +5,11 @@
       "y": 90
     },
     "facing=north": {
-      "model": "rivalrebels:block/antimatterbombblock"
-    },
-    "facing=south": {
       "model": "rivalrebels:block/antimatterbombblock",
       "y": 180
+    },
+    "facing=south": {
+      "model": "rivalrebels:block/antimatterbombblock"
     },
     "facing=west": {
       "model": "rivalrebels:block/antimatterbombblock",

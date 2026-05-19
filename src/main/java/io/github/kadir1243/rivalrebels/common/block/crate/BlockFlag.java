@@ -48,11 +48,9 @@ public class BlockFlag extends Block {
     private static final VoxelShape SOUTH_SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 1.0);
     private static final VoxelShape NORTH_SHAPE = Block.box(0.0, 0.0, 15.0, 16.0, 16.0, 16.0);
     private final Map<BlockState, VoxelShape> field_26659;
-    String texpath = "rivalrebels:";
 
     public BlockFlag(Properties settings, String name) {
         super(settings);
-        texpath += name;
         this.registerDefaultState(
             this.stateDefinition
                 .any()
@@ -277,21 +275,6 @@ public class BlockFlag extends Block {
 
         return flag ? blockstate1 : null;
     }
-
-	/*@OnlyIn(Dist.CLIENT)
-	IIcon	icon;
-
-	@Override
-	public final IIcon getIcon(int side, int meta)
-	{
-		return icon;
-	}
-
-	@Override
-	public void registerBlockIcons(IIconRegister iconregister)
-	{
-		icon = iconregister.registerIcon(texpath);
-	}*/
 
     @Override
     public BlockState rotate(BlockState state, Rotation rotation) {

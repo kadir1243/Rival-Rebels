@@ -60,12 +60,12 @@ public class RenderRocket extends EntityRenderer<EntityRocket, RenderRocket.Stat
     }
 
     @Override
-    public void extractRenderState(EntityRocket p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.xRot = p_entity.getXRot(partialTick);
-        reusedState.yRot = p_entity.getYRot(partialTick);
-        reusedState.rotation = p_entity.rotation;
-        reusedState.fins = p_entity.fins;
+    public void extractRenderState(EntityRocket entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.xRot = entity.getXRot(partialTick);
+        reusedState.yRot = entity.getYRot(partialTick);
+        reusedState.rotation = entity.rotation;
+        reusedState.fins = entity.fins;
     }
 
     public static class State extends EntityRenderState {

@@ -11,8 +11,8 @@ import net.minecraft.world.item.equipment.EquipmentAsset;
 import java.util.function.BiConsumer;
 
 public class EquipmentAssetGen extends EquipmentAssetProvider {
-    public EquipmentAssetGen(PackOutput p_387559_) {
-        super(p_387559_);
+    public EquipmentAssetGen(PackOutput output) {
+        super(output);
     }
 
     @Override

@@ -56,10 +56,10 @@ public abstract class FlameBallRenderer<T extends FlameBallProjectile> extends E
     }
 
     @Override
-    public void extractRenderState(T p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.sequence = p_entity.sequence;
-        reusedState.rotation = p_entity.rotation;
+    public void extractRenderState(T entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.sequence = entity.sequence;
+        reusedState.rotation = entity.rotation;
     }
 
     public abstract float getSize(EntityRenderState entity);

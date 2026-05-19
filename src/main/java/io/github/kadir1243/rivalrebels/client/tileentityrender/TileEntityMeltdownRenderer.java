@@ -55,7 +55,7 @@ public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntit
                 poseStack.pushPose();
                 float scale = fsize * 5.5F;
                 poseStack.scale(scale, scale, scale);
-                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
                     ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.4F, 1, 1, 1), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
                 });
 
@@ -68,7 +68,7 @@ public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntit
                 poseStack.pushPose();
                 float scale = fsize * 5.6F;
                 poseStack.scale(scale, scale, scale);
-                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
                     ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.4F, 1, 1, 1), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
                 });
 
@@ -82,7 +82,7 @@ public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntit
             poseStack.pushPose();
             float scale = fsize * 5.9F;
             poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
                 ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.4F, 1, 1, 1), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             });
 

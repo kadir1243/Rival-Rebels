@@ -68,7 +68,7 @@ public class BlockTimedBomb extends FallingBlock {
     }
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         ticksSincePlaced = 0;
         world.scheduleTick(pos, this, 8);
     }

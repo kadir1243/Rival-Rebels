@@ -89,10 +89,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 
         graphics.pose().pushMatrix();
         graphics.pose().scale(1.25f, 1f);
-        graphics.text(font, Component.literal("ToKaMaK"), 10, 8, 0x444444, false);
+        graphics.text(font, Component.literal("ToKaMaK"), 10, 8, 0xFF444444, false);
         graphics.pose().popMatrix();
-        graphics.text(font, Component.literal("Teslas: " + df.format(menu.getPower() - menu.getConsumed())), 120, 8, 0xffffff, false);
-        graphics.text(font, Component.literal("Output/t: " + df.format(menu.getLastTickConsumed())), 140, 18, 0xffffff, false);
+        graphics.text(font, Component.literal("Teslas: " + df.format(menu.getPower() - menu.getConsumed())), 120, 8, CommonColors.WHITE, false);
+        graphics.text(font, Component.literal("Output/t: " + df.format(menu.getLastTickConsumed())), 140, 18, CommonColors.WHITE, false);
 	}
 
     @Override

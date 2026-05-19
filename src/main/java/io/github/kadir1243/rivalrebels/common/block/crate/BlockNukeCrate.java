@@ -62,7 +62,7 @@ public class BlockNukeCrate extends BaseEntityBlock {
 		if (this == RRBlocks.nukeCrateTop.get()) {
             for (Direction facing : Direction.values()) {
                 BlockPos offset = pos.relative(facing);
-                if (world.getBlockState(offset).is(RRBlocks.nukeCrateBottom.get())) {
+                if (world.getBlockState(offset).is(RRBlocks.nukeCrateBottom)) {
                     targetFacing = facing.getOpposite();
                 }
             }
@@ -78,26 +78,22 @@ public class BlockNukeCrate extends BaseEntityBlock {
 	}
 
     @Override
-    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, @Nullable Orientation p_365159_, boolean p_60514_) {
+    protected void neighborChanged(BlockState state, Level world, BlockPos pos, Block block, @Nullable Orientation orientation, boolean movedByPiston) {
 		world.setBlockAndUpdate(pos, state.setValue(FACING, determineOrientation(world, pos)));
 	}
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
-        int x = pos.getX();
-        int y = pos.getY();
-        int z = pos.getZ();
-
-        world.setBlockAndUpdate(pos, state.setValue(FACING, determineOrientation(world, pos)));
+    public void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+        level.setBlockAndUpdate(pos, state.setValue(FACING, determineOrientation(level, pos)));
 
         for (Direction facing : Direction.values()) {
             BlockPos offset = pos.relative(facing);
-            BlockState offsetState = world.getBlockState(offset);
-            if (offsetState.is(RRBlocks.nukeCrateBottom.get())) {
-                neighborChanged(state, world, pos, this, null, true);
+            BlockState offsetState = level.getBlockState(offset);
+            if (offsetState.is(RRBlocks.nukeCrateBottom)) {
+                neighborChanged(state, level, pos, this, null, true);
             } else if (offsetState.getFluidState().is(FluidTags.LAVA)) {
-                world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                world.explode(null, x, y, z, 3, Level.ExplosionInteraction.NONE);
+                level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                level.explode(null, pos.getX(), pos.getY(), pos.getZ(), 3, Level.ExplosionInteraction.NONE);
             }
         }
 	}

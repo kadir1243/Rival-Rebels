@@ -45,8 +45,6 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
-        super.extractLabels(graphics, xm, ym);
-
 		if (menu.isReady()) RRTextures.guilaptopnuke.blit(graphics, 131, 89, 239, 9, 16, 16, CommonColors.WHITE);
 		else RRTextures.guilaptopnuke.blit(graphics, 131, 89, 131, 89, 16, 16, CommonColors.WHITE);
     }
@@ -54,13 +52,13 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         super.extractBackground(graphics, mouseX, mouseY, a);
-		int x = (width - imageWidth) / 2;
-		int y = (height - imageHeight) / 2;
+		int x = this.leftPos;
+		int y = this.topPos;
         RRTextures.guilaptopnuke.blit(graphics, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
 		if (menu.hasChips()) RRTextures.guilaptopnuke.blit(graphics, x + 135, y + 79, 248, 0, 8, 8, CommonColors.WHITE);
-		graphics.text(font, Translations.CONTROLLER_B83.translate(), x + 118, y + 11, 0xffffff, false);
-		graphics.text(font, Translations.LAPTOP_B2_SPIRIT.translate(), x + 25, y + 11, 0xffffff, false);
-		graphics.text(font, Component.literal("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
-		graphics.text(font, Component.literal("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
+		graphics.text(font, Translations.CONTROLLER_B83.translate(), x + 118, y + 11, CommonColors.WHITE, false);
+		graphics.text(font, Translations.LAPTOP_B2_SPIRIT.translate(), x + 25, y + 11, CommonColors.WHITE, false);
+		graphics.text(font, Component.literal("x" + menu.getB2spirit()), x + 154, y + 96, CommonColors.WHITE, false);
+		graphics.text(font, Component.literal("x" + menu.getB2carpet()), x + 154, y + 85, CommonColors.WHITE, false);
 	}
 }

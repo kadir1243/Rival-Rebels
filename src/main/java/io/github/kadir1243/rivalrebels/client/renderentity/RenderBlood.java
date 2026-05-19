@@ -50,13 +50,6 @@ public class RenderBlood extends EntityRenderer<EntityBlood, EntityRenderState> 
         return new EntityRenderState();
     }
 
-    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
-        QuadHelper.addVertice(buffer, new Vector3f(-0.5f, -0.25f, 0), new TextureVertice(0, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(0.5f, -0.25f, 0), new TextureVertice(1, 0));
-        QuadHelper.addVertice(buffer, new Vector3f(0.5f, 0.75f, 0), new TextureVertice(1, 1));
-        QuadHelper.addVertice(buffer, new Vector3f(-0.5f, 0.75f, 0), new TextureVertice(0, 1));
-    });
-
     private static final Supplier<MutableQuad> QUAD = Suppliers.memoize(() -> {
         MutableQuad quad = new MutableQuad();
         quad.setSprite(new Material.Baked(Minecraft.getInstance().getAtlasManager().get(new SpriteId(Sheets.BLOCK_ENTITIES_MAPPER.sheet(), RRIdentifiers.etblood)), false));

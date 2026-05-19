@@ -18,6 +18,7 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.components.MultiLineLabel;
@@ -81,11 +82,11 @@ public class GuiNextBattle extends Screen {
             ySizeOfTexture * f,
             0
         );
-        graphics.centeredText(font, Translations.NEXT_BATTLE_SUBTITLE.translate(), (this.width / 2), (this.height / 2 - 120), 0xffffff);
+        graphics.centeredText(font, Translations.NEXT_BATTLE_SUBTITLE.translate(), (this.width / 2), (this.height / 2 - 120), CommonColors.WHITE);
 		float scalefactor = 4f;
         graphics.pose().pushMatrix();
         graphics.pose().scale(scalefactor, scalefactor);
-        graphics.centeredText(font, Translations.NEXT_BATTLE_TITLE.translate(), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
+        graphics.centeredText(font, Translations.NEXT_BATTLE_TITLE.translate(), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), CommonColors.WHITE);
         graphics.pose().popMatrix();
         MultiLineLabel.create(font, Translations.NEXT_BATTLE_QUESTION.translate(), 128).visitLines(TextAlignment.LEFT, posX + 64, posY + 160, this.font.lineHeight, graphics.textRenderer());
         super.extractRenderState(graphics, mouseX, mouseY, a);

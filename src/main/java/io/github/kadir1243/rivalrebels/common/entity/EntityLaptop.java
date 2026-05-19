@@ -39,7 +39,7 @@ public class EntityLaptop extends EntityInanimate
 	}
 
     @Override
-    public boolean canBeCollidedWith(@Nullable Entity p_423659_) {
+    public boolean canBeCollidedWith(@Nullable Entity other) {
         return this.isAlive();
     }
 

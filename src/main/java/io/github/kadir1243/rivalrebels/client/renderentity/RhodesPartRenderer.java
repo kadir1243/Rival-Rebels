@@ -64,13 +64,13 @@ public abstract class RhodesPartRenderer<T extends EntityRhodesPiece> extends En
     }
 
     @Override
-    public void extractRenderState(T p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.xRot = p_entity.getXRot(partialTick);
-        reusedState.yRot = p_entity.getYRot(partialTick);
-        reusedState.scale = p_entity.getScale();
-        reusedState.variant = p_entity.getVariant();
-        reusedState.color = p_entity.getColorRGBA();
+    public void extractRenderState(T entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.xRot = entity.getXRot(partialTick);
+        reusedState.yRot = entity.getYRot(partialTick);
+        reusedState.scale = entity.getScale();
+        reusedState.variant = entity.getVariant();
+        reusedState.color = entity.getColorRGBA();
     }
 
     public static class State extends EntityRenderState {

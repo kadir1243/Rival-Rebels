@@ -46,20 +46,21 @@ public class EntitySphereBlast extends EntityTsarBlast {
 	@Override
 	public void tick()
 	{
-		if (random.nextInt(10) == 0)
-		{
-			this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
-		}
-		else
-		{
-			if (random.nextInt(5) == 0) this.playSound(RRSounds.TIMED_BOMB_SOUND.get(), 100, 0.7f);
-		}
+        if (playingSoundTick == 0) {
+            if (random.nextInt(10) == 0) {
+                this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
+                playingSoundTick = 5;
+            } else if (random.nextInt(5) == 0) {
+                this.playSound(RRSounds.TIMED_BOMB_SOUND.get(), 100, 0.7f);
+                playingSoundTick = 5;
+            }
+        } else {
+            playingSoundTick--;
+        }
 
 		if (random.nextBoolean()&&random.nextBoolean()) pushAndHurtEntities();
 
-		tickCount++;
-
-		if (tickCount > 400) kill((ServerLevel) level());
+		if (tickCount > 400 && !level().isClientSide()) kill((ServerLevel) level());
 	}
 
 	@Override

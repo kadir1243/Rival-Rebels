@@ -22,9 +22,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TsarBomba
 {
@@ -44,29 +49,30 @@ public class TsarBomba
 	private boolean isTree;
 	private int 	treeHeight;
 
-	public TsarBomba(int x, int y, int z, Level world, int rad)
+	public TsarBomba(int x, int y, int z, Level level, int rad)
 	{
 		posX = x;
 		posY = y;
 		posZ = z;
-        this.world = world;
+        this.world = level;
 		radius = rad;
 		//int radiussmaller = (radius / 4) + 45;
 		nlimit = ((radius + 25) * (radius + 25)) * 4;
-		if (world.isClientSide()) return;
+		if (level.isClientSide()) return;
 		int clamprad = radius; //Mth.clamp(radius, radiussmaller, 50);
 
-        BlockPos.betweenClosedStream(-clamprad, world.getMinY(), -clamprad, clamprad, posY + 70, clamprad)
+        List<BlockPos> list = BlockPos.betweenClosedStream(-clamprad, Math.max(posY - clamprad, level.getMinY()), -clamprad, clamprad, Math.min(posY + clamprad, level.getMaxY()), clamprad)
             .map(BlockPos::immutable)
             .filter(blockPos -> Vec3.atLowerCornerOf(blockPos).horizontalDistanceSqr() < radius * radius)
             .map(pos -> pos.offset(x, 0, z))
-            .forEach(offset -> {
-                BlockState state = world.getBlockState(offset);
-                if (!state.getFluidState().isEmpty() && !state.is(BlockTags.FEATURES_CANNOT_REPLACE)) {
-                    world.destroyBlock(offset, false);
-                }
-            });
-	}
+            .collect(Collectors.toList());
+        Collections.reverse(list);
+        for (BlockPos offset : list) {
+            if (!level.getFluidState(offset).isEmpty()) {
+                level.setBlock(offset, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL);
+            }
+        }
+    }
 
 	public void tick(EntityTsarBlast tsarblast)
 	{
@@ -169,20 +175,21 @@ public class TsarBomba
 				if (metadata > 15) metadata = 15;
 				for (int Y = ylimit; Y >= world.getMinY(); Y--) {
 					int yy = Y + y;
-					BlockState state = world.getBlockState(new BlockPos(x + posX, yy, z + posZ));
+                    BlockPos pos = new BlockPos(x + posX, yy, z + posZ);
+                    BlockState state = world.getBlockState(pos);
 					if (state.is(RRBlocks.omegaobj)) RivalRebels.round.winSigma();
 					else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 					else if (!isTree)
 					{
-						BlockState state1 = world.getBlockState(new BlockPos(x + posX, yy - ylimit, z + posZ));
-						world.setBlockAndUpdate(new BlockPos(x + posX, yy, z + posZ), state1);
+						BlockState state1 = world.getBlockState(pos.below(ylimit));
+						world.setBlockAndUpdate(pos, state1);
 					}
 					else
 					{
 						isTree = false;
 						for (int Yy = 0; Yy >= -treeHeight; Yy--)
 						{
-							world.setBlockAndUpdate(new BlockPos(x + posX, yy + Yy, z + posZ), RRBlocks.petrifiedwood.get().defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
+							world.setBlockAndUpdate(pos.above(Yy), RRBlocks.petrifiedwood.get().defaultBlockState().setValue(BlockPetrifiedWood.META, metadata));
 						}
 						break;
 					}
@@ -190,10 +197,11 @@ public class TsarBomba
 			}
 			else
 			{
-				BlockState state = world.getBlockState(new BlockPos(x + posX, y, z + posZ));
+                BlockPos pos = new BlockPos(x + posX, y, z + posZ);
+                BlockState state = world.getBlockState(pos);
 				if (state.is(Blocks.BEDROCK))
 				;
-				else if (!state.canOcclude()) world.setBlockAndUpdate(new BlockPos(x + posX, y, z + posZ), Blocks.AIR.defaultBlockState());
+				else if (!state.canOcclude()) world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 				if (isTree) {
 					isTree = false;
 					int metadata = Mth.floor((16d / radius) * dist);

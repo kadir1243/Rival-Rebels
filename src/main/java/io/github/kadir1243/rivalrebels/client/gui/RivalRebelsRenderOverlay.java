@@ -36,6 +36,7 @@ import net.minecraft.client.gui.render.TextureSetup;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.CommonColors;
 import net.minecraft.util.LightCoordsUtil;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
@@ -153,30 +154,31 @@ public class RivalRebelsRenderOverlay {
         }
 
         Component text = Component.literal("Rival Rebels");
-        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.05), 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.05), CommonColors.WHITE, false);
         text = Component.literal("Robot: ").append(rhodes.getName());
-        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.1), 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.1), CommonColors.WHITE, false);
         text = RRBlocks.reactor.get().getName().append(": " + rhodes.getHealth());
         float val = (rhodes.getHealth() / (float) RRConfig.SERVER.getRhodesHealth());
-        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.15), (((int)((1-val)*255)&255)<<16) | (((int)(val*255)&255)<<8), false);
+        int col = ARGB.color((int) ((1-val)*255), (int) (val*255), 0);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.15), col, false);
         float yaw = (player.getYRot() + 360000) % 360;
         text = (yaw >= 315 || yaw < 45) ? Translations.BINOCULARS_SOUTH.translate() : (yaw >= 45 && yaw < 135) ? Translations.BINOCULARS_WEST.translate() : (yaw >= 135 && yaw < 225) ? Translations.BINOCULARS_NORTH.translate() : (yaw >= 225 && yaw < 315) ? Translations.BINOCULARS_EAST.translate() : Component.literal("Whut");
-        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.2), 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.2), CommonColors.WHITE, false);
 
         text = RRItems.einsten.toStack().getItemName().copy().append(": " + rhodes.getEnergy());
-        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.05), rhodes.isAnyLaserEnabled()?0xff3333:0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.05), rhodes.isAnyLaserEnabled()?0xffff3333:CommonColors.WHITE, false);
         text = Component.literal("Jet: " + rhodes.getEnergy());
-        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.1), RRClient.RHODES_JUMP_KEY.isDown() ?0x6666ff:0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.1), RRClient.RHODES_JUMP_KEY.isDown() ?0xff6666ff:CommonColors.WHITE, false);
         text = RRBlocks.forcefieldnode.get().getName().append(": " + rhodes.getEnergy());
-        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.isForceFieldEnabled()?0xBB88FF:0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.15), rhodes.isForceFieldEnabled()?0xffBB88FF:CommonColors.WHITE, false);
         text = RRItems.seekm202.toStack().getItemName().copy().append(": " + rhodes.getRocketCount());
-        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.2), 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.2), CommonColors.WHITE, false);
         text = (rhodes.isPlasma()?Component.literal("Plasma: " + rhodes.getFlameCount()) : (RRItems.fuel.toStack().getItemName().copy().append(": " + rhodes.getFlameCount())));
-        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.25), 0xffffff, false);
-        graphics.text(fr, RRBlocks.nuclearBomb.get().getName().copy().append(": " + rhodes.getNukeCount()), (int) (w * 0.8), (int) (h * 0.3), 0xffffff, false);
-        graphics.text(fr, Component.literal("Guard"), (int) (w * 0.8), (int) (h * 0.35), RRClient.RHODES_GUARD_KEY.isDown() ? 0xffff00 : 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.8), (int) (h * 0.25), CommonColors.WHITE, false);
+        graphics.text(fr, RRBlocks.nuclearBomb.get().getName().copy().append(": " + rhodes.getNukeCount()), (int) (w * 0.8), (int) (h * 0.3), CommonColors.WHITE, false);
+        graphics.text(fr, Component.literal("Guard"), (int) (w * 0.8), (int) (h * 0.35), RRClient.RHODES_GUARD_KEY.isDown() ? CommonColors.YELLOW : CommonColors.WHITE, false);
         text = rhodes.getName().copy().append(" ").append(RRBlocks.controller.get().getName()).append(": H");
-        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.95), InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_H) ? 0xffff00 : 0xffffff, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.95), InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_H) ? CommonColors.YELLOW : CommonColors.WHITE, false);
         if (rhodes.isForceFieldEnabled()) {
             graphics.submitGuiElementRenderState(new GuiElementRenderState() {
                 private final Matrix3x2f pose = new Matrix3x2f(graphics.pose());
@@ -276,38 +278,38 @@ public class RivalRebelsRenderOverlay {
             Component text;
             text = Component.literal("X");
             if (!id.isAir()) text = id.getBlock().getName();
-            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.18), 0x00ff00, false);
+            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.18), CommonColors.GREEN, false);
             if (!ItemBinoculars.tooFar)
                 text = Component.literal("(" + tpos.getX() + ", " + tpos.getY() + ", " + tpos.getZ() + ")");
             else text = Component.empty();
-            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.13), 0x00ff00, false);
+            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.13), CommonColors.GREEN, false);
             if (tic % 30 == 0) r = !r;
             //if (nbt.getInt("ty") != -1 && nbt.getInt("cooldowntime") > 0) text = Component.literal(">" + nbt.getInt("tx") + ", " + nbt.getInt("ty") + ", " + nbt.getInt("tz") + "<");
             //else if (r) text = Component.literal(">                    <");
-            //graphics.drawText(tr, text, (int) ((w * 0.50) - (tr.getWidth(text) / 2f)), (int) (h * 0.85), 0xff0000);
+            //graphics.drawText(tr, text, (int) ((w * 0.50) - (tr.getWidth(text) / 2f)), (int) (h * 0.85), CommonColors.RED);
             text = Component.literal("LTD RR");
-            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.80), 0xffffff, false);
+            graphics.text(tr, text, (int) ((w * 0.50) - (tr.width(text) / 2f)), (int) (h * 0.80), CommonColors.WHITE, false);
             text = Component.literal(((int) ItemBinoculars.distblock) + "m");
-            graphics.text(tr, text, (int) ((w * 0.637) - (tr.width(text) / 2f)), (int) (h * 0.205), 0xffffff, false);
+            graphics.text(tr, text, (int) ((w * 0.637) - (tr.width(text) / 2f)), (int) (h * 0.205), CommonColors.WHITE, false);
             float yaw = (player.getYRot() + 360000) % 360;
             text = (yaw >= 315 || yaw < 45) ? Translations.BINOCULARS_SOUTH.translate() : (yaw >= 45 && yaw < 135) ? Translations.BINOCULARS_WEST.translate() : (yaw >= 135 && yaw < 225) ? Translations.BINOCULARS_NORTH.translate() : (yaw >= 225 && yaw < 315) ? Translations.BINOCULARS_EAST.translate() : Component.literal("Whut");
-            graphics.text(tr, text, (int) ((w * 0.370) - (tr.width(text) / 2f)), (int) (h * 0.205), 0xffffff, false);
+            graphics.text(tr, text, (int) ((w * 0.370) - (tr.width(text) / 2f)), (int) (h * 0.205), CommonColors.WHITE, false);
             if (ItemBinoculars.tooFar)
-                graphics.text(tr, Translations.CONTROLLER_OUT_OF_RANGE.translate(), (int) ((w * 0.5) - (tr.width(Translations.CONTROLLER_OUT_OF_RANGE.translate()) / 2f)), (int) (h * 0.85), 0xff0000, false);
+                graphics.text(tr, Translations.CONTROLLER_OUT_OF_RANGE.translate(), (int) ((w * 0.5) - (tr.width(Translations.CONTROLLER_OUT_OF_RANGE.translate()) / 2f)), (int) (h * 0.85), CommonColors.RED, false);
             else if (ItemBinoculars.tooClose)
-                graphics.text(tr, Translations.NEXT_BATTLE_NO.translate(), (int) ((w * 0.5) - (tr.width(Translations.NEXT_BATTLE_NO.translate()) / 2f)), (int) (h * 0.85), 0xff0000, false);
+                graphics.text(tr, Translations.NEXT_BATTLE_NO.translate(), (int) ((w * 0.5) - (tr.width(Translations.NEXT_BATTLE_NO.translate()) / 2f)), (int) (h * 0.85), CommonColors.RED, false);
                 //else if (dist2 < 40)
                 //{
                 //	text = Component.translatable("RivalRebels.nextbattle.no");
-                //	graphics.drawText(tr, text, (int) ((w * 0.5) - (tr.getWidth(text) / 2f)), (int) (h * 0.90), 0xff0000, false);
+                //	graphics.drawText(tr, text, (int) ((w * 0.5) - (tr.getWidth(text) / 2f)), (int) (h * 0.90), CommonColors.RED, false);
                 //	text = Component.literal(team == RivalRebelsTeam.OMEGA ? RivalRebels.omegaobj.getLocalizedName() : RivalRebels.omegaobj.getLocalizedName());
-                //	graphics.drawText(tr, text, (int) ((w * 0.5) - (tr.getWidth(text) / 2f)), (int) (h * 0.94), 0xff0000, false);
+                //	graphics.drawText(tr, text, (int) ((w * 0.5) - (tr.getWidth(text) / 2f)), (int) (h * 0.94), CommonColors.RED, false);
                 //}
             else if (ItemBinoculars.ready)
-                graphics.text(tr, Translations.BINOCULARS_TARGET.translate(), (int) ((w * 0.5) - (tr.width(Translations.BINOCULARS_TARGET.translate()) / 2f)), (int) (h * 0.85), 0xff0000, false);
+                graphics.text(tr, Translations.BINOCULARS_TARGET.translate(), (int) ((w * 0.5) - (tr.width(Translations.BINOCULARS_TARGET.translate()) / 2f)), (int) (h * 0.85), CommonColors.RED, false);
 
-            graphics.text(tr, Translations.USE_MESSAGE.translate().append(" ").append(Translations.SHIFT_CLICK.translate()).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), 0xff0000, false);
-            graphics.text(tr, Component.literal("Press C to select bomb type"), (int) (w * 0.60), (int) (h * 0.95), 0xff0000, false);
+            graphics.text(tr, Translations.USE_MESSAGE.translate().append(" ").append(Translations.SHIFT_CLICK.translate()).append(" B-83 x2"), (int) (w * 0.05), (int) (h * 0.95), CommonColors.RED, false);
+            graphics.text(tr, Translations.PRESS_TO_SELECT_BOMB_TYPE.translate(), (int) (w * 0.60), (int) (h * 0.95), CommonColors.RED, false);
 
             if ((tasks > 0 || carpet > 0) && dist < 10) {
                 float col = (float) (1 - dist / 10);
@@ -326,15 +328,15 @@ public class RivalRebelsRenderOverlay {
                 );
 
                 text = Component.literal("x" + tasks);
-                graphics.text(tr, text, (int) (w * 0.76), (int) (h * 0.85), ItemBinoculars.c ? 0xffff00 : 0xff0000, false);
+                graphics.text(tr, text, (int) (w * 0.76), (int) (h * 0.85), ItemBinoculars.c ? CommonColors.YELLOW : CommonColors.RED, false);
                 text = Component.literal("x" + carpet);
-                graphics.text(tr, text, (int) (w * 0.76), (int) (h * 0.9), ItemBinoculars.c ? 0xff0000 : 0xffff00, false);
+                graphics.text(tr, text, (int) (w * 0.76), (int) (h * 0.9), ItemBinoculars.c ? CommonColors.RED : CommonColors.YELLOW, false);
                 text = Translations.TACTICAL_NUKE_NAME.translate();
                 if (!r)
-                    graphics.text(tr, text, (int) ((w * 0.5) - (tr.width(text) / 2f)), (int) (h * 0.71), 0x00ff00, false);
+                    graphics.text(tr, text, (int) ((w * 0.5) - (tr.width(text) / 2f)), (int) (h * 0.71), CommonColors.GREEN, false);
             } else if ((tasks > 0 || carpet > 0) && ItemBinoculars.hasLaptop) {
                 text = RRBlocks.controller.get().getName().append(" ").append(Translations.CONTROLLER_OUT_OF_RANGE.translate());
-                graphics.text(tr, text, (int) (w * 0.63), (int) (h * 0.87), 0xffff00, false);
+                graphics.text(tr, text, (int) (w * 0.63), (int) (h * 0.87), CommonColors.YELLOW, false);
             }
         }
 	}

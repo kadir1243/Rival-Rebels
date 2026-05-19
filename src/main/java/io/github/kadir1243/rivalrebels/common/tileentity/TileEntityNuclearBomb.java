@@ -91,7 +91,7 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
         }
         hasFuse = getItem(0).is(RRItems.fuse);
         hasChip = getItem(12).is(RRItems.chip);
-        if (hasChip) {
+        if (hasChip && getItem(12).has(RRComponents.CHIP_DATA)) {
             ChipData chipData = getItem(12).get(RRComponents.CHIP_DATA);
             rrteam = chipData.team();
             player = chipData.gameProfile();
@@ -100,17 +100,17 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
     }
 
     @Override
-    protected void loadAdditional(ValueInput p_422403_) {
-        super.loadAdditional(p_422403_);
+    protected void loadAdditional(ValueInput input) {
+        super.loadAdditional(input);
 
-        ContainerHelper.loadAllItems(p_422403_, this.chestContents);
+        ContainerHelper.loadAllItems(input, this.chestContents);
 	}
 
     @Override
-    protected void saveAdditional(ValueOutput p_422177_) {
-        super.saveAdditional(p_422177_);
+    protected void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
 
-        ContainerHelper.saveAllItems(p_422177_, this.chestContents);
+        ContainerHelper.saveAllItems(output, this.chestContents);
     }
 
     @Override

@@ -119,7 +119,7 @@ public class EntityFlameBall extends FlameBallProjectile {
                 .map(blockPos -> blockPos.offset(blockPosition()))
                 .forEach(pos -> {
                     BlockState state = level().getBlockState(pos);
-                    if (level().isEmptyBlock(pos) || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+                    if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
                 });
 		}
 	}

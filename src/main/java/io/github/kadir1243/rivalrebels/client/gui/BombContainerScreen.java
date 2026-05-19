@@ -10,16 +10,25 @@ import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.phys.Vec2;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 
+@OnlyIn(Dist.CLIENT)
 public abstract class BombContainerScreen<T extends AbstractContainerMenu & BombContainer> extends AbstractContainerScreen<T> {
     public BombContainerScreen(T menu, Inventory playerInventory, Component title, int imageWidth, int imageHeight) {
         super(menu, playerInventory, title, imageWidth, imageHeight);
     }
 
+    private Vec2 timerPos;
+
+    @Override
+    protected void init() {
+        super.init();
+        this.timerPos = getTimerPos();
+    }
+
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
-        super.extractLabels(graphics, xm, ym);
-
         showTimer(graphics);
         boolean shouldScaleName = scaleName();
         if (shouldScaleName) {
@@ -42,12 +51,12 @@ public abstract class BombContainerScreen<T extends AbstractContainerMenu & Bomb
         } else {
             milli = "" + millis;
         }
-        graphics.text(font, Translations.BOMB_TIMER.translate(seconds, milli), (int) getTimerPos().x, (int) getTimerPos().y, getTimerColor(), false);
+        graphics.text(font, Translations.BOMB_TIMER.translate(seconds, milli), (int) timerPos.x, (int) timerPos.y, getTimerColor(countdown), false);
     }
 
     public abstract Vec2 getTimerPos();
 
-    public abstract int getTimerColor();
+    public abstract int getTimerColor(int countdown);
 
     public int getCountdown() {
         return menu.getCountdown();
@@ -61,9 +70,8 @@ public abstract class BombContainerScreen<T extends AbstractContainerMenu & Bomb
 
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        int x = (width - imageWidth) / 2;
-        int y = (height - imageHeight) / 2;
-        getBackgroundTexture().blit(graphics, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
+        super.extractBackground(graphics, mouseX, mouseY, a);
+        getBackgroundTexture().blit(graphics, this.leftPos, this.topPos, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
     }
 
     public abstract RRTextures.Texture getBackgroundTexture();

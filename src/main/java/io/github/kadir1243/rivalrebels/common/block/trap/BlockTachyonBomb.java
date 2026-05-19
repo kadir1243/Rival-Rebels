@@ -66,12 +66,16 @@ public class BlockTachyonBomb extends BaseEntityBlock {
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (stack.is(RRItems.pliers)) {
-            player.openMenu(state.getMenuProvider(level, pos));
+            if (!level.isClientSide()) {
+                player.openMenu(state.getMenuProvider(level, pos));
+            }
             return InteractionResult.SUCCESS;
-		} else if (!level.isClientSide()) {
-			player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
-		}
-		return InteractionResult.FAIL;
+        } else {
+            if (!level.isClientSide()) {
+                player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
+            }
+            return InteractionResult.FAIL;
+        }
 	}
 
     @Nullable

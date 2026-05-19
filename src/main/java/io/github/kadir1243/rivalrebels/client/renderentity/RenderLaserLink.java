@@ -82,11 +82,11 @@ public class RenderLaserLink extends EntityRenderer<EntityLaserLink, RenderLaser
     }
 
     @Override
-    public void extractRenderState(EntityLaserLink p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.xRot = p_entity.getXRot(partialTick);
-        reusedState.yRot = p_entity.getYRot(partialTick);
-        reusedState.deltaMovement = p_entity.getDeltaMovement();
+    public void extractRenderState(EntityLaserLink entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.xRot = entity.getXRot(partialTick);
+        reusedState.yRot = entity.getYRot(partialTick);
+        reusedState.deltaMovement = entity.getDeltaMovement();
     }
 
     public static class State extends EntityRenderState {

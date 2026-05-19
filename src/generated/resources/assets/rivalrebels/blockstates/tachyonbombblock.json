@@ -5,11 +5,11 @@
       "y": 90
     },
     "facing=north": {
-      "model": "rivalrebels:block/tachyonbombblock"
-    },
-    "facing=south": {
       "model": "rivalrebels:block/tachyonbombblock",
       "y": 180
+    },
+    "facing=south": {
+      "model": "rivalrebels:block/tachyonbombblock"
     },
     "facing=west": {
       "model": "rivalrebels:block/tachyonbombblock",

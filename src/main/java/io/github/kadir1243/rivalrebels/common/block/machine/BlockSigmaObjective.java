@@ -44,7 +44,7 @@ public class BlockSigmaObjective extends BaseEntityBlock {
     }
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
 		if (!pos.equals(RivalRebels.round.sigmaData.objPos())) {
 			world.setBlockAndUpdate(RivalRebels.round.sigmaData.objPos(), RRBlocks.plasmaexplosion.get().defaultBlockState());
 			RivalRebels.round.sigmaData.objPos = pos;

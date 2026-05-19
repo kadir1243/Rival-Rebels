@@ -22,17 +22,19 @@ public class AbstractBlastEntity<T> extends Entity {
     }
 
     @Override
-    public boolean hurtServer(ServerLevel p_376804_, DamageSource p_376155_, float p_376892_) {
+    public boolean hurtServer(ServerLevel level, DamageSource source, float damage) {
         return false;
     }
 
     @Override
     protected void readAdditionalSaveData(ValueInput valueInput) {
         radius = valueInput.getFloatOr("radius", 0);
+        tickCount = valueInput.getIntOr("Age", 0);
     }
 
     @Override
     protected void addAdditionalSaveData(ValueOutput valueOutput) {
         valueOutput.putFloat("radius", (float) radius);
+        valueOutput.putInt("Age", tickCount);
     }
 }

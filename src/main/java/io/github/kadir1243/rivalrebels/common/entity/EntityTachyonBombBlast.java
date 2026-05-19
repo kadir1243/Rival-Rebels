@@ -65,8 +65,6 @@ public class EntityTachyonBombBlast extends AbstractBlastEntity<TachyonBomb> {
 			if (random.nextInt(30) == 0) this.playSound(RRSounds.MANDELEED.get(), 100, 0.8f);
 		}
 
-		tickCount++;
-
 		if (!level().isClientSide())
 		{
 			if (bomb == null && tickCount > 1200) kill((ServerLevel) level());

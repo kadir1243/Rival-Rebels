@@ -54,7 +54,7 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid, RenderPlasmoi
             var scale = 0.4F + 0.2F * i;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
+            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
                 ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.9f, 0.65f, 0.55f, 0.95f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             });
             poseStack.popPose();
@@ -79,11 +79,11 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid, RenderPlasmoi
     }
 
     @Override
-    public void extractRenderState(EntityPlasmoid p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.xRot = p_entity.getXRot(partialTick);
-        reusedState.yRot = p_entity.getYRot(partialTick);
-        reusedState.rotation = p_entity.rotation;
+    public void extractRenderState(EntityPlasmoid entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.xRot = entity.getXRot(partialTick);
+        reusedState.yRot = entity.getYRot(partialTick);
+        reusedState.rotation = entity.rotation;
     }
 
     public static class State extends EntityRenderState {

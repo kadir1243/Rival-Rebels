@@ -41,7 +41,7 @@ public class GuiRotor extends GuiButton
 		if (deg < 22) deg = 22;
 		degree = deg;
         RRTextures.guitray.blit(graphics, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180), CommonColors.WHITE);
-        graphics.centeredText(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
+        graphics.centeredText(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, CommonColors.WHITE);
         graphics.pose().popMatrix();
 	}
 

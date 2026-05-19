@@ -14,10 +14,14 @@ package io.github.kadir1243.rivalrebels.client.model;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureFace;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
 
+import java.util.List;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -210,7 +214,7 @@ public class ModelPlasmaCannon {
 	private static final Vector3f		vbb2				= new Vector3f(20f, 0f, 2f);
 	private static final Vector3f		vbb3				= new Vector3f(20f, 0f, -2f);
 	private static final Vector3f		vbb4				= new Vector3f(8f, 0f, -2f);
-    public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
+    public static final Function<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> BAKED_MODEL = id -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(id), buffer -> {
         // body
         QuadHelper.addFace(buffer, vt1, vt2, vt3, vt4, bodytop);
         QuadHelper.addFace(buffer, vs1, vt1, vt2, vs4, bodytopside);

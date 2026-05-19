@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerTheoreticalTsar;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -25,20 +26,22 @@ import net.minecraft.world.entity.player.Inventory;
 public class GuiTheoreticalTsar extends BombContainerScreen<ContainerTheoreticalTsar> {
 	public GuiTheoreticalTsar(ContainerTheoreticalTsar container, Inventory inventoryPlayer, Component title) {
 		super(container, inventoryPlayer, title, DEFAULT_IMAGE_WIDTH, 206);
+        this.titleLabelX = 18;
+        this.titleLabelY = 16;
 	}
 
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Translations.TSAR_NAME.translate(), 18, 16, 0x404040, false);
+        graphics.text(font, Translations.TSAR_NAME.translate(), this.titleLabelX, this.titleLabelY, CommonColors.DARK_GRAY, false);
     }
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
         super.extractLabels(graphics, xm, ym);
         if (menu.isArmed()) {
-            graphics.text(font, Translations.BOMB_ARMED.translate(), 6, imageHeight - 97, 0xFF0000, false);
+            graphics.text(font, Translations.BOMB_ARMED.translate(), 6, imageHeight - 97, CommonColors.RED, false);
         } else {
-            graphics.text(font, Component.literal(menu.getMegaton() + " ").append(Translations.BOMB_MEGATONS.translate()), 6, imageHeight - 97, 0xFFFFFF, false);
+            graphics.text(font, Translations.BOMB_MEGATONS.translate(menu.getMegaton()), 6, imageHeight - 97, CommonColors.WHITE, false);
         }
     }
 
@@ -48,8 +51,8 @@ public class GuiTheoreticalTsar extends BombContainerScreen<ContainerTheoretical
     }
 
     @Override
-    public int getTimerColor() {
-        return getCountdown() % 20 >= 10 ? 0xFFFFFF : 0xFF0000;
+    public int getTimerColor(int countdown) {
+        return countdown % 20 >= 10 ? CommonColors.WHITE : CommonColors.RED;
     }
 
     @Override

@@ -27,25 +27,25 @@ import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiTesla extends Screen {
-	private final int	xSizeOfTexture	= 256;
-	private final int	ySizeOfTexture	= 256;
-	private int			posX;
-	private int			posY;
-	private GuiKnob		knob;
-	private final int s;
+    private final int xSizeOfTexture = 256;
+    private final int ySizeOfTexture = 256;
+    private int posX;
+    private int posY;
+    private GuiKnob knob;
+    private final int s;
 
-	public GuiTesla(int start) {
+    public GuiTesla(int start) {
         super(Component.empty());
         s = start - 90;
-	}
+    }
 
     @Override
     protected void init() {
-		posX = (this.width - xSizeOfTexture) / 2;
-		posY = (this.height - ySizeOfTexture) / 2;
-		knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, Component.literal("Knob"));
-		this.addRenderableWidget(knob);
-	}
+        posX = (this.width - xSizeOfTexture) / 2;
+        posY = (this.height - ySizeOfTexture) / 2;
+        knob = new GuiKnob(posX + 108, posY + 176, -90, 90, s, true, Component.literal("Knob"));
+        this.addRenderableWidget(knob);
+    }
 
     @Override
     public boolean isPauseScreen() {
@@ -53,8 +53,13 @@ public class GuiTesla extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        super.extractRenderState(graphics, mouseX, mouseY, a);
+    public boolean isInGameUi() {
+        return true;
+    }
+
+    @Override
+    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+        super.extractBackground(graphics, mouseX, mouseY, a);
         float f = 0.00390625F;
         graphics.blit(
             RRTextures.guitesla.location(),
@@ -67,18 +72,23 @@ public class GuiTesla extends Screen {
             0,
             ySizeOfTexture * f
         );
-	}
+    }
 
     @Override
     public boolean keyReleased(KeyEvent event) {
         if (RRClient.USE_KEY.matches(event)) {
             onClose();
-            Minecraft.getInstance().getConnection().send(new ItemUpdate(minecraft.player.getInventory().getSelectedSlot(), knob.getDegree()));
-            ItemStack stack = minecraft.player.getInventory().getSelectedItem();
-            if (stack.has(RRComponents.TESLA_DIAL)) {
-                stack.set(RRComponents.TESLA_DIAL, knob.getDegree());
-            }
         }
         return super.keyReleased(event);
+    }
+
+    @Override
+    public void onClose() {
+        super.onClose();
+        ItemStack stack = minecraft.player.getInventory().getSelectedItem();
+        if (stack.has(RRComponents.TESLA_DIAL)) {
+            stack.set(RRComponents.TESLA_DIAL, knob.getDegree());
+            Minecraft.getInstance().getConnection().send(new ItemUpdate(minecraft.player.getInventory().getSelectedSlot(), knob.getDegree()));
+        }
     }
 }

@@ -60,7 +60,7 @@ public class BlockMeltDown extends BaseEntityBlock {
     }
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         world.scheduleTick(pos, this, 1);
     }
 

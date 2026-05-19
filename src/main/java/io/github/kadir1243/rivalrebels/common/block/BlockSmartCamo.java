@@ -27,7 +27,7 @@ public class BlockSmartCamo extends Block
 	}
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
         if (getBlockState(world, pos.east()).is(BlockTags.SNOW) || getBlockState(world, pos.west()).is(BlockTags.SNOW) || getBlockState(world, pos.north()).is(BlockTags.SNOW) || getBlockState(world, pos.south()).is(BlockTags.SNOW)) {
             setBlock(world, pos, RRBlocks.camo3.get());
         } else {

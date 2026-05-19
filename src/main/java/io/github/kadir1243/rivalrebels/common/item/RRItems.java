@@ -4,6 +4,7 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.components.BinocularData;
+import io.github.kadir1243.rivalrebels.common.item.components.ChipData;
 import io.github.kadir1243.rivalrebels.common.item.components.FlameThrowerMode;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.item.weapon.*;

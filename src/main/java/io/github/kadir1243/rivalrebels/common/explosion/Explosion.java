@@ -102,7 +102,7 @@ public class Explosion
 					int zz = (int) z + Z;
                     BlockPos pos = new BlockPos(xx, yy, zz);
                     BlockState state = world.getBlockState(pos);
-					if (!world.isEmptyBlock(pos) && !state.is(Blocks.BEDROCK))
+					if (!state.isAir() && !state.is(Blocks.BEDROCK))
 					{
 						int dist = X * X + Y * Y + Z * Z;
 						if (dist <= delete && state.is(RRBlocks.camo1) && state.is(RRBlocks.camo2) && state.is(RRBlocks.camo3))

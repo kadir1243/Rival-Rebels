@@ -77,7 +77,7 @@ public class EntityRhodesPiece extends Entity {
     }
 
     @Override
-    public boolean canBeCollidedWith(@Nullable Entity p_423659_) {
+    public boolean canBeCollidedWith(@Nullable Entity other) {
 		return true;
 	}
 

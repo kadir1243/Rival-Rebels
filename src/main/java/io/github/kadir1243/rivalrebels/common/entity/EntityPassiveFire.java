@@ -106,15 +106,15 @@ public class EntityPassiveFire extends Projectile {
     }
 
     @Override
-    protected void addAdditionalSaveData(ValueOutput p_422546_) {
-        super.addAdditionalSaveData(p_422546_);
-        p_422546_.putDouble("damage", damage);
+    protected void addAdditionalSaveData(ValueOutput output) {
+        super.addAdditionalSaveData(output);
+        output.putDouble("damage", damage);
 	}
 
     @Override
-    protected void readAdditionalSaveData(ValueInput p_421811_) {
-        super.readAdditionalSaveData(p_421811_);
-        damage = p_421811_.getDoubleOr("damage", 0);
+    protected void readAdditionalSaveData(ValueInput input) {
+        super.readAdditionalSaveData(input);
+        damage = input.getDoubleOr("damage", 0);
 	}
 
 	@Override

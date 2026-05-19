@@ -14,7 +14,6 @@ package io.github.kadir1243.rivalrebels.client.model;
 import com.mojang.math.Transformation;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
@@ -124,7 +123,7 @@ public class ModelLaptop
             SCREENS.computeIfAbsent(new Tuple<>(screenTexture, turn), t ->
                 QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t.getA()),
                     buffer -> QuadHelper.addFace(buffer,
-                        new Transformation(new Vector3f(0, 0.122f, 0), ROTATION_AXIS.rotationDegrees(t.getB()), null, null),
+                        new Transformation(new Vector3f(0, 0.125F, 0.001F), ROTATION_AXIS.rotationDegrees(t.getB()), null, null),
                         v2v, v1v, v4v, v3v, t333, t222, t111, t444))),
             light, overlay);
 	}

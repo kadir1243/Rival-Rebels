@@ -47,7 +47,7 @@ public class BlockLight extends Block
     }
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
 		if (this == RRBlocks.light.get()) {
 			world.scheduleTick(pos, this, 10);
 		}

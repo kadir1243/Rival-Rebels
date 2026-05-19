@@ -46,10 +46,10 @@ public class RenderLaptop extends EntityRenderer<EntityLaptop, RenderLaptop.Stat
     }
 
     @Override
-    public void extractRenderState(EntityLaptop p_entity, State reusedState, float partialTick) {
-        super.extractRenderState(p_entity, reusedState, partialTick);
-        reusedState.slide = (float) p_entity.slide;
-        reusedState.yRot = p_entity.getYRot(partialTick);
+    public void extractRenderState(EntityLaptop entity, State reusedState, float partialTick) {
+        super.extractRenderState(entity, reusedState, partialTick);
+        reusedState.slide = (float) entity.slide;
+        reusedState.yRot = entity.getYRot(partialTick);
     }
 
     public static class State extends EntityRenderState {

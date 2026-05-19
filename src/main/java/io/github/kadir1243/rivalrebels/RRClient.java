@@ -4,6 +4,7 @@ import io.github.kadir1243.rivalrebels.client.gui.RivalRebelsRenderOverlay;
 import io.github.kadir1243.rivalrebels.client.itemrenders.*;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderentity.*;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.client.tileentityrender.*;
 import io.github.kadir1243.rivalrebels.common.entity.RREntities;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
@@ -43,7 +44,7 @@ public class RRClient {
     public static RivalRebelsRenderOverlay rrro;
 
     private static KeyMapping createRhodesKey(String translation, int key) {
-        return new KeyMapping("key." + RRIdentifiers.MODID + ".rhodes." + "." + translation, key, RHODES_CATEGORY);
+        return new KeyMapping("key." + RRIdentifiers.MODID + ".rhodes." + translation, key, RHODES_CATEGORY);
     }
 
     public static void registerKeyBinding(RegisterKeyMappingsEvent event) {
@@ -64,7 +65,6 @@ public class RRClient {
     }
 
 	public static void registerRenderInformation(EntityRenderersEvent.RegisterRenderers event) {
-		event.registerBlockEntityRenderer(RRTileEntities.NUKE_CRATE.get(), TileEntityNukeCrateRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.PLASMA_EXPLOSION.get(), TileEntityPlasmaExplosionRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.REACTOR.get(), TileEntityReactorRenderer::new);
 		event.registerBlockEntityRenderer(RRTileEntities.JUMP_BLOCK.get(), TileEntityJumpBlockRenderer::new);
@@ -164,5 +164,7 @@ public class RRClient {
         bus.addListener(RRClient::registerCustomRenderers);
         bus.addListener(RRClient::registerSpecialRenderers);
         bus.addListener(ObjModels::registerModels);
+        bus.addListener(RRRenderTypes::registerPIPRenderer);
+        bus.addListener(RRRenderTypes::registerRenderPipelines);
     }
 }

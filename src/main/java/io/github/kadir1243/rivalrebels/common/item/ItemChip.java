@@ -31,6 +31,7 @@ import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.TooltipDisplay;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.common.util.FakePlayer;
 import org.jspecify.annotations.Nullable;
 
 public class ItemChip extends Item {
@@ -40,7 +41,7 @@ public class ItemChip extends Item {
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel p_401805_, Entity entity, @Nullable EquipmentSlot p_401900_) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
 		if (RivalRebels.round.isStarted() && !stack.has(RRComponents.CHIP_DATA) && entity instanceof Player player) {
             stack.set(RRComponents.CHIP_DATA, new ChipData(player.getGameProfile(), RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile()).rrteam));
 		}

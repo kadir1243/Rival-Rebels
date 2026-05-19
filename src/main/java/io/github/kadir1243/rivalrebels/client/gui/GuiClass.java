@@ -162,10 +162,10 @@ public class GuiClass extends Screen {
 			graphics.item(rrclass.getInventory().get(i), X, Y);
 
 			ItemStack stack = rrclass.getInventory().get(i);
-			if (!stack.isEmpty()) graphics.text(font, Component.literal(String.valueOf(stack.getCount())),X+17-font.width(Component.literal(String.valueOf(stack.getCount()))),Y+9,0xFFFFFF);
+			if (!stack.isEmpty()) graphics.text(font, Component.literal(String.valueOf(stack.getCount())),X+17-font.width(Component.literal(String.valueOf(stack.getCount()))), Y+9, CommonColors.WHITE);
 			if (sizelookup[i] > 1) {
                 graphics.fillGradient(X + 17, Y + 3, (int) (X + ((font.width(stack.getHoverName()) + 4) * (sizelookup[i] - 1) * 2) + 15), Y + 13, 0xaa111111, 0xaa111111);
-				graphics.text(font, stack.getHoverName(), X + 18, Y + 4, 0xFFFFFF);
+				graphics.text(font, stack.getHoverName(), X + 18, Y + 4, CommonColors.WHITE);
 			}
 			pose.popMatrix();
 		}
@@ -179,7 +179,7 @@ public class GuiClass extends Screen {
 		float scalefactor = 0.6666f;
         context.pose().pushMatrix();
         context.pose().scale(scalefactor, scalefactor);
-		context.textWithWordWrap(font, rrclass.getDescription().translate(), (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), 0xffffff);
+		context.textWithWordWrap(font, rrclass.getDescription().translate(), (int) (x * 1.5), (int) ((y + dist) * 1.5), (int) (width * 1.5), CommonColors.WHITE);
 		context.pose().popMatrix();
 	}
 }

@@ -94,7 +94,7 @@ public class RRConfig {
             rhodesAI = builder.define("rhodesAIEnabled", true);
             rhodesSpeedScale = builder.define("rhodesSpeedScale", 1F);
             freeb83nukes = builder.define("freeb83nukes", false);
-            scoreboardEnabled = builder.define("scoreboardEnabled", true);
+            scoreboardEnabled = builder.define("scoreboardEnabled", false);
             stopSelfnukeinSP = builder.define("stopSelfnukeinSP", false);
             maximumResets = builder.defineInRange("MaximumResets", 2, 0, 100);
             rhodesFF = builder.define("rhodesFriendlyFire", true);
