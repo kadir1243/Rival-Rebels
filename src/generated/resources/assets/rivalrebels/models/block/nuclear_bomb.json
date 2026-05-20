@@ -1,16 +1,15 @@
 {
-  "display": {
-    "none": {
-      "rotation": [
-        0.5,
-        0.5,
-        0.5
-      ]
-    }
-  },
   "loader": "neoforge:obj",
   "model": "rivalrebels:models/wacknuke.obj",
   "textures": {
-    "texture": "rivalrebels:entity/cg.png"
+    "particle": "rivalrebels:block/wacknuke",
+    "texture": "rivalrebels:block/wacknuke"
+  },
+  "transform": {
+    "translation": [
+      0.5,
+      0.5,
+      0.5
+    ]
   }
 }

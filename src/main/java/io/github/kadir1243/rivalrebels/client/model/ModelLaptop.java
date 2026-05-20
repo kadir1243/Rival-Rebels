@@ -78,23 +78,27 @@ public class ModelLaptop
 	private static final Vector3f			v10		= new Vector3f(0.4375f, 0.125f, 0);
 	private static final Vector3f			v11		= new Vector3f(-0.4375f, 0.125f, 0);
 	private static final Vector3f			v12		= new Vector3f(-0.4375f, 0.125f, 0.5625f);
-    private static final Map<Tuple<Identifier, Float>, Supplier<List<QuadHelper.BakedQuadWrapper>>> MODELS = new HashMap<>();
+    private static final Map<MainModelRenderState, Supplier<List<QuadHelper.BakedQuadWrapper>>> MODELS = new HashMap<>();
 
-    public static void renderModel(SubmitNodeCollector nodeCollector, PoseStack matrices, float turn, int light, int overlay) {
+    private record MainModelRenderState(Identifier id, float turn, boolean shouldRenderBottom) {}
+
+    public static void renderModel(SubmitNodeCollector nodeCollector, PoseStack matrices, float turn, boolean shouldRenderBottom, int light, int overlay) {
         QuadHelper.submitQuadSupplier(nodeCollector,
             matrices,
             RenderTypes.entitySolid(RRIdentifiers.etlaptop),
-            MODELS.computeIfAbsent(new Tuple<>(RRIdentifiers.etlaptop, turn), t ->
-                QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t.getA()),
+            MODELS.computeIfAbsent(new MainModelRenderState(RRIdentifiers.etlaptop, turn, shouldRenderBottom), t ->
+                QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t.id()),
                     buffer -> {
-                        QuadHelper.addFace(buffer, v11, v12, v9, v10, t4t, t9t, t10t, t5t);
-                        QuadHelper.addFace(buffer, v12, v4, v1, v9, t9t, t13t, t14t, t10t);
-                        QuadHelper.addFace(buffer, v11, v3, v4, v12, t4t, t3t, t8t, t9t);
-                        QuadHelper.addFace(buffer, v10, v2, v3, v11, t5t, t2t, t1t, t4t);
-                        QuadHelper.addFace(buffer, v9, v1, v2, v10, t10t, t11t, t6t, t5t);
-                        QuadHelper.addFace(buffer, v2, v1, v4, v3, t6t, t11t, t12t, t7t);
+                        if (t.shouldRenderBottom()) {
+                            QuadHelper.addFace(buffer, v11, v12, v9, v10, t4t, t9t, t10t, t5t);
+                            QuadHelper.addFace(buffer, v12, v4, v1, v9, t9t, t13t, t14t, t10t);
+                            QuadHelper.addFace(buffer, v11, v3, v4, v12, t4t, t3t, t8t, t9t);
+                            QuadHelper.addFace(buffer, v10, v2, v3, v11, t5t, t2t, t1t, t4t);
+                            QuadHelper.addFace(buffer, v9, v1, v2, v10, t10t, t11t, t6t, t5t);
+                            QuadHelper.addFace(buffer, v2, v1, v4, v3, t6t, t11t, t12t, t7t);
+                        }
 
-                        Transformation transformation = new Transformation(new Vector3f(0, 0.125f, 0), ROTATION_AXIS.rotationDegrees(t.getB()), null, null);
+                        Transformation transformation = new Transformation(new Vector3f(0, 0.125f, 0), ROTATION_AXIS.rotationDegrees(t.turn()), null, null);
                         QuadHelper.addFace(buffer, transformation, v5, v6, v7, v8, t4, t9, t10, t5);
                         QuadHelper.addFace(buffer, transformation, v8, v4, v1, v5, t9, t13, t14, t10);
                         QuadHelper.addFace(buffer, transformation, v7, v3, v4, v8, t4, t3, t8, t9);

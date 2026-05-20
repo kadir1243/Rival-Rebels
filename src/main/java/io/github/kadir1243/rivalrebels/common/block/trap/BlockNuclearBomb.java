@@ -20,6 +20,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -37,9 +38,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
-import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraft.world.phys.shapes.*;
+import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
 public class BlockNuclearBomb extends BaseEntityBlock {
@@ -70,7 +70,11 @@ public class BlockNuclearBomb extends BaseEntityBlock {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         Direction direction = state.getValue(FACING);
-        return Shapes.create(-direction.getStepX(), -direction.getStepY(), -direction.getStepZ(), 1 + direction.getStepX(), 1 + direction.getStepY(), 1 + direction.getStepZ());
+        Vector3f step = direction.step();
+        float stepX = Mth.abs(step.x());
+        float stepY = Mth.abs(step.y());
+        float stepZ = Mth.abs(step.z());
+        return Shapes.create(-stepX, -stepY, -stepZ, 1 + stepX, 1 + stepY, 1 + stepZ);
     }
 
     @Override

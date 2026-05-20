@@ -2,14 +2,14 @@
   "loader": "neoforge:obj",
   "model": "rivalrebels:models/k.obj",
   "textures": {
-    "texture": "rivalrebels:textures/entity/bq.png"
+    "texture": "rivalrebels:item/battery"
   },
   "transform": {
     "rotation": [
-      0.0,
-      0.70710677,
-      0.0,
-      0.70710677
+      -0.2126311,
+      0.67437977,
+      0.2126311,
+      0.67437977
     ],
     "scale": [
       0.3,

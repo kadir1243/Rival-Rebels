@@ -34,7 +34,7 @@ public class ReactorRenderer implements NoDataSpecialModelRenderer {
         {
             poseStack.pushPose();
             poseStack.translate(0.5F, 1.1875F, 0.5F);
-            ModelLaptop.renderModel(submitNodeCollector, poseStack, 0, lightCoords, overlayCoords);
+            ModelLaptop.renderModel(submitNodeCollector, poseStack, 0, true, lightCoords, overlayCoords);
             ModelLaptop.renderScreen(submitNodeCollector, RRIdentifiers.etscreen, poseStack, 0, lightCoords, overlayCoords);
             poseStack.popPose();
         }

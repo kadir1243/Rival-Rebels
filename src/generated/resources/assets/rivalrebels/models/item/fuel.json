@@ -2,14 +2,14 @@
   "loader": "neoforge:obj",
   "model": "rivalrebels:models/o.obj",
   "textures": {
-    "texture": "rivalrebels:textures/entity/bt.png"
+    "texture": "rivalrebels:item/flamethrower"
   },
   "transform": {
     "rotation": [
-      0.0,
-      0.0,
-      0.9848077,
-      0.17364836
+      -0.12278793,
+      0.6963642,
+      0.6963642,
+      0.12278793
     ],
     "scale": [
       0.15,

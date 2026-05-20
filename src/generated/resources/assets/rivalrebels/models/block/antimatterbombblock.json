@@ -1,16 +1,15 @@
 {
-  "display": {
-    "none": {
-      "rotation": [
-        0.5,
-        1,
-        0.5
-      ]
-    }
-  },
   "loader": "neoforge:obj",
   "model": "rivalrebels:models/t.obj",
   "textures": {
-    "texture": "rivalrebels:textures/entity/ci.png"
+    "particle": "rivalrebels:block/antimatter_bomb",
+    "texture": "rivalrebels:block/antimatter_bomb"
+  },
+  "transform": {
+    "translation": [
+      0.5,
+      1.0,
+      0.5
+    ]
   }
 }

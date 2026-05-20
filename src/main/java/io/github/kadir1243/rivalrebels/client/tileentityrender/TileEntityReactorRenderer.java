@@ -61,7 +61,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
         poseStack.pushPose();
 		poseStack.translate(0.5F, 1.1875F, 0.5F);
 		poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-		ModelLaptop.renderModel(nodeCollector, poseStack, -renderState.slide, packedLight, packedOverlay);
+		ModelLaptop.renderModel(nodeCollector, poseStack, -renderState.slide, true, packedLight, packedOverlay);
 		ModelLaptop.renderScreen(nodeCollector, RRIdentifiers.etscreen, poseStack, -renderState.slide, packedLight, packedOverlay);
 		poseStack.popPose();
 		poseStack.pushPose();

@@ -35,7 +35,7 @@ public class RenderLaptop extends EntityRenderer<EntityLaptop, RenderLaptop.Stat
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotationDegrees(180 - renderState.yRot));
-		ModelLaptop.renderModel(nodeCollector, poseStack, -renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+		ModelLaptop.renderModel(nodeCollector, poseStack, -renderState.slide, true, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		ModelLaptop.renderScreen(nodeCollector, RRIdentifiers.etubuntu, poseStack, -renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
 	}

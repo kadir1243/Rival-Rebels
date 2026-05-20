@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.tileentityrender;
 
-import com.mojang.math.Axis;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
 import io.github.kadir1243.rivalrebels.common.block.machine.BlockLaptop;
@@ -46,7 +45,7 @@ public class TileEntityLaptopRenderer implements BlockEntityRenderer<TileEntityL
         poseStack.pushPose();
         poseStack.mulPose(ChestRenderer.modelTransformation(renderState.facing));
         poseStack.translate(0.5F, 0, 0.5F);
-        ModelLaptop.renderModel(nodeCollector, poseStack, -renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+        ModelLaptop.renderModel(nodeCollector, poseStack, -renderState.slide, false, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         ModelLaptop.renderScreen(nodeCollector, RRIdentifiers.etubuntu, poseStack, -renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }

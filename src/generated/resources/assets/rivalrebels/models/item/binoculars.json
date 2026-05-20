@@ -2,14 +2,14 @@
   "loader": "neoforge:obj",
   "model": "rivalrebels:models/b.obj",
   "textures": {
-    "texture": "rivalrebels:textures/entity/bj.png"
+    "texture": "rivalrebels:item/binoculars"
   },
   "transform": {
     "rotation": [
-      0.0,
-      0.70710677,
-      0.0,
-      0.70710677
+      -0.2126311,
+      0.67437977,
+      0.2126311,
+      0.67437977
     ],
     "scale": [
       0.35,
@@ -17,9 +17,9 @@
       0.35
     ],
     "translation": [
-      0.6,
-      0.05,
-      0.3
+      1.1,
+      0.55,
+      0.27
     ]
   }
 }

@@ -1,7 +1,19 @@
 {
   "variants": {
-    "": {
-      "model": "rivalrebels:block/laptop"
+    "facing=east": {
+      "model": "rivalrebels:block/laptop_bottom",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "rivalrebels:block/laptop_bottom"
+    },
+    "facing=south": {
+      "model": "rivalrebels:block/laptop_bottom",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "rivalrebels:block/laptop_bottom",
+      "y": 270
     }
   }
 }

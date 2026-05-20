@@ -1,4 +1,4 @@
-// 26.1.2	2026-05-19T20:49:32.22701419	Model Definitions - rivalrebels
+// 26.1.2	2026-05-20T20:25:09.623110216	Model Definitions - rivalrebels
 ba3554a111142a579555d44b74691babcba38a1b assets/rivalrebels/blockstates/alandmine.json
 bc9b932ce5de903e48f69970fa37cdf8dca9d839 assets/rivalrebels/blockstates/amario.json
 a31e2a94b7dbe154cda4fa3b324d161bfefac209 assets/rivalrebels/blockstates/ammunition.json
@@ -37,7 +37,7 @@ a3561a9caee6321925e0963dcad79914d9eaa86a assets/rivalrebels/blockstates/gamestar
 1bbf58c8e1803eec7b670522c3e073316b7cad84 assets/rivalrebels/blockstates/goreblock.json
 680e741a356133abb329b27bbc4f10c42990f64e assets/rivalrebels/blockstates/jump.json
 9d5affef25853c6633054e63e8e7700443354bdb assets/rivalrebels/blockstates/landmine.json
-cb9f413fc04f08b98ea8f8b23773bfea3af4205e assets/rivalrebels/blockstates/laptop.json
+44863032f79ea22e237d986c2e8dd7c2b0fd2a72 assets/rivalrebels/blockstates/laptop.json
 5e86a3d0ea3a87a678c722d6e85cd0e4b7045653 assets/rivalrebels/blockstates/light.json
 2bc83ada9a35a3fa0b7e23d162b3f5a86fc4ae96 assets/rivalrebels/blockstates/light2.json
 0aa253f072f57e2e3f50d66a36d7dfd266143302 assets/rivalrebels/blockstates/loader.json
@@ -209,7 +209,7 @@ dfa066079f3c9c0ae8b90111b15dd5143bec6b7d assets/rivalrebels/items/tower.json
 697a05ca7d63041f785e0d7419d15a29e1443792 assets/rivalrebels/models/block/alandmine.json
 697a05ca7d63041f785e0d7419d15a29e1443792 assets/rivalrebels/models/block/amario.json
 2edea2a03eadc02459c5f520f1df693b69336adc assets/rivalrebels/models/block/ammunition.json
-cfeee36bb9ee0a02ef518b70d5a22ff2340a34aa assets/rivalrebels/models/block/antimatterbombblock.json
+9109b3c84e9b3d3c312c7041adeff6f9059c52fe assets/rivalrebels/models/block/antimatterbombblock.json
 697a05ca7d63041f785e0d7419d15a29e1443792 assets/rivalrebels/models/block/aquicksand.json
 077345187b2be3b937912a30b2fa9b1f2008a039 assets/rivalrebels/models/block/barricade.json
 03ac3f52773e58f804390ae7a3373b320202cf78 assets/rivalrebels/models/block/bastion.json
@@ -257,7 +257,6 @@ e96e541ac86cfee98179fa3b8c469ca30fa8fa34 assets/rivalrebels/models/block/goreblo
 aed8f5c587aff72a0cdb9ad5f30efd7e4fcf393f assets/rivalrebels/models/block/goreblockicon6.json
 53a3c73e80d2171a16a4f2b6ca0cc898ace52bfd assets/rivalrebels/models/block/jump.json
 697a05ca7d63041f785e0d7419d15a29e1443792 assets/rivalrebels/models/block/landmine.json
-9bb40163925b69174a33c14e051e545ebc415c6e assets/rivalrebels/models/block/laptop.json
 b98e57079fd8897f4204bcd7210120e79b956d3f assets/rivalrebels/models/block/light.json
 b98e57079fd8897f4204bcd7210120e79b956d3f assets/rivalrebels/models/block/light2.json
 3ad462dba281fe9954e30b46a6081aec76bccbed assets/rivalrebels/models/block/loader.json
@@ -265,7 +264,7 @@ b98e57079fd8897f4204bcd7210120e79b956d3f assets/rivalrebels/models/block/light2.
 6c2e6b33f297208aea83fc0af3a3b2ac925711d1 assets/rivalrebels/models/block/mariotrap.json
 aca59d33af59da8fb5aeeece964beb37ad9e3a6b assets/rivalrebels/models/block/meltdown.json
 6e00752999a71b85c2b7cb90f14db1c46bdb3518 assets/rivalrebels/models/block/minetrap.json
-90f39c423d23cf4e12ac7348241407ae917a7c11 assets/rivalrebels/models/block/nuclear_bomb.json
+5bd3eb1abac368a786f6bdd5b7b6dd02c527cea1 assets/rivalrebels/models/block/nuclear_bomb.json
 7e3ac4c4ccf40381ba6acf70e94fc34194062271 assets/rivalrebels/models/block/nuke_crate_bottom.json
 49e644f0ebd680cc54e90badb37d5549379ca813 assets/rivalrebels/models/block/nuke_crate_top.json
 4e009a8d265b2f2f4fc49a982e5e6c3f649632d5 assets/rivalrebels/models/block/omegaarmor.json
@@ -289,7 +288,7 @@ eaf3c1a1504feb6f785002f02e898de52517d3c5 assets/rivalrebels/models/block/rhodesa
 96df6c44f7580f034d5521308b0259e5ad7107d3 assets/rivalrebels/models/block/smartcamo.json
 34f7808b694404628aca0081e08c59ace025bdcb assets/rivalrebels/models/block/steel.json
 a461b923696f24bb9a28a5252c340fe92c6016e4 assets/rivalrebels/models/block/supplies.json
-d7344b60c4a9049356e893a3e496da7ca65e692d assets/rivalrebels/models/block/tachyonbombblock.json
+ee50e14ce97b8ff55fe6fd3cb52835ed7f110a24 assets/rivalrebels/models/block/tachyonbombblock.json
 aca59d33af59da8fb5aeeece964beb37ad9e3a6b assets/rivalrebels/models/block/theoreticaltsarbombablock.json
 8a529ff3a8f50b7ea1187a162d934418a0a8c0cc assets/rivalrebels/models/block/timedbomb.json
 a892aa33244bcb9a8f438af52995ac9742e5777a assets/rivalrebels/models/block/tower.json
@@ -305,8 +304,8 @@ bcaf84d05715676d531340769d1fee420bedde1d assets/rivalrebels/models/item/antenna.
 4fd5ecad85e81cf48b893ca6bbe604cb68f1421f assets/rivalrebels/models/item/army_shovel.json
 74d822121e10407c651144f2ccf05f653098c748 assets/rivalrebels/models/item/barricade.json
 7f9874cb93ac9f308e3040dffb73731c6523f034 assets/rivalrebels/models/item/bastion.json
-97c240e4ff5f077c0de59e764906b60c4776f6b0 assets/rivalrebels/models/item/battery.json
-5593dba88fda94fe6cf3fc837c4c008eaf674866 assets/rivalrebels/models/item/binoculars.json
+cea4cfa62a759320ded0187b8eeb43d8b336392f assets/rivalrebels/models/item/battery.json
+235929ecedd9df3566604bf6d99b362f56a7ba56 assets/rivalrebels/models/item/binoculars.json
 681a3a53c6851bf9dd3fe72602ad841bf7daea7b assets/rivalrebels/models/item/breadbox.json
 b1b793dc0a84e50de2edb68a57bc7f98e0a236bb assets/rivalrebels/models/item/buildrhodes.json
 6ff93ee21d8c96c7f3bc52ab7c0155f716fad83d assets/rivalrebels/models/item/bunker.json
@@ -336,11 +335,11 @@ aa0a67a8609488a2a93fd65712b91ff9184c5a7c assets/rivalrebels/models/item/flagbox4
 e2372e4628b40bea3f772ece704d076a06fd1a44 assets/rivalrebels/models/item/flagbox5.json
 552e9ac989f083c5c0fc7d498b4937d933e84677 assets/rivalrebels/models/item/flagbox6.json
 1f58505b5bd5df38b2920b2c5ba9efce4af57a5f assets/rivalrebels/models/item/flagbox7.json
-43a8bba56b008704e93b67e6d73da90a3665b711 assets/rivalrebels/models/item/flamethrower.json
+1217cb7adb7979278431f668c66c0c51059adf7e assets/rivalrebels/models/item/flamethrower.json
 829b139cf91d1f03d0338dec7798f06f3e028970 assets/rivalrebels/models/item/flare.json
 4a0e9207cc35e28c754dac7de2dc2e4813e42022 assets/rivalrebels/models/item/forcefieldnode.json
 4d757dcf91b2d51ad10443b5bf9dbc816dd95028 assets/rivalrebels/models/item/fshield.json
-e721339f267aa7db2e6310ca40f9c722e8c8e901 assets/rivalrebels/models/item/fuel.json
+d8c4e385b1bce88979ee94d2b0aa48c68d1a3e8d assets/rivalrebels/models/item/fuel.json
 8567584d7f613ac740c616a9f1ff6552cbb1a676 assets/rivalrebels/models/item/fuse.json
 4df4a96b9a5a3f64a7cf71ab7c500464e0986d12 assets/rivalrebels/models/item/gamestart.json
 9f4431d3fa4f8b60379bbf880664a7f624001917 assets/rivalrebels/models/item/goreblock.json
