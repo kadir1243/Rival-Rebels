@@ -31,7 +31,7 @@ import java.util.function.Consumer;
 public record LaptopRenderer(Identifier screenTexture) implements NoDataSpecialModelRenderer {
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
-		ModelLaptop.renderModel(submitNodeCollector, poseStack, -90, true, lightCoords, overlayCoords);
+		ModelLaptop.renderModel(submitNodeCollector, poseStack, -90, lightCoords, overlayCoords);
 		ModelLaptop.renderScreen(submitNodeCollector, RRIdentifiers.etubuntu, poseStack, -90, lightCoords, overlayCoords);
 	}
 

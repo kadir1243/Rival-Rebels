@@ -1,15 +1,16 @@
 {
+  "display": {
+    "none": {
+      "rotation": [
+        0.5,
+        1,
+        0.5
+      ]
+    }
+  },
   "loader": "neoforge:obj",
   "model": "rivalrebels:models/t.obj",
   "textures": {
-    "particle": "rivalrebels:block/tachyon_bomb",
-    "texture": "rivalrebels:block/tachyon_bomb"
-  },
-  "transform": {
-    "translation": [
-      0.5,
-      1.0,
-      0.5
-    ]
+    "texture": "rivalrebels:textures/entity/ck.png"
   }
 }

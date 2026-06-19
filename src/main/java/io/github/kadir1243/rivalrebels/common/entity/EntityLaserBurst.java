@@ -103,16 +103,14 @@ public class EntityLaserBurst extends Projectile {
 	{
 		super.tick();
 
-        if (!level().isClientSide()) {
-            if (tickCount > 60) {
-                kill((ServerLevel) level());
-            }
-            HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
+		++tickCount;
+		if (tickCount > 60) kill((ServerLevel) level());
 
-            if (hitResult.getType() != HitResult.Type.MISS) {
-                onHit(hitResult);
-            }
-        }
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
+
+		if (hitResult.getType() != HitResult.Type.MISS) {
+            onHit(hitResult);
+		}
 
         setPos(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		this.updateRotation();

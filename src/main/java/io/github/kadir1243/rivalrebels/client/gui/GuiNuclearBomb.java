@@ -50,7 +50,7 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
         graphics.text(font, Translations.NUKE_TRANSLATION.translate(), 8, 6, CommonColors.WHITE, false);
-        graphics.text(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, CommonColors.WHITE, false); // this is net.minecraft.world.entity.player.Inventory.DEFAULT_NAME (= Component.translatable("container.inventory"))
+        graphics.text(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, CommonColors.WHITE, false);
     }
 
     @Override
