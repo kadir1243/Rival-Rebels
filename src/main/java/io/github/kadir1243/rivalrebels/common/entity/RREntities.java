@@ -31,6 +31,7 @@ public class RREntities {
     public static final DeferredHolder<EntityType<?>, EntityType<EntityGore>> GORE = create(EntityGore::new, "gore", 0.25F, 0.25F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityHackB83>> HACK_B83 = create(EntityHackB83::new, "hack_b83", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityHotPotato>> HOT_POTATO = create(EntityHotPotato::new, "hot_potato", 0.5F, 0.5F);
+    public static final DeferredHolder<EntityType<?>, EntityType<EntityLaptop>> LAPTOP = create(EntityLaptop::new, "laptop", 1F, 0.6F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityLaserBurst>> LASER_BURST = create(EntityLaserBurst::new, "laser_burst", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityLaserLink>> LASER_LINK = create(EntityLaserLink::new, "laser_link", 0.5F, 0.5F);
     public static final DeferredHolder<EntityType<?>, EntityType<EntityLightningLink>> LIGHTNING_LINK = create(EntityLightningLink::new, "lightning_link", 0.5F, 0.5F);

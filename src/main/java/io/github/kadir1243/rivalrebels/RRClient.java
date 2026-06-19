@@ -89,6 +89,7 @@ public class RRClient {
 		event.registerEntityRenderer(RREntities.PLASMOID.get(), RenderPlasmoid::new);
 		event.registerEntityRenderer(RREntities.LIGHTNING_LINK.get(), RenderLightningLink::new);
 		event.registerEntityRenderer(RREntities.NUCLEAR_BLAST.get(), RenderNuclearBlast::new);
+		event.registerEntityRenderer(RREntities.LAPTOP.get(), RenderLaptop::new);
 		event.registerEntityRenderer(RREntities.RODDISK_REGULAR.get(), RoddiskRenderer::new);
 		event.registerEntityRenderer(RREntities.RODDISK_REBEL.get(), RoddiskRenderer::new);
 		event.registerEntityRenderer(RREntities.RODDISK_OFFICER.get(), RoddiskRenderer::new);
