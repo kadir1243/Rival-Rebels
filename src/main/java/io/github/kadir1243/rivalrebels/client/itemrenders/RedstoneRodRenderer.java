@@ -11,8 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.itemrenders;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRod;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -20,8 +18,6 @@ import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3fc;
@@ -29,7 +25,7 @@ import org.joml.Vector3fc;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public record RodRenderer(Identifier texture) implements NoDataSpecialModelRenderer {
+public class RedstoneRodRenderer implements NoDataSpecialModelRenderer {
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         poseStack.pushPose();
@@ -38,7 +34,7 @@ public record RodRenderer(Identifier texture) implements NoDataSpecialModelRende
 		poseStack.scale(0.5f, 1.25f, 0.5f);
 		poseStack.pushPose();
 
-		ModelRod.render(poseStack, submitNodeCollector, this.texture(), RenderTypes.entitySolid(this.texture()), lightCoords, overlayCoords);
+		ModelRod.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etredrod), lightCoords, overlayCoords);
 
 		poseStack.popPose();
 		poseStack.popPose();
@@ -46,22 +42,6 @@ public record RodRenderer(Identifier texture) implements NoDataSpecialModelRende
 
     @Override
     public void getExtents(Consumer<Vector3fc> output) {
-    }
-
-    public record Unbaked(Identifier texture) implements NoDataSpecialModelRenderer.Unbaked {
-        public static final Identifier ID = RRIdentifiers.create("rod_renderer");
-        public static final MapCodec<Unbaked> MAP_CODEC = RecordCodecBuilder.mapCodec(i -> i
-            .group(Identifier.CODEC.fieldOf("texture").forGetter(Unbaked::texture))
-            .apply(i, Unbaked::new));
-        @Override
-        public SpecialModelRenderer<Void> bake(BakingContext context) {
-            return new RodRenderer(texture);
-        }
-
-        @Override
-        public MapCodec<Unbaked> type() {
-            return MAP_CODEC;
-        }
     }
 }
 

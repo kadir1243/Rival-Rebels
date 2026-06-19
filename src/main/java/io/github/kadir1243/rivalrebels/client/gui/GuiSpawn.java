@@ -70,16 +70,16 @@ public class GuiSpawn extends Screen {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
 
-		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, Translations.SELECT_CLASS_TITLE.translate(), button -> this.minecraft.setScreen(new GuiClass(rrclass)));
-		resetButton = new GuiButton(posX + 188, posY + 119, 60, 11, Translations.SPAWN_RESET.translate(), button -> {
+		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, Component.translatable("RivalRebels.spawn.class"), button -> this.minecraft.setScreen(new GuiClass(rrclass)));
+		resetButton = new GuiButton(posX + 188, posY + 119, 60, 11, Component.translatable("RivalRebels.spawn.reset"), button -> {
             this.minecraft.setScreen(new GuiClass(rrclass));
             Minecraft.getInstance().getConnection().send(ResetPacket.INSTANCE);
         });
-		omegaButton = new GuiButton(posX + 35, posY + 237, 60, 11, Translations.JOIN_OMEGA.translate(), button -> {
+		omegaButton = new GuiButton(posX + 35, posY + 237, 60, 11, Component.translatable("RivalRebels.spawn.joinomega"), button -> {
             Minecraft.getInstance().getConnection().send(new JoinTeamPacket(rrclass, RivalRebelsTeam.OMEGA));
             onClose();
         });
-		sigmaButton = new GuiButton(posX + 160, posY + 237, 60, 11, Translations.JOIN_SIGMA.translate(), button -> {
+		sigmaButton = new GuiButton(posX + 160, posY + 237, 60, 11, Component.translatable("RivalRebels.spawn.joinsigma"), button -> {
             Minecraft.getInstance().getConnection().send(new JoinTeamPacket(rrclass, RivalRebelsTeam.SIGMA));
             onClose();
         });
@@ -151,8 +151,8 @@ public class GuiSpawn extends Screen {
 
 		super.extractRenderState(graphics, mouseX, mouseY, a);
 
-		graphics.text(font, Component.literal(String.valueOf(RivalRebels.round.getOmegaWins())), posX + 9, posY + 239, 0xFFFFFF, false);
-		graphics.text(font, Component.literal(String.valueOf(RivalRebels.round.getSigmaWins())), posX + 134, posY + 239, 0xFFFFFF, false);
+		graphics.text(font, String.valueOf(RivalRebels.round.getOmegaWins()), posX + 9, posY + 239, 0xFFFFFF, false);
+		graphics.text(font, String.valueOf(RivalRebels.round.getSigmaWins()), posX + 134, posY + 239, 0xFFFFFF, false);
 
 		if (resetButton.mouseClicked(new MouseButtonEvent(mouseX, mouseY, new MouseButtonInfo(InputConstants.MOUSE_BUTTON_LEFT, 0)), false) && resetButton.active) {
             graphics.fillGradient(mouseX, mouseY, mouseX + 120, mouseY + 20, 0xaa111111, 0xaa111111);
@@ -191,7 +191,7 @@ public class GuiSpawn extends Screen {
 					b /= 2;
 				}
 				color = (r << 16) | (g << 8) | b;
-                graphics.text(font, Component.literal(player.getUsername()), x, y + Y, color, false);
+                graphics.text(font, player.getUsername(), x, y + Y, color, false);
 			}
 		}
 	}
@@ -204,7 +204,7 @@ public class GuiSpawn extends Screen {
 		{
 			int Y = dist + (i * 10);
 			if (!shouldScroll) Y -= dist;
-			if (Y > -9 && Y < height + 9) graphics.text(font, Component.literal(display[i]), x, y + Y, color[i], false);
+			if (Y > -9 && Y < height + 9) graphics.text(font, Component.translatable(display[i]), x, y + Y, color[i], false);
 		}
 	}
 
@@ -214,7 +214,7 @@ public class GuiSpawn extends Screen {
 		float scalefactor = 0.6666f;
         graphics.pose().pushMatrix();
         graphics.pose().scale(scalefactor, scalefactor);
-        MultiLineLabel.create(font, Component.literal(display), (int) (width * 1.5)).visitLines(TextAlignment.LEFT, (int) (x * 1.5), (int) ((y + dist) * 1.5), font.lineHeight, graphics.textRenderer());
+        MultiLineLabel.create(font, Component.nullToEmpty(display), (int) (width * 1.5)).visitLines(TextAlignment.LEFT, (int) (x * 1.5), (int) ((y + dist) * 1.5), font.lineHeight, graphics.textRenderer());
         graphics.pose().popMatrix();
 	}
 

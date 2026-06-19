@@ -64,9 +64,9 @@ public class BlockAntimatterBomb extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (stack.is(RRItems.pliers))
+        if (!stack.isEmpty() && stack.is(RRItems.pliers))
 		{
-            player.openMenu(state.getMenuProvider(level, pos));
+            player.openMenu(getMenuProvider(state, level, pos));
             return InteractionResult.SUCCESS;
 		} else if (!level.isClientSide()) {
 			player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));

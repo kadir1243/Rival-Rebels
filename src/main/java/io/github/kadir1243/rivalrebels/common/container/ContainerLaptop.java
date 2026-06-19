@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.container;
 
-import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.crate.BlockNukeCrate;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockRemoteCharge;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
@@ -40,17 +39,17 @@ public class ContainerLaptop extends AbstractContainerMenu {
         super(RivalRebelsGuiHandler.LAPTOP_SCREEN_HANDLER_TYPE.get(), syncId);
         this.laptop = laptop;
         this.containerData = containerData;
-        addSlot(new SlotRR(laptop, 0, 80, 23, 1, RRItems.chip));
-		addSlot(new SlotRR(laptop, 1, 50, 40, 1, RRItems.chip));
-		addSlot(new SlotRR(laptop, 2, 111, 40, 1, RRItems.chip));
-		addSlot(new SlotRR(laptop, 3, 80, 48, 1, RRItems.chip));
+        addSlot(new SlotRR(laptop, 0, 80, 23, 1, ItemChip.class));
+		addSlot(new SlotRR(laptop, 1, 50, 40, 1, ItemChip.class));
+		addSlot(new SlotRR(laptop, 2, 111, 40, 1, ItemChip.class));
+		addSlot(new SlotRR(laptop, 3, 80, 48, 1, ItemChip.class));
 		addSlot(new SlotRR(laptop, 4, 26, 76, 1, BlockNukeCrate.class));
 		addSlot(new SlotRR(laptop, 5, 44, 76, 1, BlockNukeCrate.class));
 		addSlot(new SlotRR(laptop, 6, 62, 76, 1, RRItems.NUCLEAR_ROD).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 7, 80, 76, 1, RRItems.NUCLEAR_ROD).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 8, 98, 76, 1, RRItems.NUCLEAR_ROD).setAcceptsTimedBomb(true));
-		addSlot(new SlotRR(laptop, 9, 26, 94, 1, RRItems.antenna));
-		addSlot(new SlotRR(laptop, 10, 44, 94, 1, RRBlocks.remotecharge.asItem()));
+		addSlot(new SlotRR(laptop, 9, 26, 94, 1, RRItems.antenna.asItem()));
+		addSlot(new SlotRR(laptop, 10, 44, 94, 1, BlockRemoteCharge.class));
 		addSlot(new SlotRR(laptop, 11, 62, 94, 1, RRItems.hydrod).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 12, 80, 94, 1, RRItems.hydrod).setAcceptsTimedBomb(true));
 		addSlot(new SlotRR(laptop, 13, 98, 94, 1, RRItems.hydrod).setAcceptsTimedBomb(true));
@@ -66,9 +65,18 @@ public class ContainerLaptop extends AbstractContainerMenu {
 
 	protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
-        addInventoryExtendedSlots(inventoryPlayer, 8, 119);
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
+			}
+		}
 
-        addInventoryHotbarSlots(inventoryPlayer, 8, 175);
+		for (int i = 0; i < 9; i++)
+		{
+			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
+		}
 	}
 
     @Override

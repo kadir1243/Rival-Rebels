@@ -40,7 +40,6 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -129,7 +128,7 @@ public class TileEntityTachyonBomb extends BaseContainerBlockEntity implements T
 
         hasAntennae = getItem(1).is(RRItems.antenna) && getItem(2).is(RRItems.antenna);
 
-        hasExplosive = !getItem(19).isEmpty();// getStack(19).is(RRItems.timedbomb);
+        hasExplosive = !getItem(19).isEmpty();// getStack(19).func_150998_b(RivalRebels.timedbomb);
     }
 
     @Override
@@ -166,7 +165,7 @@ public class TileEntityTachyonBomb extends BaseContainerBlockEntity implements T
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.sendSystemMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.id()).getName().copy().withStyle(ChatFormatting.RED)));
-                    player.sendSystemMessage(Translations.status().append(" ").append(rrteam.getBlockName()).append(" ").append(Translations.defuse()).append(this.getDefaultName()));
+                    player.sendSystemMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()));
                 }
 			}
 		}
@@ -185,7 +184,7 @@ public class TileEntityTachyonBomb extends BaseContainerBlockEntity implements T
 
 		if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !level.isClientSide() && nuclear == hydrogen)
 		{
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 			level.setSkyFlashTime(2);
 			float pitch = 0;
 			float yaw = this.getBlockState().getValue(BlockTachyonBomb.FACING).toYRot();
@@ -196,7 +195,7 @@ public class TileEntityTachyonBomb extends BaseContainerBlockEntity implements T
 
 		if (countdown == 0 && nuclear == 0 && hydrogen == 0)
 		{
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 			level.explode(null, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 4, Level.ExplosionInteraction.NONE);
 		}
     }

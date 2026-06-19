@@ -47,9 +47,10 @@ public class ItemTrollHelmet extends Item {
 
         ItemStack stack = player.getItemInHand(hand);
         BlockState state = world.getBlockState(pos);
+        Block block = state.getBlock();
         if (state.is(BlockTags.SNOW) && state.getValue(SnowLayerBlock.LAYERS) < 1) {
             facing = Direction.UP;
-        } else if (!state.is(Blocks.VINE) && !state.is(Blocks.TALL_GRASS) && !state.is(Blocks.DEAD_BUSH) && !state.canBeReplaced(new BlockPlaceContext(context))) {
+        } else if (block != Blocks.VINE && block != Blocks.TALL_GRASS && block != Blocks.DEAD_BUSH && !state.canBeReplaced(new BlockPlaceContext(context))) {
             pos = pos.relative(facing);
         }
         if (stack.isEnchanted() || !player.mayUseItemAt(pos, facing, stack)) {

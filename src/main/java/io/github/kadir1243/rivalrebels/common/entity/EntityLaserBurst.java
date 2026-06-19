@@ -59,9 +59,9 @@ public class EntityLaserBurst extends Projectile {
 	public EntityLaserBurst(Level level, Entity player) {
 		this(level);
         this.setOwner(player);
-        snapTo(player.getX() - (Mth.cos(player.getYRot() * Mth.DEG_TO_RAD) * 0.2F),
+        snapTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getEyeY() - 0.12D,
-            player.getZ() - (Mth.sin(player.getYRot() * Mth.DEG_TO_RAD) * 0.2F),
+            player.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getYRot(),
             player.getXRot());
 
@@ -71,9 +71,9 @@ public class EntityLaserBurst extends Projectile {
 	public EntityLaserBurst(Level level, Entity player, boolean accurate) {
 		this(level);
         this.setOwner(player);
-		snapTo(player.getX() - (Mth.cos(player.getYRot() * Mth.DEG_TO_RAD) * 0.2F),
+		snapTo(player.getX() - (Mth.cos(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getEyeY() - 0.12D,
-            player.getZ() - (Mth.sin(player.getYRot() * Mth.DEG_TO_RAD) * 0.2F),
+            player.getZ() - (Mth.sin(getYRot() * Mth.DEG_TO_RAD) * 0.2F),
             player.getYRot(),
             player.getXRot());
 

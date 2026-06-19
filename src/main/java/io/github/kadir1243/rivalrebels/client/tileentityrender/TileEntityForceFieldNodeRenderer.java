@@ -40,26 +40,15 @@ public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<Til
     }
 
     public static final Supplier<QuadHelper.BakedData> BAKED_MODEL = QuadHelper.createBakedModel(buffer -> {
-        QuadHelper.addFace(buffer,
-            new Vector3f(-0.0625f, 3.5f, 0f),
-            new Vector3f(-0.0625f, -3.5f, 0f),
-            new Vector3f(-0.0625f, -3.5f, 35f),
-            new Vector3f(-0.0625f, 3.5f, 35f),
-            new TextureVertice(0, 0),
-            new TextureVertice(0, 1),
-            new TextureVertice(5, 1),
-            new TextureVertice(5, 0)
-        );
-        QuadHelper.addFace(buffer,
-            new Vector3f(0.0625f, -3.5f, 0f),
-            new Vector3f(0.0625f, 3.5f, 0f),
-            new Vector3f(0.0625f, 3.5f, 35f),
-            new Vector3f(0.0625f, -3.5f, 35f),
-            new TextureVertice(0, 1),
-            new TextureVertice(0, 0),
-            new TextureVertice(5, 0),
-            new TextureVertice(5, 1)
-        );
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, 3.5f, 0f), new TextureVertice(0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, -3.5f, 0f), new TextureVertice(0, 1));
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, -3.5f, 35f), new TextureVertice(5, 1));
+        QuadHelper.addVertice(buffer, new Vector3f(-0.0625f, 3.5f, 35f), new TextureVertice(5, 0));
+
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, -3.5f, 0f), new TextureVertice(0, 1));
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, 3.5f, 0f), new TextureVertice(0, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, 3.5f, 35f), new TextureVertice(5, 0));
+        QuadHelper.addVertice(buffer, new Vector3f(0.0625f, -3.5f, 35f), new TextureVertice(5, 1));
     });
 
     @Override

@@ -53,7 +53,7 @@ public class EntitySeekB83 extends AbstractArrow {
         return ItemStack.EMPTY;
     }
 
-    public EntitySeekB83(Level level, Entity entity, float inaccuracy) {
+    public EntitySeekB83(Level level, Entity entity, float par3) {
 		this(level);
 		fins = false;
         this.setOwner(entity);
@@ -67,7 +67,7 @@ public class EntitySeekB83 extends AbstractArrow {
         shootFromRotation(entity, entity.getXRot(), entity.getYRot(), 0, 0.5f, 1f);
 	}
 
-	public EntitySeekB83(Level level, Entity entity, float inaccuracy, float yawdelta)
+	public EntitySeekB83(Level level, Entity entity, float par3, float yawdelta)
 	{
 		this(level);
         this.setOwner(entity);
@@ -171,7 +171,6 @@ public class EntitySeekB83 extends AbstractArrow {
         boolean isInWater = isInWater();
 		if (mop != null)
 		{
-            if (!level().isClientSide())
 			if (mop.getType() == HitResult.Type.ENTITY)
 			{
                 Entity entityHit = ((EntityHitResult) mop).getEntity();
@@ -220,9 +219,7 @@ public class EntitySeekB83 extends AbstractArrow {
 		{
             this.playSound(isInWater ? RRSounds.WET_BOMB_EXPLODED.get() : RRSounds.BOMB_EXPLODE.get(), 5, 0.3F);
 			new Explosion(level(), getX(), getY(), getZ(), RRConfig.SERVER.getRocketExplosionSize(), false, false, RivalRebelsDamageSource.rocket(level()));
-            if (!level().isClientSide()) {
-                kill((ServerLevel) level());
-            }
+			kill((ServerLevel) level());
 		}
 	}
 

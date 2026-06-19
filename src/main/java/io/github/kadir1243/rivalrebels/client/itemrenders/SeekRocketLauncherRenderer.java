@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.itemrenders;
 
-import com.mojang.serialization.MapCodec;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherBody;
 import io.github.kadir1243.rivalrebels.client.model.ModelRocketLauncherHandle;
@@ -23,8 +22,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
-import net.minecraft.client.renderer.special.SpecialModelRenderer;
-import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3fc;
@@ -44,9 +41,9 @@ public class SeekRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.translate(0.22f, -0.025f, 0f);
 		poseStack.mulPose(Axis.ZP.rotationDegrees(90));
 		poseStack.scale(0.03125f, 0.03125f, 0.03125f);
-        ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrocketseekhandle202), RRIdentifiers.etrocketseekhandle202, lightCoords, overlayCoords);
+        ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrocketseekhandle202), lightCoords, overlayCoords);
 		if (hasFoil) {
-			//ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
 		}
 		poseStack.popPose();
 
@@ -55,9 +52,9 @@ public class SeekRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.mulPose(Axis.ZP.rotationDegrees(90));
 		poseStack.mulPose(Axis.YP.rotationDegrees(90));
 		poseStack.scale(0.4f, 0.4f, 0.4f);
-		ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etseek202), RRIdentifiers.etseek202, lightCoords, overlayCoords);
+		ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etseek202), lightCoords, overlayCoords);
 		if (hasFoil) {
-			//ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
+			ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, lightCoords, overlayCoords);
         }
 		poseStack.popPose();
 
@@ -67,25 +64,25 @@ public class SeekRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, 0.71f, s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-        ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+        ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, 0.71f, s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, 0.71f, -s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, 0.71f, -s);
 		poseStack.scale(0.15f, 0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		// ---
@@ -93,25 +90,25 @@ public class SeekRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, -0.285f, s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, -0.285f, s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f + s, -0.285f, -s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f - s, -0.285f, -s);
 		poseStack.scale(0.15f, -0.1f, 0.15f);
-		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, RRIdentifiers.etrocketseektube202, lightCoords, overlayCoords);
+		ModelRocketLauncherTube.render(poseStack, submitNodeCollector, rocketSeekTube202RenderType, lightCoords, overlayCoords);
 		poseStack.popPose();
 
 		poseStack.popPose();
@@ -119,20 +116,5 @@ public class SeekRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 
     @Override
     public void getExtents(Consumer<Vector3fc> output) {
-    }
-
-    public record Unbaked() implements SpecialModelRenderer.Unbaked<Void> {
-        public static final Identifier ID = RRIdentifiers.create("seek_rocket_launcher_renderer");
-        public static final Unbaked INSTANCE = new Unbaked();
-        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(INSTANCE);
-        @Override
-        public SpecialModelRenderer<Void> bake(BakingContext context) {
-            return new SeekRocketLauncherRenderer();
-        }
-
-        @Override
-        public MapCodec<Unbaked> type() {
-            return MAP_CODEC;
-        }
     }
 }

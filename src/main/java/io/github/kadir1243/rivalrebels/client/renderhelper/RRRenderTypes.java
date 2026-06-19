@@ -24,27 +24,21 @@ import java.util.function.Function;
 
 @OnlyIn(Dist.CLIENT)
 public class RRRenderTypes {
-    public static final RenderPipeline LIGHTNING_ASTRO_BLAST_PIPELINE =
-        RenderPipeline.builder()
-            .withVertexShader("core/entity")
-            .withFragmentShader("core/entity")
+    public static final RenderPipeline COLOR_WRITE_QUAD =
+        RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
             .withColorTargetState(ColorTargetState.DEFAULT)
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.QUADS)
-            .withDepthStencilState(DepthStencilState.DEFAULT)
-            .withLocation("pipeline/entity_solid")
+            .withLocation("pipeline/solid")
             .build();
     public static final RenderPipeline COLOR_WRITE_TRI =
-        RenderPipeline.builder()
-            .withVertexShader("core/entity")
-            .withFragmentShader("core/entity")
+        RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
             .withColorTargetState(ColorTargetState.DEFAULT)
             .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
-            .withDepthStencilState(DepthStencilState.DEFAULT)
-            .withLocation("pipeline/entity_solid")
+            .withLocation("pipeline/solid")
             .build();
     public static final RenderType LIGHTNING_ASTRO_BLAST = RenderType.create(
         RRIdentifiers.MODID+"_lightning_astro_blast",
-        RenderSetup.builder(LIGHTNING_ASTRO_BLAST_PIPELINE).bufferSize(99999).createRenderSetup()
+        RenderSetup.builder(COLOR_WRITE_QUAD).bufferSize(99999).createRenderSetup()
     );
     public static final RenderType LIGHTNING_ASTRO_BLAST_TRIANGLES = RenderType.create(
         RRIdentifiers.MODID+"_lightning_astro_blast_triangles",

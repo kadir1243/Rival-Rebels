@@ -11,26 +11,16 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.model;
 
-import com.mojang.math.Transformation;
-import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.resources.Identifier;
-import net.minecraft.util.Tuple;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelRod {
@@ -59,27 +49,28 @@ public class ModelRod {
     private static final Vector3f v5 = new Vector3f(0.03125f * 9, 0.03125f * -6, 0f);
     private static final Vector3f v6 = new Vector3f(0.03125f * 8, 0.03125f * -9, 0f);
     private static final Vector3f v7 = new Vector3f(0f, 0.03125f * -10, 0f);
-    private static final Map<Tuple<Identifier, Boolean>, Supplier<List<QuadHelper.BakedQuadWrapper>>> MAP = new HashMap<>();
 
-    public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, Identifier texture, RenderType renderType, int light, int overlay) {
-        render(poseStack, nodeCollector, texture, renderType, light, overlay, true);
+    public static void render(PoseStack matrices, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
+        render(matrices, nodeCollector, renderType, light, overlay, true);
     }
 
-    public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, Identifier texture, RenderType renderType, int light, int overlay, boolean rendersecondcap) {
-        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, renderType, MAP.computeIfAbsent(new Tuple<>(texture, rendersecondcap), t -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t.getA()), buf -> {
-            for (float i = 0; i < 360; i += 360F / numOfSegs) {
-                Transformation transformation = new Transformation(null, Axis.YP.rotationDegrees(i), null, null);
-                QuadHelper.addFace(buf, transformation, v0, vd1, v1, v0, t1, t3, t2, t1);
-                QuadHelper.addFace(buf, transformation, vd1, vd2, v2, v1, t2, t4, t5, t3);
-                QuadHelper.addFace(buf, transformation, vd2, vd3, v3, v2, t4, t6, t7, t5);
-                QuadHelper.addFace(buf, transformation, vd3, vd4, v4, v3, t6, t8, t9, t7);
-                if (t.getB()) {
-                    QuadHelper.addFace(buf, transformation, v7, v6, vd6, v7, t1, t3, t2, t1);
-                    QuadHelper.addFace(buf, transformation, v6, v5, vd5, vd6, t2, t4, t5, t3);
-                    QuadHelper.addFace(buf, transformation, v5, v4, vd4, vd5, t4, t6, t7, t5);
+    public static void render(PoseStack matrices, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay, boolean rendersecondcap) {
+        for (float i = 0; i < 360; i += 360 / numOfSegs) {
+            matrices.pushPose();
+            matrices.mulPose(Axis.YP.rotationDegrees(i));
+            nodeCollector.submitCustomGeometry(matrices, renderType, (pose, consumer) -> {
+                RenderHelper.addFace(pose, consumer, v0, vd1, v1, v0, t1, t3, t2, t1, light, overlay);
+                RenderHelper.addFace(pose, consumer, vd1, vd2, v2, v1, t2, t4, t5, t3, light, overlay);
+                RenderHelper.addFace(pose, consumer, vd2, vd3, v3, v2, t4, t6, t7, t5, light, overlay);
+                RenderHelper.addFace(pose, consumer, vd3, vd4, v4, v3, t6, t8, t9, t7, light, overlay);
+                if (rendersecondcap) {
+                    RenderHelper.addFace(pose, consumer, v7, v6, vd6, v7, t1, t3, t2, t1, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v6, v5, vd5, vd6, t2, t4, t5, t3, light, overlay);
+                    RenderHelper.addFace(pose, consumer, v5, v4, vd4, vd5, t4, t6, t7, t5, light, overlay);
                 }
-            }
-        })), light, overlay);
+            });
 
+            matrices.popPose();
+        }
     }
 }

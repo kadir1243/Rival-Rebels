@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.itemrenders;
 
-import com.mojang.serialization.MapCodec;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
@@ -23,7 +22,6 @@ import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.SpecialModelRenderer;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
-import net.minecraft.resources.Identifier;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.DeltaTracker;
@@ -41,6 +39,8 @@ import java.util.function.Supplier;
 public class TeslaRenderer implements SpecialModelRenderer<Integer> {
     private static final DeltaTracker TIMER = Minecraft.getInstance().getDeltaTracker();
     private int spin;
+    private final QuadCollection teslaModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.TESLA_MODEL);
+    private final QuadCollection dynamoModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.DYNAMO_MODEL);
 
     @Override
     public @Nullable Integer extractArgument(ItemStack stack) {
@@ -60,11 +60,11 @@ public class TeslaRenderer implements SpecialModelRenderer<Integer> {
 			// poseStack.translate(0.3f, 0.05f, -0.1f);
 
             submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettesla), (pose, consumer) -> {
-                ObjModels.render(Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.TESLA_MODEL), consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
+                ObjModels.render(teslaModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
             });
 			poseStack.mulPose(Axis.XP.rotationDegrees(spin));
             submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettesla), (pose, consumer) -> {
-                ObjModels.render(Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.DYNAMO_MODEL), consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
+                ObjModels.render(dynamoModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
             });
 
 			poseStack.popPose();
@@ -75,67 +75,7 @@ public class TeslaRenderer implements SpecialModelRenderer<Integer> {
 			poseStack.mulPose(Axis.ZP.rotationDegrees(10));
 			poseStack.scale(0.6f, 0.2f, 0.2f);
 			poseStack.translate(-0.99f, 0.5f, 0.0f);
-            submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.CELLULAR_NOISE,  (pose, buffer) -> {
-                buffer.addVertex(pose, -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose, -1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
-                buffer.addVertex(pose, -1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
-                buffer.addVertex(pose, -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-
-                buffer.addVertex(pose,  1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose,  1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-                buffer.addVertex(pose,  1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
-                buffer.addVertex(pose,  1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
-
-                buffer.addVertex(pose, -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose, -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-                buffer.addVertex(pose,  1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose,  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
-
-                buffer.addVertex(pose, -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose,  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
-                buffer.addVertex(pose,  1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose, -1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-
-                buffer.addVertex(pose, -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose,  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
-                buffer.addVertex(pose,  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose, -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 1);
-
-                buffer.addVertex(pose, -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose, -1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-                buffer.addVertex(pose,  1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose,  1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 0);
-
-                buffer.addVertex(pose, -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose, -1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
-                buffer.addVertex(pose, -1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
-                buffer.addVertex(pose, -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-
-                buffer.addVertex(pose,  1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose,  1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-                buffer.addVertex(pose,  1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
-                buffer.addVertex(pose,  1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
-
-                buffer.addVertex(pose, -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose, -1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-                buffer.addVertex(pose,  1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose,  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
-
-                buffer.addVertex(pose, -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose,  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
-                buffer.addVertex(pose,  1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose, -1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
-
-                buffer.addVertex(pose, -1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose,  1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
-                buffer.addVertex(pose,  1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose, -1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 1);
-
-                buffer.addVertex(pose, -1, -1,  1).setColor(CommonColors.WHITE).setUv(0, 0);
-                buffer.addVertex(pose, -1,  1,  1).setColor(CommonColors.WHITE).setUv(0, 1);
-                buffer.addVertex(pose,  1,  1,  1).setColor(CommonColors.WHITE).setUv(3, 1);
-                buffer.addVertex(pose,  1, -1,  1).setColor(CommonColors.WHITE).setUv(3, 0);
-            });
+            ObjModels.submit(submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, BAKED_MODEL_CELLULAR_NOISE.get().quadCollection(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
 
             poseStack.popPose();
 		}
@@ -145,19 +85,66 @@ public class TeslaRenderer implements SpecialModelRenderer<Integer> {
     public void getExtents(Consumer<Vector3fc> output) {
     }
 
-    public record Unbaked() implements SpecialModelRenderer.Unbaked<Integer> {
-        public static final Identifier ID = RRIdentifiers.create("tesla_renderer");
-        public static final Unbaked INSTANCE = new Unbaked();
-        public static final MapCodec<Unbaked> MAP_CODEC = MapCodec.unit(INSTANCE);
-        @Override
-        public SpecialModelRenderer<Integer> bake(BakingContext context) {
-            return new TeslaRenderer();
-        }
+    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL_CELLULAR_NOISE = QuadHelper.createBakedModel(buffer -> {
+        buffer.addVertex(-1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex(-1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
+        buffer.addVertex(-1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
+        buffer.addVertex(-1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
 
-        @Override
-        public MapCodec<Unbaked> type() {
-            return MAP_CODEC;
-        }
-    }
+        buffer.addVertex( 1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex( 1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+        buffer.addVertex( 1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
+        buffer.addVertex( 1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
+
+        buffer.addVertex(-1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex(-1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+        buffer.addVertex( 1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex( 1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
+
+        buffer.addVertex(-1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex( 1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
+        buffer.addVertex( 1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex(-1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+
+        buffer.addVertex(-1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex( 1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
+        buffer.addVertex( 1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex(-1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 1);
+
+        buffer.addVertex(-1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex(-1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+        buffer.addVertex( 1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex( 1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 0);
+
+        buffer.addVertex(-1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex(-1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
+        buffer.addVertex(-1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
+        buffer.addVertex(-1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+
+        buffer.addVertex( 1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex( 1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+        buffer.addVertex( 1,  1, 1).setColor(CommonColors.WHITE).setUv(1, 1);
+        buffer.addVertex( 1,  1, -1).setColor(CommonColors.WHITE).setUv(1, 0);
+
+        buffer.addVertex(-1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex(-1, -1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+        buffer.addVertex( 1, -1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex( 1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
+
+        buffer.addVertex(-1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex( 1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
+        buffer.addVertex( 1,  1, 1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex(-1,  1, 1).setColor(CommonColors.WHITE).setUv(0, 1);
+
+        buffer.addVertex(-1, -1, -1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex( 1, -1, -1).setColor(CommonColors.WHITE).setUv(3, 0);
+        buffer.addVertex( 1,  1, -1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex(-1,  1, -1).setColor(CommonColors.WHITE).setUv(0, 1);
+
+        buffer.addVertex(-1, -1,  1).setColor(CommonColors.WHITE).setUv(0, 0);
+        buffer.addVertex(-1,  1,  1).setColor(CommonColors.WHITE).setUv(0, 1);
+        buffer.addVertex( 1,  1,  1).setColor(CommonColors.WHITE).setUv(3, 1);
+        buffer.addVertex( 1, -1,  1).setColor(CommonColors.WHITE).setUv(3, 0);
+    });
 
 }

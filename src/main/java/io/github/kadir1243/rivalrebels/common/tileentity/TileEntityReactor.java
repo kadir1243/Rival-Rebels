@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
+import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReactor;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
@@ -171,7 +172,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
                 meltTick++;
                 if (meltTick == 300) meltDown(10);
                 else if (meltTick == 1) {
-                    Component text = Translations.warning().append(" ").append(Translations.WARNING_MELTDOWN.translate().withStyle(ChatFormatting.RED));
+                    Component text = Translations.warning().append(" ").append(Component.translatable(RRIdentifiers.MODID + ".warning_meltdown").withStyle(ChatFormatting.RED));
                     for (Player player : level.players()) {
                         player.sendSystemMessage(text);
                     }
@@ -213,7 +214,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
             meltTick = 0;
         }
 
-        if (on && getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && getFuel().has(RRComponents.ROD_POWER))
+        if (on && getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && !getFuel().isEmpty() && getFuel().has(RRComponents.ROD_POWER))
         {
             if (!prevOn && on) level.playLocalSound(getBlockPos(), RRSounds.REACTOR_DISABLING.get(), SoundSource.BLOCKS, 1, 1, true);
             else

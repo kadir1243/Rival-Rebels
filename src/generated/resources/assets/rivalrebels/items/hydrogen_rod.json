@@ -1,10 +1,6 @@
 {
   "model": {
-    "type": "minecraft:special",
-    "base": "minecraft:air",
-    "model": {
-      "type": "rivalrebels:rod_renderer",
-      "texture": "rivalrebels:textures/entity/ao.png"
-    }
+    "type": "minecraft:model",
+    "model": "rivalrebels:item/hydrogen_rod"
   }
 }

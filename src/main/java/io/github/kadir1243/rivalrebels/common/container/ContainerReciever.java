@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.container;
 
-import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.crate.BlockWeapons;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
 import io.github.kadir1243.rivalrebels.common.item.ItemChip;
@@ -38,15 +37,15 @@ public class ContainerReciever extends AbstractContainerMenu {
         super(RivalRebelsGuiHandler.RECIEVER_SCREEN_HANDLER_TYPE.get(), syncId);
         this.reciever = reciever;
         this.containerData = containerData;
-        addSlot(new SlotRR(reciever, 0, 8, 76, 64, RRItems.fuel));
-		addSlot(new SlotRR(reciever, 1, 26, 76, 64, RRItems.fuel));
-		addSlot(new SlotRR(reciever, 2, 44, 76, 64, RRItems.fuel));
-		addSlot(new SlotRR(reciever, 3, 8, 94, 16, RRItems.battery));
-		addSlot(new SlotRR(reciever, 4, 26, 94, 16, RRItems.battery));
-		addSlot(new SlotRR(reciever, 5, 44, 94, 16, RRItems.battery));
-		addSlot(new SlotRR(reciever, 6, 116, 94, 1, RRItems.chip));
-		addSlot(new SlotRR(reciever, 7, 134, 94, 1, RRBlocks.weapons.asItem()));
-		addSlot(new SlotRR(reciever, 8, 152, 94, 1, RRBlocks.weapons.asItem()));
+        addSlot(new SlotRR(reciever, 0, 8, 76, 64, RRItems.fuel.asItem()));
+		addSlot(new SlotRR(reciever, 1, 26, 76, 64, RRItems.fuel.asItem()));
+		addSlot(new SlotRR(reciever, 2, 44, 76, 64, RRItems.fuel.asItem()));
+		addSlot(new SlotRR(reciever, 3, 8, 94, 16, RRItems.battery.asItem()));
+		addSlot(new SlotRR(reciever, 4, 26, 94, 16, RRItems.battery.asItem()));
+		addSlot(new SlotRR(reciever, 5, 44, 94, 16, RRItems.battery.asItem()));
+		addSlot(new SlotRR(reciever, 6, 116, 94, 1, ItemChip.class));
+		addSlot(new SlotRR(reciever, 7, 134, 94, 1, BlockWeapons.class));
+		addSlot(new SlotRR(reciever, 8, 152, 94, 1, BlockWeapons.class));
 		bindPlayerInventory(inventoryPlayer);
         addDataSlots(containerData);
 	}
@@ -59,9 +58,18 @@ public class ContainerReciever extends AbstractContainerMenu {
 
 	protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
-        addInventoryExtendedSlots(inventoryPlayer, 8, 119);
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
+			}
+		}
 
-        addInventoryHotbarSlots(inventoryPlayer, 8, 175);
+		for (int i = 0; i < 9; i++)
+		{
+			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
+		}
 	}
 
     @Override

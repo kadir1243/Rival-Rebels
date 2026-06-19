@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.container;
 
-import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTimedBomb;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
 import io.github.kadir1243.rivalrebels.common.item.*;
@@ -40,14 +39,15 @@ public class ContainerAntimatterBomb extends AbstractContainerMenu implements Bo
         addSlot(new SlotRR(antimatter, 0, 18, 48, 1, RRItems.fuse));
 		addSlot(new SlotRR(antimatter, 1, 40, 59, 1, RRItems.antenna));
 		addSlot(new SlotRR(antimatter, 2, 40, 37, 1, RRItems.antenna));
-		for (int i = 0; i <= 3; i++) {
+		for (int i = 0; i <= 3; i++)
+		{
 			addSlot(new SlotRR(antimatter, i + 3, 62 + i * 18, 19, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
 			addSlot(new SlotRR(antimatter, i + 7, 62 + i * 18, 37, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
 			addSlot(new SlotRR(antimatter, i + 11, 62 + i * 18, 59, 1, RRItems.redrod).setAcceptsTrollface(true));
 			addSlot(new SlotRR(antimatter, i + 15, 62 + i * 18, 77, 1, RRItems.redrod).setAcceptsTrollface(true));
 		}
-		addSlot(new SlotRR(antimatter, 19, 138, 48, 1, RRBlocks.timedbomb.asItem()));
-		addSlot(new SlotRR(antimatter, 20, 98, 99, 1, RRItems.chip));
+		addSlot(new SlotRR(antimatter, 19, 138, 48, 1, BlockTimedBomb.class));
+		addSlot(new SlotRR(antimatter, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inv);
         addDataSlots(containerData);
 	}
@@ -60,9 +60,19 @@ public class ContainerAntimatterBomb extends AbstractContainerMenu implements Bo
 
     protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
-        addInventoryExtendedSlots(inventoryPlayer, 8, 119);
-        addInventoryHotbarSlots(inventoryPlayer, 8, 175);
-    }
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
+			}
+		}
+
+		for (int i = 0; i < 9; i++)
+		{
+			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
+		}
+	}
 
     @Override
     public ItemStack quickMoveStack(Player player, int index) {

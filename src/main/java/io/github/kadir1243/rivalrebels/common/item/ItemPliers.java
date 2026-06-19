@@ -28,7 +28,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public class ItemPliers extends Item
@@ -51,12 +50,12 @@ public class ItemPliers extends Item
         Level level = context.getLevel();
         Player player = context.getPlayer();
         if (!level.isClientSide()) {
-            BlockState blockState = level.getBlockState(pos);
-            if (blockState.is(RRBlocks.jump) && player.isCreative()) {
+            Block block = level.getBlockState(pos).getBlock();
+            if (block == RRBlocks.jump.get() && player.isCreative()) {
                 CommandHotPotato.pos = pos.above(400);
-				player.sendSystemMessage(Component.literal("Hot Potato drop point set. Use /rrhotpotato to start a round."));
+				player.sendSystemMessage(Component.nullToEmpty("Hot Potato drop point set. Use /rrhotpotato to start a round."));
 			}
-			if (blockState.is(RRBlocks.remotecharge)) {
+			if (block == RRBlocks.remotecharge.get()) {
 				int t = 25;
 				i = i + 1;
 				player.sendSystemMessage(Translations.defuse().append(" %" + i * 100 / t));
@@ -67,7 +66,7 @@ public class ItemPliers extends Item
                     return InteractionResult.SUCCESS;
 				}
 			}
-			if (blockState.is(RRBlocks.timedbomb)) {
+			if (block == RRBlocks.timedbomb.get()) {
 				int t = 25;
 				i = i + 1;
 				player.sendSystemMessage(Translations.defuse().append(" %" + i * 100 / t));
@@ -79,7 +78,7 @@ public class ItemPliers extends Item
                     return InteractionResult.SUCCESS;
 				}
 			}
-			if (blockState.getBlock() instanceof BlockAutoTemplate worldBlock) {
+			if (block instanceof BlockAutoTemplate worldBlock) {
                 i = i + 1;
 				player.sendSystemMessage(Translations.status().append(" ").append(Translations.BUILDING.translate(i * 100 / worldBlock.time)));
 				if (i >= worldBlock.time) {
@@ -89,7 +88,7 @@ public class ItemPliers extends Item
                     return InteractionResult.SUCCESS;
 				}
 			}
-			if (blockState.is(RRBlocks.supplies) && level.getBlockState(pos.below()).is(RRBlocks.supplies))
+			if (block == RRBlocks.supplies.get() && level.getBlockState(pos.below()).is(RRBlocks.supplies))
 			{
 				i++;
 				player.sendSystemMessage(Translations.status().append(" ").append(Translations.BUILDING_TOKAMAK.translate(i * 100 / 15)));

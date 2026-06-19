@@ -29,7 +29,7 @@ public class GuiTheoreticalTsar extends BombContainerScreen<ContainerTheoretical
 
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Translations.TSAR_NAME.translate(), 18, 16, 0x404040, false);
+        graphics.text(font, Translations.TSAR_NAME.translate(), 18, 16, 4210752, false);
     }
 
     @Override

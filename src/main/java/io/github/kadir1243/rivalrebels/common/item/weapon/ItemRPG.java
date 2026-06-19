@@ -63,7 +63,7 @@ public class ItemRPG extends Item {
 		}
 		else if (!world.isClientSide())
 		{
-			player.sendSystemMessage(Component.literal("§cOut of ammunition"));
+			player.sendSystemMessage(Component.nullToEmpty("§cOut of ammunition"));
 		}
 		return InteractionResult.PASS;
 	}

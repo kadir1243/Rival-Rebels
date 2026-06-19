@@ -30,8 +30,8 @@ import net.minecraft.world.phys.AABB;
 public class TileEntityPlasmaExplosion extends BlockEntity implements Tickable
 {
 	public float	size		= 0;
-	private static final float increment = 0.3f;
-	public float prevsize = 0;
+	float			increment	= 0.3f;
+	float			prevsize	= 0;
 
 	public TileEntityPlasmaExplosion(BlockPos pos, BlockState state) {
         super(RRTileEntities.PLASMA_EXPLOSION.get(), pos, state);

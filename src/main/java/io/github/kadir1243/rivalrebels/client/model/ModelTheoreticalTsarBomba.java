@@ -51,7 +51,7 @@ public class ModelTheoreticalTsarBomba {
                 TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
                 TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
                 int finalF = f;
-                nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(RRIdentifiers.ettheoreticaltsarshell1), (pose, consumer) -> {
+                nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettheoreticaltsarshell1), (pose, consumer) -> {
                     RenderHelper.addFace(pose, consumer, new Vector3f(0f, tsary[finalF], tsarx[finalF]),
                         new Vector3f(0f, tsary[finalF - 1], tsarx[finalF - 1]),
                         new Vector3f(tsarx[finalF - 1] * sin, tsary[finalF - 1], tsarx[finalF - 1] * cos),
@@ -82,7 +82,7 @@ public class ModelTheoreticalTsarBomba {
         }
         poseStack.popPose();
 
-        RenderType tsarFinsTextureRenderType = RenderTypes.entityCutout(RRIdentifiers.ettsarfins);
+        RenderType tsarFinsTextureRenderType = RenderTypes.entitySolid(RRIdentifiers.ettsarfins);
 
         poseStack.pushPose();
 

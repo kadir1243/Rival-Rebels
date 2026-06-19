@@ -74,6 +74,7 @@ public class NuclearExplosion {
 					if (YY < onepointfiveradiussqrd) {
                         BlockPos pos = new BlockPos(xx, yy, zz);
                         BlockState state = world.getBlockState(pos);
+                        Block block = state.getBlock();
 						if (!world.isEmptyBlock(pos)) {
 							int dist = (int) Math.sqrt(YY);
 							if (dist < radius && !state.is(Blocks.BEDROCK)) {
@@ -134,7 +135,7 @@ public class NuclearExplosion {
 									}
 								}
 							}
-							if (dist < onepointfiveradius && !state.isAir() && !state.is(Blocks.BEDROCK))
+							if (dist < onepointfiveradius && !state.isAir() && block != Blocks.BEDROCK)
 							{
 								if (Y >= twoAOC || (dist < onepointfiveradius && Y >= AOC))
 								{

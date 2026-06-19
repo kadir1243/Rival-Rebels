@@ -20,6 +20,7 @@ import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.tags.FluidTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -108,18 +109,18 @@ public class BlockNukeCrate extends BaseEntityBlock {
 			if (!stack.isEmpty()) {
 				if (stack.is(RRItems.pliers)) {
 					Direction orientation = null;
-					if (	getBlockState(level, pos.east()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().east()).is(RRBlocks.nukeCrateBottom)) {
+					if (	getBlock(level, pos.east()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().east()) == RRBlocks.nukeCrateBottom.get()) {
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.east(), Blocks.AIR);
 						setBlock(level, pos.below(), Blocks.AIR);
 						setBlock(level, pos.below().east(), RRBlocks.antimatterbombblock.get().defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.WEST));
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.west()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().west()).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().west()) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.west(), Blocks.AIR);
@@ -127,9 +128,9 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.below().west(), RRBlocks.antimatterbombblock.get().defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.EAST));
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.south()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().south()).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().south()) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.south(), Blocks.AIR);
@@ -137,9 +138,9 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.below().south(), RRBlocks.antimatterbombblock.get().defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.NORTH));
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.north()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().north()).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().north()) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.north(), Blocks.AIR);
@@ -147,9 +148,9 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.below().north(), RRBlocks.antimatterbombblock.get().defaultBlockState().setValue(BlockAntimatterBomb.FACING, Direction.SOUTH));
 						return InteractionResult.SUCCESS;
 					}
-					if (	getBlockState(level, pos.east()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().east()).is(RRBlocks.nukeCrateBottom))
+					if (	getBlock(level, pos.east()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().east()) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos.above(), Blocks.AIR);
 						setBlock(level, pos.above().east(), Blocks.AIR);
@@ -157,9 +158,9 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.east(), RRBlocks.tachyonbombblock.get().defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.WEST));
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.west()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().west()).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().west()) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos.above(), Blocks.AIR);
 						setBlock(level, pos.above().west(), Blocks.AIR);
@@ -167,9 +168,9 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.west(), RRBlocks.tachyonbombblock.get().defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.EAST));
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.south()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().south()).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().south()) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos.above(), Blocks.AIR);
 						setBlock(level, pos.above().south(), Blocks.AIR);
@@ -177,9 +178,9 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.south(), RRBlocks.tachyonbombblock.get().defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.NORTH));
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.north()).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().north()).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().north()) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos.above(), Blocks.AIR);
 						setBlock(level, pos.above().north(), Blocks.AIR);
@@ -187,13 +188,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.north(), RRBlocks.tachyonbombblock.get().defaultBlockState().setValue(BlockTachyonBomb.FACING, Direction.SOUTH));
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.east()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.east(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.east(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().east()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().east(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below().east(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.east()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.east(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.east(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().east()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().east(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below().east(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.east(), Blocks.AIR);
@@ -205,13 +206,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.below().east(3), Blocks.AIR);
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.west()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.west(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.west(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().west()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().west(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below().west(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.west(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.west(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().west()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().west(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below().west(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.west(), Blocks.AIR);
@@ -223,13 +224,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.below().west(3), Blocks.AIR);
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.south()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.south(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.south(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().south()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().south(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below().south(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.south(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.south(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().south()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().south(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below().south(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.south(), Blocks.AIR);
@@ -241,13 +242,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.below().south(3), Blocks.AIR);
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.north()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.north(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.north(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().north()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.below().north(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.below().north(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.north(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.north(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().north()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.below().north(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.below().north(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.north(), Blocks.AIR);
@@ -259,13 +260,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.below().north(3), Blocks.AIR);
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.east()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.east(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.east(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().east()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().east(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above().east(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.east()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.east(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.east(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().east()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().east(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above().east(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.above().east(), Blocks.AIR);
@@ -277,13 +278,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.above().east(3), Blocks.AIR);
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.west()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.west(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.west(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().west()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().west(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above().west(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.west()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.west(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.west(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().west()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().west(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above().west(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.above().west(), Blocks.AIR);
@@ -295,13 +296,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.above().west(3), Blocks.AIR);
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.south()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.south(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.south(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().south()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().south(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above().south(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.south()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.south(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.south(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().south()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().south(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above().south(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.above().south(), Blocks.AIR);
@@ -313,13 +314,13 @@ public class BlockNukeCrate extends BaseEntityBlock {
 						setBlock(level, pos.above().south(3), Blocks.AIR);
 						return InteractionResult.SUCCESS;
 					}
-					else if (getBlockState(level, pos.north()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.north(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.north(3)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().north()).is(RRBlocks.nukeCrateTop) &&
-							getBlockState(level, pos.above().north(2)).is(RRBlocks.nukeCrateBottom) &&
-							getBlockState(level, pos.above().north(3)).is(RRBlocks.nukeCrateBottom))
+					else if (getBlock(level, pos.north()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.north(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.north(3)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().north()) == RRBlocks.nukeCrateTop.get() &&
+							getBlock(level, pos.above().north(2)) == RRBlocks.nukeCrateBottom.get() &&
+							getBlock(level, pos.above().north(3)) == RRBlocks.nukeCrateBottom.get())
 					{
 						setBlock(level, pos, Blocks.AIR);
 						setBlock(level, pos.above().north(), Blocks.AIR);
@@ -347,7 +348,7 @@ public class BlockNukeCrate extends BaseEntityBlock {
 				}
 				else if (!level.isClientSide())
 				{
-                    player.sendSystemMessage(Translations.use(RRItems.pliers.toStack().getItemName()));
+                    player.sendSystemMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" ").append(RRItems.pliers.toStack().getItemName()));
 				}
 			}
 			else if (!level.isClientSide())
@@ -366,8 +367,8 @@ public class BlockNukeCrate extends BaseEntityBlock {
         world.setBlockAndUpdate(pos, state);
     }
 
-    private static BlockState getBlockState(Level world, BlockPos pos) {
-        return world.getBlockState(pos);
+    private static Block getBlock(Level world, BlockPos pos) {
+        return world.getBlockState(pos).getBlock();
     }
 
     @Nullable

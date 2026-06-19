@@ -89,7 +89,7 @@ public class BlockReactor extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        player.openMenu(state.getMenuProvider(level, pos));
+        player.openMenu(getMenuProvider(state, level, pos));
         if (!level.isClientSide()) {
             ((ServerPlayer) player).connection.send(new ReactorMachinesPacket(pos, List.copyOf(((TileEntityReactor) level.getBlockEntity(pos)).entries.values())));
         }

@@ -58,9 +58,9 @@ public class GuiLaptop extends AbstractContainerScreen<ContainerLaptop> {
 		int y = (height - imageHeight) / 2;
         RRTextures.guilaptopnuke.blit(graphics, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
 		if (menu.hasChips()) RRTextures.guilaptopnuke.blit(graphics, x + 135, y + 79, 248, 0, 8, 8, CommonColors.WHITE);
-		graphics.text(font, Translations.CONTROLLER_B83.translate(), x + 118, y + 11, 0xffffff, false);
+		graphics.text(font, Component.translatable("RivalRebels.controller.B83"), x + 118, y + 11, 0xffffff, false);
 		graphics.text(font, Translations.LAPTOP_B2_SPIRIT.translate(), x + 25, y + 11, 0xffffff, false);
-		graphics.text(font, Component.literal("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
-		graphics.text(font, Component.literal("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
+		graphics.text(font, Component.translatable("x" + menu.getB2spirit()), x + 154, y + 96, 0xffffff, false);
+		graphics.text(font, Component.translatable("x" + menu.getB2carpet()), x + 154, y + 85, 0xffffff, false);
 	}
 }

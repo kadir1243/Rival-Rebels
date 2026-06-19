@@ -82,7 +82,7 @@ public class ItemTesla extends Item {
 			player.sendSystemMessage(Component.literal("§cOut of batteries"));
 		}
 		if (message) {
-            player.sendSystemMessage(Translations.use(Component.literal("[R].")));
+			player.sendSystemMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."));
 			message = false;
 		}
 		return InteractionResult.SUCCESS;

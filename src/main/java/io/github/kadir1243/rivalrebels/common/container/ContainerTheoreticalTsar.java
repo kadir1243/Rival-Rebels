@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.container;
 
-import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTimedBomb;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsGuiHandler;
 import io.github.kadir1243.rivalrebels.common.item.ItemChip;
@@ -35,8 +34,8 @@ public class ContainerTheoreticalTsar extends AbstractContainerMenu implements B
         super(RivalRebelsGuiHandler.THEORETICAL_TSAR_SCREEN_HANDLER_TYPE.get(), syncId);
         this.bomb = bomb;
         addSlot(new SlotRR(bomb, 0, 18, 48, 1, RRItems.fuse));
-		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna));
-		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna));
+		addSlot(new SlotRR(bomb, 1, 40, 59, 1, RRItems.antenna.asItem()));
+		addSlot(new SlotRR(bomb, 2, 40, 37, 1, RRItems.antenna.asItem()));
 		for (int i = 0; i <= 3; i++)
 		{
 			addSlot(new SlotRR(bomb, i + 3, 62 + i * 18, 19, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
@@ -44,8 +43,8 @@ public class ContainerTheoreticalTsar extends AbstractContainerMenu implements B
 			addSlot(new SlotRR(bomb, i + 11, 62 + i * 18, 59, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
 			addSlot(new SlotRR(bomb, i + 15, 62 + i * 18, 77, 1, RRItems.NUCLEAR_ROD).setAcceptsTrollface(true));
 		}
-		addSlot(new SlotRR(bomb, 19, 138, 48, 1, RRBlocks.timedbomb.asItem()));
-		addSlot(new SlotRR(bomb, 20, 98, 99, 1, RRItems.chip));
+		addSlot(new SlotRR(bomb, 19, 138, 48, 1, BlockTimedBomb.class));
+		addSlot(new SlotRR(bomb, 20, 98, 99, 1, ItemChip.class));
 		bindPlayerInventory(inventoryPlayer);
         addDataSlots(containerData);
         this.containerData = containerData;
@@ -59,37 +58,54 @@ public class ContainerTheoreticalTsar extends AbstractContainerMenu implements B
 
 	protected void bindPlayerInventory(Inventory inventoryPlayer)
 	{
-        addInventoryExtendedSlots(inventoryPlayer, 8, 119);
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 9; j++)
+			{
+				addSlot(new Slot(inventoryPlayer, j + i * 9 + 9, 8 + j * 18, 119 + i * 18));
+			}
+		}
 
-        addInventoryHotbarSlots(inventoryPlayer, 8, 175);
+		for (int i = 0; i < 9; i++)
+		{
+			addSlot(new Slot(inventoryPlayer, i, 8 + i * 18, 175));
+		}
 	}
 
     @Override
     public ItemStack quickMoveStack(Player player, int slot) {
-        ItemStack itemStack = ItemStack.EMPTY;
-        Slot var4 = this.slots.get(slot);
+		ItemStack var3 = ItemStack.EMPTY;
+		Slot var4 = this.slots.get(slot);
 
-        if (var4 != null && var4.hasItem()) {
-            ItemStack var5 = var4.getItem();
-            itemStack = var5.copy();
+		if (var4 != null && var4.hasItem())
+		{
+			ItemStack var5 = var4.getItem();
+			var3 = var5.copy();
 
-            if (slot <= 19) {
-                if (!this.moveItemStackTo(var5, 19, this.slots.size(), true)) {
-                    return ItemStack.EMPTY;
-                }
-            } else if (!this.moveItemStackTo(var5, 0, 19, false)) {
-                return ItemStack.EMPTY;
-            }
+			if (slot <= 19)
+			{
+				if (!this.moveItemStackTo(var5, 19, this.slots.size(), true))
+				{
+					return ItemStack.EMPTY;
+				}
+			}
+			else if (!this.moveItemStackTo(var5, 0, 19, false))
+			{
+				return ItemStack.EMPTY;
+			}
 
-            if (var5.isEmpty()) {
-                var4.setByPlayer(ItemStack.EMPTY);
-            } else {
-                var4.setChanged();
-            }
-        }
+			if (var5.isEmpty())
+			{
+				var4.setByPlayer(ItemStack.EMPTY);
+			}
+			else
+			{
+				var4.setChanged();
+			}
+		}
 
-        return itemStack;
-    }
+		return var3;
+	}
 
     public int getCountdown() {
         return this.containerData.get(0);

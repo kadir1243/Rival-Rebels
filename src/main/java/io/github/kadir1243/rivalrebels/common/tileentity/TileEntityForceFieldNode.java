@@ -66,16 +66,16 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
 			level--;
 			for (int y = 0; y < 7; y++)
 			{
-                BlockPos pos;
                 if (meta == Direction.NORTH) {
-                    pos = getBlockPos().above(y - 3).west(level + 1);
+                    if (getLevel().getBlockState(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1)).is(RRBlocks.forcefield)) {
+                        getLevel().setBlockAndUpdate(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1), Blocks.AIR.defaultBlockState());
+                    }
                 } else {
-                    pos = getBlockPos().offset(0, y, level).below(3).relative(meta);
+                    if (getLevel().getBlockState(getBlockPos().offset(0, y, level).below(3).relative(meta)).is(RRBlocks.forcefield)) {
+                        getLevel().setBlockAndUpdate(getBlockPos().offset(0, y, level).below(3).relative(meta), Blocks.AIR.defaultBlockState());
+                    }
                 }
-                if (getLevel().getBlockState(pos).is(RRBlocks.forcefield)) {
-                    getLevel().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-                }
-            }
+			}
 		}
 	}
 
@@ -146,10 +146,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
 				placeBlockCarefully(getLevel(), getBlockPos().getX(), getBlockPos().getY(), (int) (getBlockPos().getZ() - length - 1), RRBlocks.reactive.get());
 				for (int y = 0; y < 7; y++)
 				{
-                    BlockPos pos = getBlockPos().above(y - 3).west(level + 1);
-                    if (!getLevel().getBlockState(pos).is(RRBlocks.forcefield))
+					if (!getLevel().getBlockState(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1)).is(RRBlocks.forcefield))
 					{
-						getLevel().setBlockAndUpdate(pos, RRBlocks.forcefield.get().defaultBlockState().setValue(BlockForceField.FACING, meta));
+						getLevel().setBlockAndUpdate(new BlockPos(getBlockPos().getX(), getBlockPos().getY() + (y - 3), getBlockPos().getZ() - level - 1), RRBlocks.forcefield.get().defaultBlockState().setValue(BlockForceField.FACING, meta));
 						hits++;
 					}
 				}

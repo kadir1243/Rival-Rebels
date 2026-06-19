@@ -1,12 +1,6 @@
 {
-  "parent": "minecraft:block/cube",
+  "parent": "minecraft:block/cube_all",
   "textures": {
-    "down": "rivalrebels:block/ah",
-    "east": "rivalrebels:block/ah",
-    "north": "rivalrebels:block/az",
-    "particle": "rivalrebels:block/ai",
-    "south": "rivalrebels:block/az",
-    "up": "rivalrebels:block/ai",
-    "west": "rivalrebels:block/ah"
+    "all": "rivalrebels:block/omegaarmor"
   }
 }

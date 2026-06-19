@@ -67,7 +67,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
 		poseStack.pushPose();
 		poseStack.translate(0.5F, 0.5F, 0.5F);
 		poseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(RRIdentifiers.etreactor), (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etreactor), (pose, consumer) -> {
             ModelReactor.renderModel(pose, consumer, packedLight, packedOverlay);
         });
 		poseStack.translate(0, 2, -0.125f);

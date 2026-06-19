@@ -444,7 +444,7 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
             for (Player player : world.players()) {
                 scrb.getOrCreatePlayerScore(player, killObjective);
                 ScoreAccess deaths = scrb.getOrCreatePlayerScore(player, deathObjective);
-                deaths.display(Component.literal("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S"));
+                deaths.display(Component.nullToEmpty("§8R§7I§fV§7A§8L R§7E§fBE§7L§8S"));
             }
             if (RRConfig.SERVER.isScoreboardEnabled()) {
                 scrb.setDisplayObjective(DisplaySlot.SIDEBAR, deathObjective);

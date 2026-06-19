@@ -30,10 +30,10 @@ public abstract class ObjectiveBlockEntityRenderer<T extends AbstractObjectiveBl
         poseStack.translate(0.5F, 0.5F, 0.5F);
 
         float slide = renderState.slide;
-        Identifier texture = getTexture();
-        RenderType renderType = RenderTypes.entitySolid(texture);
+        RenderType renderType = RenderTypes.entitySolid(getTexture());
         poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        ModelObjective.renderA(nodeCollector, poseStack, texture, renderType, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) ->
+            ModelObjective.renderA(pose, consumer, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY));
         poseStack.mulPose(Axis.XP.rotationDegrees(-90));
         poseStack.mulPose(Axis.ZP.rotationDegrees(90));
         ModelObjective.renderB(poseStack, nodeCollector, renderType, slide, 96f / 256f, 44f / 128f, 0.125f, 0.84375f, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);

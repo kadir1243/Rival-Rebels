@@ -65,9 +65,9 @@ public class BlockTheoreticalTsarBomba extends BaseEntityBlock {
 
     @Override
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
-        if (stack.is(RRItems.pliers))
+        if (!stack.isEmpty() && stack.is(RRItems.pliers))
 		{
-            player.openMenu(state.getMenuProvider(level, pos));
+            player.openMenu(getMenuProvider(state, level, pos));
 		}
 		else if (!level.isClientSide())
 		{

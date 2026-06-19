@@ -1,6 +1,5 @@
 # Blender v2.78 (sub 0) OBJ File: 'NukeNew.blend'
 # www.blender.org
-mtllib wacknuke.mtl
 o Cylinder
 v 0.459198 -0.123042 1.295953
 v 0.459198 -0.123042 -1.064790
@@ -478,7 +477,6 @@ vn 0.0000 0.0336 -0.9994
 vn 0.0000 0.0919 -0.9958
 vn -0.0625 -0.9980 0.0000
 s 1
-usemtl None
 f 81/1/1 79/2/2 78/3/1
 f 79/2/2 83/4/3 82/5/3
 f 83/4/3 84/6/4 82/5/3

@@ -126,38 +126,13 @@ public class RecipeDataGen extends RecipeProvider {
             .unlockedBy("has_sand", has(ItemTags.SAND))
             .save(output);
 
-        this.shaped(RecipeCategory.MISC, RRBlocks.aquicksand, 16)
-            .define('S', ItemTags.SAND)
-            .define('D', ItemTags.DIRT)
-            .pattern("SS")
-            .pattern("DD")
-            .unlockedBy("has_sand", has(ItemTags.SAND))
-            .save(output);
+        addRecipe(RRBlocks.aquicksand, 16, "SS", "DD", 'S', ItemTags.SAND, 'D', ItemTags.DIRT);
 
-        this.shaped(RecipeCategory.MISC, RRBlocks.jump, 8)
-            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
-            .define('D', ItemTags.DIRT)
-            .pattern("CC")
-            .pattern("DD")
-            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(output);
+        addRecipe(RRBlocks.jump, 8, "CC", "DD", 'C', ItemTags.STONE_CRAFTING_MATERIALS, 'D', ItemTags.DIRT);
 
-        this.shaped(RecipeCategory.MISC, RRBlocks.steel, 16)
-            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
-            .pattern("CC")
-            .pattern("CC")
-            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(output);
+        addRecipe(RRBlocks.steel, 16, "CC", "CC", 'C', ItemTags.STONE_CRAFTING_MATERIALS);
 
-        this.shaped(RecipeCategory.MISC, RRBlocks.smartcamo, 16)
-            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
-            .define('S', RRBlocks.steel)
-            .define('P', RRItems.pliers)
-            .pattern("SCS")
-            .pattern("CPS")
-            .pattern("SCS")
-            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
-            .save(output);
+        addRecipe(RRBlocks.smartcamo, 16, "SCS", "CPC", "SCS", 'C', ItemTags.STONE_CRAFTING_MATERIALS, 'S', RRBlocks.steel, 'P', RRItems.pliers);
 
         // Explosives
         addRecipee(RRItems.pliers, " C", "C ", 'C', ItemTags.STONE_CRAFTING_MATERIALS);

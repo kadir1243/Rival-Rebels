@@ -39,7 +39,7 @@ public class GuiAntimatterBomb extends BombContainerScreen<ContainerAntimatterBo
 
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Translations.ANTIMATTER_BOMB_CONTAINER_NAME.translate(), 18, 16, 0x404040, false);
+        graphics.text(font, Component.translatable("RivalRebels.antimatterbomb"), 18, 16, 4210752, false);
     }
 
     @Override

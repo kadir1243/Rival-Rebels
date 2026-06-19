@@ -14,6 +14,7 @@ package io.github.kadir1243.rivalrebels.client.gui;
 import io.github.kadir1243.rivalrebels.RRClient;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiFTKnob;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
+import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.FlameThrowerMode;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.packet.ItemUpdate;
@@ -79,7 +80,7 @@ public class GuiFlameThrower extends Screen {
         if (RRClient.USE_KEY.matches(event)) {
             onClose();
             ItemStack stack = minecraft.player.getMainHandItem();
-            if (!stack.has(RRComponents.FLAME_THROWER_MODE)) return super.keyReleased(event);
+            if (stack.isEmpty() || !stack.is(RRItems.flamethrower)) return super.keyReleased(event);
             stack.set(RRComponents.FLAME_THROWER_MODE, new FlameThrowerMode(knob.getDegree()));
             Minecraft.getInstance().getConnection().send(new ItemUpdate(minecraft.player.getInventory().getSelectedSlot(), knob.getDegree()));
         }

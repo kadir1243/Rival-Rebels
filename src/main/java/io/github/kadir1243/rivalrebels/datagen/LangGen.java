@@ -69,9 +69,6 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addBlock(RRBlocks.alandmine, "Landmine");
         addBlock(RRBlocks.plasmaexplosion, "Plasma");
         addBlock(RRBlocks.remotecharge, "Plastic explosives");
-        addBlock(RRBlocks.antimatterbombblock, "Antimatter Block");
-        addBlock(RRBlocks.bastion, "Bastion");
-        addBlock(RRBlocks.gamestart, "Game Starter");
 
         addItem(RRItems.knife, "Cuchillo");
         addItem(RRItems.hydrod, "Hydrogen Rod");
@@ -98,9 +95,6 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addItem(RRItems.emptyrod, "Empty Rod");
         addItem(RRItems.roda, "Roda");
         addItem(RRItems.armyshovel, "Sapper Shovel");
-        addItem(RRItems.remote, "Detonator");
-        addItem(RRItems.expill, "Nuclear Lemonade");
-        addItem(RRItems.safepill, "Lord Vertice Lemonade");
 
         addDamage(RRDamageTypes.ELECTRICITY, "%1s is Now Electric-Man");
         addDamage(RRDamageTypes.CHARGE, "%1s Charged");
@@ -111,13 +105,12 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         add(Translations.ORDERS_TRANSLATION, "ORDERS");
         add(Translations.STATUS_TRANSLATION, "STATUS");
         add(Translations.DEFUSE_TRANSLATION, "DEFUSE");
-        add(Translations.INVENTORY_TRANSLATION, "Inventory");
         add(Translations.USE_PLIERS_TO_BUILD_TRANSLATION, "Use pliers to build.");
         add(Translations.USE_PLIERS_TO_OPEN_TRANSLATION, "Use pliers to open.");
         add(Translations.AMMUNITION_TRANSLATION, "ammunition");
         add(Translations.NUKE_TRANSLATION, "Nuclear Bomb");
         add(Translations.SHIFT_CLICK, "Shift-Click (Sneak).");
-        add(Translations.BOMB_TIMER, "Timer: -%s:%s");
+        add(Translations.BOMB_TIMER, "Timer");
         add(Translations.UNBALANCED_BOMB, "Unbalanced");
         add(Translations.BOMB_MEGATONS, "Megatons");
         add(Translations.BOMB_ARMED, "Armed");
@@ -127,51 +120,12 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         add(Translations.SPAWN_RESET_WARNING, "Warning: Resetting will clear your inventory");
         add(Translations.RHODES_IS_ARMED, "%s Armed");
         add(Translations.TSAR_NAME, "Tsar Bomb");
-        add(Translations.ANTIMATTER_BOMB_CONTAINER_NAME, "Antimatter");
-        add(Translations.NEXT_BATTLE_TITLE, "Battle Over");
-        add(Translations.NEXT_BATTLE_SUBTITLE, "Next Battle?");
-        add(Translations.NEXT_BATTLE_QUESTION, "Are you ready for next battle?");
-        add(Translations.NEXT_BATTLE_YES, "Yes");
-        add(Translations.NEXT_BATTLE_NO, "No");
-        add(Translations.BINOCULARS_WEST, "west");
-        add(Translations.BINOCULARS_EAST, "east");
-        add(Translations.BINOCULARS_NORTH, "north");
-        add(Translations.BINOCULARS_SOUTH, "south");
-        add(Translations.BINOCULARS_TARGET, "target acquired");
-        add(Translations.BINOCULARS_COORDINATES, "coordinates");
-        add(Translations.USE_MESSAGE, "Use");
-        add(Translations.SIGMA_WIN_TITLE, "Team Sigma wins");
-        add(Translations.SIGMA_WIN_SUBTITLE, "Omega Objective Destroyed");
-        add(Translations.OMEGA_WIN_TITLE, "Team Omega wins");
-        add(Translations.OMEGA_WIN_SUBTITLE, "Sigma Objective Destroyed");
-        add(Translations.TEAM_OMEGA, "Team Omega");
-        add(Translations.TEAM_SIGMA, "Team Sigma");
-        add(Translations.JOIN_OMEGA, "Omega");
-        add(Translations.JOIN_SIGMA, "Sigma");
-        add(Translations.SPAWN_RESET, "Reset");
-        add(Translations.SELECT_CLASS_TITLE, "Class");
-        add(Translations.CLASS_DESCRIPTION, "Description");
-        add(Translations.CLASS_READY, "Ready");
-        add(Translations.CLASS_NEXT, "Next");
-        add(Translations.WARNING_MELTDOWN, "Meltdown");
-        add(Translations.CHEMICAL_WEAPON, "Chemical weapon");
-        add(Translations.WELCOME_REBEL, "Welcome, rebel!");
-        add(Translations.WELCOME_OFFICER, "Welcome, officer!");
-        add(Translations.WELCOME_LEADER, "Welcome, leader!");
-        add(Translations.WELCOME_REPRESENTATIVE, "Welcome, representative!");
-        add(Translations.WELCOME_REGULAR, "nope.");
-        add(Translations.ADS_TRAY, "ADS");
-        add(Translations.EQUIP_WEAPONS_MESSAGE, "Equip your weapons.");
-        add(Translations.ADS_DRAGON, "Dragon");
-        add(Translations.CONTROLLER_OUT_OF_RANGE, "Out of Range");
-        add(Translations.CONTROLLER_B83, "B-83");
-        add(Translations.OPS_KNIFE, "Ops knife");
-        add(Translations.REQUIRES, "Requires");
-        add(Translations.TACTICAL_NUKE_NAME, "Tactical Nuke");
 
         add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_1", "Radiological Alarm.");
         add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_2", "Nuclear weapon armed.");
         add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_3", "10 seconds left.");
+
+        add(RRIdentifiers.MODID + ".warning_meltdown", "Meltdown");
 
         add(RivalRebelsClass.NONE.getDescription(), "None");
         add(RivalRebelsClass.REBEL.getDescription(), "Front line hero, heavy warrior, super soldier, half human half war machine, tank. Team value: essential to achieve victory by holding the enemy and protecting the team. Armor: Heavy, long durability. Speed: +1");

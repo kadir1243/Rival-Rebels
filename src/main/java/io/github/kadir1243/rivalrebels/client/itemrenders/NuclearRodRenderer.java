@@ -12,10 +12,11 @@
 package io.github.kadir1243.rivalrebels.client.itemrenders;
 
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
-import io.github.kadir1243.rivalrebels.client.model.ModelLaptop;
+import io.github.kadir1243.rivalrebels.client.model.ModelRod;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -24,14 +25,16 @@ import org.joml.Vector3fc;
 import java.util.function.Consumer;
 
 @OnlyIn(Dist.CLIENT)
-public class LaptopRenderer implements NoDataSpecialModelRenderer {
+public class NuclearRodRenderer implements NoDataSpecialModelRenderer {
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         poseStack.pushPose();
-		poseStack.translate(0.3F, 0.3F, 0);
-        poseStack.mulPose(Axis.YP.rotationDegrees(180));
-		ModelLaptop.renderModel(submitNodeCollector, poseStack, -90, lightCoords, overlayCoords);
-		ModelLaptop.renderScreen(submitNodeCollector, RRIdentifiers.etubuntu, poseStack, -90, lightCoords, overlayCoords);
+		poseStack.translate(0.5f, 0.5f, -0.03f);
+		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+		poseStack.scale(0.5f, 1.25f, 0.5f);
+
+		ModelRod.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etradrod), lightCoords, overlayCoords);
+
 		poseStack.popPose();
 	}
 
@@ -39,4 +42,3 @@ public class LaptopRenderer implements NoDataSpecialModelRenderer {
     public void getExtents(Consumer<Vector3fc> output) {
     }
 }
-

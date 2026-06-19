@@ -13,7 +13,6 @@ package io.github.kadir1243.rivalrebels.common.block.crate;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
-import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.Containers;
@@ -42,16 +41,16 @@ public class BlockSupplies extends Block
 
 		if (level.isClientSide())
 		{
-			player.sendSystemMessage(Translations.inventory());
-			player.sendSystemMessage(Component.literal("§a" + RRItems.armyshovel.toStack().getItemName() + ". §9(" + "Ideal for special blocks." + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRBlocks.jump.get().getName() + ". §9(" + "Use at your own risk." + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRBlocks.quicksand.get().getName() + ". §9(" + "Sand that is quick" + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRBlocks.mario.get().getName() + ". §9(" + "For trap making." + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRBlocks.loader.get().getName() + ". §9(" + "Modular item container." + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRBlocks.steel.get().getName() + ". §9(" + "Climbable and blast resistant." + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRItems.expill.toStack().getItemName() + ". §9(" + "Take at your own risk." + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRItems.safepill.toStack().getItemName() + ". §9(" + "Restores health." + ")"));
-			player.sendSystemMessage(Component.literal("§a" + RRBlocks.breadbox.get().getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"));
+			player.sendSystemMessage(Component.translatable("RivalRebels.Inventory"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.armyshovel.toStack().getItemName() + ". §9(" + "Ideal for special blocks." + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.jump.get().getName() + ". §9(" + "Use at your own risk." + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.quicksand.get().getName() + ". §9(" + "Sand that is quick" + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.mario.get().getName() + ". §9(" + "For trap making." + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.loader.get().getName() + ". §9(" + "Modular item container." + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.steel.get().getName() + ". §9(" + "Climbable and blast resistant." + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.expill.toStack().getItemName() + ". §9(" + "Take at your own risk." + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.safepill.toStack().getItemName() + ". §9(" + "Restores health." + ")"));
+			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.breadbox.get().getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"));
 		}
 		if (!level.isClientSide())
 		{
@@ -69,7 +68,7 @@ public class BlockSupplies extends Block
 			if (level.getRandom().nextInt(5) == 0)
 			{
                 Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.toStack());
-				player.sendSystemMessage(Component.literal("§a" + RRItems.NUCLEAR_ROD.toStack().getItemName() + ". §9" + "(Used in nuclear weapons)"));
+				player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.toStack().getItemName() + ". §9" + "(Used in nuclear weapons)"));
 			}
 			return InteractionResult.SUCCESS;
 		}

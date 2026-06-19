@@ -12,6 +12,7 @@
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
+import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockNuclearBomb;
@@ -36,7 +37,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -147,7 +147,7 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
                     player.sendSystemMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)));
-                    player.sendSystemMessage(Translations.status().append(" ").append(rrteam.getBlockName()).append(" ").append(Translations.defuse()).append(this.getDefaultName()));
+                    player.sendSystemMessage(Component.translatable(RRIdentifiers.MODID + ".nuke_bomb_defuse", rrteam.getBlockName()));
                 }
 			}
 		}
@@ -167,14 +167,14 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
             float pitch = facing.getAxis().isVertical() ? facing.toYRot() : 0;
 			float yaw = facing.getAxis().isHorizontal() ? facing.toYRot() : 0;
 
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
 			level.addFreshEntity(new EntityNuke(level, getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, yaw, pitch, AmountOfCharges, hasTrollface));
+			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 		}
 
 		if (Countdown == 0 && AmountOfCharges == 0)
 		{
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
 			level.explode(null, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 4, Level.ExplosionInteraction.BLOCK);
+			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
 		}
     }
 

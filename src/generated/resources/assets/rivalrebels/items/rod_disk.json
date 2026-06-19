@@ -1,10 +1,6 @@
 {
   "model": {
-    "type": "minecraft:special",
-    "base": "minecraft:air",
-    "model": {
-      "type": "rivalrebels:rod_disk_renderer",
-      "texture": "rivalrebels:textures/entity/ba.png"
-    }
+    "type": "minecraft:model",
+    "model": "rivalrebels:item/rod_disk"
   }
 }

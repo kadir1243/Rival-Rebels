@@ -52,8 +52,7 @@ public class ModelBlastRing {
             Vector3f v7 = new Vector3f(Mth.sin(innerangle) * (key.size - key.thickness), +key.height, Mth.cos(innerangle) * (key.size - key.thickness));
             Vector3f v8 = new Vector3f(Mth.sin(innerangle) * (key.size + key.thickness), +key.height, Mth.cos(innerangle) * (key.size + key.thickness));
             for (float i = 0; i < 360; i += 360F / key.segments) {
-                Transformation transformation = new Transformation(null, Axis.YP.rotationDegrees(i), null, null);
-                TransformingVertexPipeline rotatedBuffer = new TransformingVertexPipeline(bakingBuffer, transformation);
+                TransformingVertexPipeline rotatedBuffer = new TransformingVertexPipeline(bakingBuffer, new Transformation(null, Axis.YP.rotationDegrees(i), null, null));
                 QuadHelper.addFace(rotatedBuffer, v5, v6, v8, v7, color);
                 QuadHelper.addFace(rotatedBuffer, v2, v1, v3, v4, color);
                 QuadHelper.addFace(rotatedBuffer, v2, v4, v8, v6, color);

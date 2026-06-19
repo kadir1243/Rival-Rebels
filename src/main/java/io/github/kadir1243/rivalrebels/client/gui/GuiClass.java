@@ -15,7 +15,6 @@ import io.github.kadir1243.rivalrebels.client.guihelper.GuiButton;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiScroll;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsClass;
-import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.components.Button;
 import net.neoforged.api.distmarker.Dist;
@@ -51,7 +50,7 @@ public class GuiClass extends Screen {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
 
-        nextButton = Button.builder(Translations.CLASS_NEXT.translate(), button -> {
+        nextButton = Button.builder(Component.translatable("RivalRebels.class.next"), button -> {
             switch (rrclass) {
                 case HACKER:
                     rrclass = RivalRebelsClass.REBEL;
@@ -70,7 +69,7 @@ public class GuiClass extends Screen {
                     break;
             }
         }).bounds(posX + 188, posY + 102, 60, 11).build(GuiButton::new);
-		doneButton = Button.builder(Translations.CLASS_READY.translate(), button -> this.minecraft.setScreen(new GuiSpawn(rrclass)))
+		doneButton = Button.builder(Component.translatable("RivalRebels.class.done"), button -> this.minecraft.setScreen(new GuiSpawn(rrclass)))
             .bounds(posX + 188, posY + 119, 60, 11)
             .build(GuiButton::new);
         gameScroll = (GuiScroll) Button.builder(Component.empty(), button -> {})
@@ -135,7 +134,7 @@ public class GuiClass extends Screen {
 		scalefactor = 0.666f;
         pose.pushMatrix();
 		pose.scale(scalefactor, scalefactor);
-        graphics.centeredText(font, Translations.CLASS_DESCRIPTION.translate(), (int) ((posX + 181) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
+        graphics.centeredText(font, Component.translatable("RivalRebels.class.description"), (int) ((posX + 181) / scalefactor), (int) ((posY + 28) / scalefactor), rrclass.color);
         pose.popMatrix();
 
         for (int i = 0; i < sizelookup.length; i++) {
@@ -162,7 +161,7 @@ public class GuiClass extends Screen {
 			graphics.item(rrclass.getInventory().get(i), X, Y);
 
 			ItemStack stack = rrclass.getInventory().get(i);
-			if (!stack.isEmpty()) graphics.text(font, Component.literal(String.valueOf(stack.getCount())),X+17-font.width(Component.literal(String.valueOf(stack.getCount()))),Y+9,0xFFFFFF);
+			if (!stack.isEmpty()) graphics.text(font, Component.nullToEmpty(String.valueOf(stack.getCount())),X+17-font.width(String.valueOf(stack.getCount())),Y+9,0xFFFFFF);
 			if (sizelookup[i] > 1) {
                 graphics.fillGradient(X + 17, Y + 3, (int) (X + ((font.width(stack.getHoverName()) + 4) * (sizelookup[i] - 1) * 2) + 15), Y + 13, 0xaa111111, 0xaa111111);
 				graphics.text(font, stack.getHoverName(), X + 18, Y + 4, 0xFFFFFF);

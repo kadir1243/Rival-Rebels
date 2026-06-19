@@ -17,18 +17,15 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.resources.Identifier;
+import net.minecraft.util.CommonColors;
 import org.joml.Vector3f;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
@@ -67,86 +64,180 @@ public class ModelNuclearBomb {
     private static final Vector3f v19 = new Vector3f(-s, -g * 24, -s);
     private static final Vector3f v20 = new Vector3f(-s, -g * 24, s);
 
-    private static final Map<Identifier, Supplier<List<QuadHelper.BakedQuadWrapper>>> BAKED_MODEL_BOMB_MAP = new HashMap<>();
+    private static final Supplier<QuadHelper.BakedData> BAKED_MODEL_BOMB = QuadHelper.createBakedModel(buffer -> {
+        int itemIcon = 39;
+        float var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
+        float var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
+        float var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
+        float var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
+        QuadHelper.addVertice(buffer, v2, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v1, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v3, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v2, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v4, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v3, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v1, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v4, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var3, var5));
+
+        itemIcon = 40;
+        var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
+        var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
+        var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
+        var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
+
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v6, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v7, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v5, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v8, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v9, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v10, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v22, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v10, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v11, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v23, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v11, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v12, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v21, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v24, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v12, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v9, new TextureVertice(var3, var5));
+
+        itemIcon = 38;
+        var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
+        var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
+        var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
+        var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
+
+        QuadHelper.addVertice(buffer, v10, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v9, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v12, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v11, new TextureVertice(var3, var5));
+
+        itemIcon = 41;
+        var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
+        var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
+        var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
+        var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
+        float o = 0.999F;
+
+        QuadHelper.addVertice(buffer, v13.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v14.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v18.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v17.mul(o, new Vector3f()), new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v14.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v15.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v19.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v18.mul(o, new Vector3f()), new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v15.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v16.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v20.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v19.mul(o, new Vector3f()), new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v16.mul(o, new Vector3f()), new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v13.mul(o, new Vector3f()), new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v17.mul(o, new Vector3f()), new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v20.mul(o, new Vector3f()), new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var3, var5));
+
+        itemIcon = 42;
+        var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
+        var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
+        var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
+        var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
+
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v15, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v13, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v17, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v19, new TextureVertice(var3, var5));
+
+        QuadHelper.addVertice(buffer, v14, new TextureVertice(var3, var6));
+        QuadHelper.addVertice(buffer, v16, new TextureVertice(var4, var6));
+        QuadHelper.addVertice(buffer, v20, new TextureVertice(var4, var5));
+        QuadHelper.addVertice(buffer, v18, new TextureVertice(var3, var5));
+    });
 
     public static void renderModel(PoseStack poseStack, SubmitNodeCollector nodeCollector, Identifier texture, int light, boolean hasFuse) {
         poseStack.pushPose();
         poseStack.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
+        int itemIcon;
+        float var3;
+        float var4;
+        float var5;
+        float var6;
 
         poseStack.pushPose();
         poseStack.scale(1.01f, 1.01f, 1.01f);
 
         int overlay = OverlayTexture.NO_OVERLAY;
 
-        QuadHelper.submitQuadSupplier(nodeCollector, poseStack, RenderTypes.entitySolid(texture), BAKED_MODEL_BOMB_MAP.computeIfAbsent(texture, t -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t), buffer -> {
-            int itemIcon = 39;
-            float var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
-            float var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
-            float var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
-            float var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
-            QuadHelper.addFace(buffer, v2, v1, v5, v6, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v3, v2, v6, v7, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v4, v3, v7, v8, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v1, v4, v8, v5, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-
-            itemIcon = 40;
-            var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
-            var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
-            var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
-            var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
-
-            QuadHelper.addFace(buffer, v6, v5, v21, v22, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v7, v6, v22, v23, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v8, v7, v23, v24, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v5, v8, v24, v21, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v22, v21, v9, v10, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v23, v22, v10, v11, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v24, v23, v11, v12, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v21, v24, v12, v9, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-
-            itemIcon = 38;
-            var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
-            var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
-            var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
-            var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
-
-            QuadHelper.addFace(buffer, v10, v9, v12, v11, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-
-            itemIcon = 41;
-            var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
-            var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
-            var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
-            var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
-            float o = 0.999F;
-
-            QuadHelper.addFace(buffer, v13.mul(o, new Vector3f()), v14.mul(o, new Vector3f()), v18.mul(o, new Vector3f()), v17.mul(o, new Vector3f()), new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v14.mul(o, new Vector3f()), v15.mul(o, new Vector3f()), v19.mul(o, new Vector3f()), v18.mul(o, new Vector3f()), new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v15.mul(o, new Vector3f()), v16.mul(o, new Vector3f()), v20.mul(o, new Vector3f()), v19.mul(o, new Vector3f()), new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v16.mul(o, new Vector3f()), v13.mul(o, new Vector3f()), v17.mul(o, new Vector3f()), v20.mul(o, new Vector3f()), new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-
-            QuadHelper.addFace(buffer, v14, v13, v17, v18, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v15, v14, v18, v19, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v16, v15, v19, v20, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v13, v16, v20, v17, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-
-            itemIcon = 42;
-            var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
-            var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
-            var5 = (itemIcon / 16 * 16 + 0) / 256.0F;
-            var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
-
-            QuadHelper.addFace(buffer, v13, v15, v19, v17, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v16, v14, v18, v20, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v15, v13, v17, v19, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-            QuadHelper.addFace(buffer, v14, v16, v20, v18, new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5));
-        })), light, overlay);
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(texture), BAKED_MODEL_BOMB.get().quadCollection(), poseStack, CommonColors.WHITE, light, overlay);
 
         if (!hasFuse) {
-            int itemIcon;
-            float var3;
-            float var4;
-            float var5;
-            float var6;
             itemIcon = 37;
             var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
             var4 = (itemIcon % 16 * 16 + 16) / 256.0F;
@@ -160,11 +251,6 @@ public class ModelNuclearBomb {
                 RenderHelper.addVertice(pose, consumer, v4, new TextureVertice(var3, var5), light, overlay);
             });
         } else {
-            int itemIcon;
-            float var3;
-            float var4;
-            float var5;
-            float var6;
             itemIcon = 43;
             var3 = (itemIcon % 16 * 16 + 0) / 256.0F;
             var4 = (itemIcon % 16 * 16 + 16) / 256.0F;

@@ -85,7 +85,7 @@ public enum RivalRebelsClass implements StringRepresentable {
                 RRItems.chip.toStack(),
                 //new ItemStack(RivalRebels.controller),
                 RRItems.remote.toStack(),
-                RRBlocks.remotecharge.toStack(8),
+                new ItemStack(RRBlocks.remotecharge, 8),
                 //new ItemStack(RivalRebels.core1),
                 RRBlocks.barricade.toStack(2),
                 RRBlocks.tower.toStack(4),
@@ -95,8 +95,8 @@ public enum RivalRebelsClass implements StringRepresentable {
                 //new ItemStack(RivalRebels.supplies, 2),
                 RRItems.battery.toStack(64),
                 RRItems.battery.toStack(64),
-                RRBlocks.steel.toStack(16),
-                RRBlocks.jump.toStack(8)
+                new ItemStack(RRBlocks.steel, 16),
+                new ItemStack(RRBlocks.jump, 8)
             };
             case REBEL -> new ItemStack[]{
                 RRItems.rpg.toStack(),
@@ -119,7 +119,7 @@ public enum RivalRebelsClass implements StringRepresentable {
                 RRItems.rocket.toStack(64),
                 RRItems.redrod.toStack(),
                 RRItems.redrod.toStack(),
-                RRBlocks.jump.toStack(4)
+                new ItemStack(RRBlocks.jump, 4)
             };
             case NUKER -> new ItemStack[]{
                 RRItems.flamethrower.toStack(),
@@ -135,8 +135,8 @@ public enum RivalRebelsClass implements StringRepresentable {
                 RRBlocks.nukeCrateTop.toStack(),
                 RRBlocks.nukeCrateBottom.toStack(),
                 RRItems.NUCLEAR_ROD.toStack(),
-                RRBlocks.explosives.toStack(2),
-                RRBlocks.tower.toStack(2),
+                new ItemStack(RRBlocks.explosives, 2),
+                new ItemStack(RRBlocks.tower, 2),
                 //new ItemStack(RivalRebels.ammunition),
                 RRItems.fuel.toStack(64),
                 RRBlocks.jump.toStack(4)
@@ -158,16 +158,16 @@ public enum RivalRebelsClass implements StringRepresentable {
                 RRItems.antenna.toStack(),
                 //new ItemStack(RivalRebels.forcefieldnode, 2),
                 //new ItemStack(RivalRebels.ffreciever, 2),
-                RRBlocks.bastion.toStack(4),
-                RRBlocks.barricade.toStack(4),
-                RRBlocks.bunker.toStack(4),
+                new ItemStack(RRBlocks.bastion, 4),
+                new ItemStack(RRBlocks.barricade, 4),
+                new ItemStack(RRBlocks.bunker, 4),
                 //new ItemStack(RivalRebels.mariotrap, 2),
-                RRBlocks.ammunition.toStack(3),
+                new ItemStack(RRBlocks.ammunition, 3),
                 RRItems.hydrod.toStack(),
-                RRBlocks.quicksandtrap.toStack(4),
-                RRBlocks.mariotrap.toStack(4),
-                RRBlocks.steel.toStack(32),
-                RRBlocks.jump.toStack(8)
+                new ItemStack(RRBlocks.quicksandtrap, 4),
+                new ItemStack(RRBlocks.mariotrap, 4),
+                new ItemStack(RRBlocks.steel, 32),
+                new ItemStack(RRBlocks.jump, 8)
             };
         };
     }
