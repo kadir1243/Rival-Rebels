@@ -152,7 +152,8 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 	{
 		if (wep != 0)
 		{
-			if (getItem(6).has(RRComponents.CHIP_DATA)) {
+			if (!getItem(6).isEmpty() && getItem(6).has(RRComponents.CHIP_DATA))
+			{
                 ChipData chipData = getItem(6).get(RRComponents.CHIP_DATA);
                 team = chipData.team();
 				owner = ResolvableProfile.createResolved(chipData.gameProfile());

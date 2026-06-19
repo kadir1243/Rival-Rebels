@@ -22,8 +22,8 @@ public class LootTableDataGen extends LootTableProvider {
     }
 
     @Override
-    public CompletableFuture<?> run(CachedOutput cache) {
-        return super.run(cache).exceptionally(e -> {
+    public CompletableFuture<?> run(CachedOutput p_254060_) {
+        return super.run(p_254060_).exceptionally(e -> {
             e.printStackTrace();
             return null;
         });

@@ -20,7 +20,6 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.util.CommonColors;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.ItemStack;
 
@@ -29,11 +28,11 @@ import java.util.List;
 import java.util.function.Supplier;
 
 public enum RivalRebelsClass implements StringRepresentable {
-	NONE(0, CommonColors.WHITE, "NONE", () -> RRTextures.guitrivalrebels),
-	REBEL(1, CommonColors.RED, "REBEL", () -> RRTextures.guitrebel),
-	NUKER(2, CommonColors.YELLOW, "NUKER", () -> RRTextures.guitnuker),
-	INTEL(3, 0xFF00FFBB, "INTEL", () -> RRTextures.guitintel),
-	HACKER(4, CommonColors.GREEN, "HACKER", () -> RRTextures.guithacker);
+	NONE(0, 0xFFFFFF, "NONE", () -> RRTextures.guitrivalrebels),
+	REBEL(1, 0xFF0000, "REBEL", () -> RRTextures.guitrebel),
+	NUKER(2, 0xFFFF00, "NUKER", () -> RRTextures.guitnuker),
+	INTEL(3, 0x00FFBB, "INTEL", () -> RRTextures.guitintel),
+	HACKER(4, 0x00FF00, "HACKER", () -> RRTextures.guithacker);
 
     public static final Codec<RivalRebelsClass> CODEC = StringRepresentable.fromValues(RivalRebelsClass::values);
     public static final StreamCodec<ByteBuf, RivalRebelsClass> STREAM_CODEC = ByteBufCodecs.fromCodec(CODEC);

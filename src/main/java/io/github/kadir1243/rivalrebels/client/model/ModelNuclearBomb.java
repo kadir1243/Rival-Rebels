@@ -154,9 +154,10 @@ public class ModelNuclearBomb {
             var6 = (itemIcon / 16 * 16 + 16) / 256.0F;
 
             nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(texture), (pose, consumer) -> {
-                RenderHelper.addFace(pose, consumer, v1, v2, v3, v4,
-                    new TextureVertice(var3, var6), new TextureVertice(var4, var6), new TextureVertice(var4, var5), new TextureVertice(var3, var5),
-                    light, overlay);
+                RenderHelper.addVertice(pose, consumer, v1, new TextureVertice(var3, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v2, new TextureVertice(var4, var6), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v3, new TextureVertice(var4, var5), light, overlay);
+                RenderHelper.addVertice(pose, consumer, v4, new TextureVertice(var3, var5), light, overlay);
             });
         } else {
             int itemIcon;

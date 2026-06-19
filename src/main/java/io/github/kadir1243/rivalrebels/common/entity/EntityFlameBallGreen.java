@@ -120,7 +120,7 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 					for (int z = -3; z < 4; z++) {
                         BlockPos pos = new BlockPos((int) getX() + x, (int) getY() + y, (int) getZ() + z);
                         BlockState state = level().getBlockState(pos);
-						if (state.isAir() || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
+						if (level().isEmptyBlock(pos) || state.is(BlockTags.SNOW) || state.is(BlockTags.ICE) || state.is(BlockTags.LEAVES)) level().setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 					}
 				}
 			}

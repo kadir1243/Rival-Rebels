@@ -73,17 +73,17 @@ public class TileEntityTachyonBomb extends BaseContainerBlockEntity implements T
 	}
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    protected void loadAdditional(ValueInput p_422403_) {
+        super.loadAdditional(p_422403_);
 
-        ContainerHelper.loadAllItems(input, this.chestContents);
+        ContainerHelper.loadAllItems(p_422403_, this.chestContents);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
+    protected void saveAdditional(ValueOutput p_422177_) {
+        super.saveAdditional(p_422177_);
 
-        ContainerHelper.saveAllItems(output, this.chestContents);
+        ContainerHelper.saveAllItems(p_422177_, this.chestContents);
     }
 
     @Override
@@ -104,14 +104,15 @@ public class TileEntityTachyonBomb extends BaseContainerBlockEntity implements T
         nuclear = 0;
         hydrogen = 0;
         for (int i = 3; i <= 18; i++) {
-            ItemStack stack = getItem(i);
-            if (!stack.isEmpty() && stack.isEnchanted()) {
-                if (i < 11 && stack.is(RRItems.NUCLEAR_ROD)) {
+            ItemStack is = getItem(i);
+            if (!is.isEmpty() && is.isEnchanted()) {
+                Item item = is.getItem();
+                if (i < 11 && item == RRItems.NUCLEAR_ROD.asItem()) {
                     nuclear++;
-                } else if (i > 10 && stack.is(RRItems.hydrod)) {
+                } else if (i > 10 && item == RRItems.hydrod.asItem()) {
                     hydrogen++;
                 }
-                if (stack.is(RRItems.trollmask)) {
+                if (item == RRItems.trollmask.asItem()) {
                     hasTrollface = true;
                 }
             }

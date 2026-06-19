@@ -16,7 +16,6 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -27,46 +26,43 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 public class BlockAmmunition extends Block {
-    public BlockAmmunition(Properties settings) {
-        super(settings);
-    }
-
-    private static Component parenthesized(MutableComponent a) {
-        return Component.literal("(").withStyle(ChatFormatting.BLUE).append(a.withStyle(ChatFormatting.BLUE)).append(Component.literal(")").withStyle(ChatFormatting.BLUE));
-    }
+	public BlockAmmunition(Properties settings)
+	{
+		super(settings);
+	}
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
         int x = pos.getX();
         int y = pos.getY();
         int z = pos.getZ();
-        if (level.isClientSide()) {
-            player.sendSystemMessage(Translations.inventory());
-            player.sendSystemMessage(RRItems.rocket.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.AMMUNITION.translate(RRItems.rpg.toStack().getItemName().copy().withStyle(ChatFormatting.BLUE)))));
-            player.sendSystemMessage(RRItems.battery.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.AMMUNITION.translate(RRItems.tesla.toStack().getItemName().copy().withStyle(ChatFormatting.BLUE)))));
-            player.sendSystemMessage(RRItems.hydrod.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.AMMUNITION.translate(RRItems.plasmacannon.toStack().getItemName().copy().withStyle(ChatFormatting.BLUE)))));
-            player.sendSystemMessage(RRItems.fuel.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.AMMUNITION.translate(RRItems.flamethrower.toStack().getItemName().copy().withStyle(ChatFormatting.BLUE)))));
-            player.sendSystemMessage(RRItems.redrod.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.AMMUNITION.translate(RRItems.einsten.toStack().getItemName().copy().withStyle(ChatFormatting.BLUE)))));
-            player.sendSystemMessage(RRItems.gasgrenade.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Translations.CHEMICAL_WEAPON.translate())));
-        } else {
-            level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+		if (level.isClientSide()) {
+			player.sendSystemMessage(Translations.inventory());
+            player.sendSystemMessage(RRItems.rocket.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(RRItems.rpg.toStack().getItemName().copy().withStyle(ChatFormatting.BLUE)).append(" ").append(Translations.ammunition()).append(")"));
+			player.sendSystemMessage(Component.literal("§a" + RRItems.battery.toStack().getItemName() + ". §9(" + RRItems.tesla.toStack().getItemName() + " " + Translations.ammunition() + ")"));
+			player.sendSystemMessage(Component.literal("§a" + RRItems.hydrod.toStack().getItemName() + ". §9(" + RRItems.plasmacannon.toStack().getItemName() + " " + Translations.ammunition() + ")"));
+			player.sendSystemMessage(Component.literal("§a" + RRItems.fuel.toStack().getItemName() + ". §9(" + RRItems.flamethrower.toStack().getItemName() + " " + Translations.ammunition() + ")"));
+			player.sendSystemMessage(Component.literal("§a" + RRItems.redrod.toStack().getItemName() + ". §9(" + RRItems.einsten.toStack().getItemName() + " " + Translations.ammunition() + ")"));
+			player.sendSystemMessage(Component.literal("§a" + RRItems.gasgrenade.toStack().getItemName() + ". §9(" + Translations.CHEMICAL_WEAPON.translate() + ")"));
+		} else {
             Containers.dropItemStack(level, x, y, z, RRItems.rocket.toStack(32));
-            Containers.dropItemStack(level, x, y, z, RRItems.battery.toStack(16));
-            Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
-            Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
-            Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
-            Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
-            Containers.dropItemStack(level, x, y, z, RRItems.fuel.toStack(64));
-            Containers.dropItemStack(level, x, y, z, RRItems.gasgrenade.toStack(6));
-            Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
-            Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
-            Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
-            Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
-            if (level.getRandom().nextInt(3) == 0) {
-                Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.toStack());
-                player.sendSystemMessage(RRItems.NUCLEAR_ROD.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(parenthesized(Component.literal("Used in nuclear weapons"))));
-            }
-        }
-        return InteractionResult.SUCCESS;
-    }
+			Containers.dropItemStack(level, x, y, z, RRItems.battery.toStack(16));
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
+			Containers.dropItemStack(level, x, y, z, RRItems.hydrod.toStack());
+			Containers.dropItemStack(level, x, y, z, RRItems.fuel.toStack(64));
+			Containers.dropItemStack(level, x, y, z, RRItems.gasgrenade.toStack(6));
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
+			Containers.dropItemStack(level, x, y, z, RRItems.redrod.toStack());
+			level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+			if (level.getRandom().nextInt(3) == 0) {
+				Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.toStack());
+				player.sendSystemMessage(Component.literal("§a" + RRItems.NUCLEAR_ROD.toStack().getItemName() + ". §9(" + "Used in nuclear weapons" + ")"));
+			}
+		}
+		return InteractionResult.SUCCESS;
+	}
 }

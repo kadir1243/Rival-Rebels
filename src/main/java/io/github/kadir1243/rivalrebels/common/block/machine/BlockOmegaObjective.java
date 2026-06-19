@@ -43,7 +43,7 @@ public class BlockOmegaObjective extends BaseEntityBlock {
     }
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
 		if (!pos.equals(RivalRebels.round.omegaData.objPos())) {
 			world.setBlockAndUpdate(RivalRebels.round.omegaData.objPos(), RRBlocks.plasmaexplosion.get().defaultBlockState());
 			RivalRebels.round.omegaData.objPos = pos;

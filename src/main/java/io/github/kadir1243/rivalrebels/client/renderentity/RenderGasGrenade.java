@@ -89,10 +89,10 @@ public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade, RenderGas
     }
 
     @Override
-    public void extractRenderState(EntityGasGrenade entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.xRot = entity.getXRot(partialTick);
-        reusedState.yRot = entity.getYRot(partialTick);
+    public void extractRenderState(EntityGasGrenade p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
     }
 
     public static class State extends EntityRenderState {

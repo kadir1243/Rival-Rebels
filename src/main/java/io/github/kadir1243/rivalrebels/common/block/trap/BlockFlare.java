@@ -15,6 +15,8 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -39,6 +41,7 @@ public class BlockFlare extends WallTorchBlock {
 		return canSupportCenter(world, pos.below(), Direction.UP);
 	}
 
+    @OnlyIn(Dist.CLIENT)
     @Override
     public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
         int x = pos.getX();

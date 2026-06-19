@@ -99,14 +99,14 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
         nuclear = 0;
         hydrogen = 0;
         for (int i = 3; i <= 18; i++) {
-            ItemStack stack = getItem(i);
-            if (!stack.isEmpty()) {
-                if (i < 11 && stack.is(RRItems.NUCLEAR_ROD)) {
+            if (!getItem(i).isEmpty()) {
+                Item item = getItem(i).getItem();
+                if (i < 11 && item == RRItems.NUCLEAR_ROD.asItem()) {
                     nuclear++;
-                } else if (i > 10 && stack.is(RRItems.hydrod)) {
+                } else if (i > 10 && item == RRItems.hydrod.asItem()) {
                     hydrogen++;
                 }
-                if (stack.is(RRItems.trollmask)) {
+                if (item == RRItems.trollmask.asItem()) {
                     hasTrollface = true;
                 }
             }

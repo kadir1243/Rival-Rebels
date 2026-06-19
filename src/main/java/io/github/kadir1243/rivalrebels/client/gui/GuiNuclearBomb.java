@@ -34,11 +34,11 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
         super.extractLabels(graphics, xm, ym);
 
 		if (menu.isArmed()) {
-            graphics.text(font, Translations.BOMB_ARMED.translate(), 80, imageHeight - 96 + 2, CommonColors.WHITE, false);
+            graphics.text(font, Translations.BOMB_ARMED.translate(), 80, imageHeight - 96 + 2, 0xffffff, false);
 		} else if (!menu.hasTrollFace()) {
-            graphics.text(font, Translations.BOMB_MEGATONS.translate(menu.getAmountOfCharges() * 2.5), 80, imageHeight - 96 + 2, CommonColors.WHITE, false);
+            graphics.text(font, Component.literal(menu.getAmountOfCharges() * 2.5 + " ").append(Translations.BOMB_MEGATONS.translate()), 80, imageHeight - 96 + 2, 0xffffff, false);
         } else {
-            graphics.text(font, Component.literal("Umad bro?"), 80, imageHeight - 96 + 2, CommonColors.WHITE, false);
+            graphics.text(font, Component.literal("Umad bro?"), 80, imageHeight - 96 + 2, 0xffffff, false);
         }
     }
 
@@ -49,8 +49,8 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
 
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Translations.NUKE_TRANSLATION.translate(), 8, 6, CommonColors.WHITE, false);
-        graphics.text(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, CommonColors.WHITE, false);
+        // graphics.text(font, Component.translatable(NUKE_TRANSLATION.toLanguageKey()), 8, 6, 0xffffff, false);
+        graphics.text(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, 0xffffff, false);
     }
 
     @Override
@@ -59,8 +59,8 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     }
 
     @Override
-    public int getTimerColor(int countdown) {
-        return countdown % 20 >= 10 ? CommonColors.BLACK : CommonColors.RED;
+    public int getTimerColor() {
+        return getCountdown() % 20 >= 10 ? 0x000000 : 0xff0000;
     }
 
     @Override
@@ -73,8 +73,8 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
         super.extractBackground(graphics, mouseX, mouseY, a);
         int color = CommonColors.WHITE;
         if (menu.getAmountOfCharges() != 0) color = ARGB.colorFromFloat(1F, (menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0F);
-		int x = this.leftPos;
-		int y = this.topPos;
+		int x = (width - imageWidth) / 2;
+		int y = (height - imageHeight) / 2;
 		RRTextures.guitnuke.blit(graphics, x, y, 0, 0, imageWidth, 81, color);
         RRTextures.guitnuke.blit(graphics, x, y + 81, 0, 81, imageWidth, imageHeight - 81, CommonColors.WHITE);
 	}

@@ -114,12 +114,12 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         add(Translations.INVENTORY_TRANSLATION, "Inventory");
         add(Translations.USE_PLIERS_TO_BUILD_TRANSLATION, "Use pliers to build.");
         add(Translations.USE_PLIERS_TO_OPEN_TRANSLATION, "Use pliers to open.");
-        add(Translations.AMMUNITION, "%s ammunition");
+        add(Translations.AMMUNITION_TRANSLATION, "ammunition");
         add(Translations.NUKE_TRANSLATION, "Nuclear Bomb");
         add(Translations.SHIFT_CLICK, "Shift-Click (Sneak).");
         add(Translations.BOMB_TIMER, "Timer: -%s:%s");
         add(Translations.UNBALANCED_BOMB, "Unbalanced");
-        add(Translations.BOMB_MEGATONS, "%s Megatons");
+        add(Translations.BOMB_MEGATONS, "Megatons");
         add(Translations.BOMB_ARMED, "Armed");
         add(Translations.LAPTOP_B2_SPIRIT, "B-2 Spirit");
         add(Translations.BUILDING_TOKAMAK, "Constructing ToKaMaK %s");
@@ -168,7 +168,6 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         add(Translations.OPS_KNIFE, "Ops knife");
         add(Translations.REQUIRES, "Requires");
         add(Translations.TACTICAL_NUKE_NAME, "Tactical Nuke");
-        add(Translations.PRESS_TO_SELECT_BOMB_TYPE, "Press C to select bomb type");
 
         add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_1", "Radiological Alarm.");
         add(RRIdentifiers.MODID + ".warning_bomb_will_explode_line_2", "Nuclear weapon armed.");

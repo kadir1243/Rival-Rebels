@@ -121,7 +121,7 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
     private void renderBlastSphere(RenderTachyonBombBlast.State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, float scale, int color) {
         poseStack.pushPose();
         poseStack.scale(scale, scale, scale);
-        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
             ObjModels.render(blastSphereModel, consumer, pose, color, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         });
 
@@ -144,9 +144,9 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
     }
 
     @Override
-    public void extractRenderState(EntityTachyonBombBlast entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.deltaMovement = entity.getDeltaMovement();
+    public void extractRenderState(EntityTachyonBombBlast p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.deltaMovement = p_entity.getDeltaMovement();
     }
 
     public static class State extends EntityRenderState {

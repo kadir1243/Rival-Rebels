@@ -63,10 +63,10 @@ public class RenderB83 extends EntityRenderer<EntityB83, RenderB83.State> {
     }
 
     @Override
-    public void extractRenderState(EntityB83 entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.xRot = entity.getXRot(partialTick);
-        reusedState.yRot = entity.getYRot(partialTick);
+    public void extractRenderState(EntityB83 p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
     }
 
     public static class State extends EntityRenderState {

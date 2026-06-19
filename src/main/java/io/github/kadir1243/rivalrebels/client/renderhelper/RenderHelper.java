@@ -69,17 +69,35 @@ public class RenderHelper {
         });
 	}
 
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light) {
+        addFace(pose, buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, OverlayTexture.NO_OVERLAY);
+    }
+
     public static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light) {
         addFace(pose, buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, OverlayTexture.NO_OVERLAY);
     }
 
-    public static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
-        addVertice(pose, buffer, v1, t1, light, overlay);
-        addVertice(pose, buffer, v2, t2, light, overlay);
-        addVertice(pose, buffer, v3, t3, light, overlay);
-        addVertice(pose, buffer, v4, t4, light, overlay);
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
+        addFace(pose, buffer, v1, v2, v3, v4, new TextureFace(t1, t2, t3, t4), light, overlay);
     }
 
+    public static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
+        addFace(pose, buffer, v1, v2, v3, v4, new TextureFace(t1, t2, t3, t4), light, overlay);
+    }
+
+    public static void addFace(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, int color, int light, int overlay) {
+        addVertice(poseStack, buffer, v1, color, light, overlay);
+        addVertice(poseStack, buffer, v2, color, light, overlay);
+        addVertice(poseStack, buffer, v3, color, light, overlay);
+        addVertice(poseStack, buffer, v4, color, light, overlay);
+    }
+
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureFace t, int light, int overlay) {
+        addVertice(pose, buffer, v1, t.v1(), light, overlay);
+        addVertice(pose, buffer, v2, t.v2(), light, overlay);
+        addVertice(pose, buffer, v3, t.v3(), light, overlay);
+        addVertice(pose, buffer, v4, t.v4(), light, overlay);
+    }
     public static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureFace t, int light, int overlay) {
         addVertice(pose, buffer, v1, t.v1(), light, overlay);
         addVertice(pose, buffer, v2, t.v2(), light, overlay);
@@ -87,11 +105,11 @@ public class RenderHelper {
         addVertice(pose, buffer, v4, t.v4(), light, overlay);
     }
 
-    public static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureFace t, int color, int light, int overlay) {
-        addVertice(pose, buffer, v1, t.v1(), color, light, overlay);
-        addVertice(pose, buffer, v2, t.v2(), color, light, overlay);
-        addVertice(pose, buffer, v3, t.v3(), color, light, overlay);
-        addVertice(pose, buffer, v4, t.v4(), color, light, overlay);
+    public static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x1, float x2, float y2, float y1, int light, int overlay) {
+        addVertice(pose, buffer, v1, new TextureVertice(x1, y1), light, overlay);
+        addVertice(pose, buffer, v2, new TextureVertice(x2, y1), light, overlay);
+        addVertice(pose, buffer, v3, new TextureVertice(x2, y2), light, overlay);
+        addVertice(pose, buffer, v4, new TextureVertice(x1, y2), light, overlay);
     }
 
     public static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x1, float x2, float y2, float y1, int light, int overlay) {
@@ -99,6 +117,15 @@ public class RenderHelper {
         addVertice(pose, buffer, v2, new TextureVertice(x2, y1), light, overlay);
         addVertice(pose, buffer, v3, new TextureVertice(x2, y2), light, overlay);
         addVertice(pose, buffer, v4, new TextureVertice(x1, y2), light, overlay);
+    }
+
+    public static void addVertice(PoseStack pose, VertexConsumer buffer, Vector3f v, TextureVertice t, int color, int light, int overlay) {
+        buffer.addVertex(pose.last(), v)
+            .setColor(color)
+            .setUv(t.x(), t.y())
+            .setOverlay(overlay)
+            .setLight(light)
+            .setNormal(pose.last(), 0F, 0F, 1F);
     }
 
     public static void addVertice(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v, TextureVertice t, int color, int light, int overlay) {
@@ -110,8 +137,20 @@ public class RenderHelper {
             .setNormal(pose, 0F, 0F, 1F);
     }
 
+    public static void addVertice(PoseStack pose, VertexConsumer buffer, Vector3f v, TextureVertice t, int light, int overlay) {
+        addVertice(pose, buffer, v, t, CommonColors.WHITE, light, overlay);
+    }
+
     public static void addVertice(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v, TextureVertice t, int light, int overlay) {
         addVertice(pose, buffer, v, t, CommonColors.WHITE, light, overlay);
     }
 
+    public static void addVertice(PoseStack pose, VertexConsumer buffer, Vector3f v, int color, int light, int overlay) {
+        buffer.addVertex(pose.last(), v)
+            .setColor(color)
+            .setUv(16, 16)
+            .setOverlay(overlay)
+            .setLight(light)
+            .setNormal(pose.last(), 0F, 0F, 1F);
+    }
 }

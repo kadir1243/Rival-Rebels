@@ -61,7 +61,7 @@ public class RenderB2Frag extends EntityRenderer<EntityB2Frag, RenderB2Frag.Stat
 	}
 
     @Override
-    protected boolean affectedByCulling(EntityB2Frag entity) {
+    protected boolean affectedByCulling(EntityB2Frag p_365169_) {
         return false;
     }
 
@@ -76,11 +76,11 @@ public class RenderB2Frag extends EntityRenderer<EntityB2Frag, RenderB2Frag.Stat
     }
 
     @Override
-    public void extractRenderState(EntityB2Frag entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.xRot = entity.getXRot(partialTick);
-        reusedState.yRot = entity.getYRot(partialTick);
-        reusedState.type = entity.type;
+    public void extractRenderState(EntityB2Frag p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+        reusedState.type = p_entity.type;
     }
 
     public static class State extends EntityRenderState {

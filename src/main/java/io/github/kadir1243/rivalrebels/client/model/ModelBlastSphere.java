@@ -29,7 +29,7 @@ public class ModelBlastSphere {
     }
 
     public static void renderModel(PoseStack matrices, MultiBufferSource vertexConsumers, float size, int color) {
-        renderModel(matrices, vertexConsumers.getBuffer(RRRenderTypes.MODEL_BLAST_SPHERE), size, color);
+        renderModel(matrices, vertexConsumers.getBuffer(RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES), size, color);
     }
 
 	public static void renderModel(PoseStack matrices, VertexConsumer buffer, float size, int color) {

@@ -119,8 +119,8 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
         if (renderState.rider != null) {
             RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(renderState.rider.getGameProfile());
             color = switch (rrp.rrteam) {
-                case OMEGA -> 0xFF44FF44;
-                case SIGMA -> 0xFF4444FF;
+                case OMEGA -> 0x44FF44;
+                case SIGMA -> 0x4444FF;
                 case NONE -> CommonColors.WHITE;
             };
         }
@@ -446,35 +446,35 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
     }
 
     @Override
-    public void extractRenderState(EntityRhodes entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        float ptt = Math.min((entity.ticksSinceLastPacket + partialTick)/5f, 1);
-        if (entity.tickCount<10) ptt = 1;
+    public void extractRenderState(EntityRhodes p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        float ptt = Math.min((p_entity.ticksSinceLastPacket + partialTick)/5f, 1);
+        if (p_entity.tickCount<10) ptt = 1;
         reusedState.ptt = ptt;
-        reusedState.rider = entity.rider;
-        reusedState.ticksSinceLastPacket = entity.ticksSinceLastPacket;
-        reusedState.health = entity.getHealth();
-        reusedState.scale = entity.getScale();
-        reusedState.displayName = entity.getDisplayName();
-        reusedState.variant = entity.getVariant();
-        reusedState.flagTextureLocation = entity.getFlagTextureLocation();
-        reusedState.leftthighpitch = entity.getleftthighpitch(ptt);
-        reusedState.rightthighpitch = entity.getrightthighpitch(ptt);
-        reusedState.leftshinpitch = entity.getleftshinpitch(ptt);
-        reusedState.rightshinpitch = entity.getrightshinpitch(ptt);
-        reusedState.rightarmpitch = entity.getrightarmpitch(ptt);
-        reusedState.rightarmyaw = entity.getrightarmyaw(ptt);
-        reusedState.leftarmpitch = entity.getleftarmpitch(ptt);
-        reusedState.leftarmyaw = entity.getleftarmyaw(ptt);
-        reusedState.headpitch = entity.getheadpitch(ptt);
-        reusedState.bodyyaw = entity.getbodyyaw(ptt);
-        reusedState.viewYRot = entity.getViewYRot(ptt);
-        reusedState.b2Energy = entity.getB2Energy();
-        reusedState.isBurning = entity.isFire();
-        reusedState.topLaserEnabled = entity.isTopLaserEnabled();
-        reusedState.bottomLaserEnabled = entity.isBottomLaserEnabled();
-        reusedState.forceFieldEnabled = entity.isForceFieldEnabled();
-        reusedState.jet = entity.jet;
+        reusedState.rider = p_entity.rider;
+        reusedState.ticksSinceLastPacket = p_entity.ticksSinceLastPacket;
+        reusedState.health = p_entity.getHealth();
+        reusedState.scale = p_entity.getScale();
+        reusedState.displayName = p_entity.getDisplayName();
+        reusedState.variant = p_entity.getVariant();
+        reusedState.flagTextureLocation = p_entity.getFlagTextureLocation();
+        reusedState.leftthighpitch = p_entity.getleftthighpitch(ptt);
+        reusedState.rightthighpitch = p_entity.getrightthighpitch(ptt);
+        reusedState.leftshinpitch = p_entity.getleftshinpitch(ptt);
+        reusedState.rightshinpitch = p_entity.getrightshinpitch(ptt);
+        reusedState.rightarmpitch = p_entity.getrightarmpitch(ptt);
+        reusedState.rightarmyaw = p_entity.getrightarmyaw(ptt);
+        reusedState.leftarmpitch = p_entity.getleftarmpitch(ptt);
+        reusedState.leftarmyaw = p_entity.getleftarmyaw(ptt);
+        reusedState.headpitch = p_entity.getheadpitch(ptt);
+        reusedState.bodyyaw = p_entity.getbodyyaw(ptt);
+        reusedState.viewYRot = p_entity.getViewYRot(ptt);
+        reusedState.b2Energy = p_entity.getB2Energy();
+        reusedState.isBurning = p_entity.isFire();
+        reusedState.topLaserEnabled = p_entity.isTopLaserEnabled();
+        reusedState.bottomLaserEnabled = p_entity.isBottomLaserEnabled();
+        reusedState.forceFieldEnabled = p_entity.isForceFieldEnabled();
+        reusedState.jet = p_entity.jet;
 
         Component name = reusedState.displayName;
         if (reusedState.rider != null) {

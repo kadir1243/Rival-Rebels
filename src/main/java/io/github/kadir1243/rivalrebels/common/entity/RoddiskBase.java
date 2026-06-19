@@ -32,7 +32,7 @@ public class RoddiskBase extends Projectile {
     }
 
     @Override
-    public boolean canBeCollidedWith(@Nullable Entity other) {
+    public boolean canBeCollidedWith(@Nullable Entity p_423659_) {
         return isAlive();
     }
 

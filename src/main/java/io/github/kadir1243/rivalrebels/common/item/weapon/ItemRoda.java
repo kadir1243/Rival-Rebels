@@ -292,7 +292,7 @@ public class ItemRoda extends Item
 	}
 
     @Override
-    public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
+    public void inventoryTick(ItemStack stack, ServerLevel level, Entity p_41406_, @Nullable EquipmentSlot p_401900_) {
 		if (level.isClientSide()) return;
 		if (stack.get(RRComponents.HAPPY_NEW_YEAR)>0)stack.set(RRComponents.HAPPY_NEW_YEAR, stack.get(RRComponents.HAPPY_NEW_YEAR)-1);
 	}

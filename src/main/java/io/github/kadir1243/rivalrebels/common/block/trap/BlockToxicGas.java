@@ -13,7 +13,6 @@ package io.github.kadir1243.rivalrebels.common.block.trap;
 
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
@@ -29,6 +28,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.FireBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -37,18 +37,10 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockToxicGas extends Block {
-	public BlockToxicGas(Properties properties) {
-		super(properties);
-    }
+	public BlockToxicGas(Properties settings) {
+		super(settings);
 
-    @Override
-    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return 100;
-    }
-
-    @Override
-    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return 60;
+        //((FireBlock) Blocks.FIRE).setFlammable(this, 60, 100);
     }
 
     @Override
@@ -75,7 +67,7 @@ public class BlockToxicGas extends Block {
     }
 
     @Override
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean notify) {
 		world.scheduleTick(pos, this, 8);
 	}
 

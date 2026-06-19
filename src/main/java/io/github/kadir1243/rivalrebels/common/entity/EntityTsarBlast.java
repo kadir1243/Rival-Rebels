@@ -51,24 +51,16 @@ public class EntityTsarBlast extends AbstractBlastEntity<TsarBomba> {
         setPos(x, y, z);
 	}
 
-    protected int playingSoundTick;
-
 	@Override
 	public void tick()
 	{
 		super.tick();
 
-        if (playingSoundTick == 0) {
-            if (getRandom().nextInt(10) == 0) {
-                this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
-                playingSoundTick = 5;
-            } else if (getRandom().nextInt(5) == 0) {
-                this.playSound(RRSounds.TIMED_BOMB_SOUND.get(), 100, 0.7f);
-                playingSoundTick = 5;
-            }
-        } else {
-            playingSoundTick--;
-        }
+		if (random.nextInt(10) == 0) {
+			this.playSound(SoundEvents.LIGHTNING_BOLT_THUNDER, 10.0F, 0.50F);
+		} else {
+			if (random.nextInt(5) == 0) this.playSound(RRSounds.TIMED_BOMB_SOUND.get(), 100, 0.7f);
+		}
 
 		if (!level().isClientSide())
 		{

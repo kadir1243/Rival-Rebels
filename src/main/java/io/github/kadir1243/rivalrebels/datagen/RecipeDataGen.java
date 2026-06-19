@@ -286,13 +286,13 @@ public class RecipeDataGen extends RecipeProvider {
     }
 
     public static class RecipeRunner extends RecipeProvider.Runner {
-        public RecipeRunner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-            super(packOutput, registries);
+        public RecipeRunner(PackOutput p_365369_, CompletableFuture<HolderLookup.Provider> p_361563_) {
+            super(p_365369_, p_361563_);
         }
 
         @Override
-        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-            return new RecipeDataGen(registries, output);
+        protected RecipeProvider createRecipeProvider(HolderLookup.Provider p_362946_, RecipeOutput p_365274_) {
+            return new RecipeDataGen(p_362946_, p_365274_);
         }
 
         @Override

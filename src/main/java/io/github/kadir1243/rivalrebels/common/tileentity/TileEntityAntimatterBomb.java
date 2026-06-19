@@ -83,15 +83,15 @@ public class TileEntityAntimatterBomb extends BaseContainerBlockEntity implement
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-        ContainerHelper.loadAllItems(input, this.items);
+    protected void loadAdditional(ValueInput p_422403_) {
+        super.loadAdditional(p_422403_);
+        ContainerHelper.loadAllItems(p_422403_, this.items);
 	}
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        ContainerHelper.saveAllItems(output, this.items);
+    protected void saveAdditional(ValueOutput p_422177_) {
+        super.saveAdditional(p_422177_);
+        ContainerHelper.saveAllItems(p_422177_, this.items);
     }
 
     @Override

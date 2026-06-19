@@ -73,16 +73,16 @@ public class TileEntityTheoreticalTsarBomba extends BaseContainerBlockEntity imp
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
+    protected void loadAdditional(ValueInput p_422403_) {
+        super.loadAdditional(p_422403_);
 
-        ContainerHelper.loadAllItems(input, this.chestContents);
+        ContainerHelper.loadAllItems(p_422403_, this.chestContents);
     }
 
     @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-        ContainerHelper.saveAllItems(output, this.chestContents);
+    protected void saveAdditional(ValueOutput p_422177_) {
+        super.saveAdditional(p_422177_);
+        ContainerHelper.saveAllItems(p_422177_, this.chestContents);
     }
 
     @Override
@@ -193,7 +193,7 @@ public class TileEntityTheoreticalTsarBomba extends BaseContainerBlockEntity imp
 
     @Override
     protected Component getDefaultName() {
-        return Translations.TSAR_NAME.translate();
+        return Component.literal("Theoretical Tsar Bomba");
     }
 
     @Override

@@ -189,14 +189,14 @@ public class RenderGore extends EntityRenderer<EntityGore, RenderGore.State> {
     }
 
     @Override
-    public void extractRenderState(EntityGore entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.xRot = entity.getXRot(partialTick);
-        reusedState.yRot = entity.getYRot(partialTick);
-        reusedState.mob = entity.getMob();
-        reusedState.type = entity.getTypeOfGore();
-        reusedState.size = entity.getSize();
-        reusedState.playerSkin = entity.playerSkin;
+    public void extractRenderState(EntityGore p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+        reusedState.mob = p_entity.getMob();
+        reusedState.type = p_entity.getTypeOfGore();
+        reusedState.size = p_entity.getSize();
+        reusedState.playerSkin = p_entity.playerSkin;
     }
 
     public static class State extends EntityRenderState {

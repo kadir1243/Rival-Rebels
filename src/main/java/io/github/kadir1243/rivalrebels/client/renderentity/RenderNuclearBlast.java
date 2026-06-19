@@ -279,11 +279,11 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast, Rende
     }
 
     @Override
-    public void extractRenderState(EntityNuclearBlast entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.deltaMovement = entity.getDeltaMovement();
+    public void extractRenderState(EntityNuclearBlast p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.deltaMovement = p_entity.getDeltaMovement();
         if (reusedState.ageInTicks == 0) {
-            textureCoordx = entity.getRandom().nextInt(64);
+            textureCoordx = p_entity.getRandom().nextInt(64);
         }
 
         ring1 = Mth.lerp(partialTick, ring1, ring1 + 0.02F);

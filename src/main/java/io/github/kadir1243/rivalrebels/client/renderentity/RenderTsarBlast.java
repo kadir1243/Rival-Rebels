@@ -105,7 +105,7 @@ public class RenderTsarBlast extends EntityRenderer<EntityTsarBlast, RenderTsarB
     private void renderBlastSphere(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, float scale, int color) {
         poseStack.pushPose();
         poseStack.scale(scale, scale, scale);
-        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
             ObjModels.render(blastSphereModel, consumer, pose, color, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         });
 
@@ -136,9 +136,9 @@ public class RenderTsarBlast extends EntityRenderer<EntityTsarBlast, RenderTsarB
     }
 
     @Override
-    public void extractRenderState(EntityTsarBlast entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.deltaMovement = entity.getDeltaMovement();
+    public void extractRenderState(EntityTsarBlast p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.deltaMovement = p_entity.getDeltaMovement();
     }
 
     public static class State extends EntityRenderState {

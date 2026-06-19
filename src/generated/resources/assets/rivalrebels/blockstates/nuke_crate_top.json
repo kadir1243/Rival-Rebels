@@ -1,28 +1,7 @@
 {
   "variants": {
-    "facing=down": {
-      "model": "rivalrebels:block/nuke_crate_top",
-      "x": 180
-    },
-    "facing=east": {
-      "model": "rivalrebels:block/nuke_crate_top",
-      "z": 270
-    },
-    "facing=north": {
-      "model": "rivalrebels:block/nuke_crate_top",
-      "x": 270
-    },
-    "facing=south": {
-      "model": "rivalrebels:block/nuke_crate_top",
-      "x": 90
-    },
-    "facing=up": {
-      "model": "rivalrebels:block/nuke_crate_top",
-      "x": 180
-    },
-    "facing=west": {
-      "model": "rivalrebels:block/nuke_crate_top",
-      "z": 90
+    "": {
+      "model": "rivalrebels:block/nuke_crate_top"
     }
   }
 }

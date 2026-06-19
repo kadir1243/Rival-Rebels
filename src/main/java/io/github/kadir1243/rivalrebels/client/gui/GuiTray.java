@@ -100,15 +100,15 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         super.extractBackground(graphics, mouseX, mouseY, a);
-		int x = this.leftPos;
-		int y = this.topPos;
+		int x = (width - imageWidth) / 2;
+		int y = (height - imageHeight) / 2;
         RRTextures.guitray.blit(graphics, x, y, 0, 0, imageWidth, imageHeight, CommonColors.WHITE);
 
 		if (menu.getPInR() > 0) {
             RRTextures.guitray.blit(graphics, x + 104, y + 68, 248, 0, 8, 8, CommonColors.WHITE);
 		}
 
-		graphics.text(font, Translations.ADS_TRAY.translate(), x + 25, y + 66, CommonColors.WHITE, false);
+		graphics.text(font, Translations.ADS_TRAY.translate(), x + 25, y + 66, 0xffffff, false);
 		drawADS(graphics, this.leftPos + 51, this.topPos + 75, 30, this.leftPos + 51 - this.xSize_lo, this.topPos + 25 - this.ySize_lo);
 	}
 }

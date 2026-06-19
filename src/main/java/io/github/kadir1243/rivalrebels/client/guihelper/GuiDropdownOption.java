@@ -17,7 +17,6 @@ import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
-import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -44,11 +43,11 @@ public class GuiDropdownOption extends Button {
 				team = t.getMenu().getSlot(6).getItem().get(RRComponents.CHIP_DATA).team();
 			}
             color = switch (team) {
-                case NONE -> CommonColors.YELLOW;
-                case OMEGA -> CommonColors.GREEN;
-                case SIGMA -> CommonColors.BLUE;
+                case NONE -> ChatFormatting.YELLOW.getColor();
+                case OMEGA -> ChatFormatting.GREEN.getColor();
+                case SIGMA -> ChatFormatting.BLUE.getColor();
             };
-            if (isHoveredOrFocused()) color = CommonColors.WHITE;
+            if (isHoveredOrFocused()) color = ChatFormatting.WHITE.getColor();
 		}
         graphics.centeredText(Minecraft.getInstance().font, getMessage(), this.getX() + 1, this.getY() + 1, ARGB.color(this.alpha, color));
 	}

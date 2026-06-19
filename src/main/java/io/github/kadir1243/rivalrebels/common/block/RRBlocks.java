@@ -5,7 +5,6 @@ import io.github.kadir1243.rivalrebels.common.block.autobuilds.*;
 import io.github.kadir1243.rivalrebels.common.block.crate.*;
 import io.github.kadir1243.rivalrebels.common.block.machine.*;
 import io.github.kadir1243.rivalrebels.common.block.trap.*;
-import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.util.Mth;
@@ -117,7 +116,7 @@ public class RRBlocks {
             int r = (int) ((Mth.sin(block.phase + BlockCycle.pShiftR) + 1f) * 128f);
             int g = (int) ((Mth.sin(block.phase + BlockCycle.pShiftG) + 1f) * 128f);
             int b = (int) ((Mth.sin(block.phase + BlockCycle.pShiftB) + 1f) * 128f);
-            return ARGB.color(r, g, b);
+            return (r & 0xff) << 16 | (g & 0xff) << 8 | b & 0xff;
         }), RRBlocks.cycle.get());
         event.register(List.of(state -> state.getValue(BlockPetrifiedStone.META) * 1118481), RRBlocks.petrifiedstone1.get(), RRBlocks.petrifiedstone2.get(), RRBlocks.petrifiedstone3.get(), RRBlocks.petrifiedstone4.get());
         event.register(List.of(state -> state.getValue(BlockPetrifiedWood.META) * 1118481), RRBlocks.petrifiedwood.get());

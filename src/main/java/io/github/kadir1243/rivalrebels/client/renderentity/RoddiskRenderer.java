@@ -63,12 +63,12 @@ public class RoddiskRenderer extends EntityRenderer<RoddiskBase, RoddiskRenderer
     }
 
     @Override
-    public void extractRenderState(RoddiskBase entity, State reusedState, float partialTick) {
-        super.extractRenderState(entity, reusedState, partialTick);
-        reusedState.xRot = entity.getXRot(partialTick);
-        reusedState.yRot = entity.getYRot(partialTick);
-        reusedState.isNoiseBuffer = entity instanceof EntityRoddiskRep;
-        reusedState.texture = switch (entity) {
+    public void extractRenderState(RoddiskBase p_entity, State reusedState, float partialTick) {
+        super.extractRenderState(p_entity, reusedState, partialTick);
+        reusedState.xRot = p_entity.getXRot(partialTick);
+        reusedState.yRot = p_entity.getYRot(partialTick);
+        reusedState.isNoiseBuffer = p_entity instanceof EntityRoddiskRep;
+        reusedState.texture = switch (p_entity) {
             case EntityRoddiskRegular ignored -> RRIdentifiers.etdisk0;
             case EntityRoddiskRebel ignored -> RRIdentifiers.etdisk1;
             case EntityRoddiskOfficer ignored -> RRIdentifiers.etdisk2;
