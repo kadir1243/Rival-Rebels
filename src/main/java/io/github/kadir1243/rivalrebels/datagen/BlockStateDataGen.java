@@ -13,6 +13,8 @@ import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
 import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.MultiVariant;
+import net.minecraft.client.data.models.blockstates.ConditionBuilder;
+import net.minecraft.client.data.models.blockstates.MultiPartGenerator;
 import net.minecraft.client.data.models.blockstates.MultiVariantGenerator;
 import net.minecraft.client.data.models.blockstates.PropertyDispatch;
 import net.minecraft.client.data.models.model.*;
@@ -25,12 +27,15 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.MultifaceBlock;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.neoforged.neoforge.client.model.generators.loaders.ObjModelBuilder;
 import net.neoforged.neoforge.client.model.generators.template.*;
 import org.apache.commons.lang3.function.Consumers;
 import org.joml.Vector3f;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -177,7 +182,8 @@ public class BlockStateDataGen extends ModelProvider {
         simpleModelHorizontallyRotated(blockModels, RRBlocks.ffreciever.value(), "dj");
         simpleBlock(blockModels, RRBlocks.rhodesactivator, "ci", "ch");
         emptyBlockModel(blockModels, RRBlocks.reactor);
-        simpleModelHorizontallyRotated(blockModels, RRBlocks.loader.value(), "av");
+        emptyBlockModel(blockModels, RRBlocks.loader);
+        //simpleModelHorizontallyRotated(blockModels, RRBlocks.loader.value(), "av");
         laptopModel(blockModels, RRBlocks.controller, idBlock("laptop_bottom"));
         simpleBlock(blockModels, RRBlocks.forcefield, "di");
         simpleBlock(blockModels, RRBlocks.ammunition, "aa", "ah", "ai");
@@ -388,7 +394,25 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private void flagBlock(BlockModelGenerators blockModels, Holder<Block> flag, String texture) {
-        simpleBlock(blockModels, flag, texture); // TODO: Flags models
+        createMultifaceBlockStates(blockModels, flag.value(), texture);
+    }
+
+    private static final ExtendedModelTemplate VINE_PARENT = ExtendedModelTemplateBuilder.builder().parent(Identifier.withDefaultNamespace("block/vine")).build();
+
+    private void createMultifaceBlockStates(BlockModelGenerators blockModels, Block block, String texture) { // same as vanilla's, just manually sets texture and sets parent model to vine model
+        Map<Property<Boolean>, VariantMutator> directionProperties = selectMultifaceProperties(block.defaultBlockState(), MultifaceBlock::getFaceProperty);
+        ConditionBuilder noFaces = condition();
+        directionProperties.forEach((property, _) -> noFaces.term(property, false));
+        TextureMapping mapping = new TextureMapping();
+        mapping.putForced(TextureSlot.create("vine"), new Material(idBlock(texture)));
+        mapping.putForced(TextureSlot.PARTICLE, new Material(idBlock(texture)));
+        MultiVariant model = plainVariant(VINE_PARENT.create(block, mapping, blockModels.modelOutput));
+        MultiPartGenerator generator = MultiPartGenerator.multiPart(block);
+        directionProperties.forEach((property, mutator) -> {
+            generator.with(condition().term(property, true), model.with(mutator));
+            generator.with(noFaces, model.with(mutator));
+        });
+        blockModels.blockStateOutput.accept(generator);
     }
 
     private void flareBlock(BlockModelGenerators blockModels, Holder<Block> flare, String texture) {

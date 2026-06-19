@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BaseCommandBlock;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -22,7 +23,7 @@ import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec2;
 import net.minecraft.world.phys.Vec3;
 
-public abstract class AbstractObjectiveBlockEntity extends BaseContainerBlockEntity implements Tickable {
+public abstract class AbstractObjectiveBlockEntity extends BaseContainerBlockEntity {
     private NonNullList<ItemStack> items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
     private final BaseCommandBlock commandExecutor = new BaseCommandBlock() {
         @Override
@@ -101,15 +102,14 @@ public abstract class AbstractObjectiveBlockEntity extends BaseContainerBlockEnt
         commandExecutor.save(valueOutput);
     }
 
-    @Override
-    public void tick() {
-        slide = (Mth.cos(test) + 1) / 32 * 10;
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, AbstractObjectiveBlockEntity blockEntity) {
+        blockEntity.slide = (Mth.cos(blockEntity.test) + 1) / 32 * 10;
 
-        boolean i = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
+        boolean i = level.hasNearbyAlivePlayer(blockPos.getX() + 0.5f, blockPos.getY() + 0.5f, blockPos.getZ() + 0.5f, 9);
         if (i) {
-            if (slide < 0.621) test += 0.05F;
+            if (blockEntity.slide < 0.621) blockEntity.test += 0.05F;
         } else {
-            if (slide > 0.004) test -= 0.05F;
+            if (blockEntity.slide > 0.004) blockEntity.test -= 0.05F;
         }
     }
 

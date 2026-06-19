@@ -13,7 +13,7 @@ package io.github.kadir1243.rivalrebels.common.block.machine;
 
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.packet.ReactorMachinesPacket;
-import io.github.kadir1243.rivalrebels.common.tileentity.Tickable;
+import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReactor;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -76,7 +76,7 @@ public class BlockReactor extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-        return world.isClientSide() ? (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).clientTick() : (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).serverTick();
+        return world.isClientSide() ? createTickerHelper(type, RRTileEntities.REACTOR.get(), TileEntityReactor::clientTick) : createTickerHelper(type, RRTileEntities.REACTOR.get(), TileEntityReactor::serverTick);
     }
 
     public static final Component DEFAULT_TOKAMAK = Component.literal("Tokamak");

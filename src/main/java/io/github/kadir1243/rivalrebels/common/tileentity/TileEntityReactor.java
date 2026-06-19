@@ -27,6 +27,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
@@ -51,7 +52,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 
-public class TileEntityReactor extends BaseContainerBlockEntity implements Tickable {
+public class TileEntityReactor extends BaseContainerBlockEntity {
     public double			slide				= 90;
 	private float test = Mth.PI;
     private NonNullList<ItemStack> items = NonNullList.withSize(getContainerSize(), ItemStack.EMPTY);
@@ -120,121 +121,118 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
         }
     }
 
-    @Override
-    public void clientTick() {
-        slide = (Mth.cos(test) + 1) * 45;
-        boolean flag = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
+    public static void clientTick(Level level, BlockPos blockPos, BlockState blockState, TileEntityReactor blockEntity) {
+        blockEntity.slide = (Mth.cos(blockEntity.test) + 1) * 45;
+        boolean flag = level.hasNearbyAlivePlayer(blockPos.getX() + 0.5f, blockPos.getY() + 0.5f, blockPos.getZ() + 0.5f, 9);
         if (flag) {
-            if (slide < 89.995) test += 0.05F;
+            if (blockEntity.slide < 89.995) blockEntity.test += 0.05F;
         } else {
-            if (slide > 0.004) test -= 0.05F;
+            if (blockEntity.slide > 0.004) blockEntity.test -= 0.05F;
         }
-        if (getCore().isEmpty()) {
-            on = false;
-            consumed = 0;
-            lasttickconsumed = 0;
-            melt = false;
-            meltTick = 0;
-        }
-
-        if (eject) {
-            consumed = 0;
-            lasttickconsumed = 0;
-            this.clearContent();
-            melt = false;
-            meltTick = 0;
-            on = false;
-            eject = false;
+        if (blockEntity.getCore().isEmpty()) {
+            blockEntity.on = false;
+            blockEntity.consumed = 0;
+            blockEntity.lasttickconsumed = 0;
+            blockEntity.melt = false;
+            blockEntity.meltTick = 0;
         }
 
-        prevOn = on;
+        if (blockEntity.eject) {
+            blockEntity.consumed = 0;
+            blockEntity.lasttickconsumed = 0;
+            blockEntity.clearContent();
+            blockEntity.melt = false;
+            blockEntity.meltTick = 0;
+            blockEntity.on = false;
+            blockEntity.eject = false;
+        }
+
+        blockEntity.prevOn = blockEntity.on;
     }
-
-    @Override
-    public void serverTick() {
-        if (eject) {
-            if (!getCore().isEmpty()) {
-                consumed = 0;
-                lasttickconsumed = 0;
-                level.addFreshEntity(new ItemEntity(level, getBlockPos().getX() + 0.5, getBlockPos().getY() + 1, getBlockPos().getZ() + 0.5, getCore()));
-                this.clearContent();
-                melt = false;
-                meltTick = 0;
-                on = false;
+    public static void serverTick(Level level, BlockPos blockPos, BlockState blockState, TileEntityReactor blockEntity) {
+        if (blockEntity.eject) {
+            if (!blockEntity.getCore().isEmpty()) {
+                blockEntity.consumed = 0;
+                blockEntity.lasttickconsumed = 0;
+                level.addFreshEntity(new ItemEntity(level, blockPos.getX() + 0.5, blockPos.getY() + 1, blockPos.getZ() + 0.5, blockEntity.getCore()));
+                blockEntity.clearContent();
+                blockEntity.melt = false;
+                blockEntity.meltTick = 0;
+                blockEntity.on = false;
             }
         }
 
-        if (melt) {
-            if (!getCore().isEmpty()) {
-                if (meltTick % 20 == 0) level.playLocalSound(getBlockPos(), RRSounds.REACTOR_RUNNING.get(), SoundSource.BLOCKS, 1, 1, true);
-                on = true;
-                meltTick++;
-                if (meltTick == 300) meltDown(10);
-                else if (meltTick == 1) {
+        if (blockEntity.melt) {
+            if (!blockEntity.getCore().isEmpty()) {
+                if (blockEntity.meltTick % 20 == 0) level.playLocalSound(blockPos, RRSounds.REACTOR_RUNNING.get(), SoundSource.BLOCKS, 1, 1, true);
+                blockEntity.on = true;
+                blockEntity.meltTick++;
+                if (blockEntity.meltTick == 300) blockEntity.meltDown(10);
+                else if (blockEntity.meltTick == 1) {
                     Component text = Translations.warning().append(" ").append(Translations.WARNING_MELTDOWN.translate().withStyle(ChatFormatting.RED));
                     for (Player player : level.players()) {
                         player.sendSystemMessage(text);
                     }
                 }
                 for (int i = 0; i < 4; i++) {
-                    level.addParticle(ParticleTypes.SMOKE, getBlockPos().getX() + 0.5, getBlockPos().getY() + 0.5, getBlockPos().getZ() + 0.5, level.getRandom().nextDouble() - 0.5, level.getRandom().nextDouble() / 2, level.getRandom().nextDouble() - 0.5);
+                    level.addParticle(ParticleTypes.SMOKE, blockPos.getX() + 0.5, blockPos.getY() + 0.5, blockPos.getZ() + 0.5, level.getRandom().nextDouble() - 0.5, level.getRandom().nextDouble() / 2, level.getRandom().nextDouble() - 0.5);
                 }
             } else {
-                melt = false;
-                meltTick = 0;
-                on = false;
+                blockEntity.melt = false;
+                blockEntity.meltTick = 0;
+                blockEntity.on = false;
             }
         }
 
-        if (getFuel().isEmpty() && tickssincelastrod != 0) {
-            tickssincelastrod++;
-            if (tickssincelastrod >= 100) {
-                if (lastrodwasredstone) on = false;
-                else melt = true;
+        if (blockEntity.getFuel().isEmpty() && blockEntity.tickssincelastrod != 0) {
+            blockEntity.tickssincelastrod++;
+            if (blockEntity.tickssincelastrod >= 100) {
+                if (blockEntity.lastrodwasredstone) blockEntity.on = false;
+                else blockEntity.melt = true;
             }
-            if (tickssincelastrod == 20 && !lastrodwasredstone) {
-                for (Player player : getLevel().players()) {
+            if (blockEntity.tickssincelastrod == 20 && !blockEntity.lastrodwasredstone) {
+                for (Player player : level.players()) {
                     player.sendSystemMessage(Translations.warning().append(" ").append(Translations.OVERHEAT_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
                 }
             }
         } else {
-            tickssincelastrod = 0;
+            blockEntity.tickssincelastrod = 0;
         }
 
-        if (melt) {
-            machines.clear();
+        if (blockEntity.melt) {
+            blockEntity.machines.clear();
         }
 
-        if (getCore().isEmpty()) {
-            on = false;
-            consumed = 0;
-            lasttickconsumed = 0;
-            melt = false;
-            meltTick = 0;
+        if (blockEntity.getCore().isEmpty()) {
+            blockEntity.on = false;
+            blockEntity.consumed = 0;
+            blockEntity.lasttickconsumed = 0;
+            blockEntity.melt = false;
+            blockEntity.meltTick = 0;
         }
 
-        if (on && getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && getFuel().has(RRComponents.ROD_POWER))
+        if (blockEntity.on && blockEntity.getCore().has(RRComponents.CORE_TIME_MULTIPLIER) && blockEntity.getFuel().has(RRComponents.ROD_POWER))
         {
-            if (!prevOn && on) level.playLocalSound(getBlockPos(), RRSounds.REACTOR_DISABLING.get(), SoundSource.BLOCKS, 1, 1, true);
+            if (!blockEntity.prevOn && blockEntity.on) level.playLocalSound(blockPos, RRSounds.REACTOR_DISABLING.get(), SoundSource.BLOCKS, 1, 1, true);
             else
             {
-                tick++;
-                if (on && tick % 39 == 0) level.playLocalSound(getBlockPos(), RRSounds.REACTOR_RUNNING_2.get(), SoundSource.BLOCKS, 0.9f, 0.77f, true);
+                blockEntity.tick++;
+                if (blockEntity.on && blockEntity.tick % 39 == 0) level.playLocalSound(blockPos, RRSounds.REACTOR_RUNNING_2.get(), SoundSource.BLOCKS, 0.9f, 0.77f, true);
             }
-            float power = ((getFuel().get(RRComponents.ROD_POWER) * getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
+            float power = ((blockEntity.getFuel().get(RRComponents.ROD_POWER) * blockEntity.getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - blockEntity.getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
             float temp = power;
             for (BlockEntity te : TileEntityMachineBase.BLOCK_ENTITIES.values()) {
                 if (te instanceof TileEntityMachineBase temb) {
                     if (level.getBlockEntity(temb.worldPosition) == null) {
-                        double dist = temb.getBlockPos().distSqr(getBlockPos());
+                        double dist = temb.getBlockPos().distSqr(blockPos);
                         if (dist < 1024) {
-                            temb.worldPosition = getBlockPos();
+                            temb.worldPosition = blockPos;
                             temb.edist = (float) Math.sqrt(dist);
-                            machines.add(temb);
+                            blockEntity.machines.add(temb);
                         }
                     }
-                    if (temb.worldPosition.equals(getBlockPos())) {
-                        machines.add(temb);
+                    if (temb.worldPosition.equals(blockPos)) {
+                        blockEntity.machines.add(temb);
                         temb.powerGiven = power;
                         if (power > temb.pInM - temb.pInR) {
                             power -= temb.pInM - temb.pInR;
@@ -247,38 +245,38 @@ public class TileEntityReactor extends BaseContainerBlockEntity implements Ticka
                     }
                 }
             }
-            lasttickconsumed = temp - power;
-            consumed += lasttickconsumed;
-            if (getFuel().has(RRComponents.REACTOR_FUEL_LEFT)) {
-                getFuel().set(RRComponents.REACTOR_FUEL_LEFT, (int) consumed);
+            blockEntity.lasttickconsumed = temp - power;
+            blockEntity.consumed += blockEntity.lasttickconsumed;
+            if (blockEntity.getFuel().has(RRComponents.REACTOR_FUEL_LEFT)) {
+                blockEntity.getFuel().set(RRComponents.REACTOR_FUEL_LEFT, (int) blockEntity.consumed);
 
-                double fuelLeft = (int) consumed;
+                double fuelLeft = (int) blockEntity.consumed;
                 double fuelPercentage = (fuelLeft / temp);
 
-                if (getFuel().is(RRItems.NUCLEAR_ROD)) {
+                if (blockEntity.getFuel().is(RRItems.NUCLEAR_ROD)) {
                     double f2 = fuelPercentage * fuelPercentage;
                     double f4 = f2 * f2;
                     double f8 = f4 * f4;
                     if (level.getRandom().nextFloat() < f8) {
-                        melt = true;
+                        blockEntity.melt = true;
                     }
                 }
             }
-            else getFuel().set(RRComponents.REACTOR_FUEL_LEFT, 0);
-            if (getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0) >= temp) {
-                lastrodwasredstone = getFuel().is(RRItems.redrod); // meltdown if not redrod
-                consumed = 0;
-                lasttickconsumed = 0;
-                tickssincelastrod = 1;
-                setFuel(ItemStack.EMPTY);
+            else blockEntity.getFuel().set(RRComponents.REACTOR_FUEL_LEFT, 0);
+            if (blockEntity.getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0) >= temp) {
+                blockEntity.lastrodwasredstone = blockEntity.getFuel().is(RRItems.redrod); // meltdown if not redrod
+                blockEntity.consumed = 0;
+                blockEntity.lasttickconsumed = 0;
+                blockEntity.tickssincelastrod = 1;
+                blockEntity.setFuel(ItemStack.EMPTY);
             }
         }
         else
         {
-            machines.clear();
+            blockEntity.machines.clear();
         }
-        eject = false;
-        prevOn = on;
+        blockEntity.eject = false;
+        blockEntity.prevOn = blockEntity.on;
     }
 
     @Nullable

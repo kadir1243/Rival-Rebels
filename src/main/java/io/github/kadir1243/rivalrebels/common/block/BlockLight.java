@@ -24,14 +24,9 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
-public class BlockLight extends Block
-{
-	public int rendertype;
-
-	public BlockLight(Properties settings, int EntityRenderer)
-	{
+public class BlockLight extends Block {
+	public BlockLight(Properties settings) {
 		super(settings);
-		rendertype = EntityRenderer;
 	}
 
     @Override

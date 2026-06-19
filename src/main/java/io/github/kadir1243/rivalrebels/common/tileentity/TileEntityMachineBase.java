@@ -14,13 +14,14 @@ package io.github.kadir1243.rivalrebels.common.tileentity;
 import java.util.HashMap;
 import java.util.Map;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public abstract class TileEntityMachineBase extends BlockEntity implements Tickable {
+public abstract class TileEntityMachineBase extends BlockEntity {
     public static final Map<BlockPos, TileEntityMachineBase> BLOCK_ENTITIES = new HashMap<>();
 	public float	pInM		= 0;
 	public float	pInR		= 0;
@@ -35,11 +36,10 @@ public abstract class TileEntityMachineBase extends BlockEntity implements Ticka
         BLOCK_ENTITIES.put(pos, this);
     }
 
-    @Override
-	public void tick() {
-		if (pInR > 0) pInR = powered(pInR, edist);
-		pInR -= decay;
-	}
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityMachineBase blockEntity) {
+        if (blockEntity.pInR > 0) blockEntity.pInR = blockEntity.powered(blockEntity.pInR, blockEntity.edist);
+        blockEntity.pInR -= blockEntity.decay;
+    }
 
     @Override
     protected void loadAdditional(ValueInput valueInput) {

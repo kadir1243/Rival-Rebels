@@ -12,14 +12,13 @@
 package io.github.kadir1243.rivalrebels.common.block.trap;
 
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
-import io.github.kadir1243.rivalrebels.common.tileentity.Tickable;
+import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityNuclearBomb;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -109,6 +108,6 @@ public class BlockNuclearBomb extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+        return createTickerHelper(type, RRTileEntities.NUCLEAR_BOMB.get(), TileEntityNuclearBomb::tick);
     }
 }

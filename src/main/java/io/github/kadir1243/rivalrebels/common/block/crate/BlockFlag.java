@@ -11,7 +11,6 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.block.crate;
 
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
@@ -34,7 +33,6 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import org.jspecify.annotations.Nullable;
 import java.util.Map;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class BlockFlag extends Block {
     public static final BooleanProperty UP = PipeBlock.UP;
@@ -42,14 +40,9 @@ public class BlockFlag extends Block {
     public static final BooleanProperty EAST = PipeBlock.EAST;
     public static final BooleanProperty SOUTH = PipeBlock.SOUTH;
     public static final BooleanProperty WEST = PipeBlock.WEST;
-    private static final VoxelShape UP_SHAPE = Block.box(0.0, 15.0, 0.0, 16.0, 16.0, 16.0);
-    private static final VoxelShape EAST_SHAPE = Block.box(0.0, 0.0, 0.0, 1.0, 16.0, 16.0);
-    private static final VoxelShape WEST_SHAPE = Block.box(15.0, 0.0, 0.0, 16.0, 16.0, 16.0);
-    private static final VoxelShape SOUTH_SHAPE = Block.box(0.0, 0.0, 0.0, 16.0, 16.0, 1.0);
-    private static final VoxelShape NORTH_SHAPE = Block.box(0.0, 0.0, 15.0, 16.0, 16.0, 16.0);
-    private final Map<BlockState, VoxelShape> field_26659;
+    private final Function<BlockState, VoxelShape> shapes;
 
-    public BlockFlag(Properties settings, String name) {
+    public BlockFlag(Properties settings) {
         super(settings);
         this.registerDefaultState(
             this.stateDefinition
@@ -60,37 +53,22 @@ public class BlockFlag extends Block {
                 .setValue(SOUTH, false)
                 .setValue(WEST, false)
         );
-        this.field_26659 = ImmutableMap.copyOf(
-            this.stateDefinition
-                .getPossibleStates()
-                .stream()
-                .collect(Collectors.toMap(Function.identity(), BlockFlag::method_31018))
-        );
+        this.shapes = this.makeShapes();
     }
 
-    private static VoxelShape method_31018(BlockState arg) {
-        VoxelShape voxelshape = Shapes.empty();
-        if (arg.getValue(UP)) {
-            voxelshape = UP_SHAPE;
-        }
+    private Function<BlockState, VoxelShape> makeShapes() {
+        Map<Direction, VoxelShape> shapes = Shapes.rotateAll(Block.boxZ(16.0, 0.0, 1.0));
+        return this.getShapeForEachState(state -> {
+            VoxelShape shape = Shapes.empty();
 
-        if (arg.getValue(NORTH)) {
-            voxelshape = Shapes.or(voxelshape, SOUTH_SHAPE);
-        }
+            for (Map.Entry<Direction, BooleanProperty> entry : VineBlock.PROPERTY_BY_DIRECTION.entrySet()) {
+                if (state.getValue(entry.getValue())) {
+                    shape = Shapes.or(shape, shapes.get(entry.getKey()));
+                }
+            }
 
-        if (arg.getValue(SOUTH)) {
-            voxelshape = Shapes.or(voxelshape, NORTH_SHAPE);
-        }
-
-        if (arg.getValue(EAST)) {
-            voxelshape = Shapes.or(voxelshape, WEST_SHAPE);
-        }
-
-        if (arg.getValue(WEST)) {
-            voxelshape = Shapes.or(voxelshape, EAST_SHAPE);
-        }
-
-        return voxelshape;
+            return shape.isEmpty() ? Shapes.block() : shape;
+        });
     }
 
     @Override
@@ -98,132 +76,54 @@ public class BlockFlag extends Block {
         builder.add(UP, NORTH, EAST, SOUTH, WEST);
     }
 
-	/*@Override
-	public void setBlockBoundsForItemRender()
-	{
-		this.setBlockBounds(0.0F, 0.0F, 0.0F, 1.0F, 1.0F, 1.0F);
-	}
-
-	@Override
-	public int getRenderType()
-	{
-		return 20;
-	}*/
-
-    /*@Override
-    public Box getBoundingBox(BlockState state, BlockView worldIn, BlockPos pos) {
-        int l = state.get(META);
-        float f1 = 1.0F;
-        float f2 = 1.0F;
-        float f3 = 1.0F;
-        float f4 = 0.0F;
-        float f5 = 0.0F;
-        float f6 = 0.0F;
-        boolean flag = l > 0;
-
-        if ((l & 2) != 0) {
-            f4 = Math.max(f4, 0.0625F);
-            f1 = 0.0F;
-            f2 = 0.0F;
-            f5 = 1.0F;
-            f3 = 0.0F;
-            f6 = 1.0F;
-            flag = true;
-        }
-
-        if ((l & 8) != 0) {
-            f1 = Math.min(f1, 0.9375F);
-            f4 = 1.0F;
-            f2 = 0.0F;
-            f5 = 1.0F;
-            f3 = 0.0F;
-            f6 = 1.0F;
-            flag = true;
-        }
-
-        if ((l & 4) != 0) {
-            f6 = Math.max(f6, 0.0625F);
-            f3 = 0.0F;
-            f1 = 0.0F;
-            f4 = 1.0F;
-            f2 = 0.0F;
-            f5 = 1.0F;
-            flag = true;
-        }
-
-        if ((l & 1) != 0) {
-            f3 = Math.min(f3, 0.9375F);
-            f6 = 1.0F;
-            f1 = 0.0F;
-            f4 = 1.0F;
-            f2 = 0.0F;
-            f5 = 1.0F;
-            flag = true;
-        }
-
-        if (!flag && this.func_150093_a(worldIn.getBlockState(pos.up()))) {
-            f2 = Math.min(f2, 0.9375F);
-            f5 = 1.0F;
-            f1 = 0.0F;
-            f4 = 1.0F;
-            f3 = 0.0F;
-            f6 = 1.0F;
-        }
-
-        return new Box(f1, f2, f3, f4, f5, f6);
-    }*/
-
     @Override
     public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
-        return this.hasAdjacentBlocks(this.getPlacementShape(state, world, pos));
+        return this.hasFaces(this.getUpdatedState(state, world, pos));
     }
 
-    /*private boolean func_150093_a(BlockState p_150093_1_) {
-        return p_150093_1_.isFullBlock();
-    }*/
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
-        return this.field_26659.get(state);
+        return this.shapes.apply(state);
     }
 
-    private boolean shouldHaveSide(BlockGetter world, BlockPos pos, Direction side) {
-        if (side == Direction.DOWN) {
+    private boolean canSupportAtFace(BlockGetter level, BlockPos pos, Direction direction) {
+        if (direction == Direction.DOWN) {
             return false;
         } else {
-            BlockPos blockpos = pos.relative(side);
-            if (VineBlock.isAcceptableNeighbour(world, blockpos, side)) {
+            BlockPos relative = pos.relative(direction);
+            if (VineBlock.isAcceptableNeighbour(level, relative, direction)) {
                 return true;
-            } else if (side.getAxis() == Direction.Axis.Y) {
+            } else if (direction.getAxis() == Direction.Axis.Y) {
                 return false;
             } else {
-                BooleanProperty booleanproperty = VineBlock.PROPERTY_BY_DIRECTION.get(side);
-                BlockState blockstate = world.getBlockState(pos.above());
-                return blockstate.is(this) && blockstate.getValue(booleanproperty);
+                BooleanProperty property = VineBlock.PROPERTY_BY_DIRECTION.get(direction);
+                BlockState aboveState = level.getBlockState(pos.above());
+                return aboveState.is(this) && aboveState.getValue(property);
             }
         }
     }
 
-    private BlockState getPlacementShape(BlockState state, BlockGetter world, BlockPos pos) {
-        BlockPos blockpos = pos.above();
+    private BlockState getUpdatedState(BlockState state, BlockGetter level, BlockPos pos) {
+        BlockPos abovePos = pos.above();
         if (state.getValue(UP)) {
-            state = state.setValue(UP, VineBlock.isAcceptableNeighbour(world, blockpos, Direction.DOWN));
+            state = state.setValue(UP, VineBlock.isAcceptableNeighbour(level, abovePos, Direction.DOWN));
         }
 
-        BlockState blockstate = null;
+        BlockState aboveState = null;
 
         for (Direction direction : Direction.Plane.HORIZONTAL) {
-            BooleanProperty booleanproperty = VineBlock.getPropertyForFace(direction);
-            if (state.getValue(booleanproperty)) {
-                boolean flag = this.shouldHaveSide(world, pos, direction);
-                if (!flag) {
-                    if (blockstate == null) {
-                        blockstate = world.getBlockState(blockpos);
+            BooleanProperty property = VineBlock.getPropertyForFace(direction);
+            if (state.getValue(property)) {
+                boolean canSupport = this.canSupportAtFace(level, pos, direction);
+                if (!canSupport) {
+                    if (aboveState == null) {
+                        aboveState = level.getBlockState(abovePos);
                     }
 
-                    flag = blockstate.is(this) && blockstate.getValue(booleanproperty);
+                    canSupport = aboveState.is(this) && aboveState.getValue(property);
                 }
 
-                state = state.setValue(booleanproperty, flag);
+                state = state.setValue(property, canSupport);
             }
         }
 
@@ -231,49 +131,49 @@ public class BlockFlag extends Block {
     }
 
     @Override
-    protected BlockState updateShape(BlockState state, LevelReader world, ScheduledTickAccess tickAccess, BlockPos pos, Direction direction, BlockPos neighborPos, BlockState neighborState, RandomSource random) {
-        if (direction == Direction.DOWN) {
-            return super.updateShape(state, world, tickAccess, pos, direction, neighborPos, neighborState, random);
+    protected BlockState updateShape(BlockState state, LevelReader level, ScheduledTickAccess ticks, BlockPos pos, Direction directionToNeighbour, BlockPos neighbourPos, BlockState neighbourState, RandomSource random) {
+        if (directionToNeighbour == Direction.DOWN) {
+            return super.updateShape(state, level, ticks, pos, directionToNeighbour, neighbourPos, neighbourState, random);
         } else {
-            BlockState blockstate = this.getPlacementShape(state, world, pos);
-            return !this.hasAdjacentBlocks(blockstate) ? Blocks.AIR.defaultBlockState() : blockstate;
+            BlockState blockState = this.getUpdatedState(state, level, pos);
+            return !hasFaces(blockState) ? Blocks.AIR.defaultBlockState() : blockState;
         }
     }
 
-    private boolean hasAdjacentBlocks(BlockState state) {
-        return this.getAdjacentBlockCount(state) > 0;
+    private boolean hasFaces(BlockState blockState) {
+        return this.countFaces(blockState) > 0;
     }
 
-    private int getAdjacentBlockCount(BlockState state) {
-        int i = 0;
+    private int countFaces(BlockState blockState) {
+        int count = 0;
 
-        for (BooleanProperty booleanproperty : VineBlock.PROPERTY_BY_DIRECTION.values()) {
-            if (state.getValue(booleanproperty)) {
-                ++i;
+        for (BooleanProperty property : VineBlock.PROPERTY_BY_DIRECTION.values()) {
+            if (blockState.getValue(property)) {
+                count++;
             }
         }
 
-        return i;
+        return count;
     }
 
     @Nullable
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext ctx) {
-        BlockState blockstate = ctx.getLevel().getBlockState(ctx.getClickedPos());
-        boolean flag = blockstate.is(this);
-        BlockState blockstate1 = flag ? blockstate : this.defaultBlockState();
+    public BlockState getStateForPlacement(BlockPlaceContext context) {
+        BlockState clickedState = context.getLevel().getBlockState(context.getClickedPos());
+        boolean clickedFlag = clickedState.is(this);
+        BlockState result = clickedFlag ? clickedState : this.defaultBlockState();
 
-        for(Direction direction : ctx.getNearestLookingDirections()) {
+        for(Direction direction : context.getNearestLookingDirections()) {
             if (direction != Direction.DOWN) {
-                BooleanProperty booleanproperty = VineBlock.getPropertyForFace(direction);
-                boolean flag1 = flag && blockstate.getValue(booleanproperty);
-                if (!flag1 && this.shouldHaveSide(ctx.getLevel(), ctx.getClickedPos(), direction)) {
-                    return blockstate1.setValue(booleanproperty, true);
+                BooleanProperty face = VineBlock.getPropertyForFace(direction);
+                boolean faceOccupied = clickedFlag && clickedState.getValue(face);
+                if (!faceOccupied && this.canSupportAtFace(context.getLevel(), context.getClickedPos(), direction)) {
+                    return result.setValue(face, true);
                 }
             }
         }
 
-        return flag ? blockstate1 : null;
+        return clickedFlag ? result : null;
     }
 
     @Override
@@ -300,5 +200,10 @@ public class BlockFlag extends Block {
             default:
                 return super.mirror(state, mirror);
         }
+    }
+
+    @Override
+    protected boolean propagatesSkylightDown(BlockState state) {
+        return true;
     }
 }

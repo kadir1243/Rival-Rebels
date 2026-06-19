@@ -1,6 +1,7 @@
 {
-  "parent": "minecraft:block/cube_all",
+  "parent": "minecraft:block/vine",
   "textures": {
-    "all": "rivalrebels:block/aj"
+    "particle": "rivalrebels:block/aj",
+    "vine": "rivalrebels:block/aj"
   }
 }

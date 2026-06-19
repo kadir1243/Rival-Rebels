@@ -1,19 +1,7 @@
 {
   "variants": {
-    "facing=east": {
-      "model": "rivalrebels:block/loader",
-      "y": 90
-    },
-    "facing=north": {
+    "": {
       "model": "rivalrebels:block/loader"
-    },
-    "facing=south": {
-      "model": "rivalrebels:block/loader",
-      "y": 180
-    },
-    "facing=west": {
-      "model": "rivalrebels:block/loader",
-      "y": 270
     }
   }
 }

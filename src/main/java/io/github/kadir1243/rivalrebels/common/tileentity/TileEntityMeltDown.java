@@ -21,6 +21,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerExplosion;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -28,7 +29,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
-public class TileEntityMeltDown extends BlockEntity implements Tickable {
+public class TileEntityMeltDown extends BlockEntity {
     private static final float INCREMENT_AMOUNT = 0.075f;
 	public float	size		= 0;
 
@@ -36,31 +37,30 @@ public class TileEntityMeltDown extends BlockEntity implements Tickable {
         super(RRTileEntities.MELT_DOWN.get(), pos, state);
     }
 
-    @Override
-	public void tick() {
-        if (size == 0) {
-            level.playSound(null, getBlockPos(), RRSounds.PLASMA.get(), SoundSource.BLOCKS, 4, 1);
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityMeltDown blockEntity) {
+        if (blockEntity.size == 0) {
+            level.playSound(null, blockPos, RRSounds.PLASMA.get(), SoundSource.BLOCKS, 4, 1);
         }
-		size += INCREMENT_AMOUNT;
+        blockEntity.size += INCREMENT_AMOUNT;
 
-		if (size > 9.3f) {
-			size = 0f;
-			level.setBlockAndUpdate(getBlockPos(), Blocks.AIR.defaultBlockState());
-			this.setRemoved();
+		if (blockEntity.size > 9.3f) {
+			blockEntity.size = 0f;
+			level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
+            blockEntity.setRemoved();
 		}
 
-		float fsize = Mth.sin(size) * 5.9F;
+		float fsize = Mth.sin(blockEntity.size) * 5.9F;
 		fsize *= 2F;
-		List<Entity> l = this.level.getEntities(null, new AABB(getBlockPos().getX() - fsize + 0.5, getBlockPos().getY() - fsize + 0.5, getBlockPos().getZ() - fsize + 0.5, getBlockPos().getX() + fsize + 0.5, getBlockPos().getY() + fsize + 0.5, getBlockPos().getZ() + fsize + 0.5));
+		List<Entity> l = level.getEntities(null, new AABB(blockPos.getX() - fsize + 0.5, blockPos.getY() - fsize + 0.5, blockPos.getZ() - fsize + 0.5, blockPos.getX() + fsize + 0.5, blockPos.getY() + fsize + 0.5, blockPos.getZ() + fsize + 0.5));
         for (Entity e : l) {
-            double var13 = Math.sqrt(e.distanceToSqr(getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ())) / fsize;
+            double var13 = Math.sqrt(e.distanceToSqr(blockPos.getX(), blockPos.getY(), blockPos.getZ())) / fsize;
 
             if (var13 <= 1.0D) {
-                Vec3 vec3 = e.getEyePosition().subtract(Vec3.atLowerCornerOf(getBlockPos()));
+                Vec3 vec3 = e.getEyePosition().subtract(Vec3.atLowerCornerOf(blockPos));
 
                 if (vec3.length() != 0.0D) {
                     vec3 = vec3.normalize();
-                    double var32 = ServerExplosion.getSeenPercent(Vec3.atLowerCornerOf(getBlockPos()), e);
+                    double var32 = ServerExplosion.getSeenPercent(Vec3.atLowerCornerOf(blockPos), e);
                     double var34 = (1.0D - var13) * var32;
                     if (!(e instanceof EntityNuclearBlast) && !(e instanceof EntityPlasmoid) && !(e instanceof EntityRhodes)) {
                         e.hurt(RivalRebelsDamageSource.plasmaExplosion(level), (int) ((var34 * var34 + var34) / 16.0D * fsize + 1.0D));

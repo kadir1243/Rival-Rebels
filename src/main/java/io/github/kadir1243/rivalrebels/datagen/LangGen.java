@@ -63,7 +63,7 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addBlock(RRBlocks.buildrhodes, "Rhodes Supply Crate");
         addBlock(RRBlocks.light, "Light");
         addBlock(RRBlocks.light2, "Light");
-        addBlock(RRBlocks.nuclearBomb, "Nuke");
+        addBlock(RRBlocks.nuclearBomb, "Nuclear Bomb");
         addBlock(RRBlocks.minetrap, "Landmine Trap");
         addBlock(RRBlocks.landmine, "Landmine");
         addBlock(RRBlocks.alandmine, "Landmine");
@@ -72,6 +72,9 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addBlock(RRBlocks.antimatterbombblock, "Antimatter Block");
         addBlock(RRBlocks.bastion, "Bastion");
         addBlock(RRBlocks.gamestart, "Game Starter");
+        addBlock(RRBlocks.tsarbombablock, "Tsar Bomb");
+        addBlock(RRBlocks.theoreticaltsarbombablock, "Tsar Bomb");
+        addBlock(RRBlocks.tachyonbombblock, "Tachyon");
 
         addItem(RRItems.knife, "Cuchillo");
         addItem(RRItems.hydrod, "Hydrogen Rod");
@@ -115,7 +118,6 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         add(Translations.USE_PLIERS_TO_BUILD_TRANSLATION, "Use pliers to build.");
         add(Translations.USE_PLIERS_TO_OPEN_TRANSLATION, "Use pliers to open.");
         add(Translations.AMMUNITION, "%s ammunition");
-        add(Translations.NUKE_TRANSLATION, "Nuclear Bomb");
         add(Translations.SHIFT_CLICK, "Shift-Click (Sneak).");
         add(Translations.BOMB_TIMER, "Timer: -%s:%s");
         add(Translations.UNBALANCED_BOMB, "Unbalanced");
@@ -126,7 +128,6 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         add(Translations.BUILDING, "Constructing %s");
         add(Translations.SPAWN_RESET_WARNING, "Warning: Resetting will clear your inventory");
         add(Translations.RHODES_IS_ARMED, "%s Armed");
-        add(Translations.TSAR_NAME, "Tsar Bomb");
         add(Translations.ANTIMATTER_BOMB_CONTAINER_NAME, "Antimatter");
         add(Translations.NEXT_BATTLE_TITLE, "Battle Over");
         add(Translations.NEXT_BATTLE_SUBTITLE, "Next Battle?");

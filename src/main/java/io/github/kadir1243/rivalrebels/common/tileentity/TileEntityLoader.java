@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.container.ContainerLoader;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 
 import java.util.ArrayList;
@@ -34,7 +35,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
-public class TileEntityLoader extends BaseContainerBlockEntity implements Tickable {
+public class TileEntityLoader extends BaseContainerBlockEntity {
 	private NonNullList<ItemStack> items = NonNullList.withSize(64, ItemStack.EMPTY);
 
 	public float slide = 0;
@@ -73,54 +74,53 @@ public class TileEntityLoader extends BaseContainerBlockEntity implements Tickab
         return Container.stillValidBlockEntity(this, player, 64);
 	}
 
-	@Override
-	public void tick() {
-		slide = (Mth.cos(test) + 1) / 32 * 14;
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityLoader blockEntity) {
+        blockEntity.slide = (Mth.cos(blockEntity.test) + 1) / 32 * 14;
 
-        if (level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9)) {
-			if (slide < 0.871) test += 0.05F;
+        if (level.hasNearbyAlivePlayer(blockPos.getX() + 0.5f, blockPos.getY() + 0.5f, blockPos.getZ() + 0.5f, 9)) {
+			if (blockEntity.slide < 0.871) blockEntity.test += 0.05F;
 		} else {
-			if (slide > 0.004) test -= 0.05F;
+			if (blockEntity.slide > 0.004) blockEntity.test -= 0.05F;
 		}
-		counter++;
-		if (counter % 10 == 0)
+        blockEntity.counter++;
+		if (blockEntity.counter % 10 == 0)
 		{
 			for (int x = 1; x < 7; x++)
 			{
-				BlockEntity te = level.getBlockEntity(getBlockPos().east(x));
+				BlockEntity te = level.getBlockEntity(blockPos.east(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
-					machines.add(te);
+                    blockEntity.machines.add(te);
 				}
-				te = level.getBlockEntity(getBlockPos().west(x));
+				te = level.getBlockEntity(blockPos.west(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
-					machines.add(te);
+                    blockEntity.machines.add(te);
 				}
-				te = level.getBlockEntity(getBlockPos().south(x));
+				te = level.getBlockEntity(blockPos.south(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
-					machines.add(te);
+                    blockEntity.machines.add(te);
 				}
-				te = level.getBlockEntity(getBlockPos().north(x));
+				te = level.getBlockEntity(blockPos.north(x));
 				if ((te instanceof TileEntityReactor || te instanceof TileEntityReciever))
 				{
-					machines.add(te);
+                    blockEntity.machines.add(te);
 				}
 			}
-			for (int index = 0; index < machines.size(); index++)
+			for (int index = 0; index < blockEntity.machines.size(); index++)
 			{
-				BlockEntity te = machines.get(index);
+				BlockEntity te = blockEntity.machines.get(index);
 				if (te != null && !te.isRemoved())
 				{
 					if (te instanceof TileEntityReactor ter)
 					{
                         if (ter.on) {
-                            for (int q = 0; q < items.size(); q++) {
+                            for (int q = 0; q < blockEntity.items.size(); q++) {
                                 if (ter.getFuel().isEmpty()) {
-                                    if (getItem(q).has(RRComponents.ROD_POWER)) {
-                                        ter.setFuel(getItem(q));
-                                        setItem(q, RRItems.emptyrod.toStack());
+                                    if (blockEntity.getItem(q).has(RRComponents.ROD_POWER)) {
+                                        ter.setFuel(blockEntity.getItem(q));
+                                        blockEntity.setItem(q, RRItems.emptyrod.toStack());
                                     }
                                 } else {
                                     break;
@@ -130,27 +130,28 @@ public class TileEntityLoader extends BaseContainerBlockEntity implements Tickab
 					}
 					if (te instanceof TileEntityReciever ter)
 					{
-                        transferItemsToReciever(ter);
+                        blockEntity.transferItemsToReciever(ter);
                     }
 				}
 				else
 				{
-					machines.remove((int) index);
+                    blockEntity.machines.remove((int) index);
 				}
 			}
-			BlockEntity te = level.getBlockEntity(getBlockPos().below());
+			BlockEntity te = level.getBlockEntity(blockPos.below());
 			if (te instanceof TileEntityLoader tel)
 			{
-                for (int q = 0; q < items.size(); q++)
+                for (int q = 0; q < blockEntity.items.size(); q++)
 				{
-					if (!getItem(q).isEmpty())
+                    ItemStack stack = blockEntity.getItem(q);
+                    if (!stack.isEmpty())
 					{
 						for (int j = 0; j < tel.items.size(); j++)
 						{
 							if (tel.getItem(j).isEmpty())
 							{
-								tel.setItem(j, getItem(q));
-								setItem(q, ItemStack.EMPTY);
+								tel.setItem(j, stack);
+                                blockEntity.setItem(q, ItemStack.EMPTY);
 								return;
 							}
 						}

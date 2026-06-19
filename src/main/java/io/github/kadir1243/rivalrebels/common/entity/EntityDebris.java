@@ -109,7 +109,7 @@ public class EntityDebris extends EntityInanimate {
             valueOutput.store("Block", CompoundTag.CODEC, NbtUtils.writeBlockState(getState()));
         }
         valueOutput.putInt("Age", tickCount);
-		if (!getTileEntityData().isEmpty()) valueOutput.store("TileEntityData", CompoundTag.CODEC, getTileEntityData());
+		if (getTileEntityData() != null) valueOutput.store("TileEntityData", CompoundTag.CODEC, getTileEntityData());
 	}
 
     @Override
@@ -127,7 +127,7 @@ public class EntityDebris extends EntityInanimate {
         if (getState() != null) {
             section.setDetail("Immitating BlockState", this.getState().toString());
         }
-        if (!getTileEntityData().isEmpty()) {
+        if (getTileEntityData() != null) {
             section.setDetail("Immitating Block Entity Data", getTileEntityData().toString());
         }
 	}

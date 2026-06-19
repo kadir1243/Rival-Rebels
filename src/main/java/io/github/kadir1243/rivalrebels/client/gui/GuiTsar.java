@@ -37,7 +37,7 @@ public class GuiTsar extends BombContainerScreen<ContainerTsar> {
 
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Translations.TSAR_NAME.translate(), this.titleLabelX, this.titleLabelY, CommonColors.DARK_GRAY, false);
+        graphics.text(font, this.title, this.titleLabelX, this.titleLabelY, CommonColors.DARK_GRAY, false);
     }
 
     @Override

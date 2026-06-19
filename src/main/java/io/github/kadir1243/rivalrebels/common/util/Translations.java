@@ -24,7 +24,6 @@ public class Translations {
     public static final TranslationKey STATUS_TRANSLATION = new TranslationKey("status");
     public static final TranslationKey DEFUSE_TRANSLATION = new TranslationKey("defuse");
     public static final TranslationKey INVENTORY_TRANSLATION = new TranslationKey("inventory");
-    public static final TranslationKey NUKE_TRANSLATION = new TranslationKey("nuke_name");
     public static final TranslationKey OVERHEAT_TRANSLATION = new TranslationKey("overheat");
     public static final TranslationKey USE_PLIERS_TO_BUILD_TRANSLATION = new TranslationKey("use_pliers_to_build");
     public static final TranslationKey USE_PLIERS_TO_OPEN_TRANSLATION = new TranslationKey("use_pliers_to_open");
@@ -33,7 +32,6 @@ public class Translations {
     public static final TranslationKey BUILDING = new TranslationKey("building_crate");
     public static final TranslationKey SPAWN_RESET_WARNING = new TranslationKey("spawn_reset_warning");
     public static final TranslationKey RHODES_IS_ARMED = new TranslationKey("rhodes_is_armed");
-    public static final TranslationKey TSAR_NAME = new TranslationKey("tsar_name");
     public static final TranslationKey ANTIMATTER_BOMB_CONTAINER_NAME = new Translations.TranslationKey("container.antimatterbomb");
     public static final TranslationKey NEXT_BATTLE_TITLE = new TranslationKey("next_battle.title");
     public static final TranslationKey NEXT_BATTLE_SUBTITLE = new TranslationKey("next_battle.subtitle");

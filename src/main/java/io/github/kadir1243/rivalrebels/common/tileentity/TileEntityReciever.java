@@ -49,6 +49,7 @@ import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ResolvableProfile;
 import net.minecraft.world.level.ClipContext;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.ValueInput;
@@ -107,14 +108,12 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
 		}
 	}
 
-	@Override
-	public void tick()
-	{
-		super.tick();
-		if (xO == zO) updateDirection();
-		powered(0, 0);
-		convertBatteryToEnergy();
-		if (!hasWeapon && wepSelected != 0 && hasWepReqs()) setWep(wepSelected);
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityReciever blockEntity) {
+        TileEntityMachineBase.tick(level, blockPos, blockState, blockEntity);
+		if (blockEntity.xO == blockEntity.zO) blockEntity.updateDirection();
+		blockEntity.powered(0, 0);
+		blockEntity.convertBatteryToEnergy();
+		if (!blockEntity.hasWeapon && blockEntity.wepSelected != 0 && blockEntity.hasWepReqs()) blockEntity.setWep(blockEntity.wepSelected);
 	}
 
 	private boolean hasBattery()

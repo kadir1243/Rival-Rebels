@@ -14,17 +14,20 @@ package io.github.kadir1243.rivalrebels.client.tileentityrender;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelLoader;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
+import io.github.kadir1243.rivalrebels.common.block.machine.BlockLaptop;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityLoader;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.blockentity.ChestRenderer;
 import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
 import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.core.Direction;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
@@ -50,9 +53,11 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
     @Override
     public void submit(LoaderBlockEntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-		poseStack.translate(0.5F, 0.5F, 0.5F);
+        poseStack.mulPose(ChestRenderer.modelTransformation(renderState.facing));
+        poseStack.translate(0.5F, 0.5F, 0.5F);
+        poseStack.mulPose(Axis.YN.rotationDegrees(90));
 
-		ModelLoader.render(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etloader), poseStack, renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+        ModelLoader.render(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etloader), poseStack, renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
         for (BlockEntity machine : renderState.machines) {
 			poseStack.pushPose();
@@ -74,7 +79,6 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
 	}
 
     @Override
-    @OnlyIn(Dist.CLIENT)
     public int getViewDistance()
     {
         return 16384;
@@ -95,10 +99,12 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
         BlockEntityRenderer.super.extractRenderState(blockEntity, renderState, partialTick, cameraPosition, breakProgress);
         renderState.machines = blockEntity.machines;
         renderState.slide = blockEntity.slide;
+        renderState.facing = blockEntity.getBlockState().getValue(BlockLaptop.FACING);
     }
 
     public static class LoaderBlockEntityRenderState extends BlockEntityRenderState {
         public float slide;
         public List<BlockEntity> machines;
+        public Direction facing;
     }
 }

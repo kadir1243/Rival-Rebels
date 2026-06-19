@@ -14,7 +14,8 @@ package io.github.kadir1243.rivalrebels.common.block.machine;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
-import io.github.kadir1243.rivalrebels.common.tileentity.Tickable;
+import io.github.kadir1243.rivalrebels.common.tileentity.AbstractObjectiveBlockEntity;
+import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
 import io.github.kadir1243.rivalrebels.common.tileentity.SigmaObjectiveBlockEntity;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -78,6 +79,6 @@ public class BlockSigmaObjective extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+        return createTickerHelper(type, RRTileEntities.SIGMA_OBJECTIVE.get(), AbstractObjectiveBlockEntity::tick);
     }
 }

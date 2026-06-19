@@ -27,21 +27,21 @@ public class GuiLoader extends AbstractContainerScreen<ContainerLoader> {
         int BASE_IMAGE_HEIGHT = 114;
         int inventoryRows = containerLoader.size() / 9;
         super(containerLoader, playerInv, title, 256, BASE_IMAGE_HEIGHT + inventoryRows * 18);
-        this.titleLabelX = 165;
-        this.titleLabelY = 237;
+        this.titleLabelX = 110;
+        this.titleLabelY = 270;
 	}
 
     @Override
     protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
         graphics.pose().pushMatrix();
 		graphics.pose().rotate(-13);
-		graphics.text(font, Component.literal("Loader"), this.titleLabelX, this.titleLabelY, 0xFF444444, false);
+		graphics.text(font, this.title, this.titleLabelX, this.titleLabelY, 0xFF444444, false);
 		graphics.pose().popMatrix();
 	}
 
     @Override
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         super.extractBackground(graphics, mouseX, mouseY, a);
-        RRTextures.guitloader.blit(graphics, width / 2 - 128, height / 2 - 103, 0, 0, 256, 210, CommonColors.WHITE);
+        RRTextures.guitloader.blit(graphics, this.leftPos, this.topPos + 8, 0, 0, 256, 210, CommonColors.WHITE);
 	}
 }

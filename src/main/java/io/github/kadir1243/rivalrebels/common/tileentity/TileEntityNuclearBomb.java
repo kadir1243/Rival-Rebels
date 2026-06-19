@@ -22,14 +22,12 @@ import io.github.kadir1243.rivalrebels.common.item.components.ChipData;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -38,27 +36,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements Tickable {
-	public GameProfile player = null;
-	public RivalRebelsTeam	rrteam			= null;
-	private NonNullList<ItemStack> chestContents = NonNullList.withSize(36, ItemStack.EMPTY);
-
-    public int				Countdown		= RRConfig.SERVER.getNuclearBombCountdown() * 20;
-
-	public int				AmountOfCharges	= 0;
-	public boolean			hasTrollface	= false;
-	public boolean			hasExplosive	= false;
-	public boolean			hasFuse			= false;
-	public boolean			hasChip			= false;
-
+public class TileEntityNuclearBomb extends AbstractBombBlockEntity {
     public TileEntityNuclearBomb(BlockPos pos, BlockState state) {
         super(RRTileEntities.NUCLEAR_BOMB.get(), pos, state);
     }
@@ -82,14 +65,14 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
     public void setChanged() {
         super.setChanged();
         hasTrollface = false;
-        AmountOfCharges = 0;
+        megaton = 0;
         for (ItemStack rod : getRods()) {
             hasTrollface |= rod.is(RRItems.trollmask);
             if (rod.is(RRItems.NUCLEAR_ROD)) {
-                AmountOfCharges++;
+                megaton += 2.5F;
             }
         }
-        hasFuse = getItem(0).is(RRItems.fuse);
+
         hasChip = getItem(12).is(RRItems.chip);
         if (hasChip && getItem(12).has(RRComponents.CHIP_DATA)) {
             ChipData chipData = getItem(12).get(RRComponents.CHIP_DATA);
@@ -100,87 +83,61 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
     }
 
     @Override
-    protected void loadAdditional(ValueInput input) {
-        super.loadAdditional(input);
-
-        ContainerHelper.loadAllItems(input, this.chestContents);
-	}
-
-    @Override
-    protected void saveAdditional(ValueOutput output) {
-        super.saveAdditional(output);
-
-        ContainerHelper.saveAllItems(output, this.chestContents);
-    }
-
-    @Override
-	public int getMaxStackSize()
-	{
-		return 1;
-	}
-
-    @Override
 	public boolean stillValid(Player player) {
         return Container.stillValidBlockEntity(this, player, 64);
 	}
 
-    @Override
-	public void tick() {
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityNuclearBomb blockEntity) {
         boolean sp = level.isClientSide() || (!level.isClientSide() && (level.getServer().isSingleplayer() || level.getServer().getPlayerCount() == 1));
 
-		if (hasFuse && hasExplosive && hasChip)
+		if (blockEntity.hasFuse && blockEntity.hasExplosive && blockEntity.hasChip)
 		{
 			double dist = 10000000;
 			if (!sp || RRConfig.SERVER.isStopSelfnukeinSP()) {
-				if (rrteam == RivalRebelsTeam.OMEGA) {
-					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.omegaData.objPos().getZ());
-				} else if (rrteam == RivalRebelsTeam.SIGMA) {
-					dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.sigmaData.objPos().getZ());
+				if (blockEntity.rrteam == RivalRebelsTeam.OMEGA) {
+					dist = blockPos.distToLowCornerSqr(RivalRebels.round.omegaData.objPos().getX(), blockPos.getY(), RivalRebels.round.omegaData.objPos().getZ());
+				} else if (blockEntity.rrteam == RivalRebelsTeam.SIGMA) {
+					dist = blockPos.distToLowCornerSqr(RivalRebels.round.sigmaData.objPos().getX(), blockPos.getY(), RivalRebels.round.sigmaData.objPos().getZ());
 				}
 			}
-			if (dist > (RRConfig.SERVER.getNuclearBombStrength() + (AmountOfCharges * AmountOfCharges) + 29) * (RRConfig.SERVER.getNuclearBombStrength() + (AmountOfCharges * AmountOfCharges) + 29))
+            float squareOfCharges = Mth.square(blockEntity.megaton / 2.5F);
+			if (dist > (RRConfig.SERVER.getNuclearBombStrength() + squareOfCharges + 29) * (RRConfig.SERVER.getNuclearBombStrength() + squareOfCharges + 29))
 			{
-				if (Countdown > 0) Countdown--;
+				if (blockEntity.countdown > 0) blockEntity.countdown--;
 			}
 			else if (!level.isClientSide())
 			{
-				this.setItem(0, ItemStack.EMPTY);
+                blockEntity.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.sendSystemMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)));
-                    player.sendSystemMessage(Translations.status().append(" ").append(rrteam.getBlockName()).append(" ").append(Translations.defuse()).append(this.getDefaultName()));
+                    player.sendSystemMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(blockEntity.player.id()).getName().copy().withStyle(ChatFormatting.RED)));
+                    player.sendSystemMessage(Translations.status().append(" ").append(blockEntity.rrteam.getBlockName()).append(" ").append(Translations.defuse()).append(blockEntity.getDefaultName()));
                 }
 			}
 		}
 		else
 		{
-			Countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
+            blockEntity.countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
 		}
 
-		if (Countdown == 200 && !level.isClientSide() && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
-            Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
+		if (blockEntity.countdown == 200 && !level.isClientSide() && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
+            Translations.sendWarningBombWillExplodeMessageToPlayers(level);
 		}
 
-		if (Countdown == 0 && AmountOfCharges != 0 && !level.isClientSide())
+		if (blockEntity.countdown == 0 && blockEntity.megaton != 0 && !level.isClientSide())
 		{
 			level.setSkyFlashTime(2);
-            Direction facing = this.getBlockState().getValue(BlockNuclearBomb.FACING);
+            Direction facing = blockState.getValue(BlockNuclearBomb.FACING);
             float pitch = facing.getAxis().isVertical() ? facing.toYRot() : 0;
 			float yaw = facing.getAxis().isHorizontal() ? facing.toYRot() : 0;
 
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
-			level.addFreshEntity(new EntityNuke(level, getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, yaw, pitch, AmountOfCharges, hasTrollface));
+            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+			level.addFreshEntity(new EntityNuke(level, blockPos.getX() + 0.5f, blockPos.getY() + 0.5f, blockPos.getZ() + 0.5f, yaw, pitch, (int) (blockEntity.megaton / 2.5), blockEntity.hasTrollface));
 		}
 
-		if (Countdown == 0 && AmountOfCharges == 0)
+		if (blockEntity.countdown == 0 && blockEntity.megaton == 0)
 		{
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
-			level.explode(null, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 4, Level.ExplosionInteraction.BLOCK);
+            explodeEmpty(level, blockPos);
 		}
-    }
-
-    @Override
-    protected Component getDefaultName() {
-        return Component.literal("Nuclear Bomb");
     }
 
     @Override
@@ -188,22 +145,12 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
         return new ContainerNuclearBomb(containerId, inventory, this, containerData);
     }
 
-    @Override
-    protected NonNullList<ItemStack> getItems() {
-        return this.chestContents;
-    }
-
-    @Override
-    protected void setItems(NonNullList<ItemStack> items) {
-        this.chestContents = items;
-    }
-
     private final ContainerData containerData = new ContainerData() {
         @Override
         public int get(int index) {
             return switch (index) {
-                case 0 -> Countdown;
-                case 1 -> AmountOfCharges;
+                case 0 -> countdown;
+                case 1 -> (int) (megaton * 100);
                 case 2 -> hasTrollface ? 1 : 0;
                 case 3 -> hasExplosive ? 1 : 0;
                 case 4 -> hasFuse ? 1 : 0;
@@ -214,8 +161,8 @@ public class TileEntityNuclearBomb extends BaseContainerBlockEntity implements T
         @Override
         public void set(int index, int value) {
             switch (index) {
-                case 0 -> Countdown = value;
-                case 1 -> AmountOfCharges = value;
+                case 0 -> countdown = value;
+                case 1 -> megaton = value / 100F;
                 case 2 -> hasTrollface = value == 1;
                 case 3 -> hasExplosive = value == 1;
                 case 4 -> hasFuse = value == 1;

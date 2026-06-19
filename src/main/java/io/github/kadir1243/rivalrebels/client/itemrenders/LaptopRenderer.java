@@ -31,7 +31,7 @@ public record LaptopRenderer(Identifier screenTexture) implements NoDataSpecialM
     @Override
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
 		ModelLaptop.renderModel(submitNodeCollector, poseStack, -90, true, lightCoords, overlayCoords);
-		ModelLaptop.renderScreen(submitNodeCollector, RRIdentifiers.etubuntu, poseStack, -90, lightCoords, overlayCoords);
+		ModelLaptop.renderScreen(submitNodeCollector, this.screenTexture(), poseStack, -90, lightCoords, overlayCoords);
 	}
 
     @Override

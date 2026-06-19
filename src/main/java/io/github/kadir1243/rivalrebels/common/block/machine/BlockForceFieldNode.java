@@ -13,10 +13,9 @@ package io.github.kadir1243.rivalrebels.common.block.machine;
 
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
-import io.github.kadir1243.rivalrebels.common.item.ItemChip;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
-import io.github.kadir1243.rivalrebels.common.tileentity.Tickable;
+import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityForceFieldNode;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -85,7 +84,7 @@ public class BlockForceFieldNode extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+        return createTickerHelper(type, RRTileEntities.FORCE_FIELD_NODE.get(), TileEntityForceFieldNode::tick);
     }
 
     @Nullable

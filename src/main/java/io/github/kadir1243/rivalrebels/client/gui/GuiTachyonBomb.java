@@ -32,7 +32,7 @@ public class GuiTachyonBomb extends BombContainerScreen<ContainerTachyonBomb> {
 
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Component.literal("Tachyon"), this.titleLabelX, this.titleLabelY, CommonColors.DARK_GRAY, false);
+        graphics.text(font, this.title, this.titleLabelX, this.titleLabelY, CommonColors.DARK_GRAY, false);
     }
 
     @Override

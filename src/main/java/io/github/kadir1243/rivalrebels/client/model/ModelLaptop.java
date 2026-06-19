@@ -32,8 +32,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 @OnlyIn(Dist.CLIENT)
-public class ModelLaptop
-{
+public class ModelLaptop {
 	private static final TextureVertice	t1		= new TextureVertice(0.03125f * 1, 0.03125f * 0);
 	private static final TextureVertice	t2		= new TextureVertice(0.03125f * 10, 0.03125f * 0);
 	private static final TextureVertice	t3		= new TextureVertice(0.03125f * 0, 0.03125f * 1);

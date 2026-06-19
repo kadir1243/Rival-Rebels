@@ -33,13 +33,14 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import org.jspecify.annotations.Nullable;
 
-public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickable {
+public class TileEntityLaptop extends BaseContainerBlockEntity {
     public RivalRebelsTeam rrteam = RivalRebelsTeam.NONE;
 	private NonNullList<ItemStack> items = NonNullList.withSize(14, ItemStack.EMPTY);
 
@@ -139,24 +140,23 @@ public class TileEntityLaptop extends BaseContainerBlockEntity implements Tickab
         return this.saveWithoutMetadata(registries);
     }
 
-    @Override
-	public void tick() {
-		slide = (Mth.cos(test) + 1) * 45;
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityLaptop blockEntity) {
+        blockEntity.slide = (Mth.cos(blockEntity.test) + 1) * 45;
 
-        ItemBinoculars.add(this);
-        boolean i = level.hasNearbyAlivePlayer(getBlockPos().getX() + 0.5f, getBlockPos().getY() + 0.5f, getBlockPos().getZ() + 0.5f, 9);
+        ItemBinoculars.add(blockEntity);
+        boolean i = level.hasNearbyAlivePlayer(blockPos.getX() + 0.5f, blockPos.getY() + 0.5f, blockPos.getZ() + 0.5f, 9);
 		if (i)
 		{
-			if (slide < 89.995) test += 0.05F;
+			if (blockEntity.slide < 89.995) blockEntity.test += 0.05F;
 		}
 		else
 		{
-			if (slide > 0.004) test -= 0.05F;
+			if (blockEntity.slide > 0.004) blockEntity.test -= 0.05F;
 		}
 
-		if (b2spirit > 0 && !hasChips())
+		if (blockEntity.b2spirit > 0 && !blockEntity.hasChips())
 		{
-			b2spirit--;
+            blockEntity.b2spirit--;
 		}
 	}
 

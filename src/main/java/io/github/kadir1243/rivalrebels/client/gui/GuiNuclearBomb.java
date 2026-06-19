@@ -36,7 +36,7 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
 		if (menu.isArmed()) {
             graphics.text(font, Translations.BOMB_ARMED.translate(), 80, imageHeight - 96 + 2, CommonColors.WHITE, false);
 		} else if (!menu.hasTrollFace()) {
-            graphics.text(font, Translations.BOMB_MEGATONS.translate(menu.getAmountOfCharges() * 2.5), 80, imageHeight - 96 + 2, CommonColors.WHITE, false);
+            graphics.text(font, Translations.BOMB_MEGATONS.translate(menu.getMegaton()), 80, imageHeight - 96 + 2, CommonColors.WHITE, false);
         } else {
             graphics.text(font, Component.literal("Umad bro?"), 80, imageHeight - 96 + 2, CommonColors.WHITE, false);
         }
@@ -49,8 +49,8 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
 
     @Override
     public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, Translations.NUKE_TRANSLATION.translate(), 8, 6, CommonColors.WHITE, false);
-        graphics.text(font, Component.translatable("container.inventory"), 8, imageHeight - 96 + 2, CommonColors.WHITE, false); // this is net.minecraft.world.entity.player.Inventory.DEFAULT_NAME (= Component.translatable("container.inventory"))
+        graphics.text(font, this.title, this.titleLabelX, this.titleLabelY, CommonColors.WHITE, false);
+        graphics.text(font, this.playerInventoryTitle, this.inventoryLabelX, this.inventoryLabelY, CommonColors.WHITE, false);
     }
 
     @Override
@@ -72,7 +72,8 @@ public class GuiNuclearBomb extends BombContainerScreen<ContainerNuclearBomb> {
     public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         super.extractBackground(graphics, mouseX, mouseY, a);
         int color = CommonColors.WHITE;
-        if (menu.getAmountOfCharges() != 0) color = ARGB.colorFromFloat(1F, (menu.getAmountOfCharges() * 0.1F), 1 - (menu.getAmountOfCharges() * 0.1F), 0F);
+        float megaton = menu.getMegaton() / 2.5F;
+        if (megaton != 0) color = ARGB.colorFromFloat(1F, (megaton * 0.1F), 1 - (megaton * 0.1F), 0F);
 		int x = this.leftPos;
 		int y = this.topPos;
 		RRTextures.guitnuke.blit(graphics, x, y, 0, 0, imageWidth, 81, color);

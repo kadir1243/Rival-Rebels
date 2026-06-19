@@ -49,35 +49,30 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
 		pInR = 345;
 	}
 
-	@Override
-	public void tick()
-	{
-		if (pInR > 0) pInR = powered(pInR, edist);
-		else turnOff();
-		pInR -= decay;
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityForceFieldNode blockEntity) {
+		if (blockEntity.pInR > 0) blockEntity.pInR = blockEntity.powered(blockEntity.pInR, blockEntity.edist);
+		else turnOff(level, blockPos, blockState, blockEntity);
+        blockEntity.pInR -= blockEntity.decay;
 	}
 
-	public void turnOff()
-	{
-		if (level > 0)
-		{
-			Direction meta = this.getBlockState().getValue(BlockForceFieldNode.FACING);
+    public static void turnOff(Level world, BlockPos blockPos, BlockState blockState, TileEntityForceFieldNode blockEntity) {
+        if (blockEntity.level > 0) {
+            Direction meta = blockState.getValue(BlockForceFieldNode.FACING);
 
-			level--;
-			for (int y = 0; y < 7; y++)
-			{
+            blockEntity.level--;
+            for (int y = 0; y < 7; y++) {
                 BlockPos pos;
                 if (meta == Direction.NORTH) {
-                    pos = getBlockPos().above(y - 3).west(level + 1);
+                    pos = blockPos.above(y - 3).west(blockEntity.level + 1);
                 } else {
-                    pos = getBlockPos().offset(0, y, level).below(3).relative(meta);
+                    pos = blockPos.above(y - 3).south(blockEntity.level).relative(meta);
                 }
-                if (getLevel().getBlockState(pos).is(RRBlocks.forcefield)) {
-                    getLevel().setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+                if (world.getBlockState(pos).is(RRBlocks.forcefield)) {
+                    world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
                 }
             }
-		}
-	}
+        }
+    }
 
     @Override
     protected void loadAdditional(ValueInput valueInput) {

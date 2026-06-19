@@ -66,8 +66,8 @@ public class ContainerNuclearBomb extends AbstractContainerMenu implements BombC
         return containerData.get(0);
     }
 
-    public int getAmountOfCharges() {
-        return containerData.get(1);
+    public float getMegaton() {
+        return containerData.get(1) / 100F;
     }
 
     public boolean hasTrollFace() {

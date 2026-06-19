@@ -11,7 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.block;
 
-import io.github.kadir1243.rivalrebels.common.tileentity.Tickable;
+import io.github.kadir1243.rivalrebels.common.tileentity.RRTileEntities;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityMeltDown;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -56,7 +56,7 @@ public class BlockMeltDown extends BaseEntityBlock {
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
-        return (world1, pos, state1, blockEntity) -> ((Tickable) blockEntity).tick();
+        return createTickerHelper(type, RRTileEntities.MELT_DOWN.get(), TileEntityMeltDown::tick);
     }
 
     @Override

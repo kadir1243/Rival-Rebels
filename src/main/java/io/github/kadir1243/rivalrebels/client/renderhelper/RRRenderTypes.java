@@ -26,7 +26,7 @@ import java.util.function.Function;
 @OnlyIn(Dist.CLIENT)
 public class RRRenderTypes {
     public static final RenderPipeline LIGHTNING_ASTRO_BLAST_PIPELINE =
-        RenderPipeline.builder()
+        RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
             .withVertexShader("core/entity")
             .withFragmentShader("core/entity")
             .withColorTargetState(ColorTargetState.DEFAULT)
@@ -35,11 +35,11 @@ public class RRRenderTypes {
             .withLocation("pipeline/lightning_astro_blast_pipeline_" + RRIdentifiers.MODID)
             .build();
     public static final RenderPipeline COLOR_WRITE_TRI =
-        RenderPipeline.builder()
-            .withVertexShader("core/entity")
-            .withFragmentShader("core/entity")
+        RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+            .withVertexShader("core/rendertype_lightning")
+            .withFragmentShader("core/rendertype_lightning")
             .withColorTargetState(ColorTargetState.DEFAULT)
-            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLES)
+            .withVertexFormat(DefaultVertexFormat.POSITION_COLOR, VertexFormat.Mode.TRIANGLE_FAN)
             .withDepthStencilState(DepthStencilState.DEFAULT)
             .withLocation("pipeline/color_write_tri_" + RRIdentifiers.MODID)
             .build();
@@ -93,7 +93,7 @@ public class RRRenderTypes {
         .padding(1)
         .build();
     public static final RenderPipeline BLAST_SPHERE_PIPELINE =
-        RenderPipeline.builder()
+        RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
             .withVertexShader("core/entity")
             .withFragmentShader("core/entity")
             .withColorTargetState(new ColorTargetState(BlendFunction.TRANSLUCENT))

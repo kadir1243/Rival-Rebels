@@ -12,7 +12,6 @@
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.block.trap.BlockTsarBomba;
 import io.github.kadir1243.rivalrebels.common.container.ContainerTsar;
@@ -23,43 +22,26 @@ import io.github.kadir1243.rivalrebels.common.item.components.ChipData;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.NonNullList;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
-import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.storage.ValueInput;
-import net.minecraft.world.level.storage.ValueOutput;
 
-public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tickable {
-    public GameProfile player = null;
-    public RivalRebelsTeam rrteam = null;
-    private NonNullList<ItemStack> chestContents = NonNullList.withSize(36, ItemStack.EMPTY);
-    public int countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
+public class TileEntityTsarBomba extends AbstractBombBlockEntity {
     public int nuclear = 0;
     public int hydrogen = 0;
     public boolean hasAntennae = false;
-    public boolean hasExplosive = false;
-    public boolean hasFuse = false;
-    public boolean hasChip = false;
-    public boolean hasTrollface = false;
-    public float megaton = 0;
 
     public TileEntityTsarBomba(BlockPos pos, BlockState state) {
         super(RRTileEntities.TSAR_BOMB.get(), pos, state);
@@ -68,24 +50,6 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
     @Override
     public int getContainerSize() {
         return 21;
-    }
-
-    @Override
-    protected void loadAdditional(ValueInput valueInput) {
-        super.loadAdditional(valueInput);
-
-        ContainerHelper.loadAllItems(valueInput, this.chestContents);
-    }
-
-    @Override
-    protected void saveAdditional(ValueOutput valueOutput) {
-        super.saveAdditional(valueOutput);
-        ContainerHelper.saveAllItems(valueOutput, this.chestContents);
-    }
-
-    @Override
-    public int getMaxStackSize() {
-        return 1;
     }
 
     @Override
@@ -113,8 +77,6 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
         }
         if (nuclear == hydrogen) megaton = nuclear * 6.25f;
 
-        hasFuse = getItem(0).is(RRItems.fuse);
-
         ItemStack chipSlotStack = getItem(20);
         hasChip = chipSlotStack.is(RRItems.chip);
         if (hasChip && chipSlotStack.has(RRComponents.CHIP_DATA)) {
@@ -128,8 +90,7 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
         hasExplosive = !getItem(19).isEmpty();// getStack(19).is(RRItems.timedbomb);
     }
 
-    @Override
-    public void tick() {
+    public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityTsarBomba blockEntity) {
         boolean sp;
         if (level.isClientSide()) {
             sp = Minecraft.getInstance().isLocalServer();
@@ -138,72 +99,56 @@ public class TileEntityTsarBomba extends BaseContainerBlockEntity implements Tic
             sp = server.getPlayerCount() == 1;
         }
 
-        if (hasFuse && hasExplosive && nuclear == hydrogen && hasAntennae && hasChip) {
+        if (blockEntity.hasFuse && blockEntity.hasExplosive && blockEntity.nuclear == blockEntity.hydrogen && blockEntity.hasAntennae && blockEntity.hasChip) {
             double dist = 1000000;
 
             if (!sp || RRConfig.SERVER.isStopSelfnukeinSP()) {
-                if (rrteam == RivalRebelsTeam.OMEGA) {
-                    dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.omegaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.omegaData.objPos().getZ());
+                if (blockEntity.rrteam == RivalRebelsTeam.OMEGA) {
+                    dist = blockPos.distToLowCornerSqr(RivalRebels.round.omegaData.objPos().getX(), blockPos.getY(), RivalRebels.round.omegaData.objPos().getZ());
                 }
-                if (rrteam == RivalRebelsTeam.SIGMA) {
-                    dist = getBlockPos().distToLowCornerSqr(RivalRebels.round.sigmaData.objPos().getX(), getBlockPos().getY(), RivalRebels.round.sigmaData.objPos().getZ());
+                if (blockEntity.rrteam == RivalRebelsTeam.SIGMA) {
+                    dist = blockPos.distToLowCornerSqr(RivalRebels.round.sigmaData.objPos().getX(), blockPos.getY(), RivalRebels.round.sigmaData.objPos().getZ());
                 }
             }
-            if (dist > (RRConfig.SERVER.getTsarBombaStrength() + (nuclear * hydrogen) + 29) * (RRConfig.SERVER.getTsarBombaStrength() + (nuclear * hydrogen) + 29)) {
-                if (countdown > 0) countdown--;
+            if (dist > (RRConfig.SERVER.getTsarBombaStrength() + (blockEntity.nuclear * blockEntity.hydrogen) + 29) * (RRConfig.SERVER.getTsarBombaStrength() + (blockEntity.nuclear * blockEntity.hydrogen) + 29)) {
+                if (blockEntity.countdown > 0) blockEntity.countdown--;
             } else if (!level.isClientSide()) {
-                this.setItem(0, ItemStack.EMPTY);
+                blockEntity.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.sendSystemMessage(Translations.warning().append(" ").append(getLevel().getPlayerByUUID(this.player.id()).getName().copy().withStyle(ChatFormatting.RED)));
-                    player.sendSystemMessage(Translations.status().append(" ").append(rrteam.getBlockName()).append(" ").append(Translations.defuse()).append(this.getDefaultName()));
+                    player.sendSystemMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(blockEntity.player.id()).getName().copy().withStyle(ChatFormatting.RED)));
+                    player.sendSystemMessage(Translations.status().append(" ").append(blockEntity.rrteam.getBlockName()).append(" ").append(Translations.defuse()).append(blockEntity.getDefaultName()));
                 }
             }
         } else {
-            countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
-            if (RRConfig.SERVER.getNuclearBombCountdown() == 0) countdown = 10;
+            blockEntity.countdown = RRConfig.SERVER.getNuclearBombCountdown() * 20;
+            if (RRConfig.SERVER.getNuclearBombCountdown() == 0) blockEntity.countdown = 10;
         }
 
-        if (countdown == 200 && !level.isClientSide() && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
-            Translations.sendWarningBombWillExplodeMessageToPlayers(getLevel());
+        if (blockEntity.countdown == 200 && !level.isClientSide() && RRConfig.SERVER.getNuclearBombCountdown() > 10) {
+            Translations.sendWarningBombWillExplodeMessageToPlayers(level);
         }
 
-        if (countdown % 20 == 0 && countdown <= 200 && RRConfig.SERVER.getNuclearBombCountdown() > 10)
-            level.playSound(null, getBlockPos(), RRSounds.NUKE.get(), SoundSource.BLOCKS, 100, 1);
+        if (blockEntity.countdown % 20 == 0 && blockEntity.countdown <= 200 && RRConfig.SERVER.getNuclearBombCountdown() > 10)
+            level.playSound(null, blockPos, RRSounds.NUKE.get(), SoundSource.BLOCKS, 100, 1);
 
-        if (countdown == 0 && nuclear != 0 && hydrogen != 0 && !level.isClientSide() && nuclear == hydrogen) {
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
+        if (blockEntity.countdown == 0 && blockEntity.nuclear != 0 && blockEntity.hydrogen != 0 && !level.isClientSide() && blockEntity.nuclear == blockEntity.hydrogen) {
+            level.setBlock(blockPos, Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
             level.setSkyFlashTime(2);
             float pitch = 0;
-            float yaw = this.getBlockState().getValue(BlockTsarBomba.FACING).toYRot();
+            float yaw = blockState.getValue(BlockTsarBomba.FACING).toYRot();
 
-            EntityTsar tsar = new EntityTsar(level, getBlockPos().getX() + 0.5f, getBlockPos().getY() + 1f, getBlockPos().getZ() + 0.5f, yaw, pitch, hydrogen, hasTrollface);
+            EntityTsar tsar = new EntityTsar(level, blockPos.getX() + 0.5f, blockPos.getY() + 1f, blockPos.getZ() + 0.5f, yaw, pitch, blockEntity.hydrogen, blockEntity.hasTrollface);
             level.addFreshEntity(tsar);
         }
 
-        if (countdown == 0 && nuclear == 0 && hydrogen == 0) {
-            level.setBlock(getBlockPos(), Blocks.AIR.defaultBlockState(), Block.UPDATE_ALL | Block.UPDATE_SKIP_BLOCK_ENTITY_SIDEEFFECTS);
-            level.explode(null, getBlockPos().getX(), getBlockPos().getY(), getBlockPos().getZ(), 4, Level.ExplosionInteraction.NONE);
+        if (blockEntity.countdown == 0 && blockEntity.nuclear == 0 && blockEntity.hydrogen == 0) {
+            explodeEmpty(level, blockPos);
         }
-    }
-
-    @Override
-    protected Component getDefaultName() {
-        return Component.literal("Tsar Bomba");
     }
 
     @Override
     protected AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
         return new ContainerTsar(containerId, inventory, this, propertyDelegate);
-    }
-
-    @Override
-    protected NonNullList<ItemStack> getItems() {
-        return this.chestContents;
-    }
-
-    @Override
-    protected void setItems(NonNullList<ItemStack> items) {
-        this.chestContents = items;
     }
 
     private final ContainerData propertyDelegate = new ContainerData() {
