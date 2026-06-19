@@ -1,5 +1,0 @@
-// 26.1.2	2026-05-03T15:20:52.75062056	Tags for minecraft:entity_type mod id rivalrebels
-6bf1afe2849879885402019109dad40d2af826d3 data/minecraft/tags/entity_type/can_breathe_under_water.json
-6bf1afe2849879885402019109dad40d2af826d3 data/minecraft/tags/entity_type/fall_damage_immune.json
-6bf1afe2849879885402019109dad40d2af826d3 data/minecraft/tags/entity_type/freeze_immune_entity_types.json
-6bf1afe2849879885402019109dad40d2af826d3 data/minecraft/tags/entity_type/ignores_poison_and_regen.json

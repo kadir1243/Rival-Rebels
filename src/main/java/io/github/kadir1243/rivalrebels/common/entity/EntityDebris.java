@@ -31,11 +31,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
 
 public class EntityDebris extends EntityInanimate {
     public static final EntityDataAccessor<Optional<BlockState>> STATE = SynchedEntityData.defineId(EntityDebris.class, EntityDataSerializers.OPTIONAL_BLOCK_STATE);
-    private @Nullable CompoundTag blockData;
+    public static final EntityDataAccessor<CompoundTag> TILE_ENTITY_DATA = SynchedEntityData.defineId(EntityDebris.class, EntityDataSerializers.COMPOUND_TAG);
 
     public EntityDebris(EntityType<? extends EntityDebris> type, Level level) {
 		super(type, level);
@@ -51,7 +50,7 @@ public class EntityDebris extends EntityInanimate {
         {
             BlockEntity blockEntity = level.getBlockEntity(pos);
             if (blockEntity != null) {
-                setTileEntityData(blockEntity.saveWithFullMetadata(registryAccess()));
+                setTileEntityData(blockEntity.saveWithFullMetadata(level.registryAccess()));
             }
         }
 		level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -73,11 +72,11 @@ public class EntityDebris extends EntityInanimate {
     }
 
     public CompoundTag getTileEntityData() {
-        return blockData;
+        return entityData.get(TILE_ENTITY_DATA);
     }
 
     public void setTileEntityData(CompoundTag tileEntityData) {
-        blockData = tileEntityData;
+        entityData.set(TILE_ENTITY_DATA, tileEntityData);
     }
 
     @Override
@@ -89,7 +88,7 @@ public class EntityDebris extends EntityInanimate {
         Vec3 add = getDeltaMovement().add(position());
         setPosRaw(add.x(), add.y(), add.z());
 
-		if (!level().isClientSide() && getInBlockState().canOcclude()) die(xo, yo, zo);
+		if (!level().isClientSide() && level().getBlockState(this.blockPosition()).canOcclude()) die(xo, yo, zo);
 	}
 
     @Override
@@ -135,5 +134,6 @@ public class EntityDebris extends EntityInanimate {
     @Override
     protected void defineSynchedData(SynchedEntityData.Builder builder) {
         builder.define(STATE, Optional.empty());
+        builder.define(TILE_ENTITY_DATA, new CompoundTag());
     }
 }

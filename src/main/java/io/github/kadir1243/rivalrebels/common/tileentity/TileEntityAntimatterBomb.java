@@ -173,8 +173,8 @@ public class TileEntityAntimatterBomb extends BaseContainerBlockEntity implement
 			{
 				this.setItem(0, ItemStack.EMPTY);
                 for (Player player : level.players()) {
-                    player.sendSystemMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)));
-                    player.sendSystemMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()));
+                    player.displayClientMessage(Translations.warning().append(" ").append(level.getPlayerByUUID(player.getUUID()).getName().copy().withStyle(ChatFormatting.RED)), false);
+                    player.displayClientMessage(Component.translatable(RRIdentifiers.MODID + ".tsar_bomb_defuse", rrteam.getBlockName()), false);
                 }
 			}
 		}

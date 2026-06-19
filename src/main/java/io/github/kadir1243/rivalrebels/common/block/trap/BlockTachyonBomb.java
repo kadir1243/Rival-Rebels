@@ -36,7 +36,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockTachyonBomb extends BaseEntityBlock {
     public static final MapCodec<BlockTachyonBomb> CODEC = simpleCodec(BlockTachyonBomb::new);
@@ -69,7 +69,7 @@ public class BlockTachyonBomb extends BaseEntityBlock {
             player.openMenu(getMenuProvider(state, level, pos));
             return InteractionResult.SUCCESS;
 		} else if (!level.isClientSide()) {
-			player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
+			player.displayClientMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)), true);
 		}
 		return InteractionResult.FAIL;
 	}

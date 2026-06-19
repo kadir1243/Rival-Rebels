@@ -117,9 +117,9 @@ public class TsarBomba
 				world.destroyBlock(pos, false);
 			}
 
-			double limit = (radius / 2) + world.getRandom().nextInt(radius / 4) + 7.5;
+			double limit = (radius / 2) + world.random.nextInt(radius / 4) + 7.5;
 			if (dist < limit) {
-				int blockType = world.getRandom().nextInt(4) + 1;
+				int blockType = world.random.nextInt(4) + 1;
 				if (x >= 0 && z < 0) blockType = 1;
 				if (x > 0 && z >= 0) blockType = 2;
 				if (x <= 0 && z > 0) blockType = 3;
@@ -129,7 +129,7 @@ public class TsarBomba
 				if (metadata < 0) metadata = -metadata;
 				metadata++;
 				if (metadata > 15) metadata = 15;
-				for (int Y = ylimit; Y > ylimit - (world.getRandom().nextInt(5) + 2); Y--) {
+				for (int Y = ylimit; Y > ylimit - (world.random.nextInt(5) + 2); Y--) {
 					if (Y == world.getMinY()) break;
                     BlockPos pos = new BlockPos(x + posX, Y, z + posZ);
                     BlockState state = world.getBlockState(pos);
@@ -225,7 +225,7 @@ public class TsarBomba
 				else if (state.is(RRBlocks.sigmaobj)) RivalRebels.round.winOmega();
 				if (state.is(RRBlocks.reactive))
 				{
-					for (int i = 0; i < (1 - (dist / radius)) * 16 + world.getRandom().nextDouble() * 2; i++)
+					for (int i = 0; i < (1 - (dist / radius)) * 16 + world.random.nextDouble() * 2; i++)
 					{
 						world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					}

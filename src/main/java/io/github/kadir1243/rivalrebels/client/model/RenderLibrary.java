@@ -12,12 +12,13 @@
 package io.github.kadir1243.rivalrebels.client.model;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -25,10 +26,11 @@ import net.minecraft.util.RandomSource;
 @OnlyIn(Dist.CLIENT)
 public class RenderLibrary {
 
-	public static void renderModel(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
-        RandomSource random = Minecraft.getInstance().level.getRandom();
+	public static void renderModel(PoseStack poseStack, MultiBufferSource bufferSource, float x1, float y1, float z1, float x, float y, float z, float segDist, float radius, int steps, float arcRatio, float rvar, float r, float g, float b, float a) {
+        RandomSource random = Minecraft.getInstance().level.random;
         poseStack.pushPose();
 		poseStack.translate(x1, y1, z1);
+        VertexConsumer buffer = bufferSource.getBuffer(RenderType.lightning());
         poseStack.mulPose(Axis.YP.rotationDegrees((float) (Math.atan2(x, z) * 57.295779513 - 90)));
 		float dist = Mth.sqrt(x * x + z * z);
 		float hdist = dist / 2f;
@@ -59,28 +61,25 @@ public class RenderLibrary {
         for (int o = 0; o < steps; o++) {
 			for (int i = 1; i < segNum; i++) {
                 float s = rs * o;
-                int finalI = i;
-                nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
 
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] + s).setColor(color);
 
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] + s, zv[i] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
 
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] + s).setColor(color);
-                });
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] - s).setColor(color);
+				buffer.addVertex(poseStack.last(), xv[i], yv[i] - s, zv[i] + s).setColor(color);
 			}
 		}
 

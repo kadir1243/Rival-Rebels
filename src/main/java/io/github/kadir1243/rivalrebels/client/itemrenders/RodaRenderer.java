@@ -15,45 +15,35 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.joml.Vector3fc;
-
-import java.util.function.Consumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
-public class RodaRenderer implements NoDataSpecialModelRenderer {
+public class RodaRenderer implements DynamicItemRenderer {
     private final QuadCollection rodaModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.RODA_MODEL);
-
     @Override
-    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
-        poseStack.pushPose();
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack poseStack, MultiBufferSource vertexConsumers, int light, int overlay) {
+		poseStack.pushPose();
 		poseStack.translate(0.5f, 0.5f, -0.03f);
 		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
 		poseStack.mulPose(Axis.YP.rotationDegrees(90));
 		poseStack.scale(0.35f, 0.35f, 0.35f);
-		//if (!mode.firstPerson()) poseStack.scale(-1, 1, 1);
+		if (!mode.firstPerson()) poseStack.scale(-1, 1, 1);
 		poseStack.translate(0.2f, -0.55f, 0.1f);
 
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etrust), (pose, consumer) ->
-            ObjModels.render(rodaModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords)
-        );
-        submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.CELLULAR_NOISE, (pose, consumer) ->
-            ObjModels.render(rodaModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords)
-        );
+        ObjModels.render(rodaModel, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etrust)), poseStack, CommonColors.WHITE, light, overlay);
+
+        ObjModels.render(rodaModel, vertexConsumers.getBuffer(RenderTypes.CELLULAR_NOISE), poseStack, CommonColors.WHITE, light, overlay);
 
 		poseStack.popPose();
 	}
-
-    @Override
-    public void getExtents(Consumer<Vector3fc> output) {
-    }
 }
 

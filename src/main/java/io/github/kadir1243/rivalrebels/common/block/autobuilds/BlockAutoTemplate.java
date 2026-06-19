@@ -43,7 +43,7 @@ public abstract class BlockAutoTemplate extends FallingBlock {
     protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!level.isClientSide()) {
             if (!stack.is(RRItems.pliers)){
-                player.sendSystemMessage(Translations.warning().append(" ").append(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.translate()));
+                player.displayClientMessage(Translations.warning().append(" ").append(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.translate()), true);
                 return InteractionResult.PASS;
             }
             return InteractionResult.SUCCESS;

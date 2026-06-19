@@ -14,33 +14,34 @@ package io.github.kadir1243.rivalrebels.client.gui;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.container.ContainerTachyonBomb;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiTachyonBomb extends BombContainerScreen<ContainerTachyonBomb> {
 	public GuiTachyonBomb(ContainerTachyonBomb containerTachyonBomb, Inventory inventoryPlayer, Component title) {
-		super(containerTachyonBomb, inventoryPlayer, title, DEFAULT_IMAGE_WIDTH, 206);
+		super(containerTachyonBomb, inventoryPlayer, title);
+		imageHeight = 206;
 	}
 
     @Override
-    public void renderName(GuiGraphicsExtractor graphics) {
-        graphics.text(font, "Tachyon", 18, 16, 4210752, false);
+    public void renderName(GuiGraphics graphics) {
+        graphics.drawString(font, "Tachyon", 18, 16, 4210752, false);
     }
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
-        super.extractLabels(graphics, xm, ym);
+    protected void renderLabels(GuiGraphics context, int mouseX, int mouseY) {
+        super.renderLabels(context, mouseX, mouseY);
 		if (menu.isUnbalanced()) {
-            graphics.text(font, Translations.UNBALANCED_BOMB.translate(), 6, imageHeight - 97, 0xFF0000, false);
+            context.drawString(font, Translations.UNBALANCED_BOMB.translate(), 6, imageHeight - 97, 0xFF0000, false);
 		} else if (menu.isArmed()) {
-            graphics.text(font, Translations.BOMB_ARMED.translate(), 6, imageHeight - 97, 0xFF0000, false);
+            context.drawString(font, Translations.BOMB_ARMED.translate(), 6, imageHeight - 97, 0xFF0000, false);
 		} else {
-            graphics.text(font, Component.literal(menu.getMegaton() + " ").append(Translations.BOMB_MEGATONS.translate()), 6, imageHeight - 97, 0xFFFFFF, false);
+            context.drawString(font, Component.literal(menu.getMegaton() + " ").append(Translations.BOMB_MEGATONS.translate()), 6, imageHeight - 97, 0xFFFFFF, false);
 		}
     }
 

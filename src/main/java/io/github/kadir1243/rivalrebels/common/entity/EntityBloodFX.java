@@ -19,22 +19,24 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.particle.SingleQuadParticle;
+import net.minecraft.client.particle.ParticleRenderType;
+import net.minecraft.client.particle.TextureSheetParticle;
 import net.minecraft.util.CommonColors;
 import net.minecraft.world.entity.Entity;
 
 @OnlyIn(Dist.CLIENT)
-public class EntityBloodFX extends SingleQuadParticle {
+public class EntityBloodFX extends TextureSheetParticle {
 	public EntityBloodFX(ClientLevel level, double x, double y, double z, boolean b) {
-		this(level, x, y, z, level.getRandom().nextGaussian() * 0.1, level.getRandom().nextGaussian() * 0.1, level.getRandom().nextGaussian() * 0.1, b);
+		this(level, x, y, z, level.random.nextGaussian() * 0.1, level.random.nextGaussian() * 0.1, level.random.nextGaussian() * 0.1, b);
 	}
 
 	public EntityBloodFX(ClientLevel level, double x, double y, double z, double dx, double dy, double dz, boolean isBlood) {
-		super(level, x, y, z, dx, dy, dz, Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(TextureAtlas.LOCATION_BLOCKS).getSprite(isBlood ? RRIdentifiers.etblood : RRIdentifiers.etgoo));
+		super(level, x, y, z, dx, dy, dz);
 
         this.setParticleSpeed(dx, dy, dz);
 		gravity = 0.75F;
 		lifetime = 20;
+        setSprite(Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(isBlood ? RRIdentifiers.etblood : RRIdentifiers.etgoo));
 	}
 
 	public EntityBloodFX(ClientLevel level, EntityGore gore, boolean isBlood)
@@ -43,8 +45,8 @@ public class EntityBloodFX extends SingleQuadParticle {
 	}
 
     @Override
-    protected Layer getLayer() {
-        return Layer.OPAQUE;
+    public ParticleRenderType getRenderType() {
+        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
 
     public void renderParticle(PoseStack pose, VertexConsumer buffer, Entity entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {

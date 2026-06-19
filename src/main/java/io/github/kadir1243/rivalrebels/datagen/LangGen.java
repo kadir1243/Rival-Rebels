@@ -186,7 +186,7 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
     }
 
     public void addDamage(ResourceKey<DamageType> resourceKey, String translation) {
-        add("death.attack."+ RRIdentifiers.MODID + "." + resourceKey.identifier().getPath(), translation);
+        add("death.attack."+ RRIdentifiers.MODID + "." + resourceKey.location().getPath(), translation);
     }
 
     public void add(Translations.TranslationKey key, String translation) {

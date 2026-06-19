@@ -25,7 +25,7 @@ import net.minecraft.util.ExtraCodecs;
 public class RivalRebelsPlayer {
     public static final Codec<RivalRebelsPlayer> CODEC = RecordCodecBuilder.create(
         i -> i.group(
-            ExtraCodecs.STORED_GAME_PROFILE.fieldOf("profile").forGetter(RivalRebelsPlayer::getProfile),
+            ExtraCodecs.GAME_PROFILE.fieldOf("profile").forGetter(RivalRebelsPlayer::getProfile),
             RivalRebelsTeam.CODEC.fieldOf("team").forGetter(RivalRebelsPlayer::getTeam),
             RivalRebelsClass.CODEC.fieldOf("fight_class").forGetter(RivalRebelsPlayer::getFightClass),
             RivalRebelsRank.CODEC.fieldOf("rank").forGetter(RivalRebelsPlayer::getRank),
@@ -102,11 +102,11 @@ public class RivalRebelsPlayer {
     }
 
     public UUID getId() {
-        return profile.id();
+        return profile.getId();
     }
 
     public String getUsername() {
-        return profile.name();
+        return profile.getName();
     }
 
     public void reset() {

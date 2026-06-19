@@ -15,7 +15,7 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderTheoreticalTsarBlast extends RenderTsarBlast {
@@ -24,7 +24,7 @@ public class RenderTheoreticalTsarBlast extends RenderTsarBlast {
     }
 
     @Override
-    public Identifier getTextureLocation(State entity) {
+    public ResourceLocation getTextureLocation(State entity) {
         return RRIdentifiers.etblacktsar;
     }
 

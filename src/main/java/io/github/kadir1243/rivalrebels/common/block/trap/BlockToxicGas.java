@@ -40,7 +40,7 @@ public class BlockToxicGas extends Block {
 	public BlockToxicGas(Properties settings) {
 		super(settings);
 
-        //((FireBlock) Blocks.FIRE).setFlammable(this, 60, 100);
+        ((FireBlock) Blocks.FIRE).setFlammable(this, 60, 100);
     }
 
     @Override
@@ -49,7 +49,7 @@ public class BlockToxicGas extends Block {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
         if (entity instanceof LivingEntity living) {
 			living.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0));
 			living.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 200, 0));

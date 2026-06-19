@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockPlasmaExplosion extends BaseEntityBlock {
     public static final MapCodec<BlockPlasmaExplosion> CODEC = simpleCodec(BlockPlasmaExplosion::new);

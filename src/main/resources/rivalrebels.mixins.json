@@ -1,7 +1,7 @@
 {
   "required": true,
   "package": "io.github.kadir1243.rivalrebels.mixin",
-  "compatibilityLevel": "JAVA_25",
+  "compatibilityLevel": "JAVA_17",
   "mixins": [
     "AttributesMixin"
   ],

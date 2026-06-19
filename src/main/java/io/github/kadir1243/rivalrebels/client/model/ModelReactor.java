@@ -81,47 +81,49 @@ public class ModelReactor {
 	private static final Vector3f			v15		= new Vector3f(-0.5f, 0.8125f, -0.5f);
 	private static final Vector3f			v16		= new Vector3f(-0.5f, 0.8125f, 0.5f);
 
-	public static void renderModel(PoseStack.Pose pose, VertexConsumer buffer, int light, int overlay) {
-		addFace(pose, buffer, v13, v14, v15, v16, t14, t2, t3, t17, light, overlay);
-		addFace(pose, buffer, v9, v5, v6, v10, t7, t4, t18, t12, light, overlay);
-		addFace(pose, buffer, v10, v6, v7, v11, t15, t19, t22, t16, light, overlay);
-		addFace(pose, buffer, v11, v7, v8, v12, t7, t4, t18, t12, light, overlay);
-		addFace(pose, buffer, v12, v8, v5, v9, t21, t24, t23, t20, light, overlay);
+	public static void renderModel(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+		matrices.pushPose();
+		addFace(matrices, buffer, v13, v14, v15, v16, t14, t2, t3, t17, light, overlay);
+		addFace(matrices, buffer, v9, v5, v6, v10, t7, t4, t18, t12, light, overlay);
+		addFace(matrices, buffer, v10, v6, v7, v11, t15, t19, t22, t16, light, overlay);
+		addFace(matrices, buffer, v11, v7, v8, v12, t7, t4, t18, t12, light, overlay);
+		addFace(matrices, buffer, v12, v8, v5, v9, t21, t24, t23, t20, light, overlay);
 
-		addFace(pose, buffer, v5, v1, v2, v6, t2, t14, t13, t1, light, overlay);
-		addFace(pose, buffer, v6, v2, v3, v7, t2, t14, t13, t1, light, overlay);
-		addFace(pose, buffer, v7, v3, v4, v8, t2, t14, t13, t1, light, overlay);
-		addFace(pose, buffer, v8, v4, v1, v5, t2, t14, t13, t1, light, overlay);
-		addFace(pose, buffer, v2, v1, v4, v3, t1v, t2v, t3v, t4v, light, overlay);
-		addFace(pose, buffer, v5, v1, v2, v6, t1v, t2v, t3v, t4v, light, overlay, 0.9375F, 1, 1);
-		addFace(pose, buffer, v6, v2, v3, v7, t1v, t2v, t3v, t4v, light, overlay, 1, 1, 0.9375F);
-		addFace(pose, buffer, v7, v3, v4, v8, t1v, t2v, t3v, t4v, light, overlay, 0.9375F, 1, 1);
-		addFace(pose, buffer, v8, v4, v1, v5, t1v, t2v, t3v, t4v, light, overlay, 1, 1, 0.9375F);
+		addFace(matrices, buffer, v5, v1, v2, v6, t2, t14, t13, t1, light, overlay);
+		addFace(matrices, buffer, v6, v2, v3, v7, t2, t14, t13, t1, light, overlay);
+		addFace(matrices, buffer, v7, v3, v4, v8, t2, t14, t13, t1, light, overlay);
+		addFace(matrices, buffer, v8, v4, v1, v5, t2, t14, t13, t1, light, overlay);
+		addFace(matrices, buffer, v2, v1, v4, v3, t1v, t2v, t3v, t4v, light, overlay);
+		addFace(matrices, buffer, v5, v1, v2, v6, t1v, t2v, t3v, t4v, light, overlay, 0.9375F, 1, 1);
+		addFace(matrices, buffer, v6, v2, v3, v7, t1v, t2v, t3v, t4v, light, overlay, 1, 1, 0.9375F);
+		addFace(matrices, buffer, v7, v3, v4, v8, t1v, t2v, t3v, t4v, light, overlay, 0.9375F, 1, 1);
+		addFace(matrices, buffer, v8, v4, v1, v5, t1v, t2v, t3v, t4v, light, overlay, 1, 1, 0.9375F);
 
-		addFace(pose, buffer, v2, v1, v4, v3, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
-		addFace(pose, buffer, v5, v1, v2, v6, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
-		addFace(pose, buffer, v6, v2, v3, v7, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
-		addFace(pose, buffer, v7, v3, v4, v8, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
-		addFace(pose, buffer, v8, v4, v1, v5, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
-		addFace(pose, buffer, v5, v6, v7, v8, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
+		addFace(matrices, buffer, v2, v1, v4, v3, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
+		addFace(matrices, buffer, v5, v1, v2, v6, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
+		addFace(matrices, buffer, v6, v2, v3, v7, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
+		addFace(matrices, buffer, v7, v3, v4, v8, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
+		addFace(matrices, buffer, v8, v4, v1, v5, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
+		addFace(matrices, buffer, v5, v6, v7, v8, t5v, t6v, t8v, t7v, light, overlay, 0.6875F);
 
-		addFace(pose, buffer, v2, v1, v4, v3, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
-		addFace(pose, buffer, v5, v1, v2, v6, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
-		addFace(pose, buffer, v6, v2, v3, v7, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
-		addFace(pose, buffer, v7, v3, v4, v8, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
-		addFace(pose, buffer, v8, v4, v1, v5, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
-		addFace(pose, buffer, v5, v6, v7, v8, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
+		addFace(matrices, buffer, v2, v1, v4, v3, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
+		addFace(matrices, buffer, v5, v1, v2, v6, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
+		addFace(matrices, buffer, v6, v2, v3, v7, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
+		addFace(matrices, buffer, v7, v3, v4, v8, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
+		addFace(matrices, buffer, v8, v4, v1, v5, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
+		addFace(matrices, buffer, v5, v6, v7, v8, t9v, t10v, t12v, t11v, light, overlay, 0.8125F);
+		matrices.popPose();
 	}
 
-	private static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
+	private static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay) {
         addFace(pose, buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, overlay, 1, 1, 1);
 	}
 
-    private static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay, float xoff, float yoff, float zoff) {
+    private static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay, float xoff, float yoff, float zoff) {
         RenderHelper.addFace(pose, buffer, new Vector3f(v1).mul(xoff, yoff, zoff), new Vector3f(v2).mul(xoff, yoff, zoff), new Vector3f(v3).mul(xoff, yoff, zoff), new Vector3f(v4).mul(xoff, yoff, zoff), t1, t2, t3, t4, light, overlay);
     }
 
-    private static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay, float offset) {
+    private static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, TextureVertice t1, TextureVertice t2, TextureVertice t3, TextureVertice t4, int light, int overlay, float offset) {
         addFace(pose, buffer, v1, v2, v3, v4, t1, t2, t3, t4, light, overlay, offset, offset, offset);
     }
 }

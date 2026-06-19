@@ -18,8 +18,6 @@ import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.permissions.Permission;
-import net.minecraft.server.permissions.PermissionLevel;
 
 public class CommandHotPotato {
     public static BlockPos pos = BlockPos.ZERO;
@@ -27,7 +25,7 @@ public class CommandHotPotato {
 
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("rrhotpotato")
-            .requires(arg -> arg.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS)))
+            .requires(arg -> arg.hasPermission(3))
             .then(Commands.argument("numberOfRounds", IntegerArgumentType.integer())
                 .executes(context -> execute(context.getSource(), IntegerArgumentType.getInteger(context, "numberOfRounds"))))
             .then(Commands.literal("stop")

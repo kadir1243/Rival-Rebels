@@ -5,7 +5,7 @@ import io.github.kadir1243.rivalrebels.RivalRebels;
 import net.minecraft.core.Holder;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.syncher.EntityDataSerializer;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.ARGB;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -34,7 +34,7 @@ public enum RhodesTypes implements RhodesType {
 
     private static final DeferredRegister<RhodesType> RHODES_TYPES = DeferredRegister.create(RivalRebels.RHODES_TYPE_REGISTRY, RRIdentifiers.MODID);
     public static final DeferredHolder<EntityDataSerializer<?>, EntityDataSerializer<Holder<RhodesType>>> HOLDER_DATA_SERIALIZER = RivalRebels.DATA_SERIALIZERS.register("rhodes_type_serializer", () -> EntityDataSerializer.forValueType(ByteBufCodecs.holderRegistry(RivalRebels.RHODES_TYPE_REGISTRY_KEY)));
-    public static final Identifier DEFAULT_TEXTURE = RRIdentifiers.create("textures/entity/rhodes.png");
+    public static final ResourceLocation DEFAULT_TEXTURE = RRIdentifiers.create("textures/entity/rhodes.png");
     private static final float[] colors = {
         255/255f,     255/255f,     255/255f, //1
         125/255f,     142/255f,     180/255f, //2
@@ -66,7 +66,7 @@ public enum RhodesTypes implements RhodesType {
     }
 
     @Override
-    public Identifier getTexture() {
+    public ResourceLocation getTexture() {
         return DEFAULT_TEXTURE;
     }
 

@@ -71,7 +71,7 @@ public class BlockFlare extends WallTorchBlock {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
 		entity.hurt(RivalRebelsDamageSource.flare(level), 1);
 		entity.igniteForSeconds(5);
 	}

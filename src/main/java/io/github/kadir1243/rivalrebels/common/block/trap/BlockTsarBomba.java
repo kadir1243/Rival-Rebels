@@ -36,7 +36,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockTsarBomba extends BaseEntityBlock {
     public static final MapCodec<BlockTsarBomba> CODEC = simpleCodec(BlockTsarBomba::new);
@@ -68,7 +68,7 @@ public class BlockTsarBomba extends BaseEntityBlock {
         if (!stack.isEmpty() && stack.is(RRItems.pliers)) {
 			player.openMenu(getMenuProvider(state, level, pos));
 		} else if (!level.isClientSide()) {
-			player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
+			player.displayClientMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_OPEN_TRANSLATION.translate().withStyle(ChatFormatting.RED)), true);
 		}
 		return InteractionResult.PASS;
 	}

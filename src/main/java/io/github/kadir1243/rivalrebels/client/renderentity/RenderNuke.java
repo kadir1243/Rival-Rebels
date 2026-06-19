@@ -17,15 +17,13 @@ import io.github.kadir1243.rivalrebels.client.model.ObjModels;
 import io.github.kadir1243.rivalrebels.common.entity.EntityNuke;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
+import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -35,20 +33,18 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 public class RenderNuke extends EntityRenderer<EntityNuke, RenderNuke.State> {
     private final QuadCollection nukeModel;
 
-    public RenderNuke(EntityRendererProvider.Context context) {
-        super(context);
-        nukeModel = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.NUKE_MODEL);
+    public RenderNuke(EntityRendererProvider.Context manager) {
+        super(manager);
+        nukeModel = manager.getModelManager().getStandaloneModel(ObjModels.NUKE_MODEL);
     }
 
     @Override
-    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         poseStack.pushPose();
         poseStack.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
         poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etwacknuke), (pose, consumer) -> {
-            ObjModels.render(nukeModel, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.render(nukeModel, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.etwacknuke)), poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

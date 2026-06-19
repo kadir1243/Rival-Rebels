@@ -27,7 +27,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.*;
-import net.minecraft.world.entity.animal.chicken.Chicken;
+import net.minecraft.world.entity.animal.Chicken;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -36,7 +36,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemRoda extends Item
 {
@@ -187,15 +187,15 @@ public class ItemRoda extends Item
 	public static void spawn(int index, Level world, double x, double y, double z, double mx, double my, double mz, double speed, double random) {
         if (world.isClientSide()) return;
         if ("roda".equals(entities[index])) {
-			int newindex = world.getRandom().nextInt(index);
+			int newindex = world.random.nextInt(index);
 			spawn(newindex, world, x,y,z,mx,my,mz,speed,random);
 			return;
 		}
 		speed *= speeds[index];
 		random += randoms[index];
-		double rx = world.getRandom().nextGaussian() * random;
-		double ry = world.getRandom().nextGaussian() * random;
-		double rz = world.getRandom().nextGaussian() * random;
+		double rx = world.random.nextGaussian() * random;
+		double ry = world.random.nextGaussian() * random;
+		double rz = world.random.nextGaussian() * random;
         Vec3 velocity = new Vec3(mx, my, mz).scale(speed).add(rx, ry, rz);
         mx = velocity.x();
         my = velocity.y();
@@ -210,7 +210,7 @@ public class ItemRoda extends Item
             case 6 -> new EntityCuchillo(world, mx, my, mz);
             case 7 -> new EntityRocket(world, mx, my, mz);
             case 8 -> new EntityLaserBurst(world, mx, my, mz);
-            case 9 -> new EntityGore(world, mx, my, mz, world.getRandom().nextInt(3), world.getRandom().nextInt(11) + 1);
+            case 9 -> new EntityGore(world, mx, my, mz, world.random.nextInt(3), world.random.nextInt(11) + 1);
             case 10 -> new EntityBomb(world, x, y, z, mx, my, mz);
             case 11 -> EntityType.CREEPER.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             case 12 -> EntityType.SNOW_GOLEM.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
@@ -232,12 +232,12 @@ public class ItemRoda extends Item
             case 20 -> new EntityDebris(world, world.registryAccess().lookupOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR));
             case 21 -> {
                 Block[] blocks2 = new Block[]{RRBlocks.ammunition.get(), RRBlocks.supplies.get(), RRBlocks.weapons.get(), RRBlocks.explosives.get(), RRBlocks.omegaarmor.get(), RRBlocks.sigmaarmor.get()};
-                Block b2 = blocks2[world.getRandom().nextInt(blocks2.length)];
+                Block b2 = blocks2[world.random.nextInt(blocks2.length)];
                 yield new EntityDebris(world, b2);
             }
             case 22 -> {
                 Block[] blocks3 = new Block[]{Blocks.SAND, Blocks.GRAVEL, Blocks.COBBLESTONE, Blocks.DIRT};
-                Block b3 = blocks3[world.getRandom().nextInt(blocks3.length)];
+                Block b3 = blocks3[world.random.nextInt(blocks3.length)];
                 yield new EntityDebris(world, b3);
             }
             case 24 -> new EntityB83(world, mx, my, mz);
@@ -260,7 +260,7 @@ public class ItemRoda extends Item
 
 	boolean pass = false;
 	public ItemRoda(Properties properties) {
-		super(properties);
+		super(properties.stacksTo(1).component(RRComponents.HAPPY_NEW_YEAR, 0));
 	}
 
     @Override
@@ -268,7 +268,7 @@ public class ItemRoda extends Item
         ItemStack stack = player.getItemInHand(hand);
 
         if (!pass) {
-			player.sendSystemMessage(Component.nullToEmpty("Password?"));
+			player.displayClientMessage(Component.nullToEmpty("Password?"), true);
 			pass = true;
 		}
 		RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(player.getGameProfile());

@@ -23,6 +23,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.equipment.ArmorType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -34,7 +35,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 
 public class ItemTrollHelmet extends Item {
     public ItemTrollHelmet(Properties properties) {
-		super(properties);
+		super(properties.humanoidArmor(RRItems.TROLL_MATERIAL, ArmorType.HELMET));
 	}
 
     @Override

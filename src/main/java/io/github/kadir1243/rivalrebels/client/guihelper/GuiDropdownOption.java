@@ -15,11 +15,11 @@ import io.github.kadir1243.rivalrebels.client.gui.GuiTray;
 import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import org.joml.Vector2i;
@@ -34,7 +34,7 @@ public class GuiDropdownOption extends Button {
 	}
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
         boolean on = t.getMenu().hasWepReqs();
 		int color = ChatFormatting.GRAY.getColor();
 		if (on) {
@@ -49,6 +49,6 @@ public class GuiDropdownOption extends Button {
             };
             if (isHoveredOrFocused()) color = ChatFormatting.WHITE.getColor();
 		}
-        graphics.centeredText(Minecraft.getInstance().font, getMessage(), this.getX() + 1, this.getY() + 1, ARGB.color(this.alpha, color));
+        context.drawCenteredString(Minecraft.getInstance().font, getMessage(), this.getX() + 1, this.getY() + 1, ARGB.color(this.alpha, color));
 	}
 }

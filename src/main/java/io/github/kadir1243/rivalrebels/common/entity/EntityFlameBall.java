@@ -78,22 +78,20 @@ public class EntityFlameBall extends FlameBallProjectile {
 		if (tickCount % 3 == 0) sequence++;
 		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill((ServerLevel) level());
 
-        if (!level().isClientSide()) {
-            HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
+		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
-            if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5) {
-                fire();
-                kill((ServerLevel) level());
-                if (hitResult.getType() == HitResult.Type.ENTITY) {
-                    Entity hitEntity = ((EntityHitResult) hitResult).getEntity();
-                    hitEntity.igniteForSeconds(3);
-                    hitEntity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
-                    if (hitEntity instanceof Player player) {
-                        ItemUtil.damageRandomArmor(player, 8, random);
-                    }
-                }
-            }
-        }
+		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5) {
+			fire();
+            kill((ServerLevel) level());
+			if (hitResult.getType() == HitResult.Type.ENTITY) {
+                Entity hitEntity = ((EntityHitResult) hitResult).getEntity();
+                hitEntity.igniteForSeconds(3);
+				hitEntity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
+				if (hitEntity instanceof Player player) {
+                    ItemUtil.damageRandomArmor(player, 8, random);
+				}
+			}
+		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 

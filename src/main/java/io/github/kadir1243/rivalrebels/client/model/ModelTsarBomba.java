@@ -16,11 +16,12 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.util.Mth;
 import org.joml.Vector3f;
 
@@ -35,75 +36,69 @@ public class ModelTsarBomba {
 	private static final float	cos			= Mth.cos(deg);
 	private static final float	add			= 360 / segments;
 
-	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, int light, int overlay) {
-		poseStack.pushPose();
+	public static void render(PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
 
-        for (float i = 0; i < segments; i++) {
-			poseStack.pushPose();
-			poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
-			for (int f = 1; f < tsarx.length; f++) {
+        VertexConsumer tsarShellTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ettsarshell));
+        for (float i = 0; i < segments; i++)
+		{
+			matrices.pushPose();
+			matrices.mulPose(Axis.YP.rotationDegrees(add * i));
+			for (int f = 1; f < tsarx.length; f++)
+			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
 				TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
 				TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
 				TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
-                int finalF = f;
-                nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarshell), (pose, consumer) -> {
-                    RenderHelper.addFace(pose, consumer, new Vector3f(0f, tsary[finalF], tsarx[finalF]),
-                        new Vector3f(0f, tsary[finalF - 1], tsarx[finalF - 1]),
-                        new Vector3f(tsarx[finalF - 1] * sin, tsary[finalF - 1], tsarx[finalF - 1] * cos),
-                        new Vector3f(tsarx[finalF] * sin, tsary[finalF], tsarx[finalF] * cos), t1, t2, t3, t4, light, overlay);
-                });
+				RenderHelper.addFace(matrices, tsarShellTextureVertexConsumer, new Vector3f(0f, tsary[f], tsarx[f]),
+						new Vector3f(0f, tsary[f - 1], tsarx[f - 1]),
+						new Vector3f(tsarx[f - 1] * sin, tsary[f - 1], tsarx[f - 1] * cos),
+						new Vector3f(tsarx[f] * sin, tsary[f], tsarx[f] * cos), t1, t2, t3, t4, light, overlay);
 			}
-			poseStack.popPose();
+			matrices.popPose();
 		}
-		poseStack.popPose();
+		matrices.popPose();
 
-        poseStack.pushPose();
+        VertexConsumer tsarFinsTextureVertexConsumer = vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.ettsarfins));
+
+        matrices.pushPose();
 
 		TextureVertice t5 = new TextureVertice(70f / 256f, 0f);
 		TextureVertice t6 = new TextureVertice(134f / 256f, 0f);
 		TextureVertice t7 = new TextureVertice(134f / 256f, 64f / 256f);
 		TextureVertice t8 = new TextureVertice(70 / 256f, 64f / 256f);
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
-            RenderHelper.addFace(pose, consumer, new Vector3f(0.5f, -5f, 0.5f),
-                new Vector3f(-0.5f, -5f, 0.5f),
-                new Vector3f(-0.5f, -5f, -0.5f),
-                new Vector3f(0.5f, -5f, -0.5f), t5, t6, t7, t8, light, overlay);
-        });
+		RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0.5f, -5f, 0.5f),
+				new Vector3f(-0.5f, -5f, 0.5f),
+				new Vector3f(-0.5f, -5f, -0.5f),
+				new Vector3f(0.5f, -5f, -0.5f), t5, t6, t7, t8, light, overlay);
 
-		poseStack.popPose();
+		matrices.popPose();
 
-		poseStack.pushPose();
+		matrices.pushPose();
 
 		TextureVertice t1 = new TextureVertice(0f, 0f);
 		TextureVertice t2 = new TextureVertice(70f / 256f, 0f);
 		TextureVertice t3 = new TextureVertice(70f / 256f, 96f / 256f);
 		TextureVertice t4 = new TextureVertice(0, 96f / 256f);
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
-            RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
-                new Vector3f(0f, -5f, -0.5f),
-                new Vector3f(0f, -3.5f, -0.5f),
-                new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
-        });
+		RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+				new Vector3f(0f, -5f, -0.5f),
+				new Vector3f(0f, -3.5f, -0.5f),
+				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		poseStack.mulPose(Axis.YP.rotationDegrees(120));
+		matrices.mulPose(Axis.YP.rotationDegrees(120));
+		RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+				new Vector3f(0f, -5f, -0.5f),
+				new Vector3f(0f, -3.5f, -0.5f),
+				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
-            RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
-                new Vector3f(0f, -5f, -0.5f),
-                new Vector3f(0f, -3.5f, -0.5f),
-                new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
-        });
-        poseStack.mulPose(Axis.YP.rotationDegrees(120));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettsarfins), (pose, consumer) -> {
-            RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
-                new Vector3f(0f, -5f, -0.5f),
-                new Vector3f(0f, -3.5f, -0.5f),
-                new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
-        });
+		matrices.mulPose(Axis.YP.rotationDegrees(120));
+		RenderHelper.addFace(matrices, tsarFinsTextureVertexConsumer, new Vector3f(0f, -5f, -1.4f),
+				new Vector3f(0f, -5f, -0.5f),
+				new Vector3f(0f, -3.5f, -0.5f),
+				new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
 
-		poseStack.popPose();
+		matrices.popPose();
 	}
 }

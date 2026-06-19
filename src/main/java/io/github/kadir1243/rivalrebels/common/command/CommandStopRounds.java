@@ -16,13 +16,11 @@ import com.mojang.brigadier.CommandDispatcher;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.permissions.Permission;
-import net.minecraft.server.permissions.PermissionLevel;
 
 public class CommandStopRounds {
     public static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(Commands.literal("rrstopround")
-            .requires(arg -> arg.permissions().hasPermission(new Permission.HasCommandLevel(PermissionLevel.ADMINS)))
+            .requires(arg -> arg.hasPermission(3))
             .executes(context -> execute(context.getSource()))
         );
     }

@@ -29,7 +29,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockOmegaObjective extends BaseEntityBlock {
     public static final MapCodec<BlockOmegaObjective> CODEC = simpleCodec(BlockOmegaObjective::new);

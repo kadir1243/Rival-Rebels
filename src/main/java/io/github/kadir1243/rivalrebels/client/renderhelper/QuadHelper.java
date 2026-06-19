@@ -14,15 +14,13 @@ package io.github.kadir1243.rivalrebels.client.renderhelper;
 import com.google.common.base.Suppliers;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Transformation;
-import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.block.dispatch.BlockStateModelPart;
-import net.minecraft.client.renderer.block.dispatch.SingleVariant;
-import net.minecraft.client.resources.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.block.model.BlockModelPart;
+import net.minecraft.client.renderer.block.model.SimpleModelWrapper;
+import net.minecraft.client.renderer.block.model.SingleVariant;
+import net.minecraft.client.renderer.texture.MissingTextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureAtlas;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
-import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.client.resources.model.QuadCollection;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -91,17 +89,17 @@ public class QuadHelper {
 
     public static Supplier<BakedData> createBakedModel(Consumer<VertexConsumer> bakedQuadSupplier) {
         return Suppliers.memoize(() -> {
-            var model = createBakedModel(bakedQuadSupplier, Transformation.IDENTITY);
-            SimpleModelWrapper wrapped = new SimpleModelWrapper(model, false, new Material.Baked(Minecraft.getInstance().getAtlasManager().getAtlasOrThrow(TextureAtlas.LOCATION_BLOCKS).missingSprite(), false));
-            return new BakedData(new SingleVariant(wrapped), wrapped, model);
+            var model = createBakedModel(bakedQuadSupplier, Transformation.identity());
+            SimpleModelWrapper wrapped = new SimpleModelWrapper(model, false, Minecraft.getInstance().getGuiSprites().getSprite(MissingTextureAtlasSprite.getLocation()));
+            return new BakedData(new SingleVariant(wrapped), wrapped);
         });
     }
 
-    public record BakedData(SingleVariant blockStateModel, BlockStateModelPart original, QuadCollection quadCollection) {}
+    public record BakedData(SingleVariant blockStateModel, BlockModelPart original) {}
 
     public static QuadCollection createBakedModel(Consumer<VertexConsumer> bakedQuadSupplier, Transformation transforms) {
         QuadBakingVertexConsumer buffer = new QuadBakingVertexConsumer();
-        buffer.setSprite(new Material.Baked(Minecraft.getInstance().getAtlasManager().get(Sheets.BLOCKS_MAPPER.apply(RRIdentifiers.create("nonexistingsprite"))), false));
+        buffer.setSprite(Minecraft.getInstance().getGuiSprites().getSprite(TextureAtlas.LOCATION_BLOCKS));
 
         QuadCollection.Builder builder = new QuadCollection.Builder();
         bakedQuadSupplier.accept(new VertexConsumerWrapper(new TransformingVertexPipeline(buffer, transforms)) {

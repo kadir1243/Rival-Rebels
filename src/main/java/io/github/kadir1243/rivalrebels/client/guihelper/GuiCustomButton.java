@@ -12,12 +12,12 @@
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import org.joml.Vector2i;
@@ -45,8 +45,8 @@ public class GuiCustomButton extends Button {
 	}
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && bbox.containsPoint(mouseX, mouseY);
+    protected void renderWidget(GuiGraphics context, int mouseX, int mouseY, float delta) {
+		boolean current = Minecraft.getInstance().mouseHandler.isLeftPressed() && bbox.containsPoint(mouseX, mouseY);
 		wasPressed = false;
 		if (toggleable && current && !mouseDown)
 		{
@@ -68,7 +68,7 @@ public class GuiCustomButton extends Button {
 		}
 
 		if (isPressed) {
-            resloc.blit(graphics, bbox.position().x(), bbox.position().y(), tbox.x, tbox.y, bbox.width(), bbox.height(), CommonColors.WHITE);
+            resloc.blit(context, bbox.position().x(), bbox.position().y(), tbox.x, tbox.y, bbox.width(), bbox.height(), CommonColors.WHITE);
 		}
 	}
 }

@@ -14,25 +14,20 @@ public class DataGen {
         event.createProvider(LangGen::new);
         event.createProvider(SoundDataGen::new);
         event.createProvider(EquipmentAssetGen::new);
-        onGatherServerData(event);
     }
 
-    private static void onGatherServerData(GatherDataEvent event) {
+    public static void onGatherServerData(GatherDataEvent.Server event) {
         event.createDatapackRegistryObjects(new RegistrySetBuilder()
             .add(Registries.DAMAGE_TYPE, context -> {
                 for (ResourceKey<DamageType> type : RivalRebelsDamageSource.RRDamageTypes.REGISTERED_DAMAGE_TYPES) {
-                    context.register(type, new DamageType(RRIdentifiers.MODID + "." + type.identifier().getPath(), 1F));
+                    context.register(type, new DamageType(RRIdentifiers.MODID + "." + type.location().getPath(), 1F));
                 }
             })
         );
         event.createProvider(DamageSourceTags::new);
         event.createBlockAndItemTags(BlockTagsGen::new, ItemTagsGen::new);
         event.createProvider(RecipeDataGen.RecipeRunner::new);
-        // FIXME: event.createProvider(LootTableDataGen::new);
+        event.createProvider(LootTableDataGen::new);
         event.createProvider(EntityTypeTagsGen::new);
-    }
-
-    public static void onGatherServerSpecificData(GatherDataEvent.Server event) {
-        onGatherServerData(event);
     }
 }

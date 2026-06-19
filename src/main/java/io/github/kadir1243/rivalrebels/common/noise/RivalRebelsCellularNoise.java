@@ -77,6 +77,7 @@ public class RivalRebelsCellularNoise {
                 zs,
                 false
             );
+            texture.setClamp(false);
             texture.setPixels(image);
 			ids[i] = texture;
 		}

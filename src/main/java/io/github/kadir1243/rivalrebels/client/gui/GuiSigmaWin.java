@@ -12,9 +12,9 @@
 package io.github.kadir1243.rivalrebels.client.gui;
 
 import io.github.kadir1243.rivalrebels.RivalRebels;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 
@@ -30,15 +30,15 @@ public class GuiSigmaWin extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        graphics.centeredText(font, Component.translatable("RivalRebels.sigmawin.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
+        graphics.drawCenteredString(font, Component.translatable("RivalRebels.sigmawin.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
 		float scalefactor = 4f;
         graphics.pose().pushMatrix();
         graphics.pose().scale(scalefactor, scalefactor);
-        graphics.centeredText(font, Component.translatable("RivalRebels.sigmawin.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
+        graphics.drawCenteredString(font, Component.translatable("RivalRebels.sigmawin.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
         graphics.pose().popMatrix();
 
-        graphics.text(font, "Sigma: " + RivalRebels.round.getSigmaWins(), (this.width / 2) - 60, (this.height / 2 + 70), 0x4444FF);
-        graphics.text(font, "Omega: " + RivalRebels.round.getOmegaWins(), (this.width / 2) + 10, (this.height / 2 + 70), 0x44FF44);
+        graphics.drawString(font, "Sigma: " + RivalRebels.round.getSigmaWins(), (this.width / 2) - 60, (this.height / 2 + 70), 0x4444FF);
+        graphics.drawString(font, "Omega: " + RivalRebels.round.getOmegaWins(), (this.width / 2) + 10, (this.height / 2 + 70), 0x44FF44);
 	}
 }

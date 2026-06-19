@@ -15,34 +15,28 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelDisk;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.special.NoDataSpecialModelRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import org.joml.Vector3fc;
-
-import java.util.function.Consumer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.world.item.ItemDisplayContext;
+import net.minecraft.world.item.ItemStack;
 
 @OnlyIn(Dist.CLIENT)
-public class RodDiskRenderer implements NoDataSpecialModelRenderer {
+public class RodDiskRenderer implements DynamicItemRenderer {
     @Override
-    public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
-        poseStack.pushPose();
-		poseStack.translate(0.5f, 0.25f, 0f);
-		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
-		poseStack.mulPose(Axis.XP.rotationDegrees(-25));
-		poseStack.scale(0.5f, 0.5f, 0.5f);
-		poseStack.pushPose();
+    public void render(ItemStack stack, ItemDisplayContext mode, PoseStack matrices, MultiBufferSource vertexConsumers, int light, int overlay) {
+		matrices.pushPose();
+		matrices.translate(0.5f, 0.25f, 0f);
+		matrices.mulPose(Axis.ZP.rotationDegrees(35));
+		matrices.mulPose(Axis.XP.rotationDegrees(-25));
+		matrices.scale(0.5f, 0.5f, 0.5f);
+		matrices.pushPose();
 
-		ModelDisk.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etdisk0), lightCoords, overlayCoords);
+		ModelDisk.render(matrices, vertexConsumers.getBuffer(RenderType.entitySolid(RRIdentifiers.etdisk0)), light, overlay);
 
-		poseStack.popPose();
-		poseStack.popPose();
+		matrices.popPose();
+		matrices.popPose();
 	}
-
-    @Override
-    public void getExtents(Consumer<Vector3fc> output) {
-    }
 }
 

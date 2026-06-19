@@ -34,7 +34,7 @@ public abstract class AbstractFlagBoxBlock extends Block {
             return InteractionResult.PASS;
         }
         if (!player.isShiftKeyDown() && !level.isClientSide()) {
-            player.sendSystemMessage(Translations.orders().append(" ").append(Translations.SHIFT_CLICK.translate()));
+            player.displayClientMessage(Translations.orders().append(" ").append(Translations.SHIFT_CLICK.translate()), false);
             level.setBlockAndUpdate(pos, getStateToReplace());
             return InteractionResult.PASS;
         }

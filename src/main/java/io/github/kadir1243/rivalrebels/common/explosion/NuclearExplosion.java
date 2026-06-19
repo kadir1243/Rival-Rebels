@@ -87,7 +87,7 @@ public class NuclearExplosion {
 										RivalRebels.round.winOmega();
 										state = RRBlocks.plasmaexplosion.get().defaultBlockState();
 									} else if (state.is(RRBlocks.reactive)) {
-										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.getRandom().nextDouble() * 2); i++)
+										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.random.nextDouble() * 2); i++)
 											world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 									} else {
 										world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -107,7 +107,7 @@ public class NuclearExplosion {
 									}
 									else if (state.is(RRBlocks.reactive))
 									{
-										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.getRandom().nextDouble() * 2); i++)
+										for (int i = 0; i < ((1 - (dist / onepointfiveradius)) * 4) + (world.random.nextDouble() * 2); i++)
                                             world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 									}
 									else if (!state.getFluidState().isEmpty())
@@ -115,7 +115,7 @@ public class NuclearExplosion {
 										world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 										state = Blocks.AIR.defaultBlockState();
 									}
-									else if (state.is(BlockTags.BASE_STONE_OVERWORLD) && world.getRandom().nextInt(randomness) < randomness / 2)
+									else if (state.is(BlockTags.BASE_STONE_OVERWORLD) && world.random.nextInt(randomness) < randomness / 2)
 									{
 										world.setBlockAndUpdate(pos, Blocks.COBBLESTONE.defaultBlockState());
 										state = Blocks.COBBLESTONE.defaultBlockState();
@@ -128,7 +128,7 @@ public class NuclearExplosion {
 									{
 										world.setBlockAndUpdate(pos, RRBlocks.radioactivesand.get().defaultBlockState());
 									}
-									else if ((world.getRandom().nextInt(varrand) == 0 || world.getRandom().nextInt(varrand / 2 + 1) == 0))
+									else if ((world.random.nextInt(varrand) == 0 || world.random.nextInt(varrand / 2 + 1) == 0))
 									{
 										world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 										state = Blocks.AIR.defaultBlockState();
@@ -159,7 +159,7 @@ public class NuclearExplosion {
 				}
 			}
 		}
-		world.playLocalSound(x, y, z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.MASTER, 4.0F, (1.0F + (world.getRandom().nextFloat() - world.getRandom().nextFloat()) * 0.2F) * 0.7F, true);
+		world.playLocalSound(x, y, z, SoundEvents.GENERIC_EXPLODE.value(), SoundSource.MASTER, 4.0F, (1.0F + (world.random.nextFloat() - world.random.nextFloat()) * 0.2F) * 0.7F, true);
 	}
 
 	private void pushAndHurtEntities(Level world, int x, int y, int z, int radius) {
@@ -206,7 +206,7 @@ public class NuclearExplosion {
                     if (world.isEmptyBlock(pos) && world.getMaxLocalRawBrightness(pos) == 0) {
                         boolean isEmptyNotSideAvailable = Arrays.stream(Direction.values()).map(pos::relative).noneMatch(world::isEmptyBlock);
                         if (isEmptyNotSideAvailable) {
-							int r = world.getRandom().nextInt(50);
+							int r = world.random.nextInt(50);
 							Block id;
 							if (r == 0) {
                                 id = world.registryAccess().lookupOrThrow(Registries.BLOCK).getRandomElementOf(ModBlockTags.ORES, world.getRandom()).map(Holder::value).orElse(Blocks.AIR);

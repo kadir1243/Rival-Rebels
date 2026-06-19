@@ -12,12 +12,11 @@
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 
@@ -34,21 +33,21 @@ public class GuiRotor extends GuiButton
 	}
 
     @Override
-    protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+    protected void renderWidget(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         graphics.pose().pushMatrix();
 		int deg = (degree % 180);
 		if (degree >= 180) deg = 180 - deg;
 		if (deg < 22) deg = 22;
 		degree = deg;
         RRTextures.guitray.blit(graphics, this.getX(), this.getY(), 224, 66, this.width, this.height * deg / (180), CommonColors.WHITE);
-        graphics.centeredText(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
+        graphics.drawCenteredString(Minecraft.getInstance().font, (deg * 2) + "°", getX() + width / 2, getY() + height / 2 - 4, 0xffffff);
         graphics.pose().popMatrix();
 	}
 
     @Override
-    protected void onDrag(MouseButtonEvent event, double mouseX, double mouseY) {
+    protected void onDrag(double mouseX, double mouseY, double deltaX, double deltaY) {
 		if (Minecraft.getInstance().mouseHandler.isLeftPressed()) {
-			if (mouseClicked(event, false)) pressed = true;
+			if (mouseClicked(mouseX, mouseY, 0)) pressed = true;
 			if (pressed) degree = ((int) (Math.atan2(getY() - mouseY + (height / 2), getX() - mouseX + (width / 2)) * Mth.RAD_TO_DEG) + 270) % 360;
 		} else {
 			pressed = false;
@@ -60,7 +59,7 @@ public class GuiRotor extends GuiButton
 	}
 
     @Override
-    public void onRelease(MouseButtonEvent event) {
+    public void onRelease(double mouseX, double mouseY) {
 		pressed = false;
 	}
 

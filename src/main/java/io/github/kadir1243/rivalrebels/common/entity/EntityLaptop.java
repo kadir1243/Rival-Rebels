@@ -21,8 +21,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class EntityLaptop extends EntityInanimate
 {
@@ -68,7 +67,7 @@ public class EntityLaptop extends EntityInanimate
 	}
 
     @Override
-    public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
+    public InteractionResult interact(Player player, InteractionHand hand) {
 		if (player.isShiftKeyDown() && !player.level().isClientSide()) {
 			player.openMenu(null);
 		}

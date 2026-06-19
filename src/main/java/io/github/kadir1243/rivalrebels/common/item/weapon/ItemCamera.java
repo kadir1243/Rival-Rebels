@@ -11,7 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.item.weapon;
 
-import com.mojang.blaze3d.platform.InputConstants;
+import static org.lwjgl.glfw.GLFW.*;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
@@ -19,14 +20,16 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.equipment.ArmorMaterials;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.equipment.ArmorType;
 
-import org.jspecify.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public class ItemCamera extends Item
 {
 	public ItemCamera(Properties properties) {
-		super(properties);
+		super(properties.equippable(EquipmentSlot.HEAD).humanoidArmor(ArmorMaterials.CHAINMAIL, ArmorType.HELMET));
 	}
 
 	float	zoom		= 30f;
@@ -44,7 +47,7 @@ public class ItemCamera extends Item
                 if (level.isClientSide()) {
                     Minecraft client = Minecraft.getInstance();
                     if (entity == client.player) {
-                        boolean key = InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_B) && client.screen == null;
+                        boolean key = glfwGetKey(client.getWindow().getWindow(), GLFW_KEY_B) == GLFW_PRESS && client.screen == null;
                         if (key != bkey && key) zoomed = !zoomed;
                         bkey = key;
                         if (zoomed) {

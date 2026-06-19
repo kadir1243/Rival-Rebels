@@ -40,7 +40,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemUseAnimation;
 import net.minecraft.world.level.Level;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class ItemFlameThrower extends Item {
 	public static final Translations.TranslationKey OUT_OF_FUEL = new Translations.TranslationKey("out_of_fuel");
@@ -76,13 +76,13 @@ public class ItemFlameThrower extends Item {
 			}
 			if (stack.isEnchanted() && !world.isClientSide())
 			{
-				world.addFreshEntity(new EntityFlameBallGreen(world, user, world.getRandom().nextFloat() + 1.0f));
+				world.addFreshEntity(new EntityFlameBallGreen(world, user, world.random.nextFloat() + 1.0f));
 			}
 		} else {
-			user.sendSystemMessage(OUT_OF_FUEL.translate().withStyle(ChatFormatting.RED));
+			user.displayClientMessage(OUT_OF_FUEL.translate().withStyle(ChatFormatting.RED), false);
 		}
 		if (message) {
-			user.sendSystemMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."));
+			user.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" [R]."), false);
 			message = false;
 		}
 		return InteractionResult.PASS;
@@ -92,9 +92,9 @@ public class ItemFlameThrower extends Item {
     @Override
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
 		if (!world.isClientSide()) {
-            if (world.getRandom().nextInt(10) == 0 && !user.isInWater()) {
+            if (world.random.nextInt(10) == 0 && !user.isInWater()) {
                 user.playSound(RRSounds.FLAME_THROWER_USE.get(), 0.03f, 1F);
-                if (world.getRandom().nextInt(3) == 0 && !user.isInWater()) {
+                if (world.random.nextInt(3) == 0 && !user.isInWater()) {
                     user.playSound(RRSounds.FLAME_THROWER_EXTINGUISH.get(), 0.1F, 1F);
                 }
             }
@@ -102,7 +102,7 @@ public class ItemFlameThrower extends Item {
                 switch (getMode(stack)) {
                     case 0:
                         for (int i = 0; i < 4; i++)
-                            world.addFreshEntity(new EntityFlameBall2(world, user, world.getRandom().nextFloat() + 0.5f));
+                            world.addFreshEntity(new EntityFlameBall2(world, user, world.random.nextFloat() + 0.5f));
                         break;
                     case 1:
                         world.addFreshEntity(new EntityFlameBall1(world, user, 1));
@@ -118,7 +118,7 @@ public class ItemFlameThrower extends Item {
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
 		if (entity instanceof Player) {
-            if (slot != null && level.getRandom().nextInt(10) == 0 && !entity.isInWater()) {
+            if (slot != null && level.random.nextInt(10) == 0 && !entity.isInWater()) {
                 entity.playSound(RRSounds.FLAME_THROWER_USE.get(), 0.03f, 1F);
             }
         }

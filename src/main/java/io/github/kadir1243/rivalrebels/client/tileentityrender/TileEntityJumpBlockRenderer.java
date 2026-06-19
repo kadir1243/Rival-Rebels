@@ -15,32 +15,24 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelJump;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityJumpBlock;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.RenderType;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 
 @OnlyIn(Dist.CLIENT)
-public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEntityJumpBlock, BlockEntityRenderState> {
+public class TileEntityJumpBlockRenderer implements BlockEntityRenderer<TileEntityJumpBlock> {
     public TileEntityJumpBlockRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public BlockEntityRenderState createRenderState() {
-        return new BlockEntityRenderState();
-    }
-
-    @Override
-    public void submit(BlockEntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+    public void render(TileEntityJumpBlock blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
         poseStack.pushPose();
-        poseStack.translate(0.5F, 0.5F, 0.5F);
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.btcrate), (pose, consumer) ->
-            ModelJump.renderModel(pose, consumer, renderState.lightCoords, OverlayTexture.NO_OVERLAY));
-        poseStack.popPose();
-    }
+		poseStack.translate(0.5F, 0.5F, 0.5F);
+		ModelJump.renderModel(poseStack, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.btcrate)), packedLight, packedOverlay);
+		poseStack.popPose();
+	}
 }

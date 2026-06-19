@@ -21,10 +21,10 @@ import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsSimplexNoise;
 import io.github.kadir1243.rivalrebels.common.packet.ReactorMachinesPacket;
 import io.github.kadir1243.rivalrebels.common.packet.ReactorStatePacket;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.CommonColors;
@@ -52,7 +52,8 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
     private ReactorConnectedMachinesList dockWidget;
 
     public GuiReactor(ContainerReactor containerReactor, Inventory playerInventory, Component title) {
-		super(containerReactor, playerInventory, title, DEFAULT_IMAGE_WIDTH, 200);
+		super(containerReactor, playerInventory, title);
+        this.imageHeight = 200;
     }
 
     public static void onMachinesPacket(ReactorMachinesPacket packet, IPayloadContext context) {
@@ -83,16 +84,17 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 	}
 
     @Override
-    protected void extractLabels(GuiGraphicsExtractor graphics, int xm, int ym) {
+    protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
+        graphics.pose().pushMatrix();
+        graphics.pose().scale(1.25f, 1f);
+
         menu.core.locked = menu.isOn();
         menu.fuel.locked = menu.fuel.hasItem() && menu.isOn();
 
-        graphics.pose().pushMatrix();
-        graphics.pose().scale(1.25f, 1f);
-        graphics.text(font, "ToKaMaK", 10, 8, 0x444444, false);
+		graphics.drawString(font, "ToKaMaK", 10, 8, 0x444444, false);
         graphics.pose().popMatrix();
-        graphics.text(font, "Teslas: " + df.format(menu.getPower() - menu.getConsumed()), 120, 8, 0xffffff, false);
-        graphics.text(font, "Output/t: " + df.format(menu.getLastTickConsumed()), 140, 18, 0xffffff, false);
+        graphics.drawString(font, "Teslas: " + df.format(menu.getPower() - menu.getConsumed()), 120, 8, 0xffffff, false);
+        graphics.drawString(font, "Output/t: " + df.format(menu.getLastTickConsumed()), 140, 18, 0xffffff, false);
 	}
 
     @Override
@@ -102,9 +104,8 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
     }
 
     @Override
-    public void extractBackground(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
-        super.extractBackground(graphics, mouseX, mouseY, a);
-        RRTextures.guittokamak.blit(graphics, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208, CommonColors.WHITE);
+    protected void renderBg(GuiGraphics context, float delta, int mouseX, int mouseY) {
+        RRTextures.guittokamak.blit(context, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208, CommonColors.WHITE);
 
 		long time = System.currentTimeMillis();
 		// 1f, 1f, 1f, 0.7f, 0f, 1f, HYDROGEN
@@ -120,18 +121,18 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 			if (menu.core.getItem().is(RRItems.core1)) brightness = -0.4f;
 			if (menu.core.getItem().is(RRItems.core2)) brightness = -0.25f;
 			if (menu.core.getItem().is(RRItems.core3)) brightness = -0.1f;
-			if (menu.fuel.getItem().is(RRItems.NUCLEAR_ROD)) drawNoiseSphere(graphics, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
-			if (menu.fuel.getItem().is(RRItems.hydrod)) drawNoiseSphere(graphics, 1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
-			if (menu.fuel.getItem().is(RRItems.redrod)) drawNoiseSphere(graphics, 1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (menu.fuel.getItem().is(RRItems.NUCLEAR_ROD)) drawNoiseSphere(context, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (menu.fuel.getItem().is(RRItems.hydrod)) drawNoiseSphere(context, 1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (menu.fuel.getItem().is(RRItems.redrod)) drawNoiseSphere(context, 1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
 		}
 		else if (menu.isMelt() || (menu.isOn() && !menu.fuel.hasItem()))
 		{
 			if (melttick > 1) melttick -= 0.03f;
-			drawNoiseSphere(graphics, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, (int) (20 + Mth.sin(frame / melttick) * 20), 10, resolution, 0.02f, 0);
+			drawNoiseSphere(context, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, (int) (20 + Mth.sin(frame / melttick) * 20), 10, resolution, 0.02f, 0);
 		}
 		else if (menu.fuel.hasItem() && menu.core.hasItem())
 		{
-			drawInfographic(graphics, resolution, 15, 8, 5, 20, 0.666f, 0.25f, 0.32f);
+			drawInfographic(context, resolution, 15, 8, 5, 20, 0.666f, 0.25f, 0.32f);
 		}
 		long elapsed = System.currentTimeMillis() - time;
 		if (elapsed > 30)
@@ -162,7 +163,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
      * @param resolution Resolution in pixels of Noise Sphere
      * @param sscale     Noise Scale
      */
-    protected void drawNoiseSphere(GuiGraphicsExtractor graphics, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
+    protected void drawNoiseSphere(GuiGraphics graphics, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
         graphics.pose().pushMatrix();
         float pointSize = (float) (minecraft.getWindow().getGuiScale() / resolution);
         radius *= resolution;
@@ -208,7 +209,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
         graphics.pose().popMatrix();
     }
 
-    private static void drawPoint(GuiGraphicsExtractor graphics, float pointSize, float x, float y, float z, int color) {
+    private static void drawPoint(GuiGraphics graphics, float pointSize, float x, float y, float z, int color) {
         float halfSize = pointSize / 2.0f;
 
         // I don't really know what is rendering, so I just tried to create points from quads
@@ -219,7 +220,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
         return start * (1 - end) + delta * end;
 	}
 
-	protected void drawInfographic(GuiGraphicsExtractor graphics, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {
+	protected void drawInfographic(GuiGraphics graphics, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {
         float pointSize = 4 / resolution;
         radius *= resolution;
 		sep *= resolution;
@@ -274,4 +275,10 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 			}
 		}
 	}
+
+    @Override
+    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick) {
+        super.render(guiGraphics, mouseX, mouseY, partialTick);
+        this.renderTooltip(guiGraphics, mouseX, mouseY);
+    }
 }

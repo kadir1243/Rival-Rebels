@@ -17,8 +17,6 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.util.Mth;
@@ -53,7 +51,7 @@ public class ModelTsarBlast {
         }
     }
 
-    public void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
+    public void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
         if (timer == 0) {
             timer += time[index];
             index++;
@@ -61,10 +59,10 @@ public class ModelTsarBlast {
         index %= time.length;
         if (timer > 0) timer--;
         texanim += texadd;
-        poseStack.pushPose();
+        matrices.pushPose();
         for (float i = 0; i < segments; i++) {
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+            matrices.pushPose();
+            matrices.mulPose(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < tsart; f++) {
                 int ind0 = (time.length + index - 1) % time.length;
                 float x0 = tsarx[ind0][f - 1] + (((tsarx[index][f - 1] - tsarx[ind0][f - 1]) / time[ind0]) * timer);
@@ -75,15 +73,13 @@ public class ModelTsarBlast {
                 TextureVertice t2 = new TextureVertice((1f / segments) * (i - 1), ((1f / tsart) * (f - 1)) + texanim);
                 TextureVertice t3 = new TextureVertice((1f / segments) * i, ((1f / tsart) * (f - 1)) + texanim);
                 TextureVertice t4 = new TextureVertice((1f / segments) * i, ((1f / tsart) * f) + texanim);
-                nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
-                    RenderHelper.addFace(pose, consumer, new Vector3f(0f, y1, x1),
-                        new Vector3f(0f, y0, x0),
-                        new Vector3f(x0 * sin, y0, x0 * cos),
-                        new Vector3f(x1 * sin, y1, x1 * cos), t1, t2, t3, t4, light, overlay);
-                });
+                RenderHelper.addFace(matrices, buffer, new Vector3f(0f, y1, x1),
+                    new Vector3f(0f, y0, x0),
+                    new Vector3f(x0 * sin, y0, x0 * cos),
+                    new Vector3f(x1 * sin, y1, x1 * cos), t1, t2, t3, t4, light, overlay);
             }
-            poseStack.popPose();
+            matrices.popPose();
         }
-        poseStack.popPose();
+        matrices.popPose();
     }
 }

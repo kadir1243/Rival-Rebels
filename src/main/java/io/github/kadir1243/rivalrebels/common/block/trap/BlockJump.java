@@ -27,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockJump extends Block implements EntityBlock {
 	public BlockJump(Properties settings)
@@ -36,7 +36,7 @@ public class BlockJump extends Block implements EntityBlock {
 	}
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
         if (entity instanceof LivingEntity) {
             entity.push(0, 2, 0);
 			level.playLocalSound(pos, SoundEvents.ARROW_HIT, SoundSource.BLOCKS, 3F, 2, true);

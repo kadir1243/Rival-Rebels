@@ -39,13 +39,13 @@ public class BlockExplosives extends Block
         int y = pos.getY();
         int z = pos.getZ();
 		if (!level.isClientSide()) {
-            player.sendSystemMessage(Component.translatable("RivalRebels.Inventory"));
-            player.sendSystemMessage(RRBlocks.timedbomb.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(1 minute countdown.)").withStyle(ChatFormatting.BLUE)));
-            player.sendSystemMessage(RRItems.pliers.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("§9(to defuse explosives.)").withStyle(ChatFormatting.BLUE)));
-            player.sendSystemMessage(RRBlocks.remotecharge.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Remote charge.)").withStyle(ChatFormatting.BLUE)));
-            player.sendSystemMessage(RRItems.remote.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Set and detonate charge.)").withStyle(ChatFormatting.BLUE)));
-            player.sendSystemMessage(RRBlocks.minetrap.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Handle with care.)").withStyle(ChatFormatting.BLUE)));
-            player.sendSystemMessage(RRBlocks.flare.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Incendiary defense.)").withStyle(ChatFormatting.BLUE)));
+            player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
+            player.displayClientMessage(RRBlocks.timedbomb.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(1 minute countdown.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRItems.pliers.get().getName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("§9(to defuse explosives.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRBlocks.remotecharge.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Remote charge.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRItems.remote.get().getName().copy().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Set and detonate charge.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRBlocks.minetrap.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Handle with care.)").withStyle(ChatFormatting.BLUE)), false);
+            player.displayClientMessage(RRBlocks.flare.get().getName().withStyle(ChatFormatting.GREEN).append(". ").append(Component.literal("(Incendiary defense.)").withStyle(ChatFormatting.BLUE)), false);
             Containers.dropItemStack(level, x, y, z, RRBlocks.timedbomb.toStack());
             Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.remotecharge, 8));
 			Containers.dropItemStack(level, x, y, z, new ItemStack(RRBlocks.minetrap, 16));

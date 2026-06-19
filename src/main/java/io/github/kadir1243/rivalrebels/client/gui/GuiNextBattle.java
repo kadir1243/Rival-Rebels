@@ -14,11 +14,13 @@ package io.github.kadir1243.rivalrebels.client.gui;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiButton;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
 import io.github.kadir1243.rivalrebels.common.packet.VotePacket;
+import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.gui.TextAlignment;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.util.CommonColors;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.MultiLineLabel;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
@@ -61,7 +63,7 @@ public class GuiNextBattle extends Screen {
     }
 
     @Override
-    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float delta) {
         count++;
 		if (count == 60)
 		{
@@ -69,24 +71,26 @@ public class GuiNextBattle extends Screen {
 			count = 0;
 		}
         float f = 0.00390625F;
-        graphics.blit(
+        ((GuiGraphicsAccessor) graphics).blit(
+            RenderPipelines.GUI_TEXTURED,
             num == 0 ? RRTextures.guitwarning0 : RRTextures.guitwarning1,
             posX,
-            posY,
             posX + xSizeOfTexture,
+            posY,
             posY + ySizeOfTexture,
             0,
             xSizeOfTexture * f,
             ySizeOfTexture * f,
-            0
+            0,
+            CommonColors.WHITE
         );
-        graphics.centeredText(font, Component.translatable("RivalRebels.nextbattle.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
+        graphics.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.subtitle"), (this.width / 2), (this.height / 2 - 120), 0xffffff);
 		float scalefactor = 4f;
         graphics.pose().pushMatrix();
         graphics.pose().scale(scalefactor, scalefactor);
-        graphics.centeredText(font, Component.translatable("RivalRebels.nextbattle.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
+        graphics.drawCenteredString(font, Component.translatable("RivalRebels.nextbattle.title"), (int) ((this.width / 2) / scalefactor), (int) ((this.height / 2 - 100) / scalefactor), 0xffffff);
         graphics.pose().popMatrix();
-        MultiLineLabel.create(font, Component.translatable("RivalRebels.nextbattle.question"), 128).visitLines(TextAlignment.LEFT, posX + 64, posY + 160, this.font.lineHeight, graphics.textRenderer());
-        super.extractRenderState(graphics, mouseX, mouseY, a);
+        MultiLineLabel.create(font, Component.translatable("RivalRebels.nextbattle.question"), 128).renderLeftAlignedNoShadow(graphics, posX + 64, posY + 160, this.font.lineHeight, 0xffffff);
+        super.render(graphics, mouseX, mouseY, delta);
 	}
 }

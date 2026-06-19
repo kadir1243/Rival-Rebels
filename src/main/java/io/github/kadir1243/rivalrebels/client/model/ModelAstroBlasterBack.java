@@ -15,9 +15,8 @@ package io.github.kadir1243.rivalrebels.client.model;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.util.Mth;
@@ -35,26 +34,23 @@ public class ModelAstroBlasterBack {
     private static final float cos = Mth.cos(deg);
     private static final float add = 360 / segments;
 
-    public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
-        poseStack.pushPose();
+    public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+        matrices.pushPose();
         for (float i = 0; i < segments; i++) {
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+            matrices.pushPose();
+            matrices.mulPose(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < barrelx.length; f++) {
                 TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
                 TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
                 TextureVertice t3 = new TextureVertice((1f / segments) * (i + 1), tsart[f - 1]);
                 TextureVertice t4 = new TextureVertice((1f / segments) * (i + 1), tsart[f]);
-                int finalF = f;
-                nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
-                    RenderHelper.addFace(pose, consumer, new Vector3f(0f, barrely[finalF], barrelx[finalF]),
-                        new Vector3f(0f, barrely[finalF - 1], barrelx[finalF - 1]),
-                        new Vector3f(barrelx[finalF - 1] * sin, barrely[finalF - 1], barrelx[finalF - 1] * cos),
-                        new Vector3f(barrelx[finalF] * sin, barrely[finalF], barrelx[finalF] * cos), t1, t2, t3, t4, light, overlay);
-                });
+                RenderHelper.addFace(matrices, buffer, new Vector3f(0f, barrely[f], barrelx[f]),
+                    new Vector3f(0f, barrely[f - 1], barrelx[f - 1]),
+                    new Vector3f(barrelx[f - 1] * sin, barrely[f - 1], barrelx[f - 1] * cos),
+                    new Vector3f(barrelx[f] * sin, barrely[f], barrelx[f] * cos), t1, t2, t3, t4, light, overlay);
             }
-            poseStack.popPose();
+            matrices.popPose();
         }
-        poseStack.popPose();
+        matrices.popPose();
     }
 }

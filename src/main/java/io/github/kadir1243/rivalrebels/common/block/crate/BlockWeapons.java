@@ -38,20 +38,20 @@ public class BlockWeapons extends Block
         int y = pos.getY();
         int z = pos.getZ();
         if (level.isClientSide()) {
-            player.sendSystemMessage(Component.translatable("RivalRebels.Inventory"));
-            player.sendSystemMessage(Component.literal(RRItems.rpg.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.rocket.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal(RRItems.tesla.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.hydrod.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.flamethrower.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.fuel.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.plasmacannon.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.battery.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.einsten.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.redrod.toStack().getItemName()) + ")"));
-            player.sendSystemMessage(Component.literal((RRItems.roddisk.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.message.use") + " /rr)"));
+            player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
+            player.displayClientMessage(Component.literal(RRItems.rpg.get().getName().copy().withStyle(ChatFormatting.GREEN) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.rocket.get().getName()) + ")"), false);
+            player.displayClientMessage(Component.literal(RRItems.tesla.get().getName().copy().withStyle(ChatFormatting.GREEN) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.hydrod.get().getName()) + ")"), false);
+            player.displayClientMessage(Component.literal((RRItems.flamethrower.get().getName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.fuel.asItem().getName()) + ")"), false);
+            player.displayClientMessage(Component.literal((RRItems.plasmacannon.get().getName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.battery.asItem().getName()) + ")"), false);
+            player.displayClientMessage(Component.literal((RRItems.einsten.get().getName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.consume") + " " + (RRItems.redrod.asItem().getName()) + ")"), false);
+            player.displayClientMessage(Component.literal((RRItems.roddisk.get().getName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.message.use") + " /rr)"), false);
             // player.sendMessage(Text.literal("§a" + I18n.translate(RivalRebels.bastion.getTranslationKey() + ".name") + ". §9(" +
             // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.barricade.getTranslationKey() + ".name") + ")");
             // player.sendMessage(Text.literal("§a" + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ". §9(" +
             // I18n.translate("RivalRebels.build") + " " + I18n.translate(RivalRebels.tower.getTranslationKey() + ".name") + ")");
-            player.sendSystemMessage((RRItems.knife.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN).append(". §9(").append(Component.translatable("RivalRebels.opknife")).append(")")));
-            player.sendSystemMessage(Component.literal((RRItems.gasgrenade.toStack().getItemName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.chemicalweapon") + ")"));
-            player.sendSystemMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.equipweapons")));
+            player.displayClientMessage((RRItems.knife.get().getName().copy().withStyle(ChatFormatting.GREEN).append(". §9(").append(Component.translatable("RivalRebels.opknife")).append(")")), false);
+            player.displayClientMessage(Component.literal((RRItems.gasgrenade.get().getName().copy().withStyle(ChatFormatting.GREEN)) + ". §9(" + Component.translatable("RivalRebels.chemicalweapon") + ")"), false);
+            player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.equipweapons")), false);
         }
         if (!level.isClientSide())
         {

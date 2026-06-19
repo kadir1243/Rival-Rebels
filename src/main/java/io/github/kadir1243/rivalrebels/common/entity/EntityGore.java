@@ -26,7 +26,7 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
@@ -35,7 +35,7 @@ import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -58,7 +58,7 @@ public class EntityGore extends EntityInanimate {
 	float					motionpitch	= 0;
 	int						pitchLock	= 0;
 	float					offset		= 0;
-	public Identifier	playerSkin	= null;
+	public ResourceLocation	playerSkin	= null;
 	private int				bounces		= -1;
 
     public EntityGore(EntityType<? extends EntityGore> type, Level world) {
@@ -326,7 +326,7 @@ public class EntityGore extends EntityInanimate {
     }
 
     public void setOwner(@Nullable LivingEntity owner) {
-        entityData.set(OWNER, Optional.ofNullable(owner).map(EntityReference::of));
+        entityData.set(OWNER, Optional.ofNullable(owner).map(EntityReference::new));
     }
 
 	@Override
@@ -336,7 +336,7 @@ public class EntityGore extends EntityInanimate {
             for (Player player : level().players()) {
                 if (getOwner().matches(player)) {
                     AbstractClientPlayer acp = (AbstractClientPlayer) player;
-                    playerSkin = acp.getSkin().body().texturePath();
+                    playerSkin = acp.getSkin().texture();
                 }
             }
 		}

@@ -17,68 +17,42 @@ import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.crate.BlockNukeCrate;
 import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityNukeCrate;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.blockentity.state.BlockEntityRenderState;
-import net.minecraft.client.renderer.feature.ModelFeatureRenderer;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.Direction;
-import org.jspecify.annotations.Nullable;
 
 @OnlyIn(Dist.CLIENT)
-public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEntityNukeCrate, TileEntityNukeCrateRenderer.NukeCrateRenderState> {
+public class TileEntityNukeCrateRenderer implements BlockEntityRenderer<TileEntityNukeCrate> {
     public TileEntityNukeCrateRenderer(BlockEntityRendererProvider.Context context) {
     }
 
     @Override
-    public NukeCrateRenderState createRenderState() {
-        return new NukeCrateRenderState();
-    }
-
-    @Override
-    public void extractRenderState(TileEntityNukeCrate blockEntity, NukeCrateRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
-        BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
-        state.facing = blockEntity.getBlockState().getValue(BlockNukeCrate.FACING);
-        state.isBottomCrate = blockEntity.getBlockState().is(RRBlocks.nukeCrateBottom);
-    }
-
-    @Override
-    public void submit(NukeCrateRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+    public void render(TileEntityNukeCrate blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay, Vec3 cameraPos) {
         poseStack.pushPose();
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        switch (renderState.facing) {
+        Direction metadata = blockEntity.getBlockState().getValue(BlockNukeCrate.FACING);
+        switch (metadata) {
             case DOWN -> poseStack.mulPose(Axis.XP.rotationDegrees(180));
             case NORTH -> poseStack.mulPose(Axis.XP.rotationDegrees(-90));
             case SOUTH -> poseStack.mulPose(Axis.XP.rotationDegrees(90));
             case WEST -> poseStack.mulPose(Axis.ZP.rotationDegrees(90));
             case EAST -> poseStack.mulPose(Axis.ZP.rotationDegrees(-90));
         }
-        RenderType buffer;
-        if (renderState.isBottomCrate)
-            buffer = RenderTypes.entitySolid(RRIdentifiers.btnukebottom);
-        else
-            buffer = RenderTypes.entitySolid(RRIdentifiers.btnuketop);
-        int packedLight = renderState.lightCoords;
-        int packedOverlay = OverlayTexture.NO_OVERLAY;
-        nodeCollector.submitCustomGeometry(poseStack, buffer, (pose, consumer) -> {
-            ModelNukeCrate.renderModelA(pose, consumer, packedLight, packedOverlay);
-        });
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.btcrate), (pose, consumer) -> {
-            ModelNukeCrate.renderModelB(pose, consumer, packedLight, packedOverlay);
-        });
+        VertexConsumer buffer;
+        if (blockEntity.getBlockState().is(RRBlocks.nukeCrateBottom))
+            buffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.btnukebottom));
+        else if (blockEntity.getBlockState().is(RRBlocks.nukeCrateTop))
+            buffer = bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.btnuketop));
+        else throw new UnsupportedOperationException("Unknown block to render");
+        ModelNukeCrate.renderModelA(poseStack, buffer, packedLight, packedOverlay);
+        ModelNukeCrate.renderModelB(poseStack, bufferSource.getBuffer(RenderType.entitySolid(RRIdentifiers.btcrate)), packedLight, packedOverlay);
         poseStack.popPose();
-    }
-
-    public static class NukeCrateRenderState extends BlockEntityRenderState {
-        public Direction facing;
-        public boolean isBottomCrate;
     }
 }

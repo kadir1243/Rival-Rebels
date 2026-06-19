@@ -11,20 +11,14 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.renderentity;
 
-import io.github.kadir1243.rivalrebels.client.model.ObjModels;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
+import io.github.kadir1243.rivalrebels.client.model.ModelBlastSphere;
 import io.github.kadir1243.rivalrebels.common.entity.EntitySphereBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.client.resources.model.geometry.QuadCollection;
-import net.minecraft.util.ARGB;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -35,62 +29,35 @@ import net.minecraft.world.level.lighting.LightEngine;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast, EntityRenderState> {
-    private final QuadCollection model;
-    public RenderSphereBlast(EntityRendererProvider.Context context) {
-        super(context);
-
-        model = Minecraft.getInstance().getModelManager().getStandaloneModel(ObjModels.BLAST_SPHERE_MODEL);
+	public RenderSphereBlast(EntityRendererProvider.Context manager) {
+        super(manager);
 	}
 
     @Override
-    public void submit(EntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+    public void render(EntityRenderState renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
         poseStack.pushPose();
         double elev = ((Mth.sin(renderState.ageInTicks / 40f) + 1.5f) * 10);
         poseStack.translate(0, elev, 0);
-
-        {
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * 2)));
-            poseStack.mulPose(Axis.XP.rotationDegrees((float) (elev * 3)));
-            poseStack.scale((float) elev, (float) elev, (float) elev);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(1F, 1, 0.25f, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
-            poseStack.popPose();
-        }
-        {
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * -2)));
-            poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 4)));
-            float scale = (float) (elev - 0.2f);
-            poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(1F, 1, 0.5f, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
-            poseStack.popPose();
-        }
-        {
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.XP.rotationDegrees((float) (elev * -3)));
-            poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 2)));
-            float scale = (float) (elev - 0.4f);
-            poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, CommonColors.RED, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
-            poseStack.popPose();
-        }
-        {
-            poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * -1)));
-            poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 3)));
-            float scale = (float) (elev - 0.6f);
-            poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE_TRIANGLES, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(1F, 1, 1, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
-            poseStack.popPose();
-        }
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * 2)));
+        poseStack.mulPose(Axis.XP.rotationDegrees((float) (elev * 3)));
+        ModelBlastSphere.renderModel(poseStack, bufferSource, (float) elev, 1, 0.25f, 0, 1f);
+        poseStack.popPose();
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * -2)));
+        poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 4)));
+        ModelBlastSphere.renderModel(poseStack, bufferSource, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
+        poseStack.popPose();
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.XP.rotationDegrees((float) (elev * -3)));
+        poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 2)));
+        ModelBlastSphere.renderModel(poseStack, bufferSource, (float) (elev - 0.4f), CommonColors.RED);
+        poseStack.popPose();
+        poseStack.pushPose();
+        poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * -1)));
+        poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 3)));
+        ModelBlastSphere.renderModel(poseStack, bufferSource, (float) (elev - 0.6f), 1, 1, 0, 1);
+        poseStack.popPose();
         poseStack.popPose();
     }
 

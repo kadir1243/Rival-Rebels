@@ -29,7 +29,7 @@ import net.minecraft.world.level.Level;
 
 public class ItemRemote extends Item {
 	public ItemRemote(Properties properties) {
-		super(properties);
+		super(properties.stacksTo(1).component(RRComponents.REMOTE_CONTROLLED_BOMB_POS, BlockPos.ZERO));
 	}
 
     @Override
@@ -54,7 +54,7 @@ public class ItemRemote extends Item {
         ItemStack itemStack = ItemUtil.getItemStack(player, RRBlocks.remotecharge.asItem());
         if (((player.getAbilities().invulnerable && world.isEmptyBlock(pos.above()) || !itemStack.isEmpty() && world.isEmptyBlock(pos.above()))) && !player.isShiftKeyDown()) {
             player.playSound(RRSounds.REMOTE_PLANT.get());
-            player.sendSystemMessage(Translations.orders().append(" ").append(Component.literal("Shift-click (Sneak) to detonate.").withStyle(ChatFormatting.RED)));
+            player.displayClientMessage(Translations.orders().append(" ").append(Component.literal("Shift-click (Sneak) to detonate.").withStyle(ChatFormatting.RED)), false);
             itemStack.set(RRComponents.REMOTE_CONTROLLED_BOMB_POS, pos);
             itemStack.consume(1, context.getPlayer());
 			world.setBlockAndUpdate(pos.above(), RRBlocks.remotecharge.get().defaultBlockState());

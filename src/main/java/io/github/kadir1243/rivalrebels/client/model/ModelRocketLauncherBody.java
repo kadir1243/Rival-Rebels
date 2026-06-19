@@ -14,9 +14,8 @@ package io.github.kadir1243.rivalrebels.client.model;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.util.CommonColors;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
@@ -160,7 +159,7 @@ public class ModelRocketLauncherBody
         QuadHelper.addFace(buffer, rlauncher6, rlauncher5, rlauncher8, rlauncher7, rs12, rs11, rs2, rs1);
     });
 
-	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
-        ObjModels.submit(nodeCollector, renderType, BAKED_MODEL.get().quadCollection(), poseStack, CommonColors.WHITE, light, overlay);
+	public static void render(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+        ModelBlockRenderer.renderModel(matrices.last(), buffer, BAKED_MODEL.get().blockStateModel(), 1, 1, 1, light, overlay);
 	}
 }

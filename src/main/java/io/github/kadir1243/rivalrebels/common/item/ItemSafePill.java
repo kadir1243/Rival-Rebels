@@ -37,7 +37,7 @@ public class ItemSafePill extends Item
     public InteractionResult use(Level world, Player player, InteractionHand hand) {
 		player.startUsingItem(hand);
 		if (!world.isClientSide()) {
-			player.sendSystemMessage(Translations.status().append(" ").append(Component.literal("Regenerating...").withStyle(ChatFormatting.YELLOW)));
+			player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Regenerating...").withStyle(ChatFormatting.YELLOW)), true);
             player.playSound(RRSounds.PILL2.get());
             player.playSound(RRSounds.VOICE_18.get());
 			player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);

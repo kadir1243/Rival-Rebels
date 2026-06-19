@@ -38,9 +38,9 @@ public class BlockPetrifiedStone extends Block {
     }
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
-		if (level.getRandom().nextInt(2) == 0) {
-			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), ((16 - level.getBlockState(pos).getValue(META)) / 2F) + level.getRandom().nextInt(3) - 1);
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
+		if (level.random.nextInt(2) == 0) {
+			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), ((16 - level.getBlockState(pos).getValue(META)) / 2F) + level.random.nextInt(3) - 1);
 		}
 	}
 

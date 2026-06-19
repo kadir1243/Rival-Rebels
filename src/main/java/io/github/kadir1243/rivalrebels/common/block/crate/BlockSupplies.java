@@ -41,16 +41,16 @@ public class BlockSupplies extends Block
 
 		if (level.isClientSide())
 		{
-			player.sendSystemMessage(Component.translatable("RivalRebels.Inventory"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.armyshovel.toStack().getItemName() + ". §9(" + "Ideal for special blocks." + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.jump.get().getName() + ". §9(" + "Use at your own risk." + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.quicksand.get().getName() + ". §9(" + "Sand that is quick" + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.mario.get().getName() + ". §9(" + "For trap making." + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.loader.get().getName() + ". §9(" + "Modular item container." + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.steel.get().getName() + ". §9(" + "Climbable and blast resistant." + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.expill.toStack().getItemName() + ". §9(" + "Take at your own risk." + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.safepill.toStack().getItemName() + ". §9(" + "Restores health." + ")"));
-			player.sendSystemMessage(Component.nullToEmpty("§a" + RRBlocks.breadbox.get().getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"));
+			player.displayClientMessage(Component.translatable("RivalRebels.Inventory"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.armyshovel.get().getName() + ". §9(" + "Ideal for special blocks." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.jump.get().getName() + ". §9(" + "Use at your own risk." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.quicksand.get().getName() + ". §9(" + "Sand that is quick" + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.mario.get().getName() + ". §9(" + "For trap making." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.loader.get().getName() + ". §9(" + "Modular item container." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.steel.get().getName() + ". §9(" + "Climbable and blast resistant." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.expill.get().getName() + ". §9(" + "Take at your own risk." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.safepill.get().getName() + ". §9(" + "Restores health." + ")"), false);
+			player.displayClientMessage(Component.nullToEmpty("§a" + RRBlocks.breadbox.get().getName() + ". §9(" + "Unlimited toast! You don't say..." + ")"), false);
 		}
 		if (!level.isClientSide())
 		{
@@ -65,10 +65,10 @@ public class BlockSupplies extends Block
 			Containers.dropItemStack(level, x, y, z, RRItems.expill.toStack(6));
 			Containers.dropItemStack(level, x, y, z, RRItems.safepill.toStack(3));
             level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-			if (level.getRandom().nextInt(5) == 0)
+			if (level.random.nextInt(5) == 0)
 			{
                 Containers.dropItemStack(level, x, y, z, RRItems.NUCLEAR_ROD.toStack());
-				player.sendSystemMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.toStack().getItemName() + ". §9" + "(Used in nuclear weapons)"));
+				player.displayClientMessage(Component.nullToEmpty("§a" + RRItems.NUCLEAR_ROD.asItem().getName() + ". §9" + "(Used in nuclear weapons)"), false);
 			}
 			return InteractionResult.SUCCESS;
 		}

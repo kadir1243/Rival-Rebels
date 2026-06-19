@@ -101,7 +101,7 @@ public class RivalRebels {
             RRClient.init(modEventBus);
             modEventBus.addListener(DataGen::onGatherClientData);
         }
-        modEventBus.addListener(DataGen::onGatherServerSpecificData);
+        modEventBus.addListener(DataGen::onGatherServerData);
 
         modEventBus.addListener(NewRegistryEvent.class, event -> event.register(RHODES_TYPE_REGISTRY));
     }

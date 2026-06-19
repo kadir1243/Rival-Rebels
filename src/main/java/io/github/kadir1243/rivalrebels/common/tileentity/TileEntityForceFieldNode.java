@@ -34,7 +34,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
 
-import org.jspecify.annotations.Nullable;
+import javax.annotation.Nullable;
 
 public class TileEntityForceFieldNode extends TileEntityMachineBase {
     @Nullable
@@ -98,7 +98,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
 	@Override
 	public float powered(float power, float distance)
 	{
-		float hits = getLevel().getRandom().nextFloat();
+		float hits = getLevel().random.nextFloat();
 		Direction meta = this.getBlockState().getValue(BlockForceFieldNode.FACING);
 
 		double randomness = 0.1;
@@ -115,7 +115,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::partialProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX() + (p.getX() > (getBlockPos().getX() + 0.5) ? -2 : 2), p.getY(), p.getZ());
@@ -132,9 +132,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                     cpy /= dist;
                     cpz /= dist;
 
-                    cpx += getLevel().getRandom().nextGaussian() * randomness;
-                    cpy += getLevel().getRandom().nextGaussian() * randomness;
-                    cpz += getLevel().getRandom().nextGaussian() * randomness;
+                    cpx += getLevel().random.nextGaussian() * randomness;
+                    cpy += getLevel().random.nextGaussian() * randomness;
+                    cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
                     e.playSound(RRSounds.GUI_UNKNOWN8.get(), 1, 2);
@@ -164,7 +164,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::partialProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX() + (p.getX() > (getBlockPos().getX() + 0.5) ? -2 : 2), p.getY(), p.getZ());
@@ -181,9 +181,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                     cpy /= dist;
                     cpz /= dist;
 
-                    cpx += getLevel().getRandom().nextGaussian() * randomness;
-                    cpy += getLevel().getRandom().nextGaussian() * randomness;
-                    cpz += getLevel().getRandom().nextGaussian() * randomness;
+                    cpx += getLevel().random.nextGaussian() * randomness;
+                    cpy += getLevel().random.nextGaussian() * randomness;
+                    cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
                     e.playSound(RRSounds.GUI_UNKNOWN8.get(), 1, 2);
@@ -213,7 +213,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::partialProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX(), p.getY(), p.getZ() + (p.getZ() > (getBlockPos().getZ() + 0.5) ? -2 : 2));
@@ -230,9 +230,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                     cpy /= dist;
                     cpz /= dist;
 
-                    cpx += getLevel().getRandom().nextGaussian() * randomness;
-                    cpy += getLevel().getRandom().nextGaussian() * randomness;
-                    cpz += getLevel().getRandom().nextGaussian() * randomness;
+                    cpx += getLevel().random.nextGaussian() * randomness;
+                    cpy += getLevel().random.nextGaussian() * randomness;
+                    cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
                     e.playSound(RRSounds.GUI_UNKNOWN8.get(), 1, 2);
@@ -262,7 +262,7 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                 boolean shouldContinue = true;
                 if (e instanceof Player p) {
                     RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(p.getGameProfile());
-                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::partialProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
+                    if (p.getGameProfile().equals(Optional.ofNullable(owner).map(ResolvableProfile::gameProfile).orElse(null)) || (player != null && player.rrteam == rrteam)) {
                         shouldContinue = false;
                         hits++;
                         p.setPosRaw(p.getX(), p.getY(), p.getZ() + (p.getZ() > (getBlockPos().getZ() + 0.5) ? -2 : 2));
@@ -279,9 +279,9 @@ public class TileEntityForceFieldNode extends TileEntityMachineBase {
                     cpy /= dist;
                     cpz /= dist;
 
-                    cpx += getLevel().getRandom().nextGaussian() * randomness;
-                    cpy += getLevel().getRandom().nextGaussian() * randomness;
-                    cpz += getLevel().getRandom().nextGaussian() * randomness;
+                    cpx += getLevel().random.nextGaussian() * randomness;
+                    cpy += getLevel().random.nextGaussian() * randomness;
+                    cpz += getLevel().random.nextGaussian() * randomness;
 
                     e.setDeltaMovement(e.getDeltaMovement().reverse().subtract(cpx, cpy, cpz));
                     e.playSound(RRSounds.GUI_UNKNOWN8.get(), 1, 2);

@@ -5,6 +5,7 @@ import io.github.kadir1243.rivalrebels.common.core.RRSounds;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import io.github.kadir1243.rivalrebels.common.round.RivalRebelsTeam;
+import com.google.common.collect.ImmutableList;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
@@ -61,9 +62,9 @@ public class IdleBrain extends Behavior<EntityRhodes> {
                 float dz = (float) ((owner.teamToRaid == RivalRebelsTeam.OMEGA ? RivalRebels.round.omegaData.objPos().getZ() : RivalRebels.round.sigmaData.objPos().getZ()) - owner.getZ());
                 float angle = ((EntityRhodes.atan2(dx, dz) - owner.bodyyaw) % 360);
                 if (angle > 1f) {
-                    brain.setActiveActivityIfPossible(Activity.INVESTIGATE);
+                    brain.addActivity(Activity.INVESTIGATE, 0, ImmutableList.of(new RotateToTarget((int) Mth.abs(angle), true)));
                 } else if (angle < -1f) {
-                    brain.setActiveActivityIfPossible(Activity.INVESTIGATE);
+                    brain.addActivity(Activity.INVESTIGATE, 0, ImmutableList.of(new RotateToTarget((int) Mth.abs(angle), false)));
                 } else {
                     float d = Mth.abs(dx) + Mth.abs(dz);
                     if (d < 5) {
@@ -88,9 +89,9 @@ public class IdleBrain extends Behavior<EntityRhodes> {
                 float dz = (float) (t.getZ() - owner.getZ());
                 float angle = ((EntityRhodes.atan2(dx, dz) - owner.bodyyaw) % 360);
                 if (angle > 1 && random.nextBoolean()) {
-                    brain.setActiveActivityIfPossible(Activity.INVESTIGATE);
+                    brain.addActivity(Activity.INVESTIGATE, 0, ImmutableList.of(new RotateToTarget((int) Mth.abs(angle), true)));
                 } else if (angle < -1 && random.nextBoolean()) {
-                    brain.setActiveActivityIfPossible(Activity.INVESTIGATE);
+                    brain.addActivity(Activity.INVESTIGATE, 0, ImmutableList.of(new RotateToTarget((int) Mth.abs(angle), false)));
                 } else {
                     if (random.nextInt(20) < (owner.endangered ? 2 : 1)) {
                         brain.setActiveActivityIfPossible(Activities.SHOOT_AND_ROTATE.get());

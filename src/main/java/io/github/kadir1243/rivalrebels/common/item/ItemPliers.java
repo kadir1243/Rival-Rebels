@@ -21,14 +21,11 @@ import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemInstance;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.jspecify.annotations.Nullable;
 
 public class ItemPliers extends Item
 {
@@ -40,8 +37,8 @@ public class ItemPliers extends Item
 	}
 
     @Override
-    public @Nullable ItemStackTemplate getCraftingRemainder(ItemInstance instance) {
-        return ItemStackTemplate.fromNonEmptyStack(this.getDefaultInstance());
+    public ItemStack getCraftingRemainder(ItemStack itemStack) {
+        return this.getDefaultInstance();
     }
 
     @Override
@@ -53,12 +50,12 @@ public class ItemPliers extends Item
             Block block = level.getBlockState(pos).getBlock();
             if (block == RRBlocks.jump.get() && player.isCreative()) {
                 CommandHotPotato.pos = pos.above(400);
-				player.sendSystemMessage(Component.nullToEmpty("Hot Potato drop point set. Use /rrhotpotato to start a round."));
+				player.displayClientMessage(Component.nullToEmpty("Hot Potato drop point set. Use /rrhotpotato to start a round."), false);
 			}
 			if (block == RRBlocks.remotecharge.get()) {
 				int t = 25;
 				i = i + 1;
-				player.sendSystemMessage(Translations.defuse().append(" %" + i * 100 / t));
+				player.displayClientMessage(Translations.defuse().append(" %" + i * 100 / t), false);
 				if (i >= t) {
                     Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), RRBlocks.remotecharge.toStack());
 					level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -69,7 +66,7 @@ public class ItemPliers extends Item
 			if (block == RRBlocks.timedbomb.get()) {
 				int t = 25;
 				i = i + 1;
-				player.sendSystemMessage(Translations.defuse().append(" %" + i * 100 / t));
+				player.displayClientMessage(Translations.defuse().append(" %" + i * 100 / t), false);
 				if (i >= t) {
                     Containers.dropItemStack(level, pos.getX(), pos.getY(), pos.getZ(), RRBlocks.timedbomb.toStack());
                     level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
@@ -80,7 +77,7 @@ public class ItemPliers extends Item
 			}
 			if (block instanceof BlockAutoTemplate worldBlock) {
                 i = i + 1;
-				player.sendSystemMessage(Translations.status().append(" ").append(Translations.BUILDING.translate(i * 100 / worldBlock.time)));
+				player.displayClientMessage(Translations.status().append(" ").append(Translations.BUILDING.translate(i * 100 / worldBlock.time)), false);
 				if (i >= worldBlock.time) {
                     level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 					worldBlock.build(level, pos.getX(), pos.getY(), pos.getZ());
@@ -91,7 +88,7 @@ public class ItemPliers extends Item
 			if (block == RRBlocks.supplies.get() && level.getBlockState(pos.below()).is(RRBlocks.supplies))
 			{
 				i++;
-				player.sendSystemMessage(Translations.status().append(" ").append(Translations.BUILDING_TOKAMAK.translate(i * 100 / 15)));
+				player.displayClientMessage(Translations.status().append(" ").append(Translations.BUILDING_TOKAMAK.translate(i * 100 / 15)), false);
 				if (i >= 15)
 				{
                     level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());

@@ -16,9 +16,7 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.util.CommonColors;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
@@ -161,8 +159,8 @@ public class ModelObjective {
         QuadHelper.addFace(buffer, rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1);
     });
 
-	public static void renderA(PoseStack.Pose pose, VertexConsumer buffer, int light, int overlay) {
-        ObjModels.render(BAKED_MODEL_A.get().quadCollection(), buffer, pose, CommonColors.WHITE, light, overlay);
+	public static void renderA(PoseStack matrices, VertexConsumer buffer, int light, int overlay) {
+        ModelBlockRenderer.renderModel(matrices.last(), buffer, BAKED_MODEL_A.get().blockStateModel(), 1, 1, 1, light, overlay);
 	}
 
 	private static final Vector3f	vfront1	= new Vector3f(0.5f, 0.3125f, 0.3125f);
@@ -175,21 +173,19 @@ public class ModelObjective {
 	private static final Vector3f	vcside4	= new Vector3f(-0.125f, -0.3125f, -0.3125f);
 	private static final Vector3f	vcside5	= new Vector3f(-0.125f, 0.3125f, -0.3125f);
 
-	public static void renderB(PoseStack matrices, SubmitNodeCollector nodeCollector, RenderType renderType, float slide, float x, float y, float X, float Y, int light, int overlay)
+	public static void renderB(PoseStack matrices, VertexConsumer buffer, float slide, float x, float y, float X, float Y, int light, int overlay)
 	{
 		matrices.pushPose();
 		matrices.translate(slide, 0, 0);
-        nodeCollector.submitCustomGeometry(matrices, renderType, (pose, consumer) -> {
-            addFace(pose, consumer, vfront3, vfront4, vfront1, vfront2, x, y, light, overlay);
-            addFace(pose, consumer, vcside3, vfront2, vfront1, vcside2, X, Y, light, overlay);
-            addFace(pose, consumer, vcside5, vfront4, vfront3, vcside4, X, Y, light, overlay);
-            addFace(pose, consumer, vcside2, vfront1, vfront4, vcside5, X, Y, light, overlay);
-            addFace(pose, consumer, vcside4, vfront3, vfront2, vcside3, X, Y, light, overlay);
-        });
+		addFace(matrices, buffer, vfront3, vfront4, vfront1, vfront2, x, y, light, overlay);
+		addFace(matrices, buffer, vcside3, vfront2, vfront1, vcside2, X, Y, light, overlay);
+		addFace(matrices, buffer, vcside5, vfront4, vfront3, vcside4, X, Y, light, overlay);
+		addFace(matrices, buffer, vcside2, vfront1, vfront4, vcside5, X, Y, light, overlay);
+		addFace(matrices, buffer, vcside4, vfront3, vfront2, vcside3, X, Y, light, overlay);
 		matrices.popPose();
 	}
 
-	private static void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x, float y, int light, int overlay) {
+	private static void addFace(PoseStack pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float x, float y, int light, int overlay) {
         RenderHelper.addFace(pose, buffer, v1, v2, v3, v4, x + 0.078125f, x - 0.15625f, y - 0.15625f, y + 0.15625f, light, overlay);
     }
 }

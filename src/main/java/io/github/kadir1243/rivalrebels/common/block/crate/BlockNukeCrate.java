@@ -37,7 +37,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.redstone.Orientation;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 public class BlockNukeCrate extends BaseEntityBlock {
     public static final MapCodec<BlockNukeCrate> CODEC = simpleCodec(BlockNukeCrate::new);
@@ -348,12 +348,12 @@ public class BlockNukeCrate extends BaseEntityBlock {
 				}
 				else if (!level.isClientSide())
 				{
-                    player.sendSystemMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" ").append(RRItems.pliers.toStack().getItemName()));
+                    player.displayClientMessage(Translations.orders().append(" ").append(Component.translatable("RivalRebels.message.use")).append(" ").append(RRItems.pliers.get().getName()), false);
 				}
 			}
 			else if (!level.isClientSide())
 			{
-				player.sendSystemMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.translate().withStyle(ChatFormatting.RED)));
+				player.displayClientMessage(Translations.orders().append(" ").append(Translations.USE_PLIERS_TO_BUILD_TRANSLATION.translate().withStyle(ChatFormatting.RED)), false);
 			}
 		}
 		return InteractionResult.FAIL;

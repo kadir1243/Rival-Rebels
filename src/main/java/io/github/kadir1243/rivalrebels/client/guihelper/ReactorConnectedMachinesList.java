@@ -1,15 +1,14 @@
 package io.github.kadir1243.rivalrebels.client.guihelper;
 
-import com.mojang.blaze3d.platform.InputConstants;
-import net.minecraft.client.gui.GuiGraphicsExtractor;
-import net.minecraft.client.input.MouseButtonEvent;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractSelectionList;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.Block;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.Objects;
 
@@ -58,20 +57,20 @@ public class ReactorConnectedMachinesList extends AbstractSelectionList<ReactorC
         }
 
         @Override
-        public boolean mouseClicked(MouseButtonEvent event, boolean isDoubleClick) {
-            if (isMouseOver(event.x(), event.y()) && event.button() == InputConstants.MOUSE_BUTTON_LEFT) {
+        public boolean mouseClicked(double mouseX, double mouseY, int button) {
+            if (isMouseOver(mouseX, mouseY) && button == GLFW.GLFW_MOUSE_BUTTON_LEFT) {
                 switchEnabledState();
                 return true;
             }
 
-            return super.mouseClicked(event, isDoubleClick);
+            return super.mouseClicked(mouseX, mouseY, button);
         }
 
         @Override
-        public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float a) {
+        public void render(GuiGraphics graphics, int index, int top, int left, int width, int height, int mouseX, int mouseY, boolean hovering, float partialTick) {
             float alpha = 0.5f;
             if (onMachine) alpha = 1;
-            graphics.item(machine.asItem().getDefaultInstance(), getContentX() + getWidth() / 2 - 13, getContentY());
+            graphics.renderItem(machine.asItem().getDefaultInstance(), left + width / 2 - 13, top);
         }
 
         @Override

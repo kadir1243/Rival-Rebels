@@ -87,7 +87,7 @@ public class BlockLandMine extends FallingBlock
 	}
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
 		if (entity instanceof Player || entity instanceof Mob || entity instanceof EntityRoddiskRegular || entity instanceof EntityRoddiskRebel || entity instanceof EntityRoddiskOfficer || entity instanceof EntityRoddiskLeader) {
 			level.setBlockAndUpdate(pos, state.setValue(UNSTABLE, true));
 			level.scheduleTick(pos, this, 5);

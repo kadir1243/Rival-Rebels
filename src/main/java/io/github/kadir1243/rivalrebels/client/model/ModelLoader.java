@@ -14,9 +14,8 @@ package io.github.kadir1243.rivalrebels.client.model;
 import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.util.CommonColors;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.block.ModelBlockRenderer;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import org.joml.Vector3f;
@@ -158,8 +157,8 @@ public class ModelLoader
         QuadHelper.addFace(buffer, rloader6, rloader5, rloader8, rloader7, rs12, rs11, rs2, rs1);
     });
 
-	public static void renderA(SubmitNodeCollector nodeCollector, RenderType renderType, PoseStack matrices, int light, int overlay) {
-        ObjModels.submit(nodeCollector, renderType, BAKED_MODEL_A.get().quadCollection(), matrices, CommonColors.WHITE, light, overlay);
+	public static void renderA(VertexConsumer buffer, PoseStack matrices, int light, int overlay) {
+        ModelBlockRenderer.renderModel(matrices.last(), buffer, BAKED_MODEL_A.get().blockStateModel(), 1, 1, 1, light, overlay);
 	}
 
 	private static final TextureVertice	front1	= new TextureVertice(70f / 256f, 24f / 128f);
@@ -228,15 +227,15 @@ public class ModelLoader
         QuadHelper.addFace(buffer, vfront2, vcside3, vcside4, vfront3, ctop2, ctop3, ctop4, ctop1);
     });
 
-	public static void renderB(SubmitNodeCollector nodeCollector, RenderType renderType, PoseStack matrices, float slide, int light, int overlay) {
+	public static void renderB(VertexConsumer buffer, PoseStack matrices, float slide, int light, int overlay) {
 		matrices.pushPose();
 		matrices.translate(slide * 0.9f, 0, 0);
-        ObjModels.submit(nodeCollector, renderType, BAKED_MODEL_B.get().quadCollection(), matrices, CommonColors.WHITE, light, overlay);
+        ModelBlockRenderer.renderModel(matrices.last(), buffer, BAKED_MODEL_B.get().blockStateModel(), 1, 1, 1, light, overlay);
         matrices.popPose();
 	}
 
-    public static void render(SubmitNodeCollector nodeCollector, RenderType renderType, PoseStack matrices, float slide, int light, int overlay) {
-        renderA(nodeCollector, renderType, matrices, light, overlay);
-        renderB(nodeCollector, renderType, matrices, slide, light, overlay);
+    public static void render(VertexConsumer buffer, PoseStack matrices, float slide, int light, int overlay) {
+        renderA(buffer, matrices, light, overlay);
+        renderB(buffer, matrices, slide, light, overlay);
     }
 }

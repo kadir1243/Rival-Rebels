@@ -14,14 +14,13 @@ package io.github.kadir1243.rivalrebels.client.renderentity;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.entity.EntityGasGrenade;
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
-import net.minecraft.client.renderer.rendertype.RenderType;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
@@ -29,15 +28,15 @@ import net.minecraft.util.CommonColors;
 
 @OnlyIn(Dist.CLIENT)
 public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade, RenderGasGrenade.State> {
-    private static final RenderType RENDER_LAYER = RenderTypes.entitySolid(RRIdentifiers.etgasgrenade);
+    private static final RenderType RENDER_LAYER = RenderType.entitySolid(RRIdentifiers.etgasgrenade);
 
     public RenderGasGrenade(EntityRendererProvider.Context renderManager) {
         super(renderManager);
     }
 
     @Override
-    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
-        poseStack.pushPose();
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90));
 		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
         byte var11 = 0;
@@ -51,32 +50,28 @@ public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade, RenderGas
 		float var19 = (10 + var11 * 10) / 32.0F;
 		float var20 = 0.05625F;
         int overlay = OverlayTexture.NO_OVERLAY;
-        int packedLight = renderState.lightCoords;
 
+        VertexConsumer buffer = bufferSource.getBuffer(RENDER_LAYER);
         poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
 		poseStack.scale(var20, var20, var20);
 		poseStack.translate(-4.0F, 0.0F, 0.0F);
         int defaultColor = CommonColors.WHITE;
-        nodeCollector.submitCustomGeometry(poseStack, RENDER_LAYER, (pose, consumer) -> {
-            consumer.addVertex(pose, -7, -2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0F, 0F);
-            consumer.addVertex(pose, -7, -2, 2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0.0F, 0.0F);
-            consumer.addVertex(pose, -7, 2, 2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0.0F, 0.0F);
-            consumer.addVertex(pose, -7, 2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0.0F, 0.0F);
+        buffer.addVertex(poseStack.last(), -7, -2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0F, 0F);
+		buffer.addVertex(poseStack.last(), -7, -2,  2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0.0F, 0.0F);
+		buffer.addVertex(poseStack.last(), -7,  2,  2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0.0F, 0.0F);
+        buffer.addVertex(poseStack.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), var20, 0.0F, 0.0F);
 
-            consumer.addVertex(pose, -7, 2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
-            consumer.addVertex(pose, -7, 2, 2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
-            consumer.addVertex(pose, -7, -2, 2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
-            consumer.addVertex(pose, -7, -2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
-        });
+        buffer.addVertex(poseStack.last(), -7,  2, -2).setColor(defaultColor).setUv(var16, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
+		buffer.addVertex(poseStack.last(), -7,  2,  2).setColor(defaultColor).setUv(var17, var18).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
+		buffer.addVertex(poseStack.last(), -7, -2,  2).setColor(defaultColor).setUv(var17, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
+		buffer.addVertex(poseStack.last(), -7, -2, -2).setColor(defaultColor).setUv(var16, var19).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), -var20, 0.0F, 0.0F);
 
 		for (int var23 = 0; var23 < 4; ++var23) {
 			poseStack.mulPose(Axis.XP.rotationDegrees(90));
-            nodeCollector.submitCustomGeometry(poseStack, RENDER_LAYER, (pose, consumer) -> {
-                consumer.addVertex(pose, -8, -2, 0).setColor(defaultColor).setUv(var12, var14).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
-                consumer.addVertex(pose,  8, -2, 0).setColor(defaultColor).setUv(var13, var14).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
-                consumer.addVertex(pose,  8,  2, 0).setColor(defaultColor).setUv(var13, var15).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
-                consumer.addVertex(pose, -8,  2, 0).setColor(defaultColor).setUv(var12, var15).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
-            });
+			buffer.addVertex(poseStack.last(), -8, -2, 0).setColor(defaultColor).setUv(var12, var14).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
+			buffer.addVertex(poseStack.last(),  8, -2, 0).setColor(defaultColor).setUv(var13, var14).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
+			buffer.addVertex(poseStack.last(),  8,  2, 0).setColor(defaultColor).setUv(var13, var15).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
+			buffer.addVertex(poseStack.last(), -8,  2, 0).setColor(defaultColor).setUv(var12, var15).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
 		}
 
 		poseStack.popPose();

@@ -42,10 +42,10 @@ public class ItemExPill extends Item
 		player.startUsingItem(hand);
 		if (!world.isClientSide())
 		{
-			int random = world.getRandom().nextInt(100);
+			int random = world.random.nextInt(100);
 			if (random >= 40)
 			{
-				player.sendSystemMessage(Translations.status().append(" ").append(Component.literal("The experiment turned out a success.").withStyle(ChatFormatting.YELLOW)));
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("The experiment turned out a success.").withStyle(ChatFormatting.YELLOW)), true);
 				player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
 				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
@@ -54,7 +54,7 @@ public class ItemExPill extends Item
 			}
 			else if (random >= 30)
 			{
-				player.sendSystemMessage(Translations.status().append(" ").append(Component.literal("Begrüßen Sie den Uber-Soldat.").withStyle(ChatFormatting.YELLOW)));
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Begrüßen Sie den Uber-Soldat.").withStyle(ChatFormatting.YELLOW)), true);
                 player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
 				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.BLINDNESS, 30, 20));
@@ -70,14 +70,14 @@ public class ItemExPill extends Item
 			}
 			else if (random >= 20)
 			{
-				player.sendSystemMessage(Translations.status().append(" ").append(Component.literal("The test subject has perished.").withStyle(ChatFormatting.YELLOW)));
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("The test subject has perished.").withStyle(ChatFormatting.YELLOW)), true);
 				player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
 				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.hurt(RivalRebelsDamageSource.cyanide(world), 2000);
 			}
 			else
 			{
-				player.sendSystemMessage(Translations.status().append(" ").append(Component.literal("Unexpected results have occurred.").withStyle(ChatFormatting.YELLOW)));
+				player.displayClientMessage(Translations.status().append(" ").append(Component.literal("Unexpected results have occurred.").withStyle(ChatFormatting.YELLOW)), true);
 				player.playSound(SoundEvents.MAGMA_CUBE_JUMP, 1.0F, 1.0F);
 				player.playSound(SoundEvents.GHAST_SCREAM, 1.0F, 1.0F);
 				player.addEffect(new MobEffectInstance(MobEffects.NAUSEA, 1500, 20));

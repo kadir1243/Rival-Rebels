@@ -15,24 +15,23 @@ import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.client.model.ModelBlastRing;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RenderHelper;
-import io.github.kadir1243.rivalrebels.client.renderhelper.RRRenderTypes;
+import io.github.kadir1243.rivalrebels.client.renderhelper.RenderTypes;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import io.github.kadir1243.rivalrebels.common.entity.EntityNuclearBlast;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.state.EntityRenderState;
-import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.client.renderer.state.level.CameraRenderState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
-import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.lighting.LightEngine;
 import org.joml.Vector3f;
@@ -52,14 +51,14 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast, Rende
 	}
 
     @Override
-    public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
-        poseStack.pushPose();
-        int packedLight = renderState.lightCoords;
+    public void render(State renderState, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight) {
+		poseStack.pushPose();
 
         if (renderState.ageInTicks < 600) {
-            ModelBlastRing.renderModel(poseStack, nodeCollector, RenderTypes.solidMovingBlock(), RRConfig.CLIENT.getShroomScale() * ring1 * 15, 64, 4, 0.5f, 0, 0, 0, 0F, -3F, 0F, packedLight);
-			ModelBlastRing.renderModel(poseStack, nodeCollector, RenderTypes.solidMovingBlock(), RRConfig.CLIENT.getShroomScale() * ring2, 32, 1, 0.5f, 0, 0, 0, 0F, height + ring3, 0F, packedLight);
-			ModelBlastRing.renderModel(poseStack, nodeCollector, RenderTypes.solidMovingBlock(), RRConfig.CLIENT.getShroomScale() * ring3, 32, 2, 0.5f, 0, 0, 0, 0F, height + 7 + ring2, 0F, packedLight);
+            VertexConsumer buffer = bufferSource.getBuffer(RenderType.solid());
+            ModelBlastRing.renderModel(poseStack, buffer, RRConfig.CLIENT.getShroomScale() * ring1 * 15, 64, 4, 0.5f, 0, 0, 0, 0F, -3F, 0F, packedLight);
+			ModelBlastRing.renderModel(poseStack, buffer, RRConfig.CLIENT.getShroomScale() * ring2, 32, 1, 0.5f, 0, 0, 0, 0F, height + ring3, 0F, packedLight);
+			ModelBlastRing.renderModel(poseStack, buffer, RRConfig.CLIENT.getShroomScale() * ring3, 32, 2, 0.5f, 0, 0, 0, 0F, height + 7 + ring2, 0F, packedLight);
 			if (renderState.ageInTicks > 550) {
 				ring2 += 0.1F;
 				ring3 += 0.1F;
@@ -87,12 +86,14 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast, Rende
 		poseStack.scale(RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale(),RRConfig.CLIENT.getShroomScale());
 		poseStack.scale(0.5F + (float) renderState.deltaMovement.y() * 0.3F, 2.6F + (float) renderState.deltaMovement.y() * 0.3F, 0.5F + (float) renderState.deltaMovement.y() * 0.3F);
 
-        Identifier identifier;
+        ResourceLocation identifier;
         if (renderState.deltaMovement.x() == 1) {
 			identifier = RRIdentifiers.ettroll;
 		} else {
 			identifier = RRIdentifiers.etradiation;
 		}
+
+        VertexConsumer quadSolid = bufferSource.getBuffer(RenderType.entitySolid(identifier));
 
         int size = (int) (renderState.deltaMovement.y());
 
@@ -160,106 +161,109 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast, Rende
 
 		int time = size * 10;
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(identifier), (pose, consumer) -> {
-            if (renderState.ageInTicks > 0 && renderState.ageInTicks < 600 + time) {
-                addFace(pose, consumer, pxv1, nzv1, nzv2, pxv2, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, pzv1, pxv1, pxv2, pzv2, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nxv1, pzv1, pzv2, nxv2, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nzv1, nxv1, nxv2, nzv2, par5, par6, par7, par8, packedLight);
-            }
+		if (renderState.ageInTicks > 0 && renderState.ageInTicks < 600 + time)
+		{
+			addFace(poseStack, quadSolid, pxv1, nzv1, nzv2, pxv2, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, pzv1, pxv1, pxv2, pzv2, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nxv1, pzv1, pzv2, nxv2, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nzv1, nxv1, nxv2, nzv2, par5, par6, par7, par8, packedLight);
+		}
 
-            if (renderState.ageInTicks > 10 && renderState.ageInTicks < 610 + time) {
-                addFace(pose, consumer, pxv2, nzv2, nzv3, pxv3, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, pzv2, pxv2, pxv3, pzv3, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nxv2, pzv2, pzv3, nxv3, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nzv2, nxv2, nxv3, nzv3, par5, par6, par7, par8, packedLight);
-            }
+		if (renderState.ageInTicks > 10 && renderState.ageInTicks < 610 + time)
+		{
+			addFace(poseStack, quadSolid, pxv2, nzv2, nzv3, pxv3, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, pzv2, pxv2, pxv3, pzv3, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nxv2, pzv2, pzv3, nxv3, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nzv2, nxv2, nxv3, nzv3, par5, par6, par7, par8, packedLight);
+		}
 
-            if (renderState.ageInTicks > 20 && renderState.ageInTicks < 620 + time) {
-                addFace(pose, consumer, pxv3, nzv3, nzv4, pxv4, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, pzv3, pxv3, pxv4, pzv4, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nxv3, pzv3, pzv4, nxv4, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nzv3, nxv3, nxv4, nzv4, par5, par6, par7, par8, packedLight);
-            }
+		if (renderState.ageInTicks > 20 && renderState.ageInTicks < 620 + time)
+		{
+			addFace(poseStack, quadSolid, pxv3, nzv3, nzv4, pxv4, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, pzv3, pxv3, pxv4, pzv4, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nxv3, pzv3, pzv4, nxv4, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nzv3, nxv3, nxv4, nzv4, par5, par6, par7, par8, packedLight);
+		}
 
-            if (renderState.ageInTicks > 30 && renderState.ageInTicks < 630 + time) {
-                addFace(pose, consumer, pxv4, nzv4, nzv5, pxv5, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, pzv4, pxv4, pxv5, pzv5, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nxv4, pzv4, pzv5, nxv5, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nzv4, nxv4, nxv5, nzv5, par5, par6, par7, par8, packedLight);
-            }
+		if (renderState.ageInTicks > 30 && renderState.ageInTicks < 630 + time)
+		{
+			addFace(poseStack, quadSolid, pxv4, nzv4, nzv5, pxv5, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, pzv4, pxv4, pxv5, pzv5, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nxv4, pzv4, pzv5, nxv5, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nzv4, nxv4, nxv5, nzv5, par5, par6, par7, par8, packedLight);
+		}
 
-            if (renderState.ageInTicks > 40 && renderState.ageInTicks < 640 + time) {
-                addFace(pose, consumer, pxv5, nzv5, nzv6, pxv6, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, pzv5, pxv5, pxv6, pzv6, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nxv5, pzv5, pzv6, nxv6, par5, par6, par7, par8, packedLight);
-                addFace(pose, consumer, nzv5, nxv5, nxv6, nzv6, par5, par6, par7, par8, packedLight);
-            }
+		if (renderState.ageInTicks > 40 && renderState.ageInTicks < 640 + time)
+		{
+			addFace(poseStack, quadSolid, pxv5, nzv5, nzv6, pxv6, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, pzv5, pxv5, pxv6, pzv6, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nxv5, pzv5, pzv6, nxv6, par5, par6, par7, par8, packedLight);
+			addFace(poseStack, quadSolid, nzv5, nxv5, nxv6, nzv6, par5, par6, par7, par8, packedLight);
+		}
 
-            if (renderState.ageInTicks > 30 && renderState.ageInTicks < 650 + time) {
-                addFace(pose, consumer, pxv6, nzv6, nzv7, pxv7, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, pzv6, pxv6, pxv7, pzv7, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nxv6, pzv6, pzv7, nxv7, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nzv6, nxv6, nxv7, nzv7, par6, par5, par8, par7, packedLight);
-            }
+		if (renderState.ageInTicks > 30 && renderState.ageInTicks < 650 + time)
+		{
+			addFace(poseStack, quadSolid, pxv6, nzv6, nzv7, pxv7, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, pzv6, pxv6, pxv7, pzv7, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nxv6, pzv6, pzv7, nxv7, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nzv6, nxv6, nxv7, nzv7, par6, par5, par8, par7, packedLight);
+		}
 
-            if (renderState.ageInTicks > 20 && renderState.ageInTicks < 650 + time) {
-                addFace(pose, consumer, pzv7, ppv7, ppv8, pzv8, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, ppv7, pxv7, pxv8, ppv8, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, pxv7, pnv7, pnv8, pxv8, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, pnv7, nzv7, nzv8, pnv8, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nzv7, nnv7, nnv8, nzv8, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nnv7, nxv7, nxv8, nnv8, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nxv7, npv7, npv8, nxv8, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, npv7, pzv7, pzv8, npv8, par6, par5, par8, par7, packedLight);
-            }
-        });
+		if (renderState.ageInTicks > 20 && renderState.ageInTicks < 650 + time)
+		{
+			addFace(poseStack, quadSolid, pzv7, ppv7, ppv8, pzv8, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, ppv7, pxv7, pxv8, ppv8, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, pxv7, pnv7, pnv8, pxv8, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, pnv7, nzv7, nzv8, pnv8, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nzv7, nnv7, nnv8, nzv8, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nnv7, nxv7, nxv8, nnv8, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nxv7, npv7, npv8, nxv8, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, npv7, pzv7, pzv8, npv8, par6, par5, par8, par7, packedLight);
+		}
+
 		if (renderState.ageInTicks > 10 && renderState.ageInTicks < 650 + time)
 		{
-            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(identifier), (pose, consumer) -> {
-                addFace(pose, consumer, pzv8, ppv8, ppv9, pzv9, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, ppv8, pxv8, pxv9, ppv9, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, pxv8, pnv8, pnv9, pxv9, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, pnv8, nzv8, nzv9, pnv9, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nzv8, nnv8, nnv9, nzv9, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nnv8, nxv8, nxv9, nnv9, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, nxv8, npv8, npv9, nxv9, par6, par5, par8, par7, packedLight);
-                addFace(pose, consumer, npv8, pzv8, pzv9, npv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, pzv8, ppv8, ppv9, pzv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, ppv8, pxv8, pxv9, ppv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, pxv8, pnv8, pnv9, pxv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, pnv8, nzv8, nzv9, pnv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nzv8, nnv8, nnv9, nzv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nnv8, nxv8, nxv9, nnv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, nxv8, npv8, npv9, nxv9, par6, par5, par8, par7, packedLight);
+			addFace(poseStack, quadSolid, npv8, pzv8, pzv9, npv9, par6, par5, par8, par7, packedLight);
 
-                addFace(pose, consumer, pxv6, pzv6, nxv6, nzv6, par6, par5, par8, par7, packedLight);
-            });
+			addFace(poseStack, quadSolid, pxv6, pzv6, nxv6, nzv6, par6, par5, par8, par7, packedLight);
 
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.RENDER_SOLID_TRIANGLES.apply(identifier), (pose, consumer) -> {
-                addTri(pose, consumer, ppv9, v9, pzv9, par6, par5, par8, par7, packedLight);
-                addTri(pose, consumer, pxv9, v9, ppv9, par6, par5, par8, par7, packedLight);
-                addTri(pose, consumer, pnv9, v9, pxv9, par6, par5, par8, par7, packedLight);
-                addTri(pose, consumer, nzv9, v9, pnv9, par6, par5, par8, par7, packedLight);
-                addTri(pose, consumer, nnv9, v9, nzv9, par6, par5, par8, par7, packedLight);
-                addTri(pose, consumer, nxv9, v9, nnv9, par6, par5, par8, par7, packedLight);
-                addTri(pose, consumer, npv9, v9, nxv9, par6, par5, par8, par7, packedLight);
-                addTri(pose, consumer, pzv9, v9, npv9, par6, par5, par8, par7, packedLight);
-            });
+            VertexConsumer triangleSolid = bufferSource.getBuffer(RenderTypes.RENDER_SOLID_TRIANGLES.apply(identifier));
+			addTri(poseStack, triangleSolid, ppv9, v9, pzv9, par6, par5, par8, par7, packedLight);
+			addTri(poseStack, triangleSolid, pxv9, v9, ppv9, par6, par5, par8, par7, packedLight);
+			addTri(poseStack, triangleSolid, pnv9, v9, pxv9, par6, par5, par8, par7, packedLight);
+			addTri(poseStack, triangleSolid, nzv9, v9, pnv9, par6, par5, par8, par7, packedLight);
+			addTri(poseStack, triangleSolid, nnv9, v9, nzv9, par6, par5, par8, par7, packedLight);
+			addTri(poseStack, triangleSolid, nxv9, v9, nnv9, par6, par5, par8, par7, packedLight);
+			addTri(poseStack, triangleSolid, npv9, v9, nxv9, par6, par5, par8, par7, packedLight);
+			addTri(poseStack, triangleSolid, pzv9, v9, npv9, par6, par5, par8, par7, packedLight);
 		}
 
 		poseStack.popPose();
 		poseStack.popPose();
 	}
 
-	private void addFace(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float t1, float t2, float t3, float t4, int light) {
-		addVertice(pose, buffer, v1, t1, t4, light);
-		addVertice(pose, buffer, v2, t2, t4, light);
-		addVertice(pose, buffer, v3, t2, t3, light);
-		addVertice(pose, buffer, v4, t1, t3, light);
+	private void addFace(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, Vector3f v4, float t1, float t2, float t3, float t4, int light) {
+		addVertice(poseStack, buffer, v1, t1, t4, light);
+		addVertice(poseStack, buffer, v2, t2, t4, light);
+		addVertice(poseStack, buffer, v3, t2, t3, light);
+		addVertice(poseStack, buffer, v4, t1, t3, light);
 	}
 
-	private void addTri(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, float t1, float t2, float t3, float t4, int light) {
-		addVertice(pose, buffer, v3, t1, t4, light);
-		addVertice(pose, buffer, v1, t2, t4, light);
-		addVertice(pose, buffer, v2, t2, t3, light);
+	private void addTri(PoseStack poseStack, VertexConsumer buffer, Vector3f v1, Vector3f v2, Vector3f v3, float t1, float t2, float t3, float t4, int light) {
+		addVertice(poseStack, buffer, v3, t1, t4, light);
+		addVertice(poseStack, buffer, v1, t2, t4, light);
+		addVertice(poseStack, buffer, v2, t2, t3, light);
 	}
 
-	private void addVertice(PoseStack.Pose pose, VertexConsumer buffer, Vector3f v, float t, float t2, int light) {
-        RenderHelper.addVertice(pose, buffer, v, new TextureVertice(t, t2), light, OverlayTexture.NO_OVERLAY);
+	private void addVertice(PoseStack poseStack, VertexConsumer buffer, Vector3f v, float t, float t2, int light) {
+        RenderHelper.addVertice(poseStack, buffer, v, new TextureVertice(t, t2), light, OverlayTexture.NO_OVERLAY);
 	}
 
     @Override

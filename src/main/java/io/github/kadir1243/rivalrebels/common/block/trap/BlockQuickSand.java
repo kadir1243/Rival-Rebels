@@ -31,10 +31,10 @@ public class BlockQuickSand extends Block
 	}
 
     @Override
-    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
+    protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier p_405359_) {
 		entity.fallDistance = 0.0F;
         entity.setDeltaMovement(entity.getDeltaMovement().multiply(1, 0.005, 1));
-		if (level.getRandom().nextFloat() > 0.95) level.playSound(entity, pos, RRSounds.QUICK_SAND.get(), SoundSource.BLOCKS, 0.2F, 1);
+		if (level.random.nextFloat() > 0.95) level.playSound(entity, pos, RRSounds.QUICK_SAND.get(), SoundSource.BLOCKS, 0.2F, 1);
 	}
 
 	/*@Override
