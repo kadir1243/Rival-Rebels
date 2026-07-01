@@ -35,7 +35,7 @@ public class RRRenderTypes {
             .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
             .withPrimitiveTopology(PrimitiveTopology.QUADS)
             .withDepthStencilState(DepthStencilState.DEFAULT)
-            .withLocation("pipeline/lightning_astro_blast_pipeline_" + RRIdentifiers.MODID)
+            .withLocation(RRIdentifiers.create("pipeline/lightning_astro_blast_pipeline"))
             .build();
     public static final RenderPipeline COLOR_WRITE_TRI =
         RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
@@ -45,7 +45,7 @@ public class RRRenderTypes {
             .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
             .withPrimitiveTopology(PrimitiveTopology.TRIANGLE_FAN)
             .withDepthStencilState(DepthStencilState.DEFAULT)
-            .withLocation("pipeline/color_write_tri_" + RRIdentifiers.MODID)
+            .withLocation(RRIdentifiers.create("pipeline/color_write_tri"))
             .build();
     public static final RenderType LIGHTNING_ASTRO_BLAST = RenderType.create(
         RRIdentifiers.MODID+"_lightning_astro_blast",
@@ -55,24 +55,33 @@ public class RRRenderTypes {
         RRIdentifiers.MODID+"_lightning_astro_blast_triangles",
         RenderSetup.builder(COLOR_WRITE_TRI).createRenderSetup()
     );
-    public static final RenderPipeline CELLULAR_NOISE_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-        .withLocation("pipeline/cellular_noise_" + RRIdentifiers.MODID)
+    public static final RenderPipeline CELLULAR_NOISE_PIPELINE = RenderPipeline.builder()
+        .withVertexShader("core/entity")
+        .withFragmentShader("core/entity")
+        .withLocation(RRIdentifiers.create("pipeline/cellular_noise"))
         .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR_TEX_LIGHTMAP)
         .withPrimitiveTopology(PrimitiveTopology.QUADS)
+        .withDepthStencilState(DepthStencilState.DEFAULT)
         .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
         .build();
     public static final RenderType CELLULAR_NOISE = RenderType.create(
         RRIdentifiers.MODID + "_cellular_noise",
         RenderSetup.builder(CELLULAR_NOISE_PIPELINE).createRenderSetup()
     );
-    public static final RenderPipeline LASER_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-        .withLocation("pipeline/laser_" + RRIdentifiers.MODID)
+    public static final RenderPipeline LASER_PIPELINE = RenderPipeline.builder()
+        .withVertexShader("core/entity")
+        .withFragmentShader("core/entity")
+        .withLocation(RRIdentifiers.create("pipeline/laser"))
         .withCull(true)
         .withColorTargetState(new ColorTargetState(BlendFunction.ADDITIVE))
+        .withPrimitiveTopology(PrimitiveTopology.QUADS)
         .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+        .withDepthStencilState(DepthStencilState.DEFAULT)
         .build();
-    public static final RenderPipeline RHODES_LASER_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-        .withLocation("pipeline/rhodes_laser_" + RRIdentifiers.MODID)
+    public static final RenderPipeline RHODES_LASER_PIPELINE = RenderPipeline.builder()
+        .withVertexShader("core/entity")
+        .withFragmentShader("core/entity")
+        .withLocation(RRIdentifiers.create("pipeline/rhodes_laser"))
         .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
         .withPrimitiveTopology(PrimitiveTopology.TRIANGLES)
         .withColorTargetState(new ColorTargetState(Optional.of(BlendFunction.ADDITIVE), GpuFormat.RGBA8_UNORM, ColorTargetState.WRITE_NONE))
@@ -89,8 +98,7 @@ public class RRRenderTypes {
         RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
             .withVertexBinding(0, DefaultVertexFormat.ENTITY)
             .withPrimitiveTopology(PrimitiveTopology.TRIANGLES)
-            .withLocation("pipeline/entity_solid_tri_" + RRIdentifiers.MODID)
-            .withBindGroupLayout(BindGroupLayouts.SAMPLER0)
+            .withLocation(RRIdentifiers.create("pipeline/entity_solid_tri"))
             .build();
     public static final VertexFormat POSITION_COLOR_LIGHTMAP_NORMAL = VertexFormat.builder(0)
         .addAttribute("Position", GpuFormat.RGB32_FLOAT)
@@ -106,7 +114,7 @@ public class RRRenderTypes {
             .withVertexBinding(0, POSITION_COLOR_LIGHTMAP_NORMAL)
             .withPrimitiveTopology(PrimitiveTopology.QUADS)
             .withDepthStencilState(DepthStencilState.DEFAULT)
-            .withLocation("pipeline/blast_sphere_" + RRIdentifiers.MODID)
+            .withLocation(RRIdentifiers.create("pipeline/blast_sphere"))
             .build();
     public static final RenderType MODEL_BLAST_SPHERE = RenderType.create(
         RRIdentifiers.MODID +"_model_blast_sphere",
@@ -124,8 +132,10 @@ public class RRRenderTypes {
             return RenderType.create(RRIdentifiers.MODID + "_render_solid_triangles", rendersetup);
         }
     );
-    public static final RenderPipeline LASER_LINK_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-        .withLocation("pipeline/laser_link_" + RRIdentifiers.MODID)
+    public static final RenderPipeline LASER_LINK_PIPELINE = RenderPipeline.builder()
+        .withVertexShader("core/entity")
+        .withFragmentShader("core/entity")
+        .withLocation(RRIdentifiers.create("pipeline/laser_link"))
         .withVertexShader("core/rendertype_lightning")
         .withFragmentShader("core/rendertype_lightning")
         .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
@@ -138,8 +148,8 @@ public class RRRenderTypes {
         RRIdentifiers.MODID +"_laser_link_entity",
         RenderSetup.builder(LASER_LINK_PIPELINE).createRenderSetup()
     );
-    public static final RenderPipeline ANTIMATTER_BOMB_BLAST_ENTITY_PIPELINE = RenderPipeline.builder(RenderPipelines.ENTITY_SNIPPET)
-        .withLocation("pipeline/antimatter_bomb_blast_entity_" + RRIdentifiers.MODID)
+    public static final RenderPipeline ANTIMATTER_BOMB_BLAST_ENTITY_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
+        .withLocation(RRIdentifiers.create("pipeline/antimatter_bomb_blast_entity"))
         .withVertexShader("core/rendertype_lightning")
         .withFragmentShader("core/rendertype_lightning")
         .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
@@ -153,7 +163,7 @@ public class RRRenderTypes {
         RenderSetup.builder(ANTIMATTER_BOMB_BLAST_ENTITY_PIPELINE).createRenderSetup()
     );
     public static final RenderPipeline LIGHTNING_LINK_PIPELINE = RenderPipeline.builder(RenderPipelines.MATRICES_FOG_SNIPPET)
-        .withLocation("pipeline/lightning_link_" + RRIdentifiers.MODID)
+        .withLocation(RRIdentifiers.create("pipeline/lightning_link"))
         .withVertexShader("core/rendertype_lightning")
         .withFragmentShader("core/rendertype_lightning")
         .withVertexBinding(0, DefaultVertexFormat.POSITION_COLOR)
