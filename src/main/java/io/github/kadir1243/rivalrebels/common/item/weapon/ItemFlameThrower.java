@@ -129,8 +129,8 @@ public class ItemFlameThrower extends Item {
 
     @OnlyIn(Dist.CLIENT)
     public void openGui(ItemStack item) {
-		if (RRClient.USE_KEY.isDown() && Minecraft.getInstance().screen == null) {
-            Minecraft.getInstance().setScreen(new GuiFlameThrower(getMode(item)));
+		if (RRClient.USE_KEY.isDown() && Minecraft.getInstance().gui.screen() == null) {
+            Minecraft.getInstance().gui.setScreen(new GuiFlameThrower(getMode(item)));
 		}
 	}
 

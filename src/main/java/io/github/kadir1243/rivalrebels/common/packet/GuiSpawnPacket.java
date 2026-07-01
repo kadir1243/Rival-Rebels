@@ -35,9 +35,9 @@ public record GuiSpawnPacket() implements CustomPacketPayload {
     public static void onMessage(GuiSpawnPacket packet, IPayloadContext context) {
         RivalRebelsPlayer player = RivalRebels.round.rrplayerlist.getForGameProfile(context.player().getGameProfile());
         if (player.isreset) {
-            Minecraft.getInstance().setScreen(new GuiClass(player.rrclass));
+            Minecraft.getInstance().gui.setScreen(new GuiClass(player.rrclass));
         } else {
-            Minecraft.getInstance().setScreen(new GuiSpawn(player.rrclass));
+            Minecraft.getInstance().gui.setScreen(new GuiSpawn(player.rrclass));
         }
 	}
 }

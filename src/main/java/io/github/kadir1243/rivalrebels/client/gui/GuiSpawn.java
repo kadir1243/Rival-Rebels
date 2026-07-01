@@ -71,9 +71,9 @@ public class GuiSpawn extends Screen {
 		posX = (this.width - xSizeOfTexture) / 2;
 		posY = (this.height - ySizeOfTexture) / 2;
 
-		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, Translations.SELECT_CLASS_TITLE.translate(), button -> this.minecraft.setScreen(new GuiClass(rrclass)));
+		classButton = new GuiButton(posX + 188, posY + 102, 60, 11, Translations.SELECT_CLASS_TITLE.translate(), button -> this.minecraft.gui.setScreen(new GuiClass(rrclass)));
 		resetButton = new GuiButton(posX + 188, posY + 119, 60, 11, Translations.SPAWN_RESET.translate(), button -> {
-            this.minecraft.setScreen(new GuiClass(rrclass));
+            this.minecraft.gui.setScreen(new GuiClass(rrclass));
             Minecraft.getInstance().getConnection().send(ResetPacket.INSTANCE);
         });
 		omegaButton = new GuiButton(posX + 35, posY + 237, 60, 11, Translations.JOIN_OMEGA.translate(), button -> {

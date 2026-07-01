@@ -415,12 +415,12 @@ public class RivalRebelsRound extends SavedData implements CustomPacketPayload {
 	public void updateClient() {
         Minecraft minecraft = Minecraft.getInstance();
         winCountdown--;
-        if (winCountdown == 0 && !fatnuke) minecraft.setScreen(null);//cleargui
-		else if (winCountdown == 400 && !fatnuke) minecraft.setScreen(new GuiNextBattle());//open vote gui
-		else if (winCountdown == 1000) minecraft.setScreen(null);//close gui
+        if (winCountdown == 0 && !fatnuke) minecraft.gui.setScreen(null);//cleargui
+		else if (winCountdown == 400 && !fatnuke) minecraft.gui.setScreen(new GuiNextBattle());//open vote gui
+		else if (winCountdown == 1000) minecraft.gui.setScreen(null);//close gui
 		else if (winCountdown == 1200) { //open winner gui
-            if (lastWinnerTeam == RivalRebelsTeam.OMEGA) minecraft.setScreen(new GuiOmegaWin());
-            else if (lastWinnerTeam == RivalRebelsTeam.SIGMA) minecraft.setScreen(new GuiSigmaWin());
+            if (lastWinnerTeam == RivalRebelsTeam.OMEGA) minecraft.gui.setScreen(new GuiOmegaWin());
+            else if (lastWinnerTeam == RivalRebelsTeam.SIGMA) minecraft.gui.setScreen(new GuiSigmaWin());
             else minecraft.player.sendSystemMessage(Component.literal("Error No Winner ?").withStyle(ChatFormatting.RED));
         }
 	}

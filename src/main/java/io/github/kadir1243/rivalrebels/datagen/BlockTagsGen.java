@@ -5,8 +5,8 @@ import io.github.kadir1243.rivalrebels.RivalRebels;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.references.BlockItemIds;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
 
 import java.util.concurrent.CompletableFuture;
@@ -47,7 +47,7 @@ public class BlockTagsGen extends BlockTagsProvider {
 
         tag(RivalRebels.NUCLEAR_STONE_GENERATEABLE)
             .addTag(BlockTags.BASE_STONE_OVERWORLD)
-            .add(Blocks.COBBLESTONE)
+            .add(BlockItemIds.COBBLESTONE.block())
             .addTag(BlockTags.DIRT);
     }
 }

@@ -28,7 +28,6 @@ import io.github.kadir1243.rivalrebels.common.item.components.RRComponents;
 import io.github.kadir1243.rivalrebels.common.item.weapon.ItemBinoculars;
 import io.github.kadir1243.rivalrebels.common.noise.RivalRebelsCellularNoise;
 import io.github.kadir1243.rivalrebels.common.util.Translations;
-import io.github.kadir1243.rivalrebels.mixin.client.GuiGraphicsAccessor;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
@@ -95,30 +94,35 @@ public class RivalRebelsRenderOverlay {
         int w = graphics.guiWidth();
         int h = graphics.guiHeight();
 
-        ((GuiGraphicsAccessor) graphics).blit(RenderPipelines.GUI_TEXTURED,
+        graphics.blit(
+            RenderPipelines.GUI_TEXTURED,
             RRTextures.guirhodesline.location(),
             0,
-            w,
             h,
             0,
             0,
-            1,
-            0,
-            1,
+            w,
+            -h,
+            1600,
+            900,
+            1600,
+            900,
             ARGB.colorFromFloat(0.5F, 1.0F, 0.0F, 0.0F)
         );
 
-        ((GuiGraphicsAccessor) graphics).blit(
+        graphics.blit(
             RenderPipelines.GUI_TEXTURED,
             RRTextures.guirhodesout,
             0,
-            w,
             h,
-            0,
-            1,
-            0,
-            1,
-            0,
+            1600,
+            900,
+            w,
+            -h,
+            -1600,
+            -900,
+            1600,
+            900,
             ARGB.colorFromFloat(0.333F, 0.0F, 0.0F, 0.0F)
         );
 
@@ -245,17 +249,19 @@ public class RivalRebelsRenderOverlay {
                 1
             );
 
-            ((GuiGraphicsAccessor) graphics).blit(
+            graphics.blit(
                 RenderPipelines.GUI_TEXTURED,
                 RRTextures.guibinocularsoverlay,
                 0,
-                w,
                 h,
                 0,
                 0,
-                1,
-                0,
-                1,
+                w,
+                -h,
+                1600,
+                900,
+                1600,
+                900,
                 ARGB.colorFromFloat(0.5F, 0.333F, 0.333F, 0.333F)
             );
 
@@ -313,17 +319,20 @@ public class RivalRebelsRenderOverlay {
 
             if ((tasks > 0 || carpet > 0) && dist < 10) {
                 float col = (float) (1 - dist / 10);
-                ((GuiGraphicsAccessor) graphics).blit(
+
+                graphics.blit(
                     RenderPipelines.GUI_TEXTURED,
                     ItemBinoculars.c ? RRTextures.guicarpet : RRIdentifiers.ittaskb83,
                     Mth.floor(w * 0.72),
-                    Mth.floor(w * 0.72 + 16),
                     Mth.floor(h * 0.85 + 16),
-                    Mth.floor(h * 0.85),
                     0,
-                    1,
                     0,
-                    1,
+                    16,
+                    -16,
+                    16,
+                    16,
+                    16,
+                    16,
                     ARGB.colorFromFloat(1, col, col, col)
                 );
 

@@ -37,7 +37,7 @@ public class GuiDropdownOption extends Button {
     @Override
     protected void extractContents(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float a) {
         boolean on = t.getMenu().hasWepReqs();
-		int color = ChatFormatting.GRAY.getColor();
+		int color = CommonColors.GRAY;
 		if (on) {
 			RivalRebelsTeam team = RivalRebelsTeam.NONE;
 			if (t.getMenu().getSlot(6).getItem().has(RRComponents.CHIP_DATA)) {

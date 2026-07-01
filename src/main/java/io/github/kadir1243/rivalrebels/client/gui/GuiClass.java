@@ -70,7 +70,7 @@ public class GuiClass extends Screen {
                     break;
             }
         }).bounds(posX + 188, posY + 102, 60, 11).build(GuiButton::new);
-		doneButton = Button.builder(Translations.CLASS_READY.translate(), button -> this.minecraft.setScreen(new GuiSpawn(rrclass)))
+		doneButton = Button.builder(Translations.CLASS_READY.translate(), button -> this.minecraft.gui.setScreen(new GuiSpawn(rrclass)))
             .bounds(posX + 188, posY + 119, 60, 11)
             .build(GuiButton::new);
         gameScroll = (GuiScroll) Button.builder(Component.empty(), button -> {})

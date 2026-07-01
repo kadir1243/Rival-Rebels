@@ -17,12 +17,12 @@ public class EntityTypeTagsGen extends EntityTypeTagsProvider {
     @Override
     protected void addTags(HolderLookup.Provider provider) {
         this.tag(EntityTypeTags.CAN_BREATHE_UNDER_WATER)
-            .add(RREntities.RHODES.get());
+            .add(RREntities.RHODES.getKey());
         this.tag(EntityTypeTags.FREEZE_IMMUNE_ENTITY_TYPES)
-            .add(RREntities.RHODES.get());
+            .add(RREntities.RHODES.getKey());
         this.tag(EntityTypeTags.IGNORES_POISON_AND_REGEN)
-            .add(RREntities.RHODES.get());
+            .add(RREntities.RHODES.getKey());
         this.tag(EntityTypeTags.FALL_DAMAGE_IMMUNE)
-            .add(RREntities.RHODES.get());
+            .add(RREntities.RHODES.getKey());
     }
 }

@@ -24,6 +24,7 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.BlockItemTags;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
@@ -140,7 +141,7 @@ public class NuclearExplosion {
 								{
 									world.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
 								}
-								else if (world.getBlockState(pos.below()).is(BlockTags.LOGS_THAT_BURN))
+								else if (world.getBlockState(pos.below()).is(BlockItemTags.LOGS_THAT_BURN.block()))
 								{
 									world.setBlockAndUpdate(pos, Blocks.FIRE.defaultBlockState());
 								}

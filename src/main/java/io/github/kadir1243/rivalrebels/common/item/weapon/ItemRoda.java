@@ -212,20 +212,20 @@ public class ItemRoda extends Item
             case 8 -> new EntityLaserBurst(world, mx, my, mz);
             case 9 -> new EntityGore(world, mx, my, mz, world.getRandom().nextInt(3), world.getRandom().nextInt(11) + 1);
             case 10 -> new EntityBomb(world, x, y, z, mx, my, mz);
-            case 11 -> EntityType.CREEPER.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
-            case 12 -> EntityType.SNOW_GOLEM.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+            case 11 -> EntityTypes.CREEPER.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+            case 12 -> EntityTypes.SNOW_GOLEM.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             case 13 -> new EntityRoddiskRebel(world);
             case 14 -> new EntitySeekB83(world);
-            case 15 -> EntityType.ZOMBIFIED_PIGLIN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
-            case 16 -> EntityType.ZOMBIE.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+            case 15 -> EntityTypes.ZOMBIFIED_PIGLIN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+            case 16 -> EntityTypes.ZOMBIE.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             case 17 -> new PrimedTnt(world, x, y, z, null);
-            case 18 -> EntityType.IRON_GOLEM.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+            case 18 -> EntityTypes.IRON_GOLEM.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
             case 19 -> {
-                Entity zomb = EntityType.ZOMBIFIED_PIGLIN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+                Entity zomb = EntityTypes.ZOMBIFIED_PIGLIN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
                 zomb.setPos(x, y, z);
                 zomb.setDeltaMovement(velocity);
                 world.addFreshEntity(zomb);
-                Chicken chicken = EntityType.CHICKEN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
+                Chicken chicken = EntityTypes.CHICKEN.create(world, EntitySpawnReason.SPAWN_ITEM_USE);
                 zomb.startRiding(chicken);
                 yield chicken;
             }

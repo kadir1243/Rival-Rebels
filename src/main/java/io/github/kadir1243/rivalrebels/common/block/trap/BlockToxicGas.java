@@ -89,7 +89,7 @@ public class BlockToxicGas extends Block {
 
     @Override
     public void animateTick(BlockState state, Level world, BlockPos pos, RandomSource random) {
-        Vec3 center = pos.getCenter();
+        Vec3 center = Vec3.atCenterOf(pos);
         double x = center.x();
         double y = center.y();
         double z = center.z();

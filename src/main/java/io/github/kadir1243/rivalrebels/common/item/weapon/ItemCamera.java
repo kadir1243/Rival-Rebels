@@ -44,7 +44,7 @@ public class ItemCamera extends Item
                 if (level.isClientSide()) {
                     Minecraft client = Minecraft.getInstance();
                     if (entity == client.player) {
-                        boolean key = InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_B) && client.screen == null;
+                        boolean key = InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_B) && client.gui.screen() == null;
                         if (key != bkey && key) zoomed = !zoomed;
                         bkey = key;
                         if (zoomed) {
@@ -57,7 +57,9 @@ public class ItemCamera extends Item
                             zoom += (client.mouseHandler.ypos() * 0.01f);
                             if (zoom < 10) zoom = 10;
                             if (zoom > 67) zoom = 67;
-                            client.options.hideGui = true;
+                            if (!client.gui.hud.isHidden()) {
+                                client.gui.hud.toggle();
+                            }
                             client.options.fov().set((int) (zoom + (client.options.fov().get() - zoom) * 0.85f));
                             client.options.sensitivity().set((double) (senset * Mth.sqrt(zoom) * 0.1f));
                         }
@@ -67,7 +69,9 @@ public class ItemCamera extends Item
                             {
                                 client.options.fov().set((int) fovset);
                                 client.options.sensitivity().set((double) senset);
-                                client.options.hideGui = false;
+                                if (client.gui.hud.isHidden()) {
+                                    client.gui.hud.toggle();
+                                }
                                 client.options.smoothCamera = false;
                             }
                         }

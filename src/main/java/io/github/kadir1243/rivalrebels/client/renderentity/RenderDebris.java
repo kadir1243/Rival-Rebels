@@ -59,7 +59,7 @@ public class RenderDebris extends EntityRenderer<EntityDebris, FallingBlockRende
 
         poseStack.translate(-0.5, 0.0, -0.5);
         if (state.getRenderShape() != RenderShape.INVISIBLE) {
-            nodeCollector.submitMovingBlock(poseStack, renderState.movingBlockRenderState);
+            nodeCollector.submitMovingBlock(poseStack, renderState.movingBlockRenderState, renderState.outlineColor);
         }
 
         poseStack.popPose();

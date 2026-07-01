@@ -93,8 +93,8 @@ public class ItemTesla extends Item {
     @Override
     public void inventoryTick(ItemStack stack, ServerLevel level, Entity entity, @Nullable EquipmentSlot slot) {
         if (slot != null && level.isClientSide()) {
-            if (RRClient.USE_KEY.isDown() && Minecraft.getInstance().screen == null) {
-                Minecraft.getInstance().setScreen(new GuiTesla(getDegree(stack)));
+            if (RRClient.USE_KEY.isDown() && Minecraft.getInstance().gui.screen() == null) {
+                Minecraft.getInstance().gui.setScreen(new GuiTesla(getDegree(stack)));
             }
         }
     }

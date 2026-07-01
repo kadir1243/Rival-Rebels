@@ -17,10 +17,10 @@ import io.github.kadir1243.rivalrebels.client.renderhelper.QuadHelper;
 import io.github.kadir1243.rivalrebels.client.renderhelper.TextureVertice;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
+import it.unimi.dsi.fastutil.objects.ObjectFloatPair;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
-import net.minecraft.util.Tuple;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.resources.Identifier;
@@ -117,16 +117,16 @@ public class ModelLaptop {
 	private static final Vector3f v3v		= new Vector3f(-0.375f, 0f, 0.0625f);
 	private static final Vector3f v4v		= new Vector3f(-0.375f, 0f, 0.5f);
     private static final Axis ROTATION_AXIS = Axis.of(new Vector3f(0.1875f, 0, 0));
-    private static final Map<Tuple<Identifier, Float>, Supplier<List<QuadHelper.BakedQuadWrapper>>> SCREENS = new HashMap<>();
+    private static final Map<ObjectFloatPair<Identifier>, Supplier<List<QuadHelper.BakedQuadWrapper>>> SCREENS = new HashMap<>();
 
     public static void renderScreen(SubmitNodeCollector nodeCollector, Identifier screenTexture, PoseStack poseStack, float turn, int light, int overlay) {
         QuadHelper.submitQuadSupplier(nodeCollector,
             poseStack,
             RenderTypes.entitySolid(screenTexture),
-            SCREENS.computeIfAbsent(new Tuple<>(screenTexture, turn), t ->
-                QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t.getA()),
+            SCREENS.computeIfAbsent(ObjectFloatPair.of(screenTexture, turn), t ->
+                QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t.left()),
                     buffer -> QuadHelper.addFace(buffer,
-                        new Transformation(new Vector3f(0, 0.125F, 0.001F), ROTATION_AXIS.rotationDegrees(t.getB()), null, null),
+                        new Transformation(new Vector3f(0, 0.125F, 0.001F), ROTATION_AXIS.rotationDegrees(t.rightFloat()), null, null),
                         v2v, v1v, v4v, v3v, t333, t222, t111, t444))),
             light, overlay);
 	}

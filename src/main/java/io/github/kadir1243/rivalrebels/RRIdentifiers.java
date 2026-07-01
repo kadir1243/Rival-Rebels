@@ -78,7 +78,7 @@ public class RRIdentifiers {
     public static final Identifier btsplash4 = create("textures/block/bu.png");
     public static final Identifier btsplash5 = create("textures/block/bv.png");
     public static final Identifier btsplash6 = create("textures/block/bw.png");
-    public static final Identifier ittaskb83 = create("textures/items/bc.png");
+    public static final Identifier ittaskb83 = create("textures/item/bc.png");
     public static Identifier banner;
 
     public static Identifier create(String path) {

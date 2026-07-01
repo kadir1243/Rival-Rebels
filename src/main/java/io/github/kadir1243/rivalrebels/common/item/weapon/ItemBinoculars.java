@@ -96,7 +96,7 @@ public class ItemBinoculars extends Item {
             c ^= RRClient.USE_BINOCULARS_ITEM.isDown() && !sc;
             sc = RRClient.USE_BINOCULARS_ITEM.isDown();
             prevzoomed = zoomed;
-            zoomed = ((Minecraft.getInstance().mouseHandler.isRightPressed() && (((AbstractClientPlayer) entity).getItemBySlot(slot).is(this) || zoomed))) && !Minecraft.getInstance().options.keyDrop.isDown() && Minecraft.getInstance().screen == null;
+            zoomed = ((Minecraft.getInstance().mouseHandler.isRightPressed() && (((AbstractClientPlayer) entity).getItemBySlot(slot).is(this) || zoomed))) && !Minecraft.getInstance().options.keyDrop.isDown() && Minecraft.getInstance().gui.screen() == null;
             if (zoomed) {
                 if (!prevzoomed) {
                     fovset = (float) Minecraft.getInstance().options.fov().get();
