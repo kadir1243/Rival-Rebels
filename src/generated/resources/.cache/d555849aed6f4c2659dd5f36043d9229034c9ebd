@@ -1,4 +1,4 @@
-// 26.1.2	2026-05-30T14:50:18.682208097	Model Definitions - rivalrebels
+// 26.2	2026-07-01T11:39:48.722809255	Model Definitions - rivalrebels
 ba3554a111142a579555d44b74691babcba38a1b assets/rivalrebels/blockstates/alandmine.json
 bc9b932ce5de903e48f69970fa37cdf8dca9d839 assets/rivalrebels/blockstates/amario.json
 a31e2a94b7dbe154cda4fa3b324d161bfefac209 assets/rivalrebels/blockstates/ammunition.json
@@ -34,7 +34,7 @@ c0bcbf1a04777a8027296dbf3c985ca79036bd9a assets/rivalrebels/blockstates/forcefie
 afffe7c61c0f340388ab3d85ff9ce51791a42964 assets/rivalrebels/blockstates/forcefieldnode.json
 61f258eef5a99b468e74e63ee340be6b61251c71 assets/rivalrebels/blockstates/fshield.json
 a3561a9caee6321925e0963dcad79914d9eaa86a assets/rivalrebels/blockstates/gamestart.json
-1bbf58c8e1803eec7b670522c3e073316b7cad84 assets/rivalrebels/blockstates/goreblock.json
+67e62729cc168ddbac1a368f66ec03b09131f02b assets/rivalrebels/blockstates/goreblock.json
 680e741a356133abb329b27bbc4f10c42990f64e assets/rivalrebels/blockstates/jump.json
 9d5affef25853c6633054e63e8e7700443354bdb assets/rivalrebels/blockstates/landmine.json
 44863032f79ea22e237d986c2e8dd7c2b0fd2a72 assets/rivalrebels/blockstates/laptop.json
@@ -249,12 +249,7 @@ c984c926865a67cb8c434a5467be5f299b830f19 assets/rivalrebels/models/block/flare.j
 dedb60624f0ab980bf33c7393350365dd96ca58e assets/rivalrebels/models/block/forcefieldnode.json
 b36f5841769fb648c24c684d52d148d469868013 assets/rivalrebels/models/block/fshield.json
 0aee1425476f695662fc3ab601e2f606f0bdd8d4 assets/rivalrebels/models/block/gamestart.json
-858c9f02b9d4254ebe475b7220d43bd0fa00c2ee assets/rivalrebels/models/block/goreblockicon1.json
-e96e541ac86cfee98179fa3b8c469ca30fa8fa34 assets/rivalrebels/models/block/goreblockicon2.json
-7263cf95b84a13944fbfec1d663f4952b6ae3268 assets/rivalrebels/models/block/goreblockicon3.json
-58c86fede41a8d0d8d60dfe991aa6cd4a99ed54d assets/rivalrebels/models/block/goreblockicon4.json
-267ebcb5917add33240d568e9c123b56bc6ee6b0 assets/rivalrebels/models/block/goreblockicon5.json
-aed8f5c587aff72a0cdb9ad5f30efd7e4fcf393f assets/rivalrebels/models/block/goreblockicon6.json
+9bb40163925b69174a33c14e051e545ebc415c6e assets/rivalrebels/models/block/goreblock.json
 53a3c73e80d2171a16a4f2b6ca0cc898ace52bfd assets/rivalrebels/models/block/jump.json
 697a05ca7d63041f785e0d7419d15a29e1443792 assets/rivalrebels/models/block/landmine.json
 b98e57079fd8897f4204bcd7210120e79b956d3f assets/rivalrebels/models/block/light.json

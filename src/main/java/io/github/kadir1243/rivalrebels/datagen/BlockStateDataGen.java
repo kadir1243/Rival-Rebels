@@ -205,7 +205,8 @@ public class BlockStateDataGen extends ModelProvider {
             textureMapping.put(TextureSlot.WEST, new Material(idBlock("ca")));
             textureMapping.put(TextureSlot.EAST, new Material(idBlock("ca")));
         }));
-        goreBlock(blockModels, RRBlocks.goreblock);
+        // goreBlock(blockModels, RRBlocks.goreblock); // TODO: Remove tile entity and use this
+        emptyBlockModel(blockModels, RRBlocks.goreblock);
         createConduitVariant(blockModels, RRBlocks.conduit);
         simpleBlock(blockModels, RRBlocks.quicksandtrap, "dg", "dh");
         simpleBlock(blockModels, RRBlocks.tower, "cy", "ah", "ai");

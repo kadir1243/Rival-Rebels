@@ -59,12 +59,12 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
     public void extractRenderState(TileEntityGore blockEntity, GoreRenderState state, float partialTicks, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, state, partialTicks, cameraPosition, breakProgress);
         BlockState bstate = blockEntity.getBlockState();
-        state.ceil = bstate.getValue(BlockGore.IS_UP_FULL);
-        state.floor = bstate.getValue(BlockGore.IS_DOWN_FULL);
-        state.side1 = bstate.getValue(BlockGore.IS_SOUTH_FULL);
-        state.side2 = bstate.getValue(BlockGore.IS_WEST_FULL);
-        state.side3 = bstate.getValue(BlockGore.IS_NORTH_FULL);
-        state.side4 = bstate.getValue(BlockGore.IS_EAST_FULL);
+        state.ceil = bstate.getValue(BlockGore.UP);
+        state.floor = bstate.getValue(BlockGore.DOWN);
+        state.side1 = bstate.getValue(BlockGore.SOUTH);
+        state.side2 = bstate.getValue(BlockGore.WEST);
+        state.side3 = bstate.getValue(BlockGore.NORTH);
+        state.side4 = bstate.getValue(BlockGore.EAST);
         state.type = bstate.getValue(BlockGore.META);
     }
 
@@ -84,7 +84,7 @@ public class TileEntityGoreRenderer implements BlockEntityRenderer<TileEntityGor
         int packedLight = renderState.lightCoords;
         int packedOverlay = OverlayTexture.NO_OVERLAY;
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(texture), (pose, consumer) -> {
+        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entityCutout(texture), (pose, consumer) -> {
             if (renderState.side1) {
                 addVertex(pose, consumer, v1, 0, 0, packedLight, packedOverlay);
                 addVertex(pose, consumer, v5, 1, 0, packedLight, packedOverlay);
