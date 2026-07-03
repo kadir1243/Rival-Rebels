@@ -61,7 +61,7 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addBlock(RRBlocks.reactor, "Reactor");
         addBlock(RRBlocks.flare, "Flare");
         addBlock(RRBlocks.buildrhodes, "Rhodes Supply Crate");
-        addBlock(RRBlocks.light, "Light");
+        addBlock(RRBlocks.light, "Tick");
         addBlock(RRBlocks.light2, "Light");
         addBlock(RRBlocks.nuclearBomb, "Nuclear Bomb");
         addBlock(RRBlocks.minetrap, "Landmine Trap");
@@ -75,6 +75,27 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addBlock(RRBlocks.tsarbombablock, "Tsar Bomb");
         addBlock(RRBlocks.theoreticaltsarbombablock, "Tsar Bomb");
         addBlock(RRBlocks.tachyonbombblock, "Tachyon");
+        addBlock(RRBlocks.easteregg, "Easter Egg");
+        addBlock(RRBlocks.flag1, "Quake");
+        addBlock(RRBlocks.trollFlag, "Troll");
+        addBlock(RRBlocks.flag3, "Ghost");
+        addBlock(RRBlocks.flag4, "Nuclear");
+        addBlock(RRBlocks.flag5, "Gasmask");
+        addBlock(RRBlocks.flag6, "Deadmau5");
+        addBlock(RRBlocks.flag7, "Creeper");
+        addBlock(RRBlocks.flagbox1, "Quake Flags");
+        addBlock(RRBlocks.flagbox5, "Gasmask Flags");
+        addBlock(RRBlocks.flagbox6, "Deadmau5 Flags");
+        addBlock(RRBlocks.flagbox3, "Ghost Flags");
+        addBlock(RRBlocks.flagbox4, "Nuclear Flags");
+        addBlock(RRBlocks.flagbox7, "Creeper Flags");
+        addBlock(RRBlocks.breadbox, "Toaster");
+        addBlock(RRBlocks.fshield, "unbreakable");
+        addBlock(RRBlocks.cycle, "Spectrum");
+        addBlock(RRBlocks.forcefieldnode, "Emitter");
+        addBlock(RRBlocks.goreblock, "Gore Block");
+        addBlock(RRBlocks.ffreciever, "ADS");
+        addBlock(RRBlocks.rhodesactivator, "Assembler");
 
         addItem(RRItems.knife, "Cuchillo");
         addItem(RRItems.hydrod, "Hydrogen Rod");
@@ -104,6 +125,10 @@ public class LangGen extends LanguageProvider { // TODO: Add Every Translation t
         addItem(RRItems.remote, "Detonator");
         addItem(RRItems.expill, "Nuclear Lemonade");
         addItem(RRItems.safepill, "Lord Vertice Lemonade");
+        addItem(RRItems.rpg, "M202-RR");
+        addItem(RRItems.seekm202, "Seeker");
+        addItem(RRItems.camera, "SLR");
+        addItem(RRItems.binoculars, "LTD-RR");
 
         addDamage(RRDamageTypes.ELECTRICITY, "%1s is Now Electric-Man");
         addDamage(RRDamageTypes.CHARGE, "%1s Charged");
