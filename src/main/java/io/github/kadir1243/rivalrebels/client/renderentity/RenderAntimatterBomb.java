@@ -47,9 +47,7 @@ public class RenderAntimatterBomb extends EntityRenderer<EntityAntimatterBomb, R
         poseStack.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
         poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etantimatterbomb), (pose, consumer) -> {
-            ObjModels.render(bombModel, consumer, pose, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etantimatterbomb), bombModel, poseStack, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

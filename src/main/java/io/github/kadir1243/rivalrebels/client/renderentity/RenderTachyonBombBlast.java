@@ -121,9 +121,7 @@ public class RenderTachyonBombBlast extends EntityRenderer<EntityTachyonBombBlas
     private void renderBlastSphere(RenderTachyonBombBlast.State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, float scale, int color) {
         poseStack.pushPose();
         poseStack.scale(scale, scale, scale);
-        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-            ObjModels.render(blastSphereModel, consumer, pose, color, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, blastSphereModel, poseStack, color, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
     }

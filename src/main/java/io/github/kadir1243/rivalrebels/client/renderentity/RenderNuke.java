@@ -46,9 +46,7 @@ public class RenderNuke extends EntityRenderer<EntityNuke, RenderNuke.State> {
         poseStack.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
         poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etwacknuke), (pose, consumer) -> {
-            ObjModels.render(nukeModel, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etwacknuke), nukeModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

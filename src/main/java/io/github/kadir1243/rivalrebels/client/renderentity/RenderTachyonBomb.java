@@ -47,9 +47,7 @@ public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb, RenderT
         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
         // poseStack.mulPose(Axis.XP.rotationDegrees(90));
         poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettachyonbomb), (pose, consumer) -> {
-            ObjModels.render(bombModel, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.ettachyonbomb), bombModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

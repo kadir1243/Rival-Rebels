@@ -46,9 +46,7 @@ public class RenderB83 extends EntityRenderer<EntityB83, RenderB83.State> {
         poseStack.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
         poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90));
         poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 180));
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etb83), (pose, consumer) -> {
-            ObjModels.render(b83Model, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb83), b83Model, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 

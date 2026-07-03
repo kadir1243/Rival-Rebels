@@ -51,12 +51,11 @@ public class RenderB2Frag extends EntityRenderer<EntityB2Frag, RenderB2Frag.Stat
 		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
         poseStack.scale(3, 3, 3);
 
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), (pose, consumer) -> {
-            if (renderState.type == 0)
-                ObjModels.render(b2FragSide1Model, consumer, pose, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-            else if (renderState.type == 1)
-                ObjModels.render(b2FragSide2Model, consumer, pose, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-        });
+        if (renderState.type == 0)
+            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), b2FragSide1Model, poseStack, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+        else if (renderState.type == 1)
+            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), b2FragSide2Model, poseStack, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
+
 		poseStack.popPose();
 	}
 

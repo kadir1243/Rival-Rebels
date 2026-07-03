@@ -55,9 +55,9 @@ public class GuiTrayModelRenderer extends PictureInPictureRenderer<TrayModelPIPR
         ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etreciever), trayModel, poseStack, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         if (renderState.hasWeapon()) {
             poseStack.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-            poseStack.mulPose(Axis.YP.rotationDegrees((float) (-Math.atan(renderState.x1() / 40.0F) * 40.0F)));
+            poseStack.mulPose(Axis.YP.rotationDegrees((float) (-Math.atan(renderState.realX1() / 40.0F) * 40.0F)));
             ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etreciever), armModel, poseStack, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
-            poseStack.mulPose(Axis.XP.rotationDegrees((float) (Math.atan(renderState.y1() / 40.0F) * 40.0F + 20)));
+            poseStack.mulPose(Axis.XP.rotationDegrees((float) (Math.atan(renderState.realY1() / 40.0F) * 40.0F + 20)));
             ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etadsdragon), adsdragonModel, poseStack, CommonColors.WHITE, LightCoordsUtil.FULL_BRIGHT, OverlayTexture.NO_OVERLAY);
         }
         poseStack.popPose();

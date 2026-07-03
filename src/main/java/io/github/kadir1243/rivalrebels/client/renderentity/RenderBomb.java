@@ -49,13 +49,9 @@ public class RenderBomb extends EntityRenderer<EntityBomb, RenderBomb.State> {
             poseStack.pushPose();
             poseStack.scale(renderState.ageInTicks * 0.2f, renderState.ageInTicks * 0.2f, renderState.ageInTicks * 0.2f);
             if (renderState.deltaMovement.y() == 1) {
-                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                    ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.75f, 0.25f, 0.25f, 1.0f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-                });
+                ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, ARGB.colorFromFloat(0.75f, 0.25f, 0.25f, 1.0f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             } else if (renderState.deltaMovement.y() == 0) {
-                nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                    ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.75f, 0.8f, 0.8f, 1f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-                });
+                ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, ARGB.colorFromFloat(0.75f, 0.8f, 0.8f, 1f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             }
             poseStack.popPose();
         } else {

@@ -18,14 +18,10 @@ import io.github.kadir1243.rivalrebels.common.tileentity.TileEntityReactor;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.MenuConstructor;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -77,14 +73,6 @@ public class BlockReactor extends BaseEntityBlock {
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level world, BlockState state, BlockEntityType<T> type) {
         return world.isClientSide() ? createTickerHelper(type, RRTileEntities.REACTOR.get(), TileEntityReactor::clientTick) : createTickerHelper(type, RRTileEntities.REACTOR.get(), TileEntityReactor::serverTick);
-    }
-
-    public static final Component DEFAULT_TOKAMAK = Component.literal("Tokamak");
-
-    @Nullable
-    @Override
-    protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
-        return new SimpleMenuProvider((MenuConstructor) level.getBlockEntity(pos), DEFAULT_TOKAMAK);
     }
 
     @Override

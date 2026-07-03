@@ -49,13 +49,9 @@ public record PlasmaCannonRenderer(SpriteGetter spriteGetter) implements NoDataS
             {
                 poseStack.pushPose();
 
-                submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etplasmacannon), (pose, consumer) -> {
-                    ObjModels.render(plasmaCannonModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
-                });
+                ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etplasmacannon), plasmaCannonModel, poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
                 if (hasFoil) {
-                    submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.CELLULAR_NOISE, (pose, consumer) -> {
-                        ObjModels.render(plasmaCannonModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
-                    });
+                    ObjModels.submit(submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, plasmaCannonModel, poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
                 }
 
                 poseStack.popPose();

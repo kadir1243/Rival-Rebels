@@ -147,14 +147,10 @@ public class HackRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 		poseStack.mulPose(Axis.ZP.rotationDegrees(-90));
 		poseStack.scale(0.7f, 0.7f, 0.7f);
 		poseStack.translate(-0.5f, -0.1f, 0);
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etb83), (pose, consumer) -> {
-            ObjModels.render(b83Model, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
-        });
+        ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb83), b83Model, poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
 		if (hasFoil) {
-            submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.CELLULAR_NOISE, (pose, consumer) -> {
-                ObjModels.render(b83Model, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords);
-            });
-		}
+            ObjModels.submit(submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, b83Model, poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
+        }
 		poseStack.popPose();
 		poseStack.popPose();
 	}

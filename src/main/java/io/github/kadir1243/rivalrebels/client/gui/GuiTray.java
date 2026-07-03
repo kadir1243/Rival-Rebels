@@ -34,8 +34,8 @@ import org.joml.Vector2i;
 
 @OnlyIn(Dist.CLIENT)
 public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
-    private float				xSize_lo;
-	private float				ySize_lo;
+    private int	xSize_lo;
+	private int	ySize_lo;
     private GuiRotor range;
     private GuiCustomButton chip;
     private GuiCustomButton players;
@@ -76,6 +76,7 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
         super.extractRenderState(graphics, mouseX, mouseY, a);
         this.xSize_lo = mouseX;
         this.ySize_lo = mouseY;
+        drawADS(graphics, this.leftPos + 51 - this.xSize_lo, this.topPos + 75, 30, this.leftPos + 51 - this.xSize_lo, this.topPos + 25 - this.ySize_lo, this.leftPos + 51, this.topPos + 75);
     }
 
     @Override
@@ -92,9 +93,9 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 
 	static int spinfac	= 0;
 
-	public void drawADS(GuiGraphicsExtractor graphics, int x, int y, int scale, float px, float py) {
+	public void drawADS(GuiGraphicsExtractor graphics, int x, int y, int scale, int px, int py, int x2, int y2) {
 		spinfac += 1;
-        graphics.submitPictureInPictureRenderState(new TrayModelPIPRenderState(new Vec3(x, y - 40, 50), menu.hasWeapon(), spinfac, x, y, (int) px, (int) py, scale, graphics.peekScissorStack()));
+        graphics.submitPictureInPictureRenderState(new TrayModelPIPRenderState(new Vec3(x, y - 40, 50), menu.hasWeapon(), spinfac, x, y, x2, y2, scale, px, py, graphics.peekScissorStack()));
     }
 
     @Override
@@ -109,6 +110,5 @@ public class GuiTray extends AbstractContainerScreen<ContainerReciever> {
 		}
 
 		graphics.text(font, Translations.ADS_TRAY.translate(), x + 25, y + 66, CommonColors.WHITE, false);
-		drawADS(graphics, this.leftPos + 51, this.topPos + 75, 30, this.leftPos + 51 - this.xSize_lo, this.topPos + 25 - this.ySize_lo);
 	}
 }

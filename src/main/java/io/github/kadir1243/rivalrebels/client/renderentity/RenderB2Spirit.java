@@ -51,21 +51,14 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit, RenderB2Spiri
         poseStack.pushPose();
 		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
 		poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
-        int packedLight = renderState.lightCoords;
         if (RRConfig.CLIENT.getBomberType().equals("sh")) {
 			poseStack.scale(3, 3, 3);
-            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), (pose, consumer) -> {
-                ObjModels.render(shuttleModel, consumer, pose, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
-            });
-		} else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
-            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettupolev), (pose, consumer) -> {
-                ObjModels.render(tupolevModel, consumer, pose, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), shuttleModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
+        } else if (RRConfig.CLIENT.getBomberType().equals("tu")) {
+            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.ettupolev), tupolevModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         } else {
             poseStack.scale(3, 3, 3);
-            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), (pose, consumer) -> {
-                ObjModels.render(b2ForSpiritModel, consumer, pose, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), b2ForSpiritModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         }
 		poseStack.popPose();
 	}

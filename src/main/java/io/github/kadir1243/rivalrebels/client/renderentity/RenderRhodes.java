@@ -438,9 +438,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
     private void renderBlastSphereWithLightningRenderType(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, float scale, int color) {
         poseStack.pushPose();
         poseStack.scale(scale, scale, scale);
-        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.RHODES_LIGHTNING, (pose, consumer) -> {
-            ObjModels.render(blastSphereModel, consumer, pose, color, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RRRenderTypes.RHODES_LIGHTNING, blastSphereModel, poseStack, color, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
     }

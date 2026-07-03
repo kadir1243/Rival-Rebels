@@ -42,12 +42,8 @@ public class RodaRenderer implements NoDataSpecialModelRenderer {
 		//if (!mode.firstPerson()) poseStack.scale(-1, 1, 1);
 		poseStack.translate(0.2f, -0.55f, 0.1f);
 
-        submitNodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etrust), (pose, consumer) ->
-            ObjModels.render(rodaModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords)
-        );
-        submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.CELLULAR_NOISE, (pose, consumer) ->
-            ObjModels.render(rodaModel, consumer, pose, CommonColors.WHITE, lightCoords, overlayCoords)
-        );
+        ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrust), rodaModel, poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
+        ObjModels.submit(submitNodeCollector, RRRenderTypes.CELLULAR_NOISE, rodaModel, poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
 
 		poseStack.popPose();
 	}

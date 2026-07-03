@@ -69,9 +69,7 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
     private void renderBlastSphere(PlasmaExplosionBlockEntityRenderState renderState, float scale, PoseStack poseStack, SubmitNodeCollector nodeCollector, float red, float green, float blue, float alpha) {
         poseStack.pushPose();
         poseStack.scale(scale, scale, scale);
-        nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-            ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(alpha, red, green, blue), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, ARGB.colorFromFloat(alpha, red, green, blue), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 
         poseStack.popPose();
     }

@@ -72,9 +72,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
         });
 		poseStack.translate(0, 2, -0.125f);
 		poseStack.scale(0.2f, 0.2f, 0.2f);
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etelectrode), (pose, consumer) -> {
-            ObjModels.render(electrodeModel, consumer, pose, CommonColors.WHITE, packedLight, packedOverlay);
-        });
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etelectrode), electrodeModel, poseStack, CommonColors.WHITE, packedLight, packedOverlay);
         poseStack.popPose();
 
         for (TileEntityMachineBase temb : renderState.machines) {

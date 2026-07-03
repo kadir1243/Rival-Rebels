@@ -28,8 +28,6 @@ public class RenderRhodesLeftLowerArm extends RhodesPartRenderer<EntityRhodesLef
         poseStack.translate(0, 4f, 0);
         poseStack.scale(-1, 1, 1);
         super.renderParts(entity, poseStack, nodeCollector, packedLight);
-        nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(getTextureLocation(entity)), (pose, consumer) -> {
-            ObjModels.render(rocketLauncherModel, consumer, pose, entity.color, packedLight, OverlayTexture.NO_OVERLAY);
-        });
+        ObjModels.submit(nodeCollector, RenderTypes.entitySolid(getTextureLocation(entity)), rocketLauncherModel, poseStack, entity.color, packedLight, OverlayTexture.NO_OVERLAY);
     }
 }

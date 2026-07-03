@@ -70,9 +70,7 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
 			int dist = (int) Mth.sqrt((xdif * xdif) + (zdif * zdif));
             for (int d = 0; d < dist; d++) {
 				poseStack.translate(2, 0, 0);
-                nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.ettube), (pose, consumer) -> {
-                    ObjModels.render(tubeModel, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-                });
+                ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.ettube), tubeModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             }
 			poseStack.popPose();
 		}

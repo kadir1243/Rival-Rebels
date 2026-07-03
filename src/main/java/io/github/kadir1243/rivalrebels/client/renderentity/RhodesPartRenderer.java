@@ -46,9 +46,7 @@ public abstract class RhodesPartRenderer<T extends EntityRhodesPiece> extends En
 
     public void renderParts(State entity, PoseStack poseStack, SubmitNodeCollector nodeCollector, int packedLight) {
         if (model != null) {
-            nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(getTextureLocation(entity)), (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, entity.color, packedLight, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RenderTypes.entitySolid(getTextureLocation(entity)), model, poseStack, entity.color, packedLight, OverlayTexture.NO_OVERLAY);
         }
     }
 

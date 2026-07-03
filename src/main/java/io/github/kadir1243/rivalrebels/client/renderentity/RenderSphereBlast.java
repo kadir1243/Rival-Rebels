@@ -53,9 +53,7 @@ public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast, EntityR
             poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * 2)));
             poseStack.mulPose(Axis.XP.rotationDegrees((float) (elev * 3)));
             poseStack.scale((float) elev, (float) elev, (float) elev);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(1F, 1, 0.25f, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, ARGB.colorFromFloat(1F, 1, 0.25f, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
         }
         {
@@ -64,9 +62,7 @@ public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast, EntityR
             poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 4)));
             float scale = (float) (elev - 0.2f);
             poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(1F, 1, 0.5f, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, ARGB.colorFromFloat(1F, 1, 0.5f, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
         }
         {
@@ -75,9 +71,7 @@ public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast, EntityR
             poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 2)));
             float scale = (float) (elev - 0.4f);
             poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, CommonColors.RED, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, CommonColors.RED, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
         }
         {
@@ -86,9 +80,7 @@ public class RenderSphereBlast extends EntityRenderer<EntitySphereBlast, EntityR
             poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 3)));
             float scale = (float) (elev - 0.6f);
             poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(1F, 1, 1, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, ARGB.colorFromFloat(1F, 1, 1, 0), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
         }
         poseStack.popPose();

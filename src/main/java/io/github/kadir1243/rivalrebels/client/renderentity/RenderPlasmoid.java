@@ -54,9 +54,7 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid, RenderPlasmoi
             float scale = 0.4F + 0.2F * i;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                ObjModels.render(model, consumer, pose, ARGB.colorFromFloat(0.9f, 0.65f, 0.55f, 0.95f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, model, poseStack, ARGB.colorFromFloat(0.9f, 0.65f, 0.55f, 0.95f), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
         }
 		poseStack.popPose();

@@ -1,16 +1,13 @@
 package io.github.kadir1243.rivalrebels.client.model;
 
 import com.mojang.blaze3d.vertex.QuadInstance;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.block.dispatch.BlockModelRotation;
-import net.minecraft.client.resources.model.ModelDebugName;
 import net.minecraft.client.resources.model.geometry.BakedQuad;
 import net.minecraft.client.resources.model.sprite.TextureSlots;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
@@ -70,28 +67,18 @@ public class ObjModels {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static void render(QuadCollection model, VertexConsumer buffer, PoseStack pose, int color, int light, int overlay) {
-        render(model, buffer, pose.last(), color, light, overlay);
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static void render(QuadCollection model, VertexConsumer buffer, PoseStack.Pose pose, int color, int light, int overlay) {
-        if (model == null) {
-            throw new NullPointerException("Model is null");
-        }
-        QuadInstance quadInstance = new QuadInstance();
-        quadInstance.setColor(color);
-        quadInstance.setLightCoords(light);
-        quadInstance.setOverlayCoords(overlay);
-        for (BakedQuad quad : model.getAll()) {
-            buffer.putBakedQuad(pose, quad, quadInstance);
-        }
-    }
-
-    @OnlyIn(Dist.CLIENT)
     public static void submit(SubmitNodeCollector nodeCollector, RenderType renderType, QuadCollection model, PoseStack poseStack, int color, int light, int overlay) {
         nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
-            render(model, consumer, pose, color, light, overlay);
+            if (model == null) {
+                throw new NullPointerException("Model is null");
+            }
+            QuadInstance quadInstance = new QuadInstance();
+            quadInstance.setColor(color);
+            quadInstance.setLightCoords(light);
+            quadInstance.setOverlayCoords(overlay);
+            for (BakedQuad quad : model.getAll()) {
+                consumer.putBakedQuad(pose, quad, quadInstance);
+            }
         });
     }
 

@@ -440,6 +440,6 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
 
     @Override
     protected Component getDefaultName() {
-        return Component.literal("Reactor");
+        return Component.literal("Tokamak");
     }
 }

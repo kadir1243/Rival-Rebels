@@ -28,11 +28,13 @@ import net.minecraft.core.Direction;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
@@ -63,7 +65,7 @@ import net.neoforged.neoforge.model.data.ModelProperty;
 import org.jspecify.annotations.Nullable;
 import org.joml.Vector3f;
 
-public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuConstructor {
+public class TileEntityReciever extends TileEntityMachineBase implements Container, MenuProvider {
 	public float			yaw;
 	public float			pitch;
 	public Entity			target;
@@ -486,4 +488,9 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
             return 7;
         }
     };
+
+    @Override
+    public Component getDisplayName() {
+        return Component.literal("Automated Defense System");
+    }
 }

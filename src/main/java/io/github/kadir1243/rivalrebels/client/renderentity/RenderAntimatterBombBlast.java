@@ -67,9 +67,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 
             poseStack.pushPose();
             poseStack.scale(renderState.ageInTicks, renderState.ageInTicks, renderState.ageInTicks);
-            nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {
-                ObjModels.render(blastSphereModel, consumer, pose, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RRRenderTypes.MODEL_BLAST_SPHERE, blastSphereModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
         }
 		else
@@ -122,9 +120,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 			poseStack.translate(random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f);
             poseStack.pushPose();
             poseStack.scale(renderState.ageInTicks, renderState.ageInTicks, renderState.ageInTicks);
-			nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.ANTIMATTER_BOMB_BLAST_ENTITY, (pose, consumer) -> {
-                ObjModels.render(blastSphereModel, consumer, pose, ARGB.colorFromFloat(1F, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble()), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
-            });
+            ObjModels.submit(nodeCollector, RRRenderTypes.ANTIMATTER_BOMB_BLAST_ENTITY, blastSphereModel, poseStack, ARGB.colorFromFloat(1F, (float)random.nextDouble(), (float)random.nextDouble(), (float)random.nextDouble()), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
             poseStack.popPose();
 		}
 	}
