@@ -105,9 +105,11 @@ public class EntityB83 extends ThrowableProjectile
 
 	public void explode()
 	{
-		new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength());
-		level().addFreshEntity(new EntityTsarBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f).setTime());
-		this.kill((ServerLevel) level());
+        if (!level().isClientSide()) {
+            new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength());
+            level().addFreshEntity(new EntityTsarBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f).setTime());
+            this.kill((ServerLevel) level());
+        }
 	}
 
     @Override

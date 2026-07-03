@@ -98,7 +98,7 @@ public class EntityB2Frag extends EntityInanimate
 		if (onGround()) {
 			++ticksInGround;
 
-			if (ticksInGround == 1200)
+			if (ticksInGround == 1200 && !level().isClientSide())
 			{
 				kill((ServerLevel) level());
 			}

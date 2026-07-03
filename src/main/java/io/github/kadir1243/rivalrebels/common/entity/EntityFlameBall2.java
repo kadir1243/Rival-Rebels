@@ -76,14 +76,14 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 	public void tick() {
 		super.tick();
 		sequence++;
-		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */) kill((ServerLevel) level());
+		if (sequence > 15/* > RRConfig.SERVER.getFlamethrowerDecay() */ && !level().isClientSide()) kill((ServerLevel) level());
 		if (tickCount > 5 && random.nextDouble() > 0.5) gonnadie = true;
 
 		if (gonnadie && sequence < 15) sequence++;
 
 		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);
 
-		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 6) {
+		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 6 && !level().isClientSide()) {
             setPosRaw(getX() - 0.5F, getY() - 0.5, getZ() - 0.5);
 			fire();
             setPosRaw(getX() + 1, getY(), getZ());
@@ -117,7 +117,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 		rotation += motionr;
 		motionr *= 1.06f;
 
-		if (isInWater()) kill((ServerLevel) level());
+		if (isInWater() && !level().isClientSide()) kill((ServerLevel) level());
 		float airFriction = 0.9F;
 		if (gonnadie) {
             setDeltaMovement(getDeltaMovement().add(0, 0.05, 0));

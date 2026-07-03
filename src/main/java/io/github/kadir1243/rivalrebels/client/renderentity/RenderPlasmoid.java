@@ -51,7 +51,7 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid, RenderPlasmoi
 
         for (int i = 0; i < 5; i++) {
             poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rotation));
-            var scale = 0.4F + 0.2F * i;
+            float scale = 0.4F + 0.2F * i;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
             nodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.MODEL_BLAST_SPHERE, (pose, consumer) -> {

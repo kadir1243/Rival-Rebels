@@ -79,7 +79,7 @@ public class ObjModels {
         if (model == null) {
             throw new NullPointerException("Model is null");
         }
-        var quadInstance = new QuadInstance();
+        QuadInstance quadInstance = new QuadInstance();
         quadInstance.setColor(color);
         quadInstance.setLightCoords(light);
         quadInstance.setOverlayCoords(overlay);

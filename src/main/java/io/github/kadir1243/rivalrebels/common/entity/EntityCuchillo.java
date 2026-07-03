@@ -69,8 +69,10 @@ public class EntityCuchillo extends ThrowableProjectile {
 
     @Override
     protected void onHitEntity(EntityHitResult result) {
-        result.getEntity().hurt(RivalRebelsDamageSource.cuchillo(level()), 7);
-        kill((ServerLevel) level());
+        if (!level().isClientSide()) {
+            result.getEntity().hurt(RivalRebelsDamageSource.cuchillo(level()), 7);
+            kill((ServerLevel) level());
+        }
     }
 
     @Override
@@ -97,7 +99,8 @@ public class EntityCuchillo extends ThrowableProjectile {
             ticksInGround++;
             if (ticksInGround == 60) {
                 level().addFreshEntity(new ItemEntity(level(), getX(), getY(), getZ(), RRItems.knife.toStack()));
-                kill((ServerLevel) level());
+                if (!level().isClientSide())
+                    kill((ServerLevel) level());
             }
         }
     }

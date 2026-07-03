@@ -122,7 +122,9 @@ public class EntityB2Spirit extends Projectile {
 			if (t < 25.0 || tickCount > 100) {
                 rhodeswing.setB2Energy(8000);
 				rhodeswing.freeze = false;
-                kill((ServerLevel) level());
+                if (!level().isClientSide()) {
+                    kill((ServerLevel) level());
+                };
 			}
 		}
 

@@ -77,7 +77,7 @@ public class EntityBomb extends ThrowableProjectile {
 		if (exploded) {
             setDeltaMovement(0, hit ? 1 : 0, 0);
 			timeleft--;
-			if (timeleft < 0) kill((ServerLevel) level());
+			if (timeleft < 0 && !level().isClientSide()) kill((ServerLevel) level());
 			tickCount++;
 		} else {
             HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, this::canHitEntity);

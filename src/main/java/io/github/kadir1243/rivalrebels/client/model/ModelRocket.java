@@ -71,7 +71,7 @@ public class ModelRocket {
         pose.pushPose();
 		pose.scale(0.125f, 0.25f, 0.125f);
 
-        var model = BASE.computeIfAbsent(texture, t -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t), buffer -> {
+        Supplier<List<QuadHelper.BakedQuadWrapper>> model = BASE.computeIfAbsent(texture, t -> QuadHelper.createQuads(Sheets.BLOCKS_MAPPER.apply(t), buffer -> {
             QuadHelper.addFace(buffer, vpx1, vpx2, vpxpz2, vpxpz1, tx1, tx2, ty1, ty2);
             QuadHelper.addFace(buffer, vpxpz1, vpxpz2, vpz2, vpz1, tx1, tx2, ty1, ty2);
             QuadHelper.addFace(buffer, vpz1, vpz2, vnxpz2, vnxpz1, tx1, tx2, ty1, ty2);

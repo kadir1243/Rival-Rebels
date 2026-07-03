@@ -83,14 +83,14 @@ public class EntityPassiveFire extends Projectile {
 	public void tick() {
 		super.tick();
 
-		if (ticksInAir > 7) {
+		if (ticksInAir > 7 && !level().isClientSide()) {
 			this.kill((ServerLevel) level());
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
 		float var17 = 0.4F;
 
-		if (this.isInWater()) {
+		if (this.isInWater() && !level().isClientSide()) {
 			kill((ServerLevel) level());
 		}
 

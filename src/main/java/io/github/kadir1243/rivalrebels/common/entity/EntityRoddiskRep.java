@@ -328,9 +328,10 @@ public class EntityRoddiskRep extends RoddiskBase {
     @Override
     public InteractionResult interact(Player player, InteractionHand hand, Vec3 location) {
 		if (tickCount < 10 || player != getOwner()) return InteractionResult.PASS;
-		if (player.getInventory().add(RRItems.roddisk.toStack()))
-		{
-			kill((ServerLevel) level());
+		if (player.getInventory().add(RRItems.roddisk.toStack())) {
+            if (!level().isClientSide()) {
+                kill((ServerLevel) level());
+            }
             this.playSound(RRSounds.RODDISK_UNKNOWN1.get());
 		}
 		return InteractionResult.SUCCESS;

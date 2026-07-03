@@ -102,7 +102,7 @@ public class EntityHotPotato extends ThrowableProjectile {
 		}
 
         setPosRaw(getX() + getDeltaMovement().x(), getY() + getDeltaMovement().y(), getZ() + getDeltaMovement().z());
-		if (getY() < level().getMinY()) kill((ServerLevel) level());
+		if (getY() < level().getMinY() && !level().isClientSide()) kill((ServerLevel) level());
 
 		if (this.isPassenger())
 		{

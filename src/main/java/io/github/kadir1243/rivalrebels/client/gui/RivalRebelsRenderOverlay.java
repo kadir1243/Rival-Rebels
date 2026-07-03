@@ -126,7 +126,7 @@ public class RivalRebelsRenderOverlay {
             ARGB.colorFromFloat(0.333F, 0.0F, 0.0F, 0.0F)
         );
 
-        if (InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_H)) {
+        if (RRClient.RHODES_HELP_KEY.isDown()) {
             graphics.blit(
                 RRTextures.guirhodeshelp,
                 Mth.floor(w*0.25F),

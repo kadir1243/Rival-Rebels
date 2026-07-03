@@ -355,7 +355,7 @@ public class EntityGore extends EntityInanimate {
 		if (isSliding)
 		{
 			slideCount++;
-			if (slideCount == 140) kill((ServerLevel) level());
+			if (slideCount == 140 && !level().isClientSide()) kill((ServerLevel) level());
 		}
 
 		Vec3 vec3 = position();

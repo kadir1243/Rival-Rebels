@@ -40,6 +40,7 @@ public class RRClient {
     public static final KeyMapping RHODES_STOP_KEY = createRhodesKey("stop", InputConstants.KEY_X);
     public static final KeyMapping RHODES_B2SPIRIT_KEY = createRhodesKey("b2spirit", InputConstants.KEY_Z);
     public static final KeyMapping RHODES_GUARD_KEY = createRhodesKey("guard", InputConstants.KEY_G);
+    public static final KeyMapping RHODES_HELP_KEY = createRhodesKey("guard", InputConstants.KEY_H);
     public static final KeyMapping USE_BINOCULARS_ITEM = new KeyMapping("key." + RRIdentifiers.MODID + ".use_binoculars", InputConstants.KEY_C, KeyMapping.Category.MOVEMENT);
     public static RivalRebelsRenderOverlay rrro;
 
@@ -61,6 +62,7 @@ public class RRClient {
         event.register(RHODES_NUKE_KEY);
         event.register(RHODES_STOP_KEY);
         event.register(RHODES_B2SPIRIT_KEY);
+        event.register(RHODES_HELP_KEY);
         event.register(USE_BINOCULARS_ITEM);
     }
 

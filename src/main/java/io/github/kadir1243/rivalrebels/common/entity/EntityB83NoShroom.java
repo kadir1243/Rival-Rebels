@@ -36,10 +36,12 @@ public class EntityB83NoShroom extends EntityB83 {
 
 	public void explode()
 	{
-		new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength()/2);
-		EntitySphereBlast etb = new EntitySphereBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f);
-		etb.tickCount = -920;
-		level().addFreshEntity(etb);
-		this.kill((ServerLevel) level());
+        if (!level().isClientSide()) {
+            new NuclearExplosion(level(), (int) getX(), (int) getY(), (int) getZ(), RRConfig.SERVER.getB83Strength() / 2);
+            EntitySphereBlast etb = new EntitySphereBlast(level(), getX(), getY(), getZ(), RRConfig.SERVER.getB83Strength() * 1.333333333f);
+            etb.tickCount = -920;
+            level().addFreshEntity(etb);
+            this.kill((ServerLevel) level());
+        }
 	}
 }

@@ -111,15 +111,15 @@ public class BlockStateDataGen extends ModelProvider {
         TextureSlot.ALL
     );
     public final void createConduitVariant(BlockModelGenerators blockModels, Holder<Block> block) {
-        var meta1 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_1", TextureMapping.cube(new Material(idBlock("co"))), blockModels.modelOutput));
-        var meta2 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_2", TextureMapping.cube(new Material(idBlock("cp"))), blockModels.modelOutput));
-        var meta3 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_3", TextureMapping.cube(new Material(idBlock("cq"))), blockModels.modelOutput));
-        var meta4 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_4", TextureMapping.cube(new Material(idBlock("cr"))), blockModels.modelOutput));
-        var meta5 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_5", TextureMapping.cube(new Material(idBlock("cs"))), blockModels.modelOutput));
-        var meta6 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_6", TextureMapping.cube(new Material(idBlock("ct"))), blockModels.modelOutput));
-        var meta7 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_7", TextureMapping.cube(new Material(idBlock("cu"))), blockModels.modelOutput));
-        var meta8 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_8", TextureMapping.cube(new Material(idBlock("cv"))), blockModels.modelOutput));
-        var meta9 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_9", TextureMapping.cube(new Material(idBlock("cw"))), blockModels.modelOutput));
+        MultiVariant meta1 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_1", TextureMapping.cube(new Material(idBlock("co"))), blockModels.modelOutput));
+        MultiVariant meta2 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_2", TextureMapping.cube(new Material(idBlock("cp"))), blockModels.modelOutput));
+        MultiVariant meta3 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_3", TextureMapping.cube(new Material(idBlock("cq"))), blockModels.modelOutput));
+        MultiVariant meta4 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_4", TextureMapping.cube(new Material(idBlock("cr"))), blockModels.modelOutput));
+        MultiVariant meta5 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_5", TextureMapping.cube(new Material(idBlock("cs"))), blockModels.modelOutput));
+        MultiVariant meta6 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_6", TextureMapping.cube(new Material(idBlock("ct"))), blockModels.modelOutput));
+        MultiVariant meta7 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_7", TextureMapping.cube(new Material(idBlock("cu"))), blockModels.modelOutput));
+        MultiVariant meta8 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_8", TextureMapping.cube(new Material(idBlock("cv"))), blockModels.modelOutput));
+        MultiVariant meta9 = BlockModelGenerators.plainVariant(CONDUIT_TEMPLATE.createWithSuffix(block.value(), "_9", TextureMapping.cube(new Material(idBlock("cw"))), blockModels.modelOutput));
         blockModels.blockStateOutput.accept(MultiVariantGenerator.dispatch(block.value())
             .with(PropertyDispatch.initial(BlockConduit.VARIANT)
                 .select(0, meta1)
@@ -377,12 +377,12 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private void createForceFieldNodeBlock(BlockModelGenerators blockModels, Block block) {
-        var icon = idBlock("cf");
-        var icon2 = idBlock("cg");
-        var icontop1 = idBlock("cj");
-        var icontop2 = idBlock("ck");
-        var icontop3 = idBlock("cl");
-        var icontop4 = idBlock("cm");
+        Identifier icon = idBlock("cf");
+        Identifier icon2 = idBlock("cg");
+        Identifier icontop1 = idBlock("cj");
+        Identifier icontop2 = idBlock("ck");
+        Identifier icontop3 = idBlock("cl");
+        Identifier icontop4 = idBlock("cm");
 
         blockModels.createHorizontallyRotatedBlock(block, TexturedModel.CUBE.updateTexture(textureMapping -> {
             textureMapping.put(TextureSlot.NORTH, new Material(icon));
@@ -421,12 +421,12 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private void goreBlock(BlockModelGenerators blockModels, Holder<Block> block) {
-        var icon = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("br"))).createWithSuffix(block.value(), "icon1", blockModels.modelOutput));
-        var icon2 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bs"))).createWithSuffix(block.value(), "icon2", blockModels.modelOutput));
-        var icon3 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bt"))).createWithSuffix(block.value(), "icon3", blockModels.modelOutput));
-        var icon4 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bu"))).createWithSuffix(block.value(), "icon4", blockModels.modelOutput));
-        var icon5 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bv"))).createWithSuffix(block.value(), "icon5", blockModels.modelOutput));
-        var icon6 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bw"))).createWithSuffix(block.value(), "icon6", blockModels.modelOutput));
+        MultiVariant icon = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("br"))).createWithSuffix(block.value(), "icon1", blockModels.modelOutput));
+        MultiVariant icon2 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bs"))).createWithSuffix(block.value(), "icon2", blockModels.modelOutput));
+        MultiVariant icon3 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bt"))).createWithSuffix(block.value(), "icon3", blockModels.modelOutput));
+        MultiVariant icon4 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bu"))).createWithSuffix(block.value(), "icon4", blockModels.modelOutput));
+        MultiVariant icon5 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bv"))).createWithSuffix(block.value(), "icon5", blockModels.modelOutput));
+        MultiVariant icon6 = BlockModelGenerators.plainVariant(TexturedModel.createAllSame(new Material(idBlock("bw"))).createWithSuffix(block.value(), "icon6", blockModels.modelOutput));
 
         blockModels.blockStateOutput.accept(
             MultiVariantGenerator.dispatch(block.value())
