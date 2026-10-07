@@ -116,7 +116,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 				poseStack.pushPose();
 			}
 			poseStack.scale(random.nextFloat(), random.nextFloat(), random.nextFloat());
-			poseStack.mulPose(Axis.of(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat())).rotationDegrees(random.nextFloat() * 360));
+			poseStack.rotate(Axis.of(new Vector3f(random.nextFloat(), random.nextFloat(), random.nextFloat())).rotationDegrees(random.nextFloat() * 360));
 			poseStack.translate(random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f, random.nextDouble() * 10.0f - 5.0f);
             poseStack.pushPose();
             poseStack.scale(renderState.ageInTicks, renderState.ageInTicks, renderState.ageInTicks);
@@ -126,7 +126,7 @@ public class RenderAntimatterBombBlast extends EntityRenderer<EntityAntimatterBo
 	}
 
     @Override
-    public boolean shouldRender(EntityAntimatterBombBlast livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityAntimatterBombBlast livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

@@ -44,7 +44,7 @@ public record PlasmaCannonRenderer(SpriteGetter spriteGetter) implements NoDataS
         {
             poseStack.pushPose();
             poseStack.translate(0.5f, 0.2f, -0.03f);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+            poseStack.rotate(Axis.ZP.rotationDegrees(35));
             poseStack.scale(0.03125f, 0.03125f, 0.03125f);
             {
                 poseStack.pushPose();
@@ -62,10 +62,10 @@ public record PlasmaCannonRenderer(SpriteGetter spriteGetter) implements NoDataS
         {
             poseStack.pushPose();
             poseStack.translate(0.5f, 0.2f, -0.03f);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+            poseStack.rotate(Axis.ZP.rotationDegrees(35));
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.ZP.rotationDegrees(225));
+                poseStack.rotate(Axis.ZP.rotationDegrees(225));
                 poseStack.translate(-0.5f, 0.5f, 0.0f);
                 poseStack.scale(0.25f, 0.5f, 0.25f);
                 ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.ethydrod, RenderTypes.entitySolid(RRIdentifiers.ethydrod), lightCoords, overlayCoords, false);
@@ -80,10 +80,10 @@ public record PlasmaCannonRenderer(SpriteGetter spriteGetter) implements NoDataS
         {
             poseStack.pushPose();
             poseStack.translate(0.5f, 0.2f, -0.03f);
-            poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+            poseStack.rotate(Axis.ZP.rotationDegrees(35));
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.ZP.rotationDegrees(247.5f));
+                poseStack.rotate(Axis.ZP.rotationDegrees(247.5f));
                 poseStack.translate(-0.175f, 0.1f, 0.0f);
                 poseStack.scale(0.25f, 0.5f, 0.25f);
                 ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.ethydrod, RenderTypes.entitySolid(RRIdentifiers.ethydrod), lightCoords, overlayCoords);

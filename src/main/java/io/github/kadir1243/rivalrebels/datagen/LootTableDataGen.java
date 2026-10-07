@@ -2,36 +2,27 @@ package io.github.kadir1243.rivalrebels.datagen;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
-import net.minecraft.data.CachedOutput;
-import net.minecraft.data.PackOutput;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.loot.LootTableSubProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
 public class LootTableDataGen extends LootTableProvider {
-    public LootTableDataGen(PackOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
-        super(dataOutput, Set.of(), List.of(new SubProviderEntry(BlockLoots::new, LootContextParamSets.BLOCK)), registryLookup);
-    }
-
-    @Override
-    public CompletableFuture<?> run(CachedOutput cache) {
-        return super.run(cache).exceptionally(e -> {
-            e.printStackTrace();
-            return null;
-        });
+    public LootTableDataGen(BootstrapContext<LootTable> ctx) {
+        super(Set.of(), List.of(new SubProviderEntry(BlockLoots::new, LootContextParamSets.BLOCK)));
     }
 
     public static class BlockLoots extends BlockLootSubProvider {
-        protected BlockLoots(HolderLookup.Provider registries) {
-            super(Set.of(), FeatureFlags.DEFAULT_FLAGS, registries);
+        protected BlockLoots(LootTableSubProvider.Context output) {
+            super(Set.of(), FeatureFlags.DEFAULT_FLAGS, output);
         }
 
         @Override

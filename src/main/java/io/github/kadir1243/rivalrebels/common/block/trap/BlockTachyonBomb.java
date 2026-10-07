@@ -23,15 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public class BlockTachyonBomb extends AbstractBombBlock {
-    public static final MapCodec<BlockTachyonBomb> CODEC = simpleCodec(BlockTachyonBomb::new);
-
     public BlockTachyonBomb(Properties settings) {
 		super(settings);
-    }
-
-    @Override
-    protected MapCodec<BlockTachyonBomb> codec() {
-        return CODEC;
     }
 
     @Nullable

@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "S": "#minecraft:sand"
+  },
+  "pattern": [
+    "SS"
+  ],
+  "result": {
+    "count": 8,
+    "id": "rivalrebels:troll_mask"
+  }
+}

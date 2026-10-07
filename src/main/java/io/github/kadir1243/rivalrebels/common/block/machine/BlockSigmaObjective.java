@@ -33,16 +33,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BlockSigmaObjective extends BaseEntityBlock {
-    public static final MapCodec<BlockSigmaObjective> CODEC = simpleCodec(BlockSigmaObjective::new);
     public BlockSigmaObjective(Properties settings)
 	{
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {

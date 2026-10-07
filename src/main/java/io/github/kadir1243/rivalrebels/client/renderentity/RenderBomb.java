@@ -43,8 +43,8 @@ public class RenderBomb extends EntityRenderer<EntityBomb, RenderBomb.State> {
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+        poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
         if (renderState.deltaMovement.x() == 0 && renderState.deltaMovement.z() == 0) {
             poseStack.pushPose();
             poseStack.scale(renderState.ageInTicks * 0.2f, renderState.ageInTicks * 0.2f, renderState.ageInTicks * 0.2f);
@@ -62,7 +62,7 @@ public class RenderBomb extends EntityRenderer<EntityBomb, RenderBomb.State> {
     }
 
     @Override
-    public boolean shouldRender(EntityBomb livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityBomb livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

@@ -39,10 +39,10 @@ public abstract class FlameBallRenderer<T extends FlameBallProjectile> extends E
         float X = (renderState.sequence % 4) / 4f;
         float Y = (renderState.sequence - (renderState.sequence % 4)) / 16f;
         float size = getSize(renderState);
-        pose.mulPose(cameraRenderState.orientation);
-        pose.mulPose(Axis.XP.rotationDegrees(90));
+        pose.rotate(cameraRenderState.orientation);
+        pose.rotate(Axis.XP.rotationDegrees(90));
         pose.pushPose();
-        pose.mulPose(Axis.YP.rotationDegrees(renderState.rotation));
+        pose.rotate(Axis.YP.rotationDegrees(renderState.rotation));
         nodeCollector.submitCustomGeometry(pose, RenderTypes.entityTranslucentEmissive(RRIdentifiers.etflamebluered), (pose1, buffer) -> {
             buffer.addVertex(pose1, -size, 0, -size).setColor(CommonColors.WHITE).setUv(X, Y).setLight(LightCoordsUtil.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(pose.last(), 0, 1, 0);
             buffer.addVertex(pose1,  size, 0, -size).setColor(CommonColors.WHITE).setUv(X + 0.25f, Y).setLight(LightCoordsUtil.FULL_BRIGHT).setOverlay(OverlayTexture.NO_OVERLAY).setNormal(pose.last(), 0, 1, 0);

@@ -30,9 +30,6 @@ public abstract class AbstractBombBlock extends BaseEntityBlock {
     }
 
     @Override
-    protected abstract MapCodec<? extends BaseEntityBlock> codec();
-
-    @Override
     public @Nullable abstract BlockEntity newBlockEntity(BlockPos worldPosition, BlockState blockState);
 
     @Override

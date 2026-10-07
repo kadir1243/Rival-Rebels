@@ -44,7 +44,7 @@ public class ModelTheoreticalTsarBomba {
 
         for (float i = 0; i < segments; i++) {
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+            poseStack.rotate(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < tsarx.length; f++) {
                 TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
                 TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);
@@ -63,7 +63,7 @@ public class ModelTheoreticalTsarBomba {
 
         for (float i = 0; i < segments; i++) {
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+            poseStack.rotate(Axis.YP.rotationDegrees(add * i));
             poseStack.scale(0.85f, 0.95f, 0.85f);
             for (int f = 1; f < tsarx.length; f++) {
                 TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
@@ -114,7 +114,7 @@ public class ModelTheoreticalTsarBomba {
                 new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
         });
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(120));
+        poseStack.rotate(Axis.YP.rotationDegrees(120));
         nodeCollector.submitCustomGeometry(poseStack, tsarFinsTextureRenderType, (pose, consumer) -> {
             RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
                 new Vector3f(0f, -5f, -0.5f),
@@ -122,7 +122,7 @@ public class ModelTheoreticalTsarBomba {
                 new Vector3f(0f, -3.5f, -1.4f), t1, t2, t3, t4, light, overlay);
         });
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(120));
+        poseStack.rotate(Axis.YP.rotationDegrees(120));
         nodeCollector.submitCustomGeometry(poseStack, tsarFinsTextureRenderType, (pose, consumer) -> {
             RenderHelper.addFace(pose, consumer, new Vector3f(0f, -5f, -1.4f),
                 new Vector3f(0f, -5f, -0.5f),

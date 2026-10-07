@@ -42,17 +42,11 @@ import org.joml.Vector3f;
 import org.jspecify.annotations.Nullable;
 
 public class BlockNuclearBomb extends BaseEntityBlock {
-    public static final MapCodec<BlockNuclearBomb> CODEC = simpleCodec(BlockNuclearBomb::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 
 	public BlockNuclearBomb(Properties settings) {
 		super(settings);
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.DOWN));
-    }
-
-    @Override
-    protected MapCodec<BlockNuclearBomb> codec() {
-        return CODEC;
     }
 
     @Override

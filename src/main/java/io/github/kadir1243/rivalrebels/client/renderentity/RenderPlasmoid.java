@@ -44,13 +44,13 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid, RenderPlasmoi
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		poseStack.pushPose();
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+		poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
 		poseStack.scale(0.4f, 2.5f, 0.4f);
 		poseStack.pushPose();
 
         for (int i = 0; i < 5; i++) {
-            poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rotation));
+            poseStack.rotate(Axis.YP.rotationDegrees(renderState.rotation));
             float scale = 0.4F + 0.2F * i;
             poseStack.pushPose();
             poseStack.scale(scale, scale, scale);
@@ -62,7 +62,7 @@ public class RenderPlasmoid extends EntityRenderer<EntityPlasmoid, RenderPlasmoi
 	}
 
     @Override
-    public boolean shouldRender(EntityPlasmoid livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityPlasmoid livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

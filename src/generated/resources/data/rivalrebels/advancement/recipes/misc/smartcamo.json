@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:smartcamo"
+        "recipes": "rivalrebels:smartcamo"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

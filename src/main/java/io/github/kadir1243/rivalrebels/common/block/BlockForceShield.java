@@ -23,7 +23,7 @@ import net.minecraft.world.level.material.PushReaction;
 public class BlockForceShield extends Block {
 	public BlockForceShield(Properties settings)
 	{
-		super(settings.pushReaction(PushReaction.BLOCK));
+		super(settings.pushReaction(PushReaction.IMMOVEABLE));
 	}
 
     @Override

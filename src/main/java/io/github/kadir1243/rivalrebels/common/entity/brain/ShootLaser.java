@@ -91,7 +91,7 @@ public class ShootLaser extends Behavior<EntityRhodes> {
                                 arms = 2;
                                 mobs = 3;
                             }
-                            case EnderMan ignored -> {
+                            case Enderman ignored -> {
                                 legs = 2;
                                 arms = 2;
                                 mobs = 4;

@@ -186,7 +186,7 @@ public class EntityB2Spirit extends Projectile {
 
                 if (var9 instanceof EntityLaserBurst) {
                     var9.kill((ServerLevel) level());
-                    this.hurt(damageSources().generic(), 6);
+                    this.hurtServer((ServerLevel) level(), damageSources().generic(), 6);
                 }
             }
 
@@ -263,7 +263,7 @@ public class EntityB2Spirit extends Projectile {
 
     @Override
     public boolean hurtServer(ServerLevel level, DamageSource damageSource, float amount) {
-		super.hurt(damageSource, amount);
+		super.hurtServer(level, damageSource, amount);
 		if (this.isAlive()) {
 			this.health -= amount;
 			if (this.health <= 0) {

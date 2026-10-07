@@ -11,10 +11,10 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
-import com.mojang.blaze3d.pipeline.RenderPipeline;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.textures.FilterMode;
+import com.mojang.renderpearl.api.textures.FilterMode;
 import io.github.kadir1243.rivalrebels.RRClient;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RRIdentifiers;
@@ -182,7 +182,7 @@ public class RivalRebelsRenderOverlay {
         graphics.text(fr, RRBlocks.nuclearBomb.get().getName().copy().append(": " + rhodes.getNukeCount()), (int) (w * 0.8), (int) (h * 0.3), CommonColors.WHITE, false);
         graphics.text(fr, Component.literal("Guard"), (int) (w * 0.8), (int) (h * 0.35), RRClient.RHODES_GUARD_KEY.isDown() ? CommonColors.YELLOW : CommonColors.WHITE, false);
         text = rhodes.getName().copy().append(" ").append(RRBlocks.controller.get().getName()).append(": H");
-        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.95), InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_H) ? CommonColors.YELLOW : CommonColors.WHITE, false);
+        graphics.text(fr, text, (int) (w * 0.05), (int) (h * 0.95), InputConstants.isKeyDown(InputConstants.KEY_H) ? CommonColors.YELLOW : CommonColors.WHITE, false);
         if (rhodes.isForceFieldEnabled()) {
             graphics.submitGuiElementRenderState(new GuiElementRenderState() {
                 private final Matrix3x2f pose = new Matrix3x2f(graphics.pose());

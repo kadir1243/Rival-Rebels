@@ -25,6 +25,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ProjectileUtil;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
@@ -105,7 +106,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 			{
                 Entity entityHit = ((EntityHitResult) hitResult).getEntity();
                 entityHit.igniteForSeconds(3);
-				entityHit.hurt(RivalRebelsDamageSource.cooked(level()), 12);
+				entityHit.hurtServer((ServerLevel) level(), RivalRebelsDamageSource.cooked(level()), 12);
 				if (entityHit instanceof Player player) {
                     ItemUtil.damageRandomArmor(player, 8, random);
 				}
@@ -153,7 +154,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 			else if (state.is(RRBlocks.landmine)) id.destroy(level(), blockPosition(), state);
 			else if (state.is(RRBlocks.alandmine)) id.destroy(level(), blockPosition(), state);
 			else if (state.is(Blocks.TNT)) {
-                TntBlock.prime(level(), blockPosition());
+                state.onCaughtFire(level(), blockPosition(), null, null, ItemStack.EMPTY);
                 level().removeBlock(blockPosition(), false);
 			}
 			else if (state.is(RRBlocks.conduit)) level().setBlockAndUpdate(blockPosition(), Blocks.FIRE.defaultBlockState());

@@ -38,8 +38,8 @@ public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade, RenderGas
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90));
+		poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot));
         byte var11 = 0;
 		float var12 = 0.0F;
 		float var13 = 0.5F;
@@ -53,7 +53,7 @@ public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade, RenderGas
         int overlay = OverlayTexture.NO_OVERLAY;
         int packedLight = renderState.lightCoords;
 
-        poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
+        poseStack.rotate(Axis.XP.rotationDegrees(45.0F));
 		poseStack.scale(var20, var20, var20);
 		poseStack.translate(-4.0F, 0.0F, 0.0F);
         int defaultColor = CommonColors.WHITE;
@@ -70,7 +70,7 @@ public class RenderGasGrenade extends EntityRenderer<EntityGasGrenade, RenderGas
         });
 
 		for (int var23 = 0; var23 < 4; ++var23) {
-			poseStack.mulPose(Axis.XP.rotationDegrees(90));
+			poseStack.rotate(Axis.XP.rotationDegrees(90));
             nodeCollector.submitCustomGeometry(poseStack, RENDER_LAYER, (pose, consumer) -> {
                 consumer.addVertex(pose, -8, -2, 0).setColor(defaultColor).setUv(var12, var14).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);
                 consumer.addVertex(pose,  8, -2, 0).setColor(defaultColor).setUv(var13, var14).setOverlay(overlay).setLight(packedLight).setNormal(poseStack.last(), 0.0F, 0.0F, var20);

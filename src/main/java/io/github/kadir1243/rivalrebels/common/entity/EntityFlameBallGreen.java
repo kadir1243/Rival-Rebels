@@ -84,13 +84,13 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 	@Override
 	public void tick() {
 		super.tick();
-		if (tickCount > 100) kill((ServerLevel) level());
+		if (!level().isClientSide() && tickCount > 100) kill((ServerLevel) level());
 		if (tickCount % 3 == 0) sequence++;
 		if (sequence > 3) sequence = 0;
 
 		HitResult hitResult = ProjectileUtil.getHitResultOnMoveVector(this, entity -> entity.canBeCollidedWith(this));
 
-		if (hitResult.getType() != HitResult.Type.MISS && tickCount >= 5)
+		if (!level().isClientSide() && hitResult.getType() != HitResult.Type.MISS && tickCount >= 5)
 		{
 			fire();
 			kill((ServerLevel) level());
@@ -98,7 +98,7 @@ public class EntityFlameBallGreen extends FlameBallProjectile {
 			{
                 Entity entity = ((EntityHitResult) hitResult).getEntity();
                 entity.igniteForSeconds(3);
-				entity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
+				entity.hurtServer((ServerLevel) level(), RivalRebelsDamageSource.cooked(level()), 12);
 				if (entity instanceof Player player) {
                     ItemUtil.damageRandomArmor(player, 8, random);
 				}

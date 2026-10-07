@@ -85,7 +85,7 @@ public class RRConfig {
             infiniteAmmo = builder.define("infiniteAmmo", false);
             infiniteNukes = builder.define("infiniteNukes", false);
             infiniteGrenades = builder.define("infiniteGrenades", false);
-            rhodesTeams = builder.comment("Repeat the type for multiple occurences of the same rhodes. Leave Empty For Random Rhodes Types").defineList("rhodesTeams", List.of(), o -> RivalRebels.RHODES_TYPE_REGISTRY.containsKey(Identifier.tryParse(o.toString())));
+            rhodesTeams = builder.comment("Repeat the type for multiple occurences of the same rhodes. Leave Empty For Random Rhodes Types").defineList("rhodesTeams", List.of(), null, o -> RivalRebels.RHODES_TYPE_REGISTRY.containsKey(Identifier.tryParse(o.toString())));
             prefillrhodes = builder.define("prefillrhodes", true);
             rhodesNukes = builder.define("rhodesNukes", 8);
             rhodesInRoundsChance = builder.define("rhodesInRoundsChance", 0);
@@ -395,27 +395,12 @@ public class RRConfig {
         }
     }
 
-
-    public static class Common {
-        private Common(ModConfigSpec.Builder builder) {
-            builder.push("general");
-
-            builder.pop();
-        }
-    }
-
     public static final ModConfigSpec SERVER_SPEC;
     public static final Server SERVER;
     public static final ModConfigSpec CLIENT_SPEC;
     public static final Client CLIENT;
-    public static final ModConfigSpec COMMON_SPEC;
-    public static final Common COMMON;
 
     static {
-        final Pair<Common, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(Common::new);
-        COMMON_SPEC = specPair.getRight();
-        COMMON = specPair.getLeft();
-
         final Pair<Client, ModConfigSpec> clientSpecPair = new ModConfigSpec.Builder().configure(Client::new);
         CLIENT_SPEC = clientSpecPair.getRight();
         CLIENT = clientSpecPair.getLeft();

@@ -1,19 +1,64 @@
 {
   "values": [
-    "rivalrebels:electricity",
-    "rivalrebels:radioactive_poisoning",
-    "rivalrebels:nuclear_blast",
-    "rivalrebels:cooked",
-    "rivalrebels:gas_grenade",
-    "rivalrebels:cuchillo",
-    "rivalrebels:tron",
-    "rivalrebels:cyanide",
-    "rivalrebels:landmine",
-    "rivalrebels:timed_bomb",
-    "rivalrebels:flare",
-    "rivalrebels:charge",
-    "rivalrebels:plasma_explosion",
-    "rivalrebels:rocket",
-    "rivalrebels:laser_burst"
+    {
+      "id": "rivalrebels:electricity",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:radioactive_poisoning",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:nuclear_blast",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:cooked",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:gas_grenade",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:cuchillo",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:tron",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:cyanide",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:landmine",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:timed_bomb",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:flare",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:charge",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:plasma_explosion",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:rocket",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:laser_burst",
+      "required": false
+    }
   ]
 }

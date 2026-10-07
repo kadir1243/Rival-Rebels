@@ -17,17 +17,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoMineTrap extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoMineTrap> CODEC = simpleCodec(BlockAutoMineTrap::new);
-
     public BlockAutoMineTrap(Properties settings)
 	{
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockAutoMineTrap> codec() {
-        return CODEC;
-    }
 
     @Override
 	public void build(Level world, int x, int y, int z)

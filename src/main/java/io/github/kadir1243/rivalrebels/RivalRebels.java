@@ -71,9 +71,8 @@ public class RivalRebels {
     public static RivalRebelsRound round;
 
     public RivalRebels(IEventBus modEventBus, ModContainer modContainer, Dist dist) {
-        modContainer.registerConfig(ModConfig.Type.COMMON, RRConfig.SERVER_SPEC);
+        modContainer.registerConfig(ModConfig.Type.SYNCED, RRConfig.SERVER_SPEC);
         modContainer.registerConfig(ModConfig.Type.CLIENT, RRConfig.CLIENT_SPEC);
-        modContainer.registerConfig(ModConfig.Type.SERVER, RRConfig.COMMON_SPEC);
 
         NeoForge.EVENT_BUS.addListener(RivalRebels::registerCommand);
         RRComponents.init(modEventBus);

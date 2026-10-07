@@ -33,8 +33,8 @@ public class RoddiskRenderer extends EntityRenderer<RoddiskBase, RoddiskRenderer
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-        poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f + er));
+        poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90.0f + er));
         poseStack.scale(0.4f, 0.4f, 0.4f);
         poseStack.pushPose();
 
@@ -48,7 +48,7 @@ public class RoddiskRenderer extends EntityRenderer<RoddiskBase, RoddiskRenderer
     }
 
     @Override
-    public boolean shouldRender(RoddiskBase livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(RoddiskBase livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

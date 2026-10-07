@@ -13,6 +13,7 @@ package io.github.kadir1243.rivalrebels.common.block.trap;
 
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
@@ -50,8 +51,8 @@ public class BlockPetrifiedWood extends Block {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
-		if (level.getRandom().nextInt(2) == 0) {
-			entity.hurt(RivalRebelsDamageSource.radioactivePoisoning(level), ((16 - level.getBlockState(pos).getValue(META)) / 2) + level.getRandom().nextInt(3) - 1);
+		if (!level.isClientSide() && level.getRandom().nextInt(2) == 0) {
+			entity.hurtServer((ServerLevel) level, RivalRebelsDamageSource.radioactivePoisoning(level), ((16 - level.getBlockState(pos).getValue(META)) / 2) + level.getRandom().nextInt(3) - 1);
 		}
 	}
 

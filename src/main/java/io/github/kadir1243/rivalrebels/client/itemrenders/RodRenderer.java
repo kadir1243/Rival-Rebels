@@ -34,7 +34,7 @@ public record RodRenderer(Identifier texture) implements NoDataSpecialModelRende
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         poseStack.pushPose();
 		poseStack.translate(0.5f, 0.5f, -0.03f);
-		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
+		poseStack.rotate(Axis.ZP.rotationDegrees(35));
 		poseStack.scale(0.5f, 1.25f, 0.5f);
 		poseStack.pushPose();
 

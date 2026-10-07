@@ -39,7 +39,6 @@ import org.jspecify.annotations.Nullable;
 import java.util.List;
 
 public class BlockReactor extends BaseEntityBlock {
-    public static final MapCodec<BlockReactor> CODEC = simpleCodec(BlockReactor::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public BlockReactor(Properties settings) {
@@ -50,11 +49,6 @@ public class BlockReactor extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
-    }
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
     }
 
     @Nullable

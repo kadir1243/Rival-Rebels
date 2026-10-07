@@ -36,8 +36,8 @@ public class RodaRenderer implements NoDataSpecialModelRenderer {
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         poseStack.pushPose();
 		poseStack.translate(0.5f, 0.5f, -0.03f);
-		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
-		poseStack.mulPose(Axis.YP.rotationDegrees(90));
+		poseStack.rotate(Axis.ZP.rotationDegrees(35));
+		poseStack.rotate(Axis.YP.rotationDegrees(90));
 		poseStack.scale(0.35f, 0.35f, 0.35f);
 		//if (!mode.firstPerson()) poseStack.scale(-1, 1, 1);
 		poseStack.translate(0.2f, -0.55f, 0.1f);

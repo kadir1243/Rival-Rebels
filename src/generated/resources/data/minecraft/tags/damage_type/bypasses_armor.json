@@ -1,6 +1,12 @@
 {
   "values": [
-    "rivalrebels:electricity",
-    "rivalrebels:radioactive_poisoning"
+    {
+      "id": "rivalrebels:electricity",
+      "required": false
+    },
+    {
+      "id": "rivalrebels:radioactive_poisoning",
+      "required": false
+    }
   ]
 }

@@ -70,7 +70,7 @@ public class EntityCuchillo extends ThrowableProjectile {
     @Override
     protected void onHitEntity(EntityHitResult result) {
         if (!level().isClientSide()) {
-            result.getEntity().hurt(RivalRebelsDamageSource.cuchillo(level()), 7);
+            result.getEntity().hurtServer((ServerLevel) level(), RivalRebelsDamageSource.cuchillo(level()), 7);
             kill((ServerLevel) level());
         }
     }

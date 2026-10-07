@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "T": "rivalrebels:troll_mask"
+  },
+  "pattern": [
+    "TT",
+    "TT"
+  ],
+  "result": {
+    "id": "rivalrebels:cycle"
+  }
+}

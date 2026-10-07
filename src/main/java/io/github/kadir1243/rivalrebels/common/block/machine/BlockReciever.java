@@ -35,7 +35,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BlockReciever extends BaseEntityBlock {
-    public static final MapCodec<BlockReciever> CODEC = simpleCodec(BlockReciever::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 
     public BlockReciever(Properties settings) {
@@ -43,11 +42,6 @@ public class BlockReciever extends BaseEntityBlock {
 
         registerDefaultState(getStateDefinition().any().setValue(FACING, Direction.NORTH));
 	}
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

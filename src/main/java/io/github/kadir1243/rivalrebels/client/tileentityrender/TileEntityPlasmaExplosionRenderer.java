@@ -53,13 +53,13 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
 		poseStack.translate(0.5F, 0.5F, 0.5F);
 
 		poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.size * 50));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.size * 50));
         renderBlastSphere(renderState, fsize * 5.5f, poseStack, nodeCollector, 0.45f, 0.45f, 0.65f, 0.4f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.size * 50));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.size * 50));
         renderBlastSphere(renderState, fsize * 5.6f, poseStack, nodeCollector, 0.45f, 0.35f, 0.65f, 0.4f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.size * 50));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.size * 50));
         renderBlastSphere(renderState, fsize * 5.7f, poseStack, nodeCollector, 0.45f, 0.35f, 0.95f, 0.4f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.size * 50));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.size * 50));
         renderBlastSphere(renderState, fsize * 5.8f, poseStack, nodeCollector, 0.45f, 0.35f, 0.65f, 0.4f);
 		poseStack.popPose();
         renderBlastSphere(renderState, fsize * 5.9f, poseStack, nodeCollector, 0.45f, 0.35f, 0.65f, 0.4f);

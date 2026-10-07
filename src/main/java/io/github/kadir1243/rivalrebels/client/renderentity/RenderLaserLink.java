@@ -43,8 +43,8 @@ public class RenderLaserLink extends EntityRenderer<EntityLaserLink, RenderLaser
             float radius = 0.7F;
 
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(-renderState.yRot));
-            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
+            poseStack.rotate(Axis.YP.rotationDegrees(-renderState.yRot));
+            poseStack.rotate(Axis.XP.rotationDegrees(renderState.xRot));
 
             for (float o = 0; o <= radius; o += radius / 16) {
                 float finalO = o;
@@ -66,7 +66,7 @@ public class RenderLaserLink extends EntityRenderer<EntityLaserLink, RenderLaser
     }
 
     @Override
-    public boolean shouldRender(EntityLaserLink livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityLaserLink livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

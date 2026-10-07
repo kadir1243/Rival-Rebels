@@ -51,7 +51,7 @@ public class RenderBullet extends EntityRenderer<Entity, EntityRenderState> {
             float var7 = 1.0F;
             float var8 = 0.5F;
             float var9 = 0.25F;
-            poseStack.mulPose(cameraRenderState.orientation);
+            poseStack.rotate(cameraRenderState.orientation);
             nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(getTextureLocation()), (pose, consumer) -> {
                 consumer.addVertex(pose, (0.0F - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(0, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(renderState.lightCoords).setNormal(poseStack.last(), 0, 1, 0);
                 consumer.addVertex(pose, (var7 - var8), (0.0F - var9), 0).setColor(CommonColors.WHITE).setUv(1, 0).setOverlay(OverlayTexture.NO_OVERLAY).setLight(renderState.lightCoords).setNormal(poseStack.last(), 0, 1, 0);
@@ -69,7 +69,7 @@ public class RenderBullet extends EntityRenderer<Entity, EntityRenderState> {
     }
 
     @Override
-    public boolean shouldRender(Entity entity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(Entity entity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return entity.shouldRender(camX, camY, camZ);
     }
 

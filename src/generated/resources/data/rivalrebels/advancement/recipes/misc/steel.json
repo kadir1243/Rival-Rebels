@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:steel"
+        "recipes": "rivalrebels:steel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

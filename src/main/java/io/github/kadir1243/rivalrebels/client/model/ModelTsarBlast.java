@@ -64,7 +64,7 @@ public class ModelTsarBlast {
         poseStack.pushPose();
         for (float i = 0; i < segments; i++) {
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+            poseStack.rotate(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < tsart; f++) {
                 int ind0 = (time.length + index - 1) % time.length;
                 float x0 = tsarx[ind0][f - 1] + (((tsarx[index][f - 1] - tsarx[ind0][f - 1]) / time[ind0]) * timer);

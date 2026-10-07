@@ -101,8 +101,8 @@ public class ItemTesla extends Item {
 
     @Override
     public void onUseTick(Level world, LivingEntity user, ItemStack stack, int remainingUseTicks) {
-		if (user.isInWaterOrRain() && !user.isInvulnerableTo(((ServerLevel) world), RivalRebelsDamageSource.electricity(world))) {
-			user.hurt(RivalRebelsDamageSource.electricity(world), 2);
+		if (!world.isClientSide() && user.isInWaterOrRain() && !user.isInvulnerableTo(((ServerLevel) world), RivalRebelsDamageSource.electricity(world))) {
+			user.hurtServer((ServerLevel) world, RivalRebelsDamageSource.electricity(world), 2);
 		}
 		if (user.getRandom().nextInt(10) == 0) user.playSound(RRSounds.TESLA.get());
 

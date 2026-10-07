@@ -43,7 +43,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class BlockGore extends BaseEntityBlock {
-    public static final MapCodec<BlockGore> CODEC = simpleCodec(BlockGore::new);
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 5);
     public static final BooleanProperty NORTH = PipeBlock.NORTH;
     public static final BooleanProperty EAST = PipeBlock.EAST;
@@ -69,11 +68,6 @@ public class BlockGore extends BaseEntityBlock {
             .setValue(EAST, false)
             .setValue(META, 0));
         this.shapes = this.makeShapes();
-    }
-
-    @Override
-    protected MapCodec<BlockGore> codec() {
-        return CODEC;
     }
 
     @Override

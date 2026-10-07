@@ -25,7 +25,7 @@ import org.joml.Vector3f;
 @OnlyIn(Dist.CLIENT)
 public class RenderHelper {
     public static void renderBox(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, float length, float height, float depth, float texLocX, float texLocY, float texXsize, float texYsize, float resolution, int light) {
-		poseStack.mulPose(Axis.YP.rotationDegrees(90));
+		poseStack.rotate(Axis.YP.rotationDegrees(90));
 		texLocX /= texXsize;
 		texLocY /= texYsize;
 		float hl = (length / 2f) / resolution;

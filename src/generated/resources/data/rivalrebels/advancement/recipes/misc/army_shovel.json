@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:army_shovel"
+        "recipes": "rivalrebels:army_shovel"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

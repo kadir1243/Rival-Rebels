@@ -2,20 +2,18 @@ package io.github.kadir1243.rivalrebels.datagen;
 
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.item.RRItems;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.data.PackOutput;
+import net.minecraft.advancements.Advancement;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.worldgen.BootstrapContext;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.ItemLike;
 
-import java.util.concurrent.CompletableFuture;
-
 public class RecipeDataGen extends RecipeProvider {
-    public RecipeDataGen(HolderLookup.Provider output, RecipeOutput recipeOutput) {
-        super(output, recipeOutput);
+    public RecipeDataGen(BootstrapContext<Recipe<?>> recipeOutput, BootstrapContext<Advancement> advancementOutput) {
+        super(recipeOutput, advancementOutput);
     }
 
     @Override
@@ -160,28 +158,89 @@ public class RecipeDataGen extends RecipeProvider {
             .save(output);
 
         // Explosives
-        addRecipee(RRItems.pliers, " C", "C ", 'C', ItemTags.STONE_CRAFTING_MATERIALS);
+        this.shaped(RecipeCategory.MISC, RRItems.pliers)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
+            .pattern(" C")
+            .pattern("C ")
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
+            .save(output);
 
-        addRecipee(RRItems.roda, "IN", "IH", "IR", 'I', Items.IRON_INGOT, 'N', RRItems.NUCLEAR_ROD, 'H', RRItems.hydrod, 'R', RRItems.redrod);
+        this.shaped(RecipeCategory.MISC, RRItems.roda)
+            .define('I', Items.IRON_INGOT)
+            .define('N', RRItems.NUCLEAR_ROD)
+            .define('H', RRItems.hydrod)
+            .define('R', RRItems.redrod)
+            .pattern("IN")
+            .pattern("IH")
+            .pattern("IR")
+            .unlockedBy("has_iron_ingot", this.has(Items.IRON_INGOT))
+            .save(output);
 
         // Weapons
-        addRecipe(RRItems.knife, 5, "CG", "GC", 'C', ItemTags.STONE_CRAFTING_MATERIALS, 'G', Items.GRAVEL);
+        this.shaped(RecipeCategory.MISC, RRItems.knife, 5)
+            .define('C', ItemTags.STONE_CRAFTING_MATERIALS)
+            .define('G', Items.GRAVEL)
+            .pattern("CG")
+            .pattern("GC")
+            .unlockedBy("has_cobblestone", has(ItemTags.STONE_CRAFTING_MATERIALS))
+            .save(output);
 
         // Miscellaneous
-        addRecipe(RRItems.trollmask, 8, "SS", 'S', ItemTags.SAND);
+        this.shaped(RecipeCategory.MISC, RRItems.trollmask, 8)
+            .define('S', ItemTags.SAND)
+            .pattern("SS")
+            .unlockedBy("has_sand", has(ItemTags.SAND))
+            .save(output);
 
-        addRecipee(RRBlocks.cycle, "TT", "TT", 'T', RRItems.trollmask);
+        this.shaped(RecipeCategory.MISC, RRBlocks.cycle)
+            .define('T', RRItems.trollmask)
+            .pattern("TT")
+            .pattern("TT")
+            .unlockedBy("has_trollmask", has(RRItems.trollmask))
+            .save(output);
 
         // End Tier 1
         // Tier 2
         // AutoBuilds
-        addRecipe(RRBlocks.tower, 2, "SS", "SJ", 'S', RRBlocks.steel, 'J', RRBlocks.jump);
+        this.shaped(RecipeCategory.MISC, RRBlocks.tower, 2)
+            .define('S', RRBlocks.steel)
+            .define('J', RRBlocks.jump)
+            .pattern("SS")
+            .pattern("SJ")
+            .unlockedBy("has_steel", has(RRBlocks.steel))
+            .save(output);
 
-        addRecipee(RRBlocks.barricade, "SSS", "LPL", "RCR", 'L', RRItems.binoculars, 'P', RRItems.pliers, 'S', RRBlocks.supplies, 'R', RRBlocks.reactive, 'C', RRBlocks.conduit);
+        this.shaped(RecipeCategory.MISC, RRBlocks.barricade)
+            .define('S', RRBlocks.supplies)
+            .define('L', RRItems.binoculars)
+            .define('P', RRItems.pliers)
+            .define('R', RRBlocks.reactive)
+            .define('C', RRBlocks.conduit)
+            .pattern("SSS")
+            .pattern("LPL")
+            .pattern("RCR")
+            .unlockedBy("has_supplies", has(RRBlocks.supplies))
+            .save(output);
 
-        addRecipee(RRBlocks.timedbomb, "FB", "RP", 'P', RRItems.pliers, 'B', RRItems.battery, 'R', RRItems.rocket, 'F', RRItems.fuel);
+        this.shaped(RecipeCategory.MISC, RRBlocks.timedbomb)
+            .define('F', RRItems.fuel)
+            .define('P', RRItems.pliers)
+            .define('R', RRItems.rocket)
+            .define('B', RRItems.battery)
+            .pattern("FB")
+            .pattern("RP")
+            .unlockedBy("has_pliers", has(RRItems.pliers))
+            .save(output);
 
-        addRecipe(RRBlocks.remotecharge, 4, "GB", "RF", 'G', RRItems.gasgrenade, 'B', RRItems.battery, 'R', RRItems.rocket, 'F', RRItems.fuel);
+        this.shaped(RecipeCategory.MISC, RRBlocks.remotecharge, 4)
+            .define('F', RRItems.fuel)
+            .define('G', RRItems.gasgrenade)
+            .define('R', RRItems.rocket)
+            .define('B', RRItems.battery)
+            .pattern("GB")
+            .pattern("RF")
+            .unlockedBy("has_pliers", has(RRItems.pliers))
+            .save(output);
 
         addRecipee(RRItems.remote, "BF", "RP", 'P', RRItems.pliers, 'B', RRItems.battery, 'R', RRItems.rocket, 'F', RRItems.fuel);
 
@@ -283,21 +342,5 @@ public class RecipeDataGen extends RecipeProvider {
 
     @Deprecated(forRemoval = true)
     private static void addRecipe(ItemLike output, int count, Object... input) {
-    }
-
-    public static class RecipeRunner extends RecipeProvider.Runner {
-        public RecipeRunner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-            super(packOutput, registries);
-        }
-
-        @Override
-        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-            return new RecipeDataGen(registries, output);
-        }
-
-        @Override
-        public String getName() {
-            return "RR Recipe DataGen";
-        }
     }
 }

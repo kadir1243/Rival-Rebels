@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:sigmaarmor"
+        "recipes": "rivalrebels:sigmaarmor"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

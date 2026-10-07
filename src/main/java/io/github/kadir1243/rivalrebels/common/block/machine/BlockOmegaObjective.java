@@ -33,15 +33,9 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BlockOmegaObjective extends BaseEntityBlock {
-    public static final MapCodec<BlockOmegaObjective> CODEC = simpleCodec(BlockOmegaObjective::new);
 	public BlockOmegaObjective(Properties settings) {
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockOmegaObjective> codec() {
-        return CODEC;
-    }
 
     @Override
     public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean movedByPiston) {

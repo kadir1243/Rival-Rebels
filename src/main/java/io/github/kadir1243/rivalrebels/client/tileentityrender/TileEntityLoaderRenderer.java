@@ -55,7 +55,7 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
         poseStack.pushPose();
         poseStack.mulPose(ChestRenderer.modelTransformation(renderState.facing));
         poseStack.translate(0.5F, 0.5F, 0.5F);
-        poseStack.mulPose(Axis.YN.rotationDegrees(90));
+        poseStack.rotate(Axis.YN.rotationDegrees(90));
 
         ModelLoader.render(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etloader), poseStack, renderState.slide, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
@@ -64,7 +64,7 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
 			poseStack.translate(0.5F, 0.5F, 0.5F);
 			int xdif = machine.getBlockPos().getX() - renderState.blockPos.getX();
 			int zdif = machine.getBlockPos().getZ() - renderState.blockPos.getZ();
-			poseStack.mulPose(Axis.YP.rotationDegrees((float) (-90 + Math.atan2(xdif, zdif) * Mth.RAD_TO_DEG)));
+			poseStack.rotate(Axis.YP.rotationDegrees((float) (-90 + Math.atan2(xdif, zdif) * Mth.RAD_TO_DEG)));
 			poseStack.translate(-1f, -0.40f, 0);
 			poseStack.scale(0.5F, 0.15F, 0.15F);
 			int dist = (int) Mth.sqrt((xdif * xdif) + (zdif * zdif));

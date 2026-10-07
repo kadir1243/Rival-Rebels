@@ -99,7 +99,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
     }
 
     @Override
-    public boolean shouldRender(EntityRhodes livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityRhodes livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 
@@ -126,7 +126,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
         }
         poseStack.pushPose();
         poseStack.translate(0, 16, 0);
-        poseStack.mulPose(cameraRenderState.orientation);
+        poseStack.rotate(cameraRenderState.orientation);
         poseStack.scale(0.025F, -0.025F, 0.025F);
         float f = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
         int j = (int)(f * 255.0F) << 24;
@@ -156,12 +156,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
             if (rhodesType == RhodesTypes.Space) {
                 {
                     poseStack.pushPose();
-                    poseStack.mulPose(Axis.YP.rotationDegrees(renderState.bodyyaw));
+                    poseStack.rotate(Axis.YP.rotationDegrees(renderState.bodyyaw));
                     poseStack.translate(0, 10f, 0);
                     ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etbooster), boosterModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                     {
                         poseStack.pushPose();
-                        poseStack.mulPose(Axis.XP.rotationDegrees(-90));
+                        poseStack.rotate(Axis.XP.rotationDegrees(-90));
                         poseStack.translate(0, 4, -2);
                         poseStack.scale(2.2f, 2.2f, 2.2f);
                         if (renderState.b2Energy > 0) {
@@ -173,7 +173,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                 }
 			} else {
                 RenderType textureRenderType = RenderTypes.entitySolid(rhodesType.getTexture());
-                poseStack.mulPose(Axis.YP.rotationDegrees(renderState.bodyyaw));
+                poseStack.rotate(Axis.YP.rotationDegrees(renderState.bodyyaw));
 
 				float leftlegheight = 7.26756f - 15
 						+ (Mth.cos((renderState.leftthighpitch+11.99684962f)*Mth.DEG_TO_RAD) * 7.331691240f)
@@ -188,7 +188,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     poseStack.translate(0, Math.max(leftlegheight, rightlegheight), 0);
 
                     poseStack.pushPose();
-                    poseStack.mulPose(Axis.XP.rotationDegrees(-90));
+                    poseStack.rotate(Axis.XP.rotationDegrees(-90));
                     poseStack.translate(0, 4, -2);
                     if (renderState.b2Energy > 0) {
                         poseStack.pushPose();
@@ -210,7 +210,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     {//RIGHT UPPERARM
                         poseStack.pushPose();
                         poseStack.translate(-6.4f, 0, 0);
-                        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rightarmyaw));
+                        poseStack.rotate(Axis.YP.rotationDegrees(renderState.rightarmyaw));
                         poseStack.scale(-1, 1, 1);
                         ObjModels.submit(nodeCollector, textureRenderType, upperArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
@@ -218,7 +218,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         {
                             poseStack.pushPose();
                             poseStack.translate(0, -1.5f, 0);
-                            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightarmpitch));
+                            poseStack.rotate(Axis.XP.rotationDegrees(renderState.rightarmpitch));
                             ObjModels.submit(nodeCollector, textureRenderType, lowerArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             poseStack.scale(-1, 1, 1);
                             ObjModels.submit(nodeCollector, textureRenderType, flameThrowerModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
@@ -231,13 +231,13 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     {//LEFT UPPERARM
                         poseStack.pushPose();
                         poseStack.translate(6.4f, 0, 0);
-                        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.leftarmyaw));
+                        poseStack.rotate(Axis.YP.rotationDegrees(renderState.leftarmyaw));
                         ObjModels.submit(nodeCollector, textureRenderType, upperArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         {//LEFT LOWERARM
                             poseStack.pushPose();
                             poseStack.translate(0, -1.5f, 0);
-                            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftarmpitch));
+                            poseStack.rotate(Axis.XP.rotationDegrees(renderState.leftarmpitch));
                             ObjModels.submit(nodeCollector, textureRenderType, lowerArmModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             ObjModels.submit(nodeCollector, textureRenderType, rocketLauncherModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             poseStack.popPose();
@@ -249,14 +249,14 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     {//RIGHT THIGH
                         poseStack.pushPose();
                         poseStack.translate(0, -7.26756f, -0.27904f);
-                        poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightthighpitch));
+                        poseStack.rotate(Axis.XP.rotationDegrees(renderState.rightthighpitch));
                         poseStack.scale(-1, 1, 1);
                         ObjModels.submit(nodeCollector, textureRenderType, thighModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         {//RIGHT SHIN
                             poseStack.pushPose();
                             poseStack.translate(0, -7.17156f, -1.52395f);
-                            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightshinpitch));
+                            poseStack.rotate(Axis.XP.rotationDegrees(renderState.rightshinpitch));
                             ObjModels.submit(nodeCollector, textureRenderType, shinModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             if (renderState.isBurning) {
                                 ObjModels.submit(nodeCollector, RenderTypes.entityCutout(flame), flameModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
@@ -270,14 +270,14 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     {//LEFT THIGH
                         poseStack.pushPose();
                         poseStack.translate(0, -7.26756f, -0.27904f);
-                        poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftthighpitch));
+                        poseStack.rotate(Axis.XP.rotationDegrees(renderState.leftthighpitch));
                         ObjModels.submit(nodeCollector, textureRenderType, thighModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         //LEFT SHIN
                         {
                             poseStack.pushPose();
                             poseStack.translate(0, -7.17156f, -1.52395f);
-                            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftshinpitch));
+                            poseStack.rotate(Axis.XP.rotationDegrees(renderState.leftshinpitch));
                             ObjModels.submit(nodeCollector, textureRenderType, shinModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
                             if (renderState.isBurning) {
                                 ObjModels.submit(nodeCollector, RenderTypes.entityCutout(flame), flameModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
@@ -291,8 +291,8 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                     {//HEAD
                         poseStack.pushPose();
                         poseStack.translate(0, 5.23244f, 0);
-                        poseStack.mulPose(Axis.XP.rotationDegrees(renderState.headpitch));
-                        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.viewYRot));
+                        poseStack.rotate(Axis.XP.rotationDegrees(renderState.headpitch));
+                        poseStack.rotate(Axis.YP.rotationDegrees(renderState.viewYRot));
                         ObjModels.submit(nodeCollector, textureRenderType, headModel, poseStack, colorOfRhodes, packedLight, OverlayTexture.NO_OVERLAY);
 
                         {
@@ -325,13 +325,13 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         {//RIGHT UPPERARM
                             poseStack.pushPose();
                             poseStack.translate(-6.4f, 0, 0);
-                            poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rightarmyaw));
+                            poseStack.rotate(Axis.YP.rotationDegrees(renderState.rightarmyaw));
                             poseStack.scale(-1, 1, 1);
                             ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffUpperArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//RIGHT LOWERARM
                                 poseStack.pushPose();
                                 poseStack.translate(0, -1.5f, 0);
-                                poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightarmpitch));
+                                poseStack.rotate(Axis.XP.rotationDegrees(renderState.rightarmpitch));
                                 ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffLowerArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
@@ -340,12 +340,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         {//LEFT UPPERARM
                             poseStack.pushPose();
                             poseStack.translate(6.4f, 0, 0);
-                            poseStack.mulPose(Axis.YP.rotationDegrees(renderState.leftarmyaw));
+                            poseStack.rotate(Axis.YP.rotationDegrees(renderState.leftarmyaw));
                             ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffUpperArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//LEFT LOWERARM
                                 poseStack.pushPose();
                                 poseStack.translate(0, -1.5f, 0);
-                                poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftarmpitch));
+                                poseStack.rotate(Axis.XP.rotationDegrees(renderState.leftarmpitch));
                                 ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffLowerArmModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
@@ -354,13 +354,13 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         {//RIGHT THIGH
                             poseStack.pushPose();
                             poseStack.translate(0, -7.26756f, -0.27904f);
-                            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightthighpitch));
+                            poseStack.rotate(Axis.XP.rotationDegrees(renderState.rightthighpitch));
                             poseStack.scale(-1, 1, 1);
                             ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffThighModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//RIGHT SHIN
                                 poseStack.pushPose();
                                 poseStack.translate(0, -7.17156f, -1.52395f);
-                                poseStack.mulPose(Axis.XP.rotationDegrees(renderState.rightshinpitch));
+                                poseStack.rotate(Axis.XP.rotationDegrees(renderState.rightshinpitch));
                                 ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffShinModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
@@ -369,12 +369,12 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         {//LEFT THIGH
                             poseStack.pushPose();
                             poseStack.translate(0, -7.26756f, -0.27904f);
-                            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftthighpitch));
+                            poseStack.rotate(Axis.XP.rotationDegrees(renderState.leftthighpitch));
                             ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffThighModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             {//LEFT SHIN
                                 poseStack.pushPose();
                                 poseStack.translate(0, -7.17156f, -1.52395f);
-                                poseStack.mulPose(Axis.XP.rotationDegrees(renderState.leftshinpitch));
+                                poseStack.rotate(Axis.XP.rotationDegrees(renderState.leftshinpitch));
                                 ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffShinModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                                 poseStack.popPose();
                             }
@@ -383,8 +383,8 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
                         {//HEAD
                             poseStack.pushPose();
                             poseStack.translate(0, 5.23244f, 0);
-                            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.headpitch));
-                            poseStack.mulPose(Axis.YP.rotationDegrees(renderState.viewYRot));
+                            poseStack.rotate(Axis.XP.rotationDegrees(renderState.headpitch));
+                            poseStack.rotate(Axis.YP.rotationDegrees(renderState.viewYRot));
                             ObjModels.submit(nodeCollector, RRRenderTypes.CELLULAR_NOISE, ffheadModel, poseStack, CommonColors.WHITE, packedLight, OverlayTexture.NO_OVERLAY);
                             poseStack.popPose();
                         }
@@ -401,32 +401,32 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
 
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.YP.rotationDegrees(elev * 2));
-                poseStack.mulPose(Axis.XP.rotationDegrees(elev * 3));
+                poseStack.rotate(Axis.YP.rotationDegrees(elev * 2));
+                poseStack.rotate(Axis.XP.rotationDegrees(elev * 3));
                 renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev, ARGB.colorFromFloat(1F, 1F, 0.25f, 0));
                 poseStack.popPose();
             }
 
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.YP.rotationDegrees(elev * -2));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 4));
+                poseStack.rotate(Axis.YP.rotationDegrees(elev * -2));
+                poseStack.rotate(Axis.ZP.rotationDegrees(elev * 4));
                 renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev - 0.2f, ARGB.colorFromFloat(1F, 1, 0.5f, 0));
                 poseStack.popPose();
             }
 
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.XP.rotationDegrees(elev * -3));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 2));
+                poseStack.rotate(Axis.XP.rotationDegrees(elev * -3));
+                poseStack.rotate(Axis.ZP.rotationDegrees(elev * 2));
                 renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev - 0.4f, CommonColors.RED);
                 poseStack.popPose();
             }
 
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.YP.rotationDegrees(elev * -1));
-                poseStack.mulPose(Axis.ZP.rotationDegrees(elev * 3));
+                poseStack.rotate(Axis.YP.rotationDegrees(elev * -1));
+                poseStack.rotate(Axis.ZP.rotationDegrees(elev * 3));
                 renderBlastSphereWithLightningRenderType(renderState, poseStack, nodeCollector, elev - 0.6f, CommonColors.YELLOW);
                 poseStack.popPose();
             }

@@ -68,9 +68,9 @@ public class TileEntityRecieverRenderer implements BlockEntityRenderer<TileEntit
         ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etreciever), trayModel, poseStack, CommonColors.WHITE, packedLight, packedOverlay);
 		if (renderState.hasWeapon) {
             poseStack.translate(0, 0.5 * 1.5, (-0.5 - 0.34) * 1.5);
-			poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yaw - facing.toYRot()));
+			poseStack.rotate(Axis.YP.rotationDegrees(renderState.yaw - facing.toYRot()));
             ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etreciever), armModel, poseStack, CommonColors.WHITE, packedLight, packedOverlay);
-            poseStack.mulPose(Axis.XP.rotationDegrees(renderState.pitch));
+            poseStack.rotate(Axis.XP.rotationDegrees(renderState.pitch));
             ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etreciever), adsdragonModel, poseStack, CommonColors.WHITE, packedLight, packedOverlay);
 		}
 		poseStack.popPose();

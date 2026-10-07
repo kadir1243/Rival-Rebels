@@ -91,11 +91,11 @@ public class RenderCuchillo extends EntityRenderer<EntityCuchillo, RenderCuchill
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90));
+		poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot));
 		float var20 = 0.05625F;
 
-        poseStack.mulPose(Axis.XP.rotationDegrees(45.0F));
+        poseStack.rotate(Axis.XP.rotationDegrees(45.0F));
 		poseStack.scale(var20, var20, var20);
 		poseStack.translate(-4.0F, 0.0F, 0.0F);
         QuadHelper.submitQuadSupplier(nodeCollector, poseStack, RenderTypes.entityCutout(RRIdentifiers.etknife), BAKED_MODEL, renderState.lightCoords, OverlayTexture.NO_OVERLAY);

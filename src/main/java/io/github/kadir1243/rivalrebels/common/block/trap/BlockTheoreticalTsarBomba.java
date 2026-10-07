@@ -30,15 +30,8 @@ import org.jspecify.annotations.Nullable;
 import java.util.Map;
 
 public class BlockTheoreticalTsarBomba extends AbstractBombBlock {
-    public static final MapCodec<BlockTheoreticalTsarBomba> CODEC = simpleCodec(BlockTheoreticalTsarBomba::new);
-
     public BlockTheoreticalTsarBomba(Properties settings) {
 		super(settings);
-    }
-
-    @Override
-    protected MapCodec<BlockTheoreticalTsarBomba> codec() {
-        return CODEC;
     }
 
     private static final Map<Direction, VoxelShape> SHAPE = Shapes.rotateHorizontal(Shapes.create(0, 0, -2, 1, 2, 3));

@@ -38,8 +38,8 @@ public abstract class RhodesPartRenderer<T extends EntityRhodesPiece> extends En
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
         poseStack.scale(renderState.scale, renderState.scale, renderState.scale);
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
-        poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot));
+        poseStack.rotate(Axis.XP.rotationDegrees(renderState.xRot));
         this.renderParts(renderState, poseStack, nodeCollector, renderState.lightCoords);
         poseStack.popPose();
     }
@@ -51,7 +51,7 @@ public abstract class RhodesPartRenderer<T extends EntityRhodesPiece> extends En
     }
 
     @Override
-    public boolean shouldRender(T livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(T entity, Frustum culler, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

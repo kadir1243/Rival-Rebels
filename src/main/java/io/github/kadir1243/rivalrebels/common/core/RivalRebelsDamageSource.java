@@ -88,7 +88,6 @@ public class RivalRebelsDamageSource {
     }
 
     public static class RRDamageTypes {
-        public static final List<ResourceKey<DamageType>> REGISTERED_DAMAGE_TYPES = new ArrayList<>();
         public static final ResourceKey<DamageType> ELECTRICITY = register("electricity");
         public static final ResourceKey<DamageType> RADIOACTIVE_POISONING = register("radioactive_poisoning");
         public static final ResourceKey<DamageType> NUCLEAR_BLAST = register("nuclear_blast");
@@ -106,9 +105,7 @@ public class RivalRebelsDamageSource {
         public static final ResourceKey<DamageType> LASER_BURST = register("laser_burst");
 
         private static ResourceKey<DamageType> register(String name) {
-            ResourceKey<DamageType> key = ResourceKey.create(Registries.DAMAGE_TYPE, RRIdentifiers.create(name));
-            REGISTERED_DAMAGE_TYPES.add(key);
-            return key;
+            return ResourceKey.create(Registries.DAMAGE_TYPE, RRIdentifiers.create(name));
         }
 
         public static void init() {

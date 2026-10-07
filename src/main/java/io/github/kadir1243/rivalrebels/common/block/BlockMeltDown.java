@@ -29,17 +29,11 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jspecify.annotations.Nullable;
 
 public class BlockMeltDown extends BaseEntityBlock {
-    public static final MapCodec<BlockMeltDown> CODEC = simpleCodec(BlockMeltDown::new);
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
     public BlockMeltDown(Properties settings) {
 		super(settings);
         this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
-    }
-
-    @Override
-    protected MapCodec<BlockMeltDown> codec() {
-        return CODEC;
     }
 
     @Override

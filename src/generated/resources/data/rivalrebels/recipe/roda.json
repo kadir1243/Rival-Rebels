@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "H": "rivalrebels:hydrogen_rod",
+    "I": "minecraft:iron_ingot",
+    "N": "rivalrebels:nuclear_rod",
+    "R": "rivalrebels:redstone_rod"
+  },
+  "pattern": [
+    "IN",
+    "IH",
+    "IR"
+  ],
+  "result": {
+    "id": "rivalrebels:roda"
+  }
+}

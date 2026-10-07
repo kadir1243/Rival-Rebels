@@ -18,17 +18,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoBunker extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoBunker> CODEC = simpleCodec(BlockAutoBunker::new);
-
     public BlockAutoBunker(Properties settings)
 	{
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockAutoBunker> codec() {
-        return CODEC;
-    }
 
     @Override
 	public void build(Level world, int x, int y, int z)

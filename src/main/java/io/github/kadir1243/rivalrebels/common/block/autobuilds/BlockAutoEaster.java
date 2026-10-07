@@ -17,16 +17,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoEaster extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoEaster> CODEC = simpleCodec(BlockAutoEaster::new);
-
     public BlockAutoEaster(Properties settings) {
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockAutoEaster> codec() {
-        return CODEC;
-    }
 
     @Override
 	public void build(Level level, int x, int y, int z)

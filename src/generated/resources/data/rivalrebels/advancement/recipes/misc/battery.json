@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:battery"
+        "recipes": "rivalrebels:battery"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

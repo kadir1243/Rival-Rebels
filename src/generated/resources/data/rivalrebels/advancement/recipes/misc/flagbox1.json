@@ -3,7 +3,7 @@
   "criteria": {
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:flagbox1"
+        "recipes": "rivalrebels:flagbox1"
       },
       "trigger": "minecraft:recipe_unlocked"
     },

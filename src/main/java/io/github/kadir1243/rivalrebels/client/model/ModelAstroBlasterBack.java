@@ -39,7 +39,7 @@ public class ModelAstroBlasterBack {
         poseStack.pushPose();
         for (float i = 0; i < segments; i++) {
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+            poseStack.rotate(Axis.YP.rotationDegrees(add * i));
             for (int f = 1; f < barrelx.length; f++) {
                 TextureVertice t1 = new TextureVertice((1f / segments) * i, tsart[f]);
                 TextureVertice t2 = new TextureVertice((1f / segments) * i, tsart[f - 1]);

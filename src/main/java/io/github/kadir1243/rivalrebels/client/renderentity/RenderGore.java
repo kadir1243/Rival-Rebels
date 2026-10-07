@@ -52,14 +52,14 @@ public class RenderGore extends EntityRenderer<EntityGore, RenderGore.State> {
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(-renderState.yRot + 180));
-		poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
+		poseStack.rotate(Axis.YP.rotationDegrees(-renderState.yRot + 180));
+		poseStack.rotate(Axis.XP.rotationDegrees(renderState.xRot));
         int mob = renderState.mob;
 		int type = renderState.type;
 		float size = renderState.size;
         int packedLight = renderState.lightCoords;
 
-        RenderType renderType = RenderTypes.entityTranslucentCullItemTarget(getTextureLocation(renderState));
+        RenderType renderType = RenderTypes.entityTranslucentCull(getTextureLocation(renderState));
         if (mob == 0) {
 			if (type == 0) RenderHelper.renderBox(poseStack, nodeCollector, renderType, 8, 8, 8, 0, 0, 64, 32, 16, packedLight);
 			else if (type == 1) RenderHelper.renderBox(poseStack, nodeCollector, renderType, 4, 12, 8, 16, 16, 64, 32, 16, packedLight);
@@ -124,7 +124,7 @@ public class RenderGore extends EntityRenderer<EntityGore, RenderGore.State> {
 			if (type == 0) RenderHelper.renderBox(poseStack, nodeCollector, renderType, 8, 8, 8, 32, 4, 64, 32, 16, packedLight);
 			else if (type == 1)
 			{
-                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+                poseStack.rotate(Axis.YP.rotationDegrees(90));
 				RenderHelper.renderBox(poseStack, nodeCollector, renderType, 8, 12, 10, 4, 12, 64, 32, 16, packedLight);
 			}
 			else if (type == 3) RenderHelper.renderBox(poseStack, nodeCollector, renderType, 2, 2, 16, 18, 0, 64, 32, 16, packedLight);
@@ -135,7 +135,7 @@ public class RenderGore extends EntityRenderer<EntityGore, RenderGore.State> {
 			if (type == 0) RenderHelper.renderBox(poseStack, nodeCollector, renderType, 8, 8, 8, 32, 4, 64, 32, 16, packedLight);
 			else if (type == 1)
 			{
-                poseStack.mulPose(Axis.YP.rotationDegrees(90));
+                poseStack.rotate(Axis.YP.rotationDegrees(90));
 				RenderHelper.renderBox(poseStack, nodeCollector, renderType, 8, 12, 10, 4, 12, 64, 32, 16, packedLight);
 			}
 			else if (type == 3) RenderHelper.renderBox(poseStack, nodeCollector, renderType, 2, 2, 16, 18, 0, 64, 32, 16, packedLight);
@@ -178,7 +178,7 @@ public class RenderGore extends EntityRenderer<EntityGore, RenderGore.State> {
 	}
 
     @Override
-    public boolean shouldRender(EntityGore livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityGore livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

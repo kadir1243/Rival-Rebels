@@ -82,6 +82,7 @@ public class CommandPassword {
         return 0;
     }
 
+    @SuppressWarnings("deprecation")
     public static String encrypt(String source) {
         return Hashing.md5().hashString(source, StandardCharsets.UTF_8).toString();
     }

@@ -44,14 +44,14 @@ public class RenderHackB83 extends EntityRenderer<EntityHackB83, RenderHackB83.S
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		poseStack.pushPose();
 		poseStack.scale(RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale(), RRConfig.CLIENT.getNukeScale());
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 180));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+		poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot - 180));
         ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb83), b83Model, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
 	}
 
     @Override
-    public boolean shouldRender(EntityHackB83 livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityHackB83 livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

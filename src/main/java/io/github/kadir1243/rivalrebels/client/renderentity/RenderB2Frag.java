@@ -47,8 +47,8 @@ public class RenderB2Frag extends EntityRenderer<EntityB2Frag, RenderB2Frag.Stat
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot));
+		poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot));
         poseStack.scale(3, 3, 3);
 
         if (renderState.type == 0)
@@ -65,7 +65,7 @@ public class RenderB2Frag extends EntityRenderer<EntityB2Frag, RenderB2Frag.Stat
     }
 
     @Override
-    public boolean shouldRender(EntityB2Frag livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityB2Frag livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

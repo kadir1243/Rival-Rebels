@@ -34,8 +34,8 @@ public record RodDiskRenderer(Identifier texture) implements NoDataSpecialModelR
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         poseStack.pushPose();
 		poseStack.translate(0.5f, 0.25f, 0f);
-		poseStack.mulPose(Axis.ZP.rotationDegrees(35));
-		poseStack.mulPose(Axis.XP.rotationDegrees(-25));
+		poseStack.rotate(Axis.ZP.rotationDegrees(35));
+		poseStack.rotate(Axis.XP.rotationDegrees(-25));
 		poseStack.scale(0.5f, 0.5f, 0.5f);
 
 		ModelDisk.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(texture), lightCoords, overlayCoords);

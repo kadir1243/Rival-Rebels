@@ -135,7 +135,7 @@ public class EntityB2Frag extends EntityInanimate
 
                 if (var9 instanceof EntityLaserBurst) {
                     var9.kill((ServerLevel) level());
-                    hurt(damageSources().generic(), 6);
+                    hurtServer((ServerLevel) level(), damageSources().generic(), 6);
                 }
             }
 		}

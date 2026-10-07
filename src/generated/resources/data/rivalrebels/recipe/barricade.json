@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "rivalrebels:conduit",
+    "L": "rivalrebels:binoculars",
+    "P": "rivalrebels:pliers",
+    "R": "rivalrebels:reactive",
+    "S": "rivalrebels:supplies"
+  },
+  "pattern": [
+    "SSS",
+    "LPL",
+    "RCR"
+  ],
+  "result": {
+    "id": "rivalrebels:barricade"
+  }
+}

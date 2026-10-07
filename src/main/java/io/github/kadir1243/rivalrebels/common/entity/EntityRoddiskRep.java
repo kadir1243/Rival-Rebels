@@ -28,9 +28,9 @@ import net.minecraft.world.entity.ambient.Bat;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.squid.Squid;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.spider.CaveSpider;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.EnderMan;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
@@ -212,7 +212,7 @@ public class EntityRoddiskRep extends RoddiskBase {
 							arms = 2;
 							mobs = 3;
 						}
-						else if (entity instanceof EnderMan)
+						else if (entity instanceof Enderman)
 						{
 							legs = 2;
 							arms = 2;

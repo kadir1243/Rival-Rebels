@@ -49,7 +49,7 @@ public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntit
 		poseStack.translate(0.5F, 0.5F, 0.5F);
         {
             poseStack.pushPose();
-            poseStack.mulPose(Axis.YP.rotationDegrees(renderState.size * 50));
+            poseStack.rotate(Axis.YP.rotationDegrees(renderState.size * 50));
 
             {
                 poseStack.pushPose();
@@ -60,7 +60,7 @@ public class TileEntityMeltdownRenderer implements BlockEntityRenderer<TileEntit
                 poseStack.popPose();
             }
 
-            poseStack.mulPose(Axis.YP.rotationDegrees(renderState.size * 50));
+            poseStack.rotate(Axis.YP.rotationDegrees(renderState.size * 50));
 
             {
                 poseStack.pushPose();

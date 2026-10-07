@@ -17,17 +17,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoQuickSandTrap extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoQuickSandTrap> CODEC = simpleCodec(BlockAutoQuickSandTrap::new);
-
     public BlockAutoQuickSandTrap(Properties settings)
 	{
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockAutoQuickSandTrap> codec() {
-        return CODEC;
-    }
 
     @Override
 	public void build(Level world, int x, int y, int z)

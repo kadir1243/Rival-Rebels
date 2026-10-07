@@ -28,7 +28,7 @@ import net.minecraft.world.entity.animal.squid.Squid;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.entity.monster.spider.CaveSpider;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
@@ -186,7 +186,7 @@ public class EntityLaserBurst extends Projectile {
                         arms = 2;
                         mobs = 3;
                     }
-                    case EnderMan ignored -> {
+                    case Enderman ignored -> {
                         legs = 2;
                         arms = 2;
                         mobs = 4;

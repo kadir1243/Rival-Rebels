@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:omegaarmor"
+        "recipes": "rivalrebels:omegaarmor"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

@@ -28,7 +28,6 @@ import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import org.jspecify.annotations.Nullable;
 
 public class BlockReactive extends BaseEntityBlock {
-    public static final MapCodec<BlockReactive> CODEC = simpleCodec(BlockReactive::new);
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 
     public BlockReactive(Properties settings) {
@@ -36,11 +35,6 @@ public class BlockReactive extends BaseEntityBlock {
 
         this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
 	}
-
-    @Override
-    protected MapCodec<BlockReactive> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

@@ -41,7 +41,7 @@ public class ModelNukeCloud
 		for (float i = 0; i < segments; i++)
 		{
 			poseStack.pushPose();
-			poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+			poseStack.rotate(Axis.YP.rotationDegrees(add * i));
 			for (int f = 1; f < topx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / topx.length) * f);
@@ -62,7 +62,7 @@ public class ModelNukeCloud
 		for (float i = 0; i < segments; i++)
 		{
 			poseStack.pushPose();
-			poseStack.mulPose(Axis.YP.rotationDegrees(add * i));
+			poseStack.rotate(Axis.YP.rotationDegrees(add * i));
 			for (int f = 1; f < bottomx.length; f++)
 			{
 				TextureVertice t1 = new TextureVertice((1f / segments) * (i - 1), (1f / bottomx.length) * f);

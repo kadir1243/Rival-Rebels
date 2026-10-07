@@ -58,7 +58,7 @@ import net.minecraft.world.entity.monster.cubemob.MagmaCube;
 import net.minecraft.world.entity.monster.cubemob.Slime;
 import net.minecraft.world.entity.monster.spider.CaveSpider;
 import net.minecraft.world.entity.monster.Creeper;
-import net.minecraft.world.entity.monster.EnderMan;
+import net.minecraft.world.entity.monster.Enderman;
 import net.minecraft.world.entity.monster.Ghast;
 import net.minecraft.world.entity.monster.skeleton.Skeleton;
 import net.minecraft.world.entity.monster.spider.Spider;
@@ -978,7 +978,7 @@ public class EntityRhodes extends LivingEntity {
                                             legs = 2;
                                             arms = 2;
                                             mobs = 3;
-                                        } else if (e instanceof EnderMan) {
+                                        } else if (e instanceof Enderman) {
                                             legs = 2;
                                             arms = 2;
                                             mobs = 4;

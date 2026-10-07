@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:jump"
+        "recipes": "rivalrebels:jump"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

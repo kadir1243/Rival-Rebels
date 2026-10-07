@@ -23,16 +23,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public class BlockAntimatterBomb extends AbstractBombBlock {
-    public static final MapCodec<BlockAntimatterBomb> CODEC = simpleCodec(BlockAntimatterBomb::new);
-
     public BlockAntimatterBomb(Properties settings) {
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockAntimatterBomb> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

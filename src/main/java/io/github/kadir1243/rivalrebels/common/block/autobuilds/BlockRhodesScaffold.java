@@ -13,7 +13,6 @@ package io.github.kadir1243.rivalrebels.common.block.autobuilds;
 
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
-import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -21,8 +20,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
 public class BlockRhodesScaffold extends BlockAutoTemplate {
-    public static final MapCodec<BlockRhodesScaffold> CODEC = simpleCodec(BlockRhodesScaffold::new);
-
     public static final byte[] binimg = {
 		0,0,0,0,0,0,0,7,7,
 		0,1,1,1,1,0,0,0,0,
@@ -61,11 +58,6 @@ public class BlockRhodesScaffold extends BlockAutoTemplate {
 	{
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockRhodesScaffold> codec() {
-        return CODEC;
-    }
 
     @Override
 	public void build(Level world, int x, int y, int z)

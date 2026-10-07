@@ -54,11 +54,11 @@ public class RRBlocks {
     public static final DeferredBlock<Block> fshield = BLOCKS.registerBlock("fshield", BlockForceShield::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noLootTable().noOcclusion().strength(0.2F, 10F).lightLevel(state -> 4));
     public static final DeferredBlock<Block> gamestart = BLOCKS.registerBlock("gamestart", BlockGameStart::new, () -> Properties.of().mapColor(MapColor.COLOR_BROWN));
     public static final DeferredBlock<Block> breadbox = BLOCKS.registerBlock("breadbox", BlockBreadBox::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().strength(-1.0F, 3600000.0F));
-    public static final DeferredBlock<Block> alandmine = BLOCKS.registerBlock("alandmine", BlockLandMine::new, () -> Properties.of().mapColor(MapColor.COLOR_GREEN).pushReaction(PushReaction.DESTROY).strength(0.6F, 1F));
+    public static final DeferredBlock<Block> alandmine = BLOCKS.registerBlock("alandmine", BlockLandMine::new, () -> Properties.of().mapColor(MapColor.COLOR_GREEN).pushReaction(PushReaction.POPPED).strength(0.6F, 1F));
     public static final DeferredBlock<Block> nukeCrateTop = BLOCKS.registerBlock("nuke_crate_top", BlockNukeCrate::new, () -> Properties.of().mapColor(MapColor.COLOR_BROWN).ignitedByLava().noOcclusion().strength(0.5F));
     public static final DeferredBlock<Block> nukeCrateBottom = BLOCKS.registerBlock("nuke_crate_bottom", BlockNukeCrate::new, () -> Properties.of().mapColor(MapColor.COLOR_BROWN).ignitedByLava().noOcclusion().strength(0.5F));
     public static final DeferredBlock<Block> radioactivedirt = BLOCKS.registerBlock("radioactive_dirt", BlockRadioactiveDirt::new, () -> Properties.of().mapColor(MapColor.DIRT).strength(0.5F));
-    public static final DeferredBlock<Block> radioactivesand = BLOCKS.registerBlock("radioactive_sand", BlockRadioactiveSand::new, () -> Properties.of().mapColor(MapColor.COLOR_GREEN).pushReaction(PushReaction.DESTROY).strength(0.5F));
+    public static final DeferredBlock<Block> radioactivesand = BLOCKS.registerBlock("radioactive_sand", BlockRadioactiveSand::new, () -> Properties.of().mapColor(MapColor.COLOR_GREEN).pushReaction(PushReaction.POPPED).strength(0.5F));
     public static final DeferredBlock<Block> reactor = BLOCKS.registerBlock("reactor", BlockReactor::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noOcclusion().strength(1.0F, 10F).lightLevel(state -> 15));
     public static final DeferredBlock<Block> loader = BLOCKS.registerBlock("loader", BlockLoader::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noLootTable().noOcclusion().strength(2.0F, 10F));
     public static final DeferredBlock<Block> omegaobj = BLOCKS.registerBlock("omegaobj", BlockOmegaObjective::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noLootTable().noOcclusion().strength(1F, 10F).lightLevel(state -> 15));
@@ -69,7 +69,7 @@ public class RRBlocks {
     public static final DeferredBlock<Block> petrifiedstone3 = BLOCKS.registerBlock("petrifiedstone3", BlockPetrifiedStone::new, () -> Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(1.5F, 10F));
     public static final DeferredBlock<Block> petrifiedstone4 = BLOCKS.registerBlock("petrifiedstone4", BlockPetrifiedStone::new, () -> Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(1.5F, 10F));
     public static final DeferredBlock<Block> forcefieldnode = BLOCKS.registerBlock("forcefieldnode", BlockForceFieldNode::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noOcclusion().strength(5));
-    public static final DeferredBlock<Block> goreblock = BLOCKS.registerBlock("goreblock", BlockGore::new, () -> Properties.of().pushReaction(PushReaction.DESTROY).noLootTable().noCollision().instabreak().replaceable());
+    public static final DeferredBlock<Block> goreblock = BLOCKS.registerBlock("goreblock", BlockGore::new, () -> Properties.of().pushReaction(PushReaction.POPPED).noLootTable().noCollision().instabreak().replaceable());
     public static final DeferredBlock<Block> reactive = BLOCKS.registerBlock("reactive", BlockReactive::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noLootTable().strength(2, 100));
     public static final DeferredBlock<Block> bastion = BLOCKS.registerBlock("bastion", BlockAutoForceField::new, () -> Properties.of().mapColor(MapColor.COLOR_BROWN).ignitedByLava().strength(0.5F, 10F));
     public static final DeferredBlock<Block> conduit = BLOCKS.registerBlock("conduit", BlockConduit::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noOcclusion().strength(0.5F, 10F));
@@ -87,12 +87,12 @@ public class RRBlocks {
     public static final DeferredBlock<Block> flag5 = BLOCKS.registerBlock("flag5", BlockFlag::new, () -> Properties.of().ignitedByLava().noCollision());
     public static final DeferredBlock<Block> flag6 = BLOCKS.registerBlock("flag6", BlockFlag::new, () -> Properties.of().ignitedByLava().noCollision());
     public static final DeferredBlock<Block> flag7 = BLOCKS.registerBlock("flag7", BlockFlag::new, () -> Properties.of().ignitedByLava().noCollision());
-    public static final DeferredBlock<Block> light = BLOCKS.registerBlock("light", BlockLight::new, () -> Properties.of().pushReaction(PushReaction.BLOCK).noCollision().noLootTable().lightLevel(state -> 15));
-    public static final DeferredBlock<Block> light2 = BLOCKS.registerBlock("light2", BlockLight::new, () -> Properties.of().pushReaction(PushReaction.BLOCK).noCollision().noLootTable().lightLevel(state -> 15));
+    public static final DeferredBlock<Block> light = BLOCKS.registerBlock("light", BlockLight::new, () -> Properties.of().pushReaction(PushReaction.IMMOVEABLE).noCollision().noLootTable().lightLevel(state -> 15));
+    public static final DeferredBlock<Block> light2 = BLOCKS.registerBlock("light2", BlockLight::new, () -> Properties.of().pushReaction(PushReaction.IMMOVEABLE).noCollision().noLootTable().lightLevel(state -> 15));
     public static final DeferredBlock<Block> forcefield = BLOCKS.registerBlock("forcefield", BlockForceField::new, () -> Properties.of().noLootTable().noOcclusion().strength(1000000F, 1000000F).lightLevel(state -> 7));
-    public static final DeferredBlock<Block> meltdown = BLOCKS.registerBlock("meltdown", BlockMeltDown::new, () -> Properties.of().pushReaction(PushReaction.BLOCK).noCollision().noLootTable().strength(0.5F, 10F));
-    public static final DeferredBlock<Block> plasmaexplosion = BLOCKS.registerBlock("plasma_explosion", BlockPlasmaExplosion::new, () -> Properties.of().pushReaction(PushReaction.BLOCK).noCollision().noLootTable().lightLevel(state -> 15));
-    public static final DeferredBlock<Block> toxicgas = BLOCKS.registerBlock("toxicgas", BlockToxicGas::new, () -> Properties.of().pushReaction(PushReaction.BLOCK).noLootTable().noCollision().randomTicks().strength(-1.0F, 3600000.0F));
+    public static final DeferredBlock<Block> meltdown = BLOCKS.registerBlock("meltdown", BlockMeltDown::new, () -> Properties.of().pushReaction(PushReaction.IMMOVEABLE).noCollision().noLootTable().strength(0.5F, 10F));
+    public static final DeferredBlock<Block> plasmaexplosion = BLOCKS.registerBlock("plasma_explosion", BlockPlasmaExplosion::new, () -> Properties.of().pushReaction(PushReaction.IMMOVEABLE).noCollision().noLootTable().lightLevel(state -> 15));
+    public static final DeferredBlock<Block> toxicgas = BLOCKS.registerBlock("toxicgas", BlockToxicGas::new, () -> Properties.of().pushReaction(PushReaction.IMMOVEABLE).noLootTable().noCollision().randomTicks().strength(-1.0F, 3600000.0F));
     public static final DeferredBlock<Block> tsarbombablock = BLOCKS.registerBlock("tsarbombablock", BlockTsarBomba::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noLootTable().noOcclusion().strength(5.0F));
     public static final DeferredBlock<Block> theoreticaltsarbombablock = BLOCKS.registerBlock("theoreticaltsarbombablock", BlockTheoreticalTsarBomba::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noOcclusion().noLootTable().strength(5).lightLevel(state -> 6));
     public static final DeferredBlock<Block> antimatterbombblock = BLOCKS.registerBlock("antimatterbombblock", BlockAntimatterBomb::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noOcclusion().noLootTable().strength(5).lightLevel(state -> 6));
@@ -100,7 +100,7 @@ public class RRBlocks {
     public static final DeferredBlock<Block> nuclearBomb = BLOCKS.registerBlock("nuclear_bomb", BlockNuclearBomb::new, () -> Properties.of().mapColor(MapColor.METAL).requiresCorrectToolForDrops().noOcclusion().noLootTable().strength(5.0F));
     public static final DeferredBlock<Block> mario = BLOCKS.registerBlock("mario", BlockMario::new, () -> Properties.of().mapColor(MapColor.STONE).requiresCorrectToolForDrops().strength(1.5F, 10F));
     public static final DeferredBlock<Block> quicksand = BLOCKS.registerBlock("quicksand", BlockQuickSand::new, () -> Properties.of().mapColor(MapColor.DIRT).noOcclusion().strength(0.5F).noCollision());
-    public static final DeferredBlock<Block> landmine = BLOCKS.registerBlock("landmine", BlockLandMine::new, () -> Properties.of().mapColor(MapColor.COLOR_GREEN).pushReaction(PushReaction.DESTROY).strength(0.6F, 1F));
+    public static final DeferredBlock<Block> landmine = BLOCKS.registerBlock("landmine", BlockLandMine::new, () -> Properties.of().mapColor(MapColor.COLOR_GREEN).pushReaction(PushReaction.POPPED).strength(0.6F, 1F));
 
     public static void init(IEventBus bus, Dist dist) {
         BLOCKS.register(bus);

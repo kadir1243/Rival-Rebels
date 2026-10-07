@@ -79,7 +79,7 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
         }
         poseStack.pushPose();
         poseStack.translate(0.4f, 0.35f, -0.03f);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(-55));
+        poseStack.rotate(Axis.ZP.rotationDegrees(-55));
         poseStack.translate(0f, -0.05f, 0.05f);
 
         poseStack.pushPose();
@@ -92,7 +92,7 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
 
         poseStack.pushPose();
         poseStack.translate(0.22f, -0.025f, 0f);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+        poseStack.rotate(Axis.ZP.rotationDegrees(90));
         poseStack.scale(0.03125f, 0.03125f, 0.03125f);
 
         QuadHelper.submitQuadSupplier(submitNodeCollector, poseStack, RenderTypes.entitySolid(RRIdentifiers.eteinstenhandle), ModelAstroBlasterHandle.BAKED_MODEL, lightCoords, overlayCoords);
@@ -103,7 +103,7 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
 
         // poseStack.push();
         // poseStack.translate(0f, 0.8f, 0f);
-        // poseStack.mulPose(180, 0.0F, 0.0F, 1.0F);
+        // poseStack.rotate(180, 0.0F, 0.0F, 1.0F);
         // poseStack.scale(0.9F, 4.5F, 0.9F);
         // md3.render(0.2f, 0.3f, 0.3f, 0.3f, 1f);
         // poseStack.pop();
@@ -119,32 +119,32 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
 
         poseStack.pushPose();
         poseStack.translate(0f, -pullback, 0f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(rotation));
+        poseStack.rotate(Axis.YP.rotationDegrees(rotation));
         poseStack.pushPose();
         RenderType redstoneRodRenderType = RenderTypes.entitySolid(RRIdentifiers.etredrod);
         poseStack.translate(0.12f, 0.1f, 0.12f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.rotate(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
         ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(-0.12f, 0.1f, 0.12f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.rotate(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
         ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(-0.12f, 0.1f, -0.12f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.rotate(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
         ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(0.12f, 0.1f, -0.12f);
-        poseStack.mulPose(Axis.YP.rotationDegrees(pullback * 270));
+        poseStack.rotate(Axis.YP.rotationDegrees(pullback * 270));
         poseStack.scale(0.3f, 0.7f, 0.3f);
         ModelRod.render(poseStack, submitNodeCollector, RRIdentifiers.etredrod, redstoneRodRenderType, lightCoords, overlayCoords);
         poseStack.popPose();
@@ -213,8 +213,8 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
                 });
             }
             //poseStack.pushPose();
-            //poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-            //poseStack.mulPose(Axis.YP.rotationDegrees((float) angle));
+            //poseStack.rotate(Axis.ZP.rotationDegrees(90));
+            //poseStack.rotate(Axis.YP.rotationDegrees((float) angle));
             //float o = 0.075f;
             //float s = 0.1f;
             //Tesselator tesselator = Tesselator.getInstance();
@@ -248,16 +248,16 @@ public class AstroBlasterRenderer implements SpecialModelRenderer<Integer> {
 
         poseStack.pushPose();
         poseStack.translate(0f, 0.8f, 0f);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(180));
-        poseStack.mulPose(Axis.YP.rotationDegrees(spin));
+        poseStack.rotate(Axis.ZP.rotationDegrees(180));
+        poseStack.rotate(Axis.YP.rotationDegrees(spin));
         poseStack.scale(0.9F, 4.1F, 0.9F);
         ModelAstroBlasterBody.render(poseStack, submitNodeCollector, RRRenderTypes.LIGHTNING_ASTRO_BLAST_TRIANGLES, (float) (0.22f + (Mth.sin(spin / 10) * 0.005)), 0.5f, 0f, 0f, 1f);
         poseStack.popPose();
 
         poseStack.pushPose();
         poseStack.translate(0f, 0.8f, 0f);
-        poseStack.mulPose(Axis.ZP.rotationDegrees(180));
-        poseStack.mulPose(Axis.YP.rotationDegrees(-spin));
+        poseStack.rotate(Axis.ZP.rotationDegrees(180));
+        poseStack.rotate(Axis.YP.rotationDegrees(-spin));
         poseStack.scale(0.9F, 4.1F, 0.9F);
         ModelAstroBlasterBody.render(poseStack, submitNodeCollector, RRRenderTypes.LIGHTNING_ASTRO_BLAST_TRIANGLES, (float) (0.22f + (Mth.cos(-spin / 15) * 0.005)), 0.5f, 0f, 0f, 1f);
         poseStack.popPose();

@@ -33,18 +33,12 @@ import net.minecraft.world.level.block.FallingBlock;
 import net.minecraft.world.level.block.state.BlockState;
 
 public class BlockTimedBomb extends FallingBlock {
-    public static final MapCodec<BlockTimedBomb> CODEC = AnvilBlock.simpleCodec(BlockTimedBomb::new);
     int	ticksSincePlaced;
 
 	public BlockTimedBomb(Properties settings) {
 		super(settings);
 		ticksSincePlaced = 0;
 	}
-
-    @Override
-    protected MapCodec<BlockTimedBomb> codec() {
-        return CODEC;
-    }
 
     @Override
     public void wasExploded(ServerLevel world, BlockPos pos, net.minecraft.world.level.Explosion explosion) {

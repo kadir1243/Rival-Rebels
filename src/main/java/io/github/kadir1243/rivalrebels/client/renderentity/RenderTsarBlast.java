@@ -62,29 +62,29 @@ public class RenderTsarBlast extends EntityRenderer<EntityTsarBlast, RenderTsarB
             poseStack.scale(RRConfig.CLIENT.getShroomScale(), RRConfig.CLIENT.getShroomScale(), RRConfig.CLIENT.getShroomScale());
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * 2)));
-                poseStack.mulPose(Axis.XP.rotationDegrees((float) (elev * 3)));
+                poseStack.rotate(Axis.YP.rotationDegrees((float) (elev * 2)));
+                poseStack.rotate(Axis.XP.rotationDegrees((float) (elev * 3)));
                 renderBlastSphere(renderState, poseStack, nodeCollector, (float) elev, 1, 0.25f, 0, 1f);
                 poseStack.popPose();
             }
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * -2)));
-                poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 4)));
+                poseStack.rotate(Axis.YP.rotationDegrees((float) (elev * -2)));
+                poseStack.rotate(Axis.ZP.rotationDegrees((float) (elev * 4)));
                 renderBlastSphere(renderState, poseStack, nodeCollector, (float) (elev - 0.2f), 1, 0.5f, 0, 1f);
                 poseStack.popPose();
             }
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.XP.rotationDegrees((float) (elev * -3)));
-                poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 2)));
+                poseStack.rotate(Axis.XP.rotationDegrees((float) (elev * -3)));
+                poseStack.rotate(Axis.ZP.rotationDegrees((float) (elev * 2)));
                 renderBlastSphere(renderState, poseStack, nodeCollector, (float) (elev - 0.4f), CommonColors.RED);
                 poseStack.popPose();
             }
             {
                 poseStack.pushPose();
-                poseStack.mulPose(Axis.YP.rotationDegrees((float) (elev * -1)));
-                poseStack.mulPose(Axis.ZP.rotationDegrees((float) (elev * 3)));
+                poseStack.rotate(Axis.YP.rotationDegrees((float) (elev * -1)));
+                poseStack.rotate(Axis.ZP.rotationDegrees((float) (elev * 3)));
                 renderBlastSphere(renderState, poseStack, nodeCollector, (float) (elev - 0.6f), 1, 1, 0, 1);
                 poseStack.popPose();
             }
@@ -119,7 +119,7 @@ public class RenderTsarBlast extends EntityRenderer<EntityTsarBlast, RenderTsarB
     }
 
     @Override
-    public boolean shouldRender(EntityTsarBlast livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityTsarBlast livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

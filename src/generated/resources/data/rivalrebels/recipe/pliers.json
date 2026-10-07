@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "C": "#minecraft:stone_crafting_materials"
+  },
+  "pattern": [
+    " C",
+    "C "
+  ],
+  "result": {
+    "id": "rivalrebels:pliers"
+  }
+}

@@ -263,7 +263,7 @@ public class RenderNuclearBlast extends EntityRenderer<EntityNuclearBlast, Rende
 	}
 
     @Override
-    public boolean shouldRender(EntityNuclearBlast livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityNuclearBlast livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

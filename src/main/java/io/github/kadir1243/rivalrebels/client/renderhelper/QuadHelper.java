@@ -47,7 +47,7 @@ public class QuadHelper {
                 poseStack.pushPose();
                 poseStack.translate(translation.x(), translation.y(), translation.z());
                 poseStack.scale(scale.x(), scale.y(), scale.z());
-                poseStack.mulPose(quad.transformation().leftRotation());
+                poseStack.rotate(quad.transformation().leftRotation());
                 nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> buffer.putBakedQuad(pose, quad.quad(), qi));
                 poseStack.popPose();
             } else

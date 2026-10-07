@@ -55,7 +55,7 @@ public class ModelDisk
 	public static void render(PoseStack poseStack, SubmitNodeCollector nodeCollector, RenderType renderType, int light, int overlay) {
 		for (float i = 0; i < 360; i += 360 / numOfSegs) {
 			poseStack.pushPose();
-			poseStack.mulPose(Axis.YP.rotationDegrees(i));
+			poseStack.rotate(Axis.YP.rotationDegrees(i));
             float finalI = i;
             nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
                 RenderHelper.addFace(pose, consumer, v2, v1, v6, v7, t4, t9, t10, t5, light, overlay);

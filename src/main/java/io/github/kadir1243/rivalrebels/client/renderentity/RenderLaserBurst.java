@@ -40,8 +40,8 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst, RenderLas
         int distance = 4;
         poseStack.pushPose();
 
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
-        poseStack.mulPose(Axis.XP.rotationDegrees(-renderState.xRot));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot));
+        poseStack.rotate(Axis.XP.rotationDegrees(-renderState.xRot));
 
         for (float o = 0; o <= radius; o += radius / 8) {
             float color = 1f - (o * 8.333f);
@@ -64,7 +64,7 @@ public class RenderLaserBurst extends EntityRenderer<EntityLaserBurst, RenderLas
     }
 
     @Override
-    public boolean shouldRender(EntityLaserBurst livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityLaserBurst livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

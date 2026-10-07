@@ -4,9 +4,12 @@ import io.github.kadir1243.rivalrebels.RRIdentifiers;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import net.minecraft.core.RegistrySetBuilder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.damagesource.DamageType;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+
+import java.util.Set;
 
 public class DataGen {
     public static void onGatherClientData(GatherDataEvent.Client event) {
@@ -18,17 +21,17 @@ public class DataGen {
     }
 
     private static void onGatherServerData(GatherDataEvent event) {
-        event.createDatapackRegistryObjects(new RegistrySetBuilder()
-            .add(Registries.DAMAGE_TYPE, context -> {
-                for (ResourceKey<DamageType> type : RivalRebelsDamageSource.RRDamageTypes.REGISTERED_DAMAGE_TYPES) {
-                    context.register(type, new DamageType(RRIdentifiers.MODID + "." + type.identifier().getPath(), 1F));
-                }
-            })
-        );
+        event.createReloadableRegistryObjects(
+            new RegistrySetBuilder()
+                .add(RecipeProvider.asBootstrap(RecipeDataGen::new))
+                .add(Registries.LOOT_TABLE, LootTableDataGen::new)
+            , Set.of(RRIdentifiers.MODID));
+        event.createWorldRegistryObjects(
+            new RegistrySetBuilder()
+                .add(Registries.DAMAGE_TYPE, DamageSourceTags::initialiseDamageSources)
+            , Set.of(RRIdentifiers.MODID));
         event.createProvider(DamageSourceTags::new);
         event.createBlockAndItemTags(BlockTagsGen::new, ItemTagsGen::new);
-        event.createProvider(RecipeDataGen.RecipeRunner::new);
-        // FIXME: event.createProvider(LootTableDataGen::new);
         event.createProvider(EntityTypeTagsGen::new);
     }
 

@@ -59,8 +59,8 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink, Ren
 			float radius = 0.07F;
 
             poseStack.pushPose();
-			poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
-			poseStack.mulPose(Axis.XP.rotationDegrees(-renderState.xRot));
+			poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot));
+			poseStack.rotate(Axis.XP.rotationDegrees(-renderState.xRot));
 
 			float AddedX = 0;
 			float AddedY = 0;
@@ -121,7 +121,7 @@ public class RenderLightningLink extends EntityRenderer<EntityLightningLink, Ren
 	}
 
     @Override
-    public boolean shouldRender(EntityLightningLink livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityLightningLink livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

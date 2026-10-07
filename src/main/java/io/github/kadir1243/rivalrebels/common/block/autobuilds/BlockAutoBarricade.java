@@ -19,17 +19,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 
 public class BlockAutoBarricade extends BlockAutoTemplate {
-    public static final MapCodec<BlockAutoBarricade> CODEC = simpleCodec(BlockAutoBarricade::new);
-
     public BlockAutoBarricade(Properties settings)
 	{
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockAutoBarricade> codec() {
-        return CODEC;
-    }
 
     @Override
 	public void build(Level level, int x, int y, int z) {

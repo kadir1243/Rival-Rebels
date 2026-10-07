@@ -14,6 +14,7 @@ package io.github.kadir1243.rivalrebels.common.block.trap;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.common.core.RivalRebelsDamageSource;
 import io.github.kadir1243.rivalrebels.common.explosion.Explosion;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.InsideBlockEffectApplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -69,7 +70,9 @@ public class BlockFlare extends WallTorchBlock {
 
     @Override
     protected void entityInside(BlockState state, Level level, BlockPos pos, Entity entity, InsideBlockEffectApplier applier, boolean intersects) {
-		entity.hurt(RivalRebelsDamageSource.flare(level), 1);
-		entity.igniteForSeconds(5);
+        if (!level.isClientSide()) {
+            entity.hurtServer((ServerLevel) level, RivalRebelsDamageSource.flare(level), 1);
+            entity.igniteForSeconds(5);
+        }
 	}
 }

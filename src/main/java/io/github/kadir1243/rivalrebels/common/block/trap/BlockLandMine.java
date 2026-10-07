@@ -46,20 +46,12 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 
 import java.util.function.BiConsumer;
 
-public class BlockLandMine extends FallingBlock
-{
-    public static final MapCodec<BlockLandMine> CODEC = simpleCodec(BlockLandMine::new);
-
+public class BlockLandMine extends FallingBlock {
     public static final BooleanProperty UNSTABLE = BlockStateProperties.UNSTABLE;
 	public BlockLandMine(Properties settings)
 	{
 		super(settings);
         this.registerDefaultState(this.getStateDefinition().any().setValue(UNSTABLE, false));
-    }
-
-    @Override
-    protected MapCodec<? extends FallingBlock> codec() {
-        return CODEC;
     }
 
     @Override
@@ -172,7 +164,7 @@ public class BlockLandMine extends FallingBlock
 	}*/
 
     @Override
-    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return RRBlocks.alandmine.toStack();
     }
 

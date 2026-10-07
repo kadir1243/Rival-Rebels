@@ -54,7 +54,7 @@ public class RenderGoo extends EntityRenderer<EntityGoo, EntityRenderState> {
         if (renderState.ageInTicks < 2) return;
         poseStack.pushPose();
         poseStack.scale(0.25F, 0.25F, 0.25F);
-        poseStack.mulPose(cameraRenderState.orientation);
+        poseStack.rotate(cameraRenderState.orientation);
         QuadHelper.submitQuadSupplier(nodeCollector, poseStack, RenderTypes.entitySolid(RRIdentifiers.etgoo), MAP.computeIfAbsent(RRIdentifiers.etgoo, BAKED_MODEL), renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }

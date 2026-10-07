@@ -44,15 +44,15 @@ public class RenderTachyonBomb extends EntityRenderer<EntityTachyonBomb, RenderT
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
         poseStack.scale(RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale(),RRConfig.CLIENT.getNukeScale());
-        poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
-        // poseStack.mulPose(Axis.XP.rotationDegrees(90));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot));
+        poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+        // poseStack.rotate(Axis.XP.rotationDegrees(90));
+        poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot));
         ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.ettachyonbomb), bombModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
         poseStack.popPose();
     }
 
     @Override
-    public boolean shouldRender(EntityTachyonBomb livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityTachyonBomb livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

@@ -80,7 +80,7 @@ public class EntityFlameBall1 extends FlameBallProjectile {
             Entity entity = ((EntityHitResult) hitResult).getEntity();
             if (entity != null) {
 				entity.igniteForSeconds(3);
-				entity.hurt(RivalRebelsDamageSource.cooked(level()), 12);
+				entity.hurtServer((ServerLevel) level(), RivalRebelsDamageSource.cooked(level()), 12);
 				if (entity instanceof Player player) {
                     ItemUtil.damageRandomArmor(player, 8, random);
 				}
@@ -89,15 +89,15 @@ public class EntityFlameBall1 extends FlameBallProjectile {
 				if (entity instanceof Player player)
 				{
                     ItemUtil.damageRandomArmor(player, 44, random);
-					player.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
+					player.hurtServer((ServerLevel) level(), RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
 				}
 				else if (entity instanceof EntityB2Spirit)
 				{
-					entity.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
+					entity.hurtServer((ServerLevel) level(), RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
 				}
 				else if (entity.isAttackable())
 				{
-					entity.hurt(RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
+					entity.hurtServer((ServerLevel) level(), RivalRebelsDamageSource.cooked(level()), 250 / ((int) entity.distanceTo(this) + 1));
 				}
 			}
 		}

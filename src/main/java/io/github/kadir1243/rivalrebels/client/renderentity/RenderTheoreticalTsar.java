@@ -34,16 +34,16 @@ public class RenderTheoreticalTsar extends EntityRenderer<EntityTheoreticalTsar,
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
 		poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
-		//poseStack.mulPose(Axis.XP.rotationDegrees(90));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+		//poseStack.rotate(Axis.XP.rotationDegrees(90));
+		poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
 		poseStack.scale(1.3f, 1.3f, 1.3f);
 		ModelTheoreticalTsarBomba.render(poseStack, nodeCollector, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
 	}
 
     @Override
-    public boolean shouldRender(EntityTheoreticalTsar livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityTheoreticalTsar livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

@@ -56,7 +56,7 @@ public class BlockStateDataGen extends ModelProvider {
     }
 
     private void simpleBlock(BlockModelGenerators blockModels, Holder<Block> block, String sides, String down, String up) {
-        blockModels.createTrivialBlock(block.value(), TexturedModel.CUBE_TOP_BOTTOM.updateTexture(textureMapping -> {
+        blockModels.createTrivialBlock(block.value(), TexturedModel.CUBE_BOTTOM_TOP.updateTexture(textureMapping -> {
             textureMapping.put(TextureSlot.BOTTOM, new Material(idBlock(down)));
             textureMapping.put(TextureSlot.TOP, new Material(idBlock(up)));
             textureMapping.put(TextureSlot.SIDE, new Material(idBlock(sides)));

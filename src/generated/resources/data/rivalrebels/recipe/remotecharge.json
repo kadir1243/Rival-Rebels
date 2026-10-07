@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "key": {
+    "B": "rivalrebels:battery",
+    "F": "rivalrebels:fuel",
+    "G": "rivalrebels:gas_grenade",
+    "R": "rivalrebels:rocket"
+  },
+  "pattern": [
+    "GB",
+    "RF"
+  ],
+  "result": {
+    "count": 4,
+    "id": "rivalrebels:remotecharge"
+  }
+}

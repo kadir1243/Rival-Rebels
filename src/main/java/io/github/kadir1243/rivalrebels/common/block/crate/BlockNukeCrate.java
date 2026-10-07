@@ -39,18 +39,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BlockNukeCrate extends BaseEntityBlock {
-    public static final MapCodec<BlockNukeCrate> CODEC = simpleCodec(BlockNukeCrate::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.FACING;
 	public BlockNukeCrate(Properties settings)
 	{
 		super(settings);
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.UP));
 	}
-
-    @Override
-    protected MapCodec<BlockNukeCrate> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

@@ -49,8 +49,8 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit, RenderB2Spiri
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot));
-		poseStack.mulPose(Axis.XP.rotationDegrees(renderState.xRot));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot));
+		poseStack.rotate(Axis.XP.rotationDegrees(renderState.xRot));
         if (RRConfig.CLIENT.getBomberType().equals("sh")) {
 			poseStack.scale(3, 3, 3);
             ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etb2spirit), shuttleModel, poseStack, CommonColors.WHITE, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
@@ -69,7 +69,7 @@ public class RenderB2Spirit extends EntityRenderer<EntityB2Spirit, RenderB2Spiri
     }
 
     @Override
-    public boolean shouldRender(EntityB2Spirit livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityB2Spirit livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

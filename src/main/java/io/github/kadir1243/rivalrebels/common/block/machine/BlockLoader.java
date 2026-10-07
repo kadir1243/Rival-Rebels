@@ -35,16 +35,10 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BlockLoader extends BaseEntityBlock {
-    public static final MapCodec<BlockLoader> CODEC = simpleCodec(BlockLoader::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public BlockLoader(Properties settings) {
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockLoader> codec() {
-        return CODEC;
-    }
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {

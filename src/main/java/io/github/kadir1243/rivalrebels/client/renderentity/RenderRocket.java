@@ -37,15 +37,15 @@ public class RenderRocket extends EntityRenderer<EntityRocket, RenderRocket.Stat
     @Override
     public void submit(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
-		poseStack.mulPose(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
-		poseStack.mulPose(Axis.YP.rotationDegrees(renderState.rotation));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.yRot - 90.0f));
+		poseStack.rotate(Axis.ZP.rotationDegrees(renderState.xRot - 90.0f));
+		poseStack.rotate(Axis.YP.rotationDegrees(renderState.rotation));
 		ModelRocket.render(poseStack, nodeCollector, RRIdentifiers.etrocket, renderState.fins, renderState.lightCoords, OverlayTexture.NO_OVERLAY);
 		poseStack.popPose();
 	}
 
     @Override
-    public boolean shouldRender(EntityRocket livingEntity, Frustum camera, double camX, double camY, double camZ) {
+    public boolean shouldRender(EntityRocket livingEntity, Frustum camera, double camX, double camY, double camZ, float partialTicks) {
         return true;
     }
 

@@ -44,17 +44,11 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 
 public class BlockRemoteCharge extends FallingBlock {
-    public static final MapCodec<BlockRemoteCharge> CODEC = simpleCodec(BlockRemoteCharge::new);
     public static final IntegerProperty META = IntegerProperty.create("meta", 0, 15);
 	public BlockRemoteCharge(Properties settings)
 	{
 		super(settings);
         this.registerDefaultState(this.getStateDefinition().any().setValue(META, 0));
-    }
-
-    @Override
-    protected MapCodec<BlockRemoteCharge> codec() {
-        return CODEC;
     }
 
     @Override

@@ -13,7 +13,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "rivalrebels:gas_grenade"
+        "recipes": "rivalrebels:gas_grenade"
       },
       "trigger": "minecraft:recipe_unlocked"
     }

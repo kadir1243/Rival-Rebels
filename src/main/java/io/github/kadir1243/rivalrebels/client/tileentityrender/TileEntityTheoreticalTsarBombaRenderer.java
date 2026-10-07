@@ -54,17 +54,17 @@ public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRender
         poseStack.scale(1.3f, 1.3f, 1.3f);
         switch (renderState.facing) {
             case NORTH -> {
-                poseStack.mulPose(Axis.YP.rotationDegrees(180));
-                poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                poseStack.rotate(Axis.YP.rotationDegrees(180));
+                poseStack.rotate(Axis.XP.rotationDegrees(90));
             }
-            case SOUTH -> poseStack.mulPose(Axis.XP.rotationDegrees(90));
+            case SOUTH -> poseStack.rotate(Axis.XP.rotationDegrees(90));
             case WEST -> {
-                poseStack.mulPose(Axis.YN.rotationDegrees(90));
-                poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                poseStack.rotate(Axis.YN.rotationDegrees(90));
+                poseStack.rotate(Axis.XP.rotationDegrees(90));
             }
             case EAST -> {
-                poseStack.mulPose(Axis.YP.rotationDegrees(90));
-                poseStack.mulPose(Axis.XP.rotationDegrees(90));
+                poseStack.rotate(Axis.YP.rotationDegrees(90));
+                poseStack.rotate(Axis.XP.rotationDegrees(90));
             }
         }
 

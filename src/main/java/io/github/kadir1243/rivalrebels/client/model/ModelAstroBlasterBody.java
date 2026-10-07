@@ -14,16 +14,12 @@ package io.github.kadir1243.rivalrebels.client.model;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.rendertype.RenderType;
-import net.minecraft.client.renderer.texture.OverlayTexture;
-import net.minecraft.world.level.lighting.LightEngine;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.util.ARGB;
 import org.joml.Vector3f;
-import org.lwjgl.opengl.GL11;
 
 @OnlyIn(Dist.CLIENT)
 public class ModelAstroBlasterBody {
@@ -50,7 +46,7 @@ public class ModelAstroBlasterBody {
 		matrices.scale(size, size, size);
         for (int p = 0; p < 4; p++) {
             matrices.pushPose();
-            matrices.mulPose(Axis.YP.rotationDegrees(p * 90));
+            matrices.rotate(Axis.YP.rotationDegrees(p * 90));
 
             nodeCollector.submitCustomGeometry(matrices, renderType, (pose, buffer) -> {
                 addTri(buffer, pose, vy, vy1, vy3, color);

@@ -64,7 +64,7 @@ public class RenderBlood extends EntityRenderer<EntityBlood, EntityRenderState> 
     public void submit(EntityRenderState renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
         poseStack.pushPose();
 		poseStack.scale(0.25F, 0.25F, 0.25F);
-        poseStack.mulPose(cameraRenderState.orientation);
+        poseStack.rotate(cameraRenderState.orientation);
         QuadInstance instance = new QuadInstance();
         instance.setLightCoords(renderState.lightCoords);
         nodeCollector.submitCustomGeometry(poseStack, RenderTypes.entitySolid(RRIdentifiers.etblood), (pose, buffer) -> buffer.putMutableQuad(pose, QUAD.get(), instance));

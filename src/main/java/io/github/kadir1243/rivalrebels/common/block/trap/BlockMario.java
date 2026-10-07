@@ -109,7 +109,7 @@ public class BlockMario extends Block
     }
 
     @Override
-    protected ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData) {
+    public ItemStack getCloneItemStack(LevelReader level, BlockPos pos, BlockState state, boolean includeData, Player player) {
         return RRBlocks.amario.toStack();
     }
 

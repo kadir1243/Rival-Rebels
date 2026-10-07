@@ -3,6 +3,7 @@ package io.github.kadir1243.rivalrebels.client.guihelper;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
@@ -32,10 +33,10 @@ public class ReactorConnectedMachinesList extends AbstractSelectionList<ReactorC
     @OnlyIn(Dist.CLIENT)
     public static class WidgetEntry extends AbstractSelectionList.Entry<WidgetEntry> {
         private final BlockPos machinePos;
-        private final Block machine;
+        private final BlockState machine;
         private boolean onMachine;
 
-        public WidgetEntry(BlockPos machinePos, Block machine, boolean onMachine) {
+        public WidgetEntry(BlockPos machinePos, BlockState machine, boolean onMachine) {
             this.machinePos = machinePos;
             this.machine = machine;
             this.onMachine = onMachine;
@@ -45,7 +46,7 @@ public class ReactorConnectedMachinesList extends AbstractSelectionList<ReactorC
             return machinePos;
         }
 
-        public Block getMachine() {
+        public BlockState getMachine() {
             return machine;
         }
 
@@ -71,7 +72,7 @@ public class ReactorConnectedMachinesList extends AbstractSelectionList<ReactorC
         public void extractContent(GuiGraphicsExtractor graphics, int mouseX, int mouseY, boolean hovered, float a) {
             float alpha = 0.5f;
             if (onMachine) alpha = 1;
-            graphics.item(machine.asItem().getDefaultInstance(), getContentX() + getWidth() / 2 - 13, getContentY());
+            graphics.item(machine.getBlock().asItem().getDefaultInstance(), getContentX() + getWidth() / 2 - 13, getContentY());
         }
 
         @Override

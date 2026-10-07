@@ -40,17 +40,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BlockForceFieldNode extends BaseEntityBlock {
-    public static final MapCodec<BlockForceFieldNode> CODEC = simpleCodec(BlockForceFieldNode::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
 	public BlockForceFieldNode(Properties settings)
 	{
 		super(settings);
         this.registerDefaultState(this.getStateDefinition().any().setValue(FACING, Direction.NORTH));
-    }
-
-    @Override
-    protected MapCodec<BlockForceFieldNode> codec() {
-        return CODEC;
     }
 
     @Override

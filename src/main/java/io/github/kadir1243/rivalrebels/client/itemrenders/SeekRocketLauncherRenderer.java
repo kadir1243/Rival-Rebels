@@ -37,12 +37,12 @@ public class SeekRocketLauncherRenderer implements NoDataSpecialModelRenderer {
     public void submit(PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
         poseStack.pushPose();
 		poseStack.translate(0.4f, 0.35f, -0.03f);
-		poseStack.mulPose(Axis.ZP.rotationDegrees(-55));
+		poseStack.rotate(Axis.ZP.rotationDegrees(-55));
 		poseStack.translate(0f, 0.05f, 0.05f);
 		//if (mode.firstPerson()) poseStack.scale(1, 1, -1);
 		poseStack.pushPose();
 		poseStack.translate(0.22f, -0.025f, 0f);
-		poseStack.mulPose(Axis.ZP.rotationDegrees(90));
+		poseStack.rotate(Axis.ZP.rotationDegrees(90));
 		poseStack.scale(0.03125f, 0.03125f, 0.03125f);
         ModelRocketLauncherHandle.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etrocketseekhandle202), RRIdentifiers.etrocketseekhandle202, lightCoords, overlayCoords);
 		if (hasFoil) {
@@ -52,8 +52,8 @@ public class SeekRocketLauncherRenderer implements NoDataSpecialModelRenderer {
 
 		poseStack.pushPose();
 		poseStack.translate(-0.07f, 0.31f, 0f);
-		poseStack.mulPose(Axis.ZP.rotationDegrees(90));
-		poseStack.mulPose(Axis.YP.rotationDegrees(90));
+		poseStack.rotate(Axis.ZP.rotationDegrees(90));
+		poseStack.rotate(Axis.YP.rotationDegrees(90));
 		poseStack.scale(0.4f, 0.4f, 0.4f);
 		ModelRocketLauncherBody.render(poseStack, submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.etseek202), RRIdentifiers.etseek202, lightCoords, overlayCoords);
 		if (hasFoil) {

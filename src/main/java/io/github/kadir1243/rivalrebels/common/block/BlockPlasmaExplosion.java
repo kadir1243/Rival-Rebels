@@ -24,8 +24,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public class BlockPlasmaExplosion extends BaseEntityBlock {
-    public static final MapCodec<BlockPlasmaExplosion> CODEC = simpleCodec(BlockPlasmaExplosion::new);
-
     public BlockPlasmaExplosion(Properties settings) {
 		super(settings);
 	}
@@ -35,11 +33,6 @@ public class BlockPlasmaExplosion extends BaseEntityBlock {
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 		return new TileEntityPlasmaExplosion(pos, state);
 	}
-
-    @Override
-    protected MapCodec<? extends BaseEntityBlock> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

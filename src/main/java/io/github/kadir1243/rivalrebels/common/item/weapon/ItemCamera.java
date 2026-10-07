@@ -44,7 +44,7 @@ public class ItemCamera extends Item
                 if (level.isClientSide()) {
                     Minecraft client = Minecraft.getInstance();
                     if (entity == client.player) {
-                        boolean key = InputConstants.isKeyDown(client.getWindow(), InputConstants.KEY_B) && client.gui.screen() == null;
+                        boolean key = InputConstants.isKeyDown(InputConstants.KEY_B) && client.gui.screen() == null;
                         if (key != bkey && key) zoomed = !zoomed;
                         bkey = key;
                         if (zoomed) {

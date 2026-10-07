@@ -35,8 +35,6 @@ import net.minecraft.world.phys.BlockHitResult;
 import org.jspecify.annotations.Nullable;
 
 public class BlockLaptop extends BaseEntityBlock {
-    public static final MapCodec<BlockLaptop> CODEC = simpleCodec(BlockLaptop::new);
-
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public BlockLaptop(Properties settings) {
 		super(settings);
@@ -45,11 +43,6 @@ public class BlockLaptop extends BaseEntityBlock {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
         builder.add(FACING);
-    }
-
-    @Override
-    protected MapCodec<BlockLaptop> codec() {
-        return CODEC;
     }
 
     @Nullable

@@ -15,6 +15,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BaseCommandBlock;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -35,7 +36,7 @@ public abstract class AbstractObjectiveBlockEntity extends BaseContainerBlockEnt
         @Override
         public void onUpdated(ServerLevel level) {
             BlockState lv = level.getBlockState(worldPosition);
-            getLevel().sendBlockUpdated(worldPosition, lv, lv, 3);
+            getLevel().sendBlockUpdated(worldPosition, lv, lv, Block.UPDATE_ALL);
         }
 
         @Override
@@ -46,10 +47,8 @@ public abstract class AbstractObjectiveBlockEntity extends BaseContainerBlockEnt
                 Vec2.ZERO,
                 level,
                 LevelBasedPermissionSet.GAMEMASTER,
-                this.getName().getString(),
                 this.getName(),
-                level.getServer(),
-                null
+                level.getServer()
             );
         }
 

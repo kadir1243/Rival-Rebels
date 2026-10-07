@@ -51,7 +51,7 @@ public class TeslaRenderer implements SpecialModelRenderer<Integer> {
 
     @Override
     public void submit(@Nullable Integer argument, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, int lightCoords, int overlayCoords, boolean hasFoil, int outlineColor) {
-        //if (mode == ItemDisplayContext.GUI) poseStack.mulPose(Axis.YP.rotationDegrees(45));
+        //if (mode == ItemDisplayContext.GUI) poseStack.rotate(Axis.YP.rotationDegrees(45));
 
         if (!hasFoil) {
             int degree = argument;
@@ -62,15 +62,15 @@ public class TeslaRenderer implements SpecialModelRenderer<Integer> {
 			// poseStack.translate(0.3f, 0.05f, -0.1f);
 
             ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.ettesla), teslaModel.get(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
-            poseStack.mulPose(Axis.XP.rotationDegrees(spin));
+            poseStack.rotate(Axis.XP.rotationDegrees(spin));
             ObjModels.submit(submitNodeCollector, RenderTypes.entitySolid(RRIdentifiers.ettesla), dynamoModel.get(), poseStack, CommonColors.WHITE, lightCoords, overlayCoords);
 
 			poseStack.popPose();
 		} else {
 			poseStack.pushPose();
 			poseStack.scale(1.01f, 1.01f, 1.01f);
-			poseStack.mulPose(Axis.YP.rotationDegrees(45));
-			poseStack.mulPose(Axis.ZP.rotationDegrees(10));
+			poseStack.rotate(Axis.YP.rotationDegrees(45));
+			poseStack.rotate(Axis.ZP.rotationDegrees(10));
 			poseStack.scale(0.6f, 0.2f, 0.2f);
 			poseStack.translate(-0.99f, 0.5f, 0.0f);
             submitNodeCollector.submitCustomGeometry(poseStack, RRRenderTypes.CELLULAR_NOISE,  (pose, buffer) -> {

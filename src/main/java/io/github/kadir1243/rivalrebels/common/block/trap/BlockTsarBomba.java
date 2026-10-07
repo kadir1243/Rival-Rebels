@@ -23,15 +23,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public class BlockTsarBomba extends AbstractBombBlock {
-    public static final MapCodec<BlockTsarBomba> CODEC = simpleCodec(BlockTsarBomba::new);
-
     public BlockTsarBomba(Properties settings) {
 		super(settings);
-    }
-
-    @Override
-    protected MapCodec<BlockTsarBomba> codec() {
-        return CODEC;
     }
 
     @Nullable

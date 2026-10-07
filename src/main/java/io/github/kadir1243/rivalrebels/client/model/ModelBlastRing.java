@@ -34,9 +34,9 @@ public class ModelBlastRing {
 		matrices.pushPose();
 
 		matrices.translate(x, y, z);
-		matrices.mulPose(Axis.XP.rotationDegrees(pitch));
-		matrices.mulPose(Axis.YP.rotationDegrees(yaw));
-		matrices.mulPose(Axis.ZP.rotationDegrees(roll));
+		matrices.rotate(Axis.XP.rotationDegrees(pitch));
+		matrices.rotate(Axis.YP.rotationDegrees(yaw));
+		matrices.rotate(Axis.ZP.rotationDegrees(roll));
 
         float innerangle = Mth.TWO_PI / segments;
         Vector3f v1 = new Vector3f(0, -height, size - thickness);
@@ -48,7 +48,7 @@ public class ModelBlastRing {
         Vector3f v7 = new Vector3f(Mth.sin(innerangle) * (size - thickness), +height, Mth.cos(innerangle) * (size - thickness));
         Vector3f v8 = new Vector3f(Mth.sin(innerangle) * (size + thickness), +height, Mth.cos(innerangle) * (size + thickness));
         for (float i = 0; i < 360; i += 360F / segments) {
-            matrices.mulPose(Axis.YP.rotationDegrees(i));
+            matrices.rotate(Axis.YP.rotationDegrees(i));
             nodeCollector.submitCustomGeometry(matrices, renderType, (pose, buffer) -> {
                 RenderHelper.addFace(pose, buffer, v5, v6, v8, v7, FACE, color, light, overlay);
                 RenderHelper.addFace(pose, buffer, v2, v1, v3, v4, FACE, color, light, overlay);

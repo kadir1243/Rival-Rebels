@@ -24,16 +24,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.jspecify.annotations.Nullable;
 
 public class BlockRhodesActivator extends BaseEntityBlock {
-    public static final MapCodec<BlockRhodesActivator> CODEC = simpleCodec(BlockRhodesActivator::new);
     public BlockRhodesActivator(Properties settings)
 	{
 		super(settings);
 	}
-
-    @Override
-    protected MapCodec<BlockRhodesActivator> codec() {
-        return CODEC;
-    }
 
     @Nullable
     @Override

@@ -29,7 +29,7 @@ public class RenderLibrary {
         RandomSource random = Minecraft.getInstance().level.getRandom();
         poseStack.pushPose();
 		poseStack.translate(x1, y1, z1);
-        poseStack.mulPose(Axis.YP.rotationDegrees((float) (Math.atan2(x, z) * 57.295779513 - 90)));
+        poseStack.rotate(Axis.YP.rotationDegrees((float) (Math.atan2(x, z) * 57.295779513 - 90)));
 		float dist = Mth.sqrt(x * x + z * z);
 		float hdist = dist / 2f;
 		float hdists = hdist * hdist;
