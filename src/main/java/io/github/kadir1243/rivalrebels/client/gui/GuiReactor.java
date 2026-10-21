@@ -11,6 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.client.gui;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.renderpearl.api.pipeline.RenderPipeline;
 import io.github.kadir1243.rivalrebels.client.guihelper.GuiCustomButton;
 import io.github.kadir1243.rivalrebels.client.guihelper.ReactorConnectedMachinesList;
 import io.github.kadir1243.rivalrebels.client.renderhelper.RRTextures;
@@ -23,6 +25,10 @@ import io.github.kadir1243.rivalrebels.common.packet.ReactorStatePacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
+import net.minecraft.client.gui.render.TextureSetup;
+import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
+import net.minecraft.client.renderer.state.gui.pip.PictureInPictureRenderState;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -33,7 +39,10 @@ import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.player.Inventory;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
+import org.joml.Matrix3x2f;
+import org.joml.Matrix3x2fc;
 import org.joml.Vector2i;
+import org.jspecify.annotations.Nullable;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
@@ -106,9 +115,12 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
         super.extractBackground(graphics, mouseX, mouseY, a);
         RRTextures.guittokamak.blit(graphics, width / 2 - 89, height / 2 - 103, 0, 0, 212, 208, CommonColors.WHITE);
 
-		long time = System.currentTimeMillis();
+        ScreenRectangle scissor = graphics.peekScissorStack();
+
+        long time = System.currentTimeMillis();
 		// 1f, 1f, 1f, 0.7f, 0f, 1f, HYDROGEN
 		// 1f, 0.8f, 0f, 1f, 0f, 0f REDSTONE
+        Matrix3x2f pose = new Matrix3x2f(graphics.pose());
         if (menu.isOn() && menu.fuel.hasItem() && menu.core.getItem().has(RRComponents.CORE_TIME_MULTIPLIER)) {
 			float radius = 10;
 			if (menu.fuel.getItem().has(RRComponents.REACTOR_FUEL_LEFT)) {
@@ -117,21 +129,25 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
             }
 			melttick = 30;
 			float brightness = 0;
+            ScreenRectangle bounds = PictureInPictureRenderState.getBounds((width / 2 - 45), height / 2, (int) (width / 2 - 45 + radius), (int) (height / 2 + radius), pose, scissor);
 			if (menu.core.getItem().is(RRItems.core1)) brightness = -0.4f;
 			if (menu.core.getItem().is(RRItems.core2)) brightness = -0.25f;
 			if (menu.core.getItem().is(RRItems.core3)) brightness = -0.1f;
-			if (menu.fuel.getItem().is(RRItems.NUCLEAR_ROD)) drawNoiseSphere(graphics, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
-			if (menu.fuel.getItem().is(RRItems.hydrod)) drawNoiseSphere(graphics, 1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
-			if (menu.fuel.getItem().is(RRItems.redrod)) drawNoiseSphere(graphics, 1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness);
+			if (menu.fuel.getItem().is(RRItems.NUCLEAR_ROD)) graphics.submitGuiElementRenderState(new NoiseSphereRenderState(this, pose, scissor, bounds, 0.9f, 1f, 0.1f, 0f, 1f, 0.1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness));
+			if (menu.fuel.getItem().is(RRItems.hydrod)) graphics.submitGuiElementRenderState(new NoiseSphereRenderState(this, pose, scissor, bounds, 1f, 1f, 1f, 0.7f, 0f, 1f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness));
+			if (menu.fuel.getItem().is(RRItems.redrod)) graphics.submitGuiElementRenderState(new NoiseSphereRenderState(this, pose, scissor, bounds, 1f, 0.8f, 0f, 1f, 0f, 0f, frame, 4, (int) radius, (int) (50 - radius), resolution, 0.02f, brightness));
 		}
 		else if (menu.isMelt() || (menu.isOn() && !menu.fuel.hasItem()))
 		{
 			if (melttick > 1) melttick -= 0.03f;
-			drawNoiseSphere(graphics, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, (int) (20 + Mth.sin(frame / melttick) * 20), 10, resolution, 0.02f, 0);
+            int radius = (int) (20 + Mth.sin(frame / melttick) * 20);
+            ScreenRectangle bounds = PictureInPictureRenderState.getBounds((width / 2 - 45), height / 2, (int) (width / 2 - 45 + radius), (int) (height / 2 + radius), pose, scissor);
+			graphics.submitGuiElementRenderState(new NoiseSphereRenderState(this, pose, scissor, bounds, 1f, 1f, 1f, 0f, 0f, 0f, frame, 4, radius, 10, resolution, 0.02f, 0));
 		}
 		else if (menu.fuel.hasItem() && menu.core.hasItem())
 		{
-			drawInfographic(graphics, resolution, 15, 8, 5, 20, 0.666f, 0.25f, 0.32f);
+            ScreenRectangle bounds = PictureInPictureRenderState.getBounds((width / 2 - 45), height / 2, (int) (width / 2 - 45 + 15), (int) (height / 2 + 15), pose, scissor);
+			graphics.submitGuiElementRenderState(new InfographicRenderState(this, pose, scissor, bounds));
 		}
 		long elapsed = System.currentTimeMillis() - time;
 		if (elapsed > 30)
@@ -145,6 +161,45 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 		frame += 0.75f + (menu.getLastTickConsumed() / 100);
 		power.isPressed = menu.isOn();
 	}
+
+    public record InfographicRenderState(GuiReactor instance, Matrix3x2fc pose, @Nullable ScreenRectangle scissorArea, @Nullable ScreenRectangle bounds) implements GuiElementRenderState {
+        @Override
+        public void buildVertices(VertexConsumer vertexConsumer) {
+            instance.drawInfographic(vertexConsumer, pose, instance.resolution, 15, 8, 5, 20, 0.666f, 0.25f, 0.32f);
+        }
+
+        @Override
+        public RenderPipeline pipeline() {
+            return RenderPipelines.GUI;
+        }
+
+        @Override
+        public TextureSetup textureSetup() {
+            return TextureSetup.noTexture();
+        }
+    }
+
+    public record NoiseSphereRenderState(GuiReactor instance,
+                                         Matrix3x2fc pose,
+                                         @Nullable ScreenRectangle scissorArea,
+                                         @Nullable ScreenRectangle bounds,
+                                         float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol
+    ) implements GuiElementRenderState {
+        @Override
+        public void buildVertices(VertexConsumer vertexConsumer) {
+            instance.drawNoiseSphere(vertexConsumer, pose, red, grn, blu, red1, grn1, blu1, frame, o, radius, outer, resolution, sscale, startcol);
+        }
+
+        @Override
+        public RenderPipeline pipeline() {
+            return RenderPipelines.GUI;
+        }
+
+        @Override
+        public TextureSetup textureSetup() {
+            return TextureSetup.noTexture();
+        }
+    }
 
     /**
      * Method that draws the noise sphere.
@@ -162,8 +217,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
      * @param resolution Resolution in pixels of Noise Sphere
      * @param sscale     Noise Scale
      */
-    protected void drawNoiseSphere(GuiGraphicsExtractor graphics, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
-        graphics.pose().pushMatrix();
+    protected void drawNoiseSphere(VertexConsumer vertexConsumer, Matrix3x2fc pose, float red, float grn, float blu, float red1, float grn1, float blu1, float frame, int o, int radius, int outer, float resolution, float sscale, float startcol) {
         float pointSize = (float) (minecraft.getWindow().getGuiScale() / resolution);
         radius *= resolution;
         int outerR = (int) (radius + (outer * resolution));
@@ -188,8 +242,8 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
                         a /= 2;
                     }
                     v *= 1f - (fdist - radius) / maxdist;
-                    drawPoint(graphics, pointSize, X, Y, 4, ARGB.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
-                } else {
+                    drawPoint(vertexConsumer, pose, pointSize, X, Y, ARGB.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
+                } else if (fdist < radius) {
                     float Z = Mth.sqrt(rradius - ys) / resolution;
                     float v = startcol;
                     float a = 1f;
@@ -201,25 +255,26 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
                     }
 
 
-                    drawPoint(graphics, pointSize, X, Y, 4, ARGB.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
+                    drawPoint(vertexConsumer, pose, pointSize, X, Y, ARGB.colorFromFloat(v, lerp(red, red1, v), lerp(grn, grn1, v), lerp(blu, blu1, v)));
                 }
             }
         }
-        graphics.pose().popMatrix();
     }
 
-    private static void drawPoint(GuiGraphicsExtractor graphics, float pointSize, float x, float y, float z, int color) {
+    private static void drawPoint(VertexConsumer vertexConsumer, Matrix3x2fc pose, float pointSize, float x, float y, int color) {
         float halfSize = pointSize / 2F;
 
-        // I don't really know what is rendering, so I just tried to create points from quads
-        graphics.fill((int) (x - halfSize), (int) (y - halfSize), (int) (x + halfSize), (int) (y + halfSize), color);
+        vertexConsumer.addVertexWith2DPose(pose, x - halfSize, y - halfSize).setColor(color);
+        vertexConsumer.addVertexWith2DPose(pose, x - halfSize, y + halfSize).setColor(color);
+        vertexConsumer.addVertexWith2DPose(pose, x + halfSize, y + halfSize).setColor(color);
+        vertexConsumer.addVertexWith2DPose(pose, x + halfSize, y - halfSize).setColor(color);
     }
 
 	protected static float lerp(float delta, float start, float end) {
         return start * (1 - end) + delta * end;
 	}
 
-	protected void drawInfographic(GuiGraphicsExtractor graphics, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {
+	protected void drawInfographic(VertexConsumer vertexConsumer, Matrix3x2fc pose, float resolution, int radius, int sep, int width1, int width2, float outerRatio, float innerRatio1, float innerRatio2) {
         float pointSize = 4 / resolution;
         radius *= resolution;
 		sep *= resolution;
@@ -259,7 +314,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
                             color = ARGB.colorFromFloat(1, 0.75f, 0.75f, 1);
 						}
 					}
-                    drawPoint(graphics, pointSize, hwidth + X, hheight + Y - 45, 4, color);
+                    drawPoint(vertexConsumer, pose, pointSize, hwidth + X, hheight + Y - 45, color);
 				} else if (fdist >= midR2 && fdist < outerR) {
 					float Y = y / resolution;
 					float angle = (float) (Mth.PI + Mth.atan2(X, Y));
@@ -269,7 +324,7 @@ public class GuiReactor extends AbstractContainerScreen<ContainerReactor> {
 					} else {
                         color = CommonColors.RED;
 					}
-                    drawPoint(graphics, pointSize, hwidth + X, hheight + Y - 45, 4, color);
+                    drawPoint(vertexConsumer, pose, pointSize, hwidth + X, hheight + Y - 45, color);
 				}
 			}
 		}
