@@ -75,8 +75,8 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
         ObjModels.submit(nodeCollector, RenderTypes.entitySolid(RRIdentifiers.etelectrode), electrodeModel, poseStack, CommonColors.WHITE, packedLight, packedOverlay);
         poseStack.popPose();
 
-        for (TileEntityMachineBase temb : renderState.machines) {
-            if (!renderState.entries.get(temb.getBlockPos()).enabled()) {
+        for (MachineSnapshot temb : renderState.machines) {
+            if (!renderState.entries.containsKey(temb.pos()) || !renderState.entries.get(temb.pos()).enabled()) {
                 continue;
             }
             if (temb.powerGiven > 0) {
@@ -88,7 +88,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
 				if (radius > 0.15) steps++;
 				if (radius > 0.25) radius = 0.25f;
 				// if (steps == 2 && temb.world.random.nextInt(5) != 0) return;
-				RenderLibrary.renderModel(poseStack, nodeCollector, RenderTypes.lightning(), 0.5F, 2.5F, 0.5F, temb.getBlockPos().getX() - renderState.blockPos.getX(), temb.getBlockPos().getY() - renderState.blockPos.getY() - 2.5f, temb.getBlockPos().getZ() - renderState.blockPos.getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
+				RenderLibrary.renderModel(poseStack, nodeCollector, RenderTypes.lightning(), 0.5F, 2.5F, 0.5F, temb.pos().getX() - renderState.blockPos.getX(), temb.pos().getY() - renderState.blockPos.getY() - 2.5f, temb.pos().getZ() - renderState.blockPos.getZ(), 0.5f, radius, steps, (temb.edist / 2), 0.1f, 0.45f, 0.45f, 0.5f, 0.5f);
 			}
 		}
 	}
@@ -96,7 +96,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
     @Override
     public int getViewDistance()
     {
-        return 16384;
+        return 128;
     }
 
     @Override
@@ -113,7 +113,7 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
     public void extractRenderState(TileEntityReactor blockEntity, ReactorBlockEntityRenderState renderState, float partialTick, Vec3 cameraPosition, ModelFeatureRenderer.@Nullable CrumblingOverlay breakProgress) {
         BlockEntityRenderer.super.extractRenderState(blockEntity, renderState, partialTick, cameraPosition, breakProgress);
         renderState.slide = (float) blockEntity.slide;
-        renderState.machines = blockEntity.machines;
+        renderState.machines = blockEntity.machines.stream().map(m -> new MachineSnapshot(m.getBlockPos(), m.edist, m.powerGiven)).toList();
         renderState.entries = blockEntity.entries;
         renderState.facing = blockEntity.getBlockState().getValue(BlockReactor.FACING);
     }
@@ -121,8 +121,10 @@ public class TileEntityReactorRenderer implements BlockEntityRenderer<TileEntity
     public static class ReactorBlockEntityRenderState extends BlockEntityRenderState {
         public Direction facing;
         public float slide;
-        public List<TileEntityMachineBase> machines;
+        public List<MachineSnapshot> machines;
         public Map<BlockPos, ReactorMachinesPacket.MachineEntry> entries;
     }
 
+    public record MachineSnapshot(BlockPos pos, float edist, float powerGiven) {
+    }
 }

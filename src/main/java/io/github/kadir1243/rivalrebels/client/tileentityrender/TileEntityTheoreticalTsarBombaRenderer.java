@@ -75,7 +75,7 @@ public class TileEntityTheoreticalTsarBombaRenderer implements BlockEntityRender
     @Override
     public int getViewDistance()
     {
-        return 16384;
+        return 128;
     }
 
     @Override

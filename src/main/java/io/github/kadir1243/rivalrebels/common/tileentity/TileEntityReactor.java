@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
+import com.google.common.collect.Table;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReactor;
 import io.github.kadir1243.rivalrebels.common.core.RRSounds;
@@ -24,6 +25,7 @@ import io.github.kadir1243.rivalrebels.common.util.Translations;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
@@ -219,31 +221,31 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
             }
             float power = ((blockEntity.getFuel().get(RRComponents.ROD_POWER) * blockEntity.getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - blockEntity.getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
             float temp = power;
-            for (BlockEntity te : TileEntityMachineBase.BLOCK_ENTITIES.values()) {
-                if (te instanceof TileEntityMachineBase temb) {
-                    if (level.getBlockEntity(temb.worldPosition) == null) {
-                        double dist = temb.getBlockPos().distSqr(blockPos);
+            for (TileEntityMachineBase te : TileEntityMachineBase.BLOCK_ENTITIES.row(level.dimension()).values()) {
+                if (te != null) {
+                    if (level.getBlockEntity(te.worldPosition) == null) {
+                        double dist = te.getBlockPos().distSqr(blockPos);
                         if (dist < 1024) {
-                            temb.worldPosition = blockPos;
-                            temb.edist = (float) Math.sqrt(dist);
-                            if (!blockEntity.machines.contains(temb)) {
-                                blockEntity.machines.add(temb);
+                            te.worldPosition = blockPos;
+                            te.edist = (float) Math.sqrt(dist);
+                            if (!blockEntity.machines.contains(te)) {
+                                blockEntity.machines.add(te);
                             }
                         }
                     }
-                    if (temb.worldPosition.equals(blockPos)) {
-                        if (!blockEntity.machines.contains(temb)) {
-                            blockEntity.machines.add(temb);
+                    if (te.worldPosition.equals(blockPos)) {
+                        if (!blockEntity.machines.contains(te)) {
+                            blockEntity.machines.add(te);
                         }
-                        temb.powerGiven = power;
-                        if (power > temb.pInM - temb.pInR) {
-                            power -= temb.pInM - temb.pInR;
-                            temb.pInR = temb.pInM;
+                        te.powerGiven = power;
+                        if (power > te.pInM - te.pInR) {
+                            power -= te.pInM - te.pInR;
+                            te.pInR = te.pInM;
                         } else {
-                            temb.pInR += power;
+                            te.pInR += power;
                             power = 0;
                         }
-                        temb.powerGiven -= power;
+                        te.powerGiven -= power;
                     }
                 }
             }
@@ -368,13 +370,12 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
 
     @Override
     public boolean canPlaceItem(int slot, ItemStack stack) {
-		if (slot == 0 && stack.has(RRComponents.CORE_TIME_MULTIPLIER)) {
-			return getFuel().isEmpty() || !on;
-		} else if (slot == 1 && stack.has(RRComponents.ROD_POWER)) {
-			return !on;
-		}
-		return false;
-	}
+        return switch (slot) {
+            case 0 -> stack.has(RRComponents.ROD_POWER) && (getFuel().isEmpty() || !on);
+            case 1 -> stack.has(RRComponents.CORE_TIME_MULTIPLIER) && !on;
+            default -> false;
+        };
+    }
 
     @Override
     public void setRemoved() {

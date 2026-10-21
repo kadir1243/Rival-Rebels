@@ -79,7 +79,7 @@ public class TileEntityLoaderRenderer implements BlockEntityRenderer<TileEntityL
     @Override
     public int getViewDistance()
     {
-        return 16384;
+        return 128;
     }
 
     @Override

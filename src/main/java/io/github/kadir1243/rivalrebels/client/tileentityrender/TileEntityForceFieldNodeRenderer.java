@@ -76,7 +76,7 @@ public class TileEntityForceFieldNodeRenderer implements BlockEntityRenderer<Til
     @Override
     public int getViewDistance()
     {
-        return 16384;
+        return 128;
     }
 
     @Override

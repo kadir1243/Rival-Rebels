@@ -77,7 +77,7 @@ public class TileEntityPlasmaExplosionRenderer implements BlockEntityRenderer<Ti
     @Override
     public int getViewDistance()
     {
-        return 16384;
+        return 128;
     }
 
     @Override

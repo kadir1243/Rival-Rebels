@@ -11,9 +11,10 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
-import java.util.HashMap;
-import java.util.Map;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import net.minecraft.core.BlockPos;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -22,7 +23,7 @@ import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 
 public abstract class TileEntityMachineBase extends BlockEntity {
-    public static final Map<BlockPos, TileEntityMachineBase> BLOCK_ENTITIES = new HashMap<>();
+    public static final Table<ResourceKey<Level>, BlockPos, TileEntityMachineBase> BLOCK_ENTITIES = HashBasedTable.create();
 	public float	pInM		= 0;
 	public float	pInR		= 0;
 	public float	edist		= 0;
@@ -32,8 +33,15 @@ public abstract class TileEntityMachineBase extends BlockEntity {
 
     public TileEntityMachineBase(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
+    }
 
-        BLOCK_ENTITIES.put(pos, this);
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+
+        if (!level.isClientSide()) {
+            BLOCK_ENTITIES.put(level.dimension(), getBlockPos(), this);
+        }
     }
 
     public static void tick(Level level, BlockPos blockPos, BlockState blockState, TileEntityMachineBase blockEntity) {
@@ -59,9 +67,13 @@ public abstract class TileEntityMachineBase extends BlockEntity {
     @Override
     public void setRemoved() {
         super.setRemoved();
-		BlockEntity connectedTo = level.getBlockEntity(worldPosition);
-		if (connectedTo instanceof TileEntityReactor) ((TileEntityReactor)connectedTo).machines.remove(this);
-        BLOCK_ENTITIES.remove(getBlockPos());
+        if (getLevel() != null) {
+            BlockEntity connectedTo = getLevel().getBlockEntity(worldPosition);
+            if (connectedTo instanceof TileEntityReactor) ((TileEntityReactor)connectedTo).machines.remove(this);
+            if (!getLevel().isClientSide()) {
+                BLOCK_ENTITIES.remove(getLevel().dimension(), getBlockPos());
+            }
+        }
 	}
 
 	public abstract float powered(float power, float distance);

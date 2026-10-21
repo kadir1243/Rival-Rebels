@@ -56,33 +56,32 @@ public class RenderLibrary {
 		yv[0] = 0;
 		zv[0] = 0;
 
-        for (int o = 0; o < steps; o++) {
-			for (int i = 1; i < segNum; i++) {
-                float s = rs * o;
-                int finalI = i;
-                nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] - s).setColor(color);
+        nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
+            for (int o = 0; o < steps; o++) {
+                for (int i = 1; i < segNum; i++) {
+                    float s = rs * o;
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] + s, zv[i] + s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] + s, zv[i] - s).setColor(color);
 
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] + s).setColor(color);
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] + s, zv[i - 1] + s).setColor(color);
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] - s, zv[i] + s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] + s, zv[i] + s).setColor(color);
 
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] + s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] + s, zv[finalI] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] - s).setColor(color);
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] + s, zv[i - 1] - s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] + s, zv[i] - s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] - s, zv[i] - s).setColor(color);
 
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] + s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI - 1], yv[finalI - 1] - s, zv[finalI - 1] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] - s).setColor(color);
-                    consumer.addVertex(pose, xv[finalI], yv[finalI] - s, zv[finalI] + s).setColor(color);
-                });
-			}
-		}
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] - s, zv[i - 1] + s).setColor(color);
+                    buffer.addVertex(pose, xv[i - 1], yv[i - 1] - s, zv[i - 1] - s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] - s, zv[i] - s).setColor(color);
+                    buffer.addVertex(pose, xv[i], yv[i] - s, zv[i] + s).setColor(color);
+                }
+            }
+        });
 
 		poseStack.popPose();
 	}

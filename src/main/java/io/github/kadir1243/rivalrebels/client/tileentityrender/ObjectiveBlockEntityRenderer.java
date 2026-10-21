@@ -56,7 +56,7 @@ public abstract class ObjectiveBlockEntityRenderer<T extends AbstractObjectiveBl
     @Override
     public int getViewDistance()
     {
-        return 16384;
+        return 128;
     }
 
     @Override
