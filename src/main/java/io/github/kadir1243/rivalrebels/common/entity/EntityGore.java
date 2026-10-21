@@ -449,10 +449,8 @@ public class EntityGore extends EntityInanimate {
 		setMob(valueInput.getInt("Mob").orElseThrow());
 		setTypeOfGore(valueInput.getInt("TypeOfGore").orElseThrow());
 		setGreen(valueInput.getBooleanOr("Green", false));
-        if (valueInput.child("owner").isPresent()) {
-            EntityReference<LivingEntity> owner = EntityReference.readWithOldOwnerConversion(valueInput, "owner", this.level());
-            entityData.set(OWNER, Optional.ofNullable(owner));
-        }
+        EntityReference<LivingEntity> owner = EntityReference.readWithOldOwnerConversion(valueInput, "owner", this.level());
+        entityData.set(OWNER, Optional.ofNullable(owner));
 	}
 
     @Override

@@ -79,26 +79,23 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
     protected void loadAdditional(ValueInput valueInput) {
         super.loadAdditional(valueInput);
         ContainerHelper.loadAllItems(valueInput, items);
-		consumed = valueInput.getDoubleOr("consumed", 0);
-		on = valueInput.getBooleanOr("on", false);
+        consumed = valueInput.getDoubleOr("consumed", 0);
+        on = valueInput.getBooleanOr("on", false);
         lasttickconsumed = valueInput.getDoubleOr("lasttickconsumed", 0D);
         melt = valueInput.getBooleanOr("melt", false);
         eject = valueInput.getBooleanOr("eject", false);
-		int i = 0;
-		while (valueInput.child("mpos" + i).isPresent()) {
-            if (hasLevel()) {
-				BlockEntity te = level.getBlockEntity(BlockPos.of(valueInput.getLongOr("mpos" + i, 0L)));
-                if (te instanceof TileEntityMachineBase machineBase) {
-                    machineBase.powerGiven = valueInput.getFloatOr("mpowerGiven" + i, 0F);
-                    machineBase.pInR = valueInput.getFloatOr("mpInR" + i, 0F);
-                    machineBase.worldPosition = getBlockPos();
-                    machineBase.edist = (float) Math.sqrt(machineBase.getBlockPos().distSqr(getBlockPos()));
-                    machines.add(machineBase);
-				}
-			}
-			i++;
-		}
-	}
+        int machinesSize = valueInput.getIntOr("machines_size", 0);
+        for (int i = 0; i < machinesSize && hasLevel(); i++) {
+            BlockEntity te = level.getBlockEntity(BlockPos.of(valueInput.getLongOr("mpos" + i, 0L)));
+            if (te instanceof TileEntityMachineBase machineBase) {
+                machineBase.powerGiven = valueInput.getFloatOr("mpowerGiven" + i, 0F);
+                machineBase.pInR = valueInput.getFloatOr("mpInR" + i, 0F);
+                machineBase.worldPosition = getBlockPos();
+                machineBase.edist = (float) Math.sqrt(machineBase.getBlockPos().distSqr(getBlockPos()));
+                machines.add(machineBase);
+            }
+        }
+    }
 
     @Override
     protected void saveAdditional(ValueOutput valueOutput) {
@@ -111,6 +108,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
         valueOutput.putBoolean("melt", melt);
         valueOutput.putBoolean("eject", eject);
 		if (on) {
+            valueOutput.putInt("machines_size", machines.size());
             for (int i = 0; i < machines.size(); i++) {
                 TileEntityMachineBase te = machines.get(i);
                 if (te == null || te instanceof TileEntityReactive) continue;
@@ -228,11 +226,15 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
                         if (dist < 1024) {
                             temb.worldPosition = blockPos;
                             temb.edist = (float) Math.sqrt(dist);
-                            blockEntity.machines.add(temb);
+                            if (!blockEntity.machines.contains(temb)) {
+                                blockEntity.machines.add(temb);
+                            }
                         }
                     }
                     if (temb.worldPosition.equals(blockPos)) {
-                        blockEntity.machines.add(temb);
+                        if (!blockEntity.machines.contains(temb)) {
+                            blockEntity.machines.add(temb);
+                        }
                         temb.powerGiven = power;
                         if (power > temb.pInM - temb.pInR) {
                             power -= temb.pInM - temb.pInR;
@@ -327,19 +329,19 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
 	}
 
     public ItemStack getCore() {
-        return this.items.getFirst();
-    }
-
-    public void setCore(ItemStack core) {
-        this.setItem(0, core);
-    }
-
-    public ItemStack getFuel() {
         return this.items.get(1);
     }
 
+    public void setCore(ItemStack core) {
+        this.setItem(1, core);
+    }
+
+    public ItemStack getFuel() {
+        return this.items.getFirst();
+    }
+
     public void setFuel(ItemStack fuel) {
-        this.setItem(1, fuel);
+        this.setItem(0, fuel);
     }
 
     @Override

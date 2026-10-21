@@ -64,5 +64,5 @@ public abstract class TileEntityMachineBase extends BlockEntity {
         BLOCK_ENTITIES.remove(getBlockPos());
 	}
 
-	abstract public float powered(float power, float distance);
+	public abstract float powered(float power, float distance);
 }
