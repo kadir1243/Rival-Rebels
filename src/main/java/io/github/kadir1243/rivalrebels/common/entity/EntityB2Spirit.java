@@ -245,14 +245,14 @@ public class EntityB2Spirit extends Projectile {
 
     @Override
     protected void readAdditionalSaveData(ValueInput valueInput) {
-		entityIndex = valueInput.getInt("drop").orElseThrow();
+		entityIndex = valueInput.getIntOr("drop", 0);
 		carpet = entityIndex < ItemRoda.rodaindex;
 		tx = valueInput.getFloatOr("tx", 0);
 		ty = valueInput.getFloatOr("ty", 0);
 		tz = valueInput.getFloatOr("tz", 0);
-		ticksSinceStart = valueInput.getInt("age").orElseThrow();
-		health = valueInput.getInt("health").orElseThrow();
-		timeLeft = valueInput.getInt("duration").orElseThrow();
+		ticksSinceStart = valueInput.getIntOr("age", 0);
+		health = valueInput.getIntOr("health", 0);
+		timeLeft = valueInput.getIntOr("duration", 0);
 		if (ticksSinceStart == 0)
 		{
 			double dx = tx - getX();

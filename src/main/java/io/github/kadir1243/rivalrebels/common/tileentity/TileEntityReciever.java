@@ -414,14 +414,14 @@ public class TileEntityReciever extends TileEntityMachineBase implements Contain
         super.loadAdditional(valueInput);
 
         ContainerHelper.loadAllItems(valueInput, this.chestContents);
-		yawLimit = valueInput.getInt("yawLimit").orElse(0);
+		yawLimit = valueInput.getIntOr("yawLimit", 0);
 		kPlayers = valueInput.getBooleanOr("kPlayers", false);
 		kTeam = valueInput.getBooleanOr("kTeam", false);
 		kMobs = valueInput.getBooleanOr("kMobs", false);
 		hasWeapon = valueInput.getBooleanOr("hasWeapon", false);
         owner = valueInput.read("owner", ResolvableProfile.CODEC).orElse(null);
 		team = valueInput.read("team", RivalRebelsTeam.CODEC).orElse(RivalRebelsTeam.NONE);
-		entityIndex = valueInput.getInt("entityIndex").orElse(0);
+		entityIndex = valueInput.getIntOr("entityIndex", 0);
 	}
 
     @Override

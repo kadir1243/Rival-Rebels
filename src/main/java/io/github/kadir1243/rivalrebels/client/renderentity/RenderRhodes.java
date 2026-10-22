@@ -22,7 +22,7 @@ import io.github.kadir1243.rivalrebels.common.round.RivalRebelsPlayer;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.renderer.SubmitNodeCollector;
-import net.minecraft.client.renderer.entity.state.EntityRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.client.renderer.rendertype.RenderTypes;
 import net.minecraft.client.renderer.state.level.CameraRenderState;
@@ -30,10 +30,10 @@ import net.minecraft.client.resources.model.ModelManager;
 import net.minecraft.client.resources.model.geometry.QuadCollection;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
@@ -114,10 +114,10 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
     }
 
     @Override
-    protected void submitNameDisplay(State renderState, PoseStack poseStack, SubmitNodeCollector nodeCollector, CameraRenderState cameraRenderState) {
+    protected void submitNameDisplay(State state, PoseStack poseStack, SubmitNodeCollector submitNodeCollector, CameraRenderState camera) {
         int color = 0;
-        if (renderState.rider != null) {
-            RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(renderState.rider.getGameProfile());
+        if (state.rider != null) {
+            RivalRebelsPlayer rrp = RivalRebels.round.rrplayerlist.getForGameProfile(state.rider.getGameProfile());
             color = switch (rrp.rrteam) {
                 case OMEGA -> 0xFF44FF44;
                 case SIGMA -> 0xFF4444FF;
@@ -125,15 +125,8 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
             };
         }
         poseStack.pushPose();
-        poseStack.translate(0, 16, 0);
-        poseStack.rotate(cameraRenderState.orientation);
-        poseStack.scale(0.025F, -0.025F, 0.025F);
-        float f = Minecraft.getInstance().options.getBackgroundOpacity(0.25F);
-        int j = (int)(f * 255.0F) << 24;
-        Font font = this.getFont();
-        float x = (float)(-font.width(renderState.displayName) / 2);
-        nodeCollector.submitText(poseStack, x, 0, renderState.displayName.getVisualOrderText(), false, Font.DisplayMode.SEE_THROUGH, renderState.lightCoords, color, j, CommonColors.WHITE);
-        nodeCollector.submitText(poseStack, x, 0, renderState.displayName.getVisualOrderText(), false, Font.DisplayMode.NORMAL, renderState.lightCoords, color, 0, CommonColors.WHITE);
+
+        submitNodeCollector.submitNameTag(poseStack, new Vec3(0, 15.5, 0), 0, state.displayName.copy().withColor(color), !state.isDiscrete, state.lightCoords, camera);
 
         poseStack.popPose();
     }
@@ -481,7 +474,7 @@ public class RenderRhodes extends EntityRenderer<EntityRhodes, RenderRhodes.Stat
         reusedState.displayName = name;
     }
 
-    public static class State extends EntityRenderState {
+    public static class State extends LivingEntityRenderState {
         public Player rider;
         public float health;
         public float scale;

@@ -11,6 +11,8 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.entity;
 
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 import io.github.kadir1243.rivalrebels.RRClient;
 import io.github.kadir1243.rivalrebels.RRConfig;
 import io.github.kadir1243.rivalrebels.RivalRebels;
@@ -40,6 +42,7 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
@@ -74,7 +77,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.level.entity.LevelEntityGetter;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.phys.AABB;
@@ -105,15 +107,15 @@ public class EntityRhodes extends LivingEntity {
         BlackList.of(BlockTags.BASE_STONE_OVERWORLD),
         BlackList.of(BlockTags.BASE_STONE_NETHER),
         BlackList.of(BlockTags.SAND),
-        BlackList.of(Blocks.SANDSTONE),
-        BlackList.of(Blocks.GRAVEL),
-        BlackList.of(Blocks.IRON_BLOCK),
-        BlackList.of(Blocks.LAPIS_BLOCK),
+        BlackList.of(ModBlockTags.SANDSTONE_BLOCKS),
+        BlackList.of(ModBlockTags.GRAVELS),
+        BlackList.of(ModBlockTags.STORAGE_BLOCKS_IRON),
+        BlackList.of(ModBlockTags.STORAGE_BLOCKS_LAPIS),
         BlackList.of(BlockTags.SLABS),
         BlackList.of(BlockTags.STONE_BRICKS),
-        BlackList.of(Blocks.COBBLESTONE),
-        BlackList.of(Blocks.OBSIDIAN),
-        BlackList.of(Blocks.END_STONE),
+        BlackList.of(ModBlockTags.COBBLESTONES),
+        BlackList.of(ModBlockTags.OBSIDIANS),
+        BlackList.of(ModBlockTags.END_STONES),
         BlackList.of(BlockTags.TERRACOTTA),
         BlackList.of(ModBlockTags.GLAZED_TERRACOTTAS),
         BlackList.of(RRBlocks.reactive.get())
@@ -167,7 +169,7 @@ public class EntityRhodes extends LivingEntity {
 	public static String texloc = "";
 
     public BlockPos wakePos = new BlockPos(-1, -1, -1);
-    private Block b;
+    private boolean partsSpawned = false;
 
     public EntityRhodes(EntityType<? extends EntityRhodes> type, Level world) {
         super(type, world);
@@ -176,7 +178,6 @@ public class EntityRhodes extends LivingEntity {
 	public EntityRhodes(Level w) {
 		this(RREntities.RHODES.get(), w);
         this.getAttribute(Attributes.MAX_HEALTH).setBaseValue(RRConfig.SERVER.getRhodesHealth());
-		noPhysics = true;
 		//pushSpeedReduction = 100;
         this.playSound(RRSounds.LAPTOP2.get(), 90, 1);
         setFlagTextureLocation(texloc);
@@ -214,12 +215,9 @@ public class EntityRhodes extends LivingEntity {
 
     @Override
 	public void tick() {
+        super.tick();
 		if ((wakePos.getY() != -1) && !level().getBlockState(wakePos).is(RRBlocks.rhodesactivator)) {
 			damageUntilWake -= 100;
-		}
-		if (getY() <= level().getMinY()) {
-			kill((ServerLevel) level());
-			return;
 		}
         makeStuckInBlock(Blocks.COBWEB.defaultBlockState(), new Vec3(0.25, 0.05F, 0.25));
         fallDistance = 0.0F;
@@ -236,7 +234,6 @@ public class EntityRhodes extends LivingEntity {
 			leftlegheight *= getScale();
 			rightlegheight *= getScale();
 			float bodyY = Math.max(leftlegheight, rightlegheight);
-            this.aiStep();
             if (!level().isClientSide()) {
 				doAITick(syaw, cyaw);
 				breakBlocks(syaw, cyaw, leftlegheight, rightlegheight, bodyY);
@@ -246,11 +243,8 @@ public class EntityRhodes extends LivingEntity {
                     }
                 }
 			}
-            Vec3 add = getDeltaMovement().add(position());
-            setPosRaw(add.x(), add.y(), add.z());
-			if (tickCount % 3 == 0) doCollisions();
+			if (tickCount % 3 == 0 && !level().isClientSide()) doCollisions();
 			ticksSinceLastPacket++;
-            reapplyPosition();
 
 			if (level().isClientSide()) RRClient.rrro.setOverlay(this);
 
@@ -299,36 +293,31 @@ public class EntityRhodes extends LivingEntity {
 		{
 			if (!level().isClientSide())
 			{
-				if (isDeadOrDying()) {
-                    MutableComponent text = Translations.status().append(" ").append(getName()).append(" ").append(Translations.WARNING_MELTDOWN.translate()).append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
-                    for (Player player : level().players()) {
-                        player.sendSystemMessage(text);
-                    }
-                }
 				if (tickCount % 5 == 0) {
                     for (Player player : level().players()) {
                         ((ServerPlayer) player).connection.send(new RhodesPacket(this));
                     }
                 }
-				if (getHealth() < -100) {
-					kill((ServerLevel) level());
-				}
-				if (isDeadOrDying()) {
-					float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
-					float cyaw = Mth.cos(bodyyaw * Mth.DEG_TO_RAD);
-					level().addFreshEntity(new EntityRhodesHead(level(), getX(), getY()+13*getScale(), getZ(), getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesTorso(level(), getX(), getY()+7*getScale(), getZ(), getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesLeftUpperArm(level(), getX()+cyaw*6.4*getScale(), getY()+7*getScale(), getZ()+syaw*6.4*getScale(),getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesRightUpperArm(level(), getX()-cyaw*6.4*getScale(), getY()+7*getScale(), getZ()-syaw*6.4*getScale(),getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesLeftLowerArm(level(), getX()+cyaw*6.4*getScale(), getY()+3*getScale(), getZ()+syaw*6.4*getScale(),getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesRightLowerArm(level(), getX()-cyaw*6.4*getScale(), getY()+3*getScale(), getZ()-syaw*6.4*getScale(),getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesLeftUpperLeg(level(), getX()+cyaw*3*getScale(), getY()-3*getScale(), getZ()+syaw*3*getScale(),getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesRightUpperLeg(level(), getX()-cyaw*3*getScale(), getY()-3*getScale(), getZ()-syaw*3*getScale(),getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesLeftLowerLeg(level(), getX()+cyaw*3*getScale(), getY()-10*getScale(), getZ()+syaw*3*getScale(),getScale(), getVariant()));
-					level().addFreshEntity(new EntityRhodesRightLowerLeg(level(), getX()-cyaw*3*getScale(), getY()-10*getScale(), getZ()-syaw*3*getScale(),getScale(), getVariant()));
-				}
+                if (isDeadOrDying() && !partsSpawned) {
+                    partsSpawned = true;
+                    MutableComponent text = Translations.status().append(" ").append(getName()).append(" ").append(Translations.WARNING_MELTDOWN.translate()).append((rider == null ? Component.empty() : Component.empty().append(" ").append(rider.getName())));
+                    for (Player player : level().players()) {
+                        player.sendSystemMessage(text);
+                    }
+                    float syaw = Mth.sin(bodyyaw * Mth.DEG_TO_RAD);
+                    float cyaw = Mth.cos(bodyyaw * Mth.DEG_TO_RAD);
+                    level().addFreshEntity(new EntityRhodesHead(level(), getX(), getY() + 13 * getScale(), getZ(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesTorso(level(), getX(), getY() + 7 * getScale(), getZ(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesLeftUpperArm(level(), getX() + cyaw * 6.4 * getScale(), getY() + 7 * getScale(), getZ() + syaw * 6.4 * getScale(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesRightUpperArm(level(), getX() - cyaw * 6.4 * getScale(), getY() + 7 * getScale(), getZ() - syaw * 6.4 * getScale(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesLeftLowerArm(level(), getX() + cyaw * 6.4 * getScale(), getY() + 3 * getScale(), getZ() + syaw * 6.4 * getScale(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesRightLowerArm(level(), getX() - cyaw * 6.4 * getScale(), getY() + 3 * getScale(), getZ() - syaw * 6.4 * getScale(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesLeftUpperLeg(level(), getX() + cyaw * 3 * getScale(), getY() - 3 * getScale(), getZ() + syaw * 3 * getScale(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesRightUpperLeg(level(), getX() - cyaw * 3 * getScale(), getY() - 3 * getScale(), getZ() - syaw * 3 * getScale(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesLeftLowerLeg(level(), getX() + cyaw * 3 * getScale(), getY() - 10 * getScale(), getZ() + syaw * 3 * getScale(), getScale(), getVariant()));
+                    level().addFreshEntity(new EntityRhodesRightLowerLeg(level(), getX() - cyaw * 3 * getScale(), getY() - 10 * getScale(), getZ() - syaw * 3 * getScale(), getScale(), getVariant()));
+                }
 			}
-            setHealth(getHealth() - 1);
 		}
 
 		if (rider != null)
@@ -389,6 +378,14 @@ public class EntityRhodes extends LivingEntity {
 
 		prevflame = flame;
 	}
+
+    protected void tickDeath() {
+        this.deathTime++;
+        if (this.deathTime >= 100 && !this.level().isClientSide() && !this.isRemoved()) {
+            this.level().broadcastEntityEvent(this, (byte)60);
+            this.remove(Entity.RemovalReason.KILLED);
+        }
+    }
 
     @Override
     protected void serverAiStep() {
@@ -580,7 +577,9 @@ public class EntityRhodes extends LivingEntity {
 	}
 
 	private void doCollisions() {
-        for (Entity e : level().getEntities(this, AABB.of(BoundingBox.infinite()))) {
+        double margin = Math.max(2.0, 2.0 * Math.abs(getScale()));
+        AABB searchBox = getBoundingBox().inflate(margin);
+        for (Entity e : level().getEntities(this, searchBox)) {
             if (e == rider || e == passenger1 || e == passenger2) continue;
             double bbd = (e.getBbWidth() + 10 * getScale()) * 0.5;
             double bbh = (e.getBbHeight() + 30 * getScale()) * 0.5;
@@ -731,7 +730,7 @@ public class EntityRhodes extends LivingEntity {
                     }
                 }
             }
-            for (BlockEntity e1 : BLOCK_ENTITIES.values()) {
+            for (BlockEntity e1 : BLOCK_ENTITIES.row(level().dimension()).values()) {
                 if (e1 instanceof TileEntityRhodesActivator || e1 instanceof TileEntityNukeCrate || e1 instanceof TileEntityReactor) {
                     float dx = (float) e1.getBlockPos().getX() - px;
                     float dz = (float) e1.getBlockPos().getZ() - pz;
@@ -1353,7 +1352,7 @@ public class EntityRhodes extends LivingEntity {
 	private int lastshot;
 	private int shotstaken;
 
-    public static final Map<BlockPos, BlockEntity> BLOCK_ENTITIES = new HashMap<>();
+    public static final Table<ResourceKey<Level>, BlockPos, BlockEntity> BLOCK_ENTITIES = HashBasedTable.create();
 
     //lower is less prior
     public float getPriority(Entity e) {
@@ -1494,15 +1493,18 @@ public class EntityRhodes extends LivingEntity {
 		leftshinpitch = valueInput.getFloatOr("leftshinpitch", 0);
 		rightshinpitch = valueInput.getFloatOr("rightshinpitch", 0);
 		endangered = valueInput.getBooleanOr("endangered", false);
-		walkstate = valueInput.getInt("walkstate").orElseThrow();
-		damageUntilWake = valueInput.getInt("damageuntilwake").orElseThrow();
-        RivalRebels.RHODES_TYPE_REGISTRY.get(Identifier.tryParse(valueInput.getString("type").orElseThrow())).ifPresent(this::setVariant);
-		setRocketCount(valueInput.getInt("rocketcount").orElseThrow());
-		setEnergy(valueInput.getInt("energy").orElseThrow());
-		setB2Energy(valueInput.getInt("b2energy").orElseThrow());
-		setFlameCount(valueInput.getInt("flamecount").orElseThrow());
-		setNukeCount(valueInput.getInt("nukecount").orElseThrow());
-        setFlagTextureLocation(valueInput.getString("texloc").orElseThrow());
+		walkstate = valueInput.getIntOr("walkstate", 0);
+		damageUntilWake = valueInput.getIntOr("damageuntilwake", 0);
+        Identifier type = Identifier.tryParse(valueInput.getStringOr("type", ""));
+        if (type != null) {
+            RivalRebels.RHODES_TYPE_REGISTRY.get(type).ifPresent(this::setVariant);
+        }
+		setRocketCount(valueInput.getIntOr("rocketcount", 0));
+		setEnergy(valueInput.getIntOr("energy", 0));
+		setB2Energy(valueInput.getIntOr("b2energy", 0));
+		setFlameCount(valueInput.getIntOr("flamecount", 0));
+		setNukeCount(valueInput.getIntOr("nukecount", 0));
+        valueInput.getString("texloc").ifPresent(this::setFlagTextureLocation);
 	}
 
     @Override
@@ -1512,14 +1514,14 @@ public class EntityRhodes extends LivingEntity {
 
     @Override
     protected void actuallyHurt(ServerLevel level, DamageSource damageSource, float amount) {
+        if (amount > 50)
+            this.damageContainers.peek().setNewDamage(50);
         super.actuallyHurt(level, damageSource, amount);
 
         if (amount > 50) {
-            setHealth(getHealth() - 50);
             if (rider == null) damageUntilWake -= 50;
             endangered = true;
         } else {
-            setHealth(getHealth() - amount);
             if (rider == null) damageUntilWake -= amount;
         }
 

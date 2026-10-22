@@ -139,7 +139,7 @@ public class EntityTheoreticalTsar extends ThrowableProjectile
     @Override
     protected void readAdditionalSaveData(ValueInput valueInput) {
         super.readAdditionalSaveData(valueInput);
-		aoc = valueInput.getInt("charge").orElseThrow();
+		aoc = valueInput.getIntOr("charge", 0);
 		hasTrollface = valueInput.getBooleanOr("troll", false);
 		setYRot(yRotO = valueInput.getFloatOr("rot", 0F));
 	}

@@ -141,7 +141,7 @@ public class EntityFlameBall2 extends FlameBallProjectile {
 			else if (state.is(BlockItemTags.COAL_ORES.block()) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(BlockTags.GOLD_ORES) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(BlockItemTags.LAPIS_ORES.block()) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
-			else if (state.is(Blocks.GRAVEL) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
+			else if (state.is(ModBlockTags.GRAVELS) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(ModBlockTags.SANDSTONE_BLOCKS) && random.nextInt(30) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(Blocks.IRON_BLOCK) && random.nextInt(50) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.LAVA.defaultBlockState());
 			else if (state.is(Blocks.BEDROCK) && random.nextInt(500) == 0) level().setBlockAndUpdate(blockPosition(), Blocks.OBSIDIAN.defaultBlockState());

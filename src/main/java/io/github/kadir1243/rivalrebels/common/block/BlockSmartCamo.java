@@ -37,7 +37,7 @@ public class BlockSmartCamo extends Block
                 if (getBlockState(world, pos.below()).is(BlockTags.SAND) || getBlockState(world, pos.below()).is(ModBlockTags.SANDSTONE_BLOCKS)) {
                     setBlock(world, pos, RRBlocks.camo2.get());
                 } else {
-                    if (getBlockState(world, pos.below()).is(BlockTags.BASE_STONE_OVERWORLD) || getBlockState(world, pos.below()).is(Blocks.GRAVEL) || getBlockState(world, pos.below()).is(Blocks.BEDROCK) || getBlockState(world, pos.below()).is(Blocks.COBBLESTONE)) {
+                    if (getBlockState(world, pos.below()).is(BlockTags.BASE_STONE_OVERWORLD) || getBlockState(world, pos.below()).is(ModBlockTags.GRAVELS) || getBlockState(world, pos.below()).is(Blocks.BEDROCK) || getBlockState(world, pos.below()).is(Blocks.COBBLESTONE)) {
                         setBlock(world, pos, RRBlocks.camo3.get());
                     } else {
                         if (getBlockState(world, pos.below()).is(RRBlocks.camo2) || getBlockState(world, pos.east()).is(RRBlocks.camo2) || getBlockState(world, pos.west()).is(RRBlocks.camo2) || getBlockState(world, pos.south()).is(RRBlocks.camo2) || getBlockState(world, pos.north()).is(RRBlocks.camo2) || getBlockState(world, pos.above()).is(RRBlocks.camo2)) {

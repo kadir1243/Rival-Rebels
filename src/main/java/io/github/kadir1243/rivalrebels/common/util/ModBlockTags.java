@@ -13,4 +13,11 @@ public class ModBlockTags {
     public static final TagKey<Block> SANDSTONE_BLOCKS = Tags.Blocks.SANDSTONE_BLOCKS;
     public static final TagKey<Block> GLAZED_TERRACOTTAS = Tags.Blocks.GLAZED_TERRACOTTAS;
     public static final TagKey<Block> ORES = Tags.Blocks.ORES;
+    public static final TagKey<Block> STORAGE_BLOCKS_IRON = Tags.Blocks.STORAGE_BLOCKS_IRON;
+    public static final TagKey<Block> STORAGE_BLOCKS_LAPIS = Tags.Blocks.STORAGE_BLOCKS_LAPIS;
+    public static final TagKey<Block> END_STONES = Tags.Blocks.END_STONES;
+    public static final TagKey<Block> COBBLESTONES = Tags.Blocks.COBBLESTONES;
+    public static final TagKey<Block> OBSIDIANS = Tags.Blocks.OBSIDIANS;
+    public static final TagKey<Block> GRAVELS = Tags.Blocks.GRAVELS;
+
 }

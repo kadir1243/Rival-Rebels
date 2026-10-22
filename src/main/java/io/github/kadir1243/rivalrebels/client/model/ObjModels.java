@@ -19,6 +19,9 @@ import net.neoforged.neoforge.client.model.standalone.SimpleUnbakedStandaloneMod
 import net.neoforged.neoforge.client.model.standalone.StandaloneModelKey;
 import net.neoforged.neoforge.client.model.standalone.UnbakedStandaloneModel;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ObjModels {
     public static final StandaloneModelKey<QuadCollection> B2_JET_FOR_RHODES_MODEL = createKey("b2_jet_for_rhodes");
     public static final StandaloneModelKey<QuadCollection> HEAD_MODEL = createKey("head");
@@ -66,13 +69,15 @@ public class ObjModels {
         return new StandaloneModelKey<>(location::toString);
     }
 
+    private static final ThreadLocal<QuadInstance> QUAD_KEY_THREAD_LOCAL = ThreadLocal.withInitial(QuadInstance::new);
+
     @OnlyIn(Dist.CLIENT)
     public static void submit(SubmitNodeCollector nodeCollector, RenderType renderType, QuadCollection model, PoseStack poseStack, int color, int light, int overlay) {
+        if (model == null) {
+            throw new NullPointerException("Model is null");
+        }
         nodeCollector.submitCustomGeometry(poseStack, renderType, (pose, consumer) -> {
-            if (model == null) {
-                throw new NullPointerException("Model is null");
-            }
-            QuadInstance quadInstance = new QuadInstance();
+            QuadInstance quadInstance = QUAD_KEY_THREAD_LOCAL.get();
             quadInstance.setColor(color);
             quadInstance.setLightCoords(light);
             quadInstance.setOverlayCoords(overlay);

@@ -106,7 +106,9 @@ public class EntityRhodesPiece extends Entity {
 		{
             setDeltaMovement(getDeltaMovement().subtract(0, 0.1, 0));
 		}
-		move(MoverType.SELF, getDeltaMovement());
+        if (!level().isClientSide()) {
+            move(MoverType.SELF, getDeltaMovement());
+        }
 	}
 
 	public int getMaxAge()

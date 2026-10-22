@@ -11,6 +11,7 @@
  *******************************************************************************/
 package io.github.kadir1243.rivalrebels.common.tileentity;
 
+import com.google.common.collect.HashBasedTable;
 import com.google.common.collect.Table;
 import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.container.ContainerReactor;
@@ -73,8 +74,12 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
 
     public TileEntityReactor(BlockPos pos, BlockState state) {
         super(RRTileEntities.REACTOR.get(), pos, state);
+    }
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
 
-        EntityRhodes.BLOCK_ENTITIES.put(pos, this);
+        EntityRhodes.BLOCK_ENTITIES.put(level.dimension(), getBlockPos(), this);
     }
 
     @Override
@@ -221,7 +226,7 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
             }
             float power = ((blockEntity.getFuel().get(RRComponents.ROD_POWER) * blockEntity.getCore().get(RRComponents.CORE_TIME_MULTIPLIER)) - blockEntity.getFuel().getOrDefault(RRComponents.REACTOR_FUEL_LEFT, 0));
             float temp = power;
-            for (TileEntityMachineBase te : TileEntityMachineBase.BLOCK_ENTITIES.row(level.dimension()).values()) {
+            for (TileEntityMachineBase te : HashBasedTable.create(TileEntityMachineBase.BLOCK_ENTITIES).row(level.dimension()).values()) {
                 if (te != null) {
                     if (level.getBlockEntity(te.worldPosition) == null) {
                         double dist = te.getBlockPos().distSqr(blockPos);
@@ -386,7 +391,8 @@ public class TileEntityReactor extends BaseContainerBlockEntity {
             machine.worldPosition = BlockPos.ZERO;
             machine.edist = 0;
         }
-        EntityRhodes.BLOCK_ENTITIES.remove(getBlockPos());
+        if (hasLevel())
+            EntityRhodes.BLOCK_ENTITIES.remove(getLevel().dimension(), getBlockPos());
     }
 
 	public float getPower() {

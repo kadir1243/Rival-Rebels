@@ -45,7 +45,7 @@ public class BlackList {
         of(Blocks.WATER),
         of(Blocks.LAVA),
         of(ModBlockTags.GLASS_BLOCKS),
-        of(Blocks.OBSIDIAN),
+        of(ModBlockTags.OBSIDIANS),
         of(ModBlockTags.GLASS_PANES),
         of(RRBlocks.nuclearBomb.get()),
         of(RRBlocks.tsarbombablock.get()),

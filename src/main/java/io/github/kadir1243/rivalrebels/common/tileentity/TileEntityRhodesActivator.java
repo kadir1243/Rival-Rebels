@@ -15,6 +15,7 @@ import io.github.kadir1243.rivalrebels.common.block.RRBlocks;
 import io.github.kadir1243.rivalrebels.common.block.autobuilds.BlockRhodesScaffold;
 import io.github.kadir1243.rivalrebels.common.entity.EntityRhodes;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,8 +26,14 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
         super(RRTileEntities.RHODES_ACTIVATOR.get(), pos, state);
         pInM = 40;
 		pInR = 20;
-        EntityRhodes.BLOCK_ENTITIES.put(pos, this);
 	}
+
+    @Override
+    public void setLevel(Level level) {
+        super.setLevel(level);
+
+        EntityRhodes.BLOCK_ENTITIES.put(level.dimension(), getBlockPos(), this);
+    }
 
 	@Override
 	public float powered(float power, float distance)
@@ -244,6 +251,7 @@ public class TileEntityRhodesActivator extends TileEntityMachineBase {
     @Override
     public void setRemoved() {
         super.setRemoved();
-        EntityRhodes.BLOCK_ENTITIES.remove(getBlockPos());
+        if (hasLevel())
+            EntityRhodes.BLOCK_ENTITIES.remove(getLevel().dimension(), getBlockPos());
     }
 }
